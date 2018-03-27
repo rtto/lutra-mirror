@@ -14,7 +14,7 @@ public class SpecificTemplateTest extends TemplateAllTestsBase {
 		super(file);
 	}
 
-	private static String root = "../../"; // Root for gitlab repos
+	//private static String root = "../../"; // Root for gitlab repos
 
 	@Parameters(name = "{index}: {0}")
 	public static Collection<String[]> data () throws IOException {

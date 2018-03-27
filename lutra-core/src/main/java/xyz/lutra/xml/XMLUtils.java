@@ -1,6 +1,5 @@
 package xyz.lutra.xml;
 
-import java.io.ByteArrayOutputStream;
 import java.io.StringReader;
 import java.io.StringWriter;
 
@@ -75,6 +74,7 @@ public abstract class XMLUtils {
 		return element;
 	}
 	
+	/*
 	private static String applyXSLT (String xsltPath, String sourcePath) throws TransformerException {
 		TransformerFactory tfactory = new net.sf.saxon.TransformerFactoryImpl();
 
@@ -87,4 +87,5 @@ public abstract class XMLUtils {
 		
 		return output.toString();
 	}
+	*/
 }

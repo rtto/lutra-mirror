@@ -46,17 +46,19 @@ public class stOTTRWriter {
 
 	private final static String modeSep = " | ";
 	private final static String modeCross = "X ";
-	private final static String modeZip = "Z ";
+	//private final static String modeZip = "Z ";
 
 	private final static String listStart = "<";
 	private final static String listEnd = ">";
 	private final static String listSep = ", ";
 
+	/*
 	private final static String command = "$";
 	private final static String commandArgStart = "(";
 	private final static String commandArgEnd = ")";
 	private final static String commandArgSep = ", ";
-
+	*/
+	
 	private final static String prefix = "@prefix ";
 	private final static String prefixSep = ": ";
 	private final static String prefixNsStart = "<";

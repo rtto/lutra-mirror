@@ -17,21 +17,23 @@ public class XSLT {
 	String root = "src/test/resources/xslt/";
 	String webroot = "../lutra-servlet/src/main/webapp/xsl/";
 	
+	private void print (String s) {
+		// disable printing for now
+		//System.out.println(s);
+	}
+	
 	@Test public void shouldCopyBody () throws TransformerException {
-		String result = applyXSLT(root + "copy.xsl", root + "body.xml");
-		//System.out.println(result);
+		print(applyXSLT(root + "copy.xsl", root + "body.xml"));
 	}
 
 	@Test public void shouldCopyInstance () throws TransformerException {
-		String result = applyXSLT(root + "copy.xsl", root + "instance.xml");
-		//System.out.println(result);
+		print(applyXSLT(root + "copy.xsl", root + "instance.xml"));
 	}
 
 	@Test public void shouldInstantiateBody () throws TransformerException {
-		String result = applyXSLT(root + "copy2.xsl", root + "instance.xml");
-		//System.out.println(result);
+		print(applyXSLT(root + "copy2.xsl", root + "instance.xml"));
 	}
-	
+
 	/*
 	@Test public void shouldGiveRDF () throws TransformerException {
 		String result = applyXSLT(webroot + "lifting-template-instance.xsl", root + "agentrole.xml");
@@ -42,8 +44,7 @@ public class XSLT {
 		String w = Settings.servletRoot + Settings.servletFormatServiceHeadXML 
 				+ "/?" + Settings.servletParamTemplate + "=" 
 				+ "http://candidate.ottr.xyz/owl/axiom/EquivDataMaxCardinality";
-		String result = applyXSLT(webroot + "lifting-template-instance.xsl", w);
-		//System.out.println(result);
+		print(applyXSLT(webroot + "lifting-template-instance.xsl", w));
 	}
 	
 	/*

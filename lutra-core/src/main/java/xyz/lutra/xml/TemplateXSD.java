@@ -153,11 +153,13 @@ public abstract class TemplateXSD {
 		return doc;
 	}
 
+	/*
 	private static Element getParameterRef (Document doc, Parameter parameter) {
 		Element element = doc.createElement(XSD_prefix + ":element");
 		element.setAttribute("ref", getParameneterElementName(parameter));
 		return element;
 	}
+	*/
 
 	private static Element getParameterElement (Document doc, Parameter parameter) {
 		// <xs:element name="NAME" type="TYPE"/>

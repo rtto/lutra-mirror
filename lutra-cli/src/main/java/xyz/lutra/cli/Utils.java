@@ -7,12 +7,6 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 
-import org.apache.commons.io.FileUtils;
-import org.apache.jena.rdf.model.Model;
-
-import osl.util.rdf.ModelIO;
-import osl.util.rdf.ModelIOException;
-
 public class Utils {
 	
 	/*

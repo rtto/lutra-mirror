@@ -16,7 +16,6 @@ import org.slf4j.LoggerFactory;
 
 import osl.util.owl.Ontologies;
 import osl.util.rdf.ModelIO;
-import osl.util.rdf.ModelIOException;
 import osl.util.rdf.Models;
 import osl.util.rdf.PrefixMappings;
 import osl.util.rdf.vocab.Templates;

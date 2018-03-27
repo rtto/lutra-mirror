@@ -15,7 +15,6 @@ import xyz.lutra.Cache;
 import xyz.lutra.Settings;
 import xyz.lutra.model.Parameter;
 import xyz.lutra.model.Template;
-import xyz.lutra.model.VariableArgument;
 import xyz.lutra.parser.ParserException;
 import xyz.lutra.parser.TemplateLoader;
 

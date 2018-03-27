@@ -1,8 +1,6 @@
 package xyz.lutra.model;
 
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -11,8 +9,6 @@ import org.apache.jena.graph.Node;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.RDFList;
 import org.apache.jena.rdf.model.RDFNode;
-import org.apache.jena.rdf.model.Statement;
-import org.apache.jena.rdf.model.StmtIterator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,9 +17,7 @@ import osl.util.rdf.ModelEditorException;
 import osl.util.rdf.ModelIO;
 import osl.util.rdf.Models;
 import osl.util.rdf.RDFLists;
-import xyz.lutra.ExpanderException;
 import xyz.lutra.parser.ParserUtils;
-import xyz.lutra.parser.TemplateInstanceParser;
 
 @SuppressWarnings("rawtypes")
 public class Substitution {

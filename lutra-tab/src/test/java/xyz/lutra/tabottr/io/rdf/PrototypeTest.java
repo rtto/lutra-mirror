@@ -5,11 +5,8 @@ import static org.junit.Assert.assertTrue;
 import java.io.IOException;
 import java.util.List;
 
-import org.apache.jena.rdf.model.Model;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 
-import xyz.lutra.Expander;
-import osl.util.rdf.ModelIO;
 import osl.util.rdf.ModelIOException;
 import xyz.lutra.tabottr.Table;
 import xyz.lutra.tabottr.io.TableReader;
@@ -30,10 +27,10 @@ public class PrototypeTest {
 		
 		RDFWriter writer = new RDFWriter();
 		writer.process(tables);
-		Model instances = writer.write();
+		//Model instances = writer.write();
 		//ModelIO.printModel(instances, ModelIO.format.TURTLE);
 		
-		Model expansion = Expander.expand(instances);
+		//Model expansion = Expander.expand(instances);
 		//ModelIO.printModel(expansion, ModelIO.format.TURTLE);
 		assertTrue(true);
 	}
