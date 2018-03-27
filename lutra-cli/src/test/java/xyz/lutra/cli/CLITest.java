@@ -19,7 +19,7 @@ public class CLITest {
 	public void testNonsense() throws IOException, ModelIOException, InvalidFormatException {
 		CLI.main("nonsense".split(" "));
 	}
-
+	
 	@Test
 	public void shouldExpandSingleLocal() throws IOException, ModelIOException, InvalidFormatException {
 		assumeTrue(Utils.isFolder(resources));

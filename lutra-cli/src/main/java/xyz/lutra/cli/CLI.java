@@ -38,7 +38,10 @@ public class CLI {
 
 	private final static String libExtDefaults = String.join(valueSep+"", "owl", "rdf", "ttl");
 	
+	private final static String name = "lutra";
+	
 	private final static String 
+	version = "version",
 	libFolder = "lib", 
 	libExt = "libExt",
 	expand = "expand",
@@ -53,15 +56,20 @@ public class CLI {
 	noOWLOutput = "noOWLOutput",
 	noCache = "noCache";
 
-	private final static String[] operations = { expand, stottr, tabottr }; //, lift, lower }; 
+	private final static String[] operations = { version, expand, stottr, tabottr }; //, lift, lower }; 
 
-	public static void main (String... args) throws IOException, ModelIOException, InvalidFormatException  {
+	public static void main (String... args) throws IOException, ModelIOException, InvalidFormatException {
 		CommandLineParser parser = new DefaultParser();
 		Options options = buildOptions();
 
 		// Handle all options
 		try {
 			CommandLine line = parser.parse(options, args);
+			
+			if (line.hasOption(version)) {
+				System.out.println(name + " " + CLI.class.getPackage().getImplementationVersion());
+				System.exit(0);
+			}
 
 			// PREPARATIONS
 			
@@ -135,7 +143,7 @@ public class CLI {
 		catch( ParseException exp ) {
 			System.out.println( "Unexpected exception: " + exp.getMessage() );
 			HelpFormatter formatter = new HelpFormatter();
-			formatter.printHelp("lutra -" +String.join("|",  operations)+ " [-in <file|IRI>] [-" +out+ " <file>] [-" +libFolder+ " <path> [-" +libExt+ " <ext,..>]] [(flags)]", options );
+			formatter.printHelp(name + " -" +String.join("|",  operations)+ " [-in <file|IRI>] [-" +out+ " <file>] [-" +libFolder+ " <path> [-" +libExt+ " <ext,..>]] [(flags)]", options );
 		}
 	}
 	
@@ -146,6 +154,7 @@ public class CLI {
 
 	private static Options buildOptions () {
 		Options options = new Options();
+		options.addOption(buildOption(version, false, 0, "Prints version number."));
 		options.addOption(buildOption(libFolder, false, 1, "Path to optional local template library root, read recursively."));
 		options.addOption(buildOption(libExt, false, -1, "Comma-separated list of template file extensions to be read from '" +libFolder+ "' (default: " +libExtDefaults+ ")."));
 		options.addOption(buildOption(out, false, 1, "Path to optional output file. Defaults to stout."));
