@@ -1,0 +1,24 @@
+@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix ex:  <http://example.com#> .
+
+# equal size
+ex:fresh1  ex:hasList (ex:a1 ex:a2 ex:a3) .
+ex:old1   ex:hasList (ex:A1 ex:A2 ex:A3) .
+
+# 2a and 2b have equal content
+ex:fresh2  ex:hasList (ex:b1 ex:b2 ex:b3) .
+ex:old2a   ex:hasList (ex:B1 ex:B2 ex:B3) .
+ex:old2b   ex:hasList (ex:B1 ex:B2 ex:B3) .
+
+# different size
+ex:fresh3  ex:hasList (ex:c1 ex:c2 ex:c3 ex:c4) .
+ex:old3    ex:hasList (ex:C1 ex:C2 ex:C3) .
+
+
+# different size
+ex:fresh4  ex:hasList (ex:d1 ex:d2) .
+ex:old4    ex:hasList (ex:D1 ex:D2 ex:D3) .
+
+
+
+

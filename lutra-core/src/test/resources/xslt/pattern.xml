@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pattern>
+  <key1>a</key1>
+  <element2>key2</element2>
+  <element3 attribute="key2">key1</element3>
+</pattern>

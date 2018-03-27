@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="copy2.xsl"?>
+<root>
+  <copy>
+    <key1>VALUE1</key1>
+    <key2>VALUE2</key2>
+    <key3>VALUE3</key3>
+  </copy>
+    <copy>
+    <key1>VALUE3</key1>
+    <key2>VALUE4</key2>
+    <key3>VALUE5</key3>
+  </copy>
+</root>

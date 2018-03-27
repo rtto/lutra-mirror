@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rdf:RDF
+   xmlns:owl="http://www.w3.org/2002/07/owl#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+   xmlns:t-owl-ax="http://swtmp.gitlab.io/template/owl/axiom/"
+   xmlns:tx="http://swtmp.gitlab.io/vocabulary/templates.owl#"
+   xmlns="http://swtmp.gitlab.io/template/owl/axiom/EquivDataExactCardinality#">
+
+  <owl:DatatypeProperty rdf:about="http://swtmp.gitlab.io/template/owl/axiom/EquivDataExactCardinality#xProperty"/>
+  <rdfs:Datatype rdf:about="http://swtmp.gitlab.io/template/owl/axiom/EquivDataExactCardinality#xRange"/>
+  <owl:Class rdf:about="http://swtmp.gitlab.io/template/owl/axiom/EquivDataExactCardinality#xRestriction">
+    <owl:equivalentClass>
+      <owl:Restriction>
+        <owl:onDataRange rdf:resource="http://swtmp.gitlab.io/template/owl/axiom/EquivDataExactCardinality#xRange"/>
+        <owl:onProperty rdf:resource="http://swtmp.gitlab.io/template/owl/axiom/EquivDataExactCardinality#xProperty"/>
+        <owl:qualifiedCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger">97</owl:qualifiedCardinality>
+      </owl:Restriction>
+    </owl:equivalentClass>
+  </owl:Class>
+</rdf:RDF>

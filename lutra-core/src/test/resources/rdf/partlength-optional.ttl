@@ -1,0 +1,51 @@
+@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix owl:   <http://www.w3.org/2002/07/owl#> .
+@prefix xml:   <http://www.w3.org/XML/1998/namespace> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+
+@prefix :      <partlength-optional.ttl#> .
+
+@prefix tQ:    <http://draft.ottr.xyz/i17/qualityvalue#> .
+@prefix tP:    <partof-optional.ttl#> .
+
+@prefix ex:   <http://example.com#> .
+
+@prefix ottr:   <http://ns.ottr.xyz/templates#> .
+
+
+<partlength-optional.ttl> a owl:Ontology , ottr:Template ;
+  ottr:hasParameter :pWhole, :pPart, :pLength .
+
+:pWhole    ottr:index 1; ottr:optional true; ottr:classVariable       :Whole .
+:pPart     ottr:index 2; ottr:classVariable       :Part .
+:pLength   ottr:index 3; ottr:literalVariable     99 .
+
+ex:hasLength   a owl:ObjectProperty .
+ex:meter       a owl:Thing .
+
+[ a                 ottr:TemplateInstance ;
+  ottr:hasArgument  [ ottr:index  "1"^^xsd:int ;
+                      ottr:value  :Whole
+                    ] ;
+  ottr:hasArgument  [ ottr:index  "2"^^xsd:int ;
+                      ottr:value  :Part
+                    ] ;
+  ottr:templateRef  <partof-optional.ttl>
+] .
+
+[ a                 ottr:TemplateInstance ;
+  ottr:hasArgument  [ ottr:index  "3"^^xsd:int ;
+  					  ottr:value	ex:meter
+                    ] ;
+  ottr:hasArgument  [ ottr:index  "2"^^xsd:int ;
+                      ottr:value  ex:hasLength
+                    ] ;
+  ottr:hasArgument  [ ottr:index  "1"^^xsd:int ;
+                      ottr:value  :Part
+                    ] ;
+  ottr:hasArgument  [ ottr:index  "4"^^xsd:int ;
+                      ottr:value  99
+                    ] ;
+  ottr:templateRef  <http://draft.ottr.xyz/i17/qualityvalue>
+] .

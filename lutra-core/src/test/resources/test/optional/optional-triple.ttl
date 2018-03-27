@@ -1,0 +1,32 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+
+@prefix ottr: <http://ns.ottr.xyz/templates#> .
+
+@prefix t-owl-ax:    <http://candidate.ottr.xyz/owl/axiom/> .
+@prefix lci: <http://standards.iso.org/iso/15926/> .
+@prefix ztirdl: <http://norsok.org/rdl/> .
+@prefix req: <http://norsok.org/requirement-ontology/> .
+@prefix nreq: <http://norsok.org/norsok-requirements/> .
+@prefix ztitpl: <http://norsok.org/templates/> .
+@prefix :     <http://zti.template/test1#> .
+
+## head
+
+<http://zti.template/test1> a ottr:Template ;
+  ottr:hasParameter
+  [ ottr:index 1; ottr:classVariable           :super ; ottr:optional true ] ,
+  [ ottr:index 2; ottr:classVariable           :sub ] ,
+  [ ottr:index 3; ottr:literalVariable         "subname" ] ,
+  [ ottr:index 4; ottr:objectPropertyVariable  :prop ; ottr:optional true ] ,
+  [ ottr:index 5; ottr:classVariable           :range ; ottr:optional true ] .
+
+  ## body
+
+:sub rdfs:subClassOf :super ;
+     rdfs:label "subname" .
+
+[] ottr:templateRef t-owl-ax:SubObjectSomeValuesFrom ;
+   ottr:withValues ( :sub :prop :range ) .

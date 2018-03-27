@@ -1,0 +1,31 @@
+@prefix nreq:  <http://norsok.org/norsok-requirements/> .
+@prefix pav:   <http://purl.org/pav/> .
+@prefix owl:   <http://www.w3.org/2002/07/owl#> .
+@prefix npdv:  <http://sws.ifi.uio.no/vocab/npd-v2> .
+@prefix afn:   <http://jena.hpl.hp.com/ARQ/function#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+@prefix ztirdl: <http://norsok.org/rdl/> .
+@prefix dcmitype: <http://purl.org/dc/dcmitype/> .
+@prefix skos:  <http://www.w3.org/2004/02/skos/core#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix pca:   <http://data.posccaesar.org/rdl/> .
+@prefix ex:    <http://example.org#> .
+@prefix lci:   <http://standards.iso.org/iso/15926/> .
+@prefix pd:    <http://norsok.org/pd/> .
+@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix xml:   <http://www.w3.org/XML/1998/namespace> .
+@prefix ottr:  <http://ns.ottr.xyz/templates#> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix ztimodel: <http://norsok.org/demo/> .
+@prefix prov:  <http://www.w3.org/ns/prov#> .
+@prefix foaf:  <http://xmlns.com/foaf/0.1/> .
+@prefix req:   <http://data.sirius-labs.no/owl/requirement-ontology/> .
+ 
+[ ottr:templateRef  <http://zti.template/test1> ;
+  ottr:withValues   ( ottr:none ex:Spider "Edderkopp" ex:spins ex:Web )
+] .
+
+[ ottr:templateRef  <http://zti.template/test1> ;
+  ottr:withValues   ( ex:Animal ex:Fish "Fisk" ex:spins ottr:none )
+] .
+

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<some_root>
+<!-- instance 1 -->
+<pattern>
+  <VALUE1>a</VALUE1>
+  <element2>VALUE2</element2>
+  <element3 attribute="VALUE2">VALUE1</element3>
+</pattern>
+
+<!-- instance 2 -->
+<pattern>
+  <VALUE3>a</VALUE3>
+  <element2>VALUE4</element2>
+  <element3 attribute="VALUE4">VALUE3</element3>
+</pattern>
+</some_root>

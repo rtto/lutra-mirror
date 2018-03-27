@@ -1,0 +1,28 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix ex: <http://example.org#> .
+@prefix ottr: <http://ns.ottr.xyz/templates#> .
+[] ottr:templateRef <http://candidate.ottr.xyz/rdfs/ResourceDescription> ;
+ottr:withValues ( ex:test0 "label0" "comment0" "seeAlso0" "def0" ) .
+[] ottr:templateRef <http://candidate.ottr.xyz/rdfs/ResourceDescription> ;
+ottr:withValues ( ex:test1 "label1" "comment1" "seeAlso1" "def1" ) .
+[] ottr:templateRef <http://candidate.ottr.xyz/rdfs/ResourceDescription> ;
+ottr:withValues ( ex:test2 "label2" "comment2" "seeAlso2" "def2" ) .
+[] ottr:templateRef <http://candidate.ottr.xyz/rdfs/ResourceDescription> ;
+ottr:withValues ( ex:test3 "label3" "comment3" "seeAlso3" "def3" ) .
+[] ottr:templateRef <http://candidate.ottr.xyz/rdfs/ResourceDescription> ;
+ottr:withValues ( ex:test4 "label4" "comment4" "seeAlso4" "def4" ) .
+[] ottr:templateRef <http://candidate.ottr.xyz/rdfs/ResourceDescription> ;
+ottr:withValues ( ex:test5 "label5" "comment5" "seeAlso5" "def5" ) .
+[] ottr:templateRef <http://candidate.ottr.xyz/rdfs/ResourceDescription> ;
+ottr:withValues ( ex:test6 "label6" "comment6" "seeAlso6" "def6" ) .
+[] ottr:templateRef <http://candidate.ottr.xyz/rdfs/ResourceDescription> ;
+ottr:withValues ( ex:test7 "label7" "comment7" "seeAlso7" "def7" ) .
+[] ottr:templateRef <http://candidate.ottr.xyz/rdfs/ResourceDescription> ;
+ottr:withValues ( ex:test8 "label8" "comment8" "seeAlso8" "def8" ) .
+[] ottr:templateRef <http://candidate.ottr.xyz/rdfs/ResourceDescription> ;
+ottr:withValues ( ex:test9 "label9" "comment9" "seeAlso9" "def9" ) .
+[] ottr:templateRef <http://candidate.ottr.xyz/rdfs/ResourceDescription> ;
+ottr:withValues ( ex:test10 "label10" "comment10" "seeAlso10" "def10" ) .

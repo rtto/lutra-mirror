@@ -1,0 +1,22 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix ottr: <http://ns.ottr.xyz/templates#> .
+@prefix : <TestTemplate.ttl#> .
+@prefix ex: <http://example.com#> .
+
+ex:TestTemplate a ottr:Template ;
+  ottr:hasParameter
+     [ ottr:index 1; ottr:variable :x1; ottr:optional true ] ,
+     [ ottr:index 2; ottr:variable :x2; ottr:optional true ] ,
+     [ ottr:index 3; ottr:variable :x3; ottr:optional true ] .
+
+[] ottr:templateRef ex:Triple ;
+   ottr:withValues ( :x1 rdf:type ex:Type1 ) .
+
+[] ottr:templateRef ex:Triple ;
+   ottr:withValues ( :x2 rdf:type ex:Type2 ) .
+
+[] ottr:templateRef ex:Triple ;
+   ottr:withValues ( :x3 rdf:type ex:Type3 ) .

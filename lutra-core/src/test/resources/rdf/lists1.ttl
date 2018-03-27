@@ -1,0 +1,18 @@
+@prefix owl:   <http://www.w3.org/2002/07/owl#> .
+@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+
+@prefix ex:  <http://example.com#> .
+
+# this file has 3 non-empty lists, and 3 empty lists.
+ex:myList1 ex:hasList
+  (ex:A ex:B ex:C) , # 1
+  (ex:A ex:C) ,      # 2
+  () .               # 3
+
+ex:myList2 ex:hasList
+  () ,               # 4
+  () ,               # 5
+  (ex:A ex:B ex:C) . # 6
+

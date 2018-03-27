@@ -1,0 +1,27 @@
+@prefix :      <partof-optional.ttl#> .
+@prefix partOf: <http://www.ontologydesignpatterns.org/cp/owl/partof.owl> .
+@prefix owl:   <http://www.w3.org/2002/07/owl#> .
+@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix xml:   <http://www.w3.org/XML/1998/namespace> .
+@prefix ottr:  <http://ns.ottr.xyz/templates#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+
+:Part   a       owl:Class .
+
+:pPart  ottr:classVariable  :Part ;
+        ottr:index          2 .
+
+:Whole  a                owl:Class ;
+        rdfs:subClassOf  [ a                   owl:Restriction ;
+                           owl:onProperty      partOf:hasPart ;
+                           owl:someValuesFrom  :Part
+                         ] .
+
+<partof-optional.ttl>
+        a                  owl:Ontology , ottr:Template ;
+        ottr:hasParameter  :pWhole , :pPart ;
+        owl:imports        partOf: .
+
+:pWhole  ottr:classVariable  :Whole ;
+        ottr:index          1 .
