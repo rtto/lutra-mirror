@@ -17,7 +17,7 @@ import org.apache.jena.update.UpdateRequest;
 
 public abstract class QueryBuilder {
 	
-	private static List<Triple> sortTriples (Collection<Triple> triples) {
+	public static List<Triple> sortTriples (Collection<Triple> triples) {
 		List<Triple> sorted = new ArrayList<>(triples);
 		Collections.sort(sorted, (t1, t2) -> t1.toString().compareToIgnoreCase(t2.toString()));
 		return sorted;

@@ -1,22 +1,43 @@
 package xyz.lutra;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
+import java.util.Set;
 import java.util.function.Function;
 
+import org.apache.jena.graph.Node;
+import org.apache.jena.graph.NodeFactory;
 import org.apache.jena.graph.Triple;
 import org.apache.jena.query.Query;
+import org.apache.jena.query.QueryFactory;
 import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.RDFList;
+import org.apache.jena.rdf.model.RDFNode;
+import org.apache.jena.shared.PrefixMapping;
+import org.apache.jena.sparql.core.TriplePath;
+import org.apache.jena.sparql.path.Path;
+import org.apache.jena.sparql.path.PathParser;
+import org.apache.jena.sparql.syntax.ElementGroup;
+import org.apache.jena.sparql.syntax.ElementPathBlock;
 import org.apache.jena.update.UpdateRequest;
 
 import osl.util.rdf.Graphs;
+import osl.util.rdf.ModelEditor;
 import osl.util.rdf.Models;
 import osl.util.rdf.PrefixMappings;
 import osl.util.sparql.QueryBuilder;
+import xyz.lutra.model.Parameter;
 import xyz.lutra.model.Substitution;
 import xyz.lutra.model.Template;
 import xyz.lutra.parser.TemplateLoader;
 
 public abstract class TemplateQueries {
+	
+	public static final String PARAM_PREFIX = "param";
+	public static final String LISTITEM_POSTFIX = "item";
+	
+	private static final Path RDFListContentPath = PathParser.parse("rdf:rest*/rdf:first", PrefixMapping.Standard);
 	
 	private static Cache<Model> bodyCache = new Cache<>(
 			Settings.enableTemplateQueriesCache,
@@ -45,7 +66,7 @@ public abstract class TemplateQueries {
 		return getConstructQuery(headCache.get(iri),bodyCache.get(iri));
 	}
 	public static Query getBodySelectQuery (String iri) {
-		return getSelectQuery(bodyCache.get(iri));
+		return getBodySelectQuery(TemplateLoader.getTemplate(iri), Substitution.EMPTY);
 	}
 	public static Query getHeadSelectQuery (String iri) {		
 		return getSelectQuery(headCache.get(iri));
@@ -68,7 +89,41 @@ public abstract class TemplateQueries {
 		return getConstructQuery(getBodyModel(template, subst),getHeadModel(template, subst));
 	}
 	public static Query getBodySelectQuery (Template template, Substitution subst) {
-		return getSelectQuery(getBodyModel(template, subst));
+		// TODO: use WhereHandler in java 3.7.x?
+		Query query = QueryFactory.create();
+		Model body = getBodyModel(template, subst);
+		List<TriplePath> itemPaths = new ArrayList<>();
+		// for list item
+		for (Parameter p : template.getParameters()) {
+			if (p.getValue().canAs(RDFList.class)) {
+				Node var = NodeFactory.createVariable(PARAM_PREFIX + p.getIndex());
+				Node varList = NodeFactory.createVariable(PARAM_PREFIX + p.getIndex() + LISTITEM_POSTFIX);
+				TriplePath tp = new TriplePath(var, RDFListContentPath, varList);
+				itemPaths.add(tp);
+				
+				// replace mode expanded instances with listitem
+				for (RDFNode item : p.getValue().as(RDFList.class).asJavaList()) {
+					ModelEditor.substituteNode(body, item.asNode(), varList);
+				}
+			}
+		}
+		
+		ElementPathBlock etp = new ElementPathBlock();
+		Set<Triple> whereTriples = Models.toTripleSet(body);
+		// add triples
+		QueryBuilder.sortTriples(whereTriples).forEach(t -> etp.addTriple(t));
+		// add list item paths
+		itemPaths.forEach(t -> etp.addTriplePath(t));
+		
+		ElementGroup group = new ElementGroup();
+		group.addElement(etp);
+		//optionalElements.forEach(o -> group.addElement(o));
+		
+		query.setPrefixMapping(body);
+		query.setQueryPattern(group);
+		query.setQuerySelectType();
+		query.setQueryResultStar(true);
+		return QueryBuilder.getReformattedQuery(query);
 	}
 	public static Query getHeadSelectQuery (Template template, Substitution subst) {		
 		return getSelectQuery(getHeadModel(template, subst));
