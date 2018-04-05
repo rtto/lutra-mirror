@@ -40,12 +40,14 @@ public class XSLT {
 		System.out.println(result);
 	}*/
 	
+	/*
 	@Test public void shouldGiveRDF2 () throws TransformerException {
 		String w = Settings.servletRoot + Settings.servletFormatServiceHeadXML 
 				+ "/?" + Settings.servletParamTemplate + "=" 
 				+ "http://candidate.ottr.xyz/owl/axiom/EquivDataMaxCardinality";
 		print(applyXSLT(webroot + "lifting-template-instance.xsl", w));
 	}
+	/*
 	
 	/*
 	@Test public void shouldGiveRDF3 () throws TransformerException {

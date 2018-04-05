@@ -7,9 +7,8 @@ ex:spins  a     owl:ObjectProperty .
 
 ex:Web  a       owl:Class .
 
-ex:Spider  a             owl:Class ;
-        rdfs:label       "Edderkopp" ;
-        rdfs:subClassOf  [ a                   owl:Restriction , owl:Class ;
+ex:Spider  rdfs:label       "Edderkopp" ;
+        rdfs:subClassOf  [ a                   owl:Restriction ;
                            owl:onProperty      ex:spins ;
                            owl:someValuesFrom  ex:Web
                          ] .
