@@ -68,7 +68,7 @@ public class stOTTRWriter {
 
 	private final static String pxRDF = "t-rdf";
 	private final static String nsRDF = "http://candidate.ottr.xyz/rdf/";
-	private final static String tripleTemplate = pxRDF + ":Triple";
+	//private final static String tripleTemplate = pxRDF + ":Triple";
 	
 	private final static PrefixMapping prefixes = PrefixMapping.Factory.create();
 
@@ -150,11 +150,11 @@ public class stOTTRWriter {
 	public String print(TemplateInstance instance) {
 
 		String mode = (instance.getArguments().stream().anyMatch(a -> a instanceof MulitValueArgument)) 
-				? modeSep + modeCross 
+				? modeCross + modeSep 
 						: empty;
 
-		return print(instance.getTemplateRef())
-				+ mode 
+		return mode 
+				+ print(instance.getTemplateRef())
 				+ instance.getArguments().stream().map(a -> print(a)).collect(Collectors.joining(argSep, argStart, argEnd));
 	}
 
@@ -193,9 +193,8 @@ public class stOTTRWriter {
 	}
 
 	private String print(Statement s, Model context) {
-		pxCollector.register(nsRDF);
-		return tripleTemplate
-				+ argStart
+		return //tripleTemplate
+				argStart
 				+ print(s.getSubject(), context) + argSep
 				+ print(s.getPredicate(), context) + argSep
 				+ print(s.getObject(), context) 

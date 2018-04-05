@@ -25,6 +25,13 @@ public class stOTTRWriterTest {
 		System.out.println(printTemplate(iri));
 	}
 	
+	@Test
+	public void testSubClassOf() {
+		String iri = "http://candidate.ottr.xyz/owl/axiom/SubClassOf";
+		System.out.println(printTemplate(iri));
+	}
+	
+	
 	@AfterClass
 	public static void tearDown() {
 		TemplateLoader.clearCache();
