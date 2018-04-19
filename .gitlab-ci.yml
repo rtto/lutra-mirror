@@ -4,3 +4,10 @@ build:
   image: maven:3.3.3-jdk-8
   script: 
   - mvn package
+
+  artifacts:
+    expire_in: 3 mos 1 day
+    paths:
+    - lutra-cli/target/lutra.jar
+
+
