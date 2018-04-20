@@ -34,6 +34,8 @@ public class ExcelReader extends AbstractFileTableReader {
 	private Table getTable(Sheet sheet, int index) {
 		// for evaluating formulas and formatting cell values:
 		FormulaEvaluator evaluator = sheet.getWorkbook().getCreationHelper().createFormulaEvaluator();
+		evaluator.setIgnoreMissingWorkbooks(true);
+		
 		DataFormatter formatter = new DataFormatter();
 
 		// initialise empty table:

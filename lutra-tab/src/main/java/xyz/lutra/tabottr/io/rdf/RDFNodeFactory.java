@@ -1,8 +1,13 @@
 package xyz.lutra.tabottr.io.rdf;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Pattern;
+
 import org.apache.jena.rdf.model.AnonId;
 import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.RDFList;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.vocabulary.XSD;
@@ -21,8 +26,17 @@ public class RDFNodeFactory {
 	}
 
 	public RDFNode toRDFNode(String value, String type) {
+		// if is a list, split in to values and parse into RDF nodes with recursive call.
+		if (type.endsWith(TabOTTR.TYPE_LIST_POSTFIX)) {
+			type = type.substring(0, type.length() - 1).trim(); // remove list operator from type
+			List<RDFNode> nodes = new ArrayList<>();
+			for (String item : value.split(Pattern.quote(TabOTTR.VALUE_LIST_SEPARATOR))) {
+				nodes.add(toRDFNode(item, type));
+			}
+			return toList(nodes);
+		}
 		// if value == empty -> ottr:none
-		if (DataValidator.isEmpty(value)) {
+		else if (DataValidator.isEmpty(value)) {
 			return Templates.none;	
 		}  
 		else if (TabOTTR.TYPE_IRI.equals(type)) {
@@ -68,6 +82,10 @@ public class RDFNodeFactory {
 		else {
 			return TabOTTR.TYPE_TEXT;
 		}
+	}
+	
+	public RDFList toList(List<RDFNode> nodes) {
+		return model.createList(nodes.iterator());
 	}
 
 	public Resource toResource(String qname) {

@@ -44,12 +44,26 @@ public class OptionalTest {
 	private Resource ex (String localname) {
 		return ResourceFactory.createResource(EX + localname);
 	}
+	
+	private void checkIsomorphic(Model m1, Model m2) {
+		boolean isIso = m1.isIsomorphicWith(m2);
+		
+		if (!isIso) {
+			System.out.println("Triples in: m1 / m2");
+			Models.empty().add(m1).remove(m2).write(System.out, ModelIO.format.TURTLE.toString());
+			
+			System.out.println("Triples in: m2 / m1");
+			Models.empty().add(m2).remove(m1).write(System.out, ModelIO.format.TURTLE.toString());
+		}
+		
+		assertTrue(isIso);
+	}
 
 	@Test
 	public void optionalTest3 () throws ParserException, IOException, ModelIOException {
 		Model exp1 = Expander.expand(ROOT + "optional-triple-instances.ttl");
         Model exp2 = ModelIO.readModel(ROOT + "optional-triple-expanded.ttl");
-        assertTrue(exp1.isIsomorphicWith(exp2));
+        checkIsomorphic(exp1, exp2);
 	}
 	
 	@Test

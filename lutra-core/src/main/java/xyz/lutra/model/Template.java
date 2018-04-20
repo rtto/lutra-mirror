@@ -12,6 +12,7 @@ import org.apache.jena.rdf.model.ResourceFactory;
 import osl.util.rdf.Models;
 import osl.util.rdf.RDFLists;
 import osl.util.rdf.vocab.Templates;
+import xyz.lutra.TemplateQueries;
 import xyz.lutra.stOTTRWriter;
 
 public class Template extends xyz.lutra.model.RDFResource {
@@ -86,7 +87,7 @@ public class Template extends xyz.lutra.model.RDFResource {
 		List<VariableArgument> args = new ArrayList<>();
 		for (Parameter p : parameters) {
 			Resource res = ResourceFactory.createResource();
-			Node var = NodeFactory.createVariable("param" + p.getIndex());
+			Node var = NodeFactory.createVariable(TemplateQueries.PARAM_PREFIX + p.getIndex());
 			args.add(new VariableArgument(res, p.getIndex(), var));
 		}
 		return new Substitution(getParameters(), args);
