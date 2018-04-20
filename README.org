@@ -1,0 +1,4 @@
+* Lutra
+
+Latest develop version is available at https://gitlab.com/ottr/lutra/lutra/builds/artifacts/develop/raw/lutra.jar?job=build_develop
+
