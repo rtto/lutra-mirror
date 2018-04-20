@@ -4,19 +4,24 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>xyz.lutra</groupId>
 	<artifactId>lutra</artifactId>
-	<version>0.1.5</version>
+	<version>0.1.5-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<modules>
 		<module>lutra-core</module>
 		<module>lutra-cli</module>
 		<module>lutra-tab</module>
 	</modules>
+	
+	<scm>
+          <connection>scm:git:git@gitlab.com:ottr/lutra/lutra.git</connection>
+          <developerConnection>scm:git:git@gitlab.com:ottr/lutra/lutra.git</developerConnection>
+          <url>git@gitlab.com:ottr/lutra/lutra.git</url>
+	</scm>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<jena.version>3.1.0</jena.version>
 		<owlapi.version>5.1.0</owlapi.version>
-
 	</properties>
 
 	<dependencyManagement>
@@ -256,6 +261,11 @@
 						</goals>
 					</execution>
 				</executions>
+			</plugin>
+			<plugin>
+			  <groupId>org.apache.maven.plugins</groupId>
+			  <artifactId>maven-release-plugin</artifactId>
+			  <version>2.5.3</version>
 			</plugin>
 		</plugins>
 	</build>
