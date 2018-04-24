@@ -15,6 +15,10 @@ public class TemplateInstruction extends Instruction {
 		this.colIndices = getColIndices();
 	}
 
+	public String getTemplateIRI() {
+		return table.getCellValue(this.rowStart, 2);
+	}
+
 	/**
 	 * Get the list of template instance argument indices, 
 	 * e.g., the n'th value in the array is the column index
@@ -23,7 +27,7 @@ public class TemplateInstruction extends Instruction {
 	 */
 	private int[] getColIndices() {
 		// get the row of user indices:
-		List<String> indexRow = super.getRow(this.rowStart+2);
+		List<String> indexRow = super.getRow(this.rowStart+1);
 
 		// init output array
 		int[] colIndices = new int[indexRow.size()];
@@ -39,17 +43,13 @@ public class TemplateInstruction extends Instruction {
 			}
 		}
 		return Arrays.copyOfRange(colIndices, 0, maxIndex);
-	}
-
-	public String getTemplateIRI() {
-		return table.getCellValue(this.rowStart, 2);
-	}
-
-	public List<String> getArgumentHeadings() {
-		return super.getRow(this.rowStart+1, this.colIndices);
-	}
+	}	
 
 	public List<String> getArgumentTypes() {
+		return super.getRow(this.rowStart+2, this.colIndices);
+	}
+	
+	public List<String> getArgumentHeadings() {
 		return super.getRow(this.rowStart+3, this.colIndices);
 	}
 
