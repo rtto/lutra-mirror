@@ -22,3 +22,9 @@
 
 [ ] ottr:templateRef  ex:NoTemplate ;
     ottr:withValues   ( <http://asdf.com#test> ) .
+
+[ ] ottr:templateRef  ex:NoTemplate ;
+    ottr:withValues   ( "asdf"^^xsd:normalizedString ) .
+
+[ ] ottr:templateRef  ex:NoTemplate ;
+    ottr:withValues   ( "asdf"^^ex:mydatatype ) .
