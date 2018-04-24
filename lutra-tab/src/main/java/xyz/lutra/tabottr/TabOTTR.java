@@ -18,4 +18,5 @@ public abstract class TabOTTR {
 	public static final String VALUE_FRESH_BLANK = "*";
 	public static final String VALUE_BLANK_NODE_PREFIX = "_:";
 	public static final String VALUE_LANGUAGE_TAG_PREFIX = "@@";
+	public static final String VALUE_DATATYPE_TAG_PREFIX = "^^";
 }

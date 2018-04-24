@@ -26,7 +26,7 @@ public class RDFNodeFactory {
 	}
 
 	public RDFNode toRDFNode(String value, String type) {
-		// if is a list, split in to values and parse into RDF nodes with recursive call.
+		// if is a list, split in to values and parse into RDF nodes with a recursive call.
 		if (type.endsWith(TabOTTR.TYPE_LIST_POSTFIX)) {
 			type = type.substring(0, type.length() - 1).trim(); // remove list operator from type
 			List<RDFNode> nodes = new ArrayList<>();
@@ -50,9 +50,18 @@ public class RDFNodeFactory {
 		else if (TabOTTR.TYPE_TEXT.equals(type)) {
 			return toUntypedLiteral(value);
 		} 
-		// auto, guess type
+		// auto, get type
 		else if (TabOTTR.TYPE_AUTO.equals(type)) {
-			return toRDFNode(value, getType(value));
+			// if type is explicitly set:
+			int typeIndex = value.lastIndexOf(TabOTTR.VALUE_DATATYPE_TAG_PREFIX);
+			if (typeIndex != -1) {
+				String explicitType = value.substring(typeIndex + TabOTTR.VALUE_LANGUAGE_TAG_PREFIX.length());
+				value = value.substring(0, typeIndex);
+				return toRDFNode(value, explicitType);
+			} 
+			else { // auto-get datatype:
+				return toRDFNode(value, getAutoType(value));
+			}
 		}
 		// literal
 		else {
@@ -63,7 +72,7 @@ public class RDFNodeFactory {
 		}
 	}
 
-	private String getType(String value) {
+	private String getAutoType(String value) {
 		if(DataValidator.isBoolean(value)) {
 			return XSD.xboolean.toString();
 		}
