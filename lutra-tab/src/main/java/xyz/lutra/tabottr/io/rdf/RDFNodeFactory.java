@@ -31,6 +31,7 @@ public class RDFNodeFactory {
 			type = type.substring(0, type.length() - 1).trim(); // remove list operator from type
 			List<RDFNode> nodes = new ArrayList<>();
 			for (String item : value.split(Pattern.quote(TabOTTR.VALUE_LIST_SEPARATOR))) {
+				item = item.trim();
 				nodes.add(toRDFNode(item, type));
 			}
 			return toList(nodes);
