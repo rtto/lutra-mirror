@@ -61,7 +61,7 @@ public class Table {
 		// collect row numbers containing OTTR token:
 		List<Integer> tokenIndices = new ArrayList<>();
 		for (int rowIndex = 0; rowIndex < data.length; rowIndex += 1) {
-			if (TabOTTR.TOKEN.equals(data[rowIndex][0])) {
+			if (data[rowIndex].length > 1 && TabOTTR.TOKEN.equals(data[rowIndex][0])) {
 				tokenIndices.add(rowIndex);
 			}
 		}
