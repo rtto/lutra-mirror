@@ -91,7 +91,7 @@ public class TemplateLoader {
 
 		for (int i = 0; i < excludeExtensions.length; i += 1) {
 			if (i == 0 && ext == null) {
-				ext = FileFilterUtils.notFileFilter(extFilter.apply(includeExtensions[i]));		
+				ext = FileFilterUtils.notFileFilter(extFilter.apply(excludeExtensions[i]));		
 			} else {
 				ext = FileFilterUtils.and(ext, FileFilterUtils.notFileFilter(extFilter.apply(excludeExtensions[i])));
 			}
