@@ -1,0 +1,13 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+
+@prefix ottr: <http://ns.ottr.xyz/templates#> .
+
+@prefix :     <http://example.net/ns/Blank#> .
+@prefix ex:     <http://example.net/ns#> .
+
+ex:A1 ex:p _:b1 .   _:b1 ex:q ex:A2 .
+ex:B1 ex:p _:b2 .   _:b2 ex:q ex:B2 .
+ex:C1 ex:p _:b3 .   _:b3 ex:q ex:C2 .

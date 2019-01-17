@@ -1,0 +1,28 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix ex: <http://www.example.org/> .
+
+@prefix ottr: <http://ns.ottr.xyz/templates#> .
+
+[] a ottr:TemplateInstance ;
+    ottr:templateRef <http://candidate.ottr.xyz/rdfs/ResourceDescription> ;
+    ottr:withValues ( ex:toDescribe "Label" ottr:none ottr:none ottr:none ) .
+
+[] a ottr:TemplateInstance ;
+    ottr:templateRef <http://candidate.ottr.xyz/rdfs/ResourceDescription> ;
+    ottr:hasArgument
+        [ ottr:index 1 ; ottr:value ex:toDescribe2 ] ,
+        [ ottr:index 2 ; ottr:value "Label2" ] ,
+        [ ottr:index 3 ] ,
+        [ ottr:index 4 ] ,
+        [ ottr:index 5 ] .
+
+[] a ottr:TemplateInstance ;
+    ottr:templateRef <http://candidate.ottr.xyz/rdfs/TypedResourceDescription> ;
+    ottr:withValues ( ex:toDescribe3 ex:Super "Label3" ottr:none ottr:none ottr:none ) .
+
+[] a ottr:TemplateInstance ;
+    ottr:templateRef <http://candidate.ottr.xyz/rdfs/TypedResourceDescription> ;
+    ottr:withValues ( ex:toDescribe4 ottr:none "Label4" ottr:none ottr:none ottr:none ) .

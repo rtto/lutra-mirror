@@ -1,0 +1,94 @@
+package xyz.ottr.lutra.wottr.io;
+
+/*-
+ * #%L
+ * lutra-wottr
+ * %%
+ * Copyright (C) 2018 - 2019 University of Oslo
+ * %%
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation, either version 2.1 of the
+ * License, or (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Lesser Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Lesser Public
+ * License along with this program.  If not, see
+ * <http://www.gnu.org/licenses/lgpl-2.1.html>.
+ * #L%
+ */
+
+import java.util.HashSet;
+import java.util.Set;
+import java.util.function.Function;
+
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.RDFNode;
+import org.apache.jena.rdf.model.Resource;
+
+import org.dyreriket.gaupa.rdf.ModelSelector;
+import org.dyreriket.gaupa.rdf.ModelSelectorException;
+
+import xyz.ottr.lutra.model.NoneTerm;
+import xyz.ottr.lutra.model.Term;
+import xyz.ottr.lutra.result.Message;
+import xyz.ottr.lutra.result.Result;
+import xyz.ottr.lutra.wottr.WOTTR;
+import xyz.ottr.lutra.wottr.WTermFactory;
+
+public class WArgumentParser implements Function<RDFNode, Result<Term>> {
+
+    private final Model model;
+    private final WTermFactory rdfTermFactory;
+    private final Set<Term> expanderValues;
+
+    public WArgumentParser(Model model) {
+        this.model = model;
+        this.rdfTermFactory = new WTermFactory();
+        this.expanderValues = new HashSet<>();
+    }
+
+    public Result<Term> apply(RDFNode argNode) {
+
+        if (!argNode.isResource()) {
+            return Result.empty(Message.error(
+                "Argument node cannot be non-resource node, for argument " + argNode.toString() + "."));
+        }
+
+        Resource arg = argNode.asResource();
+        Result<Term> resultTerm;
+
+        try {
+
+            RDFNode var = ModelSelector.getRequiredObjectOfProperty(this.model, arg, WOTTR.value);
+            resultTerm = var != null
+                ? this.rdfTermFactory.apply(var)
+                : Result.of(new NoneTerm());
+
+            Resource expand = ModelSelector.getOptionalResourceOfProperty(this.model, arg, WOTTR.modifier);
+
+            if (expand != null) {
+                if (!expand.equals(WOTTR.listExpand)) {
+                    resultTerm.addMessage(Message.error(
+                        "Only " + WOTTR.listExpand.toString() + " can be used as modifier on arguments, got "
+                        + expand.toString() + "."));
+                } else if (resultTerm.isPresent()) {
+                    this.expanderValues.add(resultTerm.get());
+                }
+            }
+        } catch (ModelSelectorException ex) {
+            // TODO: Correct lvl and good message?
+            resultTerm = Result.empty(Message.error("Error parsing argument: " + ex.getMessage()));
+        }
+
+        return resultTerm;
+    }
+
+    public Set<Term> getExpanderValues() {
+        return this.expanderValues;
+    }
+}

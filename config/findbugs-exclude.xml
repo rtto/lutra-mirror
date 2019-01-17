@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FindBugsFilter>
+  <Match>
+    <!-- Template inherits equals and hashCode from KnowledgeBase -->
+    <Class name="xyz.ottr.lutra.store.TemplateNode" />
+    <Bug pattern="EQ_DOESNT_OVERRIDE_EQUALS" />
+  </Match>
+</FindBugsFilter>

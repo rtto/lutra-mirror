@@ -1,0 +1,22 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+
+@prefix ottr: <http://ns.ottr.xyz/templates#> .
+
+@prefix t-owl-atom: <http://candidate.ottr.xyz/owl/atom/> .
+@prefix t-owl-rstr: <http://candidate.ottr.xyz/owl/restriction/> .
+@prefix t-owl-ax: <http://candidate.ottr.xyz/owl/axiom/> .
+
+@prefix : <http://candidate.ottr.xyz/owl/atom/AllThreeDifferent#> .
+
+t-owl-atom:AllThreeDifferent a ottr:Template ;
+  ottr:hasParameter :i1, :i2, :i3 .
+
+:i1 ottr:index 1;  ottr:nonLiteralVariable :x1 .
+:i2 ottr:index 2;  ottr:nonLiteralVariable :x2 .
+:i3 ottr:index 3;  ottr:nonLiteralVariable :x3 .
+
+[] ottr:templateRef t-owl-ax:DifferentIndividuals;
+   ottr:withValues ( (:x1 :x2 :x3) ) .

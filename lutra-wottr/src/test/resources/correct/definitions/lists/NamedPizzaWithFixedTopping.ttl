@@ -1,0 +1,22 @@
+@prefix p:     <http://example.com/external#> .
+@prefix :      <http://draft.ottr.xyz/pizza/NamedPizza#> .
+@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix owl:   <http://www.w3.org/2002/07/owl#> .
+@prefix ottr:  <http://ns.ottr.xyz/templates#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+
+<http://draft.ottr.xyz/pizza/NamedPizzaWithFixedTopping>
+        a                  ottr:Template ;
+        ottr:hasParameter  [ ottr:index     "1"^^xsd:int ;
+                             ottr:variable  :pizza
+                           ] .
+
+[ ottr:hasArgument  [ ottr:index  1 ;
+                      ottr:value  :pizza
+                    ] ;
+  ottr:hasArgument  [ ottr:value  ( :peppers :mushroom :cheese ) ;
+                      ottr:index      2
+                    ] ;
+  ottr:templateRef  <http://draft.ottr.xyz/pizza/NamedPizza>
+] .

@@ -1,0 +1,19 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+
+@prefix ottr: <http://ns.ottr.xyz/templates#> .
+
+@prefix t-owl-atom: <http://candidate.ottr.xyz/owl/atom/> .
+@prefix t-owl-rstr: <http://candidate.ottr.xyz/owl/restriction/> .
+@prefix t-owl-axiom: <http://candidate.ottr.xyz/owl/axiom/> .
+
+@prefix :     <http://candidate.ottr.xyz/owl/axiom/DifferentIndividuals#> .
+
+t-owl-axiom:DifferentIndividuals a ottr:Template ;
+	  ottr:hasParameter :pList .
+:pList  ottr:index 1;  ottr:listVariable   ( :item1 :item2 ) .
+
+[] ottr:templateRef t-owl-atom:TypedListRelation ;
+   ottr:withValues ( [] owl:AllDifferent owl:members ( :item1 :item2 )) .

@@ -1,0 +1,25 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+
+@prefix ottr: <http://ns.ottr.xyz/templates#> .
+
+@prefix t-owl-atom: <http://candidate.ottr.xyz/owl/atom/> .
+@prefix t-owl-rstr: <http://candidate.ottr.xyz/owl/restriction/> .
+@prefix t-owl-ax: <http://candidate.ottr.xyz/owl/axiom/> .
+
+@prefix : <http://candidate.ottr.xyz/owl/atom/TypedListRelation#> .
+
+t-owl-atom:TypedListRelation a ottr:Template ;
+  ottr:hasParameter :pRestriction, :pType, :pListOperator, :pList .
+
+:pRestriction   ottr:index 1;  ottr:nonLiteralVariable  :xRestriction .
+:pType          ottr:index 2;  ottr:nonLiteralVariable  :xType .
+:pListOperator  ottr:index 3;  ottr:propertyVariable    :xListOperator .
+:pList          ottr:index 4;  ottr:listVariable        ( :item1 :item2 ) .
+
+[] ottr:templateRef t-owl-atom:ListRelation;
+   ottr:withValues ( :xRestriction :xListOperator ( :item1 :item2 ) ) .
+
+:xRestriction a :xType .

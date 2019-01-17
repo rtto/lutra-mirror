@@ -1,0 +1,2 @@
+This folder contains various project configuration files, e.g., for
+development tool settings and maven plugin input.

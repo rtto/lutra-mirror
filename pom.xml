@@ -1,0 +1,346 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+  <modelVersion>4.0.0</modelVersion>	
+  
+  <groupId>xyz.ottr.lutra</groupId>
+  <artifactId>lutra</artifactId>
+  <version>0.5.0</version>
+  <packaging>pom</packaging>
+  <modules>
+    <module>lutra-core</module>
+    <module>lutra-wottr</module>
+    <module>lutra-tab</module>
+    <module>lutra-cli</module>
+  </modules>
+	
+  <issueManagement>
+    <url>/issues</url>
+    <system>GitLab Issues</system>
+  </issueManagement>
+
+  <licenses>
+    <license>
+      <name>GNU Lesser General Public License</name>
+      <url>https://www.gnu.org/licenses/old-licenses/lgpl-2.1.html</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+
+  <scm>
+    <url></url>
+    <connection>scm:git</connection>
+    <developerConnection>scm:git</developerConnection>
+  </scm>
+
+  <developers>
+    <developer>
+      <name>Martin G. Skjæveland</name>
+    </developer>
+    <developer>
+      <name>Leif Harald Karlsen</name>
+    </developer>
+  </developers>
+
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  </properties>
+
+  <build>
+    <plugins>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+	<version>3.7.0</version>
+        <configuration>
+          <source>1.8</source>
+          <target>1.8</target>
+        </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+	<version>3.0.2</version>
+        <configuration>
+          <archive>
+            <manifest>
+              <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+              <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
+            </manifest>
+          </archive>
+        </configuration>
+      </plugin>
+
+    <plugin>
+      <artifactId>maven-assembly-plugin</artifactId>
+      <configuration>
+        <archive>
+          <manifest>
+            <mainClass>fully.qualified.MainClass</mainClass>
+          </manifest>
+        </archive>
+        <descriptorRefs>
+          <descriptorRef>jar-with-dependencies</descriptorRef>
+        </descriptorRefs>
+      </configuration>
+    </plugin>      
+      <!--plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+	<version>3.0.0-M1</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>jar</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin-->
+      
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-source-plugin</artifactId>
+	<version>3.0.1</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>jar</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
+	<groupId>org.apache.maven.plugins</groupId>
+	<artifactId>maven-surefire-plugin</artifactId>
+	<version>2.5</version>
+        <configuration>
+          <useSystemClassLoader>false</useSystemClassLoader>
+        </configuration> <!-- For Debian, see https://stackoverflow.com/questions/13170860/failed-to-execute-goal-org-apache-maven-pluginsmaven-surefire-plugin2-10test/41666587#41666587 -->
+        <!-- <configuration>
+	  <argLine>-Xms15512m -Xmx15512m</argLine>
+        </configuration> --> <!-- To increase memory -->
+      </plugin>
+
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>license-maven-plugin</artifactId>
+        <version>1.16</version>
+        <configuration>
+          <verbose>false</verbose>
+          <licenseName>lgpl_v2_1</licenseName>
+          <inceptionYear>2018</inceptionYear>
+          <organizationName>University of Oslo</organizationName>
+        </configuration>
+        <executions>
+          <execution>
+            <id>first</id>
+            <goals>
+              <goal>update-file-header</goal>
+            </goals>
+            <phase>process-sources</phase>
+            <configuration>
+              <roots>
+                <root>src/main/java</root>
+                <root>src/test/java</root>
+              </roots>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      
+      <!-- code checks -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-checkstyle-plugin</artifactId>
+        <version>2.17</version>
+        <executions>
+          <execution>
+            <id>verify-style</id>
+            <phase>process-classes</phase>
+            <goals>
+              <goal>check</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <encoding>UTF-8</encoding>
+          <configLocation>config/checkstyle.xml</configLocation>
+          <suppressionsLocation>config/checkstyle-suppressions.xml</suppressionsLocation>
+          <suppressionsFileExpression>checkstyle.suppressions.file</suppressionsFileExpression>
+          <includeTestSourceDirectory>true</includeTestSourceDirectory>
+          <consoleOutput>true</consoleOutput>
+          <linkXRef>false</linkXRef>
+          <violationSeverity>error</violationSeverity>
+          <failsOnError>true</failsOnError>
+          <failOnViolation>true</failOnViolation>
+        </configuration>
+        <dependencies>
+          <dependency>
+            <groupId>com.puppycrawl.tools</groupId>
+            <artifactId>checkstyle</artifactId>
+            <version>8.4</version>
+          </dependency>
+        </dependencies>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-pmd-plugin</artifactId>
+        <version>3.8</version>
+        <configuration>
+          <printFailingErrors>true</printFailingErrors>
+        </configuration>
+        <executions>
+          <execution>
+            <phase>validate</phase>
+            <goals>
+              <goal>check</goal>
+              <goal>cpd-check</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>findbugs-maven-plugin</artifactId>
+        <version>3.0.5</version>
+        <configuration>
+          <effort>Max</effort>
+          <threshold>Low</threshold>
+          <xmlOutput>true</xmlOutput>
+	  <excludeFilterFile>config/findbugs-exclude.xml</excludeFilterFile>
+        </configuration>
+        <executions>
+          <execution>
+            <phase>verify</phase>
+            <goals>
+              <goal>check</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      
+    </plugins>
+    <pluginManagement>
+      <plugins>
+        
+        <!-- https://github.com/maven-download-plugin/maven-download-plugin -->
+        <plugin>
+          <groupId>com.googlecode.maven-download-plugin</groupId>
+          <artifactId>download-maven-plugin</artifactId>
+          <version>1.3.0</version>
+        </plugin>
+        
+      </plugins>
+    </pluginManagement>
+  </build>
+
+  <reporting>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-project-info-reports-plugin</artifactId>
+        <version>2.9</version>
+	<configuration>
+          <dependencyDetailsEnabled>true</dependencyDetailsEnabled>
+          <dependencyLocationsEnabled>true</dependencyLocationsEnabled>
+        </configuration>
+      </plugin>
+      
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jxr-plugin</artifactId>
+        <version>2.5</version>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <version>2.7</version>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-report-plugin</artifactId>
+        <version>2.6</version>
+      </plugin>
+      
+      <plugin>
+        <artifactId>maven-pmd-plugin</artifactId>
+        <version>3.8</version>
+        <reportSets>
+          <reportSet>
+            <reports>
+              <report>pmd</report>
+              <report>cpd</report>
+            </reports>
+          </reportSet>
+        </reportSets>
+      </plugin>
+
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>findbugs-maven-plugin</artifactId>
+        <version>3.0.5</version>
+        <configuration>
+          <xmlOutput>true</xmlOutput>
+        </configuration>
+      </plugin>
+
+    </plugins>
+  </reporting>
+
+  
+  <dependencies>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.8</version>
+      <scope>test</scope>
+    </dependency>
+      <!-- Apache commons -->
+      <dependency>
+      <groupId>org.apache.commons</groupId>
+       <artifactId>commons-collections4</artifactId>
+       <version>4.2</version>
+      </dependency>
+      <dependency>
+      <groupId>org.apache.commons</groupId>
+       <artifactId>commons-math3</artifactId>
+       <version>3.6</version>
+      </dependency>
+
+        <dependency>
+            <groupId>org.dyreriket</groupId>
+            <artifactId>gaupa-core</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+	</dependency>
+
+        <dependency>
+          <groupId>org.slf4j</groupId> 
+          <artifactId>slf4j-log4j12</artifactId>
+          <version>1.7.12</version>
+      </dependency>
+  </dependencies>
+
+  <dependencyManagement>
+    <dependencies>
+        <dependency>
+            <groupId>org.dyreriket</groupId>
+            <artifactId>gaupa-core</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+		</dependency>
+
+      <dependency>
+          <groupId>org.slf4j</groupId> 
+          <artifactId>slf4j-log4j12</artifactId>
+          <version>1.7.12</version>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+
+</project>
