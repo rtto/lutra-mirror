@@ -1,0 +1,70 @@
+
+######################
+# Java
+######################
+
+## Directories
+target/
+bin/
+
+*.class
+
+## Package Files
+*.jar
+*.war
+*.ear
+
+## Log files
+*.log
+*.log.*
+
+## Test output
+*.out
+
+## checks
+*.pmd*
+
+
+######################
+# Eclipse
+######################
+
+.project
+.classpath
+.metadata
+.settings/
+
+## Locally stored "Eclipse launch configurations"
+*.launch
+
+## Files that might appear on external disk
+.Spotlight-V100
+
+## Mobile Tools for Java (J2ME)
+.mtj.tmp/
+
+## virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
+hs_err_pid*
+
+
+######################
+# Windows
+######################
+
+## Windows image file caches
+Thumbs.db
+
+## Folder config file
+Desktop.ini
+
+######################
+# OSX
+######################
+
+.DS_Store
+.svn
+
+## Thumbnails
+._*
+
+*.xml#
