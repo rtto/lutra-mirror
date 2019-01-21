@@ -74,13 +74,38 @@ public class CLI {
 
         MessageHandler.setQuiet(settings.quiet);
 
-        if (cli.isUsageHelpRequested() || args.length == 0) {
+        if (cli.isUsageHelpRequested()) {
             cli.usage(System.out);
         } else if (cli.isVersionHelpRequested()) {
             cli.printVersionHelp(System.out);
-        } else {
+        } else if (checkOptions()) {
             execute();
         }
+    }
+
+    /**
+     * Checks that the provided options form a meaningful execution,
+     * otherwise prints an error message.
+     */
+    private static boolean checkOptions() {
+
+        if (settings.input == null
+            && (settings.mode == Settings.Mode.expand
+                || settings.mode == Settings.Mode.format)) {
+
+            MessageHandler.printMessage(Message.error("Please provide an input file to perform "
+                    + settings.mode + " on. For help on usage, use the --help option."));
+            return false;
+        } else if (settings.library == null
+            && (settings.mode == Settings.Mode.expandLibrary
+                || settings.mode == Settings.Mode.formatLibrary
+                || settings.mode == Settings.Mode.lint)) {
+
+            MessageHandler.printMessage(Message.error("Please provide a library to perform "
+                    + settings.mode + " on. For help on usage, use the --help option."));
+            return false;
+        }
+        return true;
     }
 
 
@@ -168,7 +193,7 @@ public class CLI {
                     }
                 );
                 break;
-            case libraryExpand:
+            case expandLibrary:
                 ResultConsumer.use(store.expandAll(),
                     expandedStore -> {
 
