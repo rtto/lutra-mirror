@@ -74,7 +74,7 @@ public class CLI {
 
         MessageHandler.setQuiet(settings.quiet);
 
-        if (cli.isUsageHelpRequested()) {
+        if (cli.isUsageHelpRequested() || args.length == 0) {
             cli.usage(System.out);
         } else if (cli.isVersionHelpRequested()) {
             cli.printVersionHelp(System.out);
@@ -91,15 +91,15 @@ public class CLI {
 
     private static void execute() {
 
-        if (settings.library == null && !settings.fetchMissingDependencies) {
-            if (!settings.quiet) {
-                Message err = Message.error(
-                    "No template library provided and not set to fetch missing templates, "
-                        + "thus nothing can be done.");
-                MessageHandler.printMessage(err);
-            }
-            return;
-        }
+        //if (settings.library == null && !settings.fetchMissingDependencies) {
+        //    if (!settings.quiet) {
+        //        Message err = Message.error(
+        //            "No template library provided and not set to fetch missing templates, "
+        //                + "thus nothing can be done.");
+        //        MessageHandler.printMessage(err);
+        //    }
+        //    return;
+        //}
         TemplateStore store = new DependencyGraph(); // TODO: implementation choice based on cli-arg
         ResultConsumer.use(makeTemplateReader(),
             reader -> {
@@ -124,12 +124,12 @@ public class CLI {
 
         // TODO: Make cli-argument of both base template and suffixes to include/ignore
         store.addTemplateSignature(WTemplateFactory.createTripleTemplateHead());
-        Result<MessageHandler> consumer = Result.empty();
 
         if (settings.library == null) {
-            return consumer;
+            return Result.of(new MessageHandler());
         }
 
+        Result<MessageHandler> consumer;
         try {
             consumer = Result.of(reader.loadTemplatesFromFolder(store, settings.library,
                     settings.endings, settings.ignoreEndings));
@@ -181,11 +181,24 @@ public class CLI {
                     }
                 );
                 break;
-            case format:
+            case formatLibrary:
                 ResultConsumer.use(makeTemplateWriter(),
                     writer ->  {
 
                         writeTemplates(store, writer);
+                    }
+                );
+                break;
+            case format:
+                ResultConsumer.use(makeInstanceReader(),
+                    reader -> {
+
+                        ResultConsumer.use(makeInstanceWriter(),
+                            writer ->  {
+
+                                formatInstances(reader, writer);
+                            }
+                        );
                     }
                 );
                 break;
@@ -194,7 +207,7 @@ public class CLI {
                 break;
             default:
                 if (!settings.quiet) {
-                    Message err = Message.error(settings.mode + " is not yet supported.");
+                    Message err = Message.error("The mode " + settings.mode + " is not yet supported.");
                     MessageHandler.printMessage(err);
                 }
         } 
@@ -299,6 +312,16 @@ public class CLI {
     /// WRITER-METHODS, WRITING THINGS TO FILE               ///
     ////////////////////////////////////////////////////////////
 
+    private static void formatInstances(InstanceReader reader, InstanceWriter writer) {
+        
+        ResultConsumer<Instance> consumer = new ResultConsumer<>(writer);
+        reader.apply(settings.input)
+            .forEach(consumer);
+
+        if (!Message.moreSevere(consumer.getMessageHandler().printMessages(), settings.ignore)) {
+            writeInstances(writer.write());
+        }
+    }
 
     private static void expandAndWriteInstanes(InstanceReader reader, InstanceWriter writer,
         Function<Instance, ResultStream<Instance>> expander) {
