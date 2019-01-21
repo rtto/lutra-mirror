@@ -23,12 +23,16 @@ package xyz.ottr.lutra.cli;
  */
 
 import picocli.CommandLine.Command;
+import picocli.CommandLine.IVersionProvider;
 import picocli.CommandLine.Option;
 
 import xyz.ottr.lutra.result.Message;
 
-@Command(description = "Tool for working with OTTR Templates.",
-         name = "lutra", mixinStandardHelpOptions = true, version = "2.0")
+@Command(
+    name = "lutra",
+    description = "Tool for working with OTTR Templates.",        
+    mixinStandardHelpOptions = true, 
+    versionProvider = Settings.JarFileVersionProvider.class)
 public class Settings {
 
     public enum Format { legacy, wottr, stottr, tabottr, qottr }
@@ -91,4 +95,15 @@ public class Settings {
                                                      + "(legal values: ${COMPLETION-CANDIDATES}; "
                                                      + "default: ${DEFAULT-VALUE})"})
     public Mode mode = Mode.expand;
+    
+    
+    /**
+     * This gets the version from the pom.xml file. Works only for jar file.
+     */
+    static class JarFileVersionProvider implements IVersionProvider {
+        
+        public String[] getVersion() {
+            return new String[] { Settings.class.getPackage().getImplementationVersion() };
+        }
+    }
 }
