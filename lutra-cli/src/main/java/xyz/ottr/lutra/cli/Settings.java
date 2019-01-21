@@ -104,7 +104,7 @@ public class Settings {
     public int ignore = Message.WARNING;
 
 
-    public enum Mode { expand, libraryExpand, contract, format, formatLibrary, lint, analyse }
+    public enum Mode { expand, expandLibrary, contract, format, formatLibrary, lint, analyse }
 
     @Option(names = {"-m", "--mode"}, description = {"The mode of operation to be applied to input.%n"
                                                      + "(legal values: ${COMPLETION-CANDIDATES}; "
