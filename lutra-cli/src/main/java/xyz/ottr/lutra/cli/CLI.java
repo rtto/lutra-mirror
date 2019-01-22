@@ -133,7 +133,7 @@ public class CLI {
                     messageHandler -> {
 
                         // TODO: cli-arg to decide if continue, int-flag to denote ignore level
-                        if (!Message.moreSevere(messageHandler.printMessages(), settings.ignore)) {
+                        if (!Message.moreSevere(messageHandler.printMessages(), settings.haltOn)) {
                             executeMode(store);
                         }
                     }
@@ -343,7 +343,7 @@ public class CLI {
         reader.apply(settings.input)
             .forEach(consumer);
 
-        if (!Message.moreSevere(consumer.getMessageHandler().printMessages(), settings.ignore)) {
+        if (!Message.moreSevere(consumer.getMessageHandler().printMessages(), settings.haltOn)) {
             writeInstances(writer.write());
         }
     }
@@ -356,7 +356,7 @@ public class CLI {
             .innerFlatMap(expander)
             .forEach(consumer);
 
-        if (!Message.moreSevere(consumer.getMessageHandler().printMessages(), settings.ignore)) {
+        if (!Message.moreSevere(consumer.getMessageHandler().printMessages(), settings.haltOn)) {
             writeInstances(writer.write());
         }
     }
@@ -385,7 +385,7 @@ public class CLI {
         ResultConsumer<TemplateSignature> consumer = new ResultConsumer<>(writer);
         store.getAllTemplateObjects().forEach(consumer);
 
-        if (!Message.moreSevere(consumer.getMessageHandler().printMessages(), settings.ignore)) {
+        if (!Message.moreSevere(consumer.getMessageHandler().printMessages(), settings.haltOn)) {
             for (String iri : writer.getIRIs()) {
                 writeTemplate(iri, writer.write(iri));
             }
