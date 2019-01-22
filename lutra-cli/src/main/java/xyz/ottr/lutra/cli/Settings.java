@@ -30,12 +30,13 @@ import xyz.ottr.lutra.result.Message;
 
 @Command(
     name = "lutra",
-    descriptionHeading = "%nDescription:%n%n",
-    parameterListHeading = "%nParameters:%n",
-    optionListHeading = "%nOptions:%n",
+    descriptionHeading = "%n@|bold DESCRIPTION:|@%n",
+    parameterListHeading = "%n@|bold PARAMETERS:|@%n",
+    optionListHeading = "%n@|bold OPTIONS:|@%n",
+    footerHeading = "%n",
     description = "Tool for working with OTTR Templates, for expanding instances and template definition,"
-        + " translating between different formats and for checking the integrity of a template library.%n%n"
-        + "Examples:%n%n"
+        + " translating between different formats and for checking the integrity of a template library.",
+    footer = "@|bold EXAMPLES:|@%n"
         + "The following command reads all .ttl and .owl-files in ./lib as a template library and checks its intergrity:%n%n"
         + "    lutra -l wottr -m lint -L ./lib -e \"ttl,owl\"%n%n"
         + "The following translates all template files (with .ttl-endings) in ./lib from the legacy format to wottr,"
@@ -43,7 +44,16 @@ import xyz.ottr.lutra.result.Message;
         + "    lutra -l legacy -O wottr -m formatLibrary -L ./lib -o /wottr%n%n"
         + "The following expands all instances in instances.xlsx in tabOTTR using the templates in ./lib and writes"
         + " the expanded instances to exp.ttl in the wOTTR format:%n%n"
-        + "    lutra -I tabottr -O wottr -m expand -L ./lib -o exp.ttl -f instances.xlsx%n",
+        + "    lutra -I tabottr -O wottr -m expand -L ./lib -o exp.ttl -f instances.xlsx"
+        + "%n%n@|bold DISCUSSION:|@%n"
+        + "Note that with -O wottr all triple-instances outside of template definitions are written as normal RDF triples,"
+        + " thus to expand a set of instances into an RDF graph this is what should be used."
+        + "%n%n@|bold FURTHER INFORMATION:|@%n"
+        + "Website: https://ottr.xyz%n"
+        + "Source:  https://gitlab.com/ottr/lutra/lutra"
+        + "%n%n@|bold REPORTING BUGS:|@%n"
+        + "Please report any bugs as issues to our Git repository at"
+        + "%n    https://gitlab.com/ottr/lutra/lutra/issues.",
     mixinStandardHelpOptions = true, 
     versionProvider = Settings.JarFileVersionProvider.class)
 public class Settings {
