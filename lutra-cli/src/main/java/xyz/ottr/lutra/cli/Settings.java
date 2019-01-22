@@ -98,10 +98,10 @@ public class Settings {
                                                 + "(default: ${DEFAULT-VALUE})"})
     public boolean quiet = false;
 
-    @Option(names = {"--ignore"}, description = {"Ignore messages with an int representation above the flag.%n"
+    @Option(names = {"--haltOn"}, description = {"Halt on messages with a severity equal to or below the flag.%n"
                                                  + "(legal values: 3=INFO, 2=WARNING, 1=ERROR, 0=FATAL; "
                                                  + "default: ${DEFAULT-VALUE})"})
-    public int ignore = Message.WARNING;
+    public int haltOn = Message.ERROR;
 
 
     public enum Mode { expand, expandLibrary, contract, format, formatLibrary, lint, analyse }
