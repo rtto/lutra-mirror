@@ -37,7 +37,6 @@ import xyz.ottr.lutra.result.Result;
 public class Substitution {
 
     private Map<Term, Term> termSubstitution; // Represents substitution of simple terms
-    private Map<Term, Term> substitutedFor = new HashMap<>();
     
     public Substitution(Map<Term, Term> termSubstitution) {
         this.termSubstitution = new HashMap<>();
@@ -89,8 +88,8 @@ public class Substitution {
                 TermList tl = (TermList) p;
                 substituted.add(apply(tl));
             } else if (p.isBlank() && !this.termSubstitution.containsKey(p)) {
-                BlankNodeTerm blank = (BlankNodeTerm) this.substitutedFor.getOrDefault(p, new BlankNodeTerm());
-                this.substitutedFor.putIfAbsent(p, blank);
+                BlankNodeTerm blank = new BlankNodeTerm();
+                this.termSubstitution.put(p, blank);
                 substituted.add(blank);
             } else {
                 substituted.add(this.termSubstitution.getOrDefault(p, p));
@@ -107,17 +106,10 @@ public class Substitution {
     public ArgumentList apply(ArgumentList args) {
         TermList substituted = apply(args.getTermList());
 
-        // Need to substitue ListTerms in optionals and eachValues, if substitued due to new identity
-        // Set<Term> newOptionals = null;
-        // if (optional != null) {
-        //     newOptionals = optional.stream()
-        //                            .map(t -> substitutedFor.getOrDefault(t, t))
-        //                            .collect(Collectors.toCollection(HashSet::new));
-        // }
         Set<Term> newExpanderValues = null;
         if (args.getExpanderValues() != null) {
             newExpanderValues = args.getExpanderValues().stream()
-                .map(t -> this.substitutedFor.getOrDefault(t, t))
+                .map(t -> this.termSubstitution.getOrDefault(t, t))
                 .collect(Collectors.toCollection(HashSet::new));
         }
         return new ArgumentList(substituted, newExpanderValues, args.getListExpander());
@@ -172,8 +164,6 @@ public class Substitution {
 
     @Override
     public String toString() {
-        return "<Term substitution: " + termSubstitution.toString() 
-            + (this.substitutedFor.isEmpty()
-                    ? "" : " -- Substituted for: " + this.substitutedFor.toString()) + ">";
+        return "<Term substitution: " + termSubstitution.toString() + ">";
     }
 }
