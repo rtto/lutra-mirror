@@ -25,6 +25,7 @@ package xyz.ottr.lutra.tabottr.io.excel;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import org.apache.poi.openxml4j.exceptions.InvalidOperationException;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.DataFormatter;
 import org.apache.poi.ss.usermodel.FormulaEvaluator;
@@ -58,6 +59,9 @@ public class ExcelReader {
             return Result.of(tables);
         } catch (IOException ex) {
             Message msg = Message.error(ex.getMessage());
+            return Result.empty(msg);
+        } catch (InvalidOperationException exs) {
+            Message msg = Message.error(exs.getMessage());
             return Result.empty(msg);
         }
     }
