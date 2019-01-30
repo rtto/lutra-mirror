@@ -612,7 +612,9 @@ public class DependencyGraph implements TemplateStore {
         }
 
         public boolean canExpand() {
-            if (this.to.getParameters() == null || this.to.isBaseTemplate()) {
+            if (this.to.getParameters() == null
+                || this.to.isBaseTemplate()
+                   && !this.argumentList.hasListExpander()) {
                 return false;
             }
             for (int i = 0; i < this.argumentList.size(); i++) {
