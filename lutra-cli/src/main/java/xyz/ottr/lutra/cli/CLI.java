@@ -89,11 +89,11 @@ public class CLI {
      */
     private static boolean checkOptions() {
 
-        if (settings.input == null
+        if (settings.inputs.isEmpty()
             && (settings.mode == Settings.Mode.expand
                 || settings.mode == Settings.Mode.format)) {
 
-            MessageHandler.printMessage(Message.error("Please provide an input file to perform "
+            MessageHandler.printMessage(Message.error("Please provide one or more input files to perform "
                     + settings.mode + " on. For help on usage, use the --help option."));
             return false;
         } else if (settings.library == null
@@ -157,7 +157,7 @@ public class CLI {
         Result<MessageHandler> consumer;
         try {
             consumer = Result.of(reader.loadTemplatesFromFolder(store, settings.library,
-                    settings.endings, settings.ignoreEndings));
+                    settings.extensions, settings.ignoreExtensions));
         } catch (IOException ex) {
             Message err = Message.error(
                 "Error when parsing templates from folder -- " + ex.getMessage());
@@ -252,9 +252,6 @@ public class CLI {
             case tabottr:
                 return Result.empty(Message.error(
                         "TabOTTR does not support template definitions."));
-            case qottr:
-                return Result.empty(Message.error(
-                        "qOTTR does not support template definitions."));
             case legacy:
                 // legacy WOTTR
                 return Result.of(new TemplateReader(new WFileReader(),
@@ -266,7 +263,7 @@ public class CLI {
     }
             
     private static Result<InstanceReader> makeInstanceReader() {
-        if (settings.input == null) {
+        if (settings.inputs.isEmpty()) {
             return Result.empty(Message.error(
                     "No input file provided."));
         }
@@ -276,9 +273,6 @@ public class CLI {
             case stottr:
                 return Result.empty(Message.error(
                         "stOTTR not yet supported as input format."));
-            case qottr:
-                return Result.empty(Message.error(
-                        "qOTTR not yet supported as input format."));
             case legacy:
                 // legacy WOTTR
                 return Result.of(new InstanceReader(new WFileReader(),
@@ -306,9 +300,6 @@ public class CLI {
             case stottr:
                 return Result.empty(Message.error(
                         "stOTTR not yet supported as output format."));
-            case qottr:
-                return Result.empty(Message.error(
-                        "qOTTR is yet not supported as output format."));
             default:
                 // WOTTR
                 return Result.of(new WInstanceWriter());
@@ -323,9 +314,6 @@ public class CLI {
             case stottr:
                 return Result.empty(Message.error(
                         "stOTTR not yet supported as output format."));
-            case qottr:
-                return Result.empty(Message.error(
-                        "qOTTR is yet not supported as output format."));
             default:
                 // WOTTR
                 return Result.of(new WTemplateWriter());
@@ -340,7 +328,8 @@ public class CLI {
     private static void formatInstances(InstanceReader reader, InstanceWriter writer) {
         
         ResultConsumer<Instance> consumer = new ResultConsumer<>(writer);
-        reader.apply(settings.input)
+        ResultStream.innerOf(settings.inputs)
+            .innerFlatMap(reader)
             .forEach(consumer);
 
         if (!Message.moreSevere(consumer.getMessageHandler().printMessages(), settings.haltOn)) {
@@ -352,7 +341,8 @@ public class CLI {
         Function<Instance, ResultStream<Instance>> expander) {
 
         ResultConsumer<Instance> consumer = new ResultConsumer<>(writer);
-        reader.apply(settings.input)
+        ResultStream.innerOf(settings.inputs)
+            .innerFlatMap(reader)
             .innerFlatMap(expander)
             .forEach(consumer);
 
@@ -402,7 +392,7 @@ public class CLI {
             return;
         }
         try {
-            // TODO: cli-arg to decide ending
+            // TODO: cli-arg to decide extension
             String iriPath = iriToPath(iri);
             Files.createDirectories(Paths.get(settings.out, iriToDirectory(iriPath)));
             Files.write(Paths.get(settings.out, iriPath + ".ttl"), output.getBytes(Charset.forName("UTF-8")));

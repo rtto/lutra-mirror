@@ -22,9 +22,15 @@ package xyz.ottr.lutra.cli;
  * #L%
  */
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
+
 import picocli.CommandLine.Command;
 import picocli.CommandLine.IVersionProvider;
 import picocli.CommandLine.Option;
+import picocli.CommandLine.Parameters;
 
 import xyz.ottr.lutra.result.Message;
 
@@ -39,7 +45,7 @@ import xyz.ottr.lutra.result.Message;
     footer = "@|bold EXAMPLES:|@%n"
         + "The following command reads all .ttl and .owl-files in ./lib as a template library and checks its intergrity:%n%n"
         + "    lutra -l wottr -m lint -L ./lib -e \"ttl,owl\"%n%n"
-        + "The following translates all template files (with .ttl-endings) in ./lib from the legacy format to wottr,"
+        + "The following translates all template files (with .ttl-extension) in ./lib from the legacy format to wottr,"
         + " and writes them to ./wottr:%n%n"
         + "    lutra -l legacy -O wottr -m formatLibrary -L ./lib -o ./wottr%n%n"
         + "The following expands all instances in instances.xlsx in tabOTTR using the templates in ./lib and writes"
@@ -65,70 +71,112 @@ import xyz.ottr.lutra.result.Message;
     versionProvider = Settings.JarFileVersionProvider.class)
 public class Settings {
 
-    public enum Format { legacy, wottr, stottr, tabottr, qottr }
+    public enum Format { legacy, wottr, stottr, tabottr }
 
-    @Option(names = {"--endings", "-e"}, split = ",",
-        description = {"File endings of files to use as input to template library.%n"
+    @Option(names = {"--extension", "-e"}, split = ",",
+        description = {"File extension of files to use as input to template library.%n"
                        + "(default: ${DEFAULT-VALUE})"})
-    public String[] endings = new String[]{ "ttl" };
+    public String[] extensions = new String[]{ "ttl" };
 
-    @Option(names = {"--ignoreEndings", "-E"}, split = ",",
-        description = {"File endings of files to ignore as input to template library.%n"
+    @Option(names = {"--ignoreExtension", "-E"}, split = ",",
+        description = {"File extensions of files to ignore as input to template library.%n"
                        + "(default: ${DEFAULT-VALUE})"})
-    public String[] ignoreEndings = new String[]{ };
+    public String[] ignoreExtensions = new String[]{ };
 
-    @Option(names = {"-I", "--inputFormat"}, description = {"Input format of instances.%n"
-                                                            + "(legal values: ${COMPLETION-CANDIDATES}; "
-                                                            + "default: ${DEFAULT-VALUE})"})
+    @Option(names = {"-I", "--inputFormat"}, completionCandidates = InsInputFormat.class,
+        description = {"Input format of instances.%n"
+                       + "(legal values: ${COMPLETION-CANDIDATES}; "
+                       + "default: ${DEFAULT-VALUE})"})
     public Format inputFormat = Format.wottr;
 
-    @Option(names = {"-O", "--outputFormat"}, description = {"Output format of output of operation defined by the mode.%n"
-                                                             + "(legal values: ${COMPLETION-CANDIDATES}; "
-                                                             + "default: ${DEFAULT-VALUE})"})
+    @Option(names = {"-O", "--outputFormat"}, completionCandidates = OutputFormat.class,
+        description = {"Output format of output of operation defined by the mode.%n"
+                       + "(legal values: ${COMPLETION-CANDIDATES}; "
+                       + "default: ${DEFAULT-VALUE})"})
     public Format outputFormat = Format.wottr;
 
-    @Option(names = {"-l", "--libraryFormat"}, description = {"The input format of the library.%n"
-                                                              + "(legal values: ${COMPLETION-CANDIDATES}; "
-                                                              + "default: ${DEFAULT-VALUE})"})
+    @Option(names = {"-l", "--libraryFormat"}, completionCandidates = TplInputFormat.class,
+        description = {"The input format of the library.%n"
+                       + "(legal values: ${COMPLETION-CANDIDATES}; "
+                       + "default: ${DEFAULT-VALUE})"})
     public Format libraryFormat = Format.wottr;
 
 
-    @Option(names = {"-F", "--fetchMissing"}, description = {"Fetch missing template dependencies. It is here assumed that"
-                                                             + " templates' definitions are accessible via their IRI, that is, the IRI is"
-                                                             + " either a path to a file, a URL, or similar.%n"
-                                                             + "(default: ${DEFAULT-VALUE})"})
+    @Option(names = {"-F", "--fetchMissing"},
+        description = {"Fetch missing template dependencies. It is here assumed that"
+                       + " templates' definitions are accessible via their IRI, that is, the IRI is"
+                       + " either a path to a file, a URL, or similar.%n"
+                       + "(default: ${DEFAULT-VALUE})"})
     public boolean fetchMissingDependencies = false;
 
     @Option(names = {"-L", "--library"}, description = {"Folder containing templates to use as library."})
     public String library;
 
-    @Option(names = {"-f", "--file"}, description = {"Path to content to which operations are to be applied."})
-    public String input;
+    @Parameters(description = {"Files of instances to which operations are to be applied."})
+    public List<String> inputs = new LinkedList<>();
 
-    @Option(names = {"-o", "--out"}, description = {"Path to which output from operations are to be written."})
+    @Option(names = {"-o", "--output"}, description = {"Path to which output from operations are to be written."})
     public String out;
 
-    @Option(names = {"--stdout"}, description = {"Print result of operations to standard out.%n"
-                                                 + "(default: ${DEFAULT-VALUE})"})
+    @Option(names = {"--stdout"},
+        description = {"Print result of operations to standard out.%n"
+                       + "(default: ${DEFAULT-VALUE})"})
     public boolean stdout = false;
 
-    @Option(names = {"--quiet"}, description = {"Suppress all messages, including errors and warnings.%n"
-                                                + "(default: ${DEFAULT-VALUE})"})
+    @Option(names = {"--quiet"},
+        description = {"Suppress all messages, including errors and warnings.%n"
+                       + "(default: ${DEFAULT-VALUE})"})
     public boolean quiet = false;
 
-    @Option(names = {"--haltOn"}, description = {"Halt on messages with a severity equal to or below the flag.%n"
-                                                 + "(legal values: 3=INFO, 2=WARNING, 1=ERROR, 0=FATAL; "
-                                                 + "default: ${DEFAULT-VALUE})"})
+    @Option(names = {"--haltOn"},
+        description = {"Halt on messages with a severity equal to or below the flag.%n"
+                       + "(legal values: 3=INFO, 2=WARNING, 1=ERROR, 0=FATAL; "
+                       + "default: ${DEFAULT-VALUE})"})
     public int haltOn = Message.ERROR;
 
 
     public enum Mode { expand, expandLibrary, contract, format, formatLibrary, lint, analyse }
 
-    @Option(names = {"-m", "--mode"}, description = {"The mode of operation to be applied to input.%n"
-                                                     + "(legal values: ${COMPLETION-CANDIDATES}; "
-                                                     + "default: ${DEFAULT-VALUE})"})
+    @Option(names = {"-m", "--mode"},
+        description = {"The mode of operation to be applied to input.%n"
+                       + "(legal values: ${COMPLETION-CANDIDATES}; "
+                       + "default: ${DEFAULT-VALUE})"})
     public Mode mode = Mode.expand;
     
+    /* The following classes restrict the selections of Format to supported formats. */
+    private static class InsInputFormat extends ArrayList<String> {
+
+        static final long serialVersionUID = 0L; // Not correct!
+
+        InsInputFormat() {
+            super(Arrays.asList(
+                    Format.legacy.toString(),
+                    Format.wottr.toString(),
+                    Format.tabottr.toString()));
+        }
+    }
+
+    private static class TplInputFormat extends ArrayList<String> {
+
+        static final long serialVersionUID = 0L; // Not correct!
+
+        TplInputFormat() {
+            super(Arrays.asList(
+                    Format.legacy.toString(),
+                    Format.wottr.toString()));
+        }
+    }
+
+    private static class OutputFormat extends ArrayList<String> {
+
+        static final long serialVersionUID = 0L; // Not correct!
+
+        OutputFormat() {
+            super(Arrays.asList(
+                    Format.legacy.toString(),
+                    Format.wottr.toString()));
+        }
+    }
     
     /**
      * This gets the version from the pom.xml file. Works only for jar file.
@@ -139,4 +187,5 @@ public class Settings {
             return new String[] { Settings.class.getPackage().getImplementationVersion() };
         }
     }
+
 }
