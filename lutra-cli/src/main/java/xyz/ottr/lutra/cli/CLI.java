@@ -246,19 +246,14 @@ public class CLI {
 
     private static Result<TemplateReader> makeTemplateReader() {
         switch (settings.libraryFormat) {
-            case stottr:
-                return Result.empty(Message.error(
-                        "stOTTR not yet supported as input format."));
-            case tabottr:
-                return Result.empty(Message.error(
-                        "TabOTTR does not support template definitions."));
             case legacy:
-                // legacy WOTTR
                 return Result.of(new TemplateReader(new WFileReader(),
                         new xyz.ottr.lutra.wottr.legacy.io.WTemplateParser()));
-            default:
-                // WOTTR
+            case wottr:
                 return Result.of(new TemplateReader(new WFileReader(), new WTemplateParser()));
+            default:
+                return Result.empty(Message.error(
+                        "Library format " + settings.libraryFormat + " not yet supported as input format."));
         }
     }
             
@@ -270,15 +265,15 @@ public class CLI {
         switch (settings.inputFormat) {
             case tabottr:
                 return Result.of(new InstanceReader(new TabInstanceParser()));
-            case stottr:
-                return Result.empty(Message.error(
-                        "stOTTR not yet supported as input format."));
             case legacy:
-                // legacy WOTTR
                 return Result.of(new InstanceReader(new WFileReader(),
                         new xyz.ottr.lutra.wottr.legacy.io.WInstanceParser()));
-            default: // WOTTR
+            case wottr:
                 return Result.of(new InstanceReader(new WFileReader(), new WInstanceParser()));
+            default:
+                return Result.empty(Message.error(
+                        "Input format " + settings.outputFormat.toString()
+                            + " not yet supported for instances."));
         }
     }
 
@@ -294,29 +289,23 @@ public class CLI {
 
     private static Result<InstanceWriter> makeInstanceWriter() {
         switch (settings.outputFormat) {
-            case tabottr:
-                return Result.empty(Message.error(
-                        "tabOTTR not yet supported as output format."));
-            case stottr:
-                return Result.empty(Message.error(
-                        "stOTTR not yet supported as output format."));
-            default:
-                // WOTTR
+            case wottr:
                 return Result.of(new WInstanceWriter());
+            default:
+                return Result.empty(Message.error(
+                        "Output format " + settings.outputFormat.toString()
+                            + " not yet supported for instances."));
         }
     }
 
     private static Result<TemplateWriter> makeTemplateWriter() {
         switch (settings.outputFormat) {
-            case tabottr:
-                return Result.empty(Message.error(
-                        "tabOTTR not yet supported as output format."));
-            case stottr:
-                return Result.empty(Message.error(
-                        "stOTTR not yet supported as output format."));
-            default:
-                // WOTTR
+            case wottr:
                 return Result.of(new WTemplateWriter());
+            default:
+                return Result.empty(Message.error(
+                        "Output format " + settings.outputFormat.toString()
+                            + " not yet supported for templates."));
         }
     }
 
