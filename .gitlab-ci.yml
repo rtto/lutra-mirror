@@ -10,16 +10,17 @@ variables:
   - mvn install package
   - cp lutra-cli/target/lutra.jar lutra.jar
 
-build_develop:
+snapshot:
   <<: *build_core
-  only: 
+  only:
     - develop
+    - master
   artifacts:
-    expire_in: 3 mos 1day
+    expire_in: 6 mos 1day
     paths:
     - lutra.jar
 
-build_tags:
+release:
   <<: *build_core
   only: 
     - tags
