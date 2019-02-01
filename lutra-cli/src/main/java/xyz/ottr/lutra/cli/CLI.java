@@ -78,9 +78,34 @@ public class CLI {
             cli.usage(System.out);
         } else if (cli.isVersionHelpRequested()) {
             cli.printVersionHelp(System.out);
-        } else {
+        } else if (checkOptions()) {
             execute();
         }
+    }
+
+    /**
+     * Checks that the provided options form a meaningful execution,
+     * otherwise prints an error message.
+     */
+    private static boolean checkOptions() {
+
+        if (settings.inputs.isEmpty()
+            && (settings.mode == Settings.Mode.expand
+                || settings.mode == Settings.Mode.format)) {
+
+            MessageHandler.printMessage(Message.error("Please provide one or more input files to perform "
+                    + settings.mode + " on. For help on usage, use the --help option."));
+            return false;
+        } else if (settings.library == null
+            && (settings.mode == Settings.Mode.expandLibrary
+                || settings.mode == Settings.Mode.formatLibrary
+                || settings.mode == Settings.Mode.lint)) {
+
+            MessageHandler.printMessage(Message.error("Please provide a library to perform "
+                    + settings.mode + " on. For help on usage, use the --help option."));
+            return false;
+        }
+        return true;
     }
 
 
@@ -91,15 +116,15 @@ public class CLI {
 
     private static void execute() {
 
-        if (settings.library == null && !settings.fetchMissingDependencies) {
-            if (!settings.quiet) {
-                Message err = Message.error(
-                    "No template library provided and not set to fetch missing templates, "
-                        + "thus nothing can be done.");
-                MessageHandler.printMessage(err);
-            }
-            return;
-        }
+        //if (settings.library == null && !settings.fetchMissingDependencies) {
+        //    if (!settings.quiet) {
+        //        Message err = Message.error(
+        //            "No template library provided and not set to fetch missing templates, "
+        //                + "thus nothing can be done.");
+        //        MessageHandler.printMessage(err);
+        //    }
+        //    return;
+        //}
         TemplateStore store = new DependencyGraph(); // TODO: implementation choice based on cli-arg
         ResultConsumer.use(makeTemplateReader(),
             reader -> {
@@ -108,7 +133,7 @@ public class CLI {
                     messageHandler -> {
 
                         // TODO: cli-arg to decide if continue, int-flag to denote ignore level
-                        if (!Message.moreSevere(messageHandler.printMessages(), settings.ignore)) {
+                        if (!Message.moreSevere(messageHandler.printMessages(), settings.haltOn)) {
                             executeMode(store);
                         }
                     }
@@ -124,15 +149,15 @@ public class CLI {
 
         // TODO: Make cli-argument of both base template and suffixes to include/ignore
         store.addTemplateSignature(WTemplateFactory.createTripleTemplateHead());
-        Result<MessageHandler> consumer = Result.empty();
 
         if (settings.library == null) {
-            return consumer;
+            return Result.of(new MessageHandler());
         }
 
+        Result<MessageHandler> consumer;
         try {
             consumer = Result.of(reader.loadTemplatesFromFolder(store, settings.library,
-                    settings.endings, settings.ignoreEndings));
+                    settings.extensions, settings.ignoreExtensions));
         } catch (IOException ex) {
             Message err = Message.error(
                 "Error when parsing templates from folder -- " + ex.getMessage());
@@ -168,7 +193,7 @@ public class CLI {
                     }
                 );
                 break;
-            case libraryExpand:
+            case expandLibrary:
                 ResultConsumer.use(store.expandAll(),
                     expandedStore -> {
 
@@ -181,11 +206,24 @@ public class CLI {
                     }
                 );
                 break;
-            case format:
+            case formatLibrary:
                 ResultConsumer.use(makeTemplateWriter(),
                     writer ->  {
 
                         writeTemplates(store, writer);
+                    }
+                );
+                break;
+            case format:
+                ResultConsumer.use(makeInstanceReader(),
+                    reader -> {
+
+                        ResultConsumer.use(makeInstanceWriter(),
+                            writer ->  {
+
+                                formatInstances(reader, writer);
+                            }
+                        );
                     }
                 );
                 break;
@@ -194,7 +232,7 @@ public class CLI {
                 break;
             default:
                 if (!settings.quiet) {
-                    Message err = Message.error(settings.mode + " is not yet supported.");
+                    Message err = Message.error("The mode " + settings.mode + " is not yet supported.");
                     MessageHandler.printMessage(err);
                 }
         } 
@@ -208,45 +246,34 @@ public class CLI {
 
     private static Result<TemplateReader> makeTemplateReader() {
         switch (settings.libraryFormat) {
-            case stottr:
-                return Result.empty(Message.error(
-                        "stOTTR not yet supported as input format."));
-            case tabottr:
-                return Result.empty(Message.error(
-                        "TabOTTR does not support template definitions."));
-            case qottr:
-                return Result.empty(Message.error(
-                        "qOTTR does not support template definitions."));
             case legacy:
-                // legacy WOTTR
                 return Result.of(new TemplateReader(new WFileReader(),
                         new xyz.ottr.lutra.wottr.legacy.io.WTemplateParser()));
-            default:
-                // WOTTR
+            case wottr:
                 return Result.of(new TemplateReader(new WFileReader(), new WTemplateParser()));
+            default:
+                return Result.empty(Message.error(
+                        "Library format " + settings.libraryFormat + " not yet supported as input format."));
         }
     }
             
     private static Result<InstanceReader> makeInstanceReader() {
-        if (settings.input == null) {
+        if (settings.inputs.isEmpty()) {
             return Result.empty(Message.error(
                     "No input file provided."));
         }
         switch (settings.inputFormat) {
             case tabottr:
                 return Result.of(new InstanceReader(new TabInstanceParser()));
-            case stottr:
-                return Result.empty(Message.error(
-                        "stOTTR not yet supported as input format."));
-            case qottr:
-                return Result.empty(Message.error(
-                        "qOTTR not yet supported as input format."));
             case legacy:
-                // legacy WOTTR
                 return Result.of(new InstanceReader(new WFileReader(),
                         new xyz.ottr.lutra.wottr.legacy.io.WInstanceParser()));
-            default: // WOTTR
+            case wottr:
                 return Result.of(new InstanceReader(new WFileReader(), new WInstanceParser()));
+            default:
+                return Result.empty(Message.error(
+                        "Input format " + settings.outputFormat.toString()
+                            + " not yet supported for instances."));
         }
     }
 
@@ -262,35 +289,23 @@ public class CLI {
 
     private static Result<InstanceWriter> makeInstanceWriter() {
         switch (settings.outputFormat) {
-            case tabottr:
-                return Result.empty(Message.error(
-                        "tabOTTR not yet supported as output format."));
-            case stottr:
-                return Result.empty(Message.error(
-                        "stOTTR not yet supported as output format."));
-            case qottr:
-                return Result.empty(Message.error(
-                        "qOTTR is yet not supported as output format."));
-            default:
-                // WOTTR
+            case wottr:
                 return Result.of(new WInstanceWriter());
+            default:
+                return Result.empty(Message.error(
+                        "Output format " + settings.outputFormat.toString()
+                            + " not yet supported for instances."));
         }
     }
 
     private static Result<TemplateWriter> makeTemplateWriter() {
         switch (settings.outputFormat) {
-            case tabottr:
-                return Result.empty(Message.error(
-                        "tabOTTR not yet supported as output format."));
-            case stottr:
-                return Result.empty(Message.error(
-                        "stOTTR not yet supported as output format."));
-            case qottr:
-                return Result.empty(Message.error(
-                        "qOTTR is yet not supported as output format."));
-            default:
-                // WOTTR
+            case wottr:
                 return Result.of(new WTemplateWriter());
+            default:
+                return Result.empty(Message.error(
+                        "Output format " + settings.outputFormat.toString()
+                            + " not yet supported for templates."));
         }
     }
 
@@ -299,16 +314,28 @@ public class CLI {
     /// WRITER-METHODS, WRITING THINGS TO FILE               ///
     ////////////////////////////////////////////////////////////
 
+    private static void formatInstances(InstanceReader reader, InstanceWriter writer) {
+        
+        ResultConsumer<Instance> consumer = new ResultConsumer<>(writer);
+        ResultStream.innerOf(settings.inputs)
+            .innerFlatMap(reader)
+            .forEach(consumer);
+
+        if (!Message.moreSevere(consumer.getMessageHandler().printMessages(), settings.haltOn)) {
+            writeInstances(writer.write());
+        }
+    }
 
     private static void expandAndWriteInstanes(InstanceReader reader, InstanceWriter writer,
         Function<Instance, ResultStream<Instance>> expander) {
 
         ResultConsumer<Instance> consumer = new ResultConsumer<>(writer);
-        reader.apply(settings.input)
+        ResultStream.innerOf(settings.inputs)
+            .innerFlatMap(reader)
             .innerFlatMap(expander)
             .forEach(consumer);
 
-        if (!Message.moreSevere(consumer.getMessageHandler().printMessages(), settings.ignore)) {
+        if (!Message.moreSevere(consumer.getMessageHandler().printMessages(), settings.haltOn)) {
             writeInstances(writer.write());
         }
     }
@@ -337,7 +364,7 @@ public class CLI {
         ResultConsumer<TemplateSignature> consumer = new ResultConsumer<>(writer);
         store.getAllTemplateObjects().forEach(consumer);
 
-        if (!Message.moreSevere(consumer.getMessageHandler().printMessages(), settings.ignore)) {
+        if (!Message.moreSevere(consumer.getMessageHandler().printMessages(), settings.haltOn)) {
             for (String iri : writer.getIRIs()) {
                 writeTemplate(iri, writer.write(iri));
             }
@@ -354,7 +381,7 @@ public class CLI {
             return;
         }
         try {
-            // TODO: cli-arg to decide ending
+            // TODO: cli-arg to decide extension
             String iriPath = iriToPath(iri);
             Files.createDirectories(Paths.get(settings.out, iriToDirectory(iriPath)));
             Files.write(Paths.get(settings.out, iriPath + ".ttl"), output.getBytes(Charset.forName("UTF-8")));

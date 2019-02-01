@@ -33,6 +33,7 @@ import java.util.stream.Stream;
 
 import org.apache.jena.shared.PrefixMapping;
 
+import xyz.ottr.lutra.ROTTR;
 import xyz.ottr.lutra.model.Instance;
 import xyz.ottr.lutra.result.Message;
 import xyz.ottr.lutra.result.Result;
@@ -97,6 +98,7 @@ public class TableParser {
         PrefixMapping stdPrefixes = PrefixMapping.Factory.create();
         stdPrefixes.setNsPrefixes(PrefixMapping.Standard);
         stdPrefixes.setNsPrefix("ottr", WOTTR.namespace);
+        stdPrefixes.setNsPrefix("ottt", ROTTR.namespace);
 
         List<Message> conflicts = checkForConflicts(definedPrefixes, stdPrefixes);
 
