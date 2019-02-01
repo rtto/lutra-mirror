@@ -23,6 +23,7 @@ package xyz.ottr.lutra.io;
  */
 
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.function.Function;
 
@@ -30,12 +31,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import xyz.ottr.lutra.model.Instance;
+import xyz.ottr.lutra.result.Message;
+import xyz.ottr.lutra.result.Result;
 import xyz.ottr.lutra.result.ResultStream;
 
 public class InstanceReader implements Function<String, ResultStream<Instance>> {
 
     private Function<String, ResultStream<Instance>> instancePipeline;
     private final Logger log = LoggerFactory.getLogger(InstanceReader.class);
+
+    private final String[] includeExtensions = new String[0]; // TODO: Set via arguments
+    private final String[] excludeExtensions = new String[0]; // TODO: Set via arguments
 
     public InstanceReader(Function<String, ResultStream<Instance>> instancePipeline) {
         this.instancePipeline = instancePipeline;
@@ -48,11 +54,21 @@ public class InstanceReader implements Function<String, ResultStream<Instance>> 
     }
 
     public ResultStream<Instance> readInstances(ResultStream<String> files) {
-        return files.innerFlatMap(instancePipeline);
+        return files.innerFlatMap(this);
     }
 
     public ResultStream<Instance> apply(String filename) {
-        return instancePipeline.apply(filename);
+        try {
+            if (Paths.get(filename).toFile().isDirectory()) {
+                return loadInstancesFromFolder(filename);
+            } else {
+                return instancePipeline.apply(filename);
+            }
+        } catch (IOException ex) {
+            return ResultStream.of(Result.empty(Message.error(
+                        "Problem reading file or folder "
+                            + filename + ": " + ex.getMessage())));
+        }
     }
 
     /**
@@ -65,10 +81,9 @@ public class InstanceReader implements Function<String, ResultStream<Instance>> 
      * @param excludeExtensions
      *            the file extensions of the files in the folder to exclude
      */
-    public ResultStream<Instance> loadInstancesFromFolder(String folder, String[] includeExtensions,
-            String[] excludeExtensions) throws IOException {
+    public ResultStream<Instance> loadInstancesFromFolder(String folder) throws IOException {
         log.info("Loading all template instaces from folder " + folder + " with suffix "
                 + Arrays.toString(includeExtensions) + " except " + Arrays.toString(excludeExtensions));
-        return readInstances(Files.loadFromFolder(folder, includeExtensions, excludeExtensions));
+        return readInstances(Files.loadFromFolder(folder, this.includeExtensions, this.excludeExtensions));
     }
 }
