@@ -28,9 +28,6 @@ import static org.junit.Assert.assertTrue;
 
 import org.apache.jena.rdf.model.Model;
 
-import org.dyreriket.gaupa.rdf.ModelIO;
-import org.dyreriket.gaupa.rdf.ModelIOException;
-
 import org.junit.Test;
 
 import xyz.ottr.lutra.io.InstanceReader;
@@ -50,6 +47,8 @@ import xyz.ottr.lutra.wottr.io.WFileReader;
 import xyz.ottr.lutra.wottr.io.WInstanceParser;
 import xyz.ottr.lutra.wottr.io.WInstanceWriter;
 import xyz.ottr.lutra.wottr.io.WTemplateParser;
+import xyz.ottr.lutra.wottr.util.ModelIO;
+import xyz.ottr.lutra.wottr.util.ModelIOException;
 
 public class BlankNodeTest {
 

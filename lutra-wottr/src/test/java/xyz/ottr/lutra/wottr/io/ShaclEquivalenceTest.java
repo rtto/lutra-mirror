@@ -36,9 +36,6 @@ import java.util.stream.Stream;
 
 import org.apache.jena.rdf.model.Model;
 
-import org.dyreriket.gaupa.rdf.ModelIO;
-import org.dyreriket.gaupa.rdf.ModelIOException;
-
 import org.junit.BeforeClass;
 import org.junit.Test;
 

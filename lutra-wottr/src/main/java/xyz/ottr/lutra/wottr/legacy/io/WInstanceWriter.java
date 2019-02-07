@@ -28,13 +28,12 @@ import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.shared.PrefixMapping;
 //import org.apache.jena.vocabulary.RDF;
 
-import org.dyreriket.gaupa.rdf.ModelIO;
-import org.dyreriket.gaupa.rdf.ModelIOException;
-
 import xyz.ottr.lutra.io.InstanceWriter;
 import xyz.ottr.lutra.model.ArgumentList;
 import xyz.ottr.lutra.model.Instance;
 import xyz.ottr.lutra.wottr.legacy.WOTTR;
+import xyz.ottr.lutra.wottr.util.ModelIO;
+import xyz.ottr.lutra.wottr.util.ModelIOException;
 
 public class WInstanceWriter extends AbstractWriter implements InstanceWriter {
 

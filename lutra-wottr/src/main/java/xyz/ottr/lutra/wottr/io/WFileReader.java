@@ -26,8 +26,6 @@ import org.apache.jena.rdf.model.Model;
 import org.apache.jena.shared.JenaException;
 import org.apache.jena.shared.PrefixMapping;
 
-import org.dyreriket.gaupa.rdf.ModelIO;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,6 +33,7 @@ import xyz.ottr.lutra.io.InputReader;
 import xyz.ottr.lutra.result.Message;
 import xyz.ottr.lutra.result.Result;
 import xyz.ottr.lutra.result.ResultStream;
+import xyz.ottr.lutra.wottr.util.ModelIO;
 
 public class WFileReader implements InputReader<String, Model> {
 
