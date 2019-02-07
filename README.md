@@ -1,68 +1,65 @@
-# Lutra – an open source reference implementation
+# Lutra – Reasonable Ontology Template (OTTR) reference implementation
 
-Detailed documentation can be found on our web site: https://ottr.xyz/.
+Detailed documentation on the OTTR framework can be found on our web site: https://ottr.xyz/.
 
-Lutra is our open source reference implementation of the OTTR language available under an LGPL licence. Lutra can read and write OTTR templates and instances on different serialisation formats, and expand instances into regular RDF graphs or OWL ontologies. Lutra is written in Java and is currently only available via a command line interface.
+Lutra is our open source reference implementation of the OTTR language available under an LGPL licence. Lutra can read and write OTTR templates and instances on different serialisation formats, and expand instances into regular RDF graphs or RDF/OWL ontologies. Lutra is written in Java 8 and is currently available for use as a command line interface.
 
-Download:
-* [Releases][2]
-* [Lastest master snapshot][3]
-* [Lastest develop snapshot][4']
 
 ## Running and installation
 
 ### Prerequisites
 
-To run Lutra you will need to install Java, for instance [OpenJDK][1].
+To run Lutra you will need to install Java 8 JRE, for instance [OpenJDK][1].
+
+### Downloads
+
+* [Releases][2]
+* [Latest master snapshot][3]
+* [Latest develop snapshot][4]
 
 ### Installing
 
-Simply download the jar file. No installation required.
+Simply download the executable jar file. No installation required.
 
+Run the jar file with for example: `java -jar lutra.jar --help`.
 
 ## Development
 
-### Build
-Clone the project and use Maven to build.
+Clone the project and use Maven to build: `mvn package` will produce the executable jar at `lutra-cli/target/lutra.jar`.
 
-* Java, for instance [OpenJDK][1]
+Requirements:
+
+* Java JDK 8, for instance [OpenJDK][1]
 * [Maven](https://maven.apache.org/) - Dependency Management
-
-### Running the tests
-
-//TODO: Explain how to run the automated tests for this system
-
-### And coding style tests
-
-//TODO: Add info about code standard, PMD, etc.
-
-```
-//TODO: an example
-```
 
 ## Contributing
 
 In case you want to build your own jar of Lutra, you can clone the project and use Maven to build it.
 
-Feel free to create an issue and/or send a pull request (PR). Make sure that you submit a [pull request][5] to the `devemopment` branch, explaining what your PR is about and, preferably, linking to an issue you want to address. It is always a good idea to create an issue first.
+Feel free to create an issue and/or send a pull request (PR). Make sure that you submit a [pull request][5] to the `develop` branch or suitable feature branch (`feature/*`), explaining what your PR is about and, preferably, linking to an issue you want to address. It is always a good idea to create an issue first.
+
+We make use of various Maven plugins to ensure consistent coding style and to avoid bugs. Please make sure that your contribution adheres to these settings by running `mvn clean package install`.
 
 ## Versioning
 
+We use [Semantic Versioning][8].
+
 Please see the [tags on this repository][6] for release versions and other important milestones. 
 
-## Authors
+## Maintainers
 
-* //TODO: Add
+* Martin G. Skjæveland
+* Leif Harald Karlsen
 
-See also the list of [contributors][7] who participated in this project.
+See also the list of [contributors](CONTRIBUTORS) who participated in this project.
 
 ## License
 
-This project is licensed under the GNU Lesser General Public License v2.1 - see the [LICENSE.md](LICENSE.txt) file for details.
+This project is licensed under the GNU Lesser General Public License v2.1 - see the [LICENSE.txt](LICENSE.txt) file for details.
 
 ## Acknowledgments
 
-* //TODO: Add
+The project is supported by the [Department of Informatics][9] at University of Oslo and the [SIRIUS Centre][10] for Research-driven Innovation.
 
 
 [1]:https://openjdk.java.net/install/index.html
@@ -72,3 +69,6 @@ This project is licensed under the GNU Lesser General Public License v2.1 - see 
 [5]:https://docs.gitlab.com/ee/gitlab-basics/add-merge-request.html
 [6]:https://gitlab.com/ottr/lutra/lutra/tags
 [7]:https://gitlab.com/ottr/lutra/lutra/graphs/master
+[8]:https://semver.org
+[9]:https://www.ifi.uio.no
+[10]:https://sirius-labs.no
