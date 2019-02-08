@@ -368,18 +368,22 @@ public class DependencyGraph implements TemplateStore {
 
         Set<Result<Dependency>> expanded = new HashSet<>();
         if (edge.to.isBaseTemplate()) {
-            expanded.add(Result.empty(Message.error(
-                            "Cannot expand instance of base template " + edge.to.getIRI()
-                            + " with arguments " + edge.argumentList.toString()
-                            + (edge.from == null ? "" : " in body of " + edge.from.getIRI()) + ".")));
+            Result res = Result.of(edge);
+            res.addMessage(Message.error(
+                    "Cannot expand instance of base template " + edge.to.getIRI()
+                        + " with arguments " + edge.argumentList.toString()
+                        + (edge.from == null ? "" : " in body of " + edge.from.getIRI()) + "."));
+            expanded.add(res);
             return expanded;
         }
-        if (this.dependencies.get(edge.to).isEmpty()) {
-            expanded.add(Result.empty(Message.error(
-                            "Cannot expand instance of template " + edge.to.getIRI()
-                            + " with arguments " + edge.argumentList.toString()
-                            + (edge.from == null ? "" : " in body of " + edge.from.getIRI())
-                            + " due to missing definition.")));
+        if (this.dependencies.get(edge.to).isEmpty() || edge.to.getParameters() == null) {
+            Result res = Result.of(edge);
+            res.addMessage(Message.error(
+                    "Cannot expand instance of template " + edge.to.getIRI()
+                        + " with arguments " + edge.argumentList.toString()
+                        + (edge.from == null ? "" : " in body of " + edge.from.getIRI())
+                        + " due to missing definition."));
+            expanded.add(res);
             return expanded;
         }
 
@@ -611,10 +615,12 @@ public class DependencyGraph implements TemplateStore {
             return false;
         }
 
+        /**
+         * Checks if this edge can be expanded (i.e. not base and no optional variables, etc.),
+         * but does not check for missing definitions.
+         */
         public boolean canExpand() {
-            if (this.to.getParameters() == null
-                || this.to.isBaseTemplate()
-                   && !this.argumentList.hasListExpander()) {
+            if (this.to.isBaseTemplate() && !this.argumentList.hasListExpander()) {
                 return false;
             }
             for (int i = 0; i < this.argumentList.size(); i++) {
