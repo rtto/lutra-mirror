@@ -136,11 +136,16 @@ public class TableParser {
 
                 StringBuilder msg = new StringBuilder("Conflicting definition of prefix " + defs.getKey()
                         + ": standard definition " + standardNs + " conflicts with the following:\n");
+                boolean actualConflict = false;
+                
                 for (String[] def : defs.getValue()) {
                     if (!def[0].equals(standardNs)) {
                         msg.append(" - " + def[0] + " at row " + def[2]
                             + " in table " + def[1] + "\n");
+                        actualConflict = true;
                     }
+                }
+                if (actualConflict) {
                     conflicts.add(Message.error(msg.toString()));
                 }
             } 
