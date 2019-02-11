@@ -30,22 +30,36 @@ import xyz.ottr.lutra.model.Term;
 
 public class TemplateNode {
 
-    private ParameterList parameters;
-    private boolean isBaseTemplate;
-    private String iri;
+    /**
+     * Used to record the known type of the template:
+     * - UNDEFINED: We have only observed the IRI used as a template in
+     *              other templates, i.e. we do not (yet) have a definition of the template
+     * - BASE: The node is added as a base template 
+     * - SIGNATURE: The node is added as a signature template
+     * - DEFINITION: The template has been added with a definition
+     */
+    enum Type { UNDEFINED, BASE, SIGNATURE, DEFINITION }
 
-    public TemplateNode(String iri) {
+    private ParameterList parameters;
+    private Type type;
+    private final String iri;
+
+    public TemplateNode(String iri, Type type) {
         this.iri = iri;
+        this.type = type;
     }
 
-    public TemplateNode(String iri, ParameterList parameters, boolean isBaseTemplate) {
-        this(iri);
+    public TemplateNode(String iri, ParameterList parameters, Type type) {
+        this(iri, type);
         this.parameters = parameters;
-        this.isBaseTemplate = isBaseTemplate;
     }
 
     public String getIRI() {
         return this.iri;
+    }
+
+    public Type getType() {
+        return this.type;
     }
 
     public void addParameters(ParameterList parameters) {
@@ -56,14 +70,26 @@ public class TemplateNode {
         return this.parameters;
     }
 
-    public void setIsBaseTemplate(boolean isBaseTemplate) {
-        this.isBaseTemplate = isBaseTemplate;
+    public void setType(Type type) {
+        this.type = type;
     }
 
-    public boolean isBaseTemplate() {
-        return this.isBaseTemplate;
+    public boolean isBase() {
+        return this.type.equals(Type.BASE);
     }
-    
+
+    public boolean isSignature() {
+        return this.type.equals(Type.SIGNATURE);
+    }
+
+    public boolean isDefinition() {
+        return this.type.equals(Type.DEFINITION);
+    }
+
+    public boolean isUndefined() {
+        return this.type.equals(Type.UNDEFINED);
+    }
+
     public boolean isOptional(int index) {
         return getParameters().isOptional(getParameters().get(index));
     }
