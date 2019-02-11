@@ -25,6 +25,7 @@ package xyz.ottr.lutra.store;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -364,7 +365,7 @@ public class DependencyGraph implements TemplateStore {
                     res.addMessage(Message.error(
                             "Cannot expand expander on instance of template " + edge.to.getIRI()
                                 + " with arguments " + edge.argumentList.toString()
-                                + " due to the presence of blank nodes."));
+                                + ": it contains blank nodes."));
                     unexpanded.add(res);
                 } else {
                     unexpanded.add(Result.of(edge));
@@ -375,7 +376,7 @@ public class DependencyGraph implements TemplateStore {
                         "Cannot expand instance of template " + edge.to.getIRI()
                             + " with arguments " + edge.argumentList.toString()
                             + (edge.from == null ? "" : " in body of " + edge.from.getIRI())
-                            + " due to missing definition."));
+                            + ": missing definition."));
                 unexpanded.add(res);
             } else if (edge.canExpand()) {
                 expanded.addAll(expandEdgeWithChecks(edge));
@@ -533,6 +534,7 @@ public class DependencyGraph implements TemplateStore {
 
         log.info("Expanding definitions.");
         List<TemplateNode> sorted = topologicallySort();
+        List<Message> msgs = new LinkedList<>();
 
         DependencyGraph ngraph = new DependencyGraph();
         for (TemplateNode n : sorted) {
@@ -542,14 +544,14 @@ public class DependencyGraph implements TemplateStore {
                 Set<Result<Dependency>> expanded = new HashSet<>(); // Used for both expanded and unexpanded
                 ngraph.expandEdges(this.dependencies.get(n), expanded, expanded, shouldExpand);
                 Result<Set<Dependency>> resExpanded = Result.aggregate(expanded);
-                if (resExpanded.isPresent()) {
-                    resExpanded.get().forEach(dep -> ngraph.addDependency(dep));
-                } else {
-                    return Result.empty(resExpanded);
-                }
+
+                msgs.addAll(resExpanded.getAllMessages());
+                resExpanded.ifPresent(deps -> deps.forEach(ngraph::addDependency));
             }
         }
-        return Result.of(ngraph);
+        Result<DependencyGraph> graphRes = Result.of(ngraph);
+        graphRes.addMessages(msgs);
+        return graphRes;
     }
 
     @Override
