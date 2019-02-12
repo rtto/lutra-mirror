@@ -28,6 +28,8 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -35,6 +37,7 @@ import java.util.stream.Stream;
 import org.junit.Test;
 
 import xyz.ottr.lutra.model.ArgumentList;
+import xyz.ottr.lutra.model.BlankNodeTerm;
 import xyz.ottr.lutra.model.Instance;
 import xyz.ottr.lutra.model.NoneTerm;
 import xyz.ottr.lutra.model.ObjectTerm;
@@ -121,6 +124,35 @@ public class DependencyGraphTest {
             .collect(Collectors.toSet());
 
         expandAndCheckEquality(toExpand, shouldEqual);
+    }
+
+    @Test
+    public void undefinedTemplateError() {
+
+        DependencyGraph graph = new DependencyGraph();
+
+        graph.addTemplate(
+            new Template(
+                "t1",
+                new ParameterList(new ObjectTerm("a", true), new ObjectTerm("b", true)),
+                Stream.of(new Instance("t2",
+                                       new ArgumentList(new ObjectTerm("a", true), new ObjectTerm(1))),
+                          new Instance("base",
+                                       new ArgumentList(new ObjectTerm(2), new ObjectTerm("b", true))))
+                .collect(Collectors.toSet()))
+        );
+
+        graph.addTemplateSignature(
+            new TemplateSignature(
+                "base",
+                new ParameterList(new ObjectTerm("x", true), new ObjectTerm("y", true)),
+                true)
+        );
+
+        Result<DependencyGraph> graphRes = graph.expandAll();
+        ResultConsumer<DependencyGraph> consumer = new ResultConsumer<>();
+        consumer.accept(graphRes);
+        assertTrue(Message.moreSevere(consumer.getMessageHandler().printMessages(), Message.ERROR));
     }
 
     @Test
@@ -255,6 +287,50 @@ public class DependencyGraphTest {
                                                      new ArgumentList(new ObjectTerm(2),
                                                                       new ObjectTerm(2)))));
         expandInstanceAndCheckEquality(ins, expandedIns, templates);
+    }
+
+    @Test
+    public void instanceExpansionErrors() {
+
+        DependencyGraph graph = new DependencyGraph();
+        graph.addTemplateSignature(
+            new TemplateSignature(
+                "base",
+                new ParameterList(new ObjectTerm("x", true), new ObjectTerm("y", true)),
+                true)
+        );
+
+        ObjectTerm toListExpand = new ObjectTerm("a", true);
+        graph.addTemplate(
+            new Template(
+                "withCross",
+                new ParameterList(new ObjectTerm("a", true), new ObjectTerm("b", true)),
+                Stream.of(new Instance("base",
+                                       new ArgumentList(Arrays.asList(toListExpand, new ObjectTerm(1)),
+                                                        new HashSet<>(Arrays.asList(toListExpand)),
+                                                        ArgumentList.Expander.CROSS)),
+                          new Instance("base",
+                                       new ArgumentList(new ObjectTerm(2), new ObjectTerm("b", true))))
+                .collect(Collectors.toSet()))
+        );
+        graph.addTemplateSignature(
+            new TemplateSignature(
+                "signature",
+                    new ParameterList(new ObjectTerm("v", true), new ObjectTerm("u", true)))
+        );
+        
+        List<Instance> inss = Arrays.asList(
+            new Instance("withCross", new ArgumentList(new BlankNodeTerm(), new ObjectTerm(2))),
+            new Instance("signature", new ArgumentList(new ObjectTerm(1), new ObjectTerm(2))),
+            new Instance("undefined", new ArgumentList(new ObjectTerm(1), new ObjectTerm(2)))
+        );
+
+        for (Instance ins : inss) {
+
+            ResultConsumer<Instance> consumer = new ResultConsumer<>();
+            graph.expandInstance(ins).forEach(consumer);
+            assertTrue(Message.moreSevere(consumer.getMessageHandler().printMessages(), Message.ERROR));
+        }
     }
 
     @Test
