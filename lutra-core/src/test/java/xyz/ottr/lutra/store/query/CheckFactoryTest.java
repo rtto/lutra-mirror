@@ -151,7 +151,7 @@ public class CheckFactoryTest {
             new Template("test1",
                 new ParameterList(new ObjectTerm("a", true), new ObjectTerm("b", true)),
                 Stream.of(
-                    new Instance("base",
+                    new Instance("base2",
                         new ArgumentList(new ObjectTerm("a", true), new ObjectTerm("b", true))),
                     new Instance("test3",
                         new ArgumentList(new ObjectTerm("b", true), new ObjectTerm("a", true))))
