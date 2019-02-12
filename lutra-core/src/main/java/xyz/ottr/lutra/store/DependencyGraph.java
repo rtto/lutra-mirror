@@ -353,37 +353,59 @@ public class DependencyGraph implements TemplateStore {
             Set<Result<Dependency>> unexpanded, Predicate<Dependency> shouldExpand) {
 
         for (Dependency edge : toExpand) {
-            if (edge.shouldDiscard()) {
+
+            // Check that we can and should expand
+            List<Message> errors = checkForExpansionErrors(edge);
+            if (!errors.isEmpty()) {
+                Result res = Result.of(edge);
+                res.addMessages(errors);
+                unexpanded.add(res);
+                continue;
+            } else if (edge.shouldDiscard()) {
                 continue;
             } else if (!shouldExpand.test(edge)) {
                 unexpanded.add(Result.of(edge));
-            } else if (edge.argumentList.hasListExpander()) {
+                continue;
+            }
+
+            // Then expand instance
+            if (edge.argumentList.hasListExpander()) {
                 if (edge.canExpandExpander()) {
                     expandEdges(edge.expandListExpander(), expanded, unexpanded, shouldExpand); 
-                } else if (edge.isInstance()) {
-                    Result res = Result.of(edge);
-                    res.addMessage(Message.error(
-                            "Cannot expand expander on instance of template " + edge.to.getIRI()
-                                + " with arguments " + edge.argumentList.toString()
-                                + ": it contains blank nodes."));
-                    unexpanded.add(res);
                 } else {
                     unexpanded.add(Result.of(edge));
                 }
-            } else if (edge.to.isUndefined() || edge.isInstance() && edge.to.isSignature()) {
-                Result res = Result.of(edge);
-                res.addMessage(Message.error(
-                        "Cannot expand instance of template " + edge.to.getIRI()
-                            + " with arguments " + edge.argumentList.toString()
-                            + (edge.from == null ? "" : " in body of " + edge.from.getIRI())
-                            + ": missing definition."));
-                unexpanded.add(res);
             } else if (edge.canExpand()) {
                 expanded.addAll(expandEdgeWithChecks(edge));
             } else {
                 unexpanded.add(Result.of(edge));
             }
         }
+    }
+
+    private List<Message> checkForExpansionErrors(Dependency edge) {
+
+        List<Message> errors = new LinkedList<>();
+
+        if (edge.argumentList.hasListExpander()
+            && !edge.canExpandExpander()
+            && edge.isInstance()) {
+
+            errors.add(Message.error(
+                    "Cannot expand expander on instance of template " + edge.to.getIRI()
+                    + " with arguments " + edge.argumentList.toString()
+                    + ": it contains blank nodes."));
+        }
+
+        if (edge.to.isUndefined() || edge.isInstance() && edge.to.isSignature()) {
+            errors.add(Message.error(
+                    "Cannot expand instance of template " + edge.to.getIRI()
+                    + " with arguments " + edge.argumentList.toString()
+                    + (edge.from == null ? "" : " in body of " + edge.from.getIRI())
+                    + ": missing definition."));
+        }
+
+        return errors;
     }
 
     /**
