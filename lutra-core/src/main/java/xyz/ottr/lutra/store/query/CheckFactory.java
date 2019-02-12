@@ -36,6 +36,18 @@ public abstract class CheckFactory {
 
     public static final List<Check> defaultChecks =
         Collections.unmodifiableList(Arrays.asList(
+            /* Undefined template */
+            new Check(
+                template("T")
+                    .and(body("T", "B"))
+                    .and(instance("B", "I"))
+                    .and(instanceIRI("I", "T2"))
+                    .and(isUndefined("T2")),
+                tup -> Message.error(
+                    "Template with IRI " + tup.get("T").toString()
+                    + " depends on undefined template "
+                    + tup.get("T2").toString())
+            ),
             /* Unused parameter */
             new Check(
                 template("T")

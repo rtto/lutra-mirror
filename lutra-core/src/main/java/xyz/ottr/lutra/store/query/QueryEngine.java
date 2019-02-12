@@ -434,6 +434,51 @@ public abstract class QueryEngine<S extends TemplateStore> {
     public abstract Stream<Tuple> instanceArgs(Tuple tuple, String instance, String args);
 
     /**
+     * Constructs a a stream containing the argument tuple if the template
+     * denoted by the IRI bound to the argument string is undefined in the store,
+     * and an empty stream otherwise.
+     *
+     * @param tuple
+     *      a Map representing a tuple from variables to values
+     *@param template
+     *      a string denoting a variable bound to an IRI of a template
+     *@return
+     *      a Stream containin tuple if the IRI bound to argument string is undefined
+     *      in the store, and an empty Stream otherwise.
+     */
+    public abstract Stream<Tuple> isUndefined(Tuple tuple, String template);
+
+    /**
+     * Constructs a a stream containing the argument tuple if the template
+     * denoted by the IRI bound to the argument string is a signature in the store,
+     * and an empty stream otherwise.
+     *
+     * @param tuple
+     *      a Map representing a tuple from variables to values
+     *@param template
+     *      a string denoting a variable bound to an IRI of a template
+     *@return
+     *      a Stream containin tuple if the IRI bound to argument string is a signature
+     *      in the store, and an empty Stream otherwise.
+     */
+    public abstract Stream<Tuple> isSignature(Tuple tuple, String template);
+
+    /**
+     * Constructs a a stream containing the argument tuple if the template
+     * denoted by the IRI bound to the argument string is a base template in the store,
+     * and an empty stream otherwise.
+     *
+     * @param tuple
+     *      a Map representing a tuple from variables to values
+     *@param template
+     *      a string denoting a variable bound to an IRI of a template
+     *@return
+     *      a Stream containin tuple if the IRI bound to argument string is a base
+     *      template in the store, and an empty Stream otherwise.
+     */
+    public abstract Stream<Tuple> isBase(Tuple tuple, String template);
+
+    /**
      * Constructs a stream of tuples mapping the variable uni to
      * a unifier, according to this' store, such that the value
      * in val1 becomes equal to val2

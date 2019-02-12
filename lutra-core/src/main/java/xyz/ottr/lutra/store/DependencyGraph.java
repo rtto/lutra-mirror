@@ -253,8 +253,24 @@ public class DependencyGraph implements TemplateStore {
         return Result.of(node);
     }
 
+    @Override
     public boolean containsTemplate(String iri) {
         return this.nodes.containsKey(iri) && !this.nodes.get(iri).isUndefined();
+    }
+
+    @Override
+    public boolean containsBase(String iri) {
+        return this.nodes.containsKey(iri) && this.nodes.get(iri).isBase();
+    }
+
+    @Override
+    public boolean containsSignature(String iri) {
+        return this.nodes.containsKey(iri) && this.nodes.get(iri).isSignature();
+    }
+
+    @Override
+    public boolean containsDefinitionOf(String iri) {
+        return this.nodes.containsKey(iri) && this.nodes.get(iri).isDefinition();
     }
 
     private boolean isLeafNode(TemplateNode n) {

@@ -384,6 +384,30 @@ public class DependencyGraphEngine extends QueryEngine<DependencyGraph> {
     }
 
     @Override
+    public Stream<Tuple> isUndefined(Tuple tuple, String template) {
+        String iri = tuple.getAs(String.class, template);
+        return !this.store.containsTemplate(iri)
+            ? Stream.of(tuple)
+            : Stream.empty();
+    }
+
+    @Override
+    public Stream<Tuple> isSignature(Tuple tuple, String template) {
+        String iri = tuple.getAs(String.class, template);
+        return this.store.containsSignature(iri)
+            ? Stream.of(tuple)
+            : Stream.empty();
+    }
+
+    @Override
+    public Stream<Tuple> isBase(Tuple tuple, String template) {
+        String iri = tuple.getAs(String.class, template);
+        return this.store.containsBase(iri)
+            ? Stream.of(tuple)
+            : Stream.empty();
+    }
+
+    @Override
     public Stream<Tuple> unifiesVal(Tuple tuple, String val1, String val2, String unifier) {
         
         Term boundVal1 = tuple.getAs(Term.class, val1);

@@ -64,7 +64,29 @@ public interface TemplateStore extends Consumer<TemplateSignature> {
         }
     }
 
+    /**
+     * Returns true if this store contains either a template (base or defined)
+     * or a signature with the argument IRI.
+     */
     boolean containsTemplate(String iri);
+
+    /**
+     * Returns true if this store contains a base template
+     * with the argument IRI.
+     */
+    boolean containsBase(String iri);
+
+    /**
+     * Returns true if this store contains signature
+     * with the argument IRI.
+     */
+    boolean containsSignature(String iri);
+
+    /**
+     * Returns true if this store contains a template (with definition)
+     * with the argument IRI.
+     */
+    boolean containsDefinitionOf(String iri);
 
     Result<Template> getTemplate(String iri);
 
