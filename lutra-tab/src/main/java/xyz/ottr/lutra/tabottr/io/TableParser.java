@@ -131,15 +131,23 @@ public class TableParser {
                 if (differentDefs.size() > 1) {
                     conflicts.add(Message.error(msg.toString()));
                 }
-            } else if (standardNs != null) { // Definition conflicting with standard prefix
+            }
+            if (standardNs != null) { // Definition conflicting with standard prefix
 
                 StringBuilder msg = new StringBuilder("Conflicting definition of prefix " + defs.getKey()
                         + ": standard definition " + standardNs + " conflicts with the following:\n");
+                boolean actualConflict = false;
+                
                 for (String[] def : defs.getValue()) {
-                    msg.append(" - " + def[0] + " at row " + def[2]
+                    if (!def[0].equals(standardNs)) {
+                        msg.append(" - " + def[0] + " at row " + def[2]
                             + " in table " + def[1] + "\n");
+                        actualConflict = true;
+                    }
                 }
-                conflicts.add(Message.error(msg.toString()));
+                if (actualConflict) {
+                    conflicts.add(Message.error(msg.toString()));
+                }
             } 
         }
         return conflicts;
