@@ -31,12 +31,12 @@ This version is a complete source rewrite of previous versions of Lutra.
 - Support for writing the old (legacy) version of wOTTR (still support reading)
 
 ### Unsupported (from specs)
-- mOTTR:
+- mOTTR (version 0.?.?)
   - Annotation instances
   - Type-checking instances
   - Type-checking default values
-- stOTTR
+- stOTTR (version 0.?.?)
   - Cannot parse stOTTR syntax
   - Only partial support for writing stOTTR syntax
-- tabOTTR
+- tabOTTR (version 0.?.?)
   - Cannot write (only read) tabOTTR syntax
