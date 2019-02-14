@@ -34,9 +34,6 @@ import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 
-import org.dyreriket.gaupa.rdf.ModelSelector;
-import org.dyreriket.gaupa.rdf.ModelSelectorException;
-
 import xyz.ottr.lutra.model.Term;
 import xyz.ottr.lutra.model.types.TermType;
 import xyz.ottr.lutra.model.types.TypeFactory;
@@ -44,6 +41,8 @@ import xyz.ottr.lutra.result.Message;
 import xyz.ottr.lutra.result.Result;
 import xyz.ottr.lutra.wottr.WOTTR;
 import xyz.ottr.lutra.wottr.WTermFactory;
+import xyz.ottr.lutra.wottr.util.ModelSelector;
+import xyz.ottr.lutra.wottr.util.ModelSelectorException;
 
 public class WParameterParser implements Function<RDFNode, Result<Term>> {
 

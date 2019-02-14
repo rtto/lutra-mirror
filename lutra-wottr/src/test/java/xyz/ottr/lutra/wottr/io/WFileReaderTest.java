@@ -28,8 +28,7 @@ import java.util.Set;
 import java.util.stream.Stream;
 
 import org.apache.jena.rdf.model.Model;
-import org.dyreriket.gaupa.rdf.ModelIO;
-import org.dyreriket.gaupa.rdf.ModelIOException;
+
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -37,6 +36,8 @@ import org.junit.Test;
 import xyz.ottr.lutra.result.Result;
 import xyz.ottr.lutra.result.ResultStream;
 import xyz.ottr.lutra.wottr.io.WFileReader;
+import xyz.ottr.lutra.wottr.util.ModelIO;
+import xyz.ottr.lutra.wottr.util.ModelIOException;
 
 public class WFileReaderTest {
 

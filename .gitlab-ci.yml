@@ -1,12 +1,9 @@
 
-variables:
-  GIT_SUBMODULE_STRATEGY: normal
 
 .build: &build_core
   stage: build
   image: maven:3.3.3-jdk-8
   script:
-  - cd gaupa; mvn install; cd ..
   - mvn install package
   - cp lutra-cli/target/lutra.jar lutra.jar
 

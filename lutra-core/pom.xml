@@ -11,9 +11,10 @@
 	<packaging>jar</packaging>
 
 	<dependencies>
+	
 		<dependency>
-			<groupId>xyz.dyreriket.gaupa</groupId>
-			<artifactId>gaupa-core</artifactId>
+			<groupId>org.apache.jena</groupId>
+			<artifactId>jena-core</artifactId>
 		</dependency>
 
 		<!-- Apache commons -->
@@ -24,6 +25,10 @@
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-math3</artifactId>
+		</dependency>
+		<dependency>
+			 <groupId>commons-io</groupId>
+		     <artifactId>commons-io</artifactId>
 		</dependency>
 
 	</dependencies>

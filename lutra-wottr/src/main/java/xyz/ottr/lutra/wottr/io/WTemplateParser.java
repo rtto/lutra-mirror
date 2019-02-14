@@ -30,8 +30,6 @@ import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.RDFList;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
-import org.dyreriket.gaupa.rdf.ModelSelector;
-import org.dyreriket.gaupa.rdf.ModelSelectorException;
 
 //import org.slf4j.Logger;
 //import org.slf4j.LoggerFactory;
@@ -46,6 +44,8 @@ import xyz.ottr.lutra.result.Message;
 import xyz.ottr.lutra.result.Result;
 import xyz.ottr.lutra.result.ResultStream;
 import xyz.ottr.lutra.wottr.WOTTR;
+import xyz.ottr.lutra.wottr.util.ModelSelector;
+import xyz.ottr.lutra.wottr.util.ModelSelectorException;
 
 public class WTemplateParser implements TemplateParser<Model> {
 

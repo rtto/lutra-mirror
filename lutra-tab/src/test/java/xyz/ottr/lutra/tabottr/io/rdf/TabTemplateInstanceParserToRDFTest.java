@@ -26,8 +26,6 @@ import static org.junit.Assert.assertTrue;
 
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.shared.PrefixMapping;
-import org.dyreriket.gaupa.rdf.ModelIO;
-import org.dyreriket.gaupa.rdf.ModelIOException;
 import org.junit.Test;
 
 import xyz.ottr.lutra.model.Instance;
@@ -36,6 +34,8 @@ import xyz.ottr.lutra.result.ResultStream;
 import xyz.ottr.lutra.tabottr.io.TabInstanceParser;
 import xyz.ottr.lutra.wottr.legacy.io.WInstanceWriter;
 import xyz.ottr.lutra.wottr.legacy.io.WReader;
+import xyz.ottr.lutra.wottr.util.ModelIO;
+import xyz.ottr.lutra.wottr.util.ModelIOException;
 
 public class TabTemplateInstanceParserToRDFTest {
     
