@@ -29,6 +29,7 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 import java.util.function.Function;
 
 import picocli.CommandLine;
@@ -173,7 +174,10 @@ public class CLI {
 
     private static void executeMode(TemplateStore store) {
         
-        checkTemplates(store);
+        int severity = Message.INFO; // Least severe
+        if (!settings.quiet) {
+            severity = checkTemplates(store);
+        }
         switch (settings.mode) {
             case expand:
                 ResultConsumer.use(makeInstanceReader(),
@@ -229,6 +233,9 @@ public class CLI {
                 break;
             case lint:
                 // Simply load templates and check for messages, as done before the switch
+                if (!settings.quiet && Message.moreSevere(Message.WARNING, severity)) {
+                    System.out.println("No errors found.");
+                }
                 break;
             default:
                 if (!settings.quiet) {
@@ -411,10 +418,13 @@ public class CLI {
         return new URI(iriStr).getPath();
     }
 
-    private static void checkTemplates(TemplateStore store) {
-        if (!settings.quiet) {
-            store.checkTemplates().forEach(msg -> MessageHandler.printMessage(msg));
-        }
+    private static int checkTemplates(TemplateStore store) {
+        List<Message> msgs = store.checkTemplates();
+        msgs.forEach(msg -> MessageHandler.printMessage(msg));
+        int mostSevere = msgs.stream()
+            .mapToInt(msg -> msg.getLevel())
+            .min()
+            .orElse(Message.INFO);
+        return mostSevere;
     }
-
 }
