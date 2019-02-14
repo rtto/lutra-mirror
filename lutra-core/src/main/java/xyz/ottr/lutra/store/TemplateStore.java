@@ -27,6 +27,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Consumer;
+import org.apache.commons.collections4.SetUtils;
 
 import xyz.ottr.lutra.io.TemplateReader;
 import xyz.ottr.lutra.model.Instance;
@@ -248,17 +249,22 @@ public interface TemplateStore extends Consumer<TemplateSignature> {
      *    parsing missing templates
      */
     default MessageHandler fetchMissingDependencies(TemplateReader reader, Set<String> toFetch) {
-        Set<String> missing = toFetch;
-        MessageHandler messages = reader.populateTemplateStore(this, missing);
 
-        Set<String> previous = new HashSet<>(missing);
-        missing = getMissingDependencies();
-        missing.removeAll(previous);
+        Set<String> missing = toFetch;
+        MessageHandler messages = new MessageHandler();
+        Set<String> previous;
 
         while (!missing.isEmpty()) {
             messages.combine(reader.populateTemplateStore(this, missing));
             previous = new HashSet<>(missing);
             missing = getMissingDependencies();
+
+            // Give errors for IRIs we were unable to find def. for
+            for (String iri : SetUtils.intersection(previous, missing)) {
+                messages.add(Result.empty(Message.error(
+                    "Unable to find definition of template with IRI " + iri
+                    + " by dereferencing its IRI.")));
+            }
             missing.removeAll(previous);
         }
         return messages;
