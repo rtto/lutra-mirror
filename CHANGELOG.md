@@ -27,8 +27,11 @@ This version is a complete source rewrite of previous versions of Lutra.
 - Complete rewrite of the source code
 - A new CLI with similar, yet different flags
 
+### Deprecated
+- Support for reading the old (legacy) version of wOTTR
+
 ### Removed
-- Support for writing the old (legacy) version of wOTTR (still support reading)
+- Support for writing the old (legacy) version of wOTTR
 
 ### Unsupported (from specs)
 - mOTTR (version 0.?.?)
