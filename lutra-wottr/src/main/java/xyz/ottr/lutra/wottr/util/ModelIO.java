@@ -40,8 +40,7 @@ public abstract class ModelIO {
         RDFXML(FileUtils.langXMLAbbrev), 
         TURTLE(FileUtils.langTurtle), 
         N3(FileUtils.langN3), 
-        NTRIPLES(FileUtils.langNTriple), 
-        OWL("OWL");
+        NTRIPLES(FileUtils.langNTriple);
         
         private final String lang;
 

@@ -38,7 +38,7 @@ public abstract class ModelEditor {
     public static void substituteBlanks(Model model) {
         for (RDFNode node : ModelSelector.getRDFNodes(model)) {
             if (node.isAnon()) {
-                ModelEditor.substituteNode(model, node, ResourceFactory.createResource());
+                substituteNode(model, node, ResourceFactory.createResource());
             }
         }
     }
@@ -82,15 +82,5 @@ public abstract class ModelEditor {
     public static void substituteNode(Model model, RDFNode old, RDFNode fresh) throws ModelEditorException {
         substituteNode(model, old.asNode(), fresh.asNode());
     }
-
-    /*
-     * public static void removeResource (Model model, Resource resource) {
-     * model.removeAll(resource, null, (RDFNode) null); model.removeAll(null,
-     * ResourceFactory.createProperty(resource.getURI()), (RDFNode) null);
-     * model.removeAll(null, null, resource); }
-     *
-     * public static void removeResources (Model model, List<Resource> resources) {
-     * resources.forEach(r -> removeResource(model, r)); }
-     */
 
 }
