@@ -35,7 +35,7 @@ Requirements:
 
 ## Contributing
 
-See (CONTRIBUTING.md) for information on how to best contribute to the project.
+See [CONTRIBUTING](CONTRIBUTING.md) for information on how to best contribute to the project.
 
 ## Versioning
 

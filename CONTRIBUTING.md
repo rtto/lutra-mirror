@@ -6,7 +6,7 @@ or suitable feature branch (`feature/*`), explaining what your PR is
 about and, preferably, linking to an issue you want to address. It is
 always a good idea to create an issue first where you can check if the
 issue is real and your possible solution proposal is likely to be
-accecpted if implemented.
+accepted if implemented.
 
 Please document your code using common documentation practice and
 javadoc, and test your code with unit tests.
@@ -28,7 +28,7 @@ following branch types:
 
 We tag each release with `v` + its version number, e.g., `v0.5.0`.
 
-## Git Commit Messages
+## Git commit messages
 
 - Use the present tense ("Add feature" not "Added feature")
 - Use the imperative mood ("Move cursor to..." not "Moves cursor to...")
@@ -42,7 +42,7 @@ We tag each release with `v` + its version number, e.g., `v0.5.0`.
 
 The code base is built for each commit. The results of the build are
 kept for the `master` and `develop` branch, and for each tag. See
-(README.md) for links.
+[README](README.md) for links.
 
 ## Styleguide
 
@@ -55,16 +55,20 @@ Maven plugin on `mvn package`.
 
 ## Code quality
 
-We use different automatic code quality checks. PDM
-(https://pmd.github.io/) and FindBugs
-(http://findbugs.sourceforge.net/) are included via Maven plugins and
-are checked on `mvn package install`.  We also use the Gitlab's Code
-Climate integration
-(https://docs.gitlab.com/ee/user/project/merge_requests/code_quality.html)
-and Codebeat
-(https://codebeat.co/projects/gitlab-com-ottr-lutra-lutra-develop) to
-identify weak spots in the code.
+We use different automatic code quality checks.
+
+- PDM (https://pmd.github.io/) and
+- FindBugs (http://findbugs.sourceforge.net/)
+
+are included via Maven plugins and are checked on `mvn package install`.
+
+We also use:
+
+- Gitlab's Code Climate integration (https://docs.gitlab.com/ee/user/project/merge_requests/code_quality.html) and
+- Codebeat (https://codebeat.co/projects/gitlab-com-ottr-lutra-lutra-develop)
+
+to identify potential weak spots in the code.
 
 ## License
 
-See (README.md).
+See [README](README.md).
