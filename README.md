@@ -33,6 +33,20 @@ Requirements:
 * Java JDK 8, for instance [OpenJDK][1]
 * [Maven](https://maven.apache.org/) - Dependency Management
 
+Dependencies:
+
+This project depends on the following external libaries:
+
+- Apache Jena (https://jena.apache.org/) for RDF processing
+- Various Apache Commons libraries for utility functionality:
+  - Collections
+  - Math
+  - IO
+  - Validator
+- Apache POI (https://poi.apache.org/) for handling spreadsheet files
+
+See [pom.xml](pom.xml) for details.
+
 ## Contributing
 
 See [CONTRIBUTING](CONTRIBUTING.md) for information on how to best contribute to the project.
