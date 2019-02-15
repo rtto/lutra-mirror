@@ -26,7 +26,6 @@ package xyz.ottr.lutra.io;
 //import java.util.LinkedList;
 //import java.util.Queue;
 
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.Set;
 import java.util.function.Function;
@@ -82,9 +81,10 @@ public class TemplateReader implements Function<String, ResultStream<TemplateSig
      *       a MessageHandler containing possible Message-s with Warnings, Errors, etc.
      */
     public MessageHandler loadTemplatesFromFolder(TemplateStore store, String folder,
-            String[] includeExtensions, String[] excludeExtensions) throws IOException {
+            String[] includeExtensions, String[] excludeExtensions) {
         log.info("Loading all templates from folder " + folder + " with suffix "
                 + Arrays.toString(includeExtensions) + " except " + Arrays.toString(excludeExtensions));
+
         return populateTemplateStore(store,
                                      Files.loadFromFolder(folder,
                                                           includeExtensions,
@@ -104,7 +104,7 @@ public class TemplateReader implements Function<String, ResultStream<TemplateSig
      *       a ResultStream containing the parsed TemplateSignatures 
      */
     public ResultStream<TemplateSignature> loadTemplatesFromFolder(String folder,
-            String[] includeExtensions, String[] excludeExtensions) throws IOException {
+            String[] includeExtensions, String[] excludeExtensions) {
         log.info("Loading all templates from folder " + folder + " with suffix "
                 + Arrays.toString(includeExtensions) + " except " + Arrays.toString(excludeExtensions));
         return Files.loadFromFolder(folder, includeExtensions, excludeExtensions)
