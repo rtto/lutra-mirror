@@ -130,15 +130,12 @@ public class CLI {
         ResultConsumer.use(makeTemplateReader(),
             reader -> {
 
-                ResultConsumer.use(parseLibraryInto(reader, store),
-                    messageHandler -> {
-
-                        // TODO: cli-arg to decide if continue, int-flag to denote ignore level
-                        if (!Message.moreSevere(messageHandler.printMessages(), settings.haltOn)) {
-                            executeMode(store);
-                        }
-                    }
-                );
+                MessageHandler msgs = parseLibraryInto(reader, store);
+                
+                // TODO: cli-arg to decide if continue, int-flag to denote ignore level
+                if (!Message.moreSevere(msgs.printMessages(), settings.haltOn)) {
+                    executeMode(store);
+                }
             }
         );
     }
@@ -146,30 +143,22 @@ public class CLI {
     /**
      * Populated store with parsed templates, and returns true if error occured, and false otherwise.
      */
-    private static Result<MessageHandler> parseLibraryInto(TemplateReader reader, TemplateStore store) {
+    private static MessageHandler parseLibraryInto(TemplateReader reader, TemplateStore store) {
 
         // TODO: Make cli-argument of both base template and suffixes to include/ignore
         store.addTemplateSignature(WTemplateFactory.createTripleTemplateHead());
 
         if (settings.library == null) {
-            return Result.of(new MessageHandler());
+            return new MessageHandler();
         }
 
-        Result<MessageHandler> consumer;
-        try {
-            consumer = Result.of(reader.loadTemplatesFromFolder(store, settings.library,
-                    settings.extensions, settings.ignoreExtensions));
-        } catch (IOException ex) {
-            Message err = Message.error(
-                "Error when parsing templates from folder -- " + ex.getMessage());
-            return Result.empty(err);
-        }
+        MessageHandler msgs = reader.loadTemplatesFromFolder(store, settings.library,
+                settings.extensions, settings.ignoreExtensions);
+
         if (settings.fetchMissingDependencies) {
-            consumer = consumer.map(cnsmr ->
-                cnsmr.combine(store.fetchMissingDependencies(reader)));
+            msgs = msgs.combine(store.fetchMissingDependencies(reader));
         }
-
-        return consumer;
+        return msgs;
     } 
 
     private static void executeMode(TemplateStore store) {

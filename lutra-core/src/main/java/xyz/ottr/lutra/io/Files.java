@@ -25,6 +25,8 @@ package xyz.ottr.lutra.io;
 import java.io.File;
 //import java.io.IOException;
 //import java.util.Collection;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.function.Function;
 
 import org.apache.commons.io.FileUtils;
@@ -34,6 +36,7 @@ import org.apache.commons.io.filefilter.IOFileFilter;
 import org.apache.commons.io.filefilter.NotFileFilter;
 import org.apache.commons.io.filefilter.PrefixFileFilter;
 
+import xyz.ottr.lutra.result.Message;
 import xyz.ottr.lutra.result.Result;
 import xyz.ottr.lutra.result.ResultStream;
 
@@ -44,9 +47,35 @@ public abstract class Files {
     private static Function<String, IOFileFilter> extFilter = string -> FileFilterUtils.suffixFileFilter(string,
             IOCase.INSENSITIVE);
 
+    public static Message checkIsReadableFolder(String folder) throws SecurityException {
+        Path path = Paths.get(folder);
+
+        try {
+            if (!java.nio.file.Files.exists(path)) {
+                return Message.error("No folder with path " + folder + " exists.");
+            }
+            if (!java.nio.file.Files.isDirectory(path)) {
+                return Message.error("The path " + folder + " does not denote a folder.");
+            }
+            if (!java.nio.file.Files.isReadable(path)) {
+                return Message.error("The folder " + folder + " is not readable.");
+            }
+        } catch (SecurityException ex) {
+            return Message.error("Encountered security error when attempting to read"
+                + " folder's metadata -- " + ex.getMessage());
+        }
+
+        return null;
+    }
+
     public static ResultStream<File> getFolderContents(String folder, String[] includeExtensions,
             String[] excludeExtensions) {
 
+        Message err = checkIsReadableFolder(folder);
+        if (err != null) {
+            return ResultStream.of(Result.empty(err));
+        }
+            
         IOFileFilter ext = null;
 
         for (int i = 0; i < includeExtensions.length; i += 1) {
@@ -58,7 +87,7 @@ public abstract class Files {
 
         for (int i = 0; i < excludeExtensions.length; i += 1) {
             if (i == 0 && ext == null) {
-                ext = FileFilterUtils.notFileFilter(extFilter.apply(includeExtensions[i]));
+                ext = FileFilterUtils.notFileFilter(extFilter.apply(excludeExtensions[i]));
             } else {
                 ext = FileFilterUtils.and(ext, FileFilterUtils.notFileFilter(extFilter.apply(excludeExtensions[i])));
             }
@@ -68,13 +97,21 @@ public abstract class Files {
             ext = FileFilterUtils.trueFileFilter();
         }
 
-        return ResultStream.innerOf(FileUtils.listFiles(new File(folder), FileFilterUtils.and(hiddenFiles, ext),
-                    hiddenFiles));
+        return ResultStream.innerOf(
+            FileUtils.listFiles(new File(folder),
+                FileFilterUtils.and(hiddenFiles, ext),
+                hiddenFiles));
     }
 
     public static ResultStream<String> loadFromFolder(String folder, String[] includeExtensions,
             String[] excludeExtensions) {
+
+        Message err = checkIsReadableFolder(folder);
+        if (err != null) {
+            return ResultStream.of(Result.empty(err));
+        }
+            
         return Files.getFolderContents(folder, includeExtensions, excludeExtensions)
-                    .mapFlatMap(file -> Result.of(file.getPath()));
+            .mapFlatMap(file -> Result.of(file.getPath()));
     }
 }
