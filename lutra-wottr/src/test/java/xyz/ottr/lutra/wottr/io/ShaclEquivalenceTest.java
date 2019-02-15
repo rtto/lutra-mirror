@@ -132,7 +132,7 @@ public class ShaclEquivalenceTest {
             tplErrorMessages.accept(tpl);
         });
 
-        List<Message> errors = store.checkTemplates();
+        List<Message> errors = store.checkTemplatesOpenWorld();
         errors.addAll(tplErrorMessages.getMessageHandler().getMessages());
         
         if (!correct) {

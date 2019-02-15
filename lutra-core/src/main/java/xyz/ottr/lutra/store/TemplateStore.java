@@ -117,6 +117,8 @@ public interface TemplateStore extends Consumer<TemplateSignature> {
 
     List<Message> checkTemplates();
 
+    List<Message> checkTemplatesOpenWorld();
+
     /**
      * Expands all nodes without losing information, that is, it does not expand
      * nodes with non-optional possible null valued parameters, and does not alter

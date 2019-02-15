@@ -27,6 +27,7 @@ import static xyz.ottr.lutra.store.query.Query.*;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import org.apache.commons.collections4.ListUtils;
 
 import xyz.ottr.lutra.model.types.ListType;
 import xyz.ottr.lutra.model.types.TypeFactory;
@@ -34,7 +35,11 @@ import xyz.ottr.lutra.result.Message;
 
 public abstract class CheckFactory {
 
-    public static final List<Check> defaultChecks =
+    /**
+     * Checks that require information to be present, e.g.
+     * check for missing dependencies.
+     */
+    public static final List<Check> closedWorldChecks =
         Collections.unmodifiableList(Arrays.asList(
             /* Undefined template */
             new Check(
@@ -47,38 +52,16 @@ public abstract class CheckFactory {
                     "Template with IRI " + tup.get("T").toString()
                     + " depends on undefined template "
                     + tup.get("T2").toString())
-            ),
-            /* Unused parameter */
-            new Check(
-                template("T")
-                    .and(parameters("T", "PS"))
-                    .and(body("T", "B"))
-                    .and(index("PS", "I", "V"))
-                    .and(
-                        not(
-                            instance("B", "INS")
-                                .and(instanceArgs("INS", "AS"))
-                                .and(index("AS", "J", "V")))),
-                tup -> Message.warning(
-                    "Parameter with name " + tup.get("V").toString()
-                    + " with index " + tup.get("I").toString()
-                    + " does not occur in the body of template "
-                    + tup.get("T").toString())
-            ),
-            /* Same variabel occurs twice in parameter list */
-            new Check(
-                template("T")
-                    .and(parameters("T", "PS"))
-                    .and(index("PS", "I", "V"))
-                    .and(index("PS", "J", "V"))
-                    .and(notEquals("I", "J"))
-                    .and(removeSymmetry("I", "J")),
-                tup -> Message.error(
-                        "Parameter with name " + tup.get("V").toString()
-                        + " occurs twice with indecies " + tup.get("I").toString()
-                        + " and " + tup.get("J") + " in template "
-                        + tup.get("T").toString())
-            ),
+            )
+        ));
+
+    /**
+     * Checks that does not depend on having all definitions present.
+     * Type and parameter checks are included here, but only fails if a concrete
+     * error/inconsitency is found (thus does not fail on missing information).
+     */
+    public static final List<Check> openWorldChecks =
+        Collections.unmodifiableList(Arrays.asList(
             /* Length of argument list not equal to length of corresponding parameter list */
             new Check(
                 template("T")
@@ -122,6 +105,37 @@ public abstract class CheckFactory {
                     .and(dependsTransitive("T", "T")),
                 tup -> Message.error(
                     "Template with IRI " + tup.get("T") + " transitively depends on itself.")
+            ),
+            /* Unused parameter */
+            new Check(
+                template("T")
+                    .and(parameters("T", "PS"))
+                    .and(body("T", "B"))
+                    .and(index("PS", "I", "V"))
+                    .and(
+                        not(
+                            instance("B", "INS")
+                                .and(instanceArgs("INS", "AS"))
+                                .and(index("AS", "J", "V")))),
+                tup -> Message.warning(
+                    "Parameter with name " + tup.get("V").toString()
+                    + " with index " + tup.get("I").toString()
+                    + " does not occur in the body of template "
+                    + tup.get("T").toString())
+            ),
+            /* Same variabel occurs twice in parameter list */
+            new Check(
+                template("T")
+                    .and(parameters("T", "PS"))
+                    .and(index("PS", "I", "V"))
+                    .and(index("PS", "J", "V"))
+                    .and(notEquals("I", "J"))
+                    .and(removeSymmetry("I", "J")),
+                tup -> Message.error(
+                        "Parameter with name " + tup.get("V").toString()
+                        + " occurs twice with indecies " + tup.get("I").toString()
+                        + " and " + tup.get("J") + " in template "
+                        + tup.get("T").toString())
             ),
             /* Type checking: consistent use of terms */
             // As our type hiearachy is tree shaped, if any pair of types a term is used as
@@ -231,4 +245,6 @@ public abstract class CheckFactory {
                         + tup.get("InsOf").toString() + " with list expander on non-list argument.")
             )
         ));
+
+    public static final List<Check> allChecks = ListUtils.union(openWorldChecks, closedWorldChecks);
 }
