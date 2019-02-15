@@ -25,20 +25,31 @@ Run the jar file with for example: `java -jar lutra.jar --help`.
 
 ## Development
 
-Clone the project and use Maven to build: `mvn package` will produce the executable jar at `lutra-cli/target/lutra.jar`.
+In case you want to build your own jar of Lutra,
+clone the project and use Maven to build: `mvn package` will produce the executable jar at `lutra-cli/target/lutra.jar`.
 
 Requirements:
 
 * Java JDK 8, for instance [OpenJDK][1]
 * [Maven](https://maven.apache.org/) - Dependency Management
 
+Dependencies:
+
+This project depends on the following external libaries:
+
+* Apache Jena (https://jena.apache.org/) for RDF processing
+* Various Apache Commons libraries for utility functionality:
+  * Collections (https://commons.apache.org/proper/commons-collections/)
+  * Math (http://commons.apache.org/proper/commons-math/)
+  * IO (https://commons.apache.org/proper/commons-io/)
+  * Validator (https://commons.apache.org/proper/commons-validator/)
+* Apache POI (https://poi.apache.org/) for handling spreadsheet files
+
+See [pom.xml](pom.xml) for details.
+
 ## Contributing
 
-In case you want to build your own jar of Lutra, you can clone the project and use Maven to build it.
-
-Feel free to create an issue and/or send a pull request (PR). Make sure that you submit a [pull request][5] to the `develop` branch or suitable feature branch (`feature/*`), explaining what your PR is about and, preferably, linking to an issue you want to address. It is always a good idea to create an issue first.
-
-We make use of various Maven plugins to ensure consistent coding style and to avoid bugs. Please make sure that your contribution adheres to these settings by running `mvn clean package install`.
+See [CONTRIBUTING](CONTRIBUTING.md) for information on how to best contribute to the project.
 
 ## Versioning
 
@@ -51,7 +62,7 @@ Please see the [tags on this repository][6] for release versions and other impor
 * Martin G. Skjæveland
 * Leif Harald Karlsen
 
-See also the list of [contributors](CONTRIBUTORS) who participated in this project.
+See also the list of [CONTRIBUTORS](CONTRIBUTORS.md) who participated in this project.
 
 ## License
 
