@@ -37,13 +37,13 @@ Dependencies:
 
 This project depends on the following external libaries:
 
-- Apache Jena (https://jena.apache.org/) for RDF processing
-- Various Apache Commons libraries for utility functionality:
-  - Collections
-  - Math
-  - IO
-  - Validator
-- Apache POI (https://poi.apache.org/) for handling spreadsheet files
+* Apache Jena (https://jena.apache.org/) for RDF processing
+* Various Apache Commons libraries for utility functionality:
+  * Collections (https://commons.apache.org/proper/commons-collections/)
+  * Math (http://commons.apache.org/proper/commons-math/)
+  * IO (https://commons.apache.org/proper/commons-io/)
+  * Validator (https://commons.apache.org/proper/commons-validator/)
+* Apache POI (https://poi.apache.org/) for handling spreadsheet files
 
 See [pom.xml](pom.xml) for details.
 
@@ -62,7 +62,7 @@ Please see the [tags on this repository][6] for release versions and other impor
 * Martin G. Skjæveland
 * Leif Harald Karlsen
 
-See also the list of [contributors](CONTRIBUTORS.md) who participated in this project.
+See also the list of [CONTRIBUTORS](CONTRIBUTORS.md) who participated in this project.
 
 ## License
 
