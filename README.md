@@ -37,13 +37,13 @@ Dependencies:
 
 This project depends on the following external libaries:
 
-* Apache Jena (https://jena.apache.org/) for RDF processing
+* [Apache Jena](https://jena.apache.org/) for RDF processing
 * Various Apache Commons libraries for utility functionality:
-  * Collections (https://commons.apache.org/proper/commons-collections/)
-  * Math (http://commons.apache.org/proper/commons-math/)
-  * IO (https://commons.apache.org/proper/commons-io/)
-  * Validator (https://commons.apache.org/proper/commons-validator/)
-* Apache POI (https://poi.apache.org/) for handling spreadsheet files
+  * [Collections](https://commons.apache.org/proper/commons-collections/)
+  * [Math](http://commons.apache.org/proper/commons-math/)
+  * [IO](https://commons.apache.org/proper/commons-io/)
+  * [Validator](https://commons.apache.org/proper/commons-validator/)
+* [Apache POI](https://poi.apache.org/) for handling spreadsheet files
 
 See [pom.xml](pom.xml) for details.
 
