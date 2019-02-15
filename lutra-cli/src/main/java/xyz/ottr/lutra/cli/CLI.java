@@ -338,7 +338,8 @@ public class CLI {
 
     private static void writeInstances(String output) {
 
-        if (settings.stdout) {
+        // If neither --stdout nor -o is set, default to --stdout
+        if (settings.stdout || settings.out == null) {
             System.out.println(output);
         }
 
@@ -369,7 +370,8 @@ public class CLI {
 
     private static void writeTemplate(String iri, String output) {
 
-        if (settings.stdout) {
+        // If neither --stdout nor -o is set, default to --stdout
+        if (settings.stdout || settings.out == null) {
             System.out.println(output);
         }
 
