@@ -9,7 +9,7 @@ Lutra is our open source reference implementation of the OTTR language available
 
 ### Prerequisites
 
-To run Lutra you will need to install Java 8 JRE, for instance [OpenJDK][1].
+To run Lutra you will need to install Java 8, for instance [OpenJDK][1].
 
 ### Downloads
 
@@ -23,19 +23,24 @@ Simply download the executable jar file. No installation required.
 
 Run the jar file with for example: `java -jar lutra.jar --help`.
 
-## Development
+## Versioning
 
-In case you want to build your own jar of Lutra,
-clone the project and use Maven to build: `mvn package` will produce the executable jar at `lutra-cli/target/lutra.jar`.
+We use [Semantic Versioning][8].
+
+See the [tags on this repository][6] for release versions and other important milestones. 
+
+See [CHANGELOG](CHANGELOG.md) for description of major changes between versions. 
+
+## Building
+
+To build, clone the project and use Maven to build: `mvn package`. This will produce the executable jar at `lutra-cli/target/lutra.jar`.
 
 Requirements:
 
-* Java JDK 8, for instance [OpenJDK][1]
+* Java 8, for instance [OpenJDK][1]
 * [Maven](https://maven.apache.org/) - Dependency Management
 
-Dependencies:
-
-This project depends on the following external libaries:
+The project depends on the following external libraries:
 
 * [Apache Jena](https://jena.apache.org/) for RDF processing
 * Various Apache Commons libraries for utility functionality:
@@ -51,16 +56,10 @@ See [pom.xml](pom.xml) for details.
 
 See [CONTRIBUTING](CONTRIBUTING.md) for information on how to best contribute to the project.
 
-## Versioning
-
-We use [Semantic Versioning][8].
-
-Please see the [tags on this repository][6] for release versions and other important milestones. 
-
 ## Maintainers
 
-* Martin G. Skjæveland
-* Leif Harald Karlsen
+* [Martin G. Skjæveland](http://folk.uio.no/martige/)
+* [Leif Harald Karlsen](http://folk.uio.no/leifhka/)
 
 See also the list of [CONTRIBUTORS](CONTRIBUTORS.md) who participated in this project.
 
