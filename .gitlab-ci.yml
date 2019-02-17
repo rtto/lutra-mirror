@@ -10,6 +10,7 @@ cache:
   paths:
     - .m2/repository/
     - target/
+    - lutra-cli/target/
 
 build:
   stage: build
