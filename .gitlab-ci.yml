@@ -21,11 +21,13 @@ test:
   script:
     - mvn $MAVEN_CLI_OPTS verify
 
-snapshot:
+.deploy: &deploy
   stage: deploy
   script:
-    - mvn $MAVEN_CLI_OPTS package -DskipTests -Dcheckstyle.skip=true -Dpmd.skip=true
     - cp lutra-cli/target/lutra.jar lutra.jar
+
+snapshot:
+  <<: *deploy
   only:
     - develop
     - master
@@ -35,10 +37,7 @@ snapshot:
       - lutra.jar
 
 release:
-  stage: deploy
-  script:
-    - mvn $MAVEN_CLI_OPTS package -DskipTests -Dcheckstyle.skip=true -Dpmd.skip=true
-    - cp lutra-cli/target/lutra.jar lutra.jar
+  <<: *deploy
   only: 
     - tags
   artifacts:
