@@ -3,7 +3,7 @@ issue tracker. Please check first that the issue does not already exist.
 See also http://ottr.xyz/#Contact for more options.
 
 If you want to contribute to the project by coding or writing documentation, 
-please send a [pull request][5] 
+please send a pull request
 submitted to the `develop` branch
 or suitable feature branch (`feature/*`) where you explain what your PR is
 about and, preferably, linking to an issue you want to address. It is
