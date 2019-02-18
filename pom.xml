@@ -10,6 +10,7 @@
 		<module>lutra-core</module>
 		<module>lutra-wottr</module>
 		<module>lutra-tab</module>
+		<module>lutra-bottr</module>
 		<module>lutra-cli</module>
 	</modules>
 
