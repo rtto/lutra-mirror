@@ -39,7 +39,7 @@ public abstract class CheckFactory {
      * Checks that require information to be present, e.g.
      * check for missing dependencies.
      */
-    public static final List<Check> closedWorldChecks =
+    public static final List<Check> failsOnMissingInformationChecks =
         Collections.unmodifiableList(Arrays.asList(
             /* Undefined template */
             new Check(
@@ -60,7 +60,7 @@ public abstract class CheckFactory {
      * Type and parameter checks are included here, but only fails if a concrete
      * error/inconsitency is found (thus does not fail on missing information).
      */
-    public static final List<Check> openWorldChecks =
+    public static final List<Check> failsOnErrorChecks =
         Collections.unmodifiableList(Arrays.asList(
             /* Length of argument list not equal to length of corresponding parameter list */
             new Check(
@@ -247,5 +247,5 @@ public abstract class CheckFactory {
             )
         ));
 
-    public static final List<Check> allChecks = ListUtils.union(openWorldChecks, closedWorldChecks);
+    public static final List<Check> allChecks = ListUtils.union(failsOnErrorChecks, failsOnMissingInformationChecks);
 }

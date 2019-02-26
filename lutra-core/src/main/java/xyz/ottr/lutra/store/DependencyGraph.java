@@ -618,8 +618,8 @@ public class DependencyGraph implements TemplateStore {
     }
 
     @Override
-    public List<Message> checkTemplatesOpenWorld() {
-        return checkTemplatesFor(CheckFactory.openWorldChecks);
+    public List<Message> checkTemplatesForErrorsOnly() {
+        return checkTemplatesFor(CheckFactory.failsOnErrorChecks);
     }
 
     /**

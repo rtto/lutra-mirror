@@ -115,9 +115,25 @@ public interface TemplateStore extends Consumer<TemplateSignature> {
 
     boolean refactor(String toUse, String toChange);
 
+    /**
+     * Performs all checks on all templates in this library, and returns
+     * errors or warnings if checks fail. The following is checked:
+     * - Type correctness, non-blank flags, and consistent use of resources
+     * - Correct calling of templates in instances
+     * - Cycles in template definitions
+     * - Unused variables, reused variables in different parameters
+     * - Use of lists and expansion modifiers
+     * - Missing template 
+     */
     List<Message> checkTemplates();
 
-    List<Message> checkTemplatesOpenWorld();
+    /**
+     * Performs the same checks as #checkTemplates(), except "Missing templates".
+     * This method should be used if one either wants to check single templates
+     * (without having its dependencies loaded in the store) or to check templates
+     * in an unfinished library where not all templates are (yet) defined.
+     */
+    List<Message> checkTemplatesForErrorsOnly();
 
     /**
      * Expands all nodes without losing information, that is, it does not expand
