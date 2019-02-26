@@ -11,7 +11,7 @@
 	<packaging>jar</packaging>
 
 	<properties>
-		<url.wottrspec>https://dev.spec.ottr.xyz/wOTTR/develop/</url.wottrspec>
+		<url.wottrspec>https://dev.spec.ottr.xyz/wOTTR/</url.wottrspec>
 		<local.wottrspec>${project.basedir}/src/test/resources/spec</local.wottrspec>
 	</properties>
 
