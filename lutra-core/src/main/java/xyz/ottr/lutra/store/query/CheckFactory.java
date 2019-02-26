@@ -116,7 +116,8 @@ public abstract class CheckFactory {
                         not(
                             instance("B", "INS")
                                 .and(instanceArgs("INS", "AS"))
-                                .and(index("AS", "J", "V")))),
+                                .and(index("AS", "J", "A"))
+                                .and(hasOccurenceAt("A", "V", "Lvl")))),
                 tup -> Message.warning(
                     "Parameter with name " + tup.get("V").toString()
                     + " with index " + tup.get("I").toString()

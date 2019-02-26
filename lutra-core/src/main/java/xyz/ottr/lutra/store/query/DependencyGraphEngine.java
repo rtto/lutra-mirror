@@ -161,7 +161,7 @@ public class DependencyGraphEngine extends QueryEngine<DependencyGraph> {
     @Override
     public Stream<Tuple> hasOccurenceAt(Tuple tuple, String term, String inside, String level) {
 
-        Term boundTerm = tuple.getAs(TermList.class, term);
+        Term boundTerm = tuple.getAs(Term.class, term);
         return findOccurences(tuple, boundTerm, inside, level, 0);
     }
             
@@ -174,11 +174,11 @@ public class DependencyGraphEngine extends QueryEngine<DependencyGraph> {
         }
 
         if (term instanceof TermList) { // Match recursively on inner terms with current level +1
-            Stream<Tuple> stream = Stream.empty();
+            Stream.Builder<Tuple> stream = Stream.builder();
             for (Term inner : ((TermList) term).asList()) {
-                Stream.concat(stream, findOccurences(tuple, inner, inside, level, current + 1));
+                findOccurences(tuple, inner, inside, level, current + 1).forEach(stream);
             }
-            return stream;
+            return stream.build();
         }
 
         // Has non-list term, just need to check for equality of level and term
