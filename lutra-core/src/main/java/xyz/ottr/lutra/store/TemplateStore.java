@@ -65,7 +65,29 @@ public interface TemplateStore extends Consumer<TemplateSignature> {
         }
     }
 
+    /**
+     * Returns true if this store contains either a template (base or defined)
+     * or a signature with the argument IRI.
+     */
     boolean containsTemplate(String iri);
+
+    /**
+     * Returns true if this store contains a base template
+     * with the argument IRI.
+     */
+    boolean containsBase(String iri);
+
+    /**
+     * Returns true if this store contains signature
+     * with the argument IRI.
+     */
+    boolean containsSignature(String iri);
+
+    /**
+     * Returns true if this store contains a template (with definition)
+     * with the argument IRI.
+     */
+    boolean containsDefinitionOf(String iri);
 
     Result<Template> getTemplate(String iri);
 
@@ -94,7 +116,25 @@ public interface TemplateStore extends Consumer<TemplateSignature> {
 
     boolean refactor(String toUse, String toChange);
 
+    /**
+     * Performs all checks on all templates in this library, and returns
+     * errors or warnings if checks fail. The following is checked:
+     * - Type correctness, non-blank flags, and consistent use of resources
+     * - Correct calling of templates in instances
+     * - Cycles in template definitions
+     * - Unused variables, reused variables in different parameters
+     * - Use of lists and expansion modifiers
+     * - Missing template 
+     */
     List<Message> checkTemplates();
+
+    /**
+     * Performs the same checks as #checkTemplates(), except "Missing templates".
+     * This method should be used if one either wants to check single templates
+     * (without having its dependencies loaded in the store) or to check templates
+     * in an unfinished library where not all templates are (yet) defined.
+     */
+    List<Message> checkTemplatesForErrorsOnly();
 
     /**
      * Expands all nodes without losing information, that is, it does not expand

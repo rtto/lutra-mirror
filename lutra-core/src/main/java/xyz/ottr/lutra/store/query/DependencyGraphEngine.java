@@ -161,7 +161,7 @@ public class DependencyGraphEngine extends QueryEngine<DependencyGraph> {
     @Override
     public Stream<Tuple> hasOccurenceAt(Tuple tuple, String term, String inside, String level) {
 
-        Term boundTerm = tuple.getAs(TermList.class, term);
+        Term boundTerm = tuple.getAs(Term.class, term);
         return findOccurences(tuple, boundTerm, inside, level, 0);
     }
             
@@ -174,11 +174,11 @@ public class DependencyGraphEngine extends QueryEngine<DependencyGraph> {
         }
 
         if (term instanceof TermList) { // Match recursively on inner terms with current level +1
-            Stream<Tuple> stream = Stream.empty();
+            Stream.Builder<Tuple> stream = Stream.builder();
             for (Term inner : ((TermList) term).asList()) {
-                Stream.concat(stream, findOccurences(tuple, inner, inside, level, current + 1));
+                findOccurences(tuple, inner, inside, level, current + 1).forEach(stream);
             }
-            return stream;
+            return stream.build();
         }
 
         // Has non-list term, just need to check for equality of level and term
@@ -381,6 +381,30 @@ public class DependencyGraphEngine extends QueryEngine<DependencyGraph> {
                 ? Stream.of(tuple) : Stream.empty();
         }
         return Stream.of(tuple.bind(args, boundInstance.getArguments()));
+    }
+
+    @Override
+    public Stream<Tuple> isUndefined(Tuple tuple, String template) {
+        String iri = tuple.getAs(String.class, template);
+        return !this.store.containsTemplate(iri)
+            ? Stream.of(tuple)
+            : Stream.empty();
+    }
+
+    @Override
+    public Stream<Tuple> isSignature(Tuple tuple, String template) {
+        String iri = tuple.getAs(String.class, template);
+        return this.store.containsSignature(iri)
+            ? Stream.of(tuple)
+            : Stream.empty();
+    }
+
+    @Override
+    public Stream<Tuple> isBase(Tuple tuple, String template) {
+        String iri = tuple.getAs(String.class, template);
+        return this.store.containsBase(iri)
+            ? Stream.of(tuple)
+            : Stream.empty();
     }
 
     @Override

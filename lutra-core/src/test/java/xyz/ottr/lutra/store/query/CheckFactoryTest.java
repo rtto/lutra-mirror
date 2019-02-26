@@ -72,12 +72,36 @@ public class CheckFactoryTest {
                         new ArgumentList(new ObjectTerm("a", true), new ObjectTerm(1))))));
         QueryEngine<DependencyGraph> engine = new DependencyGraphEngine(store);
 
-        List<Message> msgs = CheckFactory.defaultChecks
+        List<Message> msgs = CheckFactory.allChecks
             .stream()
             .flatMap(c -> c.check(engine))
             .collect(Collectors.toList());
 
         assertTrue(msgs.size() == 1);
+    }
+
+    @Test
+    public void variableUsedInsideList() {
+
+        DependencyGraph store = initStore();
+        store.addTemplate(
+            new Template("test",
+                new ParameterList(new ObjectTerm("a", true), new ObjectTerm("b", true)),
+                Collections.singleton(new Instance("base2",
+                        new ArgumentList(new TermList(new ObjectTerm("a", true)),
+                                         new TermList(new ObjectTerm(1),
+                                                      new TermList(new ObjectTerm("b", true))))))));
+        QueryEngine<DependencyGraph> engine = new DependencyGraphEngine(store);
+
+        List<Message> msgs = CheckFactory.allChecks
+            .stream()
+            .flatMap(c -> c.check(engine))
+            .collect(Collectors.toList());
+
+        for (Message msg : msgs) {
+            assertFalse("Should not give any errors.",
+                Message.moreSevere(msg.getLevel(), Message.ERROR));
+        }
     }
 
     @Test
@@ -91,7 +115,7 @@ public class CheckFactoryTest {
                         new ArgumentList(new ObjectTerm("a", true), new ObjectTerm(1))))));
         QueryEngine<DependencyGraph> engine = new DependencyGraphEngine(store);
 
-        List<Message> msgs = CheckFactory.defaultChecks
+        List<Message> msgs = CheckFactory.allChecks
             .stream()
             .flatMap(c -> c.check(engine))
             .collect(Collectors.toList());
@@ -110,7 +134,7 @@ public class CheckFactoryTest {
                         new ArgumentList(new ObjectTerm("a", true), new ObjectTerm("b", true))))));
         QueryEngine<DependencyGraph> engine = new DependencyGraphEngine(store);
 
-        List<Message> msgs = CheckFactory.defaultChecks
+        List<Message> msgs = CheckFactory.allChecks
             .stream()
             .flatMap(c -> c.check(engine))
             .collect(Collectors.toList());
@@ -134,7 +158,7 @@ public class CheckFactoryTest {
                         new ArgumentList(new ObjectTerm("a", true), new ObjectTerm("b", true))))));
         QueryEngine<DependencyGraph> engine = new DependencyGraphEngine(store);
 
-        List<Message> msgs = CheckFactory.defaultChecks
+        List<Message> msgs = CheckFactory.allChecks
             .stream()
             .flatMap(c -> c.check(engine))
             .collect(Collectors.toList());
@@ -151,7 +175,7 @@ public class CheckFactoryTest {
             new Template("test1",
                 new ParameterList(new ObjectTerm("a", true), new ObjectTerm("b", true)),
                 Stream.of(
-                    new Instance("base",
+                    new Instance("base2",
                         new ArgumentList(new ObjectTerm("a", true), new ObjectTerm("b", true))),
                     new Instance("test3",
                         new ArgumentList(new ObjectTerm("b", true), new ObjectTerm("a", true))))
@@ -171,7 +195,7 @@ public class CheckFactoryTest {
 
         QueryEngine<DependencyGraph> engine = new DependencyGraphEngine(store);
 
-        List<Message> msgs = CheckFactory.defaultChecks
+        List<Message> msgs = CheckFactory.allChecks
             .stream()
             .flatMap(c -> c.check(engine))
             .collect(Collectors.toList());
@@ -215,7 +239,7 @@ public class CheckFactoryTest {
 
         QueryEngine<DependencyGraph> engine = new DependencyGraphEngine(store);
 
-        List<Message> msgs = CheckFactory.defaultChecks
+        List<Message> msgs = CheckFactory.allChecks
             .stream()
             .flatMap(c -> c.check(engine))
             .collect(Collectors.toList());
@@ -263,7 +287,7 @@ public class CheckFactoryTest {
 
         QueryEngine<DependencyGraph> engine = new DependencyGraphEngine(store);
 
-        List<Message> msgs = CheckFactory.defaultChecks
+        List<Message> msgs = CheckFactory.allChecks
             .stream()
             .flatMap(c -> c.check(engine))
             .collect(Collectors.toList());
@@ -306,7 +330,7 @@ public class CheckFactoryTest {
 
         QueryEngine<DependencyGraph> engine = new DependencyGraphEngine(store);
 
-        List<Message> msgs = CheckFactory.defaultChecks
+        List<Message> msgs = CheckFactory.allChecks
             .stream()
             .flatMap(c -> c.check(engine))
             .collect(Collectors.toList());

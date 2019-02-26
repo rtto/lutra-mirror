@@ -51,6 +51,7 @@ import xyz.ottr.lutra.model.Term;
 import xyz.ottr.lutra.result.Message;
 import xyz.ottr.lutra.result.Result;
 import xyz.ottr.lutra.result.ResultStream;
+import xyz.ottr.lutra.store.query.Check;
 import xyz.ottr.lutra.store.query.CheckFactory;
 import xyz.ottr.lutra.store.query.DependencyGraphEngine;
 import xyz.ottr.lutra.store.query.Query;
@@ -253,8 +254,24 @@ public class DependencyGraph implements TemplateStore {
         return Result.of(node);
     }
 
+    @Override
     public boolean containsTemplate(String iri) {
         return this.nodes.containsKey(iri) && !this.nodes.get(iri).isUndefined();
+    }
+
+    @Override
+    public boolean containsBase(String iri) {
+        return this.nodes.containsKey(iri) && this.nodes.get(iri).isBase();
+    }
+
+    @Override
+    public boolean containsSignature(String iri) {
+        return this.nodes.containsKey(iri) && this.nodes.get(iri).isSignature();
+    }
+
+    @Override
+    public boolean containsDefinitionOf(String iri) {
+        return this.nodes.containsKey(iri) && this.nodes.get(iri).isDefinition();
     }
 
     private boolean isLeafNode(TemplateNode n) {
@@ -586,14 +603,23 @@ public class DependencyGraph implements TemplateStore {
         return expandOnly(vocabularyExpansionPredicate(iris));
     }
 
-    @Override
-    public List<Message> checkTemplates() {
+    private List<Message> checkTemplatesFor(List<Check> checks) {
 
         QueryEngine<DependencyGraph> engine = new DependencyGraphEngine(this);
-        return CheckFactory.defaultChecks
+        return checks
             .stream()
             .flatMap(c -> c.check(engine))
             .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<Message> checkTemplates() {
+        return checkTemplatesFor(CheckFactory.allChecks);
+    }
+
+    @Override
+    public List<Message> checkTemplatesForErrorsOnly() {
+        return checkTemplatesFor(CheckFactory.failsOnErrorChecks);
     }
 
     /**
