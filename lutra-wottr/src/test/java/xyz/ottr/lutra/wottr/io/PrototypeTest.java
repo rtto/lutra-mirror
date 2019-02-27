@@ -22,18 +22,6 @@ package xyz.ottr.lutra.wottr.io;
  * #L%
  */
 
-import static xyz.ottr.lutra.store.query.Query.applyUnifier;
-import static xyz.ottr.lutra.store.query.Query.body;
-import static xyz.ottr.lutra.store.query.Query.index;
-import static xyz.ottr.lutra.store.query.Query.instance;
-import static xyz.ottr.lutra.store.query.Query.instanceArgs;
-import static xyz.ottr.lutra.store.query.Query.instanceIRI;
-import static xyz.ottr.lutra.store.query.Query.not;
-import static xyz.ottr.lutra.store.query.Query.notEquals;
-import static xyz.ottr.lutra.store.query.Query.template;
-import static xyz.ottr.lutra.store.query.Query.unifiesBody;
-import static xyz.ottr.lutra.store.query.Query.unifiesParams;
-
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;

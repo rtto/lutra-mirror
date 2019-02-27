@@ -431,7 +431,7 @@ public abstract class QueryEngine<S extends TemplateStore> {
      *      a Stream of tuples binding args to argument lists of the template body
      *      bound to i.
      */
-    public abstract Stream<Tuple> instanceArgs(Tuple tuple, String instance, String args);
+    public abstract Stream<Tuple> arguments(Tuple tuple, String instance, String args);
 
     /**
      * Constructs a a stream containing the argument tuple if the template
@@ -658,11 +658,11 @@ public abstract class QueryEngine<S extends TemplateStore> {
         // TODO: Split into smaller methods
         List<Tuple> b1Ins = instance(m.copy(), b1, "_ins")
             .flatMap(mc -> instanceIRI(mc, "_ins", "_iri"))
-            .flatMap(mc -> instanceArgs(mc, "_ins", "_args"))
+            .flatMap(mc -> arguments(mc, "_ins", "_args"))
             .collect(Collectors.toList());
         List<Tuple> b2Ins = instance(m.copy(), b2, "_ins")
             .flatMap(mc -> instanceIRI(mc, "_ins", "_iri"))
-            .flatMap(mc -> instanceArgs(mc, "_ins", "_args"))
+            .flatMap(mc -> arguments(mc, "_ins", "_args"))
             .collect(Collectors.toList());
         List<Tuple> biggestBody;
         List<Tuple> smallestBody;

@@ -372,7 +372,7 @@ public class DependencyGraphEngine extends QueryEngine<DependencyGraph> {
     }
 
     @Override
-    public Stream<Tuple> instanceArgs(Tuple tuple, String instance, String args) {
+    public Stream<Tuple> arguments(Tuple tuple, String instance, String args) {
 
         Instance boundInstance = tuple.getAs(Instance.class, instance);
 

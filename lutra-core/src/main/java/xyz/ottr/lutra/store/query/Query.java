@@ -30,6 +30,13 @@ import xyz.ottr.lutra.store.TemplateStore;
 
 public class Query {
 
+    private static int newId = 0;
+
+    private static int genNewId() {
+        newId++;
+        return newId;
+    }
+
     //public static final Query UNIFIES2 = Query.template("T1")
     //    .and(Query.parameters("T1", "P1"))
     //    .and(Query.template("T2"))
@@ -180,8 +187,8 @@ public class Query {
         return new Query((qe, m) -> qe.instanceIRI(m, i, iri));
     }
 
-    public static Query instanceArgs(String i, String args) {
-        return new Query((qe, m) -> qe.instanceArgs(m, i, args));
+    public static Query arguments(String i, String args) {
+        return new Query((qe, m) -> qe.arguments(m, i, args));
     }
 
     public static Query unifiesVal(String v1, String v2, String u) {
@@ -230,6 +237,54 @@ public class Query {
 
     public static Query isBase(String template) {
         return new Query((qe, m) -> qe.isBase(m, template));
+    }
+
+    ////////////////////
+    /// Short-cuts /////
+    ////////////////////
+
+    /**
+     * Simply the conjunction of the #parameters(String,String) and #index(String,String) queries.
+     */
+    public static Query parameterIndex(String template, String index, String param) {
+        String params = "_ps" + genNewId();
+        return parameters(template, params).and(index(params, index, param));
+    }
+
+    /**
+     * Simply the conjunction of the #argument(String,String) and #index(String,String) queries.
+     */
+    public static Query argumentIndex(String instance, String index, String arg) {
+        String args = "_as" + genNewId();
+        return arguments(instance, args).and(index(args, index, arg));
+    }
+
+    /**
+     * Simply the conjunction of the #body(String,String) and #instance(String,String) queries.
+     */
+    public static Query bodyInstance(String template, String instance) {
+        String body = "_body" + genNewId();
+        return body(template, body).and(instance(body, instance));
+    }
+
+    /**
+     * Finds the type which argument at index is used as in instance.
+     */
+    public static Query usedAsType(String instance, String index, String type) {
+
+        String temp = "_Temp" + genNewId();
+        String para = "_Para" + genNewId();
+        String args = "_Args" + genNewId();
+        String outer = "_Outer" + genNewId();
+
+        return instanceIRI(instance, temp)
+            .and(parameterIndex(temp, index, para))
+            .and(arguments(instance, args))
+            .and(hasListExpander(args, index)
+                .and(type(para, outer))
+                .and(innerType(outer, type))
+                .or(not(hasListExpander(args, index))
+                    .and(type(para, type))));
     }
 
     ////////////////////
