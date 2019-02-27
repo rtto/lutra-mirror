@@ -38,8 +38,6 @@ import xyz.ottr.lutra.model.Template;
 import xyz.ottr.lutra.model.Term;
 import xyz.ottr.lutra.model.TermList;
 import xyz.ottr.lutra.model.types.ComplexType;
-import xyz.ottr.lutra.model.types.ListType;
-import xyz.ottr.lutra.model.types.NEListType;
 import xyz.ottr.lutra.model.types.TermType;
 import xyz.ottr.lutra.result.Result;
 import xyz.ottr.lutra.store.DependencyGraph;
@@ -255,21 +253,8 @@ public class DependencyGraphEngine extends QueryEngine<DependencyGraph> {
     @Override
     public Stream<Tuple> innerType(Tuple tuple, String type, String inner) {
 
-        TermType boundType = tuple.getAs(TermType.class, type);
-
-        TermType actInner;
-        if (boundType instanceof ListType) {
-            actInner = ((ListType) boundType).getInner();
-        } else if (boundType instanceof NEListType) {
-            actInner = ((NEListType) boundType).getInner();
-        } else {
-            return Stream.empty();
-        }
-        if (tuple.hasBound(inner)) {
-            TermType boundInner = tuple.getAs(TermType.class, inner);
-            return actInner.equals(boundInner) ? Stream.of(tuple) : Stream.empty();
-        }
-        return Stream.of(tuple.bind(inner, actInner));
+        String lvl = Tuple.freshVar();
+        return innerTypeAt(tuple.bind(lvl, 1), type, inner, lvl);
     }
 
     @Override

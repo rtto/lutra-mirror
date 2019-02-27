@@ -27,6 +27,13 @@ import java.util.Map;
 
 public class Tuple {
 
+    private static int newId = 0;
+
+    protected static String freshVar() {
+        newId++;
+        return "_var" + newId;
+    }
+
     private final Map<String, Object> map;
 
     public Tuple() {

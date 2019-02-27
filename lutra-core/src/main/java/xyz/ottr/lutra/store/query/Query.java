@@ -30,13 +30,6 @@ import xyz.ottr.lutra.store.TemplateStore;
 
 public class Query {
 
-    private static int newId = 0;
-
-    private static int genNewId() {
-        newId++;
-        return newId;
-    }
-
     //public static final Query UNIFIES2 = Query.template("T1")
     //    .and(Query.parameters("T1", "P1"))
     //    .and(Query.template("T2"))
@@ -247,7 +240,7 @@ public class Query {
      * Simply the conjunction of the #parameters(String,String) and #index(String,String) queries.
      */
     public static Query parameterIndex(String template, String index, String param) {
-        String params = "_ps" + genNewId();
+        String params = Tuple.freshVar();
         return parameters(template, params).and(index(params, index, param));
     }
 
@@ -255,7 +248,7 @@ public class Query {
      * Simply the conjunction of the #argument(String,String) and #index(String,String) queries.
      */
     public static Query argumentIndex(String instance, String index, String arg) {
-        String args = "_as" + genNewId();
+        String args = Tuple.freshVar();
         return arguments(instance, args).and(index(args, index, arg));
     }
 
@@ -263,7 +256,7 @@ public class Query {
      * Simply the conjunction of the #body(String,String) and #instance(String,String) queries.
      */
     public static Query bodyInstance(String template, String instance) {
-        String body = "_body" + genNewId();
+        String body = Tuple.freshVar();
         return body(template, body).and(instance(body, instance));
     }
 
@@ -272,10 +265,10 @@ public class Query {
      */
     public static Query usedAsType(String instance, String index, String type) {
 
-        String temp = "_Temp" + genNewId();
-        String para = "_Para" + genNewId();
-        String args = "_Args" + genNewId();
-        String outer = "_Outer" + genNewId();
+        String temp = Tuple.freshVar();
+        String para = Tuple.freshVar();
+        String args = Tuple.freshVar();
+        String outer = Tuple.freshVar();
 
         return instanceIRI(instance, temp)
             .and(parameterIndex(temp, index, para))
