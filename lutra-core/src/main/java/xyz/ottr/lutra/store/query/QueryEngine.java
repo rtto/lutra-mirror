@@ -619,11 +619,11 @@ public abstract class QueryEngine<S extends TemplateStore> {
         return tuples.build();
     }
 
-    public Optional<Tuple> unifyOrdered(Tuple m, List<Object> ps1Vals, List<Object> ps2Vals, String u) {
+    public Optional<Tuple> unifyOrdered(Tuple tuple, List<Object> ps1Vals, List<Object> ps2Vals, String uni) {
 
-        Optional<Tuple> newTuple = Optional.of(m.copy());
-        if (!m.hasBound(u)) {
-            newTuple = newTuple.map(t -> t.bind(u, new Substitution()));
+        Optional<Tuple> newTuple = Optional.of(tuple.copy());
+        if (!tuple.hasBound(uni)) {
+            newTuple = newTuple.map(t -> t.bind(uni, new Substitution()));
         }
 
         for (int i = 0; i < ps1Vals.size() && newTuple.isPresent(); i++) {
@@ -631,7 +631,7 @@ public abstract class QueryEngine<S extends TemplateStore> {
             Object ps2Val = ps2Vals.get(i);
             newTuple = newTuple.map(t -> t.bind("_v1", ps1Val).bind("_v2", ps2Val))
                                .flatMap(t -> unifiesVal(t, "_v1", "_v2", "_paramsUni").findAny());
-            newTuple = newTuple.flatMap(t -> merge(t, "_paramsUni", u, u).findAny())
+            newTuple = newTuple.flatMap(t -> merge(t, "_paramsUni", uni, uni).findAny())
                                .map(t -> t.unbind("_v1", "_v2", "_paramsUni"));
         }
         return newTuple;
@@ -642,25 +642,25 @@ public abstract class QueryEngine<S extends TemplateStore> {
      * a unifier, according to this' store, such that the list of instances bound to b1
      * becomes a subset of the list of instances bound to b2.
      *
-     * @param m
+     * @param tuple
      *      a Tuple mapping variables to values
      * @param b1
      *      a variable name denoting a list of instances (i.e. a body)
      * @param b2
      *      a variable name denoting a list of instances (i.e. a body)
-     * @param u
+     * @param uni
      *      a variable name denoting a unifier
      * @return
      *      a Stream of tuples binding u to a unifier between
      *      the the bodies b1 and b2
      */
-    public Stream<Tuple> unifiesBody(Tuple m, String b1, String b2, String u) {
+    public Stream<Tuple> unifiesBody(Tuple tuple, String b1, String b2, String uni) {
         // TODO: Split into smaller methods
-        List<Tuple> b1Ins = instance(m.copy(), b1, "_ins")
+        List<Tuple> b1Ins = instance(tuple.copy(), b1, "_ins")
             .flatMap(mc -> instanceIRI(mc, "_ins", "_iri"))
             .flatMap(mc -> arguments(mc, "_ins", "_args"))
             .collect(Collectors.toList());
-        List<Tuple> b2Ins = instance(m.copy(), b2, "_ins")
+        List<Tuple> b2Ins = instance(tuple.copy(), b2, "_ins")
             .flatMap(mc -> instanceIRI(mc, "_ins", "_iri"))
             .flatMap(mc -> arguments(mc, "_ins", "_args"))
             .collect(Collectors.toList());
@@ -689,9 +689,9 @@ public abstract class QueryEngine<S extends TemplateStore> {
         while (combIter.hasNext()) {
             int[] comb = combIter.next();
             List<Tuple> biggestPerm = makeSelection(biggestBody, comb);
-            Optional<Tuple> newTuple = Optional.of(m.copy());
-            if (!m.hasBound(u)) {
-                newTuple = newTuple.map(t -> t.bind(u, new Substitution()));
+            Optional<Tuple> newTuple = Optional.of(tuple.copy());
+            if (!tuple.hasBound(uni)) {
+                newTuple = newTuple.map(t -> t.bind(uni, new Substitution()));
             }
 
             for (int i = 0; i < smallestBody.size() && newTuple.isPresent(); i++) {
@@ -713,7 +713,7 @@ public abstract class QueryEngine<S extends TemplateStore> {
 
                 newTuple = newTuple.map(t -> t.bind("_args1", t1.get("_args")).bind("_args2", t2.get("_args")))
                                    .flatMap(t -> unifiesParams(t, "_args1", "_args2", "_bodyUni").findAny());
-                newTuple = newTuple.flatMap(t -> merge(t, "_bodyUni", u, u).findAny())
+                newTuple = newTuple.flatMap(t -> merge(t, "_bodyUni", uni, uni).findAny())
                                    .map(t -> t.unbind("_args1", "_args2", "_bodyUni"));
             }
             newTuple.ifPresent(tuples);
@@ -734,7 +734,7 @@ public abstract class QueryEngine<S extends TemplateStore> {
      * a unifier which represents a merge between the
      * unifiers bound to u1 and u2, according to this' store's unifiesVal.
      *
-     * @param m
+     * @param tuple
      *      a Tuple mapping variables to values
      * @param u1
      *      a variable name denoting a unifier
@@ -746,20 +746,20 @@ public abstract class QueryEngine<S extends TemplateStore> {
      *      a Stream of tuples binding u to a unifier which is the
      *      merge of the unifiers bound to u1 and u2.
      */
-    public Stream<Tuple> merge(Tuple m, String u1, String u2, String u) {
+    public Stream<Tuple> merge(Tuple tuple, String u1, String u2, String u) {
 
-        Substitution mu1 = m.getAs(Substitution.class, u1);
-        Substitution mu2 = m.getAs(Substitution.class, u2);
+        Substitution mu1 = tuple.getAs(Substitution.class, u1);
+        Substitution mu2 = tuple.getAs(Substitution.class, u2);
 
         Optional<Substitution> newUni = mu1.mergeWithUnification(mu2);
 
-        return newUni.isPresent() ? Stream.of(m.bind(u, newUni.get())) : Stream.empty();
+        return newUni.isPresent() ? Stream.of(tuple.bind(u, newUni.get())) : Stream.empty();
     }
 
-    public Stream<Tuple> applyUnifier(Tuple m, String elem, String u, String unified) {
-        Substitution boundSubs = m.getAs(Substitution.class, u);
+    public Stream<Tuple> applyUnifier(Tuple tuple, String elem, String u, String unified) {
+        Substitution boundSubs = tuple.getAs(Substitution.class, u);
 
-        Object boundElem = m.get(elem);
+        Object boundElem = tuple.get(elem);
         Object boundUnified;
 
         if (boundElem instanceof ArgumentList) {
@@ -776,12 +776,11 @@ public abstract class QueryEngine<S extends TemplateStore> {
                     + " not bound to type a unifier can be applied to.");
         }
 
-        if (m.hasBound(unified)) {
-            return m.get(unified).equals(boundUnified) ? Stream.of(m) : Stream.empty();
+        if (tuple.hasBound(unified)) {
+            return tuple.get(unified).equals(boundUnified) ? Stream.of(tuple) : Stream.empty();
         }
-        return Stream.of(m.bind(unified, boundUnified));
+        return Stream.of(tuple.bind(unified, boundUnified));
     }
-
 
     /**
      * Utility class used in unification above.
