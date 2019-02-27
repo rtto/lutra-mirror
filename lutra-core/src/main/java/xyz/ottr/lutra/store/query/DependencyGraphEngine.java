@@ -249,7 +249,6 @@ public class DependencyGraphEngine extends QueryEngine<DependencyGraph> {
         return stream;
     }
 
-    // TODO: Remove this, and replace with innerTypesAt(tuple, type, inner, 1)
     @Override
     public Stream<Tuple> innerType(Tuple tuple, String type, String inner) {
 
