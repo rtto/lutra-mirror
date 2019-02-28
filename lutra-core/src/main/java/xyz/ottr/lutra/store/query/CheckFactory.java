@@ -110,7 +110,7 @@ public abstract class CheckFactory {
                         not(
                             bodyInstance("Temp", "Ins")
                                 .and(argumentIndex("Ins", "Index2", "Arg"))
-                                .and(hasOccurenceAt("Arg", "Val", "Lvl")))),
+                                .and(hasOccurenceAt("Arg", "Lvl", "Val")))),
                 tup -> Message.warning(
                     "Parameter with name " + tup.get("Val").toString()
                     + " with index " + tup.get("Index").toString()
@@ -140,10 +140,12 @@ public abstract class CheckFactory {
                     .and(bodyInstance("Temp", "Ins1"))
                     .and(bodyInstance("Temp", "Ins2"))
                     .and(removeSymmetry("Ins1", "Ins2"))
-                    .and(argumentIndex("Ins1", "Index1", "Val"))
-                    .and(argumentIndex("Ins2", "Index2", "Val"))
-                    .and(usedAsType("Ins1", "Index1", "Type1"))
-                    .and(usedAsType("Ins2", "Index2", "Type2"))
+                    .and(argumentIndex("Ins1", "Index1", "Arg1"))
+                    .and(hasOccurenceAt("Arg1", "Lvl1", "Val"))
+                    .and(argumentIndex("Ins2", "Index2", "Arg2"))
+                    .and(hasOccurenceAt("Arg2", "Lvl2", "Val"))
+                    .and(usedAsType("Ins1", "Index1", "Lvl1", "Type1"))
+                    .and(usedAsType("Ins2", "Index2", "Lvl2", "Type2"))
                     .and(not(isSubTypeOf("Type1", "Type2")) // not(A) and not(B) = not(A or B)
                         .and(not(isSubTypeOf("Type2", "Type1")))),
                 tup -> Message.error(
@@ -156,9 +158,10 @@ public abstract class CheckFactory {
             new Check(
                 template("Temp")
                     .and(bodyInstance("Temp", "Ins"))
-                    .and(argumentIndex("Ins", "Index", "Val"))
+                    .and(argumentIndex("Ins", "Index", "Arg"))
+                    .and(hasOccurenceAt("Arg", "Lvl", "Val"))
                     .and(type("Val", "Intrinsic"))
-                    .and(usedAsType("Ins", "Index", "UsedAs"))
+                    .and(usedAsType("Ins", "Index", "Lvl", "UsedAs"))
                     .and(not(isCompatibleWith("Intrinsic", "UsedAs"))),
                 tup -> Message.error(
                     "Template with IRI " + tup.get("Temp") + " has incompatible use of term "

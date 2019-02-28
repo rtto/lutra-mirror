@@ -76,7 +76,7 @@ public class TypeFactoryTest {
             new NEListType(new LUBType(TypeFactory.getByName("IRI"))));
         assertEquals(
             new TermList(new IRITerm("example.com/v1"), new BlankNodeTerm()).getType(),
-            new NEListType(TypeFactory.getTopType()));
+            new NEListType(new LUBType(TypeFactory.getByName("IRI"))));
         assertEquals(
             new TermList(new IRITerm("example.com/v1"), new LiteralTerm("v2")).getType(),
             new NEListType(TypeFactory.getTopType()));
@@ -208,6 +208,6 @@ public class TypeFactoryTest {
         assertEquals(var22.getType(), var22b.getType());
         assertEquals(var3.getType(), var3b.getType());
         assertEquals(lst1.getType(), new NEListType(TypeFactory.getByName("class")));
-        assertEquals(lst2.getType(), new NEListType(new NEListType(new ListType(TypeFactory.getByName("string")))));
+        assertEquals(lst2.getType(), new NEListType(new NEListType(new NEListType(TypeFactory.getByName("string")))));
     }
 }

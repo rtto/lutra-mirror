@@ -116,7 +116,7 @@ public class Query {
         return new Query((qe, m) -> qe.index(m, params, index, val));
     }
 
-    public static Query hasOccurenceAt(String term, String inside, String level) {
+    public static Query hasOccurenceAt(String term, String level, String inside) {
         return new Query((qe, m) -> qe.hasOccurenceAt(m, term, inside, level));
     }
 
@@ -263,21 +263,23 @@ public class Query {
     /**
      * Finds the type which argument at index is used as in instance.
      */
-    public static Query usedAsType(String instance, String index, String type) {
+    public static Query usedAsType(String instance, String index, String level, String type) {
 
-        String temp = Tuple.freshVar();
-        String para = Tuple.freshVar();
-        String args = Tuple.freshVar();
+        String temp =  Tuple.freshVar();
+        String para =  Tuple.freshVar();
+        String parType =  Tuple.freshVar();
+        String args =  Tuple.freshVar();
         String outer = Tuple.freshVar();
 
         return instanceIRI(instance, temp)
             .and(parameterIndex(temp, index, para))
             .and(arguments(instance, args))
+            .and(type(para, parType))
             .and(hasListExpander(args, index)
-                .and(type(para, outer))
+                .and(innerTypeAt(parType, level, outer))
                 .and(innerType(outer, type))
                 .or(not(hasListExpander(args, index))
-                    .and(type(para, type))));
+                    .and(innerTypeAt(parType, level, type))));
     }
 
     ////////////////////
