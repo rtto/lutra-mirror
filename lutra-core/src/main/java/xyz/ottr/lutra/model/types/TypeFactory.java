@@ -33,6 +33,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.apache.commons.collections4.SetUtils 
+
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.RDFNode;
@@ -56,6 +58,7 @@ public class TypeFactory {
     private static Map<String, BasicType> iris;
     private static Map<String, BasicType> names;
     private static Map<BasicType, Set<BasicType>> superTypes;
+    private static Map<BasicType, Set<BasicType>> subTypes;
     private static BasicType top;
     private static BasicType bot;
     
@@ -74,7 +77,7 @@ public class TypeFactory {
         Model model = ModelFactory.createInfModel(owlMicro, types);
 
         initNames(model);
-        initSuperTypes(model);
+        initSuperSubTypes(model);
 
     }
     
@@ -82,6 +85,7 @@ public class TypeFactory {
         iris = new HashMap<>();
         names = new HashMap<>();
         superTypes = new HashMap<>();
+        subTypes = new HashMap<>();
         
         for (BasicType term : getBasicTypes(model)) {                
             String uri = term.getIRI();
@@ -95,12 +99,13 @@ public class TypeFactory {
             }
             names.put(name, term);
             superTypes.put(term, new HashSet<>());
+            subTypes.put(term, new HashSet<>());
         }
         top = getByName("Resource");
         bot = getByName("Bot");
     }
 
-    private static void initSuperTypes(Model model) {
+    private static void initSuperSubTypes(Model model) {
 
         model.listStatements((Resource) null, model.createProperty(ROTTR.subTypeOf), (RDFNode) null)
             .forEachRemaining(stmt -> {
@@ -108,6 +113,7 @@ public class TypeFactory {
                 BasicType superType = iris.get(stmt.getObject().asResource().getURI());
 
                 superTypes.get(subType).add(superType);
+                subTypes.get(superType).add(subType);
             });
     }
 
@@ -147,7 +153,7 @@ public class TypeFactory {
                 Set<TermType> types = terms.stream()
                     .map(trm -> trm.getType())
                     .collect(Collectors.toSet());
-                return new NEListType(getLUB(types));
+                return new NEListType(getSubtypeLeastCompatible(types));
             }
 
         } else {
@@ -183,21 +189,22 @@ public class TypeFactory {
     }
 
     /**
-     * Returns the least upper bound for the input set of types.
+     * Returns the subtype-least type S for which every
+     * type T in the argument set is compatible with (T compatible S)
      */
-    private static TermType getLUB(Set<TermType> types) {
+    private static TermType getSubtypeLeastCompatible(Set<TermType> types) {
 
-        TermType lub = bot;
+        TermType slc = bot; // slc = [S]ubtype[L]east[C]ompatible
         for (TermType type : types) {
-            if (lub.isSubTypeOf(type)) {
-                lub = type;
-            } else if (!(type.isSubTypeOf(lub))) {
-                Set<TermType> ubs = getSuperTypes(lub);
-                ubs.retainAll(getSuperTypes(type));
-                lub = findLeast(ubs);
-            }
+            if (slc.equals(bot)) {
+                slc = type;
+            } else if (!(type.isCompatibleWith(slc))) {
+                Set<TermType> ubs = getCompatibleTypes(slc);
+                ubs.retainAll(getCompatibleTypes(type));
+                slc = findLeast(ubs);
+            } // otherwise we can leave slc untouched as type is compatible with slc
         }
-        return lub;
+        return slc;
     }
 
     private static Set<TermType> getSuperTypes(TermType type) {
@@ -224,6 +231,19 @@ public class TypeFactory {
         }
         sups.add(type);
         return sups;
+    }
+
+    private static Set<TermType> getSubTypes(TermType type) {
+        return null; // TODO
+    }
+
+    private static Set<TermType> getCompatibleTypes(TermType type) {
+        if (type instanceof LUBType) {
+            TermType inner = ((LUBType) type).getInner();
+            return SetUtils.union(getSubTypes(inner), getSuperTypes(inner);
+        } else { // Should never happen
+            return getSuperTypes(type);
+        }
     }
 
     /**
