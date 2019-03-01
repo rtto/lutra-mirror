@@ -33,8 +33,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.apache.commons.collections4.SetUtils 
-
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.RDFNode;
@@ -194,14 +192,15 @@ public class TypeFactory {
      */
     private static TermType getSubtypeLeastCompatible(Set<TermType> types) {
 
-        TermType slc = bot; // slc = [S]ubtype[L]east[C]ompatible
+        TermType slc = new LUBType(top); // slc = [S]ubtype[L]east[C]ompatible
         for (TermType type : types) {
-            if (slc.equals(bot)) {
+            if (slc.equals(new LUBType(top))) {
+                // slc can be anyting, so type is subtype-least compatible
                 slc = type;
             } else if (!(type.isCompatibleWith(slc))) {
-                Set<TermType> ubs = getCompatibleTypes(slc);
-                ubs.retainAll(getCompatibleTypes(type));
-                slc = findLeast(ubs);
+                Set<TermType> compats = getCompatibleTypes(slc);
+                compats.retainAll(getCompatibleTypes(type));
+                slc = findLeast(compats);
             } // otherwise we can leave slc untouched as type is compatible with slc
         }
         return slc;
@@ -227,21 +226,44 @@ public class TypeFactory {
         } else if (type instanceof LUBType) {
             sups = getSuperTypes(((LUBType) type).getInner());
         } else { // Should never happen
-            sups = Collections.singleton(bot);
+            sups = Collections.singleton(top);
         }
         sups.add(type);
         return sups;
     }
 
     private static Set<TermType> getSubTypes(TermType type) {
-        return null; // TODO
+        Set<TermType> subs;
+        if (type instanceof BasicType) {
+            subs = subTypes.get((BasicType) type)
+                .stream()
+                .map(tp -> (TermType) tp)
+                .collect(Collectors.toSet());
+        } else if (type instanceof NEListType) {
+            subs = getSubTypes(((NEListType) type).getInner())
+                .stream()
+                .map(tp -> new NEListType(tp))
+                .collect(Collectors.toSet());
+        } else if (type instanceof ListType) {
+            subs = getSubTypes(((ListType) type).getInner())
+                .stream()
+                .flatMap(tp -> Stream.of(new NEListType(tp), new ListType(tp)))
+                .collect(Collectors.toSet());
+        } else { // LUB type
+            subs = Collections.singleton(bot);
+        }
+        subs.add(type);
+        return subs;
     }
 
     private static Set<TermType> getCompatibleTypes(TermType type) {
         if (type instanceof LUBType) {
+            // A LUB-type is compatible with both its inner sub- and super types
             TermType inner = ((LUBType) type).getInner();
-            return SetUtils.union(getSubTypes(inner), getSuperTypes(inner);
-        } else { // Should never happen
+            Set<TermType> compats = new HashSet<>(getSubTypes(inner));
+            compats.addAll(getSuperTypes(inner));
+            return compats;
+        } else {
             return getSuperTypes(type);
         }
     }

@@ -165,6 +165,9 @@ public class TypeFactoryTest {
     @Test
     public void templateNestedListVariableTypes() {
 
+        // Checks that nested variables inside lists in
+        // instances in template bodies are properly set
+
         Term var1 = new IRITerm("example.org/var1");
         var1.setType(TypeFactory.getByName("class"));
         Term var21 = new IRITerm("example.org/var21");
@@ -208,6 +211,6 @@ public class TypeFactoryTest {
         assertEquals(var22.getType(), var22b.getType());
         assertEquals(var3.getType(), var3b.getType());
         assertEquals(lst1.getType(), new NEListType(TypeFactory.getByName("class")));
-        assertEquals(lst2.getType(), new NEListType(new NEListType(new NEListType(TypeFactory.getByName("string")))));
+        assertEquals(lst2.getType(), new NEListType(new NEListType(new ListType(TypeFactory.getByName("string")))));
     }
 }
