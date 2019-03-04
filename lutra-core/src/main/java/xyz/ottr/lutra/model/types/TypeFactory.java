@@ -23,7 +23,6 @@ package xyz.ottr.lutra.model.types;
  */
 
 import java.io.InputStream;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -31,7 +30,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
@@ -148,10 +146,7 @@ public class TypeFactory {
             if (terms.isEmpty()) {
                 return new ListType(bot);
             } else {
-                Set<TermType> types = terms.stream()
-                    .map(trm -> trm.getType())
-                    .collect(Collectors.toSet());
-                return new NEListType(getSubtypeLeastCompatible(types));
+                return new NEListType(new LUBType(top));
             }
 
         } else {
@@ -186,101 +181,6 @@ public class TypeFactory {
         } 
     }
 
-    /**
-     * Returns the subtype-least type S for which every
-     * type T in the argument set is compatible with (T compatible S)
-     */
-    private static TermType getSubtypeLeastCompatible(Set<TermType> types) {
-
-        TermType slc = new LUBType(top); // slc = [S]ubtype[L]east[C]ompatible
-        for (TermType type : types) {
-            if (slc.equals(new LUBType(top))) {
-                // slc can be anyting, so type is subtype-least compatible
-                slc = type;
-            } else if (!(type.isCompatibleWith(slc))) {
-                Set<TermType> compats = getCompatibleTypes(slc);
-                compats.retainAll(getCompatibleTypes(type));
-                slc = findLeast(compats);
-            } // otherwise we can leave slc untouched as type is compatible with slc
-        }
-        return slc;
-    }
-
-    private static Set<TermType> getSuperTypes(TermType type) {
-        Set<TermType> sups;
-        if (type instanceof BasicType) {
-            sups = superTypes.get((BasicType) type)
-                .stream()
-                .map(tp -> (TermType) tp)
-                .collect(Collectors.toSet());
-        } else if (type instanceof NEListType) {
-            sups = getSuperTypes(((NEListType) type).getInner())
-                .stream()
-                .flatMap(tp -> Stream.of(new NEListType(tp), new ListType(tp)))
-                .collect(Collectors.toSet());
-        } else if (type instanceof ListType) {
-            sups = getSuperTypes(((ListType) type).getInner())
-                .stream()
-                .map(tp -> new ListType(tp))
-                .collect(Collectors.toSet());
-        } else if (type instanceof LUBType) {
-            sups = getSuperTypes(((LUBType) type).getInner());
-        } else { // Should never happen
-            sups = Collections.singleton(top);
-        }
-        sups.add(type);
-        return sups;
-    }
-
-    private static Set<TermType> getSubTypes(TermType type) {
-        Set<TermType> subs;
-        if (type instanceof BasicType) {
-            subs = subTypes.get((BasicType) type)
-                .stream()
-                .map(tp -> (TermType) tp)
-                .collect(Collectors.toSet());
-        } else if (type instanceof NEListType) {
-            subs = getSubTypes(((NEListType) type).getInner())
-                .stream()
-                .map(tp -> new NEListType(tp))
-                .collect(Collectors.toSet());
-        } else if (type instanceof ListType) {
-            subs = getSubTypes(((ListType) type).getInner())
-                .stream()
-                .flatMap(tp -> Stream.of(new NEListType(tp), new ListType(tp)))
-                .collect(Collectors.toSet());
-        } else { // LUB type
-            subs = Collections.singleton(bot);
-        }
-        subs.add(type);
-        return subs;
-    }
-
-    private static Set<TermType> getCompatibleTypes(TermType type) {
-        if (type instanceof LUBType) {
-            // A LUB-type is compatible with both its inner sub- and super types
-            TermType inner = ((LUBType) type).getInner();
-            Set<TermType> compats = new HashSet<>(getSubTypes(inner));
-            compats.addAll(getSuperTypes(inner));
-            return compats;
-        } else {
-            return getSuperTypes(type);
-        }
-    }
-
-    /**
-     * Returns the least type (wrt. subtyping) for the input set of types.
-     */
-    private static TermType findLeast(Set<TermType> types) {
-        TermType least = top;
-        for (TermType type : types) {
-            if (type.isSubTypeOf(least)) {
-                least = type;
-            } 
-        }
-        return least;
-    }
-    
     protected static String normaliseName(String name) {
         return name.toLowerCase(Locale.ENGLISH); 
     }
