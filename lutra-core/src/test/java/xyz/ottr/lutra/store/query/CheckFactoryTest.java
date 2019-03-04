@@ -347,7 +347,8 @@ public class CheckFactoryTest {
     @Test
     public void incorrectListTypeUsage() {
 
-        // Using a variable with type IRI to a parameter with type Class
+        // Using a list of a variable of type Class and a an integer as argument
+        // to a parameter of type NEList<Class>
         DependencyGraph store = new DependencyGraph();
 
         Term varBase = new BlankNodeTerm("_:classes");
@@ -357,17 +358,49 @@ public class CheckFactoryTest {
             new TemplateSignature("areClasses",
                 new ParameterList(varBase)));
 
-        Term var = new BlankNodeTerm("_:class");
-        var.setType(TypeFactory.getByName("class"));
+        Term varClass = new BlankNodeTerm("_:class");
+        varClass.setType(TypeFactory.getByName("class"));
 
-        Term cons = new LiteralTerm("1", TypeFactory.getByName("integer").getIRI());
+        Term one = new LiteralTerm("1", TypeFactory.getByName("integer").getIRI());
 
         store.addTemplate(
             new Template("testCorrect1",
-                new ParameterList(var),
+                new ParameterList(varClass),
                 Stream.of(
                     new Instance("areClasses",
-                        new ArgumentList(new TermList(cons, var))))
+                        new ArgumentList(new TermList(one, varClass))))
+                .collect(Collectors.toSet())));
+
+        QueryEngine<DependencyGraph> engine = new DependencyGraphEngine(store);
+
+        check(engine, 1, Message.ERROR);
+    }
+
+    @Test
+    public void incorrectDeepListTypeUsage() {
+
+        DependencyGraph store = new DependencyGraph();
+
+        Term varBase = new BlankNodeTerm("_:classeses");
+        varBase.setType(new NEListType(new NEListType(TypeFactory.getByName("class"))));
+
+        store.addTemplateSignature(
+            new TemplateSignature("deepLists",
+                new ParameterList(varBase)));
+
+        Term varClass = new BlankNodeTerm("_:class");
+        varClass.setType(TypeFactory.getByName("class"));
+
+        Term one = new LiteralTerm("1", TypeFactory.getByName("integer").getIRI());
+
+        store.addTemplate(
+            new Template("testCorrect1",
+                new ParameterList(varClass),
+                Stream.of(
+                    new Instance("areClasses",
+                        new ArgumentList(new TermList(
+                                new TermList(new BlankNodeTerm(), varClass), // (_:a ?var) OK
+                                new TermList(one, varClass)))))              // (1 ?var)   ERR
                 .collect(Collectors.toSet())));
 
         QueryEngine<DependencyGraph> engine = new DependencyGraphEngine(store);
