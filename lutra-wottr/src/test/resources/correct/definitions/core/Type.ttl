@@ -6,9 +6,9 @@
 @prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix dc:      <http://purl.org/dc/elements/1.1/> .
 
-@prefix :        <http://candidate.ottr.xyz/rdf/Type#> .
+@prefix :        <http://tpl.ottr.xyz/rdf/0.1/Type#> .
 
-<http://candidate.ottr.xyz/rdf/Type>
+<http://tpl.ottr.xyz/rdf/0.1/Type>
       a       ottr:Template ;
       ottr:parameters 
           ([ ottr:type ottt:IRI ;
@@ -16,7 +16,7 @@
            [ ottr:type owl:Class ;
              ottr:variable :class ]) ;
       ottr:pattern
-          [ ottr:of <http://candidate.ottr.xyz/rdf/Triple> ;
+          [ ottr:of <http://tpl.ottr.xyz/rdf/0.1/Triple> ;
             ottr:arguments 
                 ([ ottr:value :resource ] 
                  [ ottr:value rdf:type ] 

@@ -27,8 +27,7 @@ public class ROTTR  {
     private static final String ns = "http://spec.ottr.xyz/rottr/0/types#";
     public static final String namespace = ns;
     
-    //public static final String triple = ns + "triple";
-    public static final String triple = "http://candidate.ottr.xyz/rdf/Triple"; // TODO: Decide on prefix
+    public static final String triple = "http://tpl.ottr.xyz/rdf/0.1/Triple"; 
     public static final String none = ns + "none";
     public static final String subTypeOf = ns + "subTypeOf";
     public static final String termType = ns + "Type";
