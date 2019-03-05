@@ -29,10 +29,8 @@ import java.util.Set;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.Resource;
-import org.apache.jena.shared.PrefixMapping;
 import org.apache.jena.vocabulary.RDF;
 
-import xyz.ottr.lutra.ROTTR;
 import xyz.ottr.lutra.io.TemplateWriter;
 import xyz.ottr.lutra.model.Instance;
 import xyz.ottr.lutra.model.ParameterList;
@@ -60,11 +58,8 @@ public class WTemplateWriter extends AbstractWWriter implements TemplateWriter {
     @Override
     public void accept(TemplateSignature template) {
         Model model = ModelFactory.createDefaultModel();
-        model.setNsPrefixes(PrefixMapping.Standard);
-        model.setNsPrefix("ottr", WOTTR.namespace);
-        model.setNsPrefix("ottr", WOTTR.namespace);
-        model.setNsPrefix("ottt", ROTTR.namespace);
-
+        addPrefixes(model);
+        
         Resource tempNode = makeWottrHead(model, template);
         if (template instanceof Template) {
             for (Instance ins : ((Template) template).getBody()) {

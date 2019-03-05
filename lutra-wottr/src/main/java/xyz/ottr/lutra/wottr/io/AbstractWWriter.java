@@ -36,6 +36,7 @@ import org.apache.jena.rdf.model.RDFList;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.Statement;
+import org.apache.jena.shared.PrefixMapping;
 import org.apache.jena.vocabulary.RDF;
 
 import xyz.ottr.lutra.ROTTR;
@@ -58,6 +59,15 @@ import xyz.ottr.lutra.wottr.WOTTR;
 public abstract class AbstractWWriter {
 
     private Map<String, Resource> blankNodes = new HashMap<String, Resource>(); // Maps label -> resource for reuse
+
+    protected void addPrefixes(Model model) {
+
+        model.setNsPrefixes(PrefixMapping.Standard);
+        model.setNsPrefix("ottr", WOTTR.namespace);
+        model.setNsPrefix("ottr", WOTTR.namespace);
+        model.setNsPrefix("ottt", ROTTR.namespace);
+        model.setNsPrefix("o-rdf", ROTTR.rdfTemplates);
+    }
 
     protected boolean isTriple(Instance node) {
         return WOTTR.triple.toString().equals(node.getIRI());

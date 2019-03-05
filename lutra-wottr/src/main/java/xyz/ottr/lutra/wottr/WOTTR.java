@@ -46,7 +46,7 @@ public class WOTTR {
 
     // Individuals
     public static final Resource incomplete = getResource(ns + "incomplete");
-    public static final Resource triple = getResource(ROTTR.triple); // TODO Move?
+    public static final Resource triple = getResource(ROTTR.triple);
     public static final Resource none = getResource(ns + "none");
     public static final Resource optional = getResource(ns + "optional");
     public static final Resource nonBlank = getResource(ns + "nonBlank");
