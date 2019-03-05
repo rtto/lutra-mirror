@@ -28,10 +28,8 @@ import java.util.Map;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.Resource;
-import org.apache.jena.shared.PrefixMapping;
 //import org.apache.jena.vocabulary.RDF;
 
-import xyz.ottr.lutra.ROTTR;
 import xyz.ottr.lutra.io.InstanceWriter;
 import xyz.ottr.lutra.model.ArgumentList;
 import xyz.ottr.lutra.model.Instance;
@@ -54,9 +52,7 @@ public class WInstanceWriter extends AbstractWWriter implements InstanceWriter {
 
     public WInstanceWriter() {
         this.model = ModelFactory.createDefaultModel();
-        this.model.setNsPrefixes(PrefixMapping.Standard);
-        this.model.setNsPrefix("ottr", WOTTR.namespace);
-        this.model.setNsPrefix("ottt", ROTTR.namespace);
+        addPrefixes(this.model);
     }
 
     @Override
