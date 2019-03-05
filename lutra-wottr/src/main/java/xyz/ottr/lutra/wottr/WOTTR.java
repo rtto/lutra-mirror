@@ -30,6 +30,8 @@ import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.ResourceFactory;
 
+import xyz.ottr.lutra.ROTTR;
+
 public class WOTTR {
 
     //private static final String ns = "http://spec.ottr.xyz/0/rottr/types#"; // TODO: Decide on prefix
@@ -44,7 +46,7 @@ public class WOTTR {
 
     // Individuals
     public static final Resource incomplete = getResource(ns + "incomplete");
-    public static final Resource triple = getResource("http://candidate.ottr.xyz/rdf/Triple"); // TODO Move?
+    public static final Resource triple = getResource(ROTTR.triple); // TODO Move?
     public static final Resource none = getResource(ns + "none");
     public static final Resource optional = getResource(ns + "optional");
     public static final Resource nonBlank = getResource(ns + "nonBlank");
