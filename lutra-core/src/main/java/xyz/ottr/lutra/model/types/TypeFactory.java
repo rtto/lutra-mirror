@@ -29,12 +29,14 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.reasoner.Reasoner;
 import org.apache.jena.reasoner.ReasonerRegistry;
 import org.apache.jena.vocabulary.RDF;
@@ -54,7 +56,6 @@ public class TypeFactory {
     private static Map<String, BasicType> iris;
     private static Map<String, BasicType> names;
     private static Map<BasicType, Set<BasicType>> superTypes;
-    private static Map<BasicType, Set<BasicType>> subTypes;
     private static BasicType top;
     private static BasicType bot;
     
@@ -73,7 +74,7 @@ public class TypeFactory {
         Model model = ModelFactory.createInfModel(owlMicro, types);
 
         initNames(model);
-        initSuperSubTypes(model);
+        initSuperTypes(model);
 
     }
     
@@ -81,44 +82,46 @@ public class TypeFactory {
         iris = new HashMap<>();
         names = new HashMap<>();
         superTypes = new HashMap<>();
-        subTypes = new HashMap<>();
         
-        for (BasicType term : getBasicTypes(model)) {                
-            String uri = term.getIRI();
-            iris.put(uri, term);
-            
-            String name = term.getName();
-            if (names.containsKey(name)) {
-                Message msg = Message.error("Error: duplicate name: " + name + ". Conflicts with " + names.get(name));
-                MessageHandler.printMessage(msg);
-                // TODO log error
-            }
-            names.put(name, term);
-            superTypes.put(term, new HashSet<>());
-            subTypes.put(term, new HashSet<>());
-        }
+        getBasicTypes(model).forEach(tp -> initName(tp));
+
         top = getByName("Resource");
         bot = getByName("Bot");
     }
 
-    private static void initSuperSubTypes(Model model) {
+    private static void initName(BasicType type) {
 
-        model.listStatements((Resource) null, model.createProperty(ROTTR.subTypeOf), (RDFNode) null)
-            .forEachRemaining(stmt -> {
-                BasicType subType = iris.get(stmt.getSubject().asResource().getURI());
-                BasicType superType = iris.get(stmt.getObject().asResource().getURI());
-
-                superTypes.get(subType).add(superType);
-                subTypes.get(superType).add(subType);
-            });
+        String uri = type.getIRI();
+        iris.put(uri, type);
+        
+        String name = type.getName();
+        if (names.containsKey(name)) {
+            Message msg = Message.error("Error: duplicate name: " + name + ". Conflicts with " + names.get(name));
+            MessageHandler.printMessage(msg);
+            // TODO log error
+        }
+        names.put(name, type);
+        superTypes.put(type, new HashSet<>());
     }
 
-    private static Set<BasicType> getBasicTypes(Model model) {
+    private static void initSuperTypes(Model model) {
+
+        Property subTypeOf = model.createProperty(ROTTR.subTypeOf);
+        model.listStatements((Resource) null, subTypeOf, (RDFNode) null)
+            .forEachRemaining(stmt -> initSuperType(stmt));
+    }
+
+    private static void initSuperType(Statement stmt) {
+        BasicType subType = iris.get(stmt.getSubject().asResource().getURI());
+        BasicType superType = iris.get(stmt.getObject().asResource().getURI());
+        superTypes.get(subType).add(superType);
+    }
+
+    private static Stream<BasicType> getBasicTypes(Model model) {
         return model.listResourcesWithProperty(RDF.type, model.createResource(ROTTR.termType))
             .toSet().stream()
             .map(RDFNode::asResource)
-            .map(BasicType::new)
-            .collect(Collectors.toSet());
+            .map(BasicType::new);
     }
 
     /**
