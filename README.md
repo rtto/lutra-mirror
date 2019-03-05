@@ -1,4 +1,4 @@
-[![BCH compliance](https://bettercodehub.com/edge/badge/rtto/lutra-mirror?branch=develop-mirror)](https://bettercodehub.com/)
+[![BCH compliance](https://bettercodehub.com/edge/badge/rtto/lutra-mirror?branch=develop-mirror)](https://bettercodehub.com/results/rtto/lutra-mirror)
 [![CodeFactor](https://www.codefactor.io/repository/github/rtto/lutra-mirror/badge)](https://www.codefactor.io/repository/github/rtto/lutra-mirror)
 [![codebeat badge](https://codebeat.co/badges/c51b77d6-c316-4067-b27a-2d41c322bafb)](https://codebeat.co/projects/github-com-rtto-lutra-mirror-develop)
 [![Total alerts](https://img.shields.io/lgtm/alerts/g/rtto/lutra-mirror.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/rtto/lutra-mirror/alerts/)
