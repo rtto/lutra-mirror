@@ -126,7 +126,7 @@
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>license-maven-plugin</artifactId>
-				<version>1.16</version>
+				<version>1.19</version>
 				<configuration>
 					<verbose>false</verbose>
 					<licenseName>lgpl_v2_1</licenseName>
