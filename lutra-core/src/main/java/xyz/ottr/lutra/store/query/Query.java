@@ -220,6 +220,18 @@ public class Query {
         return new Query((qe, m) -> qe.dependsTransitive(m, instance, template));
     }
 
+    public static Query isUndefined(String template) {
+        return new Query((qe, m) -> qe.isUndefined(m, template));
+    }
+
+    public static Query isSignature(String template) {
+        return new Query((qe, m) -> qe.isSignature(m, template));
+    }
+
+    public static Query isBase(String template) {
+        return new Query((qe, m) -> qe.isBase(m, template));
+    }
+
     ////////////////////
     /// Utils //////////
     ////////////////////

@@ -47,7 +47,7 @@
 							<goal>wget</goal>
 						</goals>
 						<configuration>
-							<url>https://dev.spec.ottr.xyz/rOTTR/develop/types.owl.ttl</url>
+							<url>https://dev.spec.ottr.xyz/rOTTR/types.owl.ttl</url>
 							<outputFileName>types.owl.ttl</outputFileName>
 							<outputDirectory>${project.basedir}/src/main/resources</outputDirectory>
 							<!--md5>MD5 SUM HERE</md5 -->
@@ -61,7 +61,7 @@
 							<goal>wget</goal>
 						</goals>
 						<configuration>
-							<url>https://dev.spec.ottr.xyz/rOTTR/develop/puntypes.owl.ttl</url>
+							<url>https://dev.spec.ottr.xyz/rOTTR/puntypes.owl.ttl</url>
 							<outputFileName>puntypes.owl.ttl</outputFileName>
 							<outputDirectory>${project.basedir}/src/main/resources</outputDirectory>
 							<!--md5>MD5 SUM HERE</md5 -->

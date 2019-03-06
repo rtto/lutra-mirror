@@ -1,12 +1,16 @@
+If you have questions/feedback/bug reports/feature requests, use the 
+issue tracker. Please check first that the issue does not already exist. 
+See also http://ottr.xyz/#Contact for more options.
 
-Feel free to create an issue and/or send a pull request (PR).
-
-Make sure that your [pull request][5] is submitted to the `develop` branch
-or suitable feature branch (`feature/*`), explaining what your PR is
+If you want to contribute to the project by coding or writing documentation, 
+please send a pull request
+submitted to the `develop` branch
+or suitable feature branch (`feature/*`) where you explain what your PR is
 about and, preferably, linking to an issue you want to address. It is
 always a good idea to create an issue first where you can check if the
 issue is real and your possible solution proposal is likely to be
-accepted if implemented.
+accepted if implemented. The pull request will be reviewed by project
+maintainers. 
 
 Please document your code using common documentation practice and
 javadoc, and test your code with unit tests.
@@ -40,7 +44,7 @@ We tag each release with `v` + its version number, e.g., `v0.5.0`.
 
 ## Automatic builds
 
-The code base is built for each commit. The results of the build are
+The code base is built and tested for each commit. The results of the build are
 kept for the `master` and `develop` branch, and for each tag. See
 [README](README.md) for links.
 
@@ -50,8 +54,8 @@ We use Checkstyle http://checkstyle.sourceforge.net/ to enforce a
 common coding style. We are not religious to about this, but use it to
 make the code as consistent as possible between different coders.
 
-The style rules are set in config/checkstyle.xml and are checked by a
-Maven plugin on `mvn package`.
+The style rules are set in `config/checkstyle.xml` and are checked by a
+Maven plugin when running `mvn verify`.
 
 ## Code quality
 
@@ -60,7 +64,7 @@ We use different automatic code quality checks.
 - PDM (https://pmd.github.io/) and
 - FindBugs (http://findbugs.sourceforge.net/)
 
-are included via Maven plugins and are checked on `mvn package install`.
+are included via Maven plugins and are checked when running `mvn verify`.
 
 We also use:
 

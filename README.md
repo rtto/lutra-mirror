@@ -13,9 +13,9 @@ To run Lutra you will need to install Java 8, for instance [OpenJDK][1].
 
 ### Downloads
 
-* [Releases][2]
-* [Latest master snapshot][3]
-* [Latest develop snapshot][4]
+* [Releases][2]: list of all releases
+* [Latest master snapshot][3]: latest release
+* [Latest develop snapshot][4]: latest development version
 
 ### Installing
 
@@ -29,11 +29,13 @@ We use [Semantic Versioning][8].
 
 See the [tags on this repository][6] for release versions and other important milestones. 
 
-See [CHANGELOG](CHANGELOG.md) for description of major changes between versions. 
+See [CHANGELOG](CHANGELOG.md) for a description of the major changes between versions. 
 
 ## Building
 
-To build, clone the project and use Maven to build: `mvn package`. This will produce the executable jar at `lutra-cli/target/lutra.jar`.
+To build, clone the project and use Maven: `mvn package`. This will produce the executable jar at `lutra-cli/target/lutra.jar`.
+
+Note that the default branch of the project is the `develop` branch.
 
 Requirements:
 
@@ -48,6 +50,7 @@ The project depends on the following external libraries:
   * [Math](http://commons.apache.org/proper/commons-math/)
   * [IO](https://commons.apache.org/proper/commons-io/)
   * [Validator](https://commons.apache.org/proper/commons-validator/)
+* [Picocli](https://picocli.info/) for the command line interface
 * [Apache POI](https://poi.apache.org/) for handling spreadsheet files
 
 See [pom.xml](pom.xml) for details.
@@ -61,7 +64,7 @@ See [CONTRIBUTING](CONTRIBUTING.md) for information on how to best contribute to
 * [Martin G. Skjæveland](http://folk.uio.no/martige/)
 * [Leif Harald Karlsen](http://folk.uio.no/leifhka/)
 
-See also the list of [CONTRIBUTORS](CONTRIBUTORS.md) who participated in this project.
+See also the list of [CONTRIBUTORS](CONTRIBUTORS.md) who have participated in this project.
 
 ## License
 
