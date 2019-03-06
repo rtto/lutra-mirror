@@ -75,24 +75,24 @@ public class Query {
     // Connectives /////
     ////////////////////
 
-    public Query and(Query r) {
-        return new Query((qe, m) -> this.rel.apply(qe, m).flatMap(n -> r.rel.apply(qe, n)));
+    public Query and(Query query) {
+        return new Query((qe, m) -> this.rel.apply(qe, m).flatMap(n -> query.rel.apply(qe, n)));
     }
 
-    public Query or(Query r) {
-        return new Query((qe, m) -> Stream.concat(this.rel.apply(qe, m), r.rel.apply(qe, m)));
+    public Query or(Query query) {
+        return new Query((qe, m) -> Stream.concat(this.rel.apply(qe, m), query.rel.apply(qe, m)));
     }
 
-    public static Query not(Query r) {
+    public static Query not(Query query) {
 
         BiPredicate<QueryEngine<? extends TemplateStore>, Tuple> shouldKeep = (qe, m) ->
-            !r.rel.apply(qe, m).findAny().isPresent();
+            !query.rel.apply(qe, m).findAny().isPresent();
 
         return new Query((qe, m) -> shouldKeep.test(qe, m) ? Stream.of(m) : Stream.empty());
     }
 
-    public static Query distinct(Query r) {
-        return new Query((qe, m) -> r.rel.apply(qe, m).distinct());
+    public static Query distinct(Query query) {
+        return new Query((qe, m) -> query.rel.apply(qe, m).distinct());
     }
 
     //
@@ -100,28 +100,28 @@ public class Query {
     // Base-relations //
     ////////////////////
 
-    public static Query template(String t) {
-        return new Query((qe, m) -> qe.template(m, t));
+    public static Query template(String template) {
+        return new Query((qe, m) -> qe.template(m, template));
     }
 
-    public static Query parameters(String t, String ps) {
-        return new Query((qe, m) -> qe.parameters(m, t, ps));
+    public static Query parameters(String template, String params) {
+        return new Query((qe, m) -> qe.parameters(m, template, params));
     }
 
-    public static Query length(String ps, String len) {
-        return new Query((qe, m) -> qe.length(m, ps, len));
+    public static Query length(String params, String len) {
+        return new Query((qe, m) -> qe.length(m, params, len));
     }
 
-    public static Query index(String ps, String i, String v) {
-        return new Query((qe, m) -> qe.index(m, ps, i, v));
+    public static Query index(String params, String index, String val) {
+        return new Query((qe, m) -> qe.index(m, params, index, val));
     }
 
-    public static Query hasOccurenceAt(String term, String inside, String level) {
+    public static Query hasOccurenceAt(String term, String level, String inside) {
         return new Query((qe, m) -> qe.hasOccurenceAt(m, term, inside, level));
     }
 
-    public static Query type(String trm, String tp) {
-        return new Query((qe, m) -> qe.type(m, trm, tp));
+    public static Query type(String term, String type) {
+        return new Query((qe, m) -> qe.type(m, term, type));
     }
 
     public static Query innerTypeAt(String type, String level, String inner) {
@@ -132,84 +132,84 @@ public class Query {
         return new Query((qe, m) -> qe.innerType(m, type, inner));
     }
 
-    public static Query isSubTypeOf(String tp1, String tp2) {
-        return new Query((qe, m) -> qe.isSubTypeOf(m, tp1, tp2));
+    public static Query isSubTypeOf(String type1, String type2) {
+        return new Query((qe, m) -> qe.isSubTypeOf(m, type1, type2));
     }
 
-    public static Query isCompatibleWith(String tp1, String tp2) {
-        return new Query((qe, m) -> qe.isCompatibleWith(m, tp1, tp2));
+    public static Query isCompatibleWith(String type1, String type2) {
+        return new Query((qe, m) -> qe.isCompatibleWith(m, type1, type2));
     }
 
-    public static Query isOptional(String ps, String i) {
-        return new Query((qe, m) -> qe.isOptional(m, ps, i));
+    public static Query isOptional(String params, String index) {
+        return new Query((qe, m) -> qe.isOptional(m, params, index));
     }
 
-    public static Query isNonBlank(String ps, String i) {
-        return new Query((qe, m) -> qe.isNonBlank(m, ps, i));
+    public static Query isNonBlank(String params, String index) {
+        return new Query((qe, m) -> qe.isNonBlank(m, params, index));
     }
 
-    public static Query hasListExpander(String ps, String i) {
-        return new Query((qe, m) -> qe.hasListExpander(m, ps, i));
+    public static Query hasListExpander(String params, String index) {
+        return new Query((qe, m) -> qe.hasListExpander(m, params, index));
     }
 
-    public static Query hasCrossModifier(String ins) {
-        return new Query((qe, m) -> qe.hasCrossModifier(m, ins));
+    public static Query hasCrossModifier(String instance) {
+        return new Query((qe, m) -> qe.hasCrossModifier(m, instance));
     }
 
-    public static Query hasZipMinModifier(String ins) {
-        return new Query((qe, m) -> qe.hasZipMinModifier(m, ins));
+    public static Query hasZipMinModifier(String instance) {
+        return new Query((qe, m) -> qe.hasZipMinModifier(m, instance));
     }
 
-    public static Query hasZipMaxModifier(String ins) {
-        return new Query((qe, m) -> qe.hasZipMaxModifier(m, ins));
+    public static Query hasZipMaxModifier(String instance) {
+        return new Query((qe, m) -> qe.hasZipMaxModifier(m, instance));
     }
 
-    public static Query hasExpansionModifier(String ins) {
-        return new Query((qe, m) -> qe.hasExpansionModifier(m, ins));
+    public static Query hasExpansionModifier(String instance) {
+        return new Query((qe, m) -> qe.hasExpansionModifier(m, instance));
     }
 
-    public static Query body(String t, String b) {
-        return new Query((qe, m) -> qe.body(m, t, b));
+    public static Query body(String template, String body) {
+        return new Query((qe, m) -> qe.body(m, template, body));
     }
 
-    public static Query instance(String b, String i) {
-        return new Query((qe, m) -> qe.instance(m, b, i));
+    public static Query instance(String body, String instance) {
+        return new Query((qe, m) -> qe.instance(m, body, instance));
     }
 
-    public static Query instanceIRI(String i, String iri) {
-        return new Query((qe, m) -> qe.instanceIRI(m, i, iri));
+    public static Query instanceIRI(String instance, String iri) {
+        return new Query((qe, m) -> qe.instanceIRI(m, instance, iri));
     }
 
-    public static Query instanceArgs(String i, String args) {
-        return new Query((qe, m) -> qe.instanceArgs(m, i, args));
+    public static Query arguments(String instance, String args) {
+        return new Query((qe, m) -> qe.arguments(m, instance, args));
     }
 
-    public static Query unifiesVal(String v1, String v2, String u) {
-        return new Query((qe, m) -> qe.unifiesVal(m, v1, v2, u));
+    public static Query unifiesVal(String val1, String val2, String unifier) {
+        return new Query((qe, m) -> qe.unifiesVal(m, val1, val2, unifier));
     }
 
-    public static Query unifiesParams(String ps1, String ps2, String u) {
-        return new Query((qe, m) -> qe.unifiesParams(m, ps1, ps2, u));
+    public static Query unifiesParams(String params1, String params2, String unifier) {
+        return new Query((qe, m) -> qe.unifiesParams(m, params1, params2, unifier));
     }
 
-    public static Query unifiesParamsUnordered(String ps1, String ps2, String u) {
-        return new Query((qe, m) -> qe.unifiesParamsUnordered(m, ps1, ps2, u));
+    public static Query unifiesParamsUnordered(String params1, String params2, String unifier) {
+        return new Query((qe, m) -> qe.unifiesParamsUnordered(m, params1, params2, unifier));
     }
 
-    public static Query unifiesBody(String b1, String b2, String u) {
-        return new Query((qe, m) -> qe.unifiesBody(m, b1, b2, u));
+    public static Query unifiesBody(String body1, String body2, String unifier) {
+        return new Query((qe, m) -> qe.unifiesBody(m, body1, body2, unifier));
     }
 
-    public static Query merge(String u1, String u2, String u) {
-        return new Query((qe, m) -> qe.merge(m, u1, u2, u));
+    public static Query merge(String unifier1, String unifier2, String unifier) {
+        return new Query((qe, m) -> qe.merge(m, unifier1, unifier2, unifier));
     }
 
-    public static Query applyUnifier(String elem, String uni, String unified) {
-        return new Query((qe, m) -> qe.applyUnifier(m, elem, uni, unified));
+    public static Query applyUnifier(String elem, String unifier, String unified) {
+        return new Query((qe, m) -> qe.applyUnifier(m, elem, unifier, unified));
     }
 
-    public static Query notEquals(String e1, String e2) {
-        return new Query((qe, m) -> m.get(e1).equals(m.get(e2)) ? Stream.empty() : Stream.of(m));
+    public static Query notEquals(String elem1, String elem2) {
+        return new Query((qe, m) -> m.get(elem1).equals(m.get(elem2)) ? Stream.empty() : Stream.of(m));
     }
 
     public static Query isDependencyOf(String instance, String template) {
@@ -230,6 +230,56 @@ public class Query {
 
     public static Query isBase(String template) {
         return new Query((qe, m) -> qe.isBase(m, template));
+    }
+
+    ////////////////////
+    /// Short-cuts /////
+    ////////////////////
+
+    /**
+     * Simply the conjunction of the #parameters(String,String) and #index(String,String) queries.
+     */
+    public static Query parameterIndex(String template, String index, String param) {
+        String params = Tuple.freshVar();
+        return parameters(template, params).and(index(params, index, param));
+    }
+
+    /**
+     * Simply the conjunction of the #argument(String,String) and #index(String,String) queries.
+     */
+    public static Query argumentIndex(String instance, String index, String arg) {
+        String args = Tuple.freshVar();
+        return arguments(instance, args).and(index(args, index, arg));
+    }
+
+    /**
+     * Simply the conjunction of the #body(String,String) and #instance(String,String) queries.
+     */
+    public static Query bodyInstance(String template, String instance) {
+        String body = Tuple.freshVar();
+        return body(template, body).and(instance(body, instance));
+    }
+
+    /**
+     * Finds the type which argument at index is used as in instance.
+     */
+    public static Query usedAsType(String instance, String index, String level, String type) {
+
+        String temp =  Tuple.freshVar();
+        String para =  Tuple.freshVar();
+        String parType =  Tuple.freshVar();
+        String args =  Tuple.freshVar();
+        String outer = Tuple.freshVar();
+
+        return instanceIRI(instance, temp)
+            .and(parameterIndex(temp, index, para))
+            .and(arguments(instance, args))
+            .and(type(para, parType))
+            .and(hasListExpander(args, index)
+                .and(innerTypeAt(parType, level, outer))
+                .and(innerType(outer, type))
+                .or(not(hasListExpander(args, index))
+                    .and(innerTypeAt(parType, level, type))));
     }
 
     ////////////////////

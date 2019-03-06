@@ -73,55 +73,14 @@ public class TypeFactoryTest {
 
         assertEquals(
             new TermList(new IRITerm("example.com/v1"), new IRITerm("example.com/v2")).getType(),
-            new NEListType(new LUBType(TypeFactory.getByName("IRI"))));
+            //new NEListType(new LUBType(TypeFactory.getByName("IRI"))));
+            new NEListType(new LUBType(TypeFactory.getTopType())));
         assertEquals(
             new TermList(new IRITerm("example.com/v1"), new BlankNodeTerm()).getType(),
-            new NEListType(TypeFactory.getTopType()));
+            new NEListType(new LUBType(TypeFactory.getTopType())));
         assertEquals(
             new TermList(new IRITerm("example.com/v1"), new LiteralTerm("v2")).getType(),
-            new NEListType(TypeFactory.getTopType()));
-        assertEquals(
-            new TermList(
-                typedLiteral("1", "integer"),
-                typedLiteral("2", "integer")).getType(),
-            new NEListType(TypeFactory.getByName("integer")));
-        assertEquals(
-            new TermList(
-                typedLiteral("1", "integer"),
-                typedLiteral("val", "string")).getType(),
-            new NEListType(TypeFactory.getByName("literal")));
-        assertEquals(
-            new TermList(
-                new TermList(
-                    typedLiteral("1", "integer"),
-                    typedLiteral("2", "integer")),
-                new TermList(
-                    typedLiteral("3", "integer"),
-                    typedLiteral("4", "integer"))).getType(),
-            new NEListType(new NEListType(TypeFactory.getByName("integer"))));
-        assertEquals(
-            new TermList(
-                new TermList(
-                    typedLiteral("1", "integer"),
-                    typedLiteral("2", "integer")),
-                new TermList(
-                    typedLiteral("3", "integer"),
-                    typedLiteral("four", "string"))).getType(),
-            new NEListType(new NEListType(TypeFactory.getByName("literal"))));
-        assertEquals(
-            new TermList(
-                new TermList(
-                    typedLiteral("1", "integer"),
-                    typedLiteral("2", "integer")),
-                typedLiteral("3", "integer")).getType(),
-            new NEListType(TypeFactory.getTopType()));
-        assertEquals(
-            new TermList(
-                new TermList(
-                    typedLiteral("1", "integer"),
-                    typedLiteral("2", "integer")),
-                new TermList()).getType(),
-            new NEListType(new ListType(TypeFactory.getByName("integer"))));
+            new NEListType(new LUBType(TypeFactory.getTopType())));
     }
 
     @Test
@@ -165,6 +124,9 @@ public class TypeFactoryTest {
     @Test
     public void templateNestedListVariableTypes() {
 
+        // Checks that nested variables inside lists in
+        // instances in template bodies are properly set
+
         Term var1 = new IRITerm("example.org/var1");
         var1.setType(TypeFactory.getByName("class"));
         Term var21 = new IRITerm("example.org/var21");
@@ -207,7 +169,5 @@ public class TypeFactoryTest {
         assertEquals(var21.getType(), var21b.getType());
         assertEquals(var22.getType(), var22b.getType());
         assertEquals(var3.getType(), var3b.getType());
-        assertEquals(lst1.getType(), new NEListType(TypeFactory.getByName("class")));
-        assertEquals(lst2.getType(), new NEListType(new NEListType(new ListType(TypeFactory.getByName("string")))));
     }
 }

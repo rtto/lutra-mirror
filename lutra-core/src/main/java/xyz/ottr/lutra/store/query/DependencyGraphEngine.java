@@ -38,8 +38,6 @@ import xyz.ottr.lutra.model.Template;
 import xyz.ottr.lutra.model.Term;
 import xyz.ottr.lutra.model.TermList;
 import xyz.ottr.lutra.model.types.ComplexType;
-import xyz.ottr.lutra.model.types.ListType;
-import xyz.ottr.lutra.model.types.NEListType;
 import xyz.ottr.lutra.model.types.TermType;
 import xyz.ottr.lutra.result.Result;
 import xyz.ottr.lutra.store.DependencyGraph;
@@ -182,13 +180,13 @@ public class DependencyGraphEngine extends QueryEngine<DependencyGraph> {
         }
 
         // Has non-list term, just need to check for equality of level and term
-        Tuple tupleWLvl = tuple;
-        if (tuple.hasBound(level)) {
-            if (current != tuple.getAs(Integer.class, level).intValue()) {
-                return Stream.empty();
-            }
-            tupleWLvl = tuple.bind(level, current);
+        if (tuple.hasBound(level)
+            && current != tuple.getAs(Integer.class, level).intValue()) {
+
+            return Stream.empty();
         }
+
+        Tuple tupleWLvl = tuple.bind(level, current);
 
         if (tupleWLvl.hasBound(inside)) {
             return term.equals(tupleWLvl.getAs(Term.class, inside))
@@ -251,25 +249,11 @@ public class DependencyGraphEngine extends QueryEngine<DependencyGraph> {
         return stream;
     }
 
-    // TODO: Remove this, and replace with innerTypesAt(tuple, type, inner, 1)
     @Override
     public Stream<Tuple> innerType(Tuple tuple, String type, String inner) {
 
-        TermType boundType = tuple.getAs(TermType.class, type);
-
-        TermType actInner;
-        if (boundType instanceof ListType) {
-            actInner = ((ListType) boundType).getInner();
-        } else if (boundType instanceof NEListType) {
-            actInner = ((NEListType) boundType).getInner();
-        } else {
-            return Stream.empty();
-        }
-        if (tuple.hasBound(inner)) {
-            TermType boundInner = tuple.getAs(TermType.class, inner);
-            return actInner.equals(boundInner) ? Stream.of(tuple) : Stream.empty();
-        }
-        return Stream.of(tuple.bind(inner, actInner));
+        String lvl = Tuple.freshVar();
+        return innerTypeAt(tuple.bind(lvl, 1), type, inner, lvl);
     }
 
     @Override
@@ -372,7 +356,7 @@ public class DependencyGraphEngine extends QueryEngine<DependencyGraph> {
     }
 
     @Override
-    public Stream<Tuple> instanceArgs(Tuple tuple, String instance, String args) {
+    public Stream<Tuple> arguments(Tuple tuple, String instance, String args) {
 
         Instance boundInstance = tuple.getAs(Instance.class, instance);
 

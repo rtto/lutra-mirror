@@ -23,20 +23,20 @@ package xyz.ottr.lutra.model.types;
  */
 
 import java.io.InputStream;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.reasoner.Reasoner;
 import org.apache.jena.reasoner.ReasonerRegistry;
 import org.apache.jena.vocabulary.RDF;
@@ -83,40 +83,45 @@ public class TypeFactory {
         names = new HashMap<>();
         superTypes = new HashMap<>();
         
-        for (BasicType term : getBasicTypes(model)) {                
-            String uri = term.getIRI();
-            iris.put(uri, term);
-            
-            String name = term.getName();
-            if (names.containsKey(name)) {
-                Message msg = Message.error("Error: duplicate name: " + name + ". Conflicts with " + names.get(name));
-                MessageHandler.printMessage(msg);
-                // TODO log error
-            }
-            names.put(name, term);
-            superTypes.put(term, new HashSet<>());
-        }
+        getBasicTypes(model).forEach(tp -> initName(tp));
+
         top = getByName("Resource");
         bot = getByName("Bot");
     }
 
-    private static void initSuperTypes(Model model) {
+    private static void initName(BasicType type) {
 
-        model.listStatements((Resource) null, model.createProperty(ROTTR.subTypeOf), (RDFNode) null)
-            .forEachRemaining(stmt -> {
-                BasicType subType = iris.get(stmt.getSubject().asResource().getURI());
-                BasicType superType = iris.get(stmt.getObject().asResource().getURI());
-
-                superTypes.get(subType).add(superType);
-            });
+        String uri = type.getIRI();
+        iris.put(uri, type);
+        
+        String name = type.getName();
+        if (names.containsKey(name)) {
+            Message msg = Message.error("Error: duplicate name: " + name + ". Conflicts with " + names.get(name));
+            MessageHandler.printMessage(msg);
+            // TODO log error
+        }
+        names.put(name, type);
+        superTypes.put(type, new HashSet<>());
     }
 
-    private static Set<BasicType> getBasicTypes(Model model) {
+    private static void initSuperTypes(Model model) {
+
+        Property subTypeOf = model.createProperty(ROTTR.subTypeOf);
+        model.listStatements((Resource) null, subTypeOf, (RDFNode) null)
+            .forEachRemaining(stmt -> initSuperType(stmt));
+    }
+
+    private static void initSuperType(Statement stmt) {
+        BasicType subType = iris.get(stmt.getSubject().asResource().getURI());
+        BasicType superType = iris.get(stmt.getObject().asResource().getURI());
+        superTypes.get(subType).add(superType);
+    }
+
+    private static Stream<BasicType> getBasicTypes(Model model) {
         return model.listResourcesWithProperty(RDF.type, model.createResource(ROTTR.termType))
             .toSet().stream()
             .map(RDFNode::asResource)
-            .map(BasicType::new)
-            .collect(Collectors.toSet());
+            .map(BasicType::new);
     }
 
     /**
@@ -144,10 +149,7 @@ public class TypeFactory {
             if (terms.isEmpty()) {
                 return new ListType(bot);
             } else {
-                Set<TermType> types = terms.stream()
-                    .map(trm -> trm.getType())
-                    .collect(Collectors.toSet());
-                return new NEListType(getLUB(types));
+                return new NEListType(new LUBType(top));
             }
 
         } else {
@@ -182,63 +184,6 @@ public class TypeFactory {
         } 
     }
 
-    /**
-     * Returns the least upper bound for the input set of types.
-     */
-    private static TermType getLUB(Set<TermType> types) {
-
-        TermType lub = bot;
-        for (TermType type : types) {
-            if (lub.isSubTypeOf(type)) {
-                lub = type;
-            } else if (!(type.isSubTypeOf(lub))) {
-                Set<TermType> ubs = getSuperTypes(lub);
-                ubs.retainAll(getSuperTypes(type));
-                lub = findLeast(ubs);
-            }
-        }
-        return lub;
-    }
-
-    private static Set<TermType> getSuperTypes(TermType type) {
-        Set<TermType> sups;
-        if (type instanceof BasicType) {
-            sups = superTypes.get((BasicType) type)
-                .stream()
-                .map(tp -> (TermType) tp)
-                .collect(Collectors.toSet());
-        } else if (type instanceof NEListType) {
-            sups = getSuperTypes(((NEListType) type).getInner())
-                .stream()
-                .flatMap(tp -> Stream.of(new NEListType(tp), new ListType(tp)))
-                .collect(Collectors.toSet());
-        } else if (type instanceof ListType) {
-            sups = getSuperTypes(((ListType) type).getInner())
-                .stream()
-                .map(tp -> new ListType(tp))
-                .collect(Collectors.toSet());
-        } else if (type instanceof LUBType) {
-            sups = getSuperTypes(((LUBType) type).getInner());
-        } else { // Should never happen
-            sups = Collections.singleton(bot);
-        }
-        sups.add(type);
-        return sups;
-    }
-
-    /**
-     * Returns the least type (wrt. subtyping) for the input set of types.
-     */
-    private static TermType findLeast(Set<TermType> types) {
-        TermType least = top;
-        for (TermType type : types) {
-            if (type.isSubTypeOf(least)) {
-                least = type;
-            } 
-        }
-        return least;
-    }
-    
     protected static String normaliseName(String name) {
         return name.toLowerCase(Locale.ENGLISH); 
     }
