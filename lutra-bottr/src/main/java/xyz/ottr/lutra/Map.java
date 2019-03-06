@@ -22,4 +22,35 @@ package xyz.ottr.lutra;
  * #L%
  */
 
-public class Dummy {}
+public abstract class Map implements Supplier<ResultStream<Instance>> {
+
+    private final String source;
+    private final String query;
+    private final TermMapping mapping;
+    private final String templateIRI;
+
+    @Override
+    public ResultStream<Instance> get() {
+        return execute().innerFlatMap(row -> mapToInstance(row));
+    }
+
+    public Result<Instance> mapToInstance(Row row) {
+        return null; // TODO
+    }
+
+    public abstract ResultStream<Row> execute();
+
+
+    private class Row {
+
+        private final List<String> elements;
+
+        public Row(List<String> elements) {
+            this.elements = elements;
+        }
+
+        public List<String> getElements() {
+            return this.elements;
+        }
+    }
+}
