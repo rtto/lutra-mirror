@@ -24,7 +24,7 @@ package xyz.ottr.lutra;
 
 public abstract class Map implements Supplier<ResultStream<Instance>> {
 
-    private final String source;
+    private final String source; // TODO: Decide how to incorporate DB drivers, etc.
     private final String query;
     private final TermMapping mapping;
     private final String templateIRI;
