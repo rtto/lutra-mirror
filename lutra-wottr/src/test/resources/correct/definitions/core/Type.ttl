@@ -1,4 +1,4 @@
-@prefix ottt:    <http://spec.ottr.xyz/rottr/0/types#> .
+@prefix ottt:    <http://spec.ottr.xyz/rottr/0.1/types#> .
 @prefix rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix owl:     <http://www.w3.org/2002/07/owl#> .
 @prefix ottr:    <http://ns.ottr.xyz/templates#> .
