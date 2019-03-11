@@ -35,7 +35,7 @@ import xyz.ottr.lutra.ROTTR;
 public class WOTTR {
 
     //private static final String ns = "http://spec.ottr.xyz/0/rottr/types#"; // TODO: Decide on prefix
-    private static final String ns = "http://ns.ottr.xyz/templates#";
+    private static final String ns = "http://spec.ottr.xyz/wottr/0.4/core#";
     public static final String namespace = ns;
 
     // Classes
