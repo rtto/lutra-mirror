@@ -33,22 +33,19 @@ import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.RDFList;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
-import org.apache.jena.rdf.model.ResourceFactory;
 import org.apache.jena.shared.PrefixMapping;
 import org.apache.jena.vocabulary.XSD;
 
-import xyz.ottr.lutra.ROTTR;
 import xyz.ottr.lutra.result.Message;
 import xyz.ottr.lutra.result.Result;
 import xyz.ottr.lutra.tabottr.TabOTTR;
+import xyz.ottr.lutra.wottr.WOTTR;
 
 public class RDFNodeFactory {
 
     private Model model;
     private DataValidator validator;
     
-    private static Resource NONE = ResourceFactory.createResource(ROTTR.none);
-
     public RDFNodeFactory(PrefixMapping prefixes) {
         this.model = ModelFactory.createDefaultModel();
         this.model.setNsPrefixes(prefixes);
@@ -70,7 +67,7 @@ public class RDFNodeFactory {
             Result<List<RDFNode>> resNodes = Result.aggregate(nodes);
             return resNodes.map(this::toList);
         } else if (DataValidator.isEmpty(value)) { // if value == empty -> ottr:none
-            return Result.of(NONE);    
+            return Result.of(WOTTR.none);    
         } else if (TabOTTR.TYPE_IRI.equals(type)) {
             return Result.of(toResource(value));
         } else if (TabOTTR.TYPE_BLANK.equals(type)) {

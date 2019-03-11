@@ -30,7 +30,7 @@ public class ROTTR  {
     private static final String ns = "http://spec.ottr.xyz/rottr/0/types#";
     public static final String namespace = ns;
     
-    public static final String none = ns + "none";
+    //public static final String none = ns + "none";
     public static final String subTypeOf = ns + "subTypeOf";
     public static final String termType = ns + "Type";
     public static final String NEListType = ns + "NEList";

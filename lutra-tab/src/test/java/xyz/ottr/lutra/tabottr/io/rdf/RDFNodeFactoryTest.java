@@ -39,9 +39,9 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import xyz.ottr.lutra.ROTTR;
 import xyz.ottr.lutra.tabottr.TabOTTR;
 import xyz.ottr.lutra.tabottr.io.rdf.RDFNodeFactory;
+import xyz.ottr.lutra.wottr.WOTTR;
 
 public class RDFNodeFactoryTest {
 
@@ -64,10 +64,10 @@ public class RDFNodeFactoryTest {
 
     @Test
     public void shouldGetNoValue() {
-        assertEquals(model.createResource(ROTTR.none), factory.toRDFNode("", TabOTTR.TYPE_AUTO).get());
-        assertEquals(model.createResource(ROTTR.none), factory.toRDFNode("", TabOTTR.TYPE_IRI).get());
-        assertEquals(model.createResource(ROTTR.none), factory.toRDFNode("", TabOTTR.TYPE_BLANK).get());
-        assertEquals(model.createResource(ROTTR.none), factory.toRDFNode("", TabOTTR.TYPE_TEXT).get());
+        assertEquals(WOTTR.none, factory.toRDFNode("", TabOTTR.TYPE_AUTO).get());
+        assertEquals(WOTTR.none, factory.toRDFNode("", TabOTTR.TYPE_IRI).get());
+        assertEquals(WOTTR.none, factory.toRDFNode("", TabOTTR.TYPE_BLANK).get());
+        assertEquals(WOTTR.none, factory.toRDFNode("", TabOTTR.TYPE_TEXT).get());
     }
     
     @Test
