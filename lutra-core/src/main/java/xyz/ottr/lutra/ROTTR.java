@@ -27,7 +27,7 @@ public class ROTTR  {
     public static final String rdfTemplates = "http://tpl.ottr.xyz/rdf/0.1/"; 
     public static final String triple = rdfTemplates + "Triple"; 
 
-    private static final String ns = "http://spec.ottr.xyz/rottr/0/types#";
+    private static final String ns = "http://spec.ottr.xyz/rottr/0.1/types#";
     public static final String namespace = ns;
     
     //public static final String none = ns + "none";

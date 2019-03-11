@@ -73,7 +73,6 @@ public class TermTypeTest {
     @Test
     public void shouldBeSubTypes() throws Exception {
         assertTrue(owlOProp.isSubTypeOf(byName("resource")));
-        assertTrue(owlOProp.isSubTypeOf(byName("property")));
         assertTrue(owlOProp.isSubTypeOf(byName("objectProperty")));
     }
 
@@ -82,7 +81,6 @@ public class TermTypeTest {
         assertTrue(owlOProp.isCompatibleWith(byName("IRI")));
         //assertTrue(owlOProp.isCompatibleWith(byName("BlankNode"))); // Sould not be a type
         assertTrue(owlOProp.isCompatibleWith(byName("resource")));
-        assertTrue(owlOProp.isCompatibleWith(byName("property")));
         assertTrue(owlOProp.isCompatibleWith(byName("objectProperty")));
     }
 
