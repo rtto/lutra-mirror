@@ -110,7 +110,7 @@ public class WParameterParser implements Function<Resource, Result<Term>> {
         } else if (type.equals(WOTTR.individualVariable)) {
             term.setType(TypeFactory.getByName("namedindividual"));
         } else if (type.equals(WOTTR.propertyVariable)) { 
-            term.setType(TypeFactory.getByName("property"));
+            term.setType(TypeFactory.getByName("iri"));
         } else if (type.equals(WOTTR.dataPropertyVariable)) {
             term.setType(TypeFactory.getByName("datatypeproperty"));
         } else if (type.equals(WOTTR.annotationPropertyVariable)) {
