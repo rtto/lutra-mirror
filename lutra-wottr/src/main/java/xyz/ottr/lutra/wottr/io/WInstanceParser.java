@@ -148,8 +148,13 @@ public class WInstanceParser implements InstanceParser<Model> {
             .map(parser)
             .map(termRes -> termRes.flatMap(term -> {
                 Result<Term> toAddErr = Result.of(term);
-                if (term instanceof IRITerm && ((IRITerm) term).getIRI().startsWith(WOTTR.namespace)) {
-                    toAddErr.addMessage(Message.error("Term with ottr-prefix occurs as argument to insance."));
+                // Check for arguments in the ottr-namespace, as this might
+                // be unintended by user
+                if (term instanceof IRITerm) {
+                    String iri = ((IRITerm) term).getIRI();
+                    if (iri.startsWith(WOTTR.namespace) && !iri.equals(WOTTR.none.getURI())) {
+                        toAddErr.addMessage(Message.warning("Instance argument in ottr namespace: " + iri));
+                    }
                 }
                 return toAddErr;
             }))

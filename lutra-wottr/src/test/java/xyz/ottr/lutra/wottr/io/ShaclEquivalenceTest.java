@@ -37,6 +37,7 @@ import java.util.stream.Stream;
 import org.apache.jena.rdf.model.Model;
 
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import xyz.ottr.lutra.io.Files;
@@ -174,11 +175,13 @@ public class ShaclEquivalenceTest {
             .innerForEach(file -> checkInstance(file, correct));
     }
 
+    @Ignore
     @Test
     public void correct() {
         check(correct, true);
     }
 
+    @Ignore
     @Test
     public void incorrect() {
         check(incorrect, false);
