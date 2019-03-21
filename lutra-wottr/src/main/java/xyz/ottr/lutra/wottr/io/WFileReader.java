@@ -106,7 +106,6 @@ public class WFileReader implements InputReader<String, Model> {
     //             objList.removeList();
     //             t.remove();
     //         }
-    //         // TODO replace OWL list with RDF list
     //     }
     //     canonical.setNsPrefixes(model);
     //     return canonical;

@@ -80,7 +80,6 @@ public class WReader {
                 objList.removeList();
                 t.remove();
             }
-            // TODO replace OWL list with RDF list
         }
         canonical.setNsPrefixes(model);
         return canonical;
@@ -135,7 +134,6 @@ public class WReader {
         return modelCopy;
     }
 
-    // TODO Move to Gaupa?
     private static List<Statement> getNeighbourhood(Model model, Resource iri) {
         List<Statement> neighbourhood = new ArrayList<>();
         if (iri == null) {
