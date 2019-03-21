@@ -22,7 +22,6 @@ package xyz.ottr.lutra.wottr.io;
  * #L%
  */
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -33,8 +32,6 @@ import org.junit.Test;
 import xyz.ottr.lutra.io.InstanceReader;
 import xyz.ottr.lutra.io.TemplateReader;
 import xyz.ottr.lutra.model.Instance;
-import xyz.ottr.lutra.model.Template;
-import xyz.ottr.lutra.model.TemplateSignature;
 import xyz.ottr.lutra.result.Message;
 import xyz.ottr.lutra.result.MessageHandler;
 import xyz.ottr.lutra.result.Result;

@@ -22,22 +22,16 @@ package xyz.ottr.lutra.wottr;
  * #L%
  */
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-
 import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.ResourceFactory;
 
-import xyz.ottr.lutra.ROTTR;
+import xyz.ottr.lutra.OTTR;
 
 public class WOTTR {
 
-    //private static final String ns = "http://spec.ottr.xyz/0/rottr/types#"; // TODO: Decide on prefix
-    private static final String ns = "http://spec.ottr.xyz/wottr/0.4/core#";
-    public static final String namespace = ns;
-
+    private static final String ns = OTTR.namespace;
+   
     // Classes
     public static final Resource Template = getResource(ns + "Template");
     public static final Resource TemplateSignature = getResource(ns + "Signature");
@@ -45,8 +39,7 @@ public class WOTTR {
     public static final Resource TemplateInstance = getResource(ns + "TemplateInstance");
 
     // Individuals
-    public static final Resource incomplete = getResource(ns + "incomplete");
-    public static final Resource triple = getResource(ROTTR.triple);
+    public static final Resource triple = getResource(OTTR.Bases.Triple);
     public static final Resource none = getResource(ns + "none");
     public static final Resource optional = getResource(ns + "optional");
     public static final Resource nonBlank = getResource(ns + "nonBlank");
@@ -68,53 +61,9 @@ public class WOTTR {
     public static final Property values = getProperty(ns + "values");
     public static final Property value = getProperty(ns + "value");
     public static final Property annotation = getProperty(ns + "annotation");
-
-    public static final Property status = getProperty(ns + "status");
-
-    // TODO put these in public inner class?
-    public static final Resource TermType = getResource(ns + "Type");
-    public static final Property moreSpecificThan = getProperty(ns + "moreSpecificThan");
+ 
     
-    // All vocabulary elements in the OTTR 
-    public static final List<Resource> ALL = Collections.unmodifiableList(Arrays.asList(
-        Template,
-        TemplateSignature,
-        BaseTemplate,
-        TemplateInstance,
-        incomplete,
-        triple,
-        none,
-        optional,
-        nonBlank,
-        listExpand,
-        zipMin,
-        zipMax,
-        cross,
-        parameters,
-        variable,
-        type,
-        defaultVal,
-        pattern,
-        arguments,
-        modifier,
-        of,
-        arguments,
-        values,
-        value,
-        status,
-        TermType,
-        moreSpecificThan
-    ));
-
-    //public static final Map<Property, List<Property>> listPropertiesMap;
-   
-    //static {
-    //    Map<Property, List<Property>> tempMap = new HashMap<>();
-    //    tempMap.put(withVariables, Arrays.asList(WOTTR.hasParameter, WOTTR.variable));
-    //    tempMap.put(withValues, Arrays.asList(WOTTR.hasArgument, WOTTR.value));
-    //    listPropertiesMap = Collections.unmodifiableMap(tempMap);
-    //}
-
+    // Utility methods
     private static Resource getResource(String uri) {
         return ResourceFactory.createResource(uri);
     }

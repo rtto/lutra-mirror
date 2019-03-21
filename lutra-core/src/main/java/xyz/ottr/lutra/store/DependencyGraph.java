@@ -38,7 +38,7 @@ import java.util.stream.Stream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import xyz.ottr.lutra.ROTTR;
+import xyz.ottr.lutra.OTTR;
 import xyz.ottr.lutra.model.ArgumentList;
 import xyz.ottr.lutra.model.BlankNodeTerm;
 import xyz.ottr.lutra.model.Instance;
@@ -106,7 +106,7 @@ public class DependencyGraph implements TemplateStore {
     }
 
     private void addInstanceToIndex(String instance, ArgumentList args, String template) {
-        if (instance.equals(ROTTR.triple)) {
+        if (instance.equals(OTTR.Bases.Triple)) {
             addInstanceToIndex(args.get(1).toString(), template);
         } else {
             addInstanceToIndex(instance, template);
@@ -118,7 +118,7 @@ public class DependencyGraph implements TemplateStore {
     }
 
     private void removeInstanceFromIndex(String instance, ArgumentList args, String template) {
-        if (instance.equals(ROTTR.triple)) {
+        if (instance.equals(OTTR.Bases.Triple)) {
             removeInstanceFromIndex(args.get(1).toString(), template);
         } else {
             removeInstanceFromIndex(instance, template);
@@ -236,7 +236,7 @@ public class DependencyGraph implements TemplateStore {
         this.dependencies.get(dependency.from).remove(dependency);
         String instance = dependency.to.getIRI();
         removeInstanceFromIndex(instance, dependency.argumentList, dependency.from.getIRI());
-        if (!instance.equals(ROTTR.triple) && this.instanceIndex.get(instance).isEmpty()) {
+        if (!instance.equals(OTTR.Bases.Triple) && this.instanceIndex.get(instance).isEmpty()) {
             this.roots.add(dependency.to);
         }
     }
