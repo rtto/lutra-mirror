@@ -213,7 +213,7 @@ public class DependencyGraph implements TemplateStore {
      *            the URI of the knowledge base to add an instance call to
      * @param pl
      *            the parameters representing the arguments in the call
-     * @param to
+     * @param instance
      *            the URI of the template called
      */
     public void addInstance(String knowledgeBase, ArgumentList pl, String instance) {
