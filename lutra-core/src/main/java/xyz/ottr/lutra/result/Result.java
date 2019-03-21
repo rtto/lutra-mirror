@@ -389,7 +389,7 @@ public class Result<E> {
     @Override
     public String toString() {
         return (this.result.isPresent()
-                ? ("Result(" + this.result.get().toString() + ")")
+                ? "Result(" + this.result.get().toString() + ")"
                 : "Empty") + this.messages.toString();
     }
 
