@@ -45,7 +45,7 @@ public interface TemplateWriter extends Consumer<TemplateSignature> {
     /**
      * Adds a set of definitions to this writer.
      *
-     * @param definitions
+     * @param templates
      *          a set of templates to add to this Writer
      */
     default void addTemplates(Set<TemplateSignature> templates) {

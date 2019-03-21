@@ -22,19 +22,13 @@ package xyz.ottr.lutra.wottr.io;
  * #L%
  */
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import java.io.IOException;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
-import org.apache.jena.rdf.model.Model;
 
 import org.junit.BeforeClass;
 import org.junit.Ignore;
@@ -53,7 +47,6 @@ import xyz.ottr.lutra.store.TemplateStore;
 
 import xyz.ottr.lutra.wottr.io.WFileReader;
 import xyz.ottr.lutra.wottr.io.WInstanceParser;
-import xyz.ottr.lutra.wottr.io.WInstanceWriter;
 import xyz.ottr.lutra.wottr.io.WTemplateParser;
 
 public class ShaclEquivalenceTest {

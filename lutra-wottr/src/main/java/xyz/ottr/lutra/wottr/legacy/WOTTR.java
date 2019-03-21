@@ -43,7 +43,7 @@ public class WOTTR {
 
     // Individuals
     public static final Resource incomplete = getResource(ns + "incomplete");
-    public static final Resource triple = getResource("http://candidate.ottr.xyz/rdf/Triple"); // TODO Move?
+    public static final Resource triple = getResource("http://candidate.ottr.xyz/rdf/Triple");
     public static final Resource none = getResource(ns + "none");
 
     // Properties

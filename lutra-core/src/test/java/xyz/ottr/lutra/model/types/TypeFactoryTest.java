@@ -27,7 +27,6 @@ import static org.junit.Assert.assertEquals;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.junit.Before;
 import org.junit.Test;
 
 import xyz.ottr.lutra.model.ArgumentList;

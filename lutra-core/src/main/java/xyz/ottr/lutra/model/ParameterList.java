@@ -146,7 +146,6 @@ public class ParameterList {
         return new ParameterList(clonedTerms, clonedNonBlanks, clonedOptionals, clonedDefaults);
     }
 
-    // TODO Use StringBuilder?
     /**
      * Returns a String similar to toString(), but
      * IRIs are written as qnames according to the
@@ -164,7 +163,6 @@ public class ParameterList {
     }
 
     @Override
-    // TODO Use StringBuilder?
     public String toString() {
         String s = "";
         String sep = "";

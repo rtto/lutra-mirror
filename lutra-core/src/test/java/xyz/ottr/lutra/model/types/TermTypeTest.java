@@ -23,7 +23,6 @@ package xyz.ottr.lutra.model.types;
  */
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import org.apache.jena.rdf.model.Resource;

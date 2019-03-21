@@ -105,7 +105,6 @@ public abstract class ModelIO {
         try {
             str.close();
         } catch (IOException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
         return modelString;

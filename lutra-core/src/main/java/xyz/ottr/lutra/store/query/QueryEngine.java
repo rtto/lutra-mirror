@@ -307,7 +307,7 @@ public abstract class QueryEngine<S extends TemplateStore> {
      *
      * @param tuple
      *      a Map representing a tuple from variables to values
-     * @param params
+     * @param arguments
      *      a variable name denoting a list of arguments
      * @param index
      *      a variable name denoting a parameter index 
