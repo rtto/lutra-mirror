@@ -39,7 +39,7 @@ snapshot:
 
 release:
   <<: *deploy
-  only: 
+  only:
     - tags
   artifacts:
     paths:
