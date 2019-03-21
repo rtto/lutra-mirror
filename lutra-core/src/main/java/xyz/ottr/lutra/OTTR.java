@@ -22,17 +22,26 @@ package xyz.ottr.lutra;
  * #L%
  */
 
-public class ROTTR  {
+public class OTTR  {
 
-    public static final String rdfTemplates = "http://tpl.ottr.xyz/rdf/0.1/"; 
-    public static final String triple = rdfTemplates + "Triple"; 
-
-    private static final String ns = "http://spec.ottr.xyz/rottr/0.1/types#";
+    private static final String ns = "http://ns.ottr.xyz/0.4/";
+    
+    public static final String prefix = "ottr";
     public static final String namespace = ns;
     
-    //public static final String none = ns + "none";
-    public static final String subTypeOf = ns + "subTypeOf";
-    public static final String termType = ns + "Type";
-    public static final String NEListType = ns + "NEList";
-    public static final String LUBType = ns + "LUB";
+    public static class Bases {
+        public static final String Triple = ns + "Triple";
+    }
+
+    public static class Types {
+        public static final String Type = ns + "Type";
+        public static final String subTypeOf = ns + "subTypeOf";
+        
+        public static final String NEList = ns + "NEList";
+        public static final String LUB = ns + "LUB";
+    }
+    
+    public static class Files {
+        public static final String StdTypes = "types.owl.ttl";
+    }
 }

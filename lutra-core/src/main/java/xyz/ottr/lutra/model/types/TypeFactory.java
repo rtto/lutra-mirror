@@ -41,7 +41,7 @@ import org.apache.jena.reasoner.Reasoner;
 import org.apache.jena.reasoner.ReasonerRegistry;
 import org.apache.jena.vocabulary.RDF;
 
-import xyz.ottr.lutra.ROTTR;
+import xyz.ottr.lutra.OTTR;
 import xyz.ottr.lutra.model.BlankNodeTerm;
 import xyz.ottr.lutra.model.IRITerm;
 import xyz.ottr.lutra.model.LiteralTerm;
@@ -59,15 +59,12 @@ public class TypeFactory {
     private static BasicType top;
     private static BasicType bot;
     
-    // TODO move - perhaps OTTR.java, or Settings?
-    private static final String IRI = "types.owl.ttl";
-
     static {
         init();
     }
     
     private static void init() {
-        InputStream filename = TypeFactory.class.getClassLoader().getResourceAsStream(IRI);
+        InputStream filename = TypeFactory.class.getClassLoader().getResourceAsStream(OTTR.Files.StdTypes);
         Model types = ModelFactory.createDefaultModel();
         types.read(filename, null, "TTL");
         Reasoner owlMicro = ReasonerRegistry.getOWLMicroReasoner();
@@ -106,7 +103,7 @@ public class TypeFactory {
 
     private static void initSuperTypes(Model model) {
 
-        Property subTypeOf = model.createProperty(ROTTR.subTypeOf);
+        Property subTypeOf = model.createProperty(OTTR.Types.subTypeOf);
         model.listStatements((Resource) null, subTypeOf, (RDFNode) null)
             .forEachRemaining(stmt -> initSuperType(stmt));
     }
@@ -118,7 +115,7 @@ public class TypeFactory {
     }
 
     private static Stream<BasicType> getBasicTypes(Model model) {
-        return model.listResourcesWithProperty(RDF.type, model.createResource(ROTTR.termType))
+        return model.listResourcesWithProperty(RDF.type, model.createResource(OTTR.Types.Type))
             .toSet().stream()
             .map(RDFNode::asResource)
             .map(BasicType::new);

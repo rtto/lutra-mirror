@@ -35,6 +35,8 @@ import org.apache.jena.rdf.model.RDFList;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 
+import xyz.ottr.lutra.OTTR;
+
 //import org.slf4j.Logger;
 //import org.slf4j.LoggerFactory;
 
@@ -152,7 +154,7 @@ public class WInstanceParser implements InstanceParser<Model> {
                 // be unintended by user
                 if (term instanceof IRITerm) {
                     String iri = ((IRITerm) term).getIRI();
-                    if (iri.startsWith(WOTTR.namespace) && !iri.equals(WOTTR.none.getURI())) {
+                    if (iri.startsWith(OTTR.namespace) && !iri.equals(WOTTR.none.getURI())) {
                         toAddErr.addMessage(Message.warning("Instance argument in ottr namespace: " + iri));
                     }
                 }
