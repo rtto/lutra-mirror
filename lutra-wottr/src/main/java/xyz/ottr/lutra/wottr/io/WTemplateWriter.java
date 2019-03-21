@@ -84,7 +84,6 @@ public class WTemplateWriter extends AbstractWWriter implements TemplateWriter {
         try {
             out = ModelIO.writeModel(this.models.get(iri), ModelIO.Format.TURTLE);
         } catch (ModelIOException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
         return out;

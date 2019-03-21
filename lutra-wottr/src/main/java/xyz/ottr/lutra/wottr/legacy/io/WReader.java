@@ -52,12 +52,6 @@ public class WReader {
     public static Model getCanonicalModel(Model model) throws ReaderException {
         Model canonical = Models.duplicate(model, Models.BlankCopy.KEEP);
 
-        /*
-         * // replacing template instance vocabulary with template vocabulary: for
-         * (Entry<Property, Property> m : TemplateInstances.templateVocabMap.entrySet())
-         * { ModelEditor.substituteNode(canonical, m.getKey(), m.getValue()); }
-         */
-
         // replacing t:with... list properties with indexed lists:
         for (Entry<Property, List<Property>> m : WOTTR.listPropertiesMap.entrySet()) {
             for (Statement t : canonical.listStatements(null, m.getKey(), (RDFNode) null).toList()) {
