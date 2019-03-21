@@ -3,8 +3,7 @@
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 
-@prefix ottr: <http://spec.ottr.xyz/wottr/0.4/core#> .
-@prefix o-rdf:   <http://tpl.ottr.xyz/rdf/0.1/> .
+@prefix ottr: <http://ns.ottr.xyz/0.4/> .
 
 @prefix :     <http://example.net/ns/Blank#> .
 @prefix ex:     <http://example.net/ns#> .
@@ -13,5 +12,5 @@
     ottr:parameters
         ([ ottr:variable :subject ] [ ottr:variable :object ] ) ;
     ottr:pattern 
-        [ ottr:of o-rdf:Triple ; ottr:values (:subject ex:p _:blank) ] ,
-        [ ottr:of o-rdf:Triple ; ottr:values (_:blank  ex:q :object) ] .  
+        [ ottr:of ottr:Triple ; ottr:values (:subject ex:p _:blank) ] ,
+        [ ottr:of ottr:Triple ; ottr:values (_:blank  ex:q :object) ] .  
