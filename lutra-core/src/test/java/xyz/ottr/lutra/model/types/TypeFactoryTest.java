@@ -23,6 +23,7 @@ package xyz.ottr.lutra.model.types;
  */
 
 import static org.junit.Assert.assertEquals;
+
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
