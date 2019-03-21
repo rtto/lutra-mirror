@@ -23,13 +23,9 @@ package xyz.ottr.lutra.model.types;
  */
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.junit.Before;
 import org.junit.Test;
 
 import xyz.ottr.lutra.model.ArgumentList;

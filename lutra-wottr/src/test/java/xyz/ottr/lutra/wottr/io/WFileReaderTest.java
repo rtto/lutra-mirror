@@ -22,9 +22,6 @@ package xyz.ottr.lutra.wottr.io;
  * #L%
  */
 
-import java.io.IOException;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.stream.Stream;
 
 import org.apache.jena.rdf.model.Model;
