@@ -32,33 +32,25 @@ public class MapJDBC extends Map {
 
     public ResultStream<Row> execute() {
     	
-    	//Get the source and type of database
-    	private String JDBC_DRIVER = getDriver();  
-    	private String DB_URL = getURL();
-
-    	//Database credentials
-    	private String USER = getUser();
-    	private String PASS = getPassword();
-    	
     	 try{
     	      //Register driver
-    	      Class.forName(JDBC_DRIVER);
+    	      Class.forName(getDriver());
 
     	      //Open connection
-    	      conn = DriverManager.getConnection(DB_URL,USER,PASS);
+    	      conn = DriverManager.getConnection(getURL(),getUser(),getPassword());
 
     	      //Execute query
     	      stmt = conn.createStatement();
     	      ResultSet rs = stmt.executeQuery(getQuery());
 
     	      //Parse the data
-    	      ResultSetMetaData rsMeta = rs.getMetaData();
+    	      int colcount = rs.getMetaData().getColumnCount();
     	      
     	      private ResultStream<Row> rowStream = new ResultStream<Row>();
     	      
     	      while(rs.next()){
     	    	  List<String> rowAsList = new ArrayList<>();
-    	    	  for(int i = 0; i < rsMeta.getColumnCount(); i++)
+    	    	  for(int i = 0; i < colcount; i++)
     	    	  {
     	    		  rowAsList.add(rs.getString(i));
     	    	  }
