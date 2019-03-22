@@ -253,7 +253,7 @@ public class DependencyGraphEngine extends QueryEngine<DependencyGraph> {
     public Stream<Tuple> innerType(Tuple tuple, String type, String inner) {
 
         String lvl = Tuple.freshVar();
-        return innerTypeAt(tuple.bind(lvl, 1), type, inner, lvl);
+        return innerTypeAt(tuple.bind(lvl, 1), type, lvl, inner);
     }
 
     @Override

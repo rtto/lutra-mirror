@@ -104,7 +104,7 @@ public class WParameterParser implements Function<Resource, Result<Term>> {
 
     private void setType(Term term, Property type) {
         if (type.equals(WOTTR.literalVariable)) {
-            return; // Already set by its xsd datatype or its java class
+            term.setType(TypeFactory.getByName("literal"));
         } else if (type.equals(WOTTR.classVariable)) {
             term.setType(TypeFactory.getByName("class"));
         } else if (type.equals(WOTTR.individualVariable)) {
