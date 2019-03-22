@@ -1,5 +1,7 @@
 package xyz.ottr.lutra.tabottr.io.excel;
 
+import java.io.File;
+
 /*-
  * #%L
  * lutra-tab
@@ -25,6 +27,9 @@ package xyz.ottr.lutra.tabottr.io.excel;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.apache.poi.EncryptedDocumentException;
+import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.openxml4j.exceptions.InvalidOperationException;
 import org.apache.poi.openxml4j.exceptions.NotOfficeXmlFileException;
 import org.apache.poi.ss.usermodel.Cell;
@@ -32,8 +37,8 @@ import org.apache.poi.ss.usermodel.DataFormatter;
 import org.apache.poi.ss.usermodel.FormulaEvaluator;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.WorkbookFactory;
 import xyz.ottr.lutra.result.Message;
 import xyz.ottr.lutra.result.Result;
 import xyz.ottr.lutra.tabottr.model.Table;
@@ -52,7 +57,10 @@ public class ExcelReader {
      *      empty with error messages on error
      */
     public static Result<List<Table>> parseTables(String filename) {
-        try (XSSFWorkbook workbook = new XSSFWorkbook(filename)) {
+        // TODO Rather take a File as input, and handle possible file IO issues somewhere more "generic"?
+        File file = new File(filename);
+        // open file in read-only mode and without any password:
+        try (Workbook workbook = WorkbookFactory.create(file, null, true)) {
             List<Table> tables = new ArrayList<>();
             for (int index = 0; index < workbook.getNumberOfSheets(); index += 1) {
                 tables.add(parseTable(workbook.getSheetAt(index), index + 1));
@@ -61,11 +69,17 @@ public class ExcelReader {
         } catch (IOException ex) {
             Message msg = Message.error(ex.getMessage());
             return Result.empty(msg);
-        } catch (InvalidOperationException ex2) {
-            Message msg = Message.error(ex2.getMessage());
+        } catch (InvalidOperationException ex) {
+            Message msg = Message.error(ex.getMessage());
             return Result.empty(msg);
-        } catch (NotOfficeXmlFileException ex3) {
-            Message msg = Message.error(ex3.getMessage());
+        } catch (NotOfficeXmlFileException ex) {
+            Message msg = Message.error(ex.getMessage());
+            return Result.empty(msg);
+        } catch (EncryptedDocumentException ex) {
+            Message msg = Message.error(ex.getMessage());
+            return Result.empty(msg);
+        } catch (InvalidFormatException ex) {
+            Message msg = Message.error(ex.getMessage());
             return Result.empty(msg);
         }
     }
