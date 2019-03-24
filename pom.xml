@@ -45,7 +45,7 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		
-		<jena.version>3.1.0</jena.version>
+		<jena.version>3.3.0</jena.version>
 	</properties>
 
 	<build>
@@ -353,6 +353,13 @@
 				<artifactId>jena-arq</artifactId>
 				<version>${jena.version}</version>
 			</dependency-->
+			
+			
+            <dependency>
+                <groupId>io.bdrc</groupId>
+                <artifactId>jena-stable-turtle</artifactId>
+                <version>0.5.0</version>
+            </dependency>
 
 
 			<!-- TabOTTR -->

@@ -20,6 +20,11 @@
 			<groupId>${project.groupId}</groupId>
 			<artifactId>lutra-core</artifactId>
 		</dependency>
+		
+		<dependency>
+            <groupId>io.bdrc</groupId>
+            <artifactId>jena-stable-turtle</artifactId>
+        </dependency>
 	</dependencies>
 
 	<build>
