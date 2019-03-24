@@ -78,7 +78,6 @@ public abstract class Models {
     /**
      * Get a fresh empty model.
      *
-     * @param mapping
      * @return an empty model
      */
     public static Model empty() {

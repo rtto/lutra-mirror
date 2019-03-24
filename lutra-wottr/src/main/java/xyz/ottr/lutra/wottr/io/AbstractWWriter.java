@@ -39,7 +39,7 @@ import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.shared.PrefixMapping;
 import org.apache.jena.vocabulary.RDF;
 
-import xyz.ottr.lutra.ROTTR;
+import xyz.ottr.lutra.OTTR;
 import xyz.ottr.lutra.model.ArgumentList;
 import xyz.ottr.lutra.model.BlankNodeTerm;
 import xyz.ottr.lutra.model.IRITerm;
@@ -63,10 +63,7 @@ public abstract class AbstractWWriter {
     protected void addPrefixes(Model model) {
 
         model.setNsPrefixes(PrefixMapping.Standard);
-        model.setNsPrefix("ottr", WOTTR.namespace);
-        model.setNsPrefix("ottr", WOTTR.namespace);
-        model.setNsPrefix("ottt", ROTTR.namespace);
-        model.setNsPrefix("o-rdf", ROTTR.rdfTemplates);
+        model.setNsPrefix(OTTR.prefix, OTTR.namespace);
     }
 
     protected boolean isTriple(Instance node) {
@@ -123,10 +120,10 @@ public abstract class AbstractWWriter {
             return rest.cons(RDF.List);
         } else if (type instanceof NEListType) {
             RDFList rest = toComplexRDFType(model, ((NEListType) type).getInner());
-            return rest.cons(model.createResource(ROTTR.NEListType));
+            return rest.cons(model.createResource(OTTR.Types.NEList));
         } else if (type instanceof LUBType) {
             RDFList rest = toComplexRDFType(model, ((LUBType) type).getInner());
-            return rest.cons(model.createResource(ROTTR.LUBType));
+            return rest.cons(model.createResource(OTTR.Types.LUB));
         } else {
             RDFList nil = model.createList();
             Resource rdfType = model.createResource(((BasicType) type).getIRI());

@@ -80,8 +80,8 @@ public class Message {
     @Override
     public boolean equals(Object o) {
         return this == o
-            || this.getClass() == o.getClass()
-            && Objects.nonNull(o)
+            || Objects.nonNull(o)
+            && this.getClass() == o.getClass()
             && this.lvl == ((Message) o).lvl
             && Objects.equals(this.msg, ((Message) o).msg);
     }

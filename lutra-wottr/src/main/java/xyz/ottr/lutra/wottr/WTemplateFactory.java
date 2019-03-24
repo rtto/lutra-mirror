@@ -29,7 +29,7 @@ import org.apache.jena.rdf.model.RDFList;
 import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.vocabulary.RDF;
 
-import xyz.ottr.lutra.ROTTR;
+import xyz.ottr.lutra.OTTR;
 import xyz.ottr.lutra.model.ArgumentList;
 import xyz.ottr.lutra.model.BlankNodeTerm;
 import xyz.ottr.lutra.model.Instance;
@@ -45,10 +45,6 @@ public abstract class WTemplateFactory {
     // TODO Possible generalisation a a generic TemplateFactory provided with with a
     // generic TermFactory
 
-    public static final Term SUBJECT = new BlankNodeTerm("_:s"); // TODO: fix iri
-    public static final Term PREDICATE = new BlankNodeTerm("_:p"); // TODO: fix iri
-    public static final Term OBJECT = new BlankNodeTerm("_:o"); // TODO: fix iri
-
     public static Result<Instance> createTripleInstance(Statement stmt) {
 
         WTermFactory rdfTermFactory = new WTermFactory();
@@ -63,7 +59,7 @@ public abstract class WTemplateFactory {
         asRes.addMessages(pred.getMessages());
         asRes.addMessages(obj.getMessages());
 
-        return asRes.map(asVal -> new Instance(ROTTR.triple, asVal));
+        return asRes.map(asVal -> new Instance(OTTR.Bases.Triple, asVal));
     }
 
     /**
@@ -76,17 +72,18 @@ public abstract class WTemplateFactory {
                 || s.getPredicate().equals(RDF.rest));
     }
 
+    // TODO Check if the s, p, o blanks must be fresh.
     public static TemplateSignature createTripleTemplateHead() {
-        Term sub = new BlankNodeTerm("_:s"); // TODO: fix iri
+        Term sub = new BlankNodeTerm("_:s");
         sub.setType(TypeFactory.getByName("IRI"));
-        Term pred = new BlankNodeTerm("_:p"); // TODO: fix iri
+        Term pred = new BlankNodeTerm("_:p");
         pred.setType(TypeFactory.getByName("IRI"));
-        Term obj = new BlankNodeTerm("_:o"); // TODO: fix iri
+        Term obj = new BlankNodeTerm("_:o");
         obj.setType(TypeFactory.getVariableType(obj));
         Set<Term> nonBlanks = new HashSet<>();
         nonBlanks.add(pred);
         return new TemplateSignature(
-            ROTTR.triple,
+            OTTR.Bases.Triple,
             new ParameterList(new TermList(sub, pred, obj), nonBlanks, null, null),
             true);
     }

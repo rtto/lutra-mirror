@@ -81,7 +81,6 @@ public class WReader {
         return head;
     }
 
-    // TODO Move to Gaupa?
     private static List<Statement> getNeighbourhood(Model model, Resource iri) {
         List<Statement> neighbourhood = new ArrayList<>();
         if (iri == null) {

@@ -76,10 +76,6 @@ public class InstanceReader implements Function<String, ResultStream<Instance>> 
      *
      * @param folder
      *            the folder containing templates to load
-     * @param includeExtensions
-     *            the file extensions of the files in the folder to include
-     * @param excludeExtensions
-     *            the file extensions of the files in the folder to exclude
      */
     public ResultStream<Instance> loadInstancesFromFolder(String folder) throws IOException {
         log.info("Loading all template instaces from folder " + folder + " with suffix "

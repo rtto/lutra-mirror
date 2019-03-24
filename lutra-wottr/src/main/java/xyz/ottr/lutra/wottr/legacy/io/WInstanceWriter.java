@@ -60,7 +60,6 @@ public class WInstanceWriter extends AbstractWriter implements InstanceWriter {
         try {
             out = ModelIO.writeModel(this.model, ModelIO.Format.TURTLE);
         } catch (ModelIOException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
         return out;

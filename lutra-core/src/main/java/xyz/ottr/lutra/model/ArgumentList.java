@@ -126,7 +126,6 @@ public class ArgumentList {
         return new ArgumentList(clonedTerms, clonedExpanderValues, this.listExpander);
     }
 
-    // TODO Use StringBuilder?
     /**
      * Returns a String similar to toString(), but
      * IRIs are written as qnames according to the
@@ -144,7 +143,6 @@ public class ArgumentList {
     }
 
     @Override
-    // TODO Use StringBuilder?
     public String toString() {
         String s = "";
         String sep = "";
