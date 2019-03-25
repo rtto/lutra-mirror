@@ -45,8 +45,8 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-
-		<jena.version>3.3.0</jena.version>
+		
+		<jena.version>3.10.0</jena.version>
 	</properties>
 
 	<build>
