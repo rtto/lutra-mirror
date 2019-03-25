@@ -95,6 +95,10 @@ public interface TemplateStore extends Consumer<TemplateSignature> {
 
     Result<TemplateSignature> getTemplateSignature(String iri);
 
+    /**
+     * Returns the set of IRIs of template objects contained in this store satifiying
+     * the argument predicate.
+     */
     Set<String> getIRIs(Predicate<String> pred);
 
     default Set<String> getTemplateIRIs() {
@@ -122,6 +126,10 @@ public interface TemplateStore extends Consumer<TemplateSignature> {
      */
     Result<Set<String>> getDependencies(String template);
 
+    /**
+     * Refactors the template having the second argument as IRI
+     * to instantiate the template having the first argument as IRI.
+     */
     boolean refactor(String toUse, String toChange);
 
     /**
