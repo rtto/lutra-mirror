@@ -29,6 +29,7 @@ import java.util.Set;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.shared.PrefixMapping;
 import org.apache.jena.vocabulary.RDF;
 
 import xyz.ottr.lutra.io.TemplateWriter;
@@ -38,15 +39,22 @@ import xyz.ottr.lutra.model.Template;
 import xyz.ottr.lutra.model.TemplateSignature;
 import xyz.ottr.lutra.wottr.WOTTR;
 import xyz.ottr.lutra.wottr.util.ModelIO;
+import xyz.ottr.lutra.wottr.util.PrefixMappings;
 
 public class WTemplateWriter extends AbstractWWriter implements TemplateWriter {
 
-    private Map<String, Model> models; // TODO: Decide on representation
-    private WInstanceWriter instanceWriter;
+    private final Map<String, Model> models; // TODO: Decide on representation
+    private final WInstanceWriter instanceWriter;
+    private final PrefixMapping prefixes;
 
     public WTemplateWriter() {
+        this(PrefixMapping.Factory.create());
+    }
+
+    public WTemplateWriter(PrefixMapping prefixes) {
         this.models = new HashMap<String, Model>();
-        this.instanceWriter = new WInstanceWriter();
+        this.instanceWriter = new WInstanceWriter(prefixes);
+        this.prefixes = prefixes;
     }
 
     @Override
@@ -57,7 +65,7 @@ public class WTemplateWriter extends AbstractWWriter implements TemplateWriter {
     @Override
     public void accept(TemplateSignature template) {
         Model model = ModelFactory.createDefaultModel();
-        addPrefixes(model);
+        model.setNsPrefixes(this.prefixes);
         
         Resource tempNode = makeWottrHead(model, template);
         if (template instanceof Template) {
@@ -66,6 +74,8 @@ public class WTemplateWriter extends AbstractWWriter implements TemplateWriter {
                 model.add(model.createStatement(tempNode, WOTTR.pattern, insNode));
             }
         }
+
+        PrefixMappings.trim(model);
         models.put(template.getIRI(), model);
     }
     

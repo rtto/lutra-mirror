@@ -34,6 +34,7 @@ import java.util.stream.Stream;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.shared.PrefixMapping;
 
 //import org.slf4j.Logger;
 //import org.slf4j.LoggerFactory;
@@ -58,9 +59,16 @@ public class WTemplateParser implements TemplateParser<Model> {
 
     //private final Logger log = LoggerFactory.getLogger(WOTTRParser.class);
     private final WInstanceParser instanceParser;
+    private final PrefixMapping prefixes;
 
     public WTemplateParser() {
-        instanceParser = new WInstanceParser();
+        this.instanceParser = new WInstanceParser();
+        this.prefixes = PrefixMapping.Factory.create();
+    }
+
+    @Override
+    public PrefixMapping getUsedPrefixes() {
+        return this.prefixes;
     }
 
     @Override

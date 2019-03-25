@@ -32,9 +32,12 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.function.Function;
 
+import org.apache.jena.shared.PrefixMapping;
+
 import picocli.CommandLine;
 import picocli.CommandLine.ParameterException;
 
+import xyz.ottr.lutra.OTTR;
 import xyz.ottr.lutra.io.InstanceReader;
 import xyz.ottr.lutra.io.InstanceWriter;
 import xyz.ottr.lutra.io.TemplateReader;
@@ -124,7 +127,9 @@ public class CLI {
                 MessageHandler msgs = parseLibraryInto(reader, store);
                 
                 if (!Message.moreSevere(msgs.printMessages(), settings.haltOn)) {
-                    executeMode(store);
+                    PrefixMapping usedPrefixes = reader.getUsedPrefixes();
+                    addStdPrefixes(usedPrefixes);
+                    executeMode(store, usedPrefixes);
                 }
             }
         );
@@ -150,7 +155,7 @@ public class CLI {
         return msgs;
     } 
 
-    private static void executeExpand(TemplateStore store) {
+    private static void executeExpand(TemplateStore store, PrefixMapping usedPrefixes) {
 
         ResultConsumer.use(makeInstanceReader(),
             reader -> {
@@ -158,7 +163,7 @@ public class CLI {
                 ResultConsumer.use(makeExpander(store),
                     expander -> {
 
-                        ResultConsumer.use(makeInstanceWriter(),
+                        ResultConsumer.use(makeInstanceWriter(usedPrefixes),
                             writer -> {
 
                                 expandAndWriteInstanes(reader, writer, expander);
@@ -170,12 +175,12 @@ public class CLI {
         );
     }
 
-    private static void executeExpandLibrary(TemplateStore store) {
+    private static void executeExpandLibrary(TemplateStore store, PrefixMapping usedPrefixes) {
         
         ResultConsumer.use(store.expandAll(),
             expandedStore -> {
 
-                ResultConsumer.use(makeTemplateWriter(),
+                ResultConsumer.use(makeTemplateWriter(usedPrefixes),
                     writer ->  {
 
                         writeTemplates(expandedStore, writer);
@@ -185,9 +190,9 @@ public class CLI {
         );
     }
 
-    private static void executeFormatLibrary(TemplateStore store) {
+    private static void executeFormatLibrary(TemplateStore store, PrefixMapping usedPrefixes) {
         
-        ResultConsumer.use(makeTemplateWriter(),
+        ResultConsumer.use(makeTemplateWriter(usedPrefixes),
             writer ->  {
 
                 writeTemplates(store, writer);
@@ -195,12 +200,12 @@ public class CLI {
         );
     }
 
-    private static void executeFormat() {
+    private static void executeFormat(PrefixMapping usedPrefixes) {
         
         ResultConsumer.use(makeInstanceReader(),
             reader -> {
 
-                ResultConsumer.use(makeInstanceWriter(),
+                ResultConsumer.use(makeInstanceWriter(usedPrefixes),
                     writer ->  {
 
                         formatInstances(reader, writer);
@@ -210,7 +215,7 @@ public class CLI {
         );
     }
 
-    private static void executeMode(TemplateStore store) {
+    private static void executeMode(TemplateStore store, PrefixMapping usedPrefixes) {
         
         int severity = Message.INFO; // Least severe
         if (!settings.quiet) {
@@ -223,16 +228,16 @@ public class CLI {
 
         switch (settings.mode) {
             case expand:
-                executeExpand(store);
+                executeExpand(store, usedPrefixes);
                 break;
             case expandLibrary:
-                executeExpandLibrary(store);
+                executeExpandLibrary(store, usedPrefixes);
                 break;
             case formatLibrary:
-                executeFormatLibrary(store);
+                executeFormatLibrary(store, usedPrefixes);
                 break;
             case format:
-                executeFormat();
+                executeFormat(usedPrefixes);
                 break;
             case lint:
                 // Simply load templates and check for messages, as done before the switch
@@ -295,10 +300,10 @@ public class CLI {
         }
     }
 
-    private static Result<InstanceWriter> makeInstanceWriter() {
+    private static Result<InstanceWriter> makeInstanceWriter(PrefixMapping usedPrefixes) {
         switch (settings.outputFormat) {
             case wottr:
-                return Result.of(new WInstanceWriter());
+                return Result.of(new WInstanceWriter(usedPrefixes));
             default:
                 return Result.empty(Message.error(
                         "Output format " + settings.outputFormat.toString()
@@ -306,10 +311,10 @@ public class CLI {
         }
     }
 
-    private static Result<TemplateWriter> makeTemplateWriter() {
+    private static Result<TemplateWriter> makeTemplateWriter(PrefixMapping usedPrefixes) {
         switch (settings.outputFormat) {
             case wottr:
-                return Result.of(new WTemplateWriter());
+                return Result.of(new WTemplateWriter(usedPrefixes));
             default:
                 return Result.empty(Message.error(
                         "Output format " + settings.outputFormat.toString()
@@ -407,6 +412,12 @@ public class CLI {
     ////////////////////////////////////////////////////////////
     /// UTILS                                                ///
     ////////////////////////////////////////////////////////////
+
+    private static void addStdPrefixes(PrefixMapping prefixes) {
+
+        prefixes.setNsPrefixes(PrefixMapping.Standard);
+        prefixes.setNsPrefix(OTTR.prefix, OTTR.namespace);
+    }
 
 
     private static boolean shouldPrintOutput() {
