@@ -25,7 +25,6 @@ package xyz.ottr.lutra.wottr.io;
 import java.util.stream.Stream;
 
 import org.apache.jena.rdf.model.Model;
-
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -34,7 +33,6 @@ import xyz.ottr.lutra.result.Result;
 import xyz.ottr.lutra.result.ResultStream;
 import xyz.ottr.lutra.wottr.io.WFileReader;
 import xyz.ottr.lutra.wottr.util.ModelIO;
-import xyz.ottr.lutra.wottr.util.ModelIOException;
 
 public class WFileReaderTest {
 
@@ -49,13 +47,13 @@ public class WFileReaderTest {
     }
 
     @Test
-    public void shouldParse() throws ModelIOException {
+    public void shouldParse() {
         ResultStream<Model> emptyFileModelStream = reader.apply(emptyFile);
         Result<Stream<Model>> aggr = emptyFileModelStream.aggregate();
 
         assert aggr.isPresent();
 
-        System.out.println(ModelIO.writeModel(aggr.get().findFirst().get(), ModelIO.Format.TURTLE));
+        System.out.println(ModelIO.writeModel(aggr.get().findFirst().get()));
     }
 
     @Test

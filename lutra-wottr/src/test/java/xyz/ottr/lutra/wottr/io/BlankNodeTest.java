@@ -26,7 +26,6 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import org.apache.jena.rdf.model.Model;
-
 import org.junit.Test;
 
 import xyz.ottr.lutra.io.InstanceReader;
@@ -46,7 +45,6 @@ import xyz.ottr.lutra.wottr.io.WInstanceParser;
 import xyz.ottr.lutra.wottr.io.WInstanceWriter;
 import xyz.ottr.lutra.wottr.io.WTemplateParser;
 import xyz.ottr.lutra.wottr.util.ModelIO;
-import xyz.ottr.lutra.wottr.util.ModelIOException;
 
 public class BlankNodeTest {
 
@@ -95,13 +93,9 @@ public class BlankNodeTest {
         assertTrue(outRes.isPresent());
         Model out = outRes.get();
 
-        try {
-            ModelIO.printModel(in, ModelIO.Format.TURTLE);
-            ModelIO.printModel(out, ModelIO.Format.TURTLE);
-        } catch (ModelIOException ex) {
-            ex.printStackTrace();
-        }
-
+        ModelIO.printModel(in);
+        ModelIO.printModel(out);
+        
         assertTrue(in.isIsomorphicWith(out));
     }
 }

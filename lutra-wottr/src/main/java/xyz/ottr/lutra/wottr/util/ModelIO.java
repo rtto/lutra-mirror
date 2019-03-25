@@ -1,5 +1,7 @@
 package xyz.ottr.lutra.wottr.util;
 
+import java.io.StringWriter;
+
 /*-
  * #%L
  * lutra-wottr
@@ -22,8 +24,6 @@ package xyz.ottr.lutra.wottr.util;
  * #L%
  */
 
-import java.io.IOException;
-import java.io.StringWriter;
 import java.util.List;
 import java.util.StringJoiner;
 
@@ -31,38 +31,33 @@ import org.apache.jena.graph.Node;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.RDFList;
 import org.apache.jena.rdf.model.RDFNode;
+import org.apache.jena.riot.Lang;
+import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.util.FileManager;
 import org.apache.jena.util.FileUtils;
 
 public abstract class ModelIO {
 
-    public enum Format {
-        RDFXML(FileUtils.langXMLAbbrev), 
-        TURTLE(FileUtils.langTurtle), 
-        N3(FileUtils.langN3), 
-        NTRIPLES(FileUtils.langNTriple);
-        
-        private final String lang;
+    private static Lang defaultLang = Lang.TURTLE;
 
-        private Format(final String lang) {
-            this.lang = lang;
-        }
+    public static void printModel(Model model) {
+        printModel(model, defaultLang);
     }
 
-    public static void printModel(Model model, ModelIO.Format format) throws ModelIOException {
-        System.out.println(writeModel(model, format));
+    public static void printModel(Model model, Lang language) {
+        System.out.println(writeModel(model, language));
     }
 
     public static Model readModel(String file) {
-        return readModel(file, FileUtils.guessLang(file, ModelIO.Format.TURTLE.lang));
+        return readModel(file, FileUtils.guessLang(file, defaultLang.getLabel()));
     }
 
-    public static Model readModel(String file, ModelIO.Format serialisation) {
-        return readModel(file, serialisation.lang);
+    public static Model readModel(String file, Lang language) {
+        return readModel(file, language.getLabel());
     }
 
-    private static Model readModel(String file, String serialisation) {
-        return FileManager.get().loadModel(file, serialisation);
+    private static Model readModel(String file, String format) {
+        return FileManager.get().loadModel(file, format);
     }
 
     public static String shortForm(Model model, List<? extends RDFNode> nodes) {
@@ -93,21 +88,18 @@ public abstract class ModelIO {
         return model == null ? node.toString() : shortForm(model, node.asNode());
     }
 
-    public static String writeModel(Model model, ModelIO.Format format) throws ModelIOException {
-        return writeRDFModel(model, format);
+    public static String writeModel(Model model) {
+        return writeRDFModel(model, defaultLang);
     }
 
-    private static String writeRDFModel(Model model, ModelIO.Format format) {
-        StringWriter str = new StringWriter();
-        model.write(str, format.lang);
-        String modelString = str.toString();
-        str.flush();
-        try {
-            str.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return modelString;
+    public static String writeModel(Model model, Lang language) {
+        return writeRDFModel(model, language);
+    }
+
+    private static String writeRDFModel(Model model, Lang language) {
+        StringWriter out = new StringWriter();
+        RDFDataMgr.write(out, model, language);
+        return out.toString();
     }
 
 }
