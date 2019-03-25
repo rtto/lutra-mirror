@@ -117,22 +117,12 @@ public class CLI {
 
     private static void execute() {
 
-        //if (settings.library == null && !settings.fetchMissingDependencies) {
-        //    if (!settings.quiet) {
-        //        Message err = Message.error(
-        //            "No template library provided and not set to fetch missing templates, "
-        //                + "thus nothing can be done.");
-        //        MessageHandler.printMessage(err);
-        //    }
-        //    return;
-        //}
-        TemplateStore store = new DependencyGraph(); // TODO: implementation choice based on cli-arg
+        TemplateStore store = new DependencyGraph();
         ResultConsumer.use(makeTemplateReader(),
             reader -> {
 
                 MessageHandler msgs = parseLibraryInto(reader, store);
                 
-                // TODO: cli-arg to decide if continue, int-flag to denote ignore level
                 if (!Message.moreSevere(msgs.printMessages(), settings.haltOn)) {
                     executeMode(store);
                 }
@@ -145,7 +135,6 @@ public class CLI {
      */
     private static MessageHandler parseLibraryInto(TemplateReader reader, TemplateStore store) {
 
-        // TODO: Make cli-argument of both base template and suffixes to include/ignore
         store.addTemplateSignature(WTemplateFactory.createTripleTemplateHead());
 
         if (settings.library == null) {
@@ -161,64 +150,89 @@ public class CLI {
         return msgs;
     } 
 
+    private static void executeExpand(TemplateStore store) {
+
+        ResultConsumer.use(makeInstanceReader(),
+            reader -> {
+
+                ResultConsumer.use(makeExpander(store),
+                    expander -> {
+
+                        ResultConsumer.use(makeInstanceWriter(),
+                            writer -> {
+
+                                expandAndWriteInstanes(reader, writer, expander);
+                            }
+                        );
+                    }
+                );
+            }
+        );
+    }
+
+    private static void executeExpandLibrary(TemplateStore store) {
+        
+        ResultConsumer.use(store.expandAll(),
+            expandedStore -> {
+
+                ResultConsumer.use(makeTemplateWriter(),
+                    writer ->  {
+
+                        writeTemplates(expandedStore, writer);
+                    }
+                );
+            }
+        );
+    }
+
+    private static void executeFormatLibrary(TemplateStore store) {
+        
+        ResultConsumer.use(makeTemplateWriter(),
+            writer ->  {
+
+                writeTemplates(store, writer);
+            }
+        );
+    }
+
+    private static void executeFormat() {
+        
+        ResultConsumer.use(makeInstanceReader(),
+            reader -> {
+
+                ResultConsumer.use(makeInstanceWriter(),
+                    writer ->  {
+
+                        formatInstances(reader, writer);
+                    }
+                );
+            }
+        );
+    }
+
     private static void executeMode(TemplateStore store) {
         
         int severity = Message.INFO; // Least severe
         if (!settings.quiet) {
             severity = checkTemplates(store);
         }
+
+        if (Message.moreSevere(severity, settings.haltOn)) {
+            return;
+        }
+
         switch (settings.mode) {
             case expand:
-                ResultConsumer.use(makeInstanceReader(),
-                    reader -> {
-
-                        ResultConsumer.use(makeExpander(store),
-                            expander -> {
-
-                                ResultConsumer.use(makeInstanceWriter(),
-                                    writer -> {
-
-                                        expandAndWriteInstanes(reader, writer, expander);
-                                    }
-                                );
-                            }
-                        );
-                    }
-                );
+                executeExpand(store);
                 break;
             case expandLibrary:
-                ResultConsumer.use(store.expandAll(),
-                    expandedStore -> {
-
-                        ResultConsumer.use(makeTemplateWriter(),
-                            writer ->  {
-
-                                writeTemplates(expandedStore, writer);
-                            }
-                        );
-                    }
-                );
+                executeExpandLibrary(store);
                 break;
             case formatLibrary:
-                ResultConsumer.use(makeTemplateWriter(),
-                    writer ->  {
-
-                        writeTemplates(store, writer);
-                    }
-                );
+                executeFormatLibrary(store);
                 break;
             case format:
-                ResultConsumer.use(makeInstanceReader(),
-                    reader -> {
-
-                        ResultConsumer.use(makeInstanceWriter(),
-                            writer ->  {
-
-                                formatInstances(reader, writer);
-                            }
-                        );
-                    }
-                );
+                executeFormat();
                 break;
             case lint:
                 // Simply load templates and check for messages, as done before the switch
@@ -227,10 +241,8 @@ public class CLI {
                 }
                 break;
             default:
-                if (!settings.quiet) {
-                    Message err = Message.error("The mode " + settings.mode + " is not yet supported.");
-                    MessageHandler.printMessage(err);
-                }
+                Message err = Message.error("The mode " + settings.mode + " is not yet supported.");
+                MessageHandler.printMessage(err);
         } 
     }
 
@@ -310,36 +322,33 @@ public class CLI {
     /// WRITER-METHODS, WRITING THINGS TO FILE               ///
     ////////////////////////////////////////////////////////////
 
-    private static void formatInstances(InstanceReader reader, InstanceWriter writer) {
-        
+    private static void processInstances(Function<String, ResultStream<Instance>> processor,
+        InstanceWriter writer) {
+
         ResultConsumer<Instance> consumer = new ResultConsumer<>(writer);
         ResultStream.innerOf(settings.inputs)
-            .innerFlatMap(reader)
+            .innerFlatMap(processor)
             .forEach(consumer);
 
         if (!Message.moreSevere(consumer.getMessageHandler().printMessages(), settings.haltOn)) {
             writeInstances(writer.write());
         }
+    }
+
+    private static void formatInstances(InstanceReader reader, InstanceWriter writer) {
+        processInstances(reader, writer);
     }
 
     private static void expandAndWriteInstanes(InstanceReader reader, InstanceWriter writer,
         Function<Instance, ResultStream<Instance>> expander) {
 
-        ResultConsumer<Instance> consumer = new ResultConsumer<>(writer);
-        ResultStream.innerOf(settings.inputs)
-            .innerFlatMap(reader)
-            .innerFlatMap(expander)
-            .forEach(consumer);
-
-        if (!Message.moreSevere(consumer.getMessageHandler().printMessages(), settings.haltOn)) {
-            writeInstances(writer.write());
-        }
+        processInstances(ResultStream.innerFlatMapCompose(reader, expander), writer);
     }
 
     private static void writeInstances(String output) {
 
         // If neither --stdout nor -o is set, default to --stdout
-        if (settings.stdout || settings.out == null) {
+        if (shouldPrintOutput()) {
             System.out.println(output);
         }
 
@@ -371,7 +380,7 @@ public class CLI {
     private static void writeTemplate(String iri, String output) {
 
         // If neither --stdout nor -o is set, default to --stdout
-        if (settings.stdout || settings.out == null) {
+        if (shouldPrintOutput()) {
             System.out.println(output);
         }
 
@@ -399,6 +408,10 @@ public class CLI {
     /// UTILS                                                ///
     ////////////////////////////////////////////////////////////
 
+
+    private static boolean shouldPrintOutput() {
+        return settings.stdout || settings.out == null;
+    }
 
     private static String iriToDirectory(String pathStr) throws URISyntaxException {
         Path folder = Paths.get(pathStr).getParent();
