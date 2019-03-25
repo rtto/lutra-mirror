@@ -1,8 +1,8 @@
-package xyz.ottr.lutra.wottr.util;
+package xyz.ottr.lutra.cli;
 
 /*-
  * #%L
- * lutra-wottr
+ * lutra-cli
  * %%
  * Copyright (C) 2018 - 2019 University of Oslo
  * %%
@@ -22,12 +22,16 @@ package xyz.ottr.lutra.wottr.util;
  * #L%
  */
 
-public class ModelIOException extends Exception {
+import org.junit.Test;
 
-    private static final long serialVersionUID = 3207045963792708117L;
-
-    public ModelIOException(String string) {
-        super(string);
+public class PrototypeCLITest {
+    
+    @Test
+    public void testHelp() {
+        runCLI("--help");
     }
 
+    public void runCLI(String cmd) {
+        CLI.main(cmd.split(" "));
+    }
 }
