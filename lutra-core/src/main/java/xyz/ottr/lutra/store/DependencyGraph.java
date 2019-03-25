@@ -452,15 +452,10 @@ public class DependencyGraph implements TemplateStore {
     }
 
     @Override
-    public Set<String> getTemplateIRIs() {
+    public Set<String> getIRIs(Predicate<String> pred) {
         return nodes.keySet().stream()
-            .filter(iri -> !this.dependencies.get(this.nodes.get(iri)).isEmpty())
+            .filter(iri -> pred.test(iri))
             .collect(Collectors.toSet());
-    }
-
-    @Override
-    public Set<String> getTemplateSignatureIRIs() {
-        return nodes.keySet();
     }
 
     @Override
@@ -484,7 +479,7 @@ public class DependencyGraph implements TemplateStore {
         Result<TemplateNode> resTemplate = checkIsTemplate(iri);
 
         return resTemplate.map(template ->
-                new TemplateSignature(template.getIRI(), template.getParameters()));
+            new TemplateSignature(template.getIRI(), template.getParameters(), template.isBase()));
     }
 
     @Override

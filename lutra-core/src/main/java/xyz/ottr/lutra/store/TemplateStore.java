@@ -27,8 +27,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 import org.apache.commons.collections4.SetUtils;
 
+import xyz.ottr.lutra.OTTR;
 import xyz.ottr.lutra.io.TemplateReader;
 import xyz.ottr.lutra.model.Instance;
 import xyz.ottr.lutra.model.Template;
@@ -93,9 +95,16 @@ public interface TemplateStore extends Consumer<TemplateSignature> {
 
     Result<TemplateSignature> getTemplateSignature(String iri);
 
-    Set<String> getTemplateIRIs();
+    Set<String> getIRIs(Predicate<String> pred);
 
-    Set<String> getTemplateSignatureIRIs();
+    default Set<String> getTemplateIRIs() {
+        return getIRIs(this::containsDefinitionOf);
+    }
+
+    default Set<String> getTemplateSignatureIRIs() {
+        return getIRIs(iri ->
+            containsSignature(iri) || containsBase(iri) && !iri.equals(OTTR.Bases.Triple));
+    }
 
     /**
      * Returns a Result containing the IRIs of all
@@ -104,7 +113,6 @@ public interface TemplateStore extends Consumer<TemplateSignature> {
      * template is not used in this store.
      */
     Result<Set<String>> getDependsOn(String template);
-
 
     /**
      * Returns a Result containing the IRIs of all
@@ -158,7 +166,7 @@ public interface TemplateStore extends Consumer<TemplateSignature> {
     Result<? extends TemplateStore> expandVocabulary(Set<String> iris);
 
     /**
-     * Retrieves the definitions of all templates, according to this graph.
+     * Retrieves the definitions of all templates, according to this store.
      *
      * @return
      *          a ResultStream of templates
@@ -168,17 +176,19 @@ public interface TemplateStore extends Consumer<TemplateSignature> {
     }
 
     /**
-     * Retrieves all signatures in this graph.
+     * Retrieves all signatures and base templates (except the ottr:Triple base)
+     * in this store.
      *
      * @return
-     *          a ResultStream of templates
+     *          a ResultStream of signatures
      */ 
     default ResultStream<TemplateSignature> getAllTemplateSignatures() {
         return getTemplateSignatures(getTemplateSignatureIRIs());
     }
 
     /**
-     * Retrieves all template objects, both definitions and signatures in this graph.
+     * Retrieves all template objects, both definitions and
+     * signatures (except the ottr:Triple base) in this graph.
      *
      * @return
      *          a ResultStream of templates
