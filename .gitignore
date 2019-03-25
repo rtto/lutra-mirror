@@ -113,3 +113,5 @@ Desktop.ini
 ._*
 
 *.xml#
+
+lutra-cli/dependency-reduced-pom\.xml

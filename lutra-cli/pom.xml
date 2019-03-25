@@ -73,6 +73,25 @@
 				</executions>
 			</plugin>
 
+            <!--  https://coderplus.github.io/copy-rename-maven-plugin/plugin-info.html -->
+			<plugin>
+				<groupId>com.coderplus.maven.plugins</groupId>
+				<artifactId>copy-rename-maven-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>rename-lutra-target</id>
+						<phase>package</phase>
+						<goals>
+							<goal>copy</goal>
+						</goals>
+						<configuration>
+							<sourceFile>${project.build.directory}/${project.build.finalName}.jar</sourceFile>
+							<destinationFile>${project.build.directory}/lutra.jar</destinationFile>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
 		</plugins>
 	</build>
 
