@@ -35,7 +35,6 @@ import xyz.ottr.lutra.model.ArgumentList;
 import xyz.ottr.lutra.model.Instance;
 import xyz.ottr.lutra.wottr.WOTTR;
 import xyz.ottr.lutra.wottr.util.ModelIO;
-import xyz.ottr.lutra.wottr.util.ModelIOException;
 
 public class WInstanceWriter extends AbstractWWriter implements InstanceWriter {
 
@@ -66,13 +65,7 @@ public class WInstanceWriter extends AbstractWWriter implements InstanceWriter {
 
     @Override
     public String write() {
-        String out = "";
-        try {
-            out = ModelIO.writeModel(this.model, ModelIO.Format.TURTLE);
-        } catch (ModelIOException e) {
-            e.printStackTrace();
-        }
-        return out;
+        return ModelIO.writeModel(this.model);
     }
 
     public Model writeToModel() {

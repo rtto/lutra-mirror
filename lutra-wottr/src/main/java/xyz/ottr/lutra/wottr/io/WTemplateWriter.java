@@ -38,7 +38,6 @@ import xyz.ottr.lutra.model.Template;
 import xyz.ottr.lutra.model.TemplateSignature;
 import xyz.ottr.lutra.wottr.WOTTR;
 import xyz.ottr.lutra.wottr.util.ModelIO;
-import xyz.ottr.lutra.wottr.util.ModelIOException;
 
 public class WTemplateWriter extends AbstractWWriter implements TemplateWriter {
 
@@ -80,13 +79,7 @@ public class WTemplateWriter extends AbstractWWriter implements TemplateWriter {
 
     @Override
     public String write(String iri) {
-        String out = "";
-        try {
-            out = ModelIO.writeModel(this.models.get(iri), ModelIO.Format.TURTLE);
-        } catch (ModelIOException e) {
-            e.printStackTrace();
-        }
-        return out;
+        return ModelIO.writeModel(this.models.get(iri));
     }
 
     private Resource makeWottrHead(Model model, TemplateSignature template) {
