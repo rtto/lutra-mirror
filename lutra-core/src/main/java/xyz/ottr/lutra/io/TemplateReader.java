@@ -30,6 +30,8 @@ import java.util.Arrays;
 import java.util.Set;
 import java.util.function.Function;
 
+import org.apache.jena.shared.PrefixMapping;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,15 +43,17 @@ import xyz.ottr.lutra.store.TemplateStore;
 
 public class TemplateReader implements Function<String, ResultStream<TemplateSignature>> {
 
-    private Function<String, ResultStream<TemplateSignature>> templatePipeline;
+    private final Function<String, ResultStream<TemplateSignature>> templatePipeline;
+    private final TemplateParser parser; // Needed for retrieving used prefixes
     private final Logger log = LoggerFactory.getLogger(TemplateReader.class);
-
-    public TemplateReader(Function<String, ResultStream<TemplateSignature>> templatePipeline) {
-        this.templatePipeline = templatePipeline;
-    }
 
     public <M> TemplateReader(InputReader<String, M> templateInputReader, TemplateParser<M> templateParser) {
         this.templatePipeline = ResultStream.innerFlatMapCompose(templateInputReader, templateParser);
+        this.parser = templateParser;
+    }
+
+    public PrefixMapping getUsedPrefixes() {
+        return parser.getUsedPrefixes();
     }
 
     public ResultStream<TemplateSignature> apply(String file) {
