@@ -168,13 +168,11 @@ public class ShaclEquivalenceTest {
             .innerForEach(file -> checkInstance(file, correct));
     }
 
-    @Ignore
     @Test
     public void correct() {
         check(correct, true);
     }
 
-    @Ignore
     @Test
     public void incorrect() {
         check(incorrect, false);
