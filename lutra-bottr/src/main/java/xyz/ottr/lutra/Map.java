@@ -40,7 +40,11 @@ public abstract class Map implements Supplier<ResultStream<Instance>> {
     }
 
     public abstract ResultStream<Row> execute();
-
+    
+    //Returns the sql query to parse. Do we need to do any formatting here?
+    public String getQuery() {
+    	return query;
+    }
 
     private class Row {
 

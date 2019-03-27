@@ -92,7 +92,7 @@ public class MapJDBC extends Map {
     }
     
     //Returns the URL. Should be contained in the source field
-    private String getURL() {
+    public String getURL() {
     	return null; //TODO
     }
     
@@ -106,8 +106,5 @@ public class MapJDBC extends Map {
     	return null; //TODO
     }
     
-    //Returns the sql query to parse. Do we need to do any formatting here?
-    private String getQuery() {
-    	return null; //TODO
-    }
+
 }
