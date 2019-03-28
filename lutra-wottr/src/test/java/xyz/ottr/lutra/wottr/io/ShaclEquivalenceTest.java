@@ -30,6 +30,9 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.apache.commons.io.FilenameUtils;
+import org.apache.jena.rdf.model.Model;
+
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -51,8 +54,8 @@ import xyz.ottr.lutra.wottr.io.WTemplateParser;
 
 public class ShaclEquivalenceTest {
 
-    private static final String correct = "src/test/resources/spec/tests/correct/";
-    private static final String incorrect = "src/test/resources/spec/tests/incorrect/";
+    private static final String correct = FilenameUtils.separatorsToSystem("src/test/resources/spec/tests/correct/");
+    private static final String incorrect = FilenameUtils.separatorsToSystem("src/test/resources/spec/tests/incorrect/");
 
     private static Set<String> unsupportedTests;
     private static Set<String> instanceTests;
