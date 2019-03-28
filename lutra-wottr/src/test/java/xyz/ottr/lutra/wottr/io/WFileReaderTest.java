@@ -22,14 +22,9 @@ package xyz.ottr.lutra.wottr.io;
  * #L%
  */
 
-import java.io.IOException;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.stream.Stream;
 
 import org.apache.jena.rdf.model.Model;
-import org.dyreriket.gaupa.rdf.ModelIO;
-import org.dyreriket.gaupa.rdf.ModelIOException;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -37,6 +32,7 @@ import org.junit.Test;
 import xyz.ottr.lutra.result.Result;
 import xyz.ottr.lutra.result.ResultStream;
 import xyz.ottr.lutra.wottr.io.WFileReader;
+import xyz.ottr.lutra.wottr.util.ModelIO;
 
 public class WFileReaderTest {
 
@@ -51,13 +47,13 @@ public class WFileReaderTest {
     }
 
     @Test
-    public void shouldParse() throws ModelIOException {
+    public void shouldParse() {
         ResultStream<Model> emptyFileModelStream = reader.apply(emptyFile);
         Result<Stream<Model>> aggr = emptyFileModelStream.aggregate();
 
         assert aggr.isPresent();
 
-        System.out.println(ModelIO.writeModel(aggr.get().findFirst().get(), ModelIO.Format.TURTLE));
+        System.out.println(ModelIO.writeModel(aggr.get().findFirst().get()));
     }
 
     @Test

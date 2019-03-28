@@ -29,11 +29,15 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 import java.util.function.Function;
+
+import org.apache.jena.shared.PrefixMapping;
 
 import picocli.CommandLine;
 import picocli.CommandLine.ParameterException;
 
+import xyz.ottr.lutra.OTTR;
 import xyz.ottr.lutra.io.InstanceReader;
 import xyz.ottr.lutra.io.InstanceWriter;
 import xyz.ottr.lutra.io.TemplateReader;
@@ -116,28 +120,17 @@ public class CLI {
 
     private static void execute() {
 
-        //if (settings.library == null && !settings.fetchMissingDependencies) {
-        //    if (!settings.quiet) {
-        //        Message err = Message.error(
-        //            "No template library provided and not set to fetch missing templates, "
-        //                + "thus nothing can be done.");
-        //        MessageHandler.printMessage(err);
-        //    }
-        //    return;
-        //}
-        TemplateStore store = new DependencyGraph(); // TODO: implementation choice based on cli-arg
+        TemplateStore store = new DependencyGraph();
         ResultConsumer.use(makeTemplateReader(),
             reader -> {
 
-                ResultConsumer.use(parseLibraryInto(reader, store),
-                    messageHandler -> {
-
-                        // TODO: cli-arg to decide if continue, int-flag to denote ignore level
-                        if (!Message.moreSevere(messageHandler.printMessages(), settings.haltOn)) {
-                            executeMode(store);
-                        }
-                    }
-                );
+                MessageHandler msgs = parseLibraryInto(reader, store);
+                
+                if (!Message.moreSevere(msgs.printMessages(), settings.haltOn)) {
+                    PrefixMapping usedPrefixes = reader.getUsedPrefixes();
+                    addStdPrefixes(usedPrefixes);
+                    executeMode(store, usedPrefixes);
+                }
             }
         );
     }
@@ -145,96 +138,116 @@ public class CLI {
     /**
      * Populated store with parsed templates, and returns true if error occured, and false otherwise.
      */
-    private static Result<MessageHandler> parseLibraryInto(TemplateReader reader, TemplateStore store) {
+    private static MessageHandler parseLibraryInto(TemplateReader reader, TemplateStore store) {
 
-        // TODO: Make cli-argument of both base template and suffixes to include/ignore
         store.addTemplateSignature(WTemplateFactory.createTripleTemplateHead());
 
         if (settings.library == null) {
-            return Result.of(new MessageHandler());
+            return new MessageHandler();
         }
 
-        Result<MessageHandler> consumer;
-        try {
-            consumer = Result.of(reader.loadTemplatesFromFolder(store, settings.library,
-                    settings.extensions, settings.ignoreExtensions));
-        } catch (IOException ex) {
-            Message err = Message.error(
-                "Error when parsing templates from folder -- " + ex.getMessage());
-            return Result.empty(err);
-        }
+        MessageHandler msgs = reader.loadTemplatesFromFolder(store, settings.library,
+                settings.extensions, settings.ignoreExtensions);
+
         if (settings.fetchMissingDependencies) {
-            consumer = consumer.map(cnsmr ->
-                cnsmr.combine(store.fetchMissingDependencies(reader)));
+            msgs = msgs.combine(store.fetchMissingDependencies(reader));
         }
-
-        return consumer;
+        return msgs;
     } 
 
-    private static void executeMode(TemplateStore store) {
+    private static void executeExpand(TemplateStore store, PrefixMapping usedPrefixes) {
+
+        ResultConsumer.use(makeInstanceReader(),
+            reader -> {
+
+                ResultConsumer.use(makeExpander(store),
+                    expander -> {
+
+                        ResultConsumer.use(makeInstanceWriter(usedPrefixes),
+                            writer -> {
+
+                                expandAndWriteInstanes(reader, writer, expander);
+                            }
+                        );
+                    }
+                );
+            }
+        );
+    }
+
+    private static void executeExpandLibrary(TemplateStore store, PrefixMapping usedPrefixes) {
         
-        checkTemplates(store);
-        switch (settings.mode) {
-            case expand:
-                ResultConsumer.use(makeInstanceReader(),
-                    reader -> {
+        ResultConsumer.use(store.expandAll(),
+            expandedStore -> {
 
-                        ResultConsumer.use(makeExpander(store),
-                            expander -> {
-
-                                ResultConsumer.use(makeInstanceWriter(),
-                                    writer -> {
-
-                                        expandAndWriteInstanes(reader, writer, expander);
-                                    }
-                                );
-                            }
-                        );
-                    }
-                );
-                break;
-            case expandLibrary:
-                ResultConsumer.use(store.expandAll(),
-                    expandedStore -> {
-
-                        ResultConsumer.use(makeTemplateWriter(),
-                            writer ->  {
-
-                                writeTemplates(expandedStore, writer);
-                            }
-                        );
-                    }
-                );
-                break;
-            case formatLibrary:
-                ResultConsumer.use(makeTemplateWriter(),
+                ResultConsumer.use(makeTemplateWriter(usedPrefixes),
                     writer ->  {
 
-                        writeTemplates(store, writer);
+                        writeTemplates(expandedStore, writer);
                     }
                 );
+            }
+        );
+    }
+
+    private static void executeFormatLibrary(TemplateStore store, PrefixMapping usedPrefixes) {
+        
+        ResultConsumer.use(makeTemplateWriter(usedPrefixes),
+            writer ->  {
+
+                writeTemplates(store, writer);
+            }
+        );
+    }
+
+    private static void executeFormat(PrefixMapping usedPrefixes) {
+        
+        ResultConsumer.use(makeInstanceReader(),
+            reader -> {
+
+                ResultConsumer.use(makeInstanceWriter(usedPrefixes),
+                    writer ->  {
+
+                        formatInstances(reader, writer);
+                    }
+                );
+            }
+        );
+    }
+
+    private static void executeMode(TemplateStore store, PrefixMapping usedPrefixes) {
+        
+        int severity = Message.INFO; // Least severe
+        if (!settings.quiet) {
+            severity = checkTemplates(store);
+        }
+
+        if (Message.moreSevere(severity, settings.haltOn)) {
+            return;
+        }
+
+        switch (settings.mode) {
+            case expand:
+                executeExpand(store, usedPrefixes);
+                break;
+            case expandLibrary:
+                executeExpandLibrary(store, usedPrefixes);
+                break;
+            case formatLibrary:
+                executeFormatLibrary(store, usedPrefixes);
                 break;
             case format:
-                ResultConsumer.use(makeInstanceReader(),
-                    reader -> {
-
-                        ResultConsumer.use(makeInstanceWriter(),
-                            writer ->  {
-
-                                formatInstances(reader, writer);
-                            }
-                        );
-                    }
-                );
+                executeFormat(usedPrefixes);
                 break;
             case lint:
                 // Simply load templates and check for messages, as done before the switch
+                if (!settings.quiet && Message.moreSevere(Message.WARNING, severity)) {
+                    System.out.println("No errors found.");
+                }
                 break;
             default:
-                if (!settings.quiet) {
-                    Message err = Message.error("The mode " + settings.mode + " is not yet supported.");
-                    MessageHandler.printMessage(err);
-                }
+                Message err = Message.error("The mode " + settings.mode + " is not yet supported.");
+                MessageHandler.printMessage(err);
         } 
     }
 
@@ -287,10 +300,10 @@ public class CLI {
         }
     }
 
-    private static Result<InstanceWriter> makeInstanceWriter() {
+    private static Result<InstanceWriter> makeInstanceWriter(PrefixMapping usedPrefixes) {
         switch (settings.outputFormat) {
             case wottr:
-                return Result.of(new WInstanceWriter());
+                return Result.of(new WInstanceWriter(usedPrefixes));
             default:
                 return Result.empty(Message.error(
                         "Output format " + settings.outputFormat.toString()
@@ -298,10 +311,10 @@ public class CLI {
         }
     }
 
-    private static Result<TemplateWriter> makeTemplateWriter() {
+    private static Result<TemplateWriter> makeTemplateWriter(PrefixMapping usedPrefixes) {
         switch (settings.outputFormat) {
             case wottr:
-                return Result.of(new WTemplateWriter());
+                return Result.of(new WTemplateWriter(usedPrefixes));
             default:
                 return Result.empty(Message.error(
                         "Output format " + settings.outputFormat.toString()
@@ -314,35 +327,33 @@ public class CLI {
     /// WRITER-METHODS, WRITING THINGS TO FILE               ///
     ////////////////////////////////////////////////////////////
 
-    private static void formatInstances(InstanceReader reader, InstanceWriter writer) {
-        
+    private static void processInstances(Function<String, ResultStream<Instance>> processor,
+        InstanceWriter writer) {
+
         ResultConsumer<Instance> consumer = new ResultConsumer<>(writer);
         ResultStream.innerOf(settings.inputs)
-            .innerFlatMap(reader)
+            .innerFlatMap(processor)
             .forEach(consumer);
 
         if (!Message.moreSevere(consumer.getMessageHandler().printMessages(), settings.haltOn)) {
             writeInstances(writer.write());
         }
+    }
+
+    private static void formatInstances(InstanceReader reader, InstanceWriter writer) {
+        processInstances(reader, writer);
     }
 
     private static void expandAndWriteInstanes(InstanceReader reader, InstanceWriter writer,
         Function<Instance, ResultStream<Instance>> expander) {
 
-        ResultConsumer<Instance> consumer = new ResultConsumer<>(writer);
-        ResultStream.innerOf(settings.inputs)
-            .innerFlatMap(reader)
-            .innerFlatMap(expander)
-            .forEach(consumer);
-
-        if (!Message.moreSevere(consumer.getMessageHandler().printMessages(), settings.haltOn)) {
-            writeInstances(writer.write());
-        }
+        processInstances(ResultStream.innerFlatMapCompose(reader, expander), writer);
     }
 
     private static void writeInstances(String output) {
 
-        if (settings.stdout) {
+        // If neither --stdout nor -o is set, default to --stdout
+        if (shouldPrintOutput()) {
             System.out.println(output);
         }
 
@@ -373,7 +384,8 @@ public class CLI {
 
     private static void writeTemplate(String iri, String output) {
 
-        if (settings.stdout) {
+        // If neither --stdout nor -o is set, default to --stdout
+        if (shouldPrintOutput()) {
             System.out.println(output);
         }
 
@@ -401,6 +413,16 @@ public class CLI {
     /// UTILS                                                ///
     ////////////////////////////////////////////////////////////
 
+    private static void addStdPrefixes(PrefixMapping prefixes) {
+
+        prefixes.setNsPrefixes(PrefixMapping.Standard);
+        prefixes.setNsPrefix(OTTR.prefix, OTTR.namespace);
+    }
+
+
+    private static boolean shouldPrintOutput() {
+        return settings.stdout || settings.out == null;
+    }
 
     private static String iriToDirectory(String pathStr) throws URISyntaxException {
         Path folder = Paths.get(pathStr).getParent();
@@ -411,10 +433,13 @@ public class CLI {
         return new URI(iriStr).getPath();
     }
 
-    private static void checkTemplates(TemplateStore store) {
-        if (!settings.quiet) {
-            store.checkTemplates().forEach(msg -> MessageHandler.printMessage(msg));
-        }
+    private static int checkTemplates(TemplateStore store) {
+        List<Message> msgs = store.checkTemplates();
+        msgs.forEach(msg -> MessageHandler.printMessage(msg));
+        int mostSevere = msgs.stream()
+            .mapToInt(msg -> msg.getLevel())
+            .min()
+            .orElse(Message.INFO);
+        return mostSevere;
     }
-
 }

@@ -175,7 +175,7 @@ public class Result<E> {
      * Returns an empty Result, with argument as Message-s (typically errors giving
      * the reasons for this Result being empty).
      * 
-     * @param msg
+     * @param msgs
      *      A list of Message-s describing the reasons for the emptiness of this Result
      *
      * @return
@@ -389,7 +389,7 @@ public class Result<E> {
     @Override
     public String toString() {
         return (this.result.isPresent()
-                ? ("Result(" + this.result.get().toString() + ")")
+                ? "Result(" + this.result.get().toString() + ")"
                 : "Empty") + this.messages.toString();
     }
 

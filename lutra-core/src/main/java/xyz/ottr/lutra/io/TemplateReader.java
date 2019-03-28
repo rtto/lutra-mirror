@@ -26,10 +26,11 @@ package xyz.ottr.lutra.io;
 //import java.util.LinkedList;
 //import java.util.Queue;
 
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.Set;
 import java.util.function.Function;
+
+import org.apache.jena.shared.PrefixMapping;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,15 +43,17 @@ import xyz.ottr.lutra.store.TemplateStore;
 
 public class TemplateReader implements Function<String, ResultStream<TemplateSignature>> {
 
-    private Function<String, ResultStream<TemplateSignature>> templatePipeline;
+    private final Function<String, ResultStream<TemplateSignature>> templatePipeline;
+    private final TemplateParser parser; // Needed for retrieving used prefixes
     private final Logger log = LoggerFactory.getLogger(TemplateReader.class);
-
-    public TemplateReader(Function<String, ResultStream<TemplateSignature>> templatePipeline) {
-        this.templatePipeline = templatePipeline;
-    }
 
     public <M> TemplateReader(InputReader<String, M> templateInputReader, TemplateParser<M> templateParser) {
         this.templatePipeline = ResultStream.innerFlatMapCompose(templateInputReader, templateParser);
+        this.parser = templateParser;
+    }
+
+    public PrefixMapping getUsedPrefixes() {
+        return parser.getUsedPrefixes();
     }
 
     public ResultStream<TemplateSignature> apply(String file) {
@@ -82,9 +85,10 @@ public class TemplateReader implements Function<String, ResultStream<TemplateSig
      *       a MessageHandler containing possible Message-s with Warnings, Errors, etc.
      */
     public MessageHandler loadTemplatesFromFolder(TemplateStore store, String folder,
-            String[] includeExtensions, String[] excludeExtensions) throws IOException {
+            String[] includeExtensions, String[] excludeExtensions) {
         log.info("Loading all templates from folder " + folder + " with suffix "
                 + Arrays.toString(includeExtensions) + " except " + Arrays.toString(excludeExtensions));
+
         return populateTemplateStore(store,
                                      Files.loadFromFolder(folder,
                                                           includeExtensions,
@@ -104,7 +108,7 @@ public class TemplateReader implements Function<String, ResultStream<TemplateSig
      *       a ResultStream containing the parsed TemplateSignatures 
      */
     public ResultStream<TemplateSignature> loadTemplatesFromFolder(String folder,
-            String[] includeExtensions, String[] excludeExtensions) throws IOException {
+            String[] includeExtensions, String[] excludeExtensions) {
         log.info("Loading all templates from folder " + folder + " with suffix "
                 + Arrays.toString(includeExtensions) + " except " + Arrays.toString(excludeExtensions));
         return Files.loadFromFolder(folder, includeExtensions, excludeExtensions)

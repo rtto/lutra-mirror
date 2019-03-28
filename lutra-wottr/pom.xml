@@ -2,7 +2,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>xyz.ottr.lutra</groupId>
-		<version>0.5.0-alpha-5-SNAPSHOT</version>
+		<version>0.5.0-beta-1</version>
 		<artifactId>lutra</artifactId>
 		<relativePath>../pom.xml</relativePath>
 	</parent>
@@ -11,7 +11,7 @@
 	<packaging>jar</packaging>
 
 	<properties>
-		<url.wottrspec>https://dev.spec.ottr.xyz/wOTTR/develop/</url.wottrspec>
+		<url.wottrspec>https://dev.spec.ottr.xyz/wOTTR/</url.wottrspec>
 		<local.wottrspec>${project.basedir}/src/test/resources/spec</local.wottrspec>
 	</properties>
 
@@ -19,6 +19,12 @@
 		<dependency>
 			<groupId>${project.groupId}</groupId>
 			<artifactId>lutra-core</artifactId>
+		</dependency>
+		
+		<!-- Needed for RDFDataMgr, RDF I/O -->
+		<dependency>
+			<groupId>org.apache.jena</groupId>
+			<artifactId>jena-arq</artifactId>
 		</dependency>
 	</dependencies>
 

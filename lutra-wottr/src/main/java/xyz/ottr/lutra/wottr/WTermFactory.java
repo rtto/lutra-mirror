@@ -33,7 +33,6 @@ import org.apache.jena.rdf.model.RDFList;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 
-import xyz.ottr.lutra.ROTTR;
 import xyz.ottr.lutra.model.BlankNodeTerm;
 import xyz.ottr.lutra.model.IRITerm;
 import xyz.ottr.lutra.model.LiteralTerm;
@@ -51,7 +50,7 @@ public class WTermFactory implements Function<RDFNode, Result<Term>> {
 
     public Result<Term> apply(RDFNode node) {
         if (node.isURIResource()) {
-            if (node.toString().equals(ROTTR.none)) {
+            if (node.toString().equals(WOTTR.none.getURI())) {
                 return Result.of(new NoneTerm());
             } else {
                 return Result.of(createIRITerm(node.asResource()));

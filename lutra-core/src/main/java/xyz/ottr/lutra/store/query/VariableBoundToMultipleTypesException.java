@@ -25,7 +25,7 @@ package xyz.ottr.lutra.store.query;
 public class VariableBoundToMultipleTypesException extends RuntimeException {
 
     public VariableBoundToMultipleTypesException(String varName, Class a, Class b) {
-        super("Variable bound " + varName + " bound to both types " + a.toString() + " and " + b.toString());
+        super("Variable " + varName + " bound to both a " + a.toString() + " and a " + b.toString());
     }
 }
 

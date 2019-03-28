@@ -27,6 +27,7 @@ import static xyz.ottr.lutra.store.query.Query.*;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import org.apache.commons.collections4.ListUtils;
 
 import xyz.ottr.lutra.model.types.ListType;
 import xyz.ottr.lutra.model.types.TypeFactory;
@@ -34,82 +35,101 @@ import xyz.ottr.lutra.result.Message;
 
 public abstract class CheckFactory {
 
-    public static final List<Check> defaultChecks =
+    /**
+     * Checks that require information to be present, e.g.
+     * check for missing dependencies.
+     */
+    public static final List<Check> failsOnMissingInformationChecks =
         Collections.unmodifiableList(Arrays.asList(
-            /* Unused parameter */
+            /* Undefined template */
             new Check(
-                template("T")
-                    .and(parameters("T", "PS"))
-                    .and(body("T", "B"))
-                    .and(index("PS", "I", "V"))
-                    .and(
-                        not(
-                            instance("B", "INS")
-                                .and(instanceArgs("INS", "AS"))
-                                .and(index("AS", "J", "V")))),
-                tup -> Message.warning(
-                    "Parameter with name " + tup.get("V").toString()
-                    + " with index " + tup.get("I").toString()
-                    + " does not occur in the body of template "
-                    + tup.get("T").toString())
-            ),
-            /* Same variabel occurs twice in parameter list */
-            new Check(
-                template("T")
-                    .and(parameters("T", "PS"))
-                    .and(index("PS", "I", "V"))
-                    .and(index("PS", "J", "V"))
-                    .and(notEquals("I", "J"))
-                    .and(removeSymmetry("I", "J")),
+                template("Temp")
+                    .and(bodyInstance("Temp", "Ins"))
+                    .and(instanceIRI("Ins", "Temp2"))
+                    .and(isUndefined("Temp2")),
                 tup -> Message.error(
-                        "Parameter with name " + tup.get("V").toString()
-                        + " occurs twice with indecies " + tup.get("I").toString()
-                        + " and " + tup.get("J") + " in template "
-                        + tup.get("T").toString())
-            ),
+                    "Template with IRI " + tup.get("Temp").toString()
+                    + " depends on undefined template "
+                    + tup.get("Temp2").toString())
+            )
+        ));
+
+    /**
+     * Checks that does not depend on having all definitions present.
+     * Type and parameter checks are included here, but only fails if a concrete
+     * error/inconsitency is found (thus does not fail on missing information).
+     */
+    public static final List<Check> failsOnErrorChecks =
+        Collections.unmodifiableList(Arrays.asList(
             /* Length of argument list not equal to length of corresponding parameter list */
             new Check(
-                template("T")
-                    .and(body("T", "B"))
-                    .and(instance("B", "I"))
-                    .and(instanceIRI("I", "T2"))
-                    .and(instanceArgs("I", "AS"))
-                    .and(length("AS", "L1"))
-                    .and(parameters("T2", "PS"))
-                    .and(length("PS", "L2"))
-                    .and(notEquals("L1", "L2")),
+                template("Temp")
+                    .and(bodyInstance("Temp", "Ins"))
+                    .and(instanceIRI("Ins", "Temp2"))
+                    .and(arguments("Ins", "Args"))
+                    .and(length("Args", "Len1"))
+                    .and(parameters("Temp2", "Params"))
+                    .and(length("Params", "Len2"))
+                    .and(notEquals("Len1", "Len2")),
                 tup -> Message.error(
-                    "Argument list to template " + tup.get("T2").toString()
-                    + " has length " + tup.get("L1")
-                    + " but corresponding parameter list has length " + tup.get("L2")
-                    + " in template " + tup.get("T").toString())
+                    "Argument list to template " + tup.get("Temp2").toString()
+                    + " has length " + tup.get("Len1")
+                    + " but corresponding parameter list has length " + tup.get("Len2")
+                    + " in template " + tup.get("Temp").toString())
             ),
             /* Any parameter used as an argument to a non-blank is set to non-blank*/
             new Check(
-                template("T1")
-                    .and(parameters("T1", "PS1"))
-                    .and(index("PS1", "J1", "V1"))
-                    .and(not(isNonBlank("PS1", "J1")))
-                    .and(body("T1", "B1"))
-                    .and(instance("B1", "I1"))
-                    .and(instanceArgs("I1", "AS1"))
-                    .and(index("AS1", "J2", "V1"))
-                    .and(instanceIRI("I1", "T2"))
-                    .and(parameters("T2", "PS2"))
-                    .and(isNonBlank("PS2", "J2")),
+                template("Temp1")
+                    .and(parameters("Temp1", "Params1"))
+                    .and(index("Params1", "Index1", "Val"))
+                    .and(not(isNonBlank("Params1", "Index1")))
+                    .and(bodyInstance("Temp1", "Ins"))
+                    .and(argumentIndex("Ins", "Index2", "Val"))
+                    .and(instanceIRI("Ins", "Temp2"))
+                    .and(parameters("Temp2", "Params2"))
+                    .and(isNonBlank("Params2", "Index2")),
                 tup -> Message.error(
-                    "Parameter with name " + tup.get("V1").toString() + " is not marked as non-blank,"
+                    "Parameter with name " + tup.get("Val").toString() + " is not marked as non-blank,"
                     + " but is used as argument to non-blank parameter index "
-                    + tup.get("J2").toString() + " in instance of template "
-                    + tup.get("T2").toString()
-                    + " in template " + tup.get("T1").toString())
+                    + tup.getAsEndUserIndex("Index2") + " in instance of template "
+                    + tup.get("Temp2").toString()
+                    + " in template " + tup.get("Temp1").toString())
             ),
             /* Any template depending on itself (cyclic dependencies) */
             new Check(
-                template("T")
-                    .and(dependsTransitive("T", "T")),
+                template("Temp")
+                    .and(dependsTransitive("Temp", "Temp")),
                 tup -> Message.error(
-                    "Template with IRI " + tup.get("T") + " transitively depends on itself.")
+                    "Template with IRI " + tup.get("Temp") + " transitively depends on itself.")
+            ),
+            /* Unused parameter */
+            new Check(
+                template("Temp")
+                    .and(parameterIndex("Temp", "Index", "Val"))
+                    .and(
+                        not(
+                            bodyInstance("Temp", "Ins")
+                                .and(argumentIndex("Ins", "Index2", "Arg"))
+                                .and(hasOccurenceAt("Arg", "Lvl", "Val")))),
+                tup -> Message.warning(
+                    "Parameter with name " + tup.get("Val").toString()
+                    + " with index " + tup.getAsEndUserIndex("Index")
+                    + " does not occur in the body of template "
+                    + tup.get("Temp").toString())
+            ),
+            /* Same variabel occurs twice in parameter list */
+            new Check(
+                template("Temp")
+                    .and(parameters("Temp", "Params"))
+                    .and(index("Params", "Index1", "Val"))
+                    .and(index("Params", "Index2", "Val"))
+                    .and(notEquals("Index1", "Index2"))
+                    .and(removeSymmetry("Index1", "Index2")),
+                tup -> Message.error(
+                        "Parameter with name " + tup.get("Val").toString()
+                        + " occurs twice with indecies " + tup.getAsEndUserIndex("Index1")
+                        + " and " + tup.getAsEndUserIndex("Index2") + " in template "
+                        + tup.get("Temp").toString())
             ),
             /* Type checking: consistent use of terms */
             // As our type hiearachy is tree shaped, if any pair of types a term is used as
@@ -117,30 +137,15 @@ public abstract class CheckFactory {
             // of all the others
             new Check(
                 template("Temp")
-                    .and(body("Temp", "Body"))
-                    .and(instance("Body", "Ins1"))
-                    .and(instance("Body", "Ins2"))
+                    .and(bodyInstance("Temp", "Ins1"))
+                    .and(bodyInstance("Temp", "Ins2"))
                     .and(removeSymmetry("Ins1", "Ins2"))
-                    .and(instanceArgs("Ins1", "Args1"))
-                    .and(instanceArgs("Ins2", "Args2"))
-                    .and(index("Args1", "Index1", "Val"))
-                    .and(index("Args2", "Index2", "Val"))
-                    .and(instanceIRI("Ins1", "Temp1"))
-                    .and(parameters("Temp1", "Params1"))
-                    .and(index("Params1", "Index1", "P1"))
-                    .and(hasListExpander("Args1", "Index1")
-                        .and(type("P1", "Outer1"))
-                        .and(innerType("Outer1", "Type1"))
-                        .or(not(hasListExpander("Args1", "Index1"))
-                            .and(type("P1", "Type1"))))
-                    .and(instanceIRI("Ins2", "Temp2"))
-                    .and(parameters("Temp2", "Params2"))
-                    .and(index("Params2", "Index2", "P2"))
-                    .and(hasListExpander("Args2", "Index2")
-                        .and(type("P2", "Outer2"))
-                        .and(innerType("Outer2", "Type2"))
-                        .or(not(hasListExpander("Args2", "Index2"))
-                            .and(type("P2", "Type2"))))
+                    .and(argumentIndex("Ins1", "Index1", "Arg1"))
+                    .and(hasOccurenceAt("Arg1", "Lvl1", "Val"))
+                    .and(argumentIndex("Ins2", "Index2", "Arg2"))
+                    .and(hasOccurenceAt("Arg2", "Lvl2", "Val"))
+                    .and(usedAsType("Ins1", "Index1", "Lvl1", "Type1"))
+                    .and(usedAsType("Ins2", "Index2", "Lvl2", "Type2"))
                     .and(not(isSubTypeOf("Type1", "Type2")) // not(A) and not(B) = not(A or B)
                         .and(not(isSubTypeOf("Type2", "Type1")))),
                 tup -> Message.error(
@@ -152,35 +157,26 @@ public abstract class CheckFactory {
             /* Type checking: intrinsic and inferred types incompatible */
             new Check(
                 template("Temp")
-                    .and(body("Temp", "Body"))
-                    .and(instance("Body", "Ins"))
-                    .and(instanceArgs("Ins", "Args"))
-                    .and(index("Args", "I", "V"))
-                    .and(type("V", "Intrinsic"))
-                    .and(instanceIRI("Ins", "TempI"))
-                    .and(parameters("TempI", "Params"))
-                    .and(index("Params", "I", "P"))
-                    .and(hasListExpander("Args", "I")
-                        .and(type("P", "Outer"))
-                        .and(innerType("Outer", "UsedAs"))
-                        .or(not(hasListExpander("Args", "I"))
-                            .and(type("P", "UsedAs"))))
+                    .and(bodyInstance("Temp", "Ins"))
+                    .and(argumentIndex("Ins", "Index", "Arg"))
+                    .and(hasOccurenceAt("Arg", "Lvl", "Val"))
+                    .and(type("Val", "Intrinsic"))
+                    .and(usedAsType("Ins", "Index", "Lvl", "UsedAs"))
                     .and(not(isCompatibleWith("Intrinsic", "UsedAs"))),
                 tup -> Message.error(
                     "Template with IRI " + tup.get("Temp") + " has incompatible use of term "
-                        + tup.get("V").toString() + " with intrinsic type " + tup.get("Intrinsic")
+                        + tup.get("Val").toString() + " with intrinsic type " + tup.get("Intrinsic")
                         + " is used as argument to parameter with type " + tup.get("UsedAs")
                         + " in instance " + tup.get("Ins").toString())
             ),
             /* Has expansion modifier but no arguments with list expanders set.*/
             new Check(
                 template("Temp")
-                    .and(body("Temp", "Body"))
-                    .and(instance("Body", "Ins"))
+                    .and(bodyInstance("Temp", "Ins"))
                     .and(instanceIRI("Ins", "InsOf"))
                     .and(hasExpansionModifier("Ins"))
                     .and(not(
-                        instanceArgs("Ins", "Args")
+                        arguments("Ins", "Args")
                             .and(index("Args", "Index", "Val"))
                             .and(hasListExpander("Args", "Index")))),
                 tup -> Message.error(
@@ -190,11 +186,10 @@ public abstract class CheckFactory {
             /* Has no expansion modifier but arguments with list expanders set.*/
             new Check(
                 template("Temp")
-                    .and(body("Temp", "Body"))
-                    .and(instance("Body", "Ins"))
+                    .and(bodyInstance("Temp", "Ins"))
                     .and(instanceIRI("Ins", "InsOf"))
                     .and(not(hasExpansionModifier("Ins")))
-                    .and(instanceArgs("Ins", "Args"))
+                    .and(arguments("Ins", "Args"))
                     .and(index("Args", "Index", "Val"))
                     .and(hasListExpander("Args", "Index")),
                 tup -> Message.error(
@@ -204,11 +199,10 @@ public abstract class CheckFactory {
             /* Has non-list argument with list expanders set.*/
             new Check(
                 template("Temp")
-                    .and(body("Temp", "Body"))
-                    .and(instance("Body", "Ins"))
+                    .and(bodyInstance("Temp", "Ins"))
                     .and(instanceIRI("Ins", "InsOf"))
                     .and(hasExpansionModifier("Ins"))
-                    .and(instanceArgs("Ins", "Args"))
+                    .and(arguments("Ins", "Args"))
                     .and(index("Args", "Index", "Val"))
                     .and(hasListExpander("Args", "Index"))
                     .and(type("Val", "Type"))
@@ -219,4 +213,6 @@ public abstract class CheckFactory {
                         + tup.get("InsOf").toString() + " with list expander on non-list argument.")
             )
         ));
+
+    public static final List<Check> allChecks = ListUtils.union(failsOnErrorChecks, failsOnMissingInformationChecks);
 }

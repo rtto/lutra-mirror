@@ -35,15 +35,14 @@ import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.Statement;
 
-import org.dyreriket.gaupa.rdf.ModelSelector;
-import org.dyreriket.gaupa.rdf.ModelSelectorException;
-
 import xyz.ottr.lutra.model.Term;
 import xyz.ottr.lutra.model.types.TypeFactory;
 import xyz.ottr.lutra.result.Message;
 import xyz.ottr.lutra.result.Result;
 import xyz.ottr.lutra.wottr.legacy.WOTTR;
 import xyz.ottr.lutra.wottr.legacy.WTermFactory;
+import xyz.ottr.lutra.wottr.util.ModelSelector;
+import xyz.ottr.lutra.wottr.util.ModelSelectorException;
 
 public class WParameterParser implements Function<Resource, Result<Term>> {
 
@@ -105,13 +104,13 @@ public class WParameterParser implements Function<Resource, Result<Term>> {
 
     private void setType(Term term, Property type) {
         if (type.equals(WOTTR.literalVariable)) {
-            return; // Already set by its xsd datatype or its java class
+            term.setType(TypeFactory.getByName("literal"));
         } else if (type.equals(WOTTR.classVariable)) {
             term.setType(TypeFactory.getByName("class"));
         } else if (type.equals(WOTTR.individualVariable)) {
             term.setType(TypeFactory.getByName("namedindividual"));
         } else if (type.equals(WOTTR.propertyVariable)) { 
-            term.setType(TypeFactory.getByName("property"));
+            term.setType(TypeFactory.getByName("iri"));
         } else if (type.equals(WOTTR.dataPropertyVariable)) {
             term.setType(TypeFactory.getByName("datatypeproperty"));
         } else if (type.equals(WOTTR.annotationPropertyVariable)) {

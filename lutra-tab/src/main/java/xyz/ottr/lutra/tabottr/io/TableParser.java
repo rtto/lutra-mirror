@@ -33,7 +33,7 @@ import java.util.stream.Stream;
 
 import org.apache.jena.shared.PrefixMapping;
 
-import xyz.ottr.lutra.ROTTR;
+import xyz.ottr.lutra.OTTR;
 import xyz.ottr.lutra.model.Instance;
 import xyz.ottr.lutra.result.Message;
 import xyz.ottr.lutra.result.Result;
@@ -43,7 +43,6 @@ import xyz.ottr.lutra.tabottr.model.Instruction;
 import xyz.ottr.lutra.tabottr.model.PrefixInstruction;
 import xyz.ottr.lutra.tabottr.model.Table;
 import xyz.ottr.lutra.tabottr.model.TemplateInstruction;
-import xyz.ottr.lutra.wottr.WOTTR;
 
 public class TableParser {
 
@@ -97,8 +96,7 @@ public class TableParser {
         // TODO move this into a more generic package
         PrefixMapping stdPrefixes = PrefixMapping.Factory.create();
         stdPrefixes.setNsPrefixes(PrefixMapping.Standard);
-        stdPrefixes.setNsPrefix("ottr", WOTTR.namespace);
-        stdPrefixes.setNsPrefix("ottt", ROTTR.namespace);
+        stdPrefixes.setNsPrefix(OTTR.prefix, OTTR.namespace);
 
         List<Message> conflicts = checkForConflicts(definedPrefixes, stdPrefixes);
 
@@ -131,15 +129,23 @@ public class TableParser {
                 if (differentDefs.size() > 1) {
                     conflicts.add(Message.error(msg.toString()));
                 }
-            } else if (standardNs != null) { // Definition conflicting with standard prefix
+            }
+            if (standardNs != null) { // Definition conflicting with standard prefix
 
                 StringBuilder msg = new StringBuilder("Conflicting definition of prefix " + defs.getKey()
                         + ": standard definition " + standardNs + " conflicts with the following:\n");
+                boolean actualConflict = false;
+                
                 for (String[] def : defs.getValue()) {
-                    msg.append(" - " + def[0] + " at row " + def[2]
+                    if (!def[0].equals(standardNs)) {
+                        msg.append(" - " + def[0] + " at row " + def[2]
                             + " in table " + def[1] + "\n");
+                        actualConflict = true;
+                    }
                 }
-                conflicts.add(Message.error(msg.toString()));
+                if (actualConflict) {
+                    conflicts.add(Message.error(msg.toString()));
+                }
             } 
         }
         return conflicts;

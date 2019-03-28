@@ -34,12 +34,11 @@ import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdf.model.StmtIterator;
 import org.apache.jena.vocabulary.RDF;
-import org.dyreriket.gaupa.rdf.ModelSelector;
-import org.dyreriket.gaupa.rdf.Models;
-import org.dyreriket.gaupa.rdf.RDFLists;
 
 import xyz.ottr.lutra.io.ReaderException;
 import xyz.ottr.lutra.wottr.legacy.WOTTR;
+import xyz.ottr.lutra.wottr.util.ModelSelector;
+import xyz.ottr.lutra.wottr.util.Models;
 
 @SuppressWarnings("CPD-START")
 public class WReader {
@@ -52,12 +51,6 @@ public class WReader {
      */
     public static Model getCanonicalModel(Model model) throws ReaderException {
         Model canonical = Models.duplicate(model, Models.BlankCopy.KEEP);
-
-        /*
-         * // replacing template instance vocabulary with template vocabulary: for
-         * (Entry<Property, Property> m : TemplateInstances.templateVocabMap.entrySet())
-         * { ModelEditor.substituteNode(canonical, m.getKey(), m.getValue()); }
-         */
 
         // replacing t:with... list properties with indexed lists:
         for (Entry<Property, List<Property>> m : WOTTR.listPropertiesMap.entrySet()) {
@@ -81,7 +74,6 @@ public class WReader {
                 objList.removeList();
                 t.remove();
             }
-            // TODO replace OWL list with RDF list
         }
         canonical.setNsPrefixes(model);
         return canonical;
@@ -136,7 +128,6 @@ public class WReader {
         return modelCopy;
     }
 
-    // TODO Move to Gaupa?
     private static List<Statement> getNeighbourhood(Model model, Resource iri) {
         List<Statement> neighbourhood = new ArrayList<>();
         if (iri == null) {
@@ -150,7 +141,7 @@ public class WReader {
             // if object is a list, we add the whole list:
             RDFNode object = t.getObject();
             if (object.canAs(RDFList.class)) {
-                neighbourhood.addAll(RDFLists.getAllListStatements(object.as(RDFList.class)));
+                neighbourhood.addAll(ModelSelector.getAllListStatements(object.as(RDFList.class)));
             }
         }
         return neighbourhood;

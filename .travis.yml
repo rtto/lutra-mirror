@@ -1,0 +1,4 @@
+## This file enables Travis integration for lutra's mirror
+## repo at github: https://github.com/mgskjaeveland/lutra-mirror
+
+language: java

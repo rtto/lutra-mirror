@@ -32,7 +32,7 @@ import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.vocabulary.RDF;
 
-import xyz.ottr.lutra.ROTTR;
+import xyz.ottr.lutra.OTTR;
 import xyz.ottr.lutra.model.types.BasicType;
 import xyz.ottr.lutra.model.types.LUBType;
 import xyz.ottr.lutra.model.types.ListType;
@@ -81,11 +81,11 @@ public class WTypeParser implements Function<RDFNode, Result<TermType>> {
         Resource type = typeNode.asResource();
 
         Result<TermType> rest = parseComplexType(complexType);
-        if (type.getURI().equals(ROTTR.NEListType)) {
+        if (type.getURI().equals(OTTR.Types.NEList)) {
             return rest.flatMap(inner -> Result.of(new NEListType(inner)));
         } else if (type.equals(RDF.List)) {
             return rest.flatMap(inner -> Result.of(new ListType(inner)));
-        } else if (type.getURI().equals(ROTTR.LUBType)) {
+        } else if (type.getURI().equals(OTTR.Types.LUB)) {
             if (rest.isPresent() && !(rest.get() instanceof BasicType)) {
                 return Result.empty(Message.error(
                     "Expected simple type as argument to LUB-type, but got "

@@ -27,6 +27,13 @@ import java.util.Map;
 
 public class Tuple {
 
+    private static int newId = 0;
+
+    protected static String freshVar() {
+        newId++;
+        return "_var" + newId;
+    }
+
     private final Map<String, Object> map;
 
     public Tuple() {
@@ -37,9 +44,9 @@ public class Tuple {
         this.map = map; 
     }
 
-    public Tuple bind(String s, Object o) {
+    public Tuple bind(String name, Object obj) {
         Map<String, Object> nmap = new HashMap<>(this.map);
-        nmap.put(s, o);
+        nmap.put(name, obj);
         return new Tuple(nmap);
     }
 
@@ -55,18 +62,19 @@ public class Tuple {
         return new Tuple(this.map);
     }
 
-    public boolean hasBound(String s) {
-        return this.map.containsKey(s);
+    public boolean hasBound(String name) {
+        return this.map.containsKey(name);
     }
 
-    public Object get(String s) {
-        return this.map.get(s);
+    public Object get(String name) {
+        return this.map.get(name);
     }
 
     @Override
-    public boolean equals(Object o) {
-        return this == o
-            || o instanceof Tuple && this.map.equals(((Tuple) o).map);
+    public boolean equals(Object other) {
+        return this == other
+            || other instanceof Tuple
+            && this.map.equals(((Tuple) other).map);
     }
 
     @Override
@@ -82,15 +90,24 @@ public class Tuple {
     /**
      * Checks that the variable denoted by t is bound and of type clazz and casts it to clazz.
      */
-    public <T> T getAs(Class<T> clazz, String t) {
-        if (!this.hasBound(t)) {
-            throw new VariableNotBoundException(t);
+    public <T> T getAs(Class<T> clazz, String name) {
+        if (!this.hasBound(name)) {
+            throw new VariableNotBoundException(name);
         }
-        Object mt = this.get(t);
+        Object mt = this.get(name);
         if (!(clazz.isInstance(mt))) {
-            throw new VariableBoundToMultipleTypesException(t, mt.getClass(), clazz);
+            throw new VariableBoundToMultipleTypesException(name, mt.getClass(), clazz);
         }
         return clazz.cast(mt);
     }
 
+    /**
+     * Internally in the model, indecies start at 0, but we want indecies to start at 1
+     * for end-users. This method simply gets the integer bound to the variable name
+     * and increases it by 1, and turns it into a String. This method should only be used
+     * when displaying the value of an index in a Message, and not internally.
+     */
+    public String getAsEndUserIndex(String name) {
+        return "" + (getAs(Integer.class, name) + 1);
+    }
 }

@@ -26,8 +26,6 @@ import static org.junit.Assert.assertTrue;
 
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.shared.PrefixMapping;
-import org.dyreriket.gaupa.rdf.ModelIO;
-import org.dyreriket.gaupa.rdf.ModelIOException;
 import org.junit.Test;
 
 import xyz.ottr.lutra.model.Instance;
@@ -36,6 +34,7 @@ import xyz.ottr.lutra.result.ResultStream;
 import xyz.ottr.lutra.tabottr.io.TabInstanceParser;
 import xyz.ottr.lutra.wottr.legacy.io.WInstanceWriter;
 import xyz.ottr.lutra.wottr.legacy.io.WReader;
+import xyz.ottr.lutra.wottr.util.ModelIO;
 
 public class TabTemplateInstanceParserToRDFTest {
     
@@ -51,7 +50,7 @@ public class TabTemplateInstanceParserToRDFTest {
         return model;
     }
     
-    private void runAtomicTest(String name) throws ModelIOException {
+    private void runAtomicTest(String name) {
         String folder = ROOT + "atomic/";
         String inFile = folder + name + ".xlsx";
         String outFile = folder + name + ".ttl";
@@ -65,82 +64,82 @@ public class TabTemplateInstanceParserToRDFTest {
         if (!isIsomorphic) {
             System.out.println("Error: inFile " + inFile + " not isomorphic to outFile " + outFile);
             System.out.println("IN:");
-            ModelIO.printModel(in, ModelIO.Format.TURTLE);
+            ModelIO.printModel(in);
             System.out.println("OUT:");
-            ModelIO.printModel(out, ModelIO.Format.TURTLE);
+            ModelIO.printModel(out);
         }
         assertTrue(isIsomorphic);
     }
     
-    @Test public void testTypedBooleans() throws ModelIOException {
+    @Test public void testTypedBooleans() {
         runAtomicTest("typedBooleans");
     }
     
-    @Test public void testTypedInts() throws ModelIOException {
+    @Test public void testTypedInts() {
         runAtomicTest("typedInts");
     }
     
-    @Test public void testTypedIntergers() throws ModelIOException {
+    @Test public void testTypedIntergers() {
         runAtomicTest("typedIntegers");
     }
     
-    @Test public void testTypedDecimals() throws ModelIOException {
+    @Test public void testTypedDecimals() {
         runAtomicTest("typedDecimals");
     }
     
-    @Test public void testTypedStrings() throws ModelIOException {
+    @Test public void testTypedStrings() {
         runAtomicTest("typedStrings");
     }
     
-    @Test public void testTypedFreshBlanks() throws ModelIOException {
+    @Test public void testTypedFreshBlanks() {
         runAtomicTest("typedFreshBlanks");
     }
     
-    @Test public void testTypedNamedBlanks() throws ModelIOException {
+    @Test public void testTypedNamedBlanks() {
         runAtomicTest("typedNamedBlanks");
     }
     
-    @Test public void testTypedQNameIRI() throws ModelIOException {
+    @Test public void testTypedQNameIRI() {
         runAtomicTest("typedQNameIRI");
     }
     
-    @Test public void testTypedFullIRI() throws ModelIOException {
+    @Test public void testTypedFullIRI() {
         runAtomicTest("typedFullIRI");
     }
     
-    @Test public void testUntypedBooleans() throws ModelIOException {
+    @Test public void testUntypedBooleans() {
         runAtomicTest("untypedBooleans");
     }
     
-    @Test public void testUntypedIntergers() throws ModelIOException {
+    @Test public void testUntypedIntergers() {
         runAtomicTest("untypedIntegers");
     }
     
-    @Test public void testUntypedDecimals() throws ModelIOException {
+    @Test public void testUntypedDecimals() {
         runAtomicTest("untypedDecimals");
     }
     
-    @Test public void testUntypedFreshBlanks() throws ModelIOException {
+    @Test public void testUntypedFreshBlanks() {
         runAtomicTest("untypedFreshBlanks");
     }
     
-    @Test public void testUntypedNamedBlanks() throws ModelIOException {
+    @Test public void testUntypedNamedBlanks() {
         runAtomicTest("untypedNamedBlanks");
     }
     
-    @Test public void testUntypedQNameIRI() throws ModelIOException {
+    @Test public void testUntypedQNameIRI() {
         runAtomicTest("untypedQNameIRI");
     }
     
-    @Test public void testUntypedFullIRI() throws ModelIOException {
+    @Test public void testUntypedFullIRI() {
         runAtomicTest("untypedFullIRI");
     }
 
-    @Test public void testUntypedLiterals() throws ModelIOException {
+    @Test public void testUntypedLiterals() {
         runAtomicTest("untypedLiterals");
     }
     
-    @Test public void testTypedUntyped() throws ModelIOException {
+    @Test public void testTypedUntyped() {
         runAtomicTest("typedText");
     }
 }

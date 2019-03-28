@@ -34,8 +34,8 @@ import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.RDFList;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
-import org.dyreriket.gaupa.rdf.ModelSelector;
-import org.dyreriket.gaupa.rdf.ModelSelectorException;
+
+import xyz.ottr.lutra.OTTR;
 
 //import org.slf4j.Logger;
 //import org.slf4j.LoggerFactory;
@@ -50,6 +50,8 @@ import xyz.ottr.lutra.result.Result;
 import xyz.ottr.lutra.result.ResultStream;
 import xyz.ottr.lutra.wottr.WOTTR;
 import xyz.ottr.lutra.wottr.WTermFactory;
+import xyz.ottr.lutra.wottr.util.ModelSelector;
+import xyz.ottr.lutra.wottr.util.ModelSelectorException;
 
 public class WInstanceParser implements InstanceParser<Model> {
 
@@ -148,8 +150,13 @@ public class WInstanceParser implements InstanceParser<Model> {
             .map(parser)
             .map(termRes -> termRes.flatMap(term -> {
                 Result<Term> toAddErr = Result.of(term);
-                if (term instanceof IRITerm && ((IRITerm) term).getIRI().startsWith(WOTTR.namespace)) {
-                    toAddErr.addMessage(Message.error("Term with ottr-prefix occurs as argument to insance."));
+                // Check for arguments in the ottr-namespace, as this might
+                // be unintended by user
+                if (term instanceof IRITerm) {
+                    String iri = ((IRITerm) term).getIRI();
+                    if (iri.startsWith(OTTR.namespace) && !iri.equals(WOTTR.none.getURI())) {
+                        toAddErr.addMessage(Message.warning("Instance argument in ottr namespace: " + iri));
+                    }
                 }
                 return toAddErr;
             }))

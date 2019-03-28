@@ -22,22 +22,15 @@ package xyz.ottr.lutra.wottr.io;
  * #L%
  */
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import org.apache.jena.rdf.model.Model;
-
-import org.dyreriket.gaupa.rdf.ModelIO;
-import org.dyreriket.gaupa.rdf.ModelIOException;
-
 import org.junit.Test;
 
 import xyz.ottr.lutra.io.InstanceReader;
 import xyz.ottr.lutra.io.TemplateReader;
 import xyz.ottr.lutra.model.Instance;
-import xyz.ottr.lutra.model.Template;
-import xyz.ottr.lutra.model.TemplateSignature;
 import xyz.ottr.lutra.result.Message;
 import xyz.ottr.lutra.result.MessageHandler;
 import xyz.ottr.lutra.result.Result;
@@ -46,10 +39,12 @@ import xyz.ottr.lutra.result.ResultStream;
 import xyz.ottr.lutra.store.DependencyGraph;
 import xyz.ottr.lutra.store.TemplateStore;
 
+import xyz.ottr.lutra.wottr.WTemplateFactory;
 import xyz.ottr.lutra.wottr.io.WFileReader;
 import xyz.ottr.lutra.wottr.io.WInstanceParser;
 import xyz.ottr.lutra.wottr.io.WInstanceWriter;
 import xyz.ottr.lutra.wottr.io.WTemplateParser;
+import xyz.ottr.lutra.wottr.util.ModelIO;
 
 public class BlankNodeTest {
 
@@ -66,6 +61,7 @@ public class BlankNodeTest {
     public void shouldBeIsomorphic() {
 
         TemplateStore store = new DependencyGraph();
+        store.addTemplateSignature(WTemplateFactory.createTripleTemplateHead());
 
         // Read templates
         TemplateReader tempReader = new TemplateReader(new WFileReader(), new WTemplateParser());
@@ -97,13 +93,9 @@ public class BlankNodeTest {
         assertTrue(outRes.isPresent());
         Model out = outRes.get();
 
-        try {
-            ModelIO.printModel(in, ModelIO.Format.TURTLE);
-            ModelIO.printModel(out, ModelIO.Format.TURTLE);
-        } catch (ModelIOException ex) {
-            ex.printStackTrace();
-        }
-
+        ModelIO.printModel(in);
+        ModelIO.printModel(out);
+        
         assertTrue(in.isIsomorphicWith(out));
     }
 }

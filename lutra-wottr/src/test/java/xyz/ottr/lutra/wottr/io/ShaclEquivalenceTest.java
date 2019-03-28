@@ -22,24 +22,19 @@ package xyz.ottr.lutra.wottr.io;
  * #L%
  */
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import java.io.IOException;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.apache.commons.io.FilenameUtils;
 import org.apache.jena.rdf.model.Model;
 
-import org.dyreriket.gaupa.rdf.ModelIO;
-import org.dyreriket.gaupa.rdf.ModelIOException;
-
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import xyz.ottr.lutra.io.Files;
@@ -55,13 +50,12 @@ import xyz.ottr.lutra.store.TemplateStore;
 
 import xyz.ottr.lutra.wottr.io.WFileReader;
 import xyz.ottr.lutra.wottr.io.WInstanceParser;
-import xyz.ottr.lutra.wottr.io.WInstanceWriter;
 import xyz.ottr.lutra.wottr.io.WTemplateParser;
 
 public class ShaclEquivalenceTest {
 
-    private static final String correct = "src/test/resources/spec/tests/correct/";
-    private static final String incorrect = "src/test/resources/spec/tests/incorrect/";
+    private static final String correct = FilenameUtils.separatorsToSystem("src/test/resources/spec/tests/correct/");
+    private static final String incorrect = FilenameUtils.separatorsToSystem("src/test/resources/spec/tests/incorrect/");
 
     private static Set<String> unsupportedTests;
     private static Set<String> instanceTests;
@@ -132,7 +126,7 @@ public class ShaclEquivalenceTest {
             tplErrorMessages.accept(tpl);
         });
 
-        List<Message> errors = store.checkTemplates();
+        List<Message> errors = store.checkTemplatesForErrorsOnly();
         errors.addAll(tplErrorMessages.getMessageHandler().getMessages());
         
         if (!correct) {

@@ -31,10 +31,10 @@ import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdf.model.StmtIterator;
-import org.dyreriket.gaupa.rdf.Models;
-import org.dyreriket.gaupa.rdf.RDFLists;
 
 import xyz.ottr.lutra.wottr.WOTTR;
+import xyz.ottr.lutra.wottr.util.ModelSelector;
+import xyz.ottr.lutra.wottr.util.Models;
 
 // TODO: Remove this class, rename to WReaderUtils or move methods into other classes
 public class WReader {
@@ -81,7 +81,6 @@ public class WReader {
         return head;
     }
 
-    // TODO Move to Gaupa?
     private static List<Statement> getNeighbourhood(Model model, Resource iri) {
         List<Statement> neighbourhood = new ArrayList<>();
         if (iri == null) {
@@ -95,7 +94,7 @@ public class WReader {
             // if object is a list, we add the whole list:
             RDFNode object = t.getObject();
             if (object.canAs(RDFList.class)) {
-                neighbourhood.addAll(RDFLists.getAllListStatements(object.as(RDFList.class)));
+                neighbourhood.addAll(ModelSelector.getAllListStatements(object.as(RDFList.class)));
             }
             if (object.isResource()) {
                 addTermStatements(model, object.asResource(), neighbourhood);

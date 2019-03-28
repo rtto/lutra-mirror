@@ -3,7 +3,7 @@
 @prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
 @prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
 
-@prefix ottr:   <http://ns.ottr.xyz/templates#> .
+@prefix ottr:    <http://ns.ottr.xyz/0.4/> .
 
 @prefix ex:   <http://example.com#> .
 

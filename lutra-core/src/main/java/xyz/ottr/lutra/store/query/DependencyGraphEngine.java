@@ -38,8 +38,6 @@ import xyz.ottr.lutra.model.Template;
 import xyz.ottr.lutra.model.Term;
 import xyz.ottr.lutra.model.TermList;
 import xyz.ottr.lutra.model.types.ComplexType;
-import xyz.ottr.lutra.model.types.ListType;
-import xyz.ottr.lutra.model.types.NEListType;
 import xyz.ottr.lutra.model.types.TermType;
 import xyz.ottr.lutra.result.Result;
 import xyz.ottr.lutra.store.DependencyGraph;
@@ -161,7 +159,7 @@ public class DependencyGraphEngine extends QueryEngine<DependencyGraph> {
     @Override
     public Stream<Tuple> hasOccurenceAt(Tuple tuple, String term, String inside, String level) {
 
-        Term boundTerm = tuple.getAs(TermList.class, term);
+        Term boundTerm = tuple.getAs(Term.class, term);
         return findOccurences(tuple, boundTerm, inside, level, 0);
     }
             
@@ -174,21 +172,21 @@ public class DependencyGraphEngine extends QueryEngine<DependencyGraph> {
         }
 
         if (term instanceof TermList) { // Match recursively on inner terms with current level +1
-            Stream<Tuple> stream = Stream.empty();
+            Stream.Builder<Tuple> stream = Stream.builder();
             for (Term inner : ((TermList) term).asList()) {
-                Stream.concat(stream, findOccurences(tuple, inner, inside, level, current + 1));
+                findOccurences(tuple, inner, inside, level, current + 1).forEach(stream);
             }
-            return stream;
+            return stream.build();
         }
 
         // Has non-list term, just need to check for equality of level and term
-        Tuple tupleWLvl = tuple;
-        if (tuple.hasBound(level)) {
-            if (current != tuple.getAs(Integer.class, level).intValue()) {
-                return Stream.empty();
-            }
-            tupleWLvl = tuple.bind(level, current);
+        if (tuple.hasBound(level)
+            && current != tuple.getAs(Integer.class, level).intValue()) {
+
+            return Stream.empty();
         }
+
+        Tuple tupleWLvl = tuple.bind(level, current);
 
         if (tupleWLvl.hasBound(inside)) {
             return term.equals(tupleWLvl.getAs(Term.class, inside))
@@ -251,25 +249,11 @@ public class DependencyGraphEngine extends QueryEngine<DependencyGraph> {
         return stream;
     }
 
-    // TODO: Remove this, and replace with innerTypesAt(tuple, type, inner, 1)
     @Override
     public Stream<Tuple> innerType(Tuple tuple, String type, String inner) {
 
-        TermType boundType = tuple.getAs(TermType.class, type);
-
-        TermType actInner;
-        if (boundType instanceof ListType) {
-            actInner = ((ListType) boundType).getInner();
-        } else if (boundType instanceof NEListType) {
-            actInner = ((NEListType) boundType).getInner();
-        } else {
-            return Stream.empty();
-        }
-        if (tuple.hasBound(inner)) {
-            TermType boundInner = tuple.getAs(TermType.class, inner);
-            return actInner.equals(boundInner) ? Stream.of(tuple) : Stream.empty();
-        }
-        return Stream.of(tuple.bind(inner, actInner));
+        String lvl = Tuple.freshVar();
+        return innerTypeAt(tuple.bind(lvl, 1), type, lvl, inner);
     }
 
     @Override
@@ -372,7 +356,7 @@ public class DependencyGraphEngine extends QueryEngine<DependencyGraph> {
     }
 
     @Override
-    public Stream<Tuple> instanceArgs(Tuple tuple, String instance, String args) {
+    public Stream<Tuple> arguments(Tuple tuple, String instance, String args) {
 
         Instance boundInstance = tuple.getAs(Instance.class, instance);
 
@@ -381,6 +365,30 @@ public class DependencyGraphEngine extends QueryEngine<DependencyGraph> {
                 ? Stream.of(tuple) : Stream.empty();
         }
         return Stream.of(tuple.bind(args, boundInstance.getArguments()));
+    }
+
+    @Override
+    public Stream<Tuple> isUndefined(Tuple tuple, String template) {
+        String iri = tuple.getAs(String.class, template);
+        return !this.store.containsTemplate(iri)
+            ? Stream.of(tuple)
+            : Stream.empty();
+    }
+
+    @Override
+    public Stream<Tuple> isSignature(Tuple tuple, String template) {
+        String iri = tuple.getAs(String.class, template);
+        return this.store.containsSignature(iri)
+            ? Stream.of(tuple)
+            : Stream.empty();
+    }
+
+    @Override
+    public Stream<Tuple> isBase(Tuple tuple, String template) {
+        String iri = tuple.getAs(String.class, template);
+        return this.store.containsBase(iri)
+            ? Stream.of(tuple)
+            : Stream.empty();
     }
 
     @Override

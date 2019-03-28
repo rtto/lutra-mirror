@@ -1,28 +1,45 @@
 
-variables:
-  GIT_SUBMODULE_STRATEGY: normal
+image: maven:3.3.3-jdk-8
 
-.build: &build_core
+variables:
+  # This will supress any download for dependencies and plugins or upload messages which would clutter the console log.
+  MAVEN_CLI_OPTS: "--batch-mode --errors --fail-at-end --show-version"
+  MAVEN_OPTS: "-Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=WARN -Dorg.slf4j.simpleLogger.showDateTime=true -Djava.awt.headless=true"
+
+cache:
+  paths:
+    - .m2/repository/
+    - target/
+    - lutra-cli/target/
+
+build:
   stage: build
-  image: maven:3.3.3-jdk-8
   script:
-  - cd gaupa; mvn install; cd ..
-  - mvn install package
-  - cp lutra-cli/target/lutra.jar lutra.jar
+    - mvn $MAVEN_CLI_OPTS compile
+
+test:
+  stage: test
+  script:
+    - mvn $MAVEN_CLI_OPTS verify
+
+.deploy: &deploy
+  stage: deploy
+  script:
+    - cp lutra-cli/target/lutra.jar lutra.jar
 
 snapshot:
-  <<: *build_core
+  <<: *deploy
   only:
     - develop
     - master
   artifacts:
     expire_in: 6 mos 1day
     paths:
-    - lutra.jar
+      - lutra.jar
 
 release:
-  <<: *build_core
-  only: 
+  <<: *deploy
+  only:
     - tags
   artifacts:
     paths:

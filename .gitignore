@@ -1,7 +1,25 @@
+##
+## Resources downloaded by maven plugin
+##
 
-######################
-# Java
-######################
+lutra-core/src/main/resources/puntypes\.owl\.ttl
+lutra-core/src/main/resources/types\.owl\.ttl
+lutra-wottr/src/test/resources/spec/core-grammar\.shacl\.ttl
+lutra-wottr/src/test/resources/spec/core-vocabulary\.owl\.ttl
+
+
+##
+## Test files downloaded by maven plugin
+##
+
+lutra-wottr/src/test/resources/spec/examples/*\.ttl
+lutra-wottr/src/test/resources/spec/tests/correct/*\.ttl
+lutra-wottr/src/test/resources/spec/tests/incorrect/*\.ttl
+
+
+##
+## Java
+##
 
 ## Directories
 target/
@@ -25,9 +43,10 @@ bin/
 *.pmd*
 
 
-######################
-# Eclipse
-######################
+
+##
+## Eclipse
+##
 
 .project
 .classpath
@@ -47,9 +66,33 @@ bin/
 hs_err_pid*
 
 
-######################
-# Windows
-######################
+
+##
+## IntelliJ IDEA
+##
+
+.idea
+*.iws
+*.iml
+*.ipr
+
+
+##
+## NetBeans
+##
+nbproject/private/
+build/
+nbbuild/
+dist/
+nbdist/
+.nb-gradle/
+
+
+
+
+##
+## Windows
+##
 
 ## Windows image file caches
 Thumbs.db
@@ -57,9 +100,11 @@ Thumbs.db
 ## Folder config file
 Desktop.ini
 
-######################
-# OSX
-######################
+
+
+##
+## OSX
+##
 
 .DS_Store
 .svn
@@ -68,3 +113,5 @@ Desktop.ini
 ._*
 
 *.xml#
+
+lutra-cli/dependency-reduced-pom\.xml

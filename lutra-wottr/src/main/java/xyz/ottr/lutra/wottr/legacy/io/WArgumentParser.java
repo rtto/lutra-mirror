@@ -33,9 +33,6 @@ import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.Statement;
 
-import org.dyreriket.gaupa.rdf.ModelSelector;
-import org.dyreriket.gaupa.rdf.ModelSelectorException;
-
 import xyz.ottr.lutra.model.ArgumentList;
 import xyz.ottr.lutra.model.NoneTerm;
 import xyz.ottr.lutra.model.Term;
@@ -43,6 +40,8 @@ import xyz.ottr.lutra.result.Message;
 import xyz.ottr.lutra.result.Result;
 import xyz.ottr.lutra.wottr.legacy.WOTTR;
 import xyz.ottr.lutra.wottr.legacy.WTermFactory;
+import xyz.ottr.lutra.wottr.util.ModelSelector;
+import xyz.ottr.lutra.wottr.util.ModelSelectorException;
 
 public class WArgumentParser implements Function<Resource, Result<Term>> {
 

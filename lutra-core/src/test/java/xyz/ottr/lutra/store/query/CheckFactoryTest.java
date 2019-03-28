@@ -22,8 +22,6 @@ package xyz.ottr.lutra.store.query;
  * #L%
  */
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.util.Collections;
@@ -34,6 +32,7 @@ import java.util.stream.Stream;
 import org.junit.Test;
 
 import xyz.ottr.lutra.model.ArgumentList;
+import xyz.ottr.lutra.model.BlankNodeTerm;
 import xyz.ottr.lutra.model.IRITerm;
 import xyz.ottr.lutra.model.Instance;
 import xyz.ottr.lutra.model.LiteralTerm;
@@ -43,8 +42,10 @@ import xyz.ottr.lutra.model.Template;
 import xyz.ottr.lutra.model.TemplateSignature;
 import xyz.ottr.lutra.model.Term;
 import xyz.ottr.lutra.model.TermList;
+import xyz.ottr.lutra.model.types.NEListType;
 import xyz.ottr.lutra.model.types.TypeFactory;
 import xyz.ottr.lutra.result.Message;
+import xyz.ottr.lutra.result.MessageHandler;
 import xyz.ottr.lutra.store.DependencyGraph;
 
 public class CheckFactoryTest {
@@ -61,6 +62,26 @@ public class CheckFactoryTest {
         return store;
     }
 
+    private void check(QueryEngine<DependencyGraph> engine, int numErrors, int severity) {
+
+        List<Message> msgs = CheckFactory.allChecks
+            .stream()
+            .flatMap(c -> c.check(engine))
+            .filter(msg -> Message.moreSevere(msg.getLevel(), severity))
+            .collect(Collectors.toList());
+
+        String assStr = "Should give " + numErrors + " messages of higher severity than "
+            + severity + " but gave " + msgs.size();
+
+        if (msgs.size() != numErrors) {
+            for (Message msg : msgs) {
+                MessageHandler.printMessage(msg);
+            }
+        }
+
+        assertTrue(assStr, msgs.size() == numErrors); 
+    }
+
     @Test
     public void variableNotUsedWarning() {
 
@@ -72,12 +93,23 @@ public class CheckFactoryTest {
                         new ArgumentList(new ObjectTerm("a", true), new ObjectTerm(1))))));
         QueryEngine<DependencyGraph> engine = new DependencyGraphEngine(store);
 
-        List<Message> msgs = CheckFactory.defaultChecks
-            .stream()
-            .flatMap(c -> c.check(engine))
-            .collect(Collectors.toList());
+        check(engine, 1, Message.WARNING);
+    }
 
-        assertTrue(msgs.size() == 1);
+    @Test
+    public void variableUsedInsideList() {
+
+        DependencyGraph store = initStore();
+        store.addTemplate(
+            new Template("test",
+                new ParameterList(new ObjectTerm("a", true), new ObjectTerm("b", true)),
+                Collections.singleton(new Instance("base2",
+                        new ArgumentList(new TermList(new ObjectTerm("a", true)),
+                                         new TermList(new ObjectTerm(1),
+                                                      new TermList(new ObjectTerm("b", true))))))));
+        QueryEngine<DependencyGraph> engine = new DependencyGraphEngine(store);
+
+        check(engine, 0, Message.WARNING);
     }
 
     @Test
@@ -91,12 +123,7 @@ public class CheckFactoryTest {
                         new ArgumentList(new ObjectTerm("a", true), new ObjectTerm(1))))));
         QueryEngine<DependencyGraph> engine = new DependencyGraphEngine(store);
 
-        List<Message> msgs = CheckFactory.defaultChecks
-            .stream()
-            .flatMap(c -> c.check(engine))
-            .collect(Collectors.toList());
-
-        assertTrue(msgs.size() == 1);
+        check(engine, 1, Message.ERROR);
     }
 
     @Test
@@ -110,12 +137,7 @@ public class CheckFactoryTest {
                         new ArgumentList(new ObjectTerm("a", true), new ObjectTerm("b", true))))));
         QueryEngine<DependencyGraph> engine = new DependencyGraphEngine(store);
 
-        List<Message> msgs = CheckFactory.defaultChecks
-            .stream()
-            .flatMap(c -> c.check(engine))
-            .collect(Collectors.toList());
-
-        assertTrue(msgs.size() == 1);
+        check(engine, 1, Message.ERROR);
     }
 
     @Test
@@ -134,12 +156,7 @@ public class CheckFactoryTest {
                         new ArgumentList(new ObjectTerm("a", true), new ObjectTerm("b", true))))));
         QueryEngine<DependencyGraph> engine = new DependencyGraphEngine(store);
 
-        List<Message> msgs = CheckFactory.defaultChecks
-            .stream()
-            .flatMap(c -> c.check(engine))
-            .collect(Collectors.toList());
-
-        assertTrue(msgs.size() == 1);
+        check(engine, 1, Message.ERROR);
     }
 
     @Test
@@ -151,7 +168,7 @@ public class CheckFactoryTest {
             new Template("test1",
                 new ParameterList(new ObjectTerm("a", true), new ObjectTerm("b", true)),
                 Stream.of(
-                    new Instance("base",
+                    new Instance("base2",
                         new ArgumentList(new ObjectTerm("a", true), new ObjectTerm("b", true))),
                     new Instance("test3",
                         new ArgumentList(new ObjectTerm("b", true), new ObjectTerm("a", true))))
@@ -171,12 +188,7 @@ public class CheckFactoryTest {
 
         QueryEngine<DependencyGraph> engine = new DependencyGraphEngine(store);
 
-        List<Message> msgs = CheckFactory.defaultChecks
-            .stream()
-            .flatMap(c -> c.check(engine))
-            .collect(Collectors.toList());
-
-        assertTrue(msgs.size() == 3); // One cycle for each testN
+        check(engine, 3, Message.ERROR); // One cycle for each testN
     }
 
     @Test
@@ -215,12 +227,7 @@ public class CheckFactoryTest {
 
         QueryEngine<DependencyGraph> engine = new DependencyGraphEngine(store);
 
-        List<Message> msgs = CheckFactory.defaultChecks
-            .stream()
-            .flatMap(c -> c.check(engine))
-            .collect(Collectors.toList());
-
-        assertTrue(msgs.size() == 0); 
+        check(engine, 0, Message.WARNING);
     }
 
     @Test
@@ -263,12 +270,7 @@ public class CheckFactoryTest {
 
         QueryEngine<DependencyGraph> engine = new DependencyGraphEngine(store);
 
-        List<Message> msgs = CheckFactory.defaultChecks
-            .stream()
-            .flatMap(c -> c.check(engine))
-            .collect(Collectors.toList());
-
-        assertTrue(msgs.size() == 1); 
+        check(engine, 1, Message.ERROR);
     }
 
     @Test
@@ -306,11 +308,101 @@ public class CheckFactoryTest {
 
         QueryEngine<DependencyGraph> engine = new DependencyGraphEngine(store);
 
-        List<Message> msgs = CheckFactory.defaultChecks
-            .stream()
-            .flatMap(c -> c.check(engine))
-            .collect(Collectors.toList());
+        check(engine, 1, Message.ERROR);
+    }
 
-        assertTrue(msgs.size() == 1); 
+    @Test
+    public void correctListTypeUsage() {
+
+        // Using a variable with type IRI to a parameter with type Class
+        DependencyGraph store = new DependencyGraph();
+
+        Term varBase = new BlankNodeTerm("_:classes");
+        varBase.setType(new NEListType(TypeFactory.getByName("class")));
+
+        store.addTemplateSignature(
+            new TemplateSignature("areClasses",
+                new ParameterList(varBase)));
+
+        Term var = new BlankNodeTerm("_:class");
+        var.setType(TypeFactory.getByName("class"));
+
+        Term cons = new BlankNodeTerm("_:b");
+
+        store.addTemplate(
+            new Template("testCorrect1",
+                new ParameterList(var),
+                Stream.of(
+                    new Instance("areClasses",
+                        new ArgumentList(new TermList(cons, var))))
+                .collect(Collectors.toSet())));
+
+        QueryEngine<DependencyGraph> engine = new DependencyGraphEngine(store);
+
+        check(engine, 0, Message.ERROR);
+    }
+
+    @Test
+    public void incorrectListTypeUsage() {
+
+        // Using a list of a variable of type Class and a an integer as argument
+        // to a parameter of type NEList<Class>
+        DependencyGraph store = new DependencyGraph();
+
+        Term varBase = new BlankNodeTerm("_:classes");
+        varBase.setType(new NEListType(TypeFactory.getByName("class")));
+
+        store.addTemplateSignature(
+            new TemplateSignature("areClasses",
+                new ParameterList(varBase)));
+
+        Term varClass = new BlankNodeTerm("_:class");
+        varClass.setType(TypeFactory.getByName("class"));
+
+        Term one = new LiteralTerm("1", TypeFactory.getByName("integer").getIRI());
+
+        store.addTemplate(
+            new Template("testCorrect1",
+                new ParameterList(varClass),
+                Stream.of(
+                    new Instance("areClasses",
+                        new ArgumentList(new TermList(one, varClass))))
+                .collect(Collectors.toSet())));
+
+        QueryEngine<DependencyGraph> engine = new DependencyGraphEngine(store);
+
+        check(engine, 1, Message.ERROR);
+    }
+
+    @Test
+    public void incorrectDeepListTypeUsage() {
+
+        DependencyGraph store = new DependencyGraph();
+
+        Term varBase = new BlankNodeTerm("_:classeses");
+        varBase.setType(new NEListType(new NEListType(TypeFactory.getByName("class"))));
+
+        store.addTemplateSignature(
+            new TemplateSignature("deepLists",
+                new ParameterList(varBase)));
+
+        Term varClass = new BlankNodeTerm("_:class");
+        varClass.setType(TypeFactory.getByName("class"));
+
+        Term one = new LiteralTerm("1", TypeFactory.getByName("integer").getIRI());
+
+        store.addTemplate(
+            new Template("testCorrect1",
+                new ParameterList(varClass),
+                Stream.of(
+                    new Instance("areClasses",
+                        new ArgumentList(new TermList(
+                                new TermList(new BlankNodeTerm(), varClass), // (_:a ?var) OK
+                                new TermList(one, varClass)))))              // (1 ?var)   ERR
+                .collect(Collectors.toSet())));
+
+        QueryEngine<DependencyGraph> engine = new DependencyGraphEngine(store);
+
+        check(engine, 1, Message.ERROR);
     }
 }

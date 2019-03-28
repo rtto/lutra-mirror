@@ -24,7 +24,7 @@ package xyz.ottr.lutra.model;
 
 import java.util.Optional;
 
-import xyz.ottr.lutra.ROTTR;
+//import xyz.ottr.lutra.ROTTR;
 import xyz.ottr.lutra.model.types.TypeFactory;
 
 public class NoneTerm extends Term {
@@ -36,7 +36,7 @@ public class NoneTerm extends Term {
     }
 
     public Object getIdentifier() {
-        return ROTTR.none;
+        return "none";
     }
 
     public void setIsVariable(boolean isVariable) {

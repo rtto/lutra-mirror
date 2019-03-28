@@ -22,61 +22,16 @@ package xyz.ottr.lutra.wottr.io;
  * #L%
  */
 
-import static xyz.ottr.lutra.store.query.Query.applyUnifier;
-import static xyz.ottr.lutra.store.query.Query.body;
-import static xyz.ottr.lutra.store.query.Query.index;
-import static xyz.ottr.lutra.store.query.Query.instance;
-import static xyz.ottr.lutra.store.query.Query.instanceArgs;
-import static xyz.ottr.lutra.store.query.Query.instanceIRI;
-import static xyz.ottr.lutra.store.query.Query.not;
-import static xyz.ottr.lutra.store.query.Query.notEquals;
-import static xyz.ottr.lutra.store.query.Query.template;
-import static xyz.ottr.lutra.store.query.Query.unifiesBody;
-import static xyz.ottr.lutra.store.query.Query.unifiesParams;
-
-import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.io.OutputStream;
-import java.io.Writer;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
-
-//import org.apache.jena.query.Query;
-import org.apache.jena.query.QueryExecutionFactory;
-import org.apache.jena.query.QueryFactory;
-import org.apache.jena.query.QuerySolution;
-import org.apache.jena.query.ResultSet;
-import org.apache.jena.rdf.model.Model;
-import org.apache.jena.rdf.model.ModelFactory;
-import org.apache.jena.rdf.model.RDFNode;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import xyz.ottr.lutra.io.InstanceReader;
 import xyz.ottr.lutra.io.TemplateReader;
-import xyz.ottr.lutra.io.TemplateWriter;
-import xyz.ottr.lutra.model.ArgumentList;
-import xyz.ottr.lutra.model.IRITerm;
-import xyz.ottr.lutra.model.Instance;
-import xyz.ottr.lutra.model.LiteralTerm;
 import xyz.ottr.lutra.model.Template;
-import xyz.ottr.lutra.model.TermList;
-import xyz.ottr.lutra.result.Result;
 import xyz.ottr.lutra.result.ResultConsumer;
-import xyz.ottr.lutra.result.ResultStream;
 import xyz.ottr.lutra.store.DependencyGraph;
-import xyz.ottr.lutra.store.query.Query;
-import xyz.ottr.lutra.store.query.Tuple;
 import xyz.ottr.lutra.wottr.WTemplateFactory;
-
-
 
 public class PrototypeTest {
 
@@ -169,7 +124,7 @@ public class PrototypeTest {
         graph.getAllTemplates().forEach(resultConsumer); 
         resultConsumer.getMessageHandler().printMessages();
         //System.out.println("Templates:");
-        //templateWriter.printDefinitions();
+        templateWriter.printDefinitions();
     }
 
     @AfterClass
