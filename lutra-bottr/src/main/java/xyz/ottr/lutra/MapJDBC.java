@@ -1,5 +1,13 @@
 package xyz.ottr.lutra;
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Stream;
+
+import xyz.ottr.lutra.Map.Row;
+import xyz.ottr.lutra.model.Instance;
+import xyz.ottr.lutra.result.Result;
+import xyz.ottr.lutra.result.ResultStream;
 
 /*-
  * #%L
@@ -32,6 +40,12 @@ public class MapJDBC extends Map {
 
     public ResultStream<Row> execute() {
     	
+    	Connection conn = null;
+    	Statement stmt = null;
+    	
+ 
+    	ResultStream<Row> rowStream = ResultStream.empty();
+    	
     	 try{
     	      //Register driver
     	      Class.forName(getDriver());
@@ -46,15 +60,13 @@ public class MapJDBC extends Map {
     	      //Parse the data
     	      int colcount = rs.getMetaData().getColumnCount();
     	      
-    	      private ResultStream<Row> rowStream = new ResultStream<Row>();
-    	      
     	      while(rs.next()){
     	    	  List<String> rowAsList = new ArrayList<>();
     	    	  for(int i = 0; i < colcount; i++)
     	    	  {
     	    		  rowAsList.add(rs.getString(i));
     	    	  }
-    	    	  rowStream.add(new Row(rowAsList));
+    	    	  rowStream = ResultStream.concat(rowStream, (ResultStream<Row>) Stream.of(new Row(rowAsList)));
     	      }
     	      
     	      //Clean up
@@ -86,14 +98,14 @@ public class MapJDBC extends Map {
     }
     
     
-    //Returns the correct driver. Based on the type field maybe?
+    //Returns the correct driver. Based on the type field maybe? returns the postgres driver for now
     private String getDriver() {
-    	return null; //TODO
+    	return "org.postgresql.Driver";
     }
     
     //Returns the URL. Should be contained in the source field
     public String getURL() {
-    	return null; //TODO
+    	return source; //TODO
     }
     
     //Returns the user name for accessing the database. Should be contained in the source field

@@ -1,5 +1,12 @@
 package xyz.ottr.lutra;
 
+import java.util.List;
+import java.util.function.Supplier;
+
+import xyz.ottr.lutra.model.Instance;
+import xyz.ottr.lutra.result.Result;
+import xyz.ottr.lutra.result.ResultStream;
+
 /*-
  * #%L
  * lutra-bottr
@@ -24,7 +31,7 @@ package xyz.ottr.lutra;
 
 public abstract class Map implements Supplier<ResultStream<Instance>> {
 
-    private final String source; // TODO: Decide how to incorporate DB drivers, etc.
+    protected final String source; // TODO: Decide how to incorporate DB drivers, etc.
     private final String query;
     private final String type;
     private final TermMapping mapping;
@@ -46,7 +53,7 @@ public abstract class Map implements Supplier<ResultStream<Instance>> {
     	return query;
     }
 
-    private class Row {
+    class Row {
 
         private final List<String> elements;
 
