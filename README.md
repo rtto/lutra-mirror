@@ -44,6 +44,12 @@ To build, clone the project and use Maven: `mvn package`. This will produce the 
 
 Note that the default branch of the project is the `develop` branch.
 
+If you are building on Windows and get the following exception during build:
+```
+PKIX path building failed: sun.security.provider.certpath.SunCertPathBuilderException: unable to find valid certification path to requested target
+```
+then see [this](https://gitlab.com/ottr/lutra/lutra/issues/94#note_153568457) comment on [Issue 94](https://gitlab.com/ottr/lutra/lutra/issues/94) for possible work-arounds.
+
 Requirements:
 
 * Java 8, for instance [OpenJDK][1]

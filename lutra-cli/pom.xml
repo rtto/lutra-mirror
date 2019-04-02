@@ -2,7 +2,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>xyz.ottr.lutra</groupId>
-		<version>0.5.0-alpha-5-SNAPSHOT</version>
+		<version>0.5.0-beta-2-SNAPSHOT</version>
 		<artifactId>lutra</artifactId>
 		<relativePath>../pom.xml</relativePath>
 	</parent>
@@ -33,30 +33,62 @@
 
 	<build>
 		<plugins>
+			<!-- Taken from https://github.com/apache/jena/blob/master/jena-fuseki2/jena-fuseki-server/pom.xml 
+				See also http://jena.apache.org/documentation/notes/jena-repack.html -->
 			<plugin>
-				<artifactId>maven-assembly-plugin</artifactId>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-shade-plugin</artifactId>
+				<configuration>
+					<shadedArtifactAttached>false</shadedArtifactAttached>
+					<transformers>
+						<transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+							<mainClass>xyz.ottr.lutra.cli.CLI</mainClass>
+						</transformer>
+						<transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer" />
+						<transformer implementation="org.apache.maven.plugins.shade.resource.ApacheLicenseResourceTransformer" />
+						<transformer implementation="org.apache.maven.plugins.shade.resource.ApacheNoticeResourceTransformer">
+							<addHeader>false</addHeader>
+						</transformer>
+					</transformers>
+					<filters>
+						<filter>
+							<artifact>*:*</artifact>
+							<excludes>
+								<!-- Some jars are signed but shading breaks that. Don't include signing files. -->
+								<exclude>META-INF/*.SF</exclude>
+								<exclude>META-INF/*.DSA</exclude>
+								<exclude>META-INF/*.RSA</exclude>
+							</excludes>
+						</filter>
+					</filters>
+				</configuration>
 				<executions>
 					<execution>
 						<phase>package</phase>
 						<goals>
-							<goal>single</goal>
+							<goal>shade</goal>
 						</goals>
 					</execution>
 				</executions>
-				<configuration>
-					<finalName>lutra</finalName>
-					<archive>
-						<manifest>
-							<addClasspath>true</addClasspath>
-							<mainClass>xyz.ottr.lutra.cli.CLI</mainClass>
-							<addDefaultImplementationEntries>true</addDefaultImplementationEntries>
-						</manifest>
-					</archive>
-					<descriptorRefs>
-						<descriptorRef>jar-with-dependencies</descriptorRef>
-					</descriptorRefs>
-					<appendAssemblyId>false</appendAssemblyId>
-				</configuration>
+			</plugin>
+
+            <!--  https://coderplus.github.io/copy-rename-maven-plugin/plugin-info.html -->
+			<plugin>
+				<groupId>com.coderplus.maven.plugins</groupId>
+				<artifactId>copy-rename-maven-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>rename-lutra-target</id>
+						<phase>package</phase>
+						<goals>
+							<goal>copy</goal>
+						</goals>
+						<configuration>
+							<sourceFile>${project.build.directory}/${project.build.finalName}.jar</sourceFile>
+							<destinationFile>${project.build.directory}/lutra.jar</destinationFile>
+						</configuration>
+					</execution>
+				</executions>
 			</plugin>
 
 		</plugins>

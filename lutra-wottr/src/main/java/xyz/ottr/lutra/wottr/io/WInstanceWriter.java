@@ -28,14 +28,14 @@ import java.util.Map;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.Resource;
-//import org.apache.jena.vocabulary.RDF;
+import org.apache.jena.shared.PrefixMapping;
 
 import xyz.ottr.lutra.io.InstanceWriter;
 import xyz.ottr.lutra.model.ArgumentList;
 import xyz.ottr.lutra.model.Instance;
 import xyz.ottr.lutra.wottr.WOTTR;
 import xyz.ottr.lutra.wottr.util.ModelIO;
-import xyz.ottr.lutra.wottr.util.ModelIOException;
+import xyz.ottr.lutra.wottr.util.PrefixMappings;
 
 public class WInstanceWriter extends AbstractWWriter implements InstanceWriter {
 
@@ -51,8 +51,12 @@ public class WInstanceWriter extends AbstractWWriter implements InstanceWriter {
     private Model model;
 
     public WInstanceWriter() {
+        this(PrefixMapping.Factory.create());
+    }
+
+    public WInstanceWriter(PrefixMapping prefixes) {
         this.model = ModelFactory.createDefaultModel();
-        addPrefixes(this.model);
+        this.model.setNsPrefixes(prefixes); // Will trim unused before write
     }
 
     @Override
@@ -66,28 +70,14 @@ public class WInstanceWriter extends AbstractWWriter implements InstanceWriter {
 
     @Override
     public String write() {
-        String out = "";
-        try {
-            out = ModelIO.writeModel(this.model, ModelIO.Format.TURTLE);
-        } catch (ModelIOException e) {
-            e.printStackTrace();
-        }
-        return out;
+        PrefixMappings.trim(this.model);
+        return ModelIO.writeModel(this.model);
     }
 
     public Model writeToModel() {
+        PrefixMappings.trim(this.model);
         return this.model;
     }
-
-    //public Model makeWottrTripleOrInstance(Instance i, boolean inTemplate) {
-    //    if (isTriple(i) && !inTemplate) {
-    //        Model m = ModelFactory.createDefaultModel();
-    //        m.add(getTriple(m, i));
-    //        return m;
-    //    } else {
-    //        return makeWottrInstance(i);
-    //    }
-    //}
 
     public Resource makeWottrInstance(Model model, Instance i) {
         Resource templateIRI = model.createResource(i.getIRI());

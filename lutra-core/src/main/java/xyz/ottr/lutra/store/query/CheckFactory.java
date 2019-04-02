@@ -91,7 +91,7 @@ public abstract class CheckFactory {
                 tup -> Message.error(
                     "Parameter with name " + tup.get("Val").toString() + " is not marked as non-blank,"
                     + " but is used as argument to non-blank parameter index "
-                    + tup.get("Index2").toString() + " in instance of template "
+                    + tup.getAsEndUserIndex("Index2") + " in instance of template "
                     + tup.get("Temp2").toString()
                     + " in template " + tup.get("Temp1").toString())
             ),
@@ -113,7 +113,7 @@ public abstract class CheckFactory {
                                 .and(hasOccurenceAt("Arg", "Lvl", "Val")))),
                 tup -> Message.warning(
                     "Parameter with name " + tup.get("Val").toString()
-                    + " with index " + tup.get("Index").toString()
+                    + " with index " + tup.getAsEndUserIndex("Index")
                     + " does not occur in the body of template "
                     + tup.get("Temp").toString())
             ),
@@ -127,8 +127,8 @@ public abstract class CheckFactory {
                     .and(removeSymmetry("Index1", "Index2")),
                 tup -> Message.error(
                         "Parameter with name " + tup.get("Val").toString()
-                        + " occurs twice with indecies " + tup.get("Index1").toString()
-                        + " and " + tup.get("Index2") + " in template "
+                        + " occurs twice with indecies " + tup.getAsEndUserIndex("Index1")
+                        + " and " + tup.getAsEndUserIndex("Index2") + " in template "
                         + tup.get("Temp").toString())
             ),
             /* Type checking: consistent use of terms */

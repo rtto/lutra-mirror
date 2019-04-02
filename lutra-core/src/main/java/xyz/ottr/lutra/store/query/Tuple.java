@@ -101,4 +101,13 @@ public class Tuple {
         return clazz.cast(mt);
     }
 
+    /**
+     * Internally in the model, indecies start at 0, but we want indecies to start at 1
+     * for end-users. This method simply gets the integer bound to the variable name
+     * and increases it by 1, and turns it into a String. This method should only be used
+     * when displaying the value of an index in a Message, and not internally.
+     */
+    public String getAsEndUserIndex(String name) {
+        return "" + (getAs(Integer.class, name) + 1);
+    }
 }

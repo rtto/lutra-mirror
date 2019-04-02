@@ -1,7 +1,6 @@
-@prefix ottt:    <http://spec.ottr.xyz/rottr/0.1/types#> .
 @prefix rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix owl:     <http://www.w3.org/2002/07/owl#> .
-@prefix ottr:    <http://spec.ottr.xyz/wottr/0.4/core#> .
+@prefix ottr:    <http://ns.ottr.xyz/0.4/> .
 @prefix xsd:     <http://www.w3.org/2001/XMLSchema#> .
 @prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix dc:      <http://purl.org/dc/elements/1.1/> .
@@ -11,7 +10,7 @@
 <http://tpl.ottr.xyz/rdf/0.1/Type>
       a       ottr:Template ;
       ottr:parameters 
-          ([ ottr:type ottt:IRI ;
+          ([ ottr:type ottr:IRI ;
              ottr:variable :resource ] 
            [ ottr:type owl:Class ;
              ottr:variable :class ]) ;

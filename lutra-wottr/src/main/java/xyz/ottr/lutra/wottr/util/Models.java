@@ -62,8 +62,8 @@ public abstract class Models {
      *
      * @param model
      *            the model to copy
-     * @param refreshBlanks
-     *            true if blank nodes are to be replaced with fresh blanks.
+     * @param blankCopyStrategy
+     *            strategy for copying blank nodes
      * @return the copy of the model
      */
     public static Model duplicate(Model model, BlankCopy blankCopyStrategy) {
