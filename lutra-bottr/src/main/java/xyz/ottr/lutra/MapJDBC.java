@@ -1,12 +1,14 @@
 package xyz.ottr.lutra;
-import java.sql.*;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
-
-import xyz.ottr.lutra.Map.Row;
 import xyz.ottr.lutra.model.Instance;
-import xyz.ottr.lutra.result.Result;
 import xyz.ottr.lutra.result.ResultStream;
 
 /*-
@@ -33,89 +35,100 @@ import xyz.ottr.lutra.result.ResultStream;
 
 public class MapJDBC extends Map {
 
-
-    public Result<Instance> mapToInstance(Row row) {
+    public MapJDBC(String src, String qry, String t, String map, String iri) {
+        super(src, qry, t, map, iri);
+    }
+    
+    public ResultStream<Instance> mapToInstance(Row row) {
         return null; // TODO
     }
 
     public ResultStream<Row> execute() {
-    	
-    	Connection conn = null;
-    	Statement stmt = null;
-    	
- 
-    	ResultStream<Row> rowStream = ResultStream.empty();
-    	
-    	 try{
-    	      //Register driver
-    	      Class.forName(getDriver());
 
-    	      //Open connection
-    	      conn = DriverManager.getConnection(getURL(),getUser(),getPassword());
+        Connection conn = null;
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+        ResultStream<Row> rowStream = ResultStream.empty();
 
-    	      //Execute query
-    	      stmt = conn.createStatement();
-    	      ResultSet rs = stmt.executeQuery(getQuery());
+        try {
+            //Register driver
+            Class.forName(getDriver());
 
-    	      //Parse the data
-    	      int colcount = rs.getMetaData().getColumnCount();
-    	      
-    	      while(rs.next()){
-    	    	  List<String> rowAsList = new ArrayList<>();
-    	    	  for(int i = 0; i < colcount; i++)
-    	    	  {
-    	    		  rowAsList.add(rs.getString(i));
-    	    	  }
-    	    	  rowStream = ResultStream.concat(rowStream, (ResultStream<Row>) Stream.of(new Row(rowAsList)));
-    	      }
-    	      
-    	      //Clean up
-    	      rs.close();
-    	      stmt.close();
-    	      conn.close();
-    	   }catch(SQLException se){
-    	      //Handle errors for JDBC
-    	      se.printStackTrace();
-    	   }catch(Exception e){
-    	      //Handle errors for Class.forName
-    	      e.printStackTrace();
-    	   }finally{
-    	      //finally block used to close resources
-    	      try{
-    	         if(stmt!=null)
-    	            stmt.close();
-    	      }catch(SQLException se2){
-    	      }// nothing we can do
-    	      try{
-    	         if(conn!=null)
-    	            conn.close();
-    	      }catch(SQLException se){
-    	         se.printStackTrace();
-    	      }//end finally try
-    	   }//end try
-    	
-    	 return rowStream;
+            //Open connection
+            conn = DriverManager.getConnection(getURL(),getUser(),getPassword());
+
+            //Execute query
+            stmt = conn.prepareStatement("?");
+            stmt.setString(1, getQuery());
+            rs = stmt.executeQuery();
+
+            //Parse the data
+            int colcount = rs.getMetaData().getColumnCount();
+
+            while (rs.next()) {
+                List<String> rowAsList = new ArrayList<>();
+                for (int i = 1; i <= colcount; i++) {
+                    rowAsList.add(rs.getString(i));
+                }
+                rowStream = ResultStream.concat(rowStream, (ResultStream<Row>) Stream.of(new Row(rowAsList)));
+            }
+
+            //Clean up
+            rs.close();
+            stmt.close();
+            conn.close();
+        } catch (SQLException se) {
+            //Handle errors for JDBC
+            se.printStackTrace();
+        } catch (Exception e) {
+            //Handle errors for Class.forName
+            e.printStackTrace();
+        } finally {
+            //finally block used to close resources
+            try {
+                if (stmt != null) {
+                    stmt.close();
+                }
+            } catch (SQLException se2) {
+                se2.printStackTrace();
+            } //nothing we can do
+            try {
+                if (conn != null) {
+                    conn.close();
+                }
+            } catch (SQLException se) {
+                se.printStackTrace();
+            } //end finally try
+            try {
+                if (rs != null) {
+                    rs.close();
+                }
+            } catch (SQLException se) {
+                se.printStackTrace();
+            } //end finally try
+        } //end try
+        return rowStream;
     }
     
     
     //Returns the correct driver. Based on the type field maybe? returns the postgres driver for now
     private String getDriver() {
-    	return "org.postgresql.Driver";
+        return "org.postgresql.Driver";
     }
-    
+
     //Returns the URL. Should be contained in the source field
     public String getURL() {
-    	return source; //TODO
+        return source; //TODO
     }
     
     //Returns the user name for accessing the database. Should be contained in the source field
     private String getUser() {
-    	return null; //TODO
+        return null; //TODO
     }
     
     //Returns the password used to access the database. Should be contained in the source field
     private String getPassword() {
-    	return null; //TODO
+        return null; //TODO
     }
     
 

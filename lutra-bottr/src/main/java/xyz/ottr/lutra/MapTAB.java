@@ -1,5 +1,9 @@
 package xyz.ottr.lutra;
 
+import xyz.ottr.lutra.Map.Row;
+import xyz.ottr.lutra.model.Instance;
+import xyz.ottr.lutra.result.ResultStream;
+
 /*-
  * #%L
  * lutra-bottr
@@ -24,12 +28,15 @@ package xyz.ottr.lutra;
 
 public class MapTAB extends Map {
 
+    public MapTAB(String src, String qry, String t, String map, String iri) {
+        super(src, qry, t, map, iri);
+    }
 
-    public Result<Instance> mapToInstance(Row row) {
+    public ResultStream<Instance> mapToInstance(Row row) {
         return null; // TODO
     }
 
     public ResultStream<Row> execute() {
-    	return null;
+        return null;
     }
 }

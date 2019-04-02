@@ -1,5 +1,9 @@
 package xyz.ottr.lutra;
 
+import java.util.function.Function;
+
+import xyz.ottr.lutra.result.ResultStream;
+
 /*-
  * #%L
  * lutra-bottr

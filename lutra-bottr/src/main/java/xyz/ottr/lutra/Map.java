@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.function.Supplier;
 
 import xyz.ottr.lutra.model.Instance;
-import xyz.ottr.lutra.result.Result;
 import xyz.ottr.lutra.result.ResultStream;
 
 /*-
@@ -32,28 +31,54 @@ import xyz.ottr.lutra.result.ResultStream;
 public abstract class Map implements Supplier<ResultStream<Instance>> {
 
     protected final String source; // TODO: Decide how to incorporate DB drivers, etc.
-    private final String query;
-    private final String type;
-    private final TermMapping mapping;
-    private final String templateIRI;
+    protected final String query;
+    protected final String type;
+    //protected final TermMapping mapping; // TODO: Implement TermMapping
+    protected final String mapping;
+    protected final String templateIRI;
 
     @Override
     public ResultStream<Instance> get() {
-        return execute().innerFlatMap(row -> mapToInstance(row));
+        return execute().innerFlatMap(row -> mapToInstance(row)); //TODO: Fix this thing
     }
 
-    public Result<Instance> mapToInstance(Row row) {
+    public ResultStream<Instance> mapToInstance(Row row) {
         return null; // TODO
     }
 
     public abstract ResultStream<Row> execute();
     
+    public Map(String src, String qry, String t, String map, String iri) {
+        source = src;
+        query = qry;
+        type = t;
+        mapping = map;
+        templateIRI = iri;
+    }
+    
     //Returns the sql query to parse. Do we need to do any formatting here?
     public String getQuery() {
-    	return query;
+        return query;
+    }
+    
+    public String getSource() {
+        return source;
+    }
+    
+    public String getMapping() {
+        return mapping;
+    }
+    
+    public String getTemplateIRI() {
+        return templateIRI;
+    }
+    
+    public String getType() {
+        return type;
     }
 
-    class Row {
+
+    static class Row {
 
         private final List<String> elements;
 
