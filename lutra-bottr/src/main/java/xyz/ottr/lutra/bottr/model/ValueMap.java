@@ -1,8 +1,8 @@
-package xyz.ottr.lutra;
+package xyz.ottr.lutra.bottr.model;
 
-import java.util.function.Function;
+import java.util.List;
 
-import xyz.ottr.lutra.result.ResultStream;
+import xyz.ottr.lutra.model.Term;
 
 /*-
  * #%L
@@ -26,9 +26,9 @@ import xyz.ottr.lutra.result.ResultStream;
  * #L%
  */
 
-public class MapSpecParser implements Function<String, ResultStream<Map>> {
-
-    public ResultStream<Map> apply(String filename) {
+public class ValueMap {
+    
+    public List<Term> getTerms(Source.Row row) {
         return null; // TODO
     }
 }

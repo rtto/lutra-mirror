@@ -1,6 +1,8 @@
-package xyz.ottr.lutra;
+package xyz.ottr.lutra.bottr.parser;
 
-import xyz.ottr.lutra.model.Instance;
+import java.util.function.Function;
+
+import xyz.ottr.lutra.bottr.model.Map;
 import xyz.ottr.lutra.result.ResultStream;
 
 /*-
@@ -25,17 +27,9 @@ import xyz.ottr.lutra.result.ResultStream;
  * #L%
  */
 
-public class MapCSV extends Map {
+public class MapSpecParser implements Function<String, ResultStream<Map>> {
 
-    public MapCSV(String src, String qry, String t, String map, String iri) {
-        super(src, qry, t, map, iri);
-    }
-
-    public ResultStream<Instance> mapToInstance(Row row) {
+    public ResultStream<Map> apply(String filename) {
         return null; // TODO
-    }
-
-    public ResultStream<Row> execute() {
-        return null;
     }
 }

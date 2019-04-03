@@ -1,8 +1,4 @@
-package xyz.ottr.lutra;
-
-import xyz.ottr.lutra.Map.Row;
-import xyz.ottr.lutra.model.Instance;
-import xyz.ottr.lutra.result.ResultStream;
+package xyz.ottr.lutra.bottr.model;
 
 /*-
  * #%L
@@ -26,17 +22,25 @@ import xyz.ottr.lutra.result.ResultStream;
  * #L%
  */
 
-public class MapXML extends Map {
+import java.util.List;
 
-    public MapXML(String src, String qry, String t, String map, String iri) {
-        super(src, qry, t, map, iri);
+import xyz.ottr.lutra.result.ResultStream;
+
+public interface Source {
+    
+    ResultStream<Row> execute(String query);
+    
+    class Row {
+
+        private final List<String> values;
+
+        public Row(List<String> values) {
+            this.values = values;
+        }
+
+        public List<String> getValues() {
+            return this.values;
+        }
     }
 
-    public ResultStream<Instance> mapToInstance(Row row) {
-        return null; // TODO
-    }
-
-    public ResultStream<Row> execute() {
-        return null;
-    }
 }

@@ -1,4 +1,4 @@
-package xyz.ottr.lutra;
+package xyz.ottr.lutra.bottr.source;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -8,7 +8,8 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
-import xyz.ottr.lutra.model.Instance;
+
+import xyz.ottr.lutra.bottr.model.Source;
 import xyz.ottr.lutra.result.ResultStream;
 
 /*-
@@ -33,17 +34,21 @@ import xyz.ottr.lutra.result.ResultStream;
  * #L%
  */
 
-public class MapJDBC extends Map {
-
-    public MapJDBC(String src, String qry, String t, String map, String iri) {
-        super(src, qry, t, map, iri);
-    }
+public class JDBCSource implements Source {
     
-    public ResultStream<Instance> mapToInstance(Row row) {
-        return null; // TODO
-    }
+    private final String databaseDriver;
+    private final String databaseURL;
+    private final String username;
+    private final String password;
 
-    public ResultStream<Row> execute() {
+    public JDBCSource(String databaseDriver, String databaseURL, String username, String password) {
+        this.databaseDriver = databaseDriver;
+        this.databaseURL = databaseURL;
+        this.username = username;
+        this.password = password;
+    }
+   
+    public ResultStream<Row> execute(String query) {
 
         Connection conn = null;
         PreparedStatement stmt = null;
@@ -52,14 +57,14 @@ public class MapJDBC extends Map {
 
         try {
             //Register driver
-            Class.forName(getDriver());
+            Class.forName(this.databaseDriver);
 
             //Open connection
-            conn = DriverManager.getConnection(getURL(),getUser(),getPassword());
+            conn = DriverManager.getConnection(this.databaseURL, this.username, this.password);
 
             //Execute query
             stmt = conn.prepareStatement("?");
-            stmt.setString(1, getQuery());
+            stmt.setString(1, query);
             rs = stmt.executeQuery();
 
             //Parse the data
@@ -109,27 +114,5 @@ public class MapJDBC extends Map {
         } //end try
         return rowStream;
     }
-    
-    
-    //Returns the correct driver. Based on the type field maybe? returns the postgres driver for now
-    private String getDriver() {
-        return "org.postgresql.Driver";
-    }
-
-    //Returns the URL. Should be contained in the source field
-    public String getURL() {
-        return source; //TODO
-    }
-    
-    //Returns the user name for accessing the database. Should be contained in the source field
-    private String getUser() {
-        return null; //TODO
-    }
-    
-    //Returns the password used to access the database. Should be contained in the source field
-    private String getPassword() {
-        return null; //TODO
-    }
-    
 
 }
