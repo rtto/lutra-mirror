@@ -1,12 +1,13 @@
 package xyz.ottr.lutra.bottr.model;
 
-import edu.umd.cs.findbugs.annotations.SuppressWarnings;
-
 import java.util.function.Supplier;
 
-import xyz.ottr.lutra.model.ArgumentList;
+import org.apache.jena.shared.PrefixMapping;
+
 import xyz.ottr.lutra.model.Instance;
+import xyz.ottr.lutra.result.Result;
 import xyz.ottr.lutra.result.ResultStream;
+import xyz.ottr.lutra.tabottr.io.rdf.TemplateInstanceFactory;
 
 /*-
  * #%L
@@ -32,30 +33,35 @@ import xyz.ottr.lutra.result.ResultStream;
 
 public class Map implements Supplier<ResultStream<Instance>> {
 
-    protected final Source source;
-    protected final String query;
-    protected final String templateIRI;
-    protected final ValueMap valueMap;
+    private final Source source;
+    private final String query;
+    private final String templateIRI;
+    //private final ValueMapList valueMaps;
 
-    public Map(Source source, String query, String templateIRI, ValueMap valueMap) {
+    /* For now we just leverage lutra-tab's TemplateInstanceFactory for converting data value 
+     * rows into template instances. Note that this requires the data value types to be according 
+     * to the tabOTTR spec; this will probably change, using designated IRIs for these types.
+     */
+    private final TemplateInstanceFactory instanceFactory;
+
+    public Map(PrefixMapping prefixes, Source source, String query, String templateIRI, ValueMapList valueMaps) {
         this.source = source;
         this.query = query;
         this.templateIRI = templateIRI;
-        this.valueMap = valueMap;
+        //this.valueMaps = valueMaps;
+        
+        this.instanceFactory = new TemplateInstanceFactory(prefixes, templateIRI, valueMaps.getTypes());
     }
     
     @Override
     public ResultStream<Instance> get() {
-        return source.execute(this.query).innerFlatMap(row -> mapToInstance(row));
+        return source.execute(this.query).mapFlatMap(row -> mapToInstance(row));
     }
 
-    @SuppressWarnings(value = "RV_RETURN_VALUE_IGNORED_NO_SIDE_EFFECT", justification = "work in progress")
-    public ResultStream<Instance> mapToInstance(Source.Row row) {
-        new Instance(this.templateIRI, new ArgumentList(this.valueMap.getTerms(row)));
-        
-        return null; // TODO
+    private Result<Instance> mapToInstance(Source.Row row) {
+        return instanceFactory.createTemplateInstance(row.getValues());
     }
-
+    
     public String getQuery() {
         return this.query;
     }
