@@ -28,4 +28,6 @@ public interface Source {
 
     ResultStream<Row> execute(String query);
     
+    void close();
+    
 }

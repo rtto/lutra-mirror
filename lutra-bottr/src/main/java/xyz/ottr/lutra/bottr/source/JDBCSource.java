@@ -10,6 +10,8 @@ import java.util.List;
 
 import xyz.ottr.lutra.bottr.model.Row;
 import xyz.ottr.lutra.bottr.model.Source;
+import xyz.ottr.lutra.result.Message;
+import xyz.ottr.lutra.result.Result;
 import xyz.ottr.lutra.result.ResultStream;
 
 /*-
@@ -35,11 +37,13 @@ import xyz.ottr.lutra.result.ResultStream;
  */
 
 public class JDBCSource implements Source {
-    
+
     private final String databaseDriver;
     private final String databaseURL;
     private final String username;
     private final String password;
+
+    private Connection conn;
 
     public JDBCSource(String databaseDriver, String databaseURL, String username, String password) {
         this.databaseDriver = databaseDriver;
@@ -47,29 +51,36 @@ public class JDBCSource implements Source {
         this.username = username;
         this.password = password;
     }
-   
+
+    private void openConnection() throws ClassNotFoundException, SQLException {
+        Class.forName(this.databaseDriver);
+        conn = DriverManager.getConnection(this.databaseURL, this.username, this.password);
+    }
+
     public ResultStream<Row> execute(String query) {
-
-        Connection conn = null;
-        Statement stmt = null;
-        ResultSet rs = null;
-        ResultStream<Row> rowStream = ResultStream.empty();
-
         try {
-            //Register driver
-            Class.forName(this.databaseDriver);
+            if (conn == null || conn.isClosed()) {
+                openConnection();
+            }
+        } catch (ClassNotFoundException | SQLException e) {
+            return ResultStream.of(Result.empty(Message.fatal(
+                    "Cannot connect to database " + this.databaseURL 
+                    + " with driver " + this.databaseDriver
+                    + " and with user " + this.username 
+                    + ": " + e.getMessage())));
+        }
 
-            //Open connection
-            conn = DriverManager.getConnection(this.databaseURL, this.username, this.password);
-
-            //Execute query
-            stmt = conn.createStatement();
-            rs = stmt.executeQuery(query);
+        // Collect results
+        List<Row> result = new ArrayList<>();
+        
+        // Execute query
+        try {
+            Statement stmt = conn.createStatement();
+            ResultSet rs = stmt.executeQuery(query);
 
             // Parse the data
             int colcount = rs.getMetaData().getColumnCount();
 
-            List<Row> result = new ArrayList<>();
             while (rs.next()) {
                 List<String> rowAsList = new ArrayList<>();
                 for (int i = 1; i <= colcount; i++) {
@@ -77,43 +88,20 @@ public class JDBCSource implements Source {
                 }
                 result.add(new Row(rowAsList));
             }
-            rowStream = ResultStream.innerOf(result);
-
-            //Clean up
+            
+            // Clean up
             rs.close();
             stmt.close();
-            conn.close();
-        } catch (SQLException se) {
-            //Handle errors for JDBC
-            se.printStackTrace();
-        } catch (Exception e) {
-            //Handle errors for Class.forName
-            e.printStackTrace();
-        } finally {
-            //finally block used to close resources
-            try {
-                if (stmt != null) {
-                    stmt.close();
-                }
-            } catch (SQLException se2) {
-                se2.printStackTrace();
-            } //nothing we can do
-            try {
-                if (conn != null) {
-                    conn.close();
-                }
-            } catch (SQLException se) {
-                se.printStackTrace();
-            } //end finally try
-            try {
-                if (rs != null) {
-                    rs.close();
-                }
-            } catch (SQLException se) {
-                se.printStackTrace();
-            } //end finally try
-        } //end try
-        return rowStream;
+
+        } catch (SQLException e) {
+            return ResultStream.of(Result.empty(Message.error(
+                    "Error running query " + query 
+                    + " over database " + this.databaseURL 
+                    + ": " + e.getMessage())));
+        }
+
+        return ResultStream.innerOf(result);
     }
+
 
 }
