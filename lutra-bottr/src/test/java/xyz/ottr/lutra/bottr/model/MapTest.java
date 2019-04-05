@@ -13,7 +13,7 @@ import org.apache.jena.shared.PrefixMapping;
 import org.junit.Test;
 
 import xyz.ottr.lutra.OTTR;
-import xyz.ottr.lutra.bottr.model.Map;
+import xyz.ottr.lutra.bottr.model.InstanceMap;
 import xyz.ottr.lutra.bottr.model.Source;
 import xyz.ottr.lutra.model.ArgumentList;
 import xyz.ottr.lutra.model.IRITerm;
@@ -58,8 +58,8 @@ public class MapTest {
 
             public StaticTestSource() {
                 this.rows = new ArrayList<>();
-                this.rows.add(new Source.Row(Arrays.asList(ns + "A1", ns + "B1", ns + "C1")));
-                this.rows.add(new Source.Row(Arrays.asList(ns + "A2", ns + "B2", ns + "C2")));
+                this.rows.add(new Row(Arrays.asList(ns + "A1", ns + "B1", ns + "C1")));
+                this.rows.add(new Row(Arrays.asList(ns + "A2", ns + "B2", ns + "C2")));
             }
 
             // NB! Returns same rows regardless of query
@@ -70,12 +70,12 @@ public class MapTest {
         }
 
         // Set up map to translate source to triple instances
-        ValueMapList valMap = new ValueMapList();
+        ValueMap valMap = new ValueMap();
         valMap.addValueMap(TabOTTR.TYPE_IRI);
         valMap.addValueMap(TabOTTR.TYPE_IRI);
         valMap.addValueMap(TabOTTR.TYPE_IRI);
 
-        Map myMap = new Map(
+        InstanceMap myMap = new InstanceMap(
                 PrefixMapping.Standard, 
                 new StaticTestSource(), 
                 "blank query", 

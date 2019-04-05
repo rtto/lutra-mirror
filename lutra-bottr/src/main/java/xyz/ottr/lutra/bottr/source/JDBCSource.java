@@ -2,14 +2,14 @@ package xyz.ottr.lutra.bottr.source;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Stream;
 
 import xyz.ottr.lutra.bottr.model.Source;
+import xyz.ottr.lutra.bottr.model.Row;
 import xyz.ottr.lutra.result.ResultStream;
 
 /*-
@@ -51,7 +51,7 @@ public class JDBCSource implements Source {
     public ResultStream<Row> execute(String query) {
 
         Connection conn = null;
-        PreparedStatement stmt = null;
+        Statement stmt = null;
         ResultSet rs = null;
         ResultStream<Row> rowStream = ResultStream.empty();
 
@@ -63,20 +63,21 @@ public class JDBCSource implements Source {
             conn = DriverManager.getConnection(this.databaseURL, this.username, this.password);
 
             //Execute query
-            stmt = conn.prepareStatement("?");
-            stmt.setString(1, query);
-            rs = stmt.executeQuery();
+            stmt = conn.createStatement();
+            rs = stmt.executeQuery(query);
 
-            //Parse the data
+            // Parse the data
             int colcount = rs.getMetaData().getColumnCount();
 
+            List<Row> result = new ArrayList<>();
             while (rs.next()) {
                 List<String> rowAsList = new ArrayList<>();
                 for (int i = 1; i <= colcount; i++) {
                     rowAsList.add(rs.getString(i));
                 }
-                rowStream = ResultStream.concat(rowStream, (ResultStream<Row>) Stream.of(new Row(rowAsList)));
+                result.add(new Row(rowAsList));
             }
+            rowStream = ResultStream.innerOf(result);
 
             //Clean up
             rs.close();

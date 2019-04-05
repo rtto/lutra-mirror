@@ -34,16 +34,16 @@ import java.util.stream.Collectors;
  * 
  * @author martige
  */
-public class ValueMapList {
+public class ValueMap {
 
-    private List<ValueMap> maps;
+    private List<ValueMapEntry> maps;
 
-    public ValueMapList() {
+    public ValueMap() {
         this.maps = new ArrayList<>();
     }
 
     public void addValueMap(String type) {
-        this.maps.add(new ValueMap(type));
+        this.maps.add(new ValueMapEntry(type));
     }
 
     public List<String> getTypes() {
@@ -57,11 +57,11 @@ public class ValueMapList {
     }
      */
 
-    private static class ValueMap {
+    private static class ValueMapEntry {
 
         private String type;
 
-        public ValueMap(String type) {
+        public ValueMapEntry(String type) {
             this.type = type;
         }
 

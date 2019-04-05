@@ -22,25 +22,10 @@ package xyz.ottr.lutra.bottr.model;
  * #L%
  */
 
-import java.util.List;
-
 import xyz.ottr.lutra.result.ResultStream;
 
 public interface Source {
-    
+
     ResultStream<Row> execute(String query);
     
-    class Row {
-
-        private final List<String> values;
-
-        public Row(List<String> values) {
-            this.values = values;
-        }
-
-        public List<String> getValues() {
-            return this.values;
-        }
-    }
-
 }

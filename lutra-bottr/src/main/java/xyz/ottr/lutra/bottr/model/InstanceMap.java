@@ -31,7 +31,7 @@ import xyz.ottr.lutra.tabottr.io.rdf.TemplateInstanceFactory;
  * #L%
  */
 
-public class Map implements Supplier<ResultStream<Instance>> {
+public class InstanceMap implements Supplier<ResultStream<Instance>> {
 
     private final Source source;
     private final String query;
@@ -44,7 +44,7 @@ public class Map implements Supplier<ResultStream<Instance>> {
      */
     private final TemplateInstanceFactory instanceFactory;
 
-    public Map(PrefixMapping prefixes, Source source, String query, String templateIRI, ValueMapList valueMaps) {
+    public InstanceMap(PrefixMapping prefixes, Source source, String query, String templateIRI, ValueMap valueMaps) {
         this.source = source;
         this.query = query;
         this.templateIRI = templateIRI;
@@ -58,7 +58,7 @@ public class Map implements Supplier<ResultStream<Instance>> {
         return source.execute(this.query).mapFlatMap(row -> mapToInstance(row));
     }
 
-    private Result<Instance> mapToInstance(Source.Row row) {
+    private Result<Instance> mapToInstance(Row row) {
         return instanceFactory.createTemplateInstance(row.getValues());
     }
     
