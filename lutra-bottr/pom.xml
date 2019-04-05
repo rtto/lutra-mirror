@@ -23,10 +23,15 @@
 			<groupId>${project.groupId}</groupId>
 			<artifactId>lutra-wottr</artifactId>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>${project.groupId}</groupId>
 			<artifactId>lutra-tab</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>com.h2database</groupId>
+			<artifactId>h2</artifactId>
 		</dependency>
 
 		<dependency>
