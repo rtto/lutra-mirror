@@ -8,8 +8,8 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
-import xyz.ottr.lutra.bottr.model.Source;
 import xyz.ottr.lutra.bottr.model.Row;
+import xyz.ottr.lutra.bottr.model.Source;
 import xyz.ottr.lutra.result.ResultStream;
 
 /*-
