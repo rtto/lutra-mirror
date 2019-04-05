@@ -99,9 +99,7 @@ public class MapTest {
         output.add(inst2);
 
         // get input instances
-        // TODO: question, is it not possible to directly collect the stream's "real" content?
-        Set<Instance> input = myMap.get().getStream().map(r -> r.get()).collect(Collectors.toSet());
-        
+        Set<Instance> input = myMap.get().innerCollect(Collectors.toSet());
         
         assertEquals(2, input.size());
         assertEquals(input, output);
