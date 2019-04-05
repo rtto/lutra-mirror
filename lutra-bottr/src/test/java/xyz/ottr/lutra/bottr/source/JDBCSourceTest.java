@@ -52,7 +52,7 @@ public class JDBCSourceTest {
         Statement stmt = conn.createStatement();
         
         //Create table
-        stmt.execute("DROP TABLE CUSTOMER");
+        stmt.execute("DROP TABLE IF EXISTS CUSTOMER");
         stmt.execute("CREATE TABLE CUSTOMER (id number, name varchar(20), age number, address varchar(20), salary number);");
         stmt.execute("INSERT into CUSTOMER values (1, 'Paulo', 32, 'Niteroi', 2500);");
         stmt.execute("INSERT into CUSTOMER values (2, 'Pedro', 33, 'Porto Alegre', 2700);");
