@@ -1,7 +1,10 @@
 package xyz.ottr.lutra.bottr.io;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.function.BiFunction;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.RDFNode;
@@ -40,10 +43,21 @@ import xyz.ottr.lutra.wottr.util.ModelSelector;
 public class BSourceParser implements BiFunction<Model, Resource, Result<Source>> {
 
     private static final List<Resource> supportedSources = Arrays.asList(BOTTR.SQLSource);
+    
+    private static Map<Integer, Result<Source>> sources = new HashMap<>();
 
     public BSourceParser() {}
-
+    
+    @Override
     public Result<Source> apply(Model model, Resource source) {
+        int key = Objects.hash(model, source);
+        if (!sources.containsKey(key)) {
+            sources.put(key, this.compute(model, source));
+        }
+        return sources.get(key);
+    }
+    
+    private Result<Source> compute(Model model, Resource source) {
         
         List<RDFNode> sourceTypes = ModelSelector.listObjectsOfProperty(model, source, RDF.type);
         
@@ -54,12 +68,13 @@ public class BSourceParser implements BiFunction<Model, Resource, Result<Source>
                     "Expected exactly one source type, but found " + sourceTypes.size() 
                     + ": " + sourceTypes.toString()));
         }
-
-        Result<Source> resSource = Result.empty();
-        if (sourceTypes.contains(BOTTR.SQLSource)) {
-            resSource = parseSQLSource(model, source);
+        
+        RDFNode sourceType = sourceTypes.get(0);
+ 
+        if (BOTTR.SQLSource.equals(sourceType)) {
+            return parseSQLSource(model, source);
         }
-        return resSource;
+        return Result.empty(Message.error("Error parsing source. Source type " + sourceType + " not supported."));
     }
 
     private Result<Source> parseSQLSource(Model model, Resource source) {
@@ -79,4 +94,8 @@ public class BSourceParser implements BiFunction<Model, Resource, Result<Source>
             return Result.of(new JDBCSource(username.get(), password.get(), jdbcDriver.get(), jdbcDatabaseURL.get()));    
         }
     }
+
+
+
+    
 }
