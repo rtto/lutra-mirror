@@ -70,4 +70,8 @@ public class InstanceMap implements Supplier<ResultStream<Instance>> {
         return this.templateIRI;
     }
     
+    public void closeSource() {
+        source.close();
+    }
+    
 }

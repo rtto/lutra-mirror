@@ -30,45 +30,43 @@ import xyz.ottr.lutra.OTTR;
 
 public class WOTTR {
 
-    private static final String ns = OTTR.namespace;
-   
     // Classes
-    public static final Resource Template = getResource(ns + "Template");
-    public static final Resource TemplateSignature = getResource(ns + "Signature");
-    public static final Resource BaseTemplate = getResource(ns + "BaseTemplate");
-    public static final Resource TemplateInstance = getResource(ns + "TemplateInstance");
+    public static final Resource Template = getResource("Template");
+    public static final Resource TemplateSignature = getResource("Signature");
+    public static final Resource BaseTemplate = getResource("BaseTemplate");
+    public static final Resource TemplateInstance = getResource("TemplateInstance");
 
     // Individuals
-    public static final Resource triple = getResource(OTTR.Bases.Triple);
-    public static final Resource none = getResource(ns + "none");
-    public static final Resource optional = getResource(ns + "optional");
-    public static final Resource nonBlank = getResource(ns + "nonBlank");
+    public static final Resource triple = ResourceFactory.createResource(OTTR.Bases.Triple);
+    public static final Resource none = getResource("none");
+    public static final Resource optional = getResource("optional");
+    public static final Resource nonBlank = getResource("nonBlank");
 
-    public static final Resource listExpand = getResource(ns + "listExpand");
-    public static final Resource zipMin = getResource(ns + "zipMin");
-    public static final Resource zipMax = getResource(ns + "zipMax");
-    public static final Resource cross = getResource(ns + "cross");
+    public static final Resource listExpand = getResource("listExpand");
+    public static final Resource zipMin = getResource("zipMin");
+    public static final Resource zipMax = getResource("zipMax");
+    public static final Resource cross = getResource("cross");
 
     // Properties
-    public static final Property parameters = getProperty(ns + "parameters");
-    public static final Property variable = getProperty(ns + "variable");
-    public static final Property type = getProperty(ns + "type");
-    public static final Property defaultVal = getProperty(ns + "default");
-    public static final Property pattern = getProperty(ns + "pattern");
-    public static final Property arguments = getProperty(ns + "arguments");
-    public static final Property modifier = getProperty(ns + "modifier");
-    public static final Property of = getProperty(ns + "of");
-    public static final Property values = getProperty(ns + "values");
-    public static final Property value = getProperty(ns + "value");
-    public static final Property annotation = getProperty(ns + "annotation");
+    public static final Property parameters = getProperty("parameters");
+    public static final Property variable = getProperty("variable");
+    public static final Property type = getProperty("type");
+    public static final Property defaultVal = getProperty("default");
+    public static final Property pattern = getProperty("pattern");
+    public static final Property arguments = getProperty("arguments");
+    public static final Property modifier = getProperty("modifier");
+    public static final Property of = getProperty("of");
+    public static final Property values = getProperty("values");
+    public static final Property value = getProperty("value");
+    public static final Property annotation = getProperty("annotation");
  
     
     // Utility methods
-    private static Resource getResource(String uri) {
-        return ResourceFactory.createResource(uri);
+    protected static Resource getResource(String localname) {
+        return ResourceFactory.createResource(OTTR.namespace + localname);
     }
 
-    private static Property getProperty(String uri) {
-        return ResourceFactory.createProperty(uri);
+    protected static Property getProperty(String localname) {
+        return ResourceFactory.createProperty(OTTR.namespace + localname);
     }
 }

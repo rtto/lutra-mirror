@@ -1,4 +1,4 @@
-package xyz.ottr.lutra.bottr.model;
+package xyz.ottr.lutra.bottr.io;
 
 /*-
  * #%L
@@ -22,14 +22,16 @@ package xyz.ottr.lutra.bottr.model;
  * #L%
  */
 
+import xyz.ottr.lutra.io.InstanceParser;
+import xyz.ottr.lutra.model.Instance;
 import xyz.ottr.lutra.result.ResultStream;
 
-public interface Source {
+public class BInstanceReader implements InstanceParser<String> {
 
-    ResultStream<Row> execute(String query);
-    
-    default void close() {
-        // do nothing;
+    @Override
+    public ResultStream<Instance> apply(String t) {
+        // TODO Auto-generated method stub
+        return null;
     }
-    
+
 }

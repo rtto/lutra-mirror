@@ -8,6 +8,9 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import xyz.ottr.lutra.bottr.model.Row;
 import xyz.ottr.lutra.bottr.model.Source;
 import xyz.ottr.lutra.result.Message;
@@ -38,6 +41,8 @@ import xyz.ottr.lutra.result.ResultStream;
 
 public class JDBCSource implements Source {
 
+    private final Logger log = LoggerFactory.getLogger(JDBCSource.class);
+    
     private final String databaseDriver;
     private final String databaseURL;
     private final String username;
@@ -56,8 +61,20 @@ public class JDBCSource implements Source {
         Class.forName(this.databaseDriver);
         conn = DriverManager.getConnection(this.databaseURL, this.username, this.password);
     }
+    
+    public void close() {
+        try {
+            if (conn != null) {
+                conn.close();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
 
     public ResultStream<Row> execute(String query) {
+        
+        // open connection if necessary, and abort if not possible
         try {
             if (conn == null || conn.isClosed()) {
                 openConnection();
@@ -70,12 +87,14 @@ public class JDBCSource implements Source {
                     + ": " + e.getMessage())));
         }
 
-        // Collect results
+        // Collect results in list
         List<Row> result = new ArrayList<>();
         
         // Execute query
         try {
             Statement stmt = conn.createStatement();
+            
+            log.info("Running query: " + query);
             ResultSet rs = stmt.executeQuery(query);
 
             // Parse the data
@@ -88,7 +107,8 @@ public class JDBCSource implements Source {
                 }
                 result.add(new Row(rowAsList));
             }
-            
+            log.info("Rows collected: " + result.size());
+
             // Clean up
             rs.close();
             stmt.close();
@@ -102,6 +122,4 @@ public class JDBCSource implements Source {
 
         return ResultStream.innerOf(result);
     }
-
-
 }

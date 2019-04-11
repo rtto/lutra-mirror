@@ -9,7 +9,9 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.junit.Assert;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 
 import xyz.ottr.lutra.bottr.model.Row;
 import xyz.ottr.lutra.bottr.source.JDBCSource;
@@ -38,12 +40,15 @@ import xyz.ottr.lutra.result.ResultStream;
  */
 
 public class JDBCSourceTest {
+  
+    @Rule
+    public TemporaryFolder testFolder = new TemporaryFolder();
 
     @Test
     public void prototypeTest() throws ClassNotFoundException, SQLException {
 
         final String driver = "org.h2.Driver";
-        final String url = "jdbc:h2:~/test";
+        final String url = "jdbc:h2:" + testFolder.getRoot().getAbsolutePath() + "/db";
         final String user = "user";
         final String pass = "pass";
 
@@ -76,6 +81,7 @@ public class JDBCSourceTest {
         JDBCSource jdbcTest = new JDBCSource(driver, url, user, pass);
         ResultStream<Row> rowStream = jdbcTest.execute("SELECT ID, NAME, SALARY FROM CUSTOMER;");
         Set<Row> dbOutput = rowStream.innerCollect(Collectors.toSet());
+        jdbcTest.close();
 
         //Compare dbOutput to expected result
         Assert.assertEquals(dbOutput, expected);
