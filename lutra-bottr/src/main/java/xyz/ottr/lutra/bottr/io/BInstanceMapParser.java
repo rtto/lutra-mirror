@@ -43,7 +43,11 @@ import xyz.ottr.lutra.wottr.util.ModelSelector;
 
 public class BInstanceMapParser implements Function<Model, ResultStream<InstanceMap>> {
 
-    public BInstanceMapParser() {}
+    private BSourceParser sourceParser;
+    
+    public BInstanceMapParser() {
+        this.sourceParser = new BSourceParser();
+    }
 
     @Override
     public ResultStream<InstanceMap> apply(Model model) {
@@ -85,7 +89,7 @@ public class BInstanceMapParser implements Function<Model, ResultStream<Instance
             return Result.empty(Message.error("Error parsing InstanceMap's source"), resSourceIRI);
         } else {
             Resource source = resSourceIRI.get();
-            return new BSourceParser().apply(model, source);
+            return this.sourceParser.apply(model, source);
         }
     }
 

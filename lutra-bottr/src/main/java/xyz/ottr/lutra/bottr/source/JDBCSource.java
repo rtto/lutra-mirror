@@ -1,18 +1,20 @@
 package xyz.ottr.lutra.bottr.source;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
+import org.apache.commons.dbcp2.BasicDataSource;
+import org.apache.commons.dbutils.QueryRunner;
+import org.apache.commons.dbutils.handlers.ArrayListHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import xyz.ottr.lutra.bottr.model.Row;
 import xyz.ottr.lutra.bottr.model.Source;
+import xyz.ottr.lutra.result.Message;
+import xyz.ottr.lutra.result.Result;
 import xyz.ottr.lutra.result.ResultStream;
 
 /*-
@@ -38,92 +40,37 @@ import xyz.ottr.lutra.result.ResultStream;
  */
 
 public class JDBCSource implements Source {
-  
+
     private final Logger log = LoggerFactory.getLogger(JDBCSource.class);
-    
-    private final String databaseDriver;
-    private final String databaseURL;
-    private final String username;
-    private final String password;
+
+    private BasicDataSource dataSource;
 
     public JDBCSource(String databaseDriver, String databaseURL, String username, String password) {
-        this.databaseDriver = databaseDriver;
-        this.databaseURL = databaseURL;
-        this.username = username;
-        this.password = password;
+        this.dataSource = new BasicDataSource();
+
+        this.dataSource.setDriverClassName(databaseDriver);
+        this.dataSource.setUsername(username);
+        this.dataSource.setPassword(password);
+        this.dataSource.setUrl(databaseURL);
     }
-   
+    
     public ResultStream<Row> execute(String query) {
 
-        Connection conn = null;
-        Statement stmt = null;
-        ResultSet rs = null;
-        ResultStream<Row> rowStream = ResultStream.empty();
-
-        try {
-            //Register driver
-            Class.forName(this.databaseDriver);
-
-            //Open connection
-            conn = DriverManager.getConnection(this.databaseURL, this.username, this.password);
-            
-            //Execute query
-            stmt = conn.createStatement();
-            
+        try (Connection conn = this.dataSource.getConnection()) {
             log.info("Running query: " + query);
-            rs = stmt.executeQuery(query);
             
+            List<Row> rows = new QueryRunner().query(conn, query, new ArrayListHandler())
+                    .stream()
+                    .map(Row::new)
+                    .collect(Collectors.toList());
             
+            return ResultStream.innerOf(rows);
 
-            // Parse the data
-            int colcount = rs.getMetaData().getColumnCount();
-
-            List<Row> result = new ArrayList<>();
-            while (rs.next()) {
-                List<String> rowAsList = new ArrayList<>();
-                for (int i = 1; i <= colcount; i++) {
-                    rowAsList.add(rs.getString(i));
-                }
-                result.add(new Row(rowAsList));
-            }
-            log.info("Rows collected: " + result.size());
-            rowStream = ResultStream.innerOf(result);
-
-            //Clean up
-            rs.close();
-            stmt.close();
-            conn.close();
-        } catch (SQLException se) {
-            //Handle errors for JDBC
-            se.printStackTrace();
-        } catch (Exception e) {
-            //Handle errors for Class.forName
-            e.printStackTrace();
-        } finally {
-            //finally block used to close resources
-            try {
-                if (stmt != null) {
-                    stmt.close();
-                }
-            } catch (SQLException se2) {
-                se2.printStackTrace();
-            } //nothing we can do
-            try {
-                if (conn != null) {
-                    conn.close();
-                }
-            } catch (SQLException se) {
-                se.printStackTrace();
-            } //end finally try
-            try {
-                if (rs != null) {
-                    rs.close();
-                }
-            } catch (SQLException se) {
-                se.printStackTrace();
-            } //end finally try
-        } //end try
-        return rowStream;
+        } catch (SQLException ex) {
+            return ResultStream.of(Result.empty(Message.error(
+                    "Error running query " + query 
+                    + " over database " + this.dataSource.getUrl() 
+                    + ": " + ex.getMessage())));
+        }
     }
-
 }
