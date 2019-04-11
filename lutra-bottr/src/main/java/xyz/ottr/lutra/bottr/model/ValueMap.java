@@ -41,6 +41,11 @@ public class ValueMap {
     public ValueMap() {
         this.maps = new ArrayList<>();
     }
+    
+    public ValueMap(List<String> types) {
+        this();
+        types.forEach(type -> this.addValueMap(type));
+    }
 
     public void addValueMap(String type) {
         this.maps.add(new ValueMapEntry(type));
