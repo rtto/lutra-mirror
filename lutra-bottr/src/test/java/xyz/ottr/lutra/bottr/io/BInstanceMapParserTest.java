@@ -35,7 +35,7 @@ import xyz.ottr.lutra.wottr.util.ModelIO;
 public class BInstanceMapParserTest {
 
     @Test
-    public void test() {
+    public void shouldParse() {
         Model model = ModelIO.readModel("instanceMap1.ttl");
         BInstanceMapParser parser = new BInstanceMapParser();
         
