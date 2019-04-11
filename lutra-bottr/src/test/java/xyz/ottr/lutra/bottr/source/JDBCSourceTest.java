@@ -81,7 +81,6 @@ public class JDBCSourceTest {
         JDBCSource jdbcTest = new JDBCSource(driver, url, user, pass);
         ResultStream<Row> rowStream = jdbcTest.execute("SELECT ID, NAME, SALARY FROM CUSTOMER;");
         Set<Row> dbOutput = rowStream.innerCollect(Collectors.toSet());
-        jdbcTest.close();
 
         //Compare dbOutput to expected result
         Assert.assertEquals(dbOutput, expected);

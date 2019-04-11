@@ -28,8 +28,4 @@ public interface Source {
 
     ResultStream<Row> execute(String query);
     
-    default void close() {
-        // do nothing;
-    }
-    
 }

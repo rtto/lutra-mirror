@@ -69,9 +69,5 @@ public class InstanceMap implements Supplier<ResultStream<Instance>> {
     public String getTemplateIRI() {
         return this.templateIRI;
     }
-    
-    public void closeSource() {
-        source.close();
-    }
-    
+        
 }

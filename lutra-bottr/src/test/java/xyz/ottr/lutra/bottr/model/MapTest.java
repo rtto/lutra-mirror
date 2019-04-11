@@ -100,7 +100,6 @@ public class MapTest {
 
         // get input instances
         Set<Instance> input = myMap.get().innerCollect(Collectors.toSet());
-        myMap.closeSource();
         
         assertEquals(2, input.size());
         assertEquals(input, output);

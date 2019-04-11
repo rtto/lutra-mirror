@@ -85,7 +85,6 @@ public class H2CSVTest {
 
         // there should be three triples
         assertEquals(3, map.get().getStream().filter(r -> r.isPresent()).count());
-        map.closeSource();
     }
 
 }

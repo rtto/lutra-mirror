@@ -1,5 +1,7 @@
 package xyz.ottr.lutra.bottr.model;
 
+import java.util.Arrays;
+
 /*-
  * #%L
  * lutra-bottr
@@ -23,11 +25,16 @@ package xyz.ottr.lutra.bottr.model;
  */
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 public class Row {
 
     private final List<String> values;
+    
+    public Row(Object[] values) {
+        this(Arrays.asList(values).stream().map(o -> o.toString()).collect(Collectors.toList()));
+    }
 
     public Row(List<String> values) {
         this.values = values;
