@@ -8,6 +8,9 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import xyz.ottr.lutra.bottr.model.Row;
 import xyz.ottr.lutra.bottr.model.Source;
 import xyz.ottr.lutra.result.ResultStream;
@@ -35,6 +38,8 @@ import xyz.ottr.lutra.result.ResultStream;
  */
 
 public class JDBCSource implements Source {
+  
+    private final Logger log = LoggerFactory.getLogger(JDBCSource.class);
     
     private final String databaseDriver;
     private final String databaseURL;
@@ -61,10 +66,14 @@ public class JDBCSource implements Source {
 
             //Open connection
             conn = DriverManager.getConnection(this.databaseURL, this.username, this.password);
-
+            
             //Execute query
             stmt = conn.createStatement();
+            
+            log.info("Running query: " + query);
             rs = stmt.executeQuery(query);
+            
+            
 
             // Parse the data
             int colcount = rs.getMetaData().getColumnCount();
@@ -77,6 +86,7 @@ public class JDBCSource implements Source {
                 }
                 result.add(new Row(rowAsList));
             }
+            log.info("Rows collected: " + result.size());
             rowStream = ResultStream.innerOf(result);
 
             //Clean up
