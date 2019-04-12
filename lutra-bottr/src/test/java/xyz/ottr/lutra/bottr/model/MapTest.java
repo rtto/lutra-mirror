@@ -70,13 +70,9 @@ public class MapTest {
         }
 
         // Set up map to translate source to triple instances
-        ValueMap valMap = new ValueMap();
-        valMap.addValueMap(TabOTTR.TYPE_IRI);
-        valMap.addValueMap(TabOTTR.TYPE_IRI);
-        valMap.addValueMap(TabOTTR.TYPE_IRI);
+        ValueMap valMap = new ValueMap(PrefixMapping.Standard, Arrays.asList(TabOTTR.TYPE_IRI, TabOTTR.TYPE_IRI, TabOTTR.TYPE_IRI));
 
         InstanceMap myMap = new InstanceMap(
-                PrefixMapping.Standard, 
                 new StaticTestSource(), 
                 "blank query", 
                 OTTR.Bases.Triple, 

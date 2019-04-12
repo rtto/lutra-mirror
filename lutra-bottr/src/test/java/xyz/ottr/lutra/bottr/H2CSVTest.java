@@ -26,6 +26,7 @@ import static org.junit.Assert.assertEquals;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Arrays;
 
 import org.apache.jena.shared.PrefixMapping;
 import org.junit.Rule;
@@ -62,10 +63,7 @@ public class H2CSVTest {
         Files.write(Paths.get(csvFilename), csvContent.getBytes());
         
         // Set up map to translate source to triple instances
-        ValueMap valMap = new ValueMap();
-        valMap.addValueMap(TabOTTR.TYPE_IRI);
-        valMap.addValueMap(TabOTTR.TYPE_IRI);
-        valMap.addValueMap(TabOTTR.TYPE_IRI);
+        ValueMap valMap = new ValueMap(prefixes, Arrays.asList(TabOTTR.TYPE_IRI, TabOTTR.TYPE_IRI, TabOTTR.TYPE_IRI));
 
         // H2 database to load CSV file
         Source h2 = new JDBCSource(
@@ -76,7 +74,6 @@ public class H2CSVTest {
         
         // map data to triples
         InstanceMap map = new InstanceMap(
-                prefixes,
                 h2,
                 "SELECT * FROM CSVREAD('" + csvFilename + "');",
                 WOTTR.triple.toString(),

@@ -79,7 +79,7 @@ public class BInstanceMapParser implements Function<Model, ResultStream<Instance
             resSource.addMessage(Message.error("Error parsing InstanceMap " + instanceMap.getURI()));
             return resMap;
         } else {
-            return Result.of(new InstanceMap(model, resSource.get(), resQuery.get(), resTemplate.get().getURI(), resValueMap.get()));
+            return Result.of(new InstanceMap(resSource.get(), resQuery.get(), resTemplate.get().getURI(), resValueMap.get()));
         }
     }
 
@@ -106,7 +106,7 @@ public class BInstanceMapParser implements Function<Model, ResultStream<Instance
                     .map(r -> BModelSelector.getRequiredResourceOfProperty(model, r, BOTTR.type))
                     .map(r -> r.map(g -> g.getURI())) // TODO: is this correct?
                     .collect(Collectors.toList());
-            return Result.aggregate(typeList).map(ValueMap::new);
+            return Result.aggregate(typeList).map(types -> new ValueMap(model, types));
         }
     }
 }

@@ -1,8 +1,18 @@
 package xyz.ottr.lutra.bottr.model;
 
-import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.function.Function;
 import java.util.stream.Collectors;
+
+import org.apache.jena.rdf.model.RDFNode;
+import org.apache.jena.shared.PrefixMapping;
+
+import xyz.ottr.lutra.model.ArgumentList;
+import xyz.ottr.lutra.model.Term;
+import xyz.ottr.lutra.result.Result;
+import xyz.ottr.lutra.tabottr.io.rdf.RDFNodeFactory;
+import xyz.ottr.lutra.wottr.WTermFactory;
 
 /*-
  * #%L
@@ -34,46 +44,42 @@ import java.util.stream.Collectors;
  * 
  * @author martige
  */
-public class ValueMap {
-
-    private List<ValueMapEntry> maps;
-
-    public ValueMap() {
-        this.maps = new ArrayList<>();
-    }
+public class ValueMap implements Function<Row, Result<ArgumentList>> {
     
-    public ValueMap(List<String> types) {
-        this();
-        types.forEach(type -> this.addValueMap(type));
+    private final RDFNodeFactory dataFactory;
+    private final WTermFactory termFactory;
+
+    private final List<ValueMap.Entry> maps;
+
+    public ValueMap(PrefixMapping prefixes, List<String> types) {
+        this.dataFactory = new RDFNodeFactory(prefixes);
+        this.termFactory = new WTermFactory();
+        this.maps = types.stream()
+                .map(ValueMap.Entry::new)
+                .collect(Collectors.toList());
+    }
+     
+    @Override
+    public Result<ArgumentList> apply(Row row) {
+        List<Result<Term>> args = new LinkedList<>();
+        for (int i = 0; i < row.getValues().size(); i += 1) {
+            Result<RDFNode> rdfNode = dataFactory.toRDFNode(row.getValue(i), this.maps.get(i).getType());
+            args.add(rdfNode.flatMap(termFactory));
+        }
+        return Result.aggregate(args).map(ArgumentList::new);
     }
 
-    public void addValueMap(String type) {
-        this.maps.add(new ValueMapEntry(type));
-    }
-
-    public List<String> getTypes() {
-        return maps.stream().map(m -> m.getType()).collect(Collectors.toList());
-    }
-
-    /*
-    // TODO. The idea is that this method will transform and type the row values into OTTR Terms.
-    public List<Term> getTerms(Source.Row row) {
-        return null; // TODO
-    }
-     */
-
-    private static class ValueMapEntry {
+    private static class Entry {
 
         private String type;
 
-        public ValueMapEntry(String type) {
+        public Entry(String type) {
             this.type = type;
         }
 
         public String getType() {
             return this.type;
         }
-
     }
-
+    
 }

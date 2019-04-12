@@ -32,14 +32,20 @@ public class Row {
 
     private final List<String> values;
     
-    public Row(Object[] values) {
-        this(Arrays.asList(values).stream().map(o -> o.toString()).collect(Collectors.toList()));
-    }
-
     public Row(List<String> values) {
         this.values = values;
     }
+    
+    public Row(Object[] values) {
+        this(Arrays.asList(values).stream()
+                .map(o -> o.toString())
+                .collect(Collectors.toList()));
+    }
 
+    public String getValue(int index) {
+        return this.values.get(index);
+    }
+    
     public List<String> getValues() {
         return this.values;
     }

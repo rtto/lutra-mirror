@@ -2,12 +2,9 @@ package xyz.ottr.lutra.bottr.model;
 
 import java.util.function.Supplier;
 
-import org.apache.jena.shared.PrefixMapping;
-
 import xyz.ottr.lutra.model.Instance;
 import xyz.ottr.lutra.result.Result;
 import xyz.ottr.lutra.result.ResultStream;
-import xyz.ottr.lutra.tabottr.io.rdf.TemplateInstanceFactory;
 
 /*-
  * #%L
@@ -36,21 +33,13 @@ public class InstanceMap implements Supplier<ResultStream<Instance>> {
     private final Source source;
     private final String query;
     private final String templateIRI;
-    //private final ValueMapList valueMaps;
+    private final ValueMap valueMap;
 
-    /* For now we just leverage lutra-tab's TemplateInstanceFactory for converting data value 
-     * rows into template instances. Note that this requires the data value types to be according 
-     * to the tabOTTR spec; this will probably change, using designated IRIs for these types.
-     */
-    private final TemplateInstanceFactory instanceFactory;
-
-    public InstanceMap(PrefixMapping prefixes, Source source, String query, String templateIRI, ValueMap valueMaps) {
+    public InstanceMap(Source source, String query, String templateIRI, ValueMap valueMap) {
         this.source = source;
         this.query = query;
         this.templateIRI = templateIRI;
-        //this.valueMaps = valueMaps;
-        
-        this.instanceFactory = new TemplateInstanceFactory(prefixes, templateIRI, valueMaps.getTypes());
+        this.valueMap = valueMap;        
     }
     
     @Override
@@ -59,7 +48,7 @@ public class InstanceMap implements Supplier<ResultStream<Instance>> {
     }
 
     private Result<Instance> mapToInstance(Row row) {
-        return instanceFactory.createTemplateInstance(row.getValues());
+        return valueMap.apply(row).flatMap(argList -> Result.of(new Instance(this.templateIRI, argList)));
     }
     
     public String getQuery() {
@@ -69,5 +58,5 @@ public class InstanceMap implements Supplier<ResultStream<Instance>> {
     public String getTemplateIRI() {
         return this.templateIRI;
     }
-        
+
 }
