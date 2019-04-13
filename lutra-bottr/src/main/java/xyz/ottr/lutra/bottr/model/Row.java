@@ -30,23 +30,24 @@ import java.util.stream.Collectors;
 
 public class Row {
 
-    private final List<String> values;
+    private final List<?> values;
     
-    public Row(List<String> values) {
+    public Row(List<?> values) {
         this.values = values;
     }
     
-    public Row(Object[] values) {
+    public Row(Object... values) {
         this(Arrays.asList(values).stream()
                 .map(o -> o.toString())
                 .collect(Collectors.toList()));
     }
 
-    public String getValue(int index) {
+
+    public Object getValue(int index) {
         return this.values.get(index);
     }
     
-    public List<String> getValues() {
+    public List<?> getValues() {
         return this.values;
     }
 

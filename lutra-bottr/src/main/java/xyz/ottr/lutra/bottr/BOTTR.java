@@ -32,6 +32,7 @@ public class BOTTR extends WOTTR {
     // Classes
     public static final Resource InstanceMap = getResource("InstanceMap");
     public static final Resource SQLSource = getResource("SQLSource");
+    public static final Resource SPARQLSource = getResource("SPARQLSource");
     
     // Properties
     public static final Property template = getProperty("template");
@@ -43,5 +44,8 @@ public class BOTTR extends WOTTR {
     public static final Property password = getProperty("password");
     public static final Property jdbcDriver = getProperty("jdbcDriver");
     public static final Property jdbcDatabaseURL = getProperty("jdbcDatabaseURL");
+    
+    public static final Property sparqlEndpoint = getProperty("sparqlEndpoint");
+
     
 }
