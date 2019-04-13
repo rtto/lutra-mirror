@@ -63,7 +63,7 @@ public class ValueMap implements Function<Row, Result<ArgumentList>> {
     public Result<ArgumentList> apply(Row row) {
         List<Result<Term>> args = new LinkedList<>();
         for (int i = 0; i < row.getValues().size(); i += 1) {
-            Result<RDFNode> rdfNode = dataFactory.toRDFNode(row.getValue(i), this.maps.get(i).getType());
+            Result<RDFNode> rdfNode = dataFactory.toRDFNode(row.getValue(i).toString(), this.maps.get(i).getType());
             args.add(rdfNode.flatMap(termFactory));
         }
         return Result.aggregate(args).map(ArgumentList::new);

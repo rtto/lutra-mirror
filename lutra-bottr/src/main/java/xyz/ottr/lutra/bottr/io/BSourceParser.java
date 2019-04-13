@@ -14,6 +14,7 @@ import org.apache.jena.vocabulary.RDF;
 import xyz.ottr.lutra.bottr.BOTTR;
 import xyz.ottr.lutra.bottr.model.Source;
 import xyz.ottr.lutra.bottr.source.JDBCSource;
+import xyz.ottr.lutra.bottr.source.SPARQLEndpointSource;
 import xyz.ottr.lutra.result.Message;
 import xyz.ottr.lutra.result.Result;
 import xyz.ottr.lutra.wottr.util.ModelSelector;
@@ -73,8 +74,10 @@ public class BSourceParser implements BiFunction<Model, Resource, Result<Source>
  
         if (BOTTR.SQLSource.equals(sourceType)) {
             return parseSQLSource(model, source);
+        } else if (BOTTR.SPARQLSource.equals(sourceType)) {
+            return parseSPARQLEndpointSource(model, source);
         }
-        return Result.empty(Message.error("Error parsing source. Source type " + sourceType + " not supported."));
+        return Result.empty(Message.error("Error parsing source. Source type " + sourceType + " is not supported."));
     }
 
     private Result<Source> parseSQLSource(Model model, Resource source) {
@@ -93,6 +96,11 @@ public class BSourceParser implements BiFunction<Model, Resource, Result<Source>
         } else {
             return Result.of(new JDBCSource(username.get(), password.get(), jdbcDriver.get(), jdbcDatabaseURL.get()));    
         }
+    }
+    
+    private Result<Source> parseSPARQLEndpointSource(Model model, Resource source) {
+        Result<String> endpoint = BModelSelector.getRequiredStringOfProperty(model, source, BOTTR.sparqlEndpoint);
+        return endpoint.map(SPARQLEndpointSource::new); 
     }
 
 
