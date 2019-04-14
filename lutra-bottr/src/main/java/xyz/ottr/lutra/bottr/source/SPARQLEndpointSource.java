@@ -31,18 +31,26 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
+import org.apache.jena.datatypes.xsd.XSDDatatype;
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryExecution;
 import org.apache.jena.query.QueryExecutionFactory;
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSet;
-import xyz.ottr.lutra.bottr.model.Row;
+import org.apache.jena.rdf.model.Literal;
+import org.apache.jena.rdf.model.RDFNode;
+import org.apache.jena.rdf.model.ResourceFactory;
+
+import xyz.ottr.lutra.bottr.model.Record;
 import xyz.ottr.lutra.bottr.model.Source;
 import xyz.ottr.lutra.result.Message;
 import xyz.ottr.lutra.result.Result;
 import xyz.ottr.lutra.result.ResultStream;
 
-public class SPARQLEndpointSource implements Source {
+public class SPARQLEndpointSource implements Source<RDFNode> {
+    
+    private static final Literal TRUE = ResourceFactory.createTypedLiteral("true", XSDDatatype.XSDboolean);
+    private static final Literal FALSE = ResourceFactory.createTypedLiteral("false", XSDDatatype.XSDboolean);
 
     private String endpointURL;
 
@@ -51,35 +59,35 @@ public class SPARQLEndpointSource implements Source {
     }
 
     @Override
-    public ResultStream<Row> execute(String query) {
+    public ResultStream<Record<RDFNode>> execute(String query) {
 
         QueryExecution qexec = QueryExecutionFactory.sparqlService(this.endpointURL, query);
         Query q = qexec.getQuery();
         if (q.isSelectType()) {
             ResultSet resultSet = qexec.execSelect();
-            return new ResultStream<Row>(streamResultSet(resultSet).map(Result::of));
+            return new ResultStream<Record<RDFNode>>(streamResultSet(resultSet).map(Result::of));
         } else if (q.isAskType()) {
             boolean result = qexec.execAsk();
-            return ResultStream.innerOf(new Row(result));
+            return ResultStream.innerOf(new Record<RDFNode>(result ? TRUE : FALSE));
         } else {
             return ResultStream.of(Result.empty(Message.error(
                     "Unsupported SPARQL query type. Query must be SELECT or ASK.")));
         }
     }
 
-    private Stream<Row> streamResultSet(ResultSet resultSet) {
+    private Stream<Record<RDFNode>> streamResultSet(ResultSet resultSet) {
 
         final List<String> columns = resultSet.getResultVars();
         // TODO: does this work when a get returns null? will there be a hole in the list? Must test.
-        final Function<QuerySolution, Row> rowCreator = (sol) -> new Row(
+        final Function<QuerySolution, Record<RDFNode>> rowCreator = (sol) -> new Record<>(
                 columns.stream()
                 .map(c -> sol.get(c))
                 .collect(Collectors.toList()));
 
-        Stream<Row> stream = StreamSupport.stream(
-                new Spliterators.AbstractSpliterator<Row>(Long.MAX_VALUE, Spliterator.ORDERED) {
+        Stream<Record<RDFNode>> stream = StreamSupport.stream(
+                new Spliterators.AbstractSpliterator<Record<RDFNode>>(Long.MAX_VALUE, Spliterator.ORDERED) {
                     @Override
-                    public boolean tryAdvance(Consumer<? super Row> action) {
+                    public boolean tryAdvance(Consumer<? super Record<RDFNode>> action) {
                         if (!resultSet.hasNext()) { 
                             return false;
                         } else { 

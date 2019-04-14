@@ -25,29 +25,25 @@ import java.util.Arrays;
  */
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 
-public class Row {
+public class Record<V> {
 
-    private final List<?> values;
-    
-    public Row(List<?> values) {
+    private final List<V> values;
+
+    public Record(List<V> values) {
         this.values = values;
     }
-    
-    public Row(Object... values) {
-        this(Arrays.asList(values).stream()
-                .map(o -> o.toString())
-                .collect(Collectors.toList()));
+
+    public Record(V... values) {
+        this(Arrays.asList(values));
     }
 
-
-    public Object getValue(int index) {
+    public V getValue(int index) {
         return this.values.get(index);
     }
-    
-    public List<?> getValues() {
+
+    public List<V> getValues() {
         return this.values;
     }
 
@@ -55,6 +51,20 @@ public class Row {
         return values.toString();
     }
 
+    /* (non-Javadoc)
+     * @see java.lang.Object#hashCode()
+     */
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((values == null) ? 0 : values.hashCode());
+        return result;
+    }
+
+    /* (non-Javadoc)
+     * @see java.lang.Object#equals(java.lang.Object)
+     */
     @Override
     public boolean equals(Object obj) {
         if (this == obj) {
@@ -63,10 +73,10 @@ public class Row {
         if (obj == null) {
             return false;
         }
-        if (getClass() != obj.getClass()) {
+        if (!(obj instanceof Record)) {
             return false;
         }
-        Row other = (Row) obj;
+        Record other = (Record) obj;
         if (values == null) {
             if (other.values != null) {
                 return false;
@@ -75,14 +85,6 @@ public class Row {
             return false;
         }
         return true;
-    }
-    
-    @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + ((values == null) ? 0 : values.hashCode());
-        return result;
     }
 
 }

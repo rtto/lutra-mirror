@@ -44,7 +44,7 @@ import xyz.ottr.lutra.wottr.WTermFactory;
  * 
  * @author martige
  */
-public class ValueMap implements Function<Row, Result<ArgumentList>> {
+public class ValueMap implements Function<Record<?>, Result<ArgumentList>> {
     
     private final RDFNodeFactory dataFactory;
     private final WTermFactory termFactory;
@@ -60,7 +60,7 @@ public class ValueMap implements Function<Row, Result<ArgumentList>> {
     }
      
     @Override
-    public Result<ArgumentList> apply(Row row) {
+    public Result<ArgumentList> apply(Record<?> row) {
         List<Result<Term>> args = new LinkedList<>();
         for (int i = 0; i < row.getValues().size(); i += 1) {
             Result<RDFNode> rdfNode = dataFactory.toRDFNode(row.getValue(i).toString(), this.maps.get(i).getType());

@@ -30,12 +30,12 @@ import xyz.ottr.lutra.result.ResultStream;
 
 public class InstanceMap implements Supplier<ResultStream<Instance>> {
 
-    private final Source source;
+    private final Source<?> source;
     private final String query;
     private final String templateIRI;
     private final ValueMap valueMap;
 
-    public InstanceMap(Source source, String query, String templateIRI, ValueMap valueMap) {
+    public InstanceMap(Source<?> source, String query, String templateIRI, ValueMap valueMap) {
         this.source = source;
         this.query = query;
         this.templateIRI = templateIRI;
@@ -47,7 +47,7 @@ public class InstanceMap implements Supplier<ResultStream<Instance>> {
         return source.execute(this.query).mapFlatMap(row -> mapToInstance(row));
     }
 
-    private Result<Instance> mapToInstance(Row row) {
+    private Result<Instance> mapToInstance(Record<?> row) {
         return valueMap.apply(row).flatMap(argList -> Result.of(new Instance(this.templateIRI, argList)));
     }
     

@@ -26,7 +26,6 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
-import xyz.ottr.lutra.bottr.model.Row;
 import xyz.ottr.lutra.bottr.model.Source;
 import xyz.ottr.lutra.result.ResultStream;
 
@@ -37,9 +36,7 @@ public class SPARQLEndpointSourceTest {
         String endpoint = "https://query.wikidata.org/bigdata/namespace/wdq/sparql";
         Source source = new SPARQLEndpointSource(endpoint);
         
-        ResultStream<Row> result = source.execute("SELECT ?s ?p ?o WHERE { ?s ?p ?o } LIMIT 13");
-        
+        ResultStream<?> result = source.execute("SELECT ?s ?p ?o WHERE { ?s ?p ?o } LIMIT 13");
         assertEquals(13, result.getStream().count());
     }
-
 }

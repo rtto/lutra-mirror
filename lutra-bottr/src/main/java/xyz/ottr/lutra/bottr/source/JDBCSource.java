@@ -2,6 +2,7 @@ package xyz.ottr.lutra.bottr.source;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -11,7 +12,7 @@ import org.apache.commons.dbutils.handlers.ArrayListHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import xyz.ottr.lutra.bottr.model.Row;
+import xyz.ottr.lutra.bottr.model.Record;
 import xyz.ottr.lutra.bottr.model.Source;
 import xyz.ottr.lutra.result.Message;
 import xyz.ottr.lutra.result.Result;
@@ -39,7 +40,7 @@ import xyz.ottr.lutra.result.ResultStream;
  * #L%
  */
 
-public class JDBCSource implements Source {
+public class JDBCSource implements Source<String> {
 
     private final Logger log = LoggerFactory.getLogger(JDBCSource.class);
 
@@ -54,14 +55,19 @@ public class JDBCSource implements Source {
         this.dataSource.setUrl(databaseURL);
     }
     
-    public ResultStream<Row> execute(String query) {
+    @Override
+    public ResultStream<Record<String>> execute(String query) {
 
         try (Connection conn = this.dataSource.getConnection()) {
             log.info("Running query: " + query);
             
-            List<Row> rows = new QueryRunner().query(conn, query, new ArrayListHandler())
+            List<Record<String>> rows = new QueryRunner().query(conn, query, new ArrayListHandler())
                     .stream()
-                    .map(Row::new)
+                    .map(array -> Arrays.asList(array)
+                            .stream()
+                            .map(value -> value.toString())
+                            .collect(Collectors.toList()))
+                    .map(Record::new)
                     .collect(Collectors.toList());
             
             return ResultStream.innerOf(rows);

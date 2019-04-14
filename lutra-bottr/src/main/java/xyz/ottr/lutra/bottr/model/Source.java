@@ -24,8 +24,8 @@ package xyz.ottr.lutra.bottr.model;
 
 import xyz.ottr.lutra.result.ResultStream;
 
-public interface Source {
+public interface Source<V> {
 
-    ResultStream<Row> execute(String query);
+    ResultStream<Record<V>> execute(String query);
     
 }

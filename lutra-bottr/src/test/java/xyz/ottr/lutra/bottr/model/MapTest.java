@@ -52,20 +52,20 @@ public class MapTest {
         final String ns = "http://example.com/ns#";
 
         // Input: Set up source with some data
-        class StaticTestSource implements Source {
+        class StaticTestSource implements Source<String> {
 
-            private List<Row> rows;
+            private List<Record<String>> rows;
 
             public StaticTestSource() {
                 this.rows = new ArrayList<>();
-                this.rows.add(new Row(Arrays.asList(ns + "A1", ns + "B1", ns + "C1")));
-                this.rows.add(new Row(Arrays.asList(ns + "A2", ns + "B2", ns + "C2")));
+                this.rows.add(new Record<>(Arrays.asList(ns + "A1", ns + "B1", ns + "C1")));
+                this.rows.add(new Record<>(Arrays.asList(ns + "A2", ns + "B2", ns + "C2")));
             }
 
             // NB! Returns same rows regardless of query
             @Override
-            public ResultStream<Row> execute(String query) {
-                return new ResultStream<Row>(rows.stream().map(Result::of));
+            public ResultStream<Record<String>> execute(String query) {
+                return new ResultStream<Record<String>>(rows.stream().map(Result::of));
             }
         }
 
