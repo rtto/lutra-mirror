@@ -1,0 +1,58 @@
+@prefix xsd:       <http://www.w3.org/2001/XMLSchema#> . 
+@prefix rdf:       <http://www.w3.org/1999/02/22-rdf-syntax-ns#> . 
+@prefix rdfs:      <http://www.w3.org/2000/01/rdf-schema#> . 
+@prefix owl:       <http://www.w3.org/2002/07/owl#> . 
+
+@prefix foaf:    <http://xmlns.com/foaf/0.1/> .
+@prefix schema:  <http://schema.org/> .
+
+@prefix ex: <http://example.com/ns#> .
+
+@prefix ottr: <http://ns.ottr.xyz/0.4/> .
+
+ex:Person a ottr:Template ;
+  ottr:parameters (
+    [ ottr:variable _:person; ottr:type ottr:IRI ]
+    [ ottr:variable _:name; ottr:type xsd:string ] 
+    [ ottr:variable _:email; ottr:type ottr:IRI ]     
+    [ ottr:variable _:phone; ottr:type ottr:IRI ]
+    [ ottr:variable _:birthdate; ottr:type xsd:dateTime ]     
+    [ ottr:variable _:heigth; ottr:type xsd:decimal ]
+    [ ottr:variable _:weigth; ottr:type xsd:decimal ] ) ;
+  ottr:pattern
+    [ ottr:of ottr:Triple ; ottr:values ( _:person rdf:type foaf:Person ) ] ,
+    [ ottr:of ottr:Triple ; ottr:values ( _:person foaf:name _:name ) ] ,
+    [ ottr:of ottr:Triple ; ottr:values ( _:person foaf:mbox _:email ) ] ,
+    [ ottr:of ottr:Triple ; ottr:values ( _:person foaf:phone _:phone ) ] ,
+    [ ottr:of ottr:Triple ; ottr:values ( _:person schema:birthDate _:birthdate ) ] ,
+    [ ottr:of ottr:Triple ; ottr:values ( _:person schema:height _:heigth ) ] ,
+    [ ottr:of ottr:Triple ; ottr:values ( _:person schema:weight _:weigth ) ]
+    .
+
+
+## PREFIX iter: <http://w3id.org/sparql-generate/iter/> .
+## PREFIX fun: <http://w3id.org/sparql-generate/fn/> .
+
+## BASE <http://example.org/> 
+
+## GENERATE { 
+##  ?personIRI a foaf:Person ;
+##             foaf:name ?name;
+##             foaf:mbox ?email ;
+##             foaf:phone ?phone ;
+##             schema:birthDate ?birthdate ;
+##             schema:height ?height ;
+##             schema:weight ?weight .
+## }
+## SOURCE <persons> AS ?persons
+## ITERATOR iter:CSV(?persons) AS ?person
+## WHERE {
+##     BIND( fun:CSV(?person, "PersonId" ) AS ?personId )
+##     BIND( URI(CONCAT("http://example.com/person/",?personId)) AS ?personIRI )
+##     BIND( fun:CSV(?person, "Name" ) AS ?name )
+##     BIND( URI( CONCAT( "tel:", fun:CSV(?person, "Phone" ) ) ) AS ?phone )
+##     BIND( URI( CONCAT( "mailto:", fun:CSV(?person, "Email" ) ) ) AS ?email )
+##     BIND( xsd:dateTime( fun:CSV(?person, "Birthdate" ) ) AS ?birthdate )
+##     BIND( xsd:decimal( fun:CSV(?person, "Height" ) ) AS ?height )
+##     BIND( xsd:decimal( fun:CSV(?person, "Weight" ) ) AS ?weight )
+## }
