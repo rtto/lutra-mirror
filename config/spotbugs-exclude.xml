@@ -5,4 +5,8 @@
     <Class name="xyz.ottr.lutra.store.TemplateNode" />
     <Bug pattern="EQ_DOESNT_OVERRIDE_EQUALS" />
   </Match>
+  <Match>
+    <!-- Generated sources -->
+    <Source name="~.*stOTTR.*"/>
+  </Match>
 </FindBugsFilter>

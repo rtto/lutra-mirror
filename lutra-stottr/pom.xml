@@ -1,0 +1,81 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>xyz.ottr.lutra</groupId>
+		<version>0.5.0-beta-2-SNAPSHOT</version>
+		<artifactId>lutra</artifactId>
+		<relativePath>../pom.xml</relativePath>
+	</parent>
+
+	<artifactId>lutra-stottr</artifactId>
+	<packaging>jar</packaging>
+
+	<properties>
+		<url.stottrspec>https://dev.spec.ottr.xyz/stOTTR/</url.stottrspec>
+		<local.stottrspec>${project.basedir}/src/main/antlr4/</local.stottrspec>
+	</properties>
+
+	<dependencies>
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>lutra-core</artifactId>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.antlr</groupId>
+			<artifactId>antlr4-maven-plugin</artifactId>
+                        <version>4.3</version>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<plugins>
+
+			<plugin>
+				<groupId>com.googlecode.maven-download-plugin</groupId>
+				<artifactId>download-maven-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>download-stottr</id>
+						<phase>generate-sources</phase>
+						<goals>
+							<goal>wget</goal>
+						</goals>
+						<configuration>
+							<url>${url.stottrspec}stOTTR.g4</url>
+							<outputDirectory>${local.stottrspec}</outputDirectory>
+							<!--md5>MD5 SUM HERE</md5 -->
+							<skipCache>true</skipCache>
+						</configuration>
+					</execution>
+					<execution>
+						<id>download-stottr-dep</id>
+						<phase>generate-sources</phase>
+						<goals>
+							<goal>wget</goal>
+						</goals>
+						<configuration>
+							<url>${url.stottrspec}Turtle.g4</url>
+							<outputDirectory>${local.stottrspec}imports/</outputDirectory>
+							<!--md5>MD5 SUM HERE</md5 -->
+							<skipCache>true</skipCache>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+                        <plugin>
+                          <groupId>org.antlr</groupId>
+                          <artifactId>antlr4-maven-plugin</artifactId>
+                          <version>4.3</version>
+                          <executions>
+                            <execution>
+                              <id>antlr</id>
+                              <goals>
+                                <goal>antlr4</goal>
+                              </goals>
+                            </execution>
+                          </executions>
+                        </plugin>
+		</plugins>
+	</build>
+</project>
