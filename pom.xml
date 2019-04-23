@@ -175,7 +175,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-pmd-plugin</artifactId>
-				<version>3.8</version>
+				<version>3.12.0</version>
 				<configuration>
 					<printFailingErrors>true</printFailingErrors>
 				</configuration>
@@ -271,7 +271,7 @@
 
 			<plugin>
 				<artifactId>maven-pmd-plugin</artifactId>
-				<version>3.8</version>
+				<version>3.12.0</version>
 				<reportSets>
 					<reportSet>
 						<reports>
