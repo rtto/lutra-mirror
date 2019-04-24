@@ -1,15 +1,24 @@
 package xyz.ottr.lutra.bottr.source;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.xml.transform.sax.SAXSource;
+
+import net.sf.saxon.s9api.DocumentBuilder;
 import net.sf.saxon.s9api.Processor;
 import net.sf.saxon.s9api.SaxonApiException;
 import net.sf.saxon.s9api.XQueryCompiler;
 import net.sf.saxon.s9api.XQueryEvaluator;
 import net.sf.saxon.s9api.XQueryExecutable;
 import net.sf.saxon.s9api.XdmItem;
+import net.sf.saxon.s9api.XdmNode;
 import net.sf.saxon.s9api.XdmValue;
+
+import org.xml.sax.InputSource;
 
 import xyz.ottr.lutra.bottr.model.Record;
 import xyz.ottr.lutra.bottr.model.Source;
@@ -39,6 +48,12 @@ import xyz.ottr.lutra.result.ResultStream;
 
 public class XMLSource implements Source<String> {
 
+    private final String uri;
+    
+    public XMLSource(String source) {
+        this.uri = source;
+    }
+
     public ResultStream<Record<String>> execute(String query) {
 
         List<Record<String>> rows = new ArrayList<Record<String>>();
@@ -46,12 +61,24 @@ public class XMLSource implements Source<String> {
         try {
 
             Processor proc = new Processor(false);
+            DocumentBuilder builder = proc.newDocumentBuilder();
+            
+            XdmNode doc = builder.build(new File(uri));
             XQueryCompiler comp = proc.newXQueryCompiler();
-            XQueryExecutable exp;
-
-            exp = comp.compile(query);
-
+            XQueryExecutable exp =  comp.compile(query);
             XQueryEvaluator qe = exp.load();
+            
+            File inputFile = new File(uri);
+            FileInputStream fis;
+            try {
+                fis = new FileInputStream(inputFile);
+            } catch (FileNotFoundException e) {
+                throw new SaxonApiException(
+                        "Input file not found.");
+            }
+            SAXSource source = new SAXSource(new InputSource(fis));
+            qe.setContextItem(doc);
+            qe.setSource(source);
             XdmValue result = qe.evaluate();
 
             for (XdmItem item : result) {
