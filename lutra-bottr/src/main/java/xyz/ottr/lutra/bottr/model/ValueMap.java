@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.shared.PrefixMapping;
 
@@ -69,12 +70,16 @@ public class ValueMap implements Function<Record<?>, Result<ArgumentList>> {
         return Result.aggregate(args).map(ArgumentList::new);
     }
 
-    // TODO: can we do this better, without instanceof?
     private Result<RDFNode> getRDFNode(Object value, String type) {
-        if (value instanceof RDFNode) {
-            return Result.of((RDFNode)value);
+        return dataFactory.toRDFNode(getStringValue(value), type);
+    }
+
+    // TODO: can we do this better, without instanceof?
+    private String getStringValue (Object value) {
+        if (value instanceof RDFNode && ((RDFNode) value).isLiteral()) {
+            return ((Literal) value).getLexicalForm();
         }
-        return dataFactory.toRDFNode(value.toString(), type);
+        return value.toString();
     }
 
     private static class Entry {

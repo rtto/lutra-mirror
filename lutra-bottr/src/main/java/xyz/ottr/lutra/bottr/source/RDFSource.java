@@ -23,7 +23,6 @@ package xyz.ottr.lutra.bottr.source;
  */
 
 import java.util.List;
-
 import org.apache.jena.query.QueryExecution;
 import org.apache.jena.query.QueryExecutionFactory;
 import org.apache.jena.rdf.model.Model;
@@ -41,21 +40,17 @@ public class RDFSource extends AbstractSPARQLSource {
         this.modelURIs = modelURIs;
     }
 
-    private Model loadModels() {
-
-        WFileReader rdfParser = new WFileReader();
-        Model union = ModelFactory.createDefaultModel();
-
-        ResultStream.innerOf(this.modelURIs)
-        .innerFlatMap(url -> rdfParser.apply(url))
-        .innerForEach(model -> union.add(model));
-       
-        return union;
+    private Result<Model> loadModels() {
+        return ResultStream.innerOf(this.modelURIs)
+                .innerFlatMap(new WFileReader())
+                .aggregate()
+                .map(stream -> stream.reduce(ModelFactory.createDefaultModel(), 
+                        (m1, m2) -> m1.add(m2)));
     }
 
     @Override
     protected Result<QueryExecution> getQueryExecution(String query) {
-        return Result.of(QueryExecutionFactory.create(query, loadModels()));
+        return loadModels().map(models -> QueryExecutionFactory.create(query, models));
     }
 
 }

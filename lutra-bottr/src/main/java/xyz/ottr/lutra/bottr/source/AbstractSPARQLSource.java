@@ -6,7 +6,6 @@ import java.util.Spliterators;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 import org.apache.jena.datatypes.xsd.XSDDatatype;
@@ -38,7 +37,7 @@ public abstract class AbstractSPARQLSource implements Source<RDFNode> {
                     Query q = exec.getQuery();
                     if (q.isSelectType()) {
                         ResultSet resultSet = exec.execSelect();
-                        return new ResultStream<Record<RDFNode>>(streamResultSet(resultSet).map(Result::of));
+                        return getResultSetStream(resultSet);
                     } else if (q.isAskType()) {
                         boolean result = exec.execAsk();
                         return ResultStream.innerOf(new Record<RDFNode>(result ? TRUE : FALSE));
@@ -49,19 +48,19 @@ public abstract class AbstractSPARQLSource implements Source<RDFNode> {
                 });
     }
 
-    private Stream<Record<RDFNode>> streamResultSet(ResultSet resultSet) {
+    private ResultStream<Record<RDFNode>> getResultSetStream(ResultSet resultSet) {
 
         final List<String> columns = resultSet.getResultVars();
         // TODO: does this work when a get returns null? will there be a hole in the list? Must test.
-        final Function<QuerySolution, Record<RDFNode>> rowCreator = (sol) -> new Record<>(
+        final Function<QuerySolution, Result<Record<RDFNode>>> rowCreator = (sol) -> Result.of(new Record<>(
                 columns.stream()
                 .map(c -> sol.get(c))
-                .collect(Collectors.toList()));
+                .collect(Collectors.toList())));
 
-        Stream<Record<RDFNode>> stream = StreamSupport.stream(
-                new Spliterators.AbstractSpliterator<Record<RDFNode>>(Long.MAX_VALUE, Spliterator.ORDERED) {
+        return new ResultStream<>(StreamSupport.stream(
+                new Spliterators.AbstractSpliterator<Result<Record<RDFNode>>>(Long.MAX_VALUE, Spliterator.ORDERED) {
                     @Override
-                    public boolean tryAdvance(Consumer<? super Record<RDFNode>> action) {
+                    public boolean tryAdvance(Consumer<? super Result<Record<RDFNode>>> action) {
                         if (!resultSet.hasNext()) { 
                             return false;
                         } else { 
@@ -69,9 +68,7 @@ public abstract class AbstractSPARQLSource implements Source<RDFNode> {
                             return true;
                         }
                     }
-                }, false);
-
-        return stream;
+                }, false));
     }
 
 }
