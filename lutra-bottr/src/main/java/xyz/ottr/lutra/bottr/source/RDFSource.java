@@ -44,8 +44,9 @@ public class RDFSource extends AbstractSPARQLSource {
         return ResultStream.innerOf(this.modelURIs)
                 .innerFlatMap(new WFileReader())
                 .aggregate()
-                .map(stream -> stream.reduce(ModelFactory.createDefaultModel(), 
-                        (m1, m2) -> m1.add(m2)));
+                .map(stream -> stream.reduce(
+                    ModelFactory.createDefaultModel(), 
+                    (m1, m2) -> m1.add(m2)));
     }
 
     @Override

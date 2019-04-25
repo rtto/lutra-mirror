@@ -75,7 +75,7 @@ public class ValueMap implements Function<Record<?>, Result<ArgumentList>> {
     }
 
     // TODO: can we do this better, without instanceof?
-    private String getStringValue (Object value) {
+    private String getStringValue(Object value) {
         if (value instanceof RDFNode && ((RDFNode) value).isLiteral()) {
             return ((Literal) value).getLexicalForm();
         }
