@@ -35,6 +35,7 @@ public class Record<V> {
         this.values = values;
     }
 
+    @SafeVarargs
     public Record(V... values) {
         this(Arrays.asList(values));
     }
@@ -76,7 +77,7 @@ public class Record<V> {
         if (!(obj instanceof Record)) {
             return false;
         }
-        Record other = (Record) obj;
+        Record<?> other = (Record<?>) obj;
         if (values == null) {
             if (other.values != null) {
                 return false;

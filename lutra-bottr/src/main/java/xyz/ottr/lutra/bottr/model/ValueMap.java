@@ -45,7 +45,7 @@ import xyz.ottr.lutra.wottr.WTermFactory;
  * @author martige
  */
 public class ValueMap implements Function<Record<?>, Result<ArgumentList>> {
-    
+
     private final RDFNodeFactory dataFactory;
     private final WTermFactory termFactory;
 
@@ -58,15 +58,23 @@ public class ValueMap implements Function<Record<?>, Result<ArgumentList>> {
                 .map(ValueMap.Entry::new)
                 .collect(Collectors.toList());
     }
-     
+
     @Override
-    public Result<ArgumentList> apply(Record<?> row) {
+    public Result<ArgumentList> apply(Record<?> record) {
         List<Result<Term>> args = new LinkedList<>();
-        for (int i = 0; i < row.getValues().size(); i += 1) {
-            Result<RDFNode> rdfNode = dataFactory.toRDFNode(row.getValue(i).toString(), this.maps.get(i).getType());
+        for (int i = 0; i < record.getValues().size(); i += 1) {
+            Result<RDFNode> rdfNode = getRDFNode(record.getValue(i), this.maps.get(i).getType());
             args.add(rdfNode.flatMap(termFactory));
         }
         return Result.aggregate(args).map(ArgumentList::new);
+    }
+
+    // TODO: can we do this better, without instanceof?
+    private Result<RDFNode> getRDFNode(Object value, String type) {
+        if (value instanceof RDFNode) {
+            return Result.of((RDFNode)value);
+        }
+        return dataFactory.toRDFNode(value.toString(), type);
     }
 
     private static class Entry {
@@ -81,5 +89,5 @@ public class ValueMap implements Function<Record<?>, Result<ArgumentList>> {
             return this.type;
         }
     }
-    
+
 }

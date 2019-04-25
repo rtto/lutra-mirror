@@ -41,6 +41,7 @@ import xyz.ottr.lutra.wottr.util.ModelSelector;
  * #L%
  */
 
+@SuppressWarnings("rawtypes")
 public class BSourceParser implements BiFunction<Model, Resource, Result<Source>> {
 
     private static final List<Resource> supportedSources = Arrays.asList(BOTTR.SQLSource);
