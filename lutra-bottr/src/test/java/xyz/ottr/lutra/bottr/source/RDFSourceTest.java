@@ -22,39 +22,37 @@ package xyz.ottr.lutra.bottr.source;
  * #L%
  */
 
+import static org.junit.Assert.assertEquals;
+
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.List;
 
-import org.apache.jena.query.QueryExecution;
-import org.apache.jena.query.QueryExecutionFactory;
-import org.apache.jena.rdf.model.Model;
-import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.rdf.model.RDFNode;
+import org.junit.Test;
 
+import xyz.ottr.lutra.bottr.model.Source;
 import xyz.ottr.lutra.result.ResultStream;
-import xyz.ottr.lutra.wottr.io.WFileReader;
 
-public class RDFSource extends AbstractSPARQLSource {
-
-    private List<String> modelURIs;
-
-    public RDFSource(List<String> modelURIs) {
-        this.modelURIs = modelURIs;
+public class RDFSourceTest {
+    
+    private final Path root = Paths.get("src", "test", "resources", "rdfsource");
+    
+    private String getResourceFile (String file) {
+        return root.resolve(file).toString();
     }
 
-    private Model loadModels() {
-
-        WFileReader rdfParser = new WFileReader();
-        Model union = ModelFactory.createDefaultModel();
-
-        ResultStream.innerOf(this.modelURIs)
-        .innerFlatMap(url -> rdfParser.apply(url))
-        .innerForEach(model -> union.add(model));
-       
-        return union;
+    @Test
+    public void prototypeTest() {
+        
+        List<String> modelURIs = Arrays.asList(getResourceFile("a.ttl"), getResourceFile("b.ttl"));
+        
+        Source<RDFNode> source = new RDFSource(modelURIs);
+        
+        ResultStream<?> result = source.execute(
+                "PREFIX foaf: <http://xmlns.com/foaf/0.1/>  " + 
+                "SELECT ?s WHERE { ?s a foaf:Person }");
+        assertEquals(6, result.getStream().count());
     }
-
-    @Override
-    protected QueryExecution getQueryExecution(String query) {
-        return QueryExecutionFactory.create(query, loadModels());
-    }
-
 }
