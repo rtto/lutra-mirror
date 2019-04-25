@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import org.apache.commons.dbcp2.BasicDataSource;
@@ -65,7 +66,7 @@ public class JDBCSource implements Source<String> {
                     .stream()
                     .map(array -> Arrays.asList(array)
                             .stream()
-                            .map(value -> value.toString())
+                            .map(value -> Objects.toString(value, null)) // the string value of null is (the object) null.
                             .collect(Collectors.toList()))
                     .map(Record::new)
                     .collect(Collectors.toList());

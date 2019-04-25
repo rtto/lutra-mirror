@@ -22,22 +22,36 @@ package xyz.ottr.lutra.bottr.source;
  * #L%
  */
 
+import java.util.List;
 import org.apache.jena.query.QueryExecution;
 import org.apache.jena.query.QueryExecutionFactory;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.ModelFactory;
 
 import xyz.ottr.lutra.result.Result;
+import xyz.ottr.lutra.result.ResultStream;
+import xyz.ottr.lutra.wottr.io.WFileReader;
 
-public class SPARQLEndpointSource extends AbstractSPARQLSource {
-    
-    private String endpointURL;
+public class RDFSource extends AbstractSPARQLSource {
 
-    public SPARQLEndpointSource(String endpointURL) {
-        this.endpointURL = endpointURL;
+    private List<String> modelURIs;
+
+    public RDFSource(List<String> modelURIs) {
+        this.modelURIs = modelURIs;
     }
-        
+
+    private Result<Model> loadModels() {
+        return ResultStream.innerOf(this.modelURIs)
+                .innerFlatMap(new WFileReader())
+                .aggregate()
+                .map(stream -> stream.reduce(
+                    ModelFactory.createDefaultModel(), 
+                    (m1, m2) -> m1.add(m2)));
+    }
+
     @Override
     protected Result<QueryExecution> getQueryExecution(String query) {
-        return Result.of(QueryExecutionFactory.sparqlService(this.endpointURL, query));
+        return loadModels().map(models -> QueryExecutionFactory.create(query, models));
     }
 
 }

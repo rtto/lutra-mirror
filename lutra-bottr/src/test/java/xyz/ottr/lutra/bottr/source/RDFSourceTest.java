@@ -24,20 +24,35 @@ package xyz.ottr.lutra.bottr.source;
 
 import static org.junit.Assert.assertEquals;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Arrays;
+import java.util.List;
+
 import org.apache.jena.rdf.model.RDFNode;
 import org.junit.Test;
 
 import xyz.ottr.lutra.bottr.model.Source;
 import xyz.ottr.lutra.result.ResultStream;
 
-public class SPARQLEndpointSourceTest {
+public class RDFSourceTest {
+
+    private final Path root = Paths.get("src", "test", "resources", "rdfsource");
+
+    private String getResourceFile(String file) {
+        return root.resolve(file).toString();
+    }
 
     @Test
     public void prototypeTest() {
-        String endpoint = "https://query.wikidata.org/bigdata/namespace/wdq/sparql";
-        Source<RDFNode> source = new SPARQLEndpointSource(endpoint);
-        
-        ResultStream<?> result = source.execute("SELECT ?s ?p ?o WHERE { ?s ?p ?o } LIMIT 13");
-        assertEquals(13, result.getStream().count());
+
+        List<String> modelURIs = Arrays.asList(getResourceFile("a.ttl"), getResourceFile("b.ttl"));
+
+        Source<RDFNode> source = new RDFSource(modelURIs);
+
+        ResultStream<?> result = source.execute(
+                "PREFIX foaf: <http://xmlns.com/foaf/0.1/>  " 
+                        + "SELECT ?s WHERE { ?s a foaf:Person }");
+        assertEquals(6, result.getStream().count());
     }
 }

@@ -66,7 +66,7 @@ public class H2CSVTest {
         ValueMap valMap = new ValueMap(prefixes, Arrays.asList(TabOTTR.TYPE_IRI, TabOTTR.TYPE_IRI, TabOTTR.TYPE_IRI));
 
         // H2 database to load CSV file
-        Source h2 = new JDBCSource(
+        Source<String> h2 = new JDBCSource(
                 "org.h2.Driver",
                 "jdbc:h2:" + root + "/db",
                 "user",

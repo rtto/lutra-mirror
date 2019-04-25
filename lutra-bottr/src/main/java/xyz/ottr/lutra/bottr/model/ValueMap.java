@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.shared.PrefixMapping;
 
@@ -45,7 +46,7 @@ import xyz.ottr.lutra.wottr.WTermFactory;
  * @author martige
  */
 public class ValueMap implements Function<Record<?>, Result<ArgumentList>> {
-    
+
     private final RDFNodeFactory dataFactory;
     private final WTermFactory termFactory;
 
@@ -58,15 +59,27 @@ public class ValueMap implements Function<Record<?>, Result<ArgumentList>> {
                 .map(ValueMap.Entry::new)
                 .collect(Collectors.toList());
     }
-     
+
     @Override
-    public Result<ArgumentList> apply(Record<?> row) {
+    public Result<ArgumentList> apply(Record<?> record) {
         List<Result<Term>> args = new LinkedList<>();
-        for (int i = 0; i < row.getValues().size(); i += 1) {
-            Result<RDFNode> rdfNode = dataFactory.toRDFNode(row.getValue(i).toString(), this.maps.get(i).getType());
+        for (int i = 0; i < record.getValues().size(); i += 1) {
+            Result<RDFNode> rdfNode = getRDFNode(record.getValue(i), this.maps.get(i).getType());
             args.add(rdfNode.flatMap(termFactory));
         }
         return Result.aggregate(args).map(ArgumentList::new);
+    }
+
+    private Result<RDFNode> getRDFNode(Object value, String type) {
+        return dataFactory.toRDFNode(getStringValue(value), type);
+    }
+
+    // TODO: can we do this better, without instanceof?
+    private String getStringValue(Object value) {
+        if (value instanceof RDFNode && ((RDFNode) value).isLiteral()) {
+            return ((Literal) value).getLexicalForm();
+        }
+        return value.toString();
     }
 
     private static class Entry {
@@ -81,5 +94,5 @@ public class ValueMap implements Function<Record<?>, Result<ArgumentList>> {
             return this.type;
         }
     }
-    
+
 }

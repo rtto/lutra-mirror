@@ -44,11 +44,11 @@ public class InstanceMap implements Supplier<ResultStream<Instance>> {
     
     @Override
     public ResultStream<Instance> get() {
-        return source.execute(this.query).mapFlatMap(row -> mapToInstance(row));
+        return source.execute(this.query).mapFlatMap(record -> mapToInstance(record));
     }
 
-    private Result<Instance> mapToInstance(Record<?> row) {
-        return valueMap.apply(row).flatMap(argList -> Result.of(new Instance(this.templateIRI, argList)));
+    private Result<Instance> mapToInstance(Record<?> record) {
+        return valueMap.apply(record).flatMap(argList -> Result.of(new Instance(this.templateIRI, argList)));
     }
     
     public String getQuery() {
