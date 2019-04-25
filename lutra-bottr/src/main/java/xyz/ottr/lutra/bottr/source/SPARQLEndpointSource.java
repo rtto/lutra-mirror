@@ -25,6 +25,8 @@ package xyz.ottr.lutra.bottr.source;
 import org.apache.jena.query.QueryExecution;
 import org.apache.jena.query.QueryExecutionFactory;
 
+import xyz.ottr.lutra.result.Result;
+
 public class SPARQLEndpointSource extends AbstractSPARQLSource {
     
     private String endpointURL;
@@ -34,8 +36,8 @@ public class SPARQLEndpointSource extends AbstractSPARQLSource {
     }
         
     @Override
-    protected QueryExecution getQueryExecution(String query) {
-        return QueryExecutionFactory.sparqlService(this.endpointURL, query);
+    protected Result<QueryExecution> getQueryExecution(String query) {
+        return Result.of(QueryExecutionFactory.sparqlService(this.endpointURL, query));
     }
 
 }

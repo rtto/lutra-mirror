@@ -29,6 +29,7 @@ import org.apache.jena.query.QueryExecutionFactory;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 
+import xyz.ottr.lutra.result.Result;
 import xyz.ottr.lutra.result.ResultStream;
 import xyz.ottr.lutra.wottr.io.WFileReader;
 
@@ -53,8 +54,8 @@ public class RDFSource extends AbstractSPARQLSource {
     }
 
     @Override
-    protected QueryExecution getQueryExecution(String query) {
-        return QueryExecutionFactory.create(query, loadModels());
+    protected Result<QueryExecution> getQueryExecution(String query) {
+        return Result.of(QueryExecutionFactory.create(query, loadModels()));
     }
 
 }

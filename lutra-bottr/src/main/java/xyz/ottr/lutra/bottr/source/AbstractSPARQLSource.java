@@ -25,26 +25,28 @@ import xyz.ottr.lutra.result.Result;
 import xyz.ottr.lutra.result.ResultStream;
 
 public abstract class AbstractSPARQLSource implements Source<RDFNode> {
-    
+
     private static final Literal TRUE = ResourceFactory.createTypedLiteral("true", XSDDatatype.XSDboolean);
     private static final Literal FALSE = ResourceFactory.createTypedLiteral("false", XSDDatatype.XSDboolean);
-    
-    protected abstract QueryExecution getQueryExecution(String query);
-    
+
+    protected abstract Result<QueryExecution> getQueryExecution(String query);
+
     @Override
     public ResultStream<Record<RDFNode>> execute(String query) {
-        QueryExecution qexec = getQueryExecution(query);
-        Query q = qexec.getQuery();
-        if (q.isSelectType()) {
-            ResultSet resultSet = qexec.execSelect();
-            return new ResultStream<Record<RDFNode>>(streamResultSet(resultSet).map(Result::of));
-        } else if (q.isAskType()) {
-            boolean result = qexec.execAsk();
-            return ResultStream.innerOf(new Record<RDFNode>(result ? TRUE : FALSE));
-        } else {
-            return ResultStream.of(Result.empty(Message.error(
-                    "Unsupported SPARQL query type. Query must be SELECT or ASK.")));
-        }
+        return getQueryExecution(query)
+                .mapToStream(exec -> {
+                    Query q = exec.getQuery();
+                    if (q.isSelectType()) {
+                        ResultSet resultSet = exec.execSelect();
+                        return new ResultStream<Record<RDFNode>>(streamResultSet(resultSet).map(Result::of));
+                    } else if (q.isAskType()) {
+                        boolean result = exec.execAsk();
+                        return ResultStream.innerOf(new Record<RDFNode>(result ? TRUE : FALSE));
+                    } else {
+                        return ResultStream.of(Result.empty(Message.error(
+                                "Unsupported SPARQL query type. Query must be SELECT or ASK.")));
+                    }
+                });
     }
 
     private Stream<Record<RDFNode>> streamResultSet(ResultSet resultSet) {
