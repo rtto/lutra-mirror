@@ -24,6 +24,7 @@ package xyz.ottr.lutra.bottr.source;
 
 import static org.junit.Assert.assertEquals;
 
+import org.apache.jena.rdf.model.RDFNode;
 import org.junit.Test;
 
 import xyz.ottr.lutra.bottr.model.Source;
@@ -34,7 +35,7 @@ public class SPARQLEndpointSourceTest {
     @Test
     public void prototypeTest() {
         String endpoint = "https://query.wikidata.org/bigdata/namespace/wdq/sparql";
-        Source source = new SPARQLEndpointSource(endpoint);
+        Source<RDFNode> source = new SPARQLEndpointSource(endpoint);
         
         ResultStream<?> result = source.execute("SELECT ?s ?p ?o WHERE { ?s ?p ?o } LIMIT 13");
         assertEquals(13, result.getStream().count());
