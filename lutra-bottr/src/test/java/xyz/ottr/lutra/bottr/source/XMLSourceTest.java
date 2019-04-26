@@ -1,5 +1,7 @@
 package xyz.ottr.lutra.bottr.source;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
@@ -37,24 +39,23 @@ import xyz.ottr.lutra.result.ResultStream;
 
 public class XMLSourceTest {
     
-    @Rule
-    public TemporaryFolder testFolder = new TemporaryFolder();
+    //@Rule
+    //public TemporaryFolder testFolder = new TemporaryFolder();
 
     @Test
     public void prototypeTest() {
         
+        Path root = Paths.get("src", "test", "resources");
+        String file = "books.xml";
         
-        String root = "C:\\";
-        String url = root + "books.xml";
-        
-        XMLSource source = new XMLSource(url);
+        XMLSource source = new XMLSource(root.resolve(file).toString());
 
         //Create expected result
         Set<Record<String>> expected = new HashSet<>();
         expected.add(new Record<>(Arrays.asList("Everyday Italian", "Giada De Laurentiis", "2005", "30.00")));
         expected.add(new Record<>(Arrays.asList("Harry Potter", "J K. Rowling", "2005", "29.99")));
         
-        ResultStream<Record<String>> rowStream = source.execute("doc(\"" + url + "\")/bookstore/book[price<35]");
+        ResultStream<Record<String>> rowStream = source.execute("doc(resolve-uri('" + file + "', '" + root.toUri().toString() + "'))/bookstore/book[price<35]");
         Set<Record<String>> dbOutput = rowStream.innerCollect(Collectors.toSet());
 
         //Compare dbOutput to expected result
