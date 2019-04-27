@@ -2,7 +2,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>xyz.ottr.lutra</groupId>
-		<version>0.5.0-beta-2-SNAPSHOT</version>
+		<version>0.5.0-beta-2</version>
 		<artifactId>lutra</artifactId>
 		<relativePath>../pom.xml</relativePath>
 	</parent>
