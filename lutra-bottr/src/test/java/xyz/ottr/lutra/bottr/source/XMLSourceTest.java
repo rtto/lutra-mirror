@@ -48,17 +48,18 @@ public class XMLSourceTest {
         Path root = Paths.get("src", "test", "resources");
         String file = "books.xml";
         
-        XMLSource source = new XMLSource(root.resolve(file).toString());
+        XMLSource source = new XMLSource();
 
         //Create expected result
         Set<Record<String>> expected = new HashSet<>();
         expected.add(new Record<>(Arrays.asList("Everyday Italian", "Giada De Laurentiis", "2005", "30.00")));
         expected.add(new Record<>(Arrays.asList("Harry Potter", "J K. Rowling", "2005", "29.99")));
         
-        ResultStream<Record<String>> rowStream = source.execute("doc(resolve-uri('" + file + "', '" + root.toUri().toString() + "'))/bookstore/book[price<35]");
+        ResultStream<Record<String>> rowStream = 
+                source.execute("doc(resolve-uri('" + file + "', '" + root.toUri().toString() + "'))/bookstore/book[price<35]");
         Set<Record<String>> dbOutput = rowStream.innerCollect(Collectors.toSet());
 
         //Compare dbOutput to expected result
-        Assert.assertEquals(dbOutput, expected);
+        Assert.assertEquals(expected, dbOutput);
     }
 }
