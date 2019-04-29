@@ -4,7 +4,7 @@
 
 	<groupId>xyz.ottr.lutra</groupId>
 	<artifactId>lutra</artifactId>
-	<version>0.5.0</version>
+	<version>0.5.1-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<modules>
 		<module>lutra-core</module>
@@ -30,7 +30,7 @@
 		<url>https://gitlab.com/ottr/lutra/lutra</url>
 		<connection>scm:git:https://gitlab.com/ottr/lutra/lutra.git</connection>
 		<developerConnection>scm:git:https://gitlab.com/ottr/lutra/lutra.git</developerConnection>
-		<tag>v0.5.0</tag>
+		<tag>v0.5.0-alpha-2</tag>
 	</scm>
 
 	<developers>
