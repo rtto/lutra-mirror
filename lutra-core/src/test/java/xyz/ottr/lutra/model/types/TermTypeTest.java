@@ -22,75 +22,56 @@ package xyz.ottr.lutra.model.types;
  * #L%
  */
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.vocabulary.OWL;
+import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.RDFS;
 import org.apache.jena.vocabulary.XSD;
 import org.junit.Before;
 import org.junit.Test;
 
+import xyz.ottr.lutra.OTTR;
+
 public class TermTypeTest {
 
-    private void termTypeIRIByNameTest(String name, Resource iri) throws Exception {
-        assertEquals(byName(name).getIRI(), iri.getURI());
+    private BasicType byIRI(Resource iri) {
+        return TypeFactory.getByIRI(iri);
     }
-
-    private BasicType byName(String name) throws Exception {
-        return TypeFactory.getByName(name);
+    
+    private BasicType byIRI(String iri) {
+        return TypeFactory.getByIRI(iri);
     }
 
     private BasicType owlOProp;
 
     @Before
-    public void setup() throws Exception {
-        owlOProp = byName("objectproperty");
-    }
-    
-    // @Test public void testRelations() {
-    //     for (TermType t1 : BasicType.getAllTermTypes()) {
-    //         for (TermType t2 : BasicType.getAllTermTypes()) {
-    //             // subtype => moreSpecificThan:
-    //             assertTrue(!t1.isSubTypeOf(t2) || t1.isMoreSpecificThan(t2));
-    //             
-    //             // moreSpecificThan => ! incompatble
-    //             assertTrue(!t1.isMoreSpecificThan(t2) || !t1.isIncompatibleWith(t2));
-    //         }
-    //     }
-    // }
-
-    @Test 
-    public void shouldGetByName() throws Exception {
-        termTypeIRIByNameTest("class", OWL.Class);
-        termTypeIRIByNameTest("ReSouRce", RDFS.Resource);
-        termTypeIRIByNameTest("int", XSD.xint);
-        termTypeIRIByNameTest("integer", XSD.integer);
+    public void setup() {
+        owlOProp = byIRI(OWL.ObjectProperty);
     }
 
     @Test
-    public void shouldBeSubTypes() throws Exception {
-        assertTrue(owlOProp.isSubTypeOf(byName("resource")));
-        assertTrue(owlOProp.isSubTypeOf(byName("objectProperty")));
+    public void shouldBeSubTypes() {
+        assertTrue(owlOProp.isSubTypeOf(byIRI(RDFS.Resource)));
+        assertTrue(owlOProp.isSubTypeOf(byIRI(OWL.ObjectProperty)));
     }
 
     @Test
-    public void shouldBeCompatible() throws Exception {
-        assertTrue(owlOProp.isCompatibleWith(byName("IRI")));
-        //assertTrue(owlOProp.isCompatibleWith(byName("BlankNode"))); // Sould not be a type
-        assertTrue(owlOProp.isCompatibleWith(byName("resource")));
-        assertTrue(owlOProp.isCompatibleWith(byName("objectProperty")));
+    public void shouldBeCompatible() {
+        assertTrue(owlOProp.isCompatibleWith(byIRI(OTTR.Types.IRI)));
+        assertTrue(owlOProp.isCompatibleWith(byIRI(RDFS.Resource)));
+        assertTrue(owlOProp.isCompatibleWith(byIRI(OWL.ObjectProperty)));
     }
 
     @Test
-    public void shouldBeIncompatible() throws Exception {
-        assertTrue(owlOProp.isIncompatibleWith(byName("datatypeproperty")));
-        assertTrue(owlOProp.isIncompatibleWith(byName("annotationproperty")));
-        assertTrue(owlOProp.isIncompatibleWith(byName("string")));
-        assertTrue(owlOProp.isIncompatibleWith(byName("Literal")));
-        assertTrue(owlOProp.isIncompatibleWith(byName("long")));
-        assertTrue(owlOProp.isIncompatibleWith(byName("HTML")));
+    public void shouldBeIncompatible() {
+        assertTrue(owlOProp.isIncompatibleWith(byIRI(OWL.DatatypeProperty)));
+        assertTrue(owlOProp.isIncompatibleWith(byIRI(OWL.AnnotationProperty)));
+        assertTrue(owlOProp.isIncompatibleWith(byIRI(XSD.xstring)));
+        assertTrue(owlOProp.isIncompatibleWith(byIRI(RDFS.Literal)));
+        assertTrue(owlOProp.isIncompatibleWith(byIRI(XSD.xlong)));
+        assertTrue(owlOProp.isIncompatibleWith(byIRI(RDF.HTML)));
     }
 
     /* For debugging
