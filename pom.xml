@@ -44,11 +44,9 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		
-		<jena.version>3.11.0</jena.version>
-		
 		<maven.javadoc.skip>true</maven.javadoc.skip>
-		
+
+		<jena.version>3.11.0</jena.version>		
 	</properties>
 
 	<build>
@@ -64,10 +62,6 @@
 				</configuration>
 			</plugin>
 
-			<!--plugin> <groupId>org.apache.maven.plugins</groupId> <artifactId>maven-release-plugin</artifactId> 
-				<version>2.5.3</version> <configuration> <tagNameFormat>v@{project.version}</tagNameFormat> 
-				</configuration> </plugin -->
-
 			<plugin>
 				<groupId>external.atlassian.jgitflow</groupId>
 				<artifactId>jgitflow-maven-plugin</artifactId>
@@ -79,7 +73,7 @@
 					<autoVersionSubmodules>true</autoVersionSubmodules>
 					<enableSshAgent>true</enableSshAgent>
 					<noDeploy>true</noDeploy>
-					<scmCommentPrefix>[RELEASE] </scmCommentPrefix>
+					<scmCommentPrefix>[Release] </scmCommentPrefix>
 				</configuration>
 			</plugin>
 
