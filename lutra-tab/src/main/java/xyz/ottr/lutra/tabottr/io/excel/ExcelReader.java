@@ -29,7 +29,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.poi.EncryptedDocumentException;
-import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.openxml4j.exceptions.InvalidOperationException;
 import org.apache.poi.openxml4j.exceptions.NotOfficeXmlFileException;
 import org.apache.poi.ss.usermodel.Cell;
@@ -76,9 +75,6 @@ public class ExcelReader {
             Message msg = Message.error(ex.getMessage());
             return Result.empty(msg);
         } catch (EncryptedDocumentException ex) {
-            Message msg = Message.error(ex.getMessage());
-            return Result.empty(msg);
-        } catch (InvalidFormatException ex) {
             Message msg = Message.error(ex.getMessage());
             return Result.empty(msg);
         }
