@@ -46,6 +46,9 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		
 		<jena.version>3.11.0</jena.version>
+		
+		<maven.javadoc.skip>true</maven.javadoc.skip>
+		
 	</properties>
 
 	<build>
