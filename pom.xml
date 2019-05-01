@@ -4,7 +4,7 @@
 
 	<groupId>xyz.ottr.lutra</groupId>
 	<artifactId>lutra</artifactId>
-	<version>0.5.0</version>
+	<version>0.5.1</version>
 	<packaging>pom</packaging>
 	<modules>
 		<module>lutra-core</module>
@@ -30,7 +30,7 @@
 		<url>https://gitlab.com/ottr/lutra/lutra</url>
 		<connection>scm:git:https://gitlab.com/ottr/lutra/lutra.git</connection>
 		<developerConnection>scm:git:https://gitlab.com/ottr/lutra/lutra.git</developerConnection>
-		<tag>v0.5.0</tag>
+		<tag>v0.5.0-alpha-2</tag>
 	</scm>
 
 	<developers>
@@ -45,7 +45,10 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		
-		<jena.version>3.10.0</jena.version>
+		<jena.version>3.11.0</jena.version>
+		
+		<maven.javadoc.skip>true</maven.javadoc.skip>
+		
 	</properties>
 
 	<build>
@@ -61,12 +64,22 @@
 				</configuration>
 			</plugin>
 
+			<!--plugin> <groupId>org.apache.maven.plugins</groupId> <artifactId>maven-release-plugin</artifactId> 
+				<version>2.5.3</version> <configuration> <tagNameFormat>v@{project.version}</tagNameFormat> 
+				</configuration> </plugin -->
+
 			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-release-plugin</artifactId>
-				<version>2.5.3</version>
+				<groupId>external.atlassian.jgitflow</groupId>
+				<artifactId>jgitflow-maven-plugin</artifactId>
+				<version>1.0-m5.1</version>
 				<configuration>
-					<tagNameFormat>v@{project.version}</tagNameFormat>
+					<flowInitContext>
+						<versionTagPrefix>v</versionTagPrefix>
+					</flowInitContext>
+					<autoVersionSubmodules>true</autoVersionSubmodules>
+					<enableSshAgent>true</enableSshAgent>
+					<noDeploy>true</noDeploy>
+					<scmCommentPrefix>[RELEASE] </scmCommentPrefix>
 				</configuration>
 			</plugin>
 
@@ -83,10 +96,6 @@
 					</archive>
 				</configuration>
 			</plugin>
-
-			<!--plugin> <groupId>org.apache.maven.plugins</groupId> <artifactId>maven-javadoc-plugin</artifactId> 
-				<version>3.0.0-M1</version> <executions> <execution> <goals> <goal>jar</goal> 
-				</goals> </execution> </executions> </plugin -->
 
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -113,7 +122,7 @@
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>license-maven-plugin</artifactId>
-				<version>1.19</version>
+				<version>1.20</version>
 				<configuration>
 					<verbose>false</verbose>
 					<licenseName>lgpl_v2_1</licenseName>
@@ -167,7 +176,7 @@
 					<dependency>
 						<groupId>com.puppycrawl.tools</groupId>
 						<artifactId>checkstyle</artifactId>
-						<version>8.18</version>
+						<version>8.20</version>
 					</dependency>
 				</dependencies>
 			</plugin>
@@ -255,12 +264,6 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-jxr-plugin</artifactId>
 				<version>3.0.0</version>
-			</plugin>
-
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-javadoc-plugin</artifactId>
-				<version>3.1.0</version>
 			</plugin>
 
 			<plugin>
@@ -369,13 +372,13 @@
 			<dependency>
 				<groupId>org.apache.poi</groupId>
 				<artifactId>poi</artifactId>
-				<version>3.16-beta2</version>
+				<version>4.1.0</version>
 			</dependency>
 
 			<dependency>
 				<groupId>org.apache.poi</groupId>
 				<artifactId>poi-ooxml</artifactId>
-				<version>3.16-beta2</version>
+				<version>4.1.0</version>
 			</dependency>
 
 			<!-- CLI -->
@@ -383,7 +386,7 @@
 			<dependency>
 				<groupId>info.picocli</groupId>
 				<artifactId>picocli</artifactId>
-				<version>3.9.5</version>
+				<version>3.9.6</version>
 			</dependency>
 
 			<dependency>
