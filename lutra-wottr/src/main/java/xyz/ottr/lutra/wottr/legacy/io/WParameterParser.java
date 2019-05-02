@@ -107,21 +107,21 @@ public class WParameterParser implements Function<Resource, Result<Term>> {
 
     private void setType(Term term, Property type) {
         if (type.equals(WOTTR.literalVariable)) {
-            term.setType(TypeFactory.getByIRI(RDFS.Literal));
+            term.setType(TypeFactory.getType(RDFS.Literal));
         } else if (type.equals(WOTTR.classVariable)) {
-            term.setType(TypeFactory.getByIRI(OWL.Class));
+            term.setType(TypeFactory.getType(OWL.Class));
         } else if (type.equals(WOTTR.individualVariable)) {
-            term.setType(TypeFactory.getByIRI(OWL.NS + "NamedIndividual"));
+            term.setType(TypeFactory.getType(OWL.NS + "NamedIndividual"));
         } else if (type.equals(WOTTR.propertyVariable)) { 
-            term.setType(TypeFactory.getByIRI(OTTR.Types.IRI));
+            term.setType(TypeFactory.getType(OTTR.Types.IRI));
         } else if (type.equals(WOTTR.dataPropertyVariable)) {
-            term.setType(TypeFactory.getByIRI(OWL.DatatypeProperty));
+            term.setType(TypeFactory.getType(OWL.DatatypeProperty));
         } else if (type.equals(WOTTR.annotationPropertyVariable)) {
-            term.setType(TypeFactory.getByIRI(OWL.AnnotationProperty));
+            term.setType(TypeFactory.getType(OWL.AnnotationProperty));
         } else if (type.equals(WOTTR.objectPropertyVariable)) {
-            term.setType(TypeFactory.getByIRI(OWL.ObjectProperty));
+            term.setType(TypeFactory.getType(OWL.ObjectProperty));
         } else if (type.equals(WOTTR.datatypeVariable)) {
-            term.setType(TypeFactory.getByIRI(RDFS.Datatype));
+            term.setType(TypeFactory.getType(RDFS.Datatype));
         } else if (type.equals(WOTTR.variable)) {
             term.setType(TypeFactory.getTopType());
         } else {

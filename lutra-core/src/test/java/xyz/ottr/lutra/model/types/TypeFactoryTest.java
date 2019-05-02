@@ -47,14 +47,14 @@ import xyz.ottr.lutra.model.TermList;
 public class TypeFactoryTest {
 
     private LiteralTerm typedLiteral(String val, Resource type) {
-        return new LiteralTerm(val, TypeFactory.getByIRI(type).getIRI());
+        return new LiteralTerm(val, TypeFactory.getType(type).getIRI());
     }
 
     @Test
     public void simpleTypeSetting1() {
         assertEquals(
                 new IRITerm("example.com/v").getType(),
-                new LUBType(TypeFactory.getByIRI(OTTR.Types.IRI)));
+                new LUBType(TypeFactory.getType(OTTR.Types.IRI)));
     }
 
     @Test
@@ -68,33 +68,39 @@ public class TypeFactoryTest {
     public void simpleTypeSetting3() {
         assertEquals(
                 new LiteralTerm("test").getType(),
-                TypeFactory.getByIRI(RDFS.Literal));
+                TypeFactory.getType(RDFS.Literal));
     }
 
     @Test
     public void simpleTypeSetting4() {
         assertEquals(
                 typedLiteral("1", XSD.integer).getType(),
-                TypeFactory.getByIRI(XSD.integer));
+                TypeFactory.getType(XSD.integer));
     }
 
     @Test
     public void simpleTypeSetting5() {
         assertEquals(
                 new LiteralTerm("val", "example.com/mytype").getType(),
-                TypeFactory.getByIRI(RDFS.Literal));
+                TypeFactory.getType(RDFS.Literal));
     }
 
     @Test
-    public void listTypeSetting() {
-
+    public void listTypeSetting1() {
         assertEquals(
                 new TermList(new IRITerm("example.com/v1"), new IRITerm("example.com/v2")).getType(),
-                //new NEListType(new LUBType(TypeFactory.getByName("IRI"))));
                 new NEListType(new LUBType(TypeFactory.getTopType())));
+    }
+    
+    @Test
+    public void listTypeSetting2() {
         assertEquals(
                 new TermList(new IRITerm("example.com/v1"), new BlankNodeTerm()).getType(),
                 new NEListType(new LUBType(TypeFactory.getTopType())));
+    }
+    
+    @Test
+    public void listTypeSetting3() {
         assertEquals(
                 new TermList(new IRITerm("example.com/v1"), new LiteralTerm("v2")).getType(),
                 new NEListType(new LUBType(TypeFactory.getTopType())));
@@ -104,10 +110,10 @@ public class TypeFactoryTest {
     public void templateVariableTypes() {
 
         Term var1 = new IRITerm("example.org/var1");
-        var1.setType(TypeFactory.getByIRI(OWL.Class));
+        var1.setType(TypeFactory.getType(OWL.Class));
         Term var2 = typedLiteral("1", XSD.integer);
         Term var3 = new BlankNodeTerm("_:b");
-        var3.setType(new ListType(TypeFactory.getByIRI(XSD.xstring)));
+        var3.setType(new ListType(TypeFactory.getType(XSD.xstring)));
 
         Term var1b1 = new IRITerm("example.org/var1");
         Term var1b2 = new IRITerm("example.org/var1");
@@ -145,13 +151,13 @@ public class TypeFactoryTest {
         // instances in template bodies are properly set
 
         Term var1 = new IRITerm("example.org/var1");
-        var1.setType(TypeFactory.getByIRI(OWL.Class));
+        var1.setType(TypeFactory.getType(OWL.Class));
         Term var21 = new IRITerm("example.org/var21");
-        var21.setType(TypeFactory.getByIRI(OWL.Class));
+        var21.setType(TypeFactory.getType(OWL.Class));
         Term var22 = new IRITerm("example.org/var22");
-        var22.setType(TypeFactory.getByIRI(OWL.Class));
+        var22.setType(TypeFactory.getType(OWL.Class));
         Term var3 = new BlankNodeTerm("_:b");
-        var3.setType(new ListType(TypeFactory.getByIRI(XSD.xstring)));
+        var3.setType(new ListType(TypeFactory.getType(XSD.xstring)));
 
         Term var1b1 = new IRITerm("example.org/var1");
         Term var1b2 = new IRITerm("example.org/var1");

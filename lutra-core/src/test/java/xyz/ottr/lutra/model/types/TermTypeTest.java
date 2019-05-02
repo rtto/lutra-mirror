@@ -37,11 +37,11 @@ import xyz.ottr.lutra.OTTR;
 public class TermTypeTest {
 
     private BasicType byIRI(Resource iri) {
-        return TypeFactory.getByIRI(iri);
+        return TypeFactory.getType(iri);
     }
     
     private BasicType byIRI(String iri) {
-        return TypeFactory.getByIRI(iri);
+        return TypeFactory.getType(iri);
     }
 
     private BasicType owlOProp;

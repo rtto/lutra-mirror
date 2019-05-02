@@ -199,21 +199,21 @@ public class CheckFactoryTest {
         DependencyGraph store = new DependencyGraph();
 
         Term varBase1 = new IRITerm("ex.com/var1");
-        varBase1.setType(TypeFactory.getByIRI(OTTR.Types.IRI));
+        varBase1.setType(TypeFactory.getType(OTTR.Types.IRI));
         Term varBase2 = new IRITerm("ex.com/var2");
-        varBase2.setType(TypeFactory.getByIRI(OWL.ObjectProperty));
-        Term varBase3 = new LiteralTerm("7", TypeFactory.getByIRI(XSD.integer).getIRI());
+        varBase2.setType(TypeFactory.getType(OWL.ObjectProperty));
+        Term varBase3 = new LiteralTerm("7", TypeFactory.getType(XSD.integer).getIRI());
 
         store.addTemplateSignature(
             new TemplateSignature("hasInt",
                 new ParameterList(varBase1, varBase2, varBase3)));
 
         Term varC1 = new IRITerm("ex.com/iri");
-        varC1.setType(TypeFactory.getByIRI(OTTR.Types.IRI));
-        Term varC2 = new LiteralTerm("1", TypeFactory.getByIRI(XSD.integer).getIRI());
+        varC1.setType(TypeFactory.getType(OTTR.Types.IRI));
+        Term varC2 = new LiteralTerm("1", TypeFactory.getType(XSD.integer).getIRI());
 
         Term varC1b = new IRITerm("ex.com/iri");
-        Term varC2b = new LiteralTerm("1", TypeFactory.getByIRI(XSD.integer).getIRI());
+        Term varC2b = new LiteralTerm("1", TypeFactory.getType(XSD.integer).getIRI());
 
         Term constC1 = new IRITerm("ex.com/nicepropiri");
         Term constC2 = new IRITerm("ex.com/niceonlyprop");
@@ -240,22 +240,22 @@ public class CheckFactoryTest {
         DependencyGraph store = new DependencyGraph();
 
         Term classVar = new IRITerm("ex.com/classVar");
-        classVar.setType(TypeFactory.getByIRI(OWL.Class));
+        classVar.setType(TypeFactory.getType(OWL.Class));
         Term objpropVar = new IRITerm("ex.com/objpropVar");
-        objpropVar.setType(TypeFactory.getByIRI(OWL.ObjectProperty));
-        Term intVar = new LiteralTerm("7", TypeFactory.getByIRI(XSD.integer).getIRI());
+        objpropVar.setType(TypeFactory.getType(OWL.ObjectProperty));
+        Term intVar = new LiteralTerm("7", TypeFactory.getType(XSD.integer).getIRI());
 
         store.addTemplateSignature(
             new TemplateSignature("hasInt",
                 new ParameterList(classVar, objpropVar, intVar)));
 
         Term classVar2 = new IRITerm("ex.com/class");
-        classVar2.setType(TypeFactory.getByIRI(OWL.Class));
-        Term intVar2 = new LiteralTerm("1", TypeFactory.getByIRI(XSD.integer).getIRI());
+        classVar2.setType(TypeFactory.getType(OWL.Class));
+        Term intVar2 = new LiteralTerm("1", TypeFactory.getType(XSD.integer).getIRI());
 
         Term classVar2b = new IRITerm("ex.com/class");
-        Term intVar21b = new LiteralTerm("1", TypeFactory.getByIRI(XSD.integer).getIRI());
-        Term intVar22b = new LiteralTerm("1", TypeFactory.getByIRI(XSD.integer).getIRI());
+        Term intVar21b = new LiteralTerm("1", TypeFactory.getType(XSD.integer).getIRI());
+        Term intVar22b = new LiteralTerm("1", TypeFactory.getType(XSD.integer).getIRI());
 
         Term propClass1 = new IRITerm("ex.com/nicepropclass");
         Term propClass2 = new IRITerm("ex.com/nicepropclass");
@@ -283,21 +283,21 @@ public class CheckFactoryTest {
         DependencyGraph store = new DependencyGraph();
 
         Term varBase1 = new IRITerm("ex.com/var1");
-        varBase1.setType(TypeFactory.getByIRI(OWL.Class));
+        varBase1.setType(TypeFactory.getType(OWL.Class));
         Term varBase2 = new IRITerm("ex.com/var2");
-        varBase2.setType(TypeFactory.getByIRI(OWL.ObjectProperty));
-        Term varBase3 = new LiteralTerm("7", TypeFactory.getByIRI(XSD.integer).getIRI());
+        varBase2.setType(TypeFactory.getType(OWL.ObjectProperty));
+        Term varBase3 = new LiteralTerm("7", TypeFactory.getType(XSD.integer).getIRI());
 
         store.addTemplateSignature(
             new TemplateSignature("hasInt",
                 new ParameterList(varBase1, varBase2, varBase3)));
 
         Term var1 = new IRITerm("ex.com/iri");
-        var1.setType(TypeFactory.getByIRI(OTTR.Types.IRI));
-        Term var2 = new LiteralTerm("1", TypeFactory.getByIRI(XSD.integer).getIRI());
+        var1.setType(TypeFactory.getType(OTTR.Types.IRI));
+        Term var2 = new LiteralTerm("1", TypeFactory.getType(XSD.integer).getIRI());
 
         Term var1b = new IRITerm("ex.com/iri");
-        Term var2b = new LiteralTerm("1", TypeFactory.getByIRI(XSD.integer).getIRI());
+        Term var2b = new LiteralTerm("1", TypeFactory.getType(XSD.integer).getIRI());
 
         Term cons1 = new IRITerm("ex.com/prop1");
 
@@ -321,14 +321,14 @@ public class CheckFactoryTest {
         DependencyGraph store = new DependencyGraph();
 
         Term varBase = new BlankNodeTerm("_:classes");
-        varBase.setType(new NEListType(TypeFactory.getByIRI(OWL.Class)));
+        varBase.setType(new NEListType(TypeFactory.getType(OWL.Class)));
 
         store.addTemplateSignature(
             new TemplateSignature("areClasses",
                 new ParameterList(varBase)));
 
         Term var = new BlankNodeTerm("_:class");
-        var.setType(TypeFactory.getByIRI(OWL.Class));
+        var.setType(TypeFactory.getType(OWL.Class));
 
         Term cons = new BlankNodeTerm("_:b");
 
@@ -353,16 +353,16 @@ public class CheckFactoryTest {
         DependencyGraph store = new DependencyGraph();
 
         Term varBase = new BlankNodeTerm("_:classes");
-        varBase.setType(new NEListType(TypeFactory.getByIRI(OWL.Class)));
+        varBase.setType(new NEListType(TypeFactory.getType(OWL.Class)));
 
         store.addTemplateSignature(
             new TemplateSignature("areClasses",
                 new ParameterList(varBase)));
 
         Term varClass = new BlankNodeTerm("_:class");
-        varClass.setType(TypeFactory.getByIRI(OWL.Class));
+        varClass.setType(TypeFactory.getType(OWL.Class));
 
-        Term one = new LiteralTerm("1", TypeFactory.getByIRI(XSD.integer).getIRI());
+        Term one = new LiteralTerm("1", TypeFactory.getType(XSD.integer).getIRI());
 
         store.addTemplate(
             new Template("testCorrect1",
@@ -383,16 +383,16 @@ public class CheckFactoryTest {
         DependencyGraph store = new DependencyGraph();
 
         Term varBase = new BlankNodeTerm("_:classeses");
-        varBase.setType(new NEListType(new NEListType(TypeFactory.getByIRI(OWL.Class))));
+        varBase.setType(new NEListType(new NEListType(TypeFactory.getType(OWL.Class))));
 
         store.addTemplateSignature(
             new TemplateSignature("deepLists",
                 new ParameterList(varBase)));
 
         Term varClass = new BlankNodeTerm("_:class");
-        varClass.setType(TypeFactory.getByIRI(OWL.Class));
+        varClass.setType(TypeFactory.getType(OWL.Class));
 
-        Term one = new LiteralTerm("1", TypeFactory.getByIRI(XSD.integer).getIRI());
+        Term one = new LiteralTerm("1", TypeFactory.getType(XSD.integer).getIRI());
 
         store.addTemplate(
             new Template("testCorrect1",
