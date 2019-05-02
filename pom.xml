@@ -73,7 +73,7 @@
 					<autoVersionSubmodules>true</autoVersionSubmodules>
 					<enableSshAgent>true</enableSshAgent>
 					<noDeploy>true</noDeploy>
-					<scmCommentPrefix>[Release] </scmCommentPrefix>
+					<scmCommentPrefix>[jgitflow] </scmCommentPrefix>
 				</configuration>
 			</plugin>
 
