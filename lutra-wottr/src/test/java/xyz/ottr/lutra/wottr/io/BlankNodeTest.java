@@ -27,6 +27,8 @@ import static org.junit.Assert.assertTrue;
 
 import org.apache.jena.rdf.model.Model;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import xyz.ottr.lutra.io.InstanceReader;
 import xyz.ottr.lutra.io.TemplateReader;
@@ -44,10 +46,10 @@ import xyz.ottr.lutra.wottr.io.WFileReader;
 import xyz.ottr.lutra.wottr.io.WInstanceParser;
 import xyz.ottr.lutra.wottr.io.WInstanceWriter;
 import xyz.ottr.lutra.wottr.io.WTemplateParser;
-import xyz.ottr.lutra.wottr.util.ModelIO;
 
 public class BlankNodeTest {
 
+    private final Logger log = LoggerFactory.getLogger(BlankNodeTest.class);
 
     // Tests if a template including a blank node is correctly instantiated.
 
@@ -87,15 +89,11 @@ public class BlankNodeTest {
         // Read out-model
         Result<Model> outRes = new WFileReader().parse("src/test/resources/correct/instances/blank1/out.ttl");
         if (!outRes.isPresent()) {
-            System.err.println("ERROR:");
-            System.err.println(outRes.toString());
+            log.error(outRes.toString());
         }
         assertTrue(outRes.isPresent());
         Model out = outRes.get();
 
-        ModelIO.printModel(in);
-        ModelIO.printModel(out);
-        
         assertTrue(in.isIsomorphicWith(out));
     }
 }

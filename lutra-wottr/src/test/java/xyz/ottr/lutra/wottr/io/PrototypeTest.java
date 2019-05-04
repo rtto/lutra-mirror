@@ -124,7 +124,7 @@ public class PrototypeTest {
         graph.getAllTemplates().forEach(resultConsumer); 
         resultConsumer.getMessageHandler().printMessages();
         //System.out.println("Templates:");
-        templateWriter.printDefinitions();
+        //templateWriter.printDefinitions();
     }
 
     @AfterClass

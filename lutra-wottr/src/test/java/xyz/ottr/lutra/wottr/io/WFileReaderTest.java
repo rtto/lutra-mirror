@@ -28,6 +28,8 @@ import org.apache.jena.rdf.model.Model;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import xyz.ottr.lutra.result.Result;
 import xyz.ottr.lutra.result.ResultStream;
@@ -35,12 +37,14 @@ import xyz.ottr.lutra.wottr.io.WFileReader;
 import xyz.ottr.lutra.wottr.util.ModelIO;
 
 public class WFileReaderTest {
-
+    
     private static final String nonExistent = "src/test/resources/thisFileDoesNotExist.ttl";
     private static final String faultyRDF = "src/test/resources/incorrect/faultyRDF.ttl";
     private static final String emptyFile = "src/test/resources/correct/emptyFile.ttl";
     private static WFileReader reader;
 
+    private final Logger log = LoggerFactory.getLogger(WFileReaderTest.class);
+    
     @BeforeClass    
     public static void load() {
         reader = new WFileReader();
@@ -53,7 +57,7 @@ public class WFileReaderTest {
 
         assert aggr.isPresent();
 
-        System.out.println(ModelIO.writeModel(aggr.get().findFirst().get()));
+        log.debug(ModelIO.writeModel(aggr.get().findFirst().get()));
     }
 
     @Test
@@ -62,12 +66,12 @@ public class WFileReaderTest {
         ResultStream<Model> nonExistentModelStream = reader.apply(nonExistent);
         Result<Stream<Model>> nonExistsentAggr = nonExistentModelStream.aggregate();
         assert !nonExistsentAggr.isPresent();
-        System.out.println(nonExistsentAggr.getMessages().toString());
+        log.debug(nonExistsentAggr.getMessages().toString());
 
         ResultStream<Model> faultyRDFModelStream = reader.apply(faultyRDF);
         Result<Stream<Model>> faultyRDFModelAggr = faultyRDFModelStream.aggregate();
         assert !faultyRDFModelAggr.isPresent();
-        System.out.println(faultyRDFModelAggr.getMessages().toString());
+        log.debug(faultyRDFModelAggr.getMessages().toString());
     }
 
     @AfterClass

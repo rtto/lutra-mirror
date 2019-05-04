@@ -617,28 +617,28 @@ public class DependencyGraph implements TemplateStore {
         return checkTemplatesFor(CheckFactory.failsOnErrorChecks);
     }
 
-    /**
-     * Prints this graph to stdout with nice linebreaks and some indentation.
-     */
-    public void printGraph() {
+    @Override
+    public String toString() {
+        
+        StringBuilder str = new StringBuilder();
 
-        System.out.println("Graph:\n");
         for (Map.Entry<TemplateNode, Set<Dependency>> ens : this.dependencies.entrySet()) {
             TemplateNode node = ens.getKey();
-            System.out.println(node.toString() + ":");
+            str.append(node.toString() + ":" + "\n");
             Map<TemplateNode, Set<ArgumentList>> deps = new HashMap<>();
             for (Dependency e : ens.getValue()) {
                 deps.putIfAbsent(e.to, new HashSet<ArgumentList>());
                 deps.get(e.to).add(e.argumentList);
             }
             for (Map.Entry<TemplateNode, Set<ArgumentList>> dep : deps.entrySet()) {
-                System.out.println("  " + dep.getKey().toString());
+                str.append("  " + dep.getKey().toString() + "\n");
                 for (ArgumentList args : dep.getValue()) {
-                    System.out.println("    => " + args.toString());
+                    str.append("    => " + args.toString() + "\n");
                 }
             }
-            System.out.println("\n");
+            str.append("\n\n");
         }
+        return str.toString();
     }
 
     static class Dependency {

@@ -27,15 +27,19 @@ import static org.junit.Assert.assertTrue;
 import java.util.function.Predicate;
 
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import xyz.ottr.lutra.tabottr.io.rdf.DataValidator;
 
 public class DataValidatorTest {
     
+    private final Logger log = LoggerFactory.getLogger(DataValidatorTest.class);
+    
     private void accept(Predicate<String> func, String value) {
         boolean result = func.test(value);
         if (!result) {
-            System.out.println("Error testing value: " + value);
+            log.error("Error testing value: " + value);
         }
         assertTrue(result);
     }

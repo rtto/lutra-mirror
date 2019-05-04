@@ -25,6 +25,7 @@ package xyz.ottr.lutra.tabottr.model;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 
 import xyz.ottr.lutra.tabottr.TabOTTR;
 
@@ -124,7 +125,7 @@ public class Table {
     }
 
     private String getFormattedRowNumber(int rowNo) {
-        return index + "." + String.format(this.rowNumberFormat, rowNo);
+        return index + "." + String.format(Locale.getDefault(), this.rowNumberFormat, rowNo);
     }
 
 }
