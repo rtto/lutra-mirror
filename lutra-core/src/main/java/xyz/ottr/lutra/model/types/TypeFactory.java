@@ -159,7 +159,7 @@ public class TypeFactory {
 
     /**
      * Get a term type by its Resource.
-     * @param iri the iri of the term type to get
+     * @param resource the Resource of the term type to get
      * @return the matching termtype, or null if no such termtype
      */
     public static BasicType getType(Resource resource)  {
