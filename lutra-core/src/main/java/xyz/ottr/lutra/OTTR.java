@@ -39,6 +39,10 @@ public class OTTR  {
         
         public static final String NEList = ns + "NEList";
         public static final String LUB = ns + "LUB";
+        
+
+        public static final String IRI = ns + "IRI";
+        public static final String Bot = ns + "Bot";
     }
     
     public static class Files {
