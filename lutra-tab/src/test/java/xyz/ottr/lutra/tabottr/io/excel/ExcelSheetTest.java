@@ -1,5 +1,6 @@
 package xyz.ottr.lutra.tabottr.io.excel;
 
+
 /*-
  * #%L
  * lutra-tab
@@ -22,12 +23,15 @@ package xyz.ottr.lutra.tabottr.io.excel;
  * #L%
  */
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 import org.junit.Test;
 
 import xyz.ottr.lutra.model.Instance;
-import xyz.ottr.lutra.result.ResultStream;
+import xyz.ottr.lutra.result.Result;
 import xyz.ottr.lutra.tabottr.io.TabInstanceParser;
 
 public class ExcelSheetTest {
@@ -35,12 +39,10 @@ public class ExcelSheetTest {
     private static final String ROOT = "src/test/resources/";
     
     @Test
-    public void shouldHandleBlank() {
+    public void shouldHandleEmptySheets() {
         TabInstanceParser parser = new TabInstanceParser();
-        ResultStream<Instance> instances = parser.apply(ROOT + "blank.xlsx");
-        instances.forEach(ins -> System.out.println(ins.toString()));
-
-        assertTrue(true);
+        List<Result<Instance>> result = parser.apply(ROOT + "blank.xlsx").collect(Collectors.toList());
+        assertEquals(0, result.size());
     }
 
 }

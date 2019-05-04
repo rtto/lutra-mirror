@@ -255,6 +255,13 @@
 						<bundledSignature>jdk-non-portable</bundledSignature>
 						<bundledSignature>jdk-reflection</bundledSignature>
 					</bundledSignatures>
+					<excludes>
+						<!-- MessageHandler uses System.err: -->
+						<exclude>**/xyz/ottr/lutra/result/MessageHandler.class</exclude>
+						
+						<!-- CLI uses System.out: -->
+						<exclude>**/xyz/ottr/lutra/cli/CLI.class</exclude>
+					</excludes>
 				</configuration>
 				<executions>
 					<execution>
