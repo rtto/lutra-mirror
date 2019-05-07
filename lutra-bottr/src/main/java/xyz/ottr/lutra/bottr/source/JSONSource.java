@@ -1,29 +1,25 @@
 package xyz.ottr.lutra.bottr.source;
 
-//import java.io.File;
-//import java.io.FileInputStream;
-//import java.io.FileNotFoundException;
+import java.io.StringReader;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
-//import javax.xml.transform.sax.SAXSource;
+import javax.xml.transform.Source;
+import javax.xml.transform.stream.StreamSource;
 
-//import net.sf.saxon.s9api.DocumentBuilder;
+import net.sf.saxon.s9api.DocumentBuilder;
 import net.sf.saxon.s9api.Processor;
 import net.sf.saxon.s9api.SaxonApiException;
 import net.sf.saxon.s9api.XQueryCompiler;
 import net.sf.saxon.s9api.XQueryEvaluator;
 import net.sf.saxon.s9api.XQueryExecutable;
 import net.sf.saxon.s9api.XdmItem;
-//import net.sf.saxon.s9api.XdmNode;
+import net.sf.saxon.s9api.XdmNode;
 import net.sf.saxon.s9api.XdmValue;
-
-//import org.xml.sax.InputSource;
-
 import xyz.ottr.lutra.bottr.model.Record;
-import xyz.ottr.lutra.bottr.model.Source;
 import xyz.ottr.lutra.result.ResultStream;
+
+
 
 /*-
  * #%L
@@ -47,26 +43,42 @@ import xyz.ottr.lutra.result.ResultStream;
  * #L%
  */
 
-public class XMLSource implements Source<String> {
+public class JSONSource extends XMLSource {
 
-    //private final String uri;
+    private final String uri;
     
-    //public XMLSource(String source) {
-    //    this.uri = source;
-    //}
+    public JSONSource(String source) {
+        this.uri = source;
+    }
 
     public ResultStream<Record<String>> execute(String query) {
-
+        
+        // Load JSON file
+        // Convert JSON to XML
+        //String json = "json-thingy";
+    
+        // the Saxon processor object
+        Processor saxon = new Processor(false);
+        
         List<Record<String>> rows = new ArrayList<Record<String>>();
-
+        
         try {
-            
-            Processor proc = new Processor(false);
-            XQueryCompiler comp = proc.newXQueryCompiler();
-            XQueryExecutable exp =  comp.compile(query);
-            XQueryEvaluator qe = exp.load();
-            XdmValue result = qe.evaluate();
+            // compile the query
+            XQueryCompiler compiler = saxon.newXQueryCompiler();
+            XQueryExecutable exec = compiler.compile(query);
 
+
+            // parse the string as a document node
+            DocumentBuilder builder = saxon.newDocumentBuilder();
+            Source src = new StreamSource(new StringReader(uri));
+            XdmNode doc = builder.build(src);
+            //XdmNode doc = builder.build(src);
+
+            // instantiate the query, bind the input and evaluate
+            XQueryEvaluator xquery = exec.load();
+            xquery.setContextItem(doc);
+            XdmValue result = xquery.evaluate();
+            
             for (XdmItem item : result) {
                 rows.add(new Record<String>(nodeToList(item)));
             }
@@ -75,32 +87,7 @@ public class XMLSource implements Source<String> {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-
+        
         return ResultStream.innerOf(rows);
-    }
-
-    protected List<String> nodeToList(XdmItem node) {
-
-        List<String> output = new ArrayList<String>();
-
-        for (XdmItem item : node) {
-            
-            // Must do some formatting on the XQuery result
-
-            // Get the result
-            String itemString = item.getStringValue();
-
-            // Get rid of tab characters and indentation spacing
-            itemString = itemString.replace("\t", "");
-            itemString = itemString.replace("  ", "");
-            
-            // Split the result using the line breaks as separators
-            List<String> row = Arrays.asList(itemString.split("\\R"));
-            output.addAll(row);
-            
-            // Remove the first element, which is empty and results from a line break
-            output.remove(0);
-        }
-        return output;
     }
 }
