@@ -59,7 +59,7 @@ public class SInstanceParser extends stOTTRBaseVisitor<Result<Instance>> {
     @Override
     public Result<Instance> visitInstance(stOTTRParser.InstanceContext ctx) {
 
-        IriContext iriCtx = ctx.templateRef().templateName().iri();
+        IriContext iriCtx = ctx.templateName().iri();
         String iri;
 
         if (iriCtx.prefixedName() != null) {
