@@ -23,24 +23,56 @@ package xyz.ottr.lutra.stottr;
  */
 
 import org.antlr.v4.runtime.CharStream;
+import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 
-import xyz.ottr.lutra.stottr.antlr.stOTTRBaseListener;
+import xyz.ottr.lutra.model.Instance;
+import xyz.ottr.lutra.result.Message;
+import xyz.ottr.lutra.result.Result;
+import xyz.ottr.lutra.stottr.antlr.stOTTRBaseVisitor;
 import xyz.ottr.lutra.stottr.antlr.stOTTRLexer;
 import xyz.ottr.lutra.stottr.antlr.stOTTRParser;
+import xyz.ottr.lutra.stottr.antlr.stOTTRParser.IriContext;
 
-public class SParser {
+public class SInstanceParser extends stOTTRBaseVisitor<Result<Instance>> {
 
-    public SParser() {
+    // TODO: Should first parse all prefixes and make a PrefixMapping
+    //       Maybe need to make a SInstanceFileParser that parses all instances
+    //       and prefixes?
+
+    public SInstanceParser() {
     }
 
-    public void parseString(CharStream in) {
+    public Result<Instance> parseString(String str) {
+        return parseStream(CharStreams.fromString(str));
+    }
+
+    public Result<Instance> parseStream(CharStream in) {
         stOTTRLexer lexer = new stOTTRLexer(in);
         CommonTokenStream commonTokenStream = new CommonTokenStream(lexer);
         stOTTRParser parser = new stOTTRParser(commonTokenStream);
  
-        stOTTRParser.StatementContext stmtContext = parser.statement();                
-        stOTTRBaseListener listener = new stOTTRBaseListener();                
-        listener.enterStatement(stmtContext);
+        stOTTRParser.InstanceContext insContext = parser.instance();
+        return visitInstance(insContext);
+    }
+
+    @Override
+    public Result<Instance> visitInstance(stOTTRParser.InstanceContext ctx) {
+
+        IriContext iriCtx = ctx.templateRef().templateName().iri();
+        String iri;
+
+        if (iriCtx.prefixedName() != null) {
+            // TODO: Use prefixes to expand to full name
+            iri = iriCtx.prefixedName().PNAME_LN().getSymbol().getText();
+        } else {
+            iri = iriCtx.IRIREF().getSymbol().getText();
+        }
+
+        if (iri == null) {
+            return Result.empty(Message.error(ctx.toString()));
+        } else {
+            return Result.empty(Message.error(iri));
+        }
     }
 }
