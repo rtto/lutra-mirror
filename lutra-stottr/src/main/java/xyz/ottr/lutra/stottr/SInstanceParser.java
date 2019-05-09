@@ -22,17 +22,22 @@ package xyz.ottr.lutra.stottr;
  * #L%
  */
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.stream.Stream;
+
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
+import org.antlr.v4.runtime.tree.TerminalNode;
 
 import xyz.ottr.lutra.model.Instance;
 import xyz.ottr.lutra.result.Message;
 import xyz.ottr.lutra.result.Result;
+import xyz.ottr.lutra.result.ResultStream;
 import xyz.ottr.lutra.stottr.antlr.stOTTRBaseVisitor;
 import xyz.ottr.lutra.stottr.antlr.stOTTRLexer;
 import xyz.ottr.lutra.stottr.antlr.stOTTRParser;
-import xyz.ottr.lutra.stottr.antlr.stOTTRParser.IriContext;
 
 public class SInstanceParser extends stOTTRBaseVisitor<Result<Instance>> {
 
@@ -40,31 +45,70 @@ public class SInstanceParser extends stOTTRBaseVisitor<Result<Instance>> {
     //       Maybe need to make a SInstanceFileParser that parses all instances
     //       and prefixes?
 
-    public SInstanceParser() {
-    }
+    private Map<String, String> prefixes = new HashMap<>();
 
-    public Result<Instance> parseString(String str) {
+    public ResultStream<Instance> parseString(String str) {
         return parseStream(CharStreams.fromString(str));
     }
 
-    public Result<Instance> parseStream(CharStream in) {
+    public ResultStream<Instance> parseStream(CharStream in) {
         stOTTRLexer lexer = new stOTTRLexer(in);
         CommonTokenStream commonTokenStream = new CommonTokenStream(lexer);
         stOTTRParser parser = new stOTTRParser(commonTokenStream);
- 
-        stOTTRParser.InstanceContext insContext = parser.instance();
-        return visitInstance(insContext);
+
+        SPrefixParser prefixParser = new SPrefixParser();
+        stOTTRParser.StOTTRDocContext document = parser.stOTTRDoc();
+        Result<Map<String, String>> prefixRes = prefixParser.visit(document);
+
+        this.prefixes = prefixRes.get();
+        // Below code will not be executed if prefixes are not present
+        return prefixRes.mapToStream(_ignore -> {
+
+            Stream<Result<Instance>> results = document
+                .statement() // List of statments
+                .stream()
+                .map(stmt -> {
+                    System.err.println(stmt.toString());
+                    System.err.println(stmt.instance().toString());
+                    return visitStatement(stmt);
+                });
+            
+            return new ResultStream<>(results);
+        });
+    }
+
+    @Override
+    public Result<Instance> visitStatement(stOTTRParser.StatementContext ctx) {
+
+        if (ctx.instance() == null) { // Not an instance
+            return Result.empty(); // TODO: Decide on error or ignore?
+        }
+
+        return visitInstance(ctx.instance());
     }
 
     @Override
     public Result<Instance> visitInstance(stOTTRParser.InstanceContext ctx) {
 
-        IriContext iriCtx = ctx.templateName().iri();
+        stOTTRParser.IriContext iriCtx = ctx.templateName().iri();
         String iri;
 
-        if (iriCtx.prefixedName() != null) {
-            // TODO: Use prefixes to expand to full name
-            iri = iriCtx.prefixedName().PNAME_LN().getSymbol().getText();
+        // TODO: Move to STermParser
+        stOTTRParser.PrefixedNameContext prefixCtx = iriCtx.prefixedName();
+        if (prefixCtx != null) {
+            // TODO: Simplify code
+            String toSplit;
+
+            TerminalNode onlyNS = prefixCtx.PNAME_NS();
+            if (onlyNS != null) {
+                toSplit = onlyNS.getSymbol().getText();
+            } else {
+                toSplit = prefixCtx.PNAME_LN().getSymbol().getText();
+            }
+
+            String[] prefixAndLocal = toSplit.split(":");
+            String prefix = this.prefixes.get(prefixAndLocal[0]);
+            iri = "<" + prefix + prefixAndLocal[1] + ">";
         } else {
             iri = iriCtx.IRIREF().getSymbol().getText();
         }

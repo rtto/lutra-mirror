@@ -36,6 +36,7 @@ public class PrototypeTest {
     public void test() {
 
         SInstanceParser parser = new SInstanceParser();
-        System.err.println(parser.parseString("<https://ex.com/T>(:a, :b) . :H(:c, :d) ."));
+        parser.parseString("@prefix ex: <http://example.com/> . <https://ex.com/T>(:a, false) .\n ex:H(:c, :d) .")
+            .forEach(res -> System.err.println("Parsed :" + res.toString()));
     }
 }
