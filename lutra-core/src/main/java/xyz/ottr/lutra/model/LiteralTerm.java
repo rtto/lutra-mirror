@@ -30,6 +30,7 @@ public class LiteralTerm extends ResourceTerm {
 
     private final String value;
     private final String datatype; // Might be an undefined TermType, thus not used for type-checking
+    private final String langtag;
 
     public LiteralTerm(String value) {
         this(value, null);
@@ -41,12 +42,25 @@ public class LiteralTerm extends ResourceTerm {
         super.type = TypeFactory.getConstantType(this);
     }
 
+    public LiteralTerm(String value, String langtag) {
+        this.value = value;
+        this.langtag = langtag;
+        super.type = TypeFactory.getConstantType(this);
+    }
+
     public String getDatatype() {
         return this.datatype;
     }
 
     public String getValue() {
-        return this.value + (getDatatype() == null ? "" : " : " + getDatatype());
+
+        String suffix = "";
+        if (getLangTag() != null) {
+            suffix = "@" + getLangTag();
+        } else if (getDatatype() != null) {
+            suffix = " : " + getDatatype();
+        }
+        return this.value + suffix;
     }
 
     public String getPureValue() {
