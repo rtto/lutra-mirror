@@ -46,6 +46,7 @@ public class SInstanceParser extends stOTTRBaseVisitor<Result<Instance>> {
     //       and prefixes?
 
     private Map<String, String> prefixes = new HashMap<>();
+    private STermParser termParser = new STermParser(prefixes);
 
     public ResultStream<Instance> parseString(String str) {
         return parseStream(CharStreams.fromString(str));
@@ -61,6 +62,7 @@ public class SInstanceParser extends stOTTRBaseVisitor<Result<Instance>> {
         Result<Map<String, String>> prefixRes = prefixParser.visit(document);
 
         this.prefixes = prefixRes.get();
+        this.termParser = new STermParser(this.prefixes);
         // Below code will not be executed if prefixes are not present
         return prefixRes.mapToStream(_ignore -> {
 
@@ -86,7 +88,6 @@ public class SInstanceParser extends stOTTRBaseVisitor<Result<Instance>> {
     @Override
     public Result<Instance> visitInstance(stOTTRParser.InstanceContext ctx) {
 
-        STermParser termParser = new STermParser(this.prefixes);
         // Parse template name
         Result<String> iriRes = termParser.visitIri(ctx.templateName().iri())
             .map(iri -> ((IRITerm) iri).getIRI());

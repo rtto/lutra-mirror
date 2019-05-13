@@ -23,7 +23,9 @@ package xyz.ottr.lutra.stottr;
  */
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.antlr.v4.runtime.tree.TerminalNode;
 
@@ -33,6 +35,7 @@ import xyz.ottr.lutra.model.BlankNodeTerm;
 import xyz.ottr.lutra.model.IRITerm;
 import xyz.ottr.lutra.model.LiteralTerm;
 import xyz.ottr.lutra.model.Term;
+import xyz.ottr.lutra.model.TermList;
 import xyz.ottr.lutra.result.Message;
 import xyz.ottr.lutra.result.Result;
 import xyz.ottr.lutra.stottr.antlr.stOTTRBaseVisitor;
@@ -48,11 +51,24 @@ public class STermParser extends stOTTRBaseVisitor<Result<Term>> {
         this.blanks = new HashMap<>();
     }
 
+    private Term makeBlank(String label) {
+
+        if (!this.blanks.containsKey(label)) {
+
+            Term newBlank = new BlankNodeTerm();
+            this.blanks.put(label, newBlank);
+            return newBlank;
+
+        } else {
+            return this.blanks.get(label);
+        }
+    }
+
     @Override
     public Result<Term> visitTerm(stOTTRParser.TermContext ctx) {
 
         if (ctx.Variable() != null) {
-            return Result.of(new BlankNodeTerm(ctx.Variable().getSymbol().getText()));
+            return Result.of(makeBlank(ctx.Variable().getSymbol().getText()));
         }
 
         Result<Term> trm = visitChildren(ctx);
@@ -75,7 +91,14 @@ public class STermParser extends stOTTRBaseVisitor<Result<Term>> {
     
     @Override
     public Result<Term> visitList(stOTTRParser.ListContext ctx) {
-        return visitChildren(ctx);
+
+        List<Result<Term>> termResLst = ctx.constant()
+            .stream()
+            .map(cnst -> visitConstant(cnst))
+            .collect(Collectors.toList());
+
+        Result<List<Term>> termLstRes = Result.aggregate(termResLst);
+        return termLstRes.map(terms -> new TermList(terms));
     }
     
     @Override
@@ -157,16 +180,7 @@ public class STermParser extends stOTTRBaseVisitor<Result<Term>> {
         }
 
         String label = ctx.BLANK_NODE_LABEL().getSymbol().getText();
-
-        if (!this.blanks.containsKey(label)) {
-
-            Term newBlank = new BlankNodeTerm();
-            this.blanks.put(label, newBlank);
-            return Result.of(newBlank);
-
-        } else {
-            return Result.of(this.blanks.get(label));
-        }
+        return Result.of(makeBlank(label));
     }
     
     @Override

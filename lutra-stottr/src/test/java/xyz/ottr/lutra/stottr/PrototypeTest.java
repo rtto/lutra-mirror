@@ -39,10 +39,14 @@ public class PrototypeTest {
         parser.parseString(
             "@prefix ex: <http://example.com/> .\n"
                 + "@prefix : <http://base.org/> .\n"
-                + "<https://ex.com/T>(:a, false) .\n"
-                + "ex:H(:c, :d) .\n"
-                + "ex:H(1, 2.32, .45) .\n"
-                + "ex:T([], _:blank) .")
+                + "@prefix xsd: <http://xsd.org/> .\n"
+                + "<https://ex.com/T0>(:a, false) .\n"
+                + "ex:H1(?c, :d) .\n"
+                + "ex:H2(?c, ?variable) .\n"
+                + "ex:H3(:x, (:lst, 1, :val)) .\n"
+                + "ex:H4(1, 2.32, .45) .\n"
+                + "ex:H5(\"1\"^^xsd:int, \"hello\"@en) .\n"
+                + "ex:T6([], _:blank) .")
             .forEach(res -> System.err.println("Parsed :" + res.toString()));
     }
 }
