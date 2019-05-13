@@ -41,9 +41,11 @@ import xyz.ottr.lutra.stottr.antlr.stOTTRParser;
 public class STermParser extends stOTTRBaseVisitor<Result<Term>> {
 
     private Map<String, String> prefixes = new HashMap<>();
+    private Map<String, Term> blanks;
 
     public STermParser(Map<String, String> prefixes) {
         this.prefixes = prefixes;
+        this.blanks = new HashMap<>();
     }
 
     @Override
@@ -122,12 +124,24 @@ public class STermParser extends stOTTRBaseVisitor<Result<Term>> {
     
     @Override
     public Result<Term> visitBlankNode(stOTTRParser.BlankNodeContext ctx) {
-        return visitChildren(ctx);
+
+        if (ctx.anon() != null) {
+            return visitAnon(ctx.anon());
+        }
+
+        String label = ctx.BLANK_NODE_LABEL().getSymbol().getText();
+        if (!this.blanks.containsKey(label)) {
+            Term newBlank = new BlankNodeTerm();
+            this.blanks.put(label, newBlank);
+            return Result.of(newBlank);
+        } else {
+            return Result.of(this.blanks.get(label));
+        }
     }
     
     @Override
     public Result<Term> visitAnon(stOTTRParser.AnonContext ctx) {
-        return visitChildren(ctx);
+        return Result.of(new BlankNodeTerm());
     }
 
 }

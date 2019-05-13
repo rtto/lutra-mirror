@@ -36,7 +36,12 @@ public class PrototypeTest {
     public void test() {
 
         SInstanceParser parser = new SInstanceParser();
-        parser.parseString("@prefix ex: <http://example.com/> . @prefix : <http://base.org/> . <https://ex.com/T>(:a, false) .\n ex:H(:c, :d) .")
+        parser.parseString(
+            "@prefix ex: <http://example.com/> .\n"
+                + "@prefix : <http://base.org/> .\n"
+                + "<https://ex.com/T>(:a, false) .\n"
+                + "ex:H(:c, :d) .\n"
+                + "ex:T([], _:blank) .")
             .forEach(res -> System.err.println("Parsed :" + res.toString()));
     }
 }
