@@ -44,6 +44,7 @@ public class PrototypeTest {
                 + "ex:H1(?c, :d) .\n"
                 + "ex:H2(?c, ?variable) .\n"
                 + "ex:H3(:x, (:lst, 1, :val)) .\n"
+                + "cross | ex:H35(:x, ++(:lst, 1, :val)) .\n"
                 + "ex:H4(1, 2.32, .45) .\n"
                 + "ex:H5(\"1\"^^xsd:int, \"hello\"@en) .\n"
                 + "ex:T6([], _:blank) .")

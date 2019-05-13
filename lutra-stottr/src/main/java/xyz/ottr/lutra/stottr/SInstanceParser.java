@@ -30,6 +30,7 @@ import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 
+import xyz.ottr.lutra.io.InstanceParser;
 import xyz.ottr.lutra.model.ArgumentList;
 import xyz.ottr.lutra.model.IRITerm;
 import xyz.ottr.lutra.model.Instance;
@@ -39,20 +40,16 @@ import xyz.ottr.lutra.stottr.antlr.stOTTRBaseVisitor;
 import xyz.ottr.lutra.stottr.antlr.stOTTRLexer;
 import xyz.ottr.lutra.stottr.antlr.stOTTRParser;
 
-public class SInstanceParser extends stOTTRBaseVisitor<Result<Instance>> {
-
-    // TODO: Should first parse all prefixes and make a PrefixMapping
-    //       Maybe need to make a SInstanceFileParser that parses all instances
-    //       and prefixes?
+public class SInstanceParser extends stOTTRBaseVisitor<Result<Instance>> implements InstanceParser<CharStream> {
 
     private Map<String, String> prefixes = new HashMap<>();
     private STermParser termParser = new STermParser(prefixes);
 
     public ResultStream<Instance> parseString(String str) {
-        return parseStream(CharStreams.fromString(str));
+        return apply(CharStreams.fromString(str));
     }
 
-    public ResultStream<Instance> parseStream(CharStream in) {
+    public ResultStream<Instance> apply(CharStream in) {
         stOTTRLexer lexer = new stOTTRLexer(in);
         CommonTokenStream commonTokenStream = new CommonTokenStream(lexer);
         stOTTRParser parser = new stOTTRParser(commonTokenStream);
