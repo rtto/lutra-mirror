@@ -101,7 +101,16 @@ public class STermParser extends stOTTRBaseVisitor<Result<Term>> {
     
     @Override
     public Result<Term> visitRdfLiteral(stOTTRParser.RdfLiteralContext ctx) {
-        return visitChildren(ctx);
+
+        String val = ctx.String().getSymbol().getText();
+        if (ctx.LANGTAG() != null) {
+            String tag = ctx.LANGTAG().getSymbol().getText();
+            tag = tag.replace("@", ""); // Remove the @-prefix
+            return Result.of(LiteralTerm.taggedLiteral(val, tag));
+        }
+        Result<Term> iriTermRes = visitIri(ctx.iri());
+        return iriTermRes.flatMap(iri ->
+            Result.of(LiteralTerm.typedLiteral(val, ((IRITerm) iri).getIRI())));
     }
     
     @Override
@@ -112,7 +121,9 @@ public class STermParser extends stOTTRBaseVisitor<Result<Term>> {
         if (prefixCtx != null) {
             return visitPrefixedName(prefixCtx);
         } else {
-            return Result.of(new IRITerm(ctx.IRIREF().getSymbol().getText()));
+            String iriBraces = ctx.IRIREF().getSymbol().getText();
+            String iri = iriBraces.replaceAll("<", "").replaceAll(">", "");
+            return Result.of(new IRITerm(iri));
         }
     }
     
@@ -131,10 +142,10 @@ public class STermParser extends stOTTRBaseVisitor<Result<Term>> {
         String prefix = this.prefixes.get(prefixAndLocal[0]);
 
         if (prefix == null) {
-            return Result.empty(Message.error("Unrecognized prefix in qname " + toSplit));
+            return Result.empty(Message.error("Unrecognized prefix in qname " + toSplit + "."));
         }
 
-        String iri = "<" + prefix + prefixAndLocal[1] + ">";
+        String iri = prefix + prefixAndLocal[1];
         return Result.of(new IRITerm(iri));
     }
     
