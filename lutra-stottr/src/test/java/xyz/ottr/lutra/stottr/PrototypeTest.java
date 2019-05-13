@@ -42,7 +42,7 @@ public class PrototypeTest {
                 + "@prefix xsd: <http://xsd.org/> .\n"
                 + "<https://ex.com/T0>(:a, false) .\n"
                 + "ex:H1(?c, :d) .\n"
-                + "ex:H2(?c, ?variable) .\n"
+                + "ex:H2(shouldProduceError, ?c, ?variable) .\n"
                 + "ex:H3(:x, (:lst, 1, :val)) .\n"
                 + "cross | ex:H35(:x, ++(:lst, 1, :val)) .\n"
                 + "ex:H4(1, 2.32, .45) .\n"

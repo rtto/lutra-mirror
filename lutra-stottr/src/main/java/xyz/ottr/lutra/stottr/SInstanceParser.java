@@ -50,9 +50,15 @@ public class SInstanceParser extends stOTTRBaseVisitor<Result<Instance>> impleme
     }
 
     public ResultStream<Instance> apply(CharStream in) {
+        ErrorToMessageListener errListener = new ErrorToMessageListener();
         stOTTRLexer lexer = new stOTTRLexer(in);
+        lexer.removeErrorListeners();
+        lexer.addErrorListener(errListener);
+
         CommonTokenStream commonTokenStream = new CommonTokenStream(lexer);
         stOTTRParser parser = new stOTTRParser(commonTokenStream);
+        parser.removeErrorListeners();
+        parser.addErrorListener(errListener);
 
         SPrefixParser prefixParser = new SPrefixParser();
         stOTTRParser.StOTTRDocContext document = parser.stOTTRDoc();
@@ -61,7 +67,7 @@ public class SInstanceParser extends stOTTRBaseVisitor<Result<Instance>> impleme
         this.prefixes = prefixRes.get();
         this.termParser = new STermParser(this.prefixes);
         // Below code will not be executed if prefixes are not present
-        return prefixRes.mapToStream(_ignore -> {
+        ResultStream<Instance> instances = prefixRes.mapToStream(_ignore -> {
 
             Stream<Result<Instance>> results = document
                 .statement() // List of statments
@@ -70,6 +76,9 @@ public class SInstanceParser extends stOTTRBaseVisitor<Result<Instance>> impleme
             
             return new ResultStream<>(results);
         });
+
+        errListener.getMessages().printMessages();
+        return instances;
     }
 
     @Override
