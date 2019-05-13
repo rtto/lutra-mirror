@@ -22,21 +22,11 @@ package xyz.ottr.lutra.stottr;
  * #L%
  */
 
-import java.io.IOException;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
+public class STOTTR {
 
-import xyz.ottr.lutra.io.TemplateReader;
-import xyz.ottr.lutra.model.Template;
-
-public class PrototypeTest {
-
-    @Test
-    public void test() {
-
-        SInstanceParser parser = new SInstanceParser();
-        parser.parseString("@prefix ex: <http://example.com/> . @prefix : <http://base.org/> . <https://ex.com/T>(:a, false) .\n ex:H(:c, :d) .")
-            .forEach(res -> System.err.println("Parsed :" + res.toString()));
+    public static class Expanders {
+        public static final String cross = "cross";
+        public static final String zipMin = "zipMin";
+        public static final String zipMax = "zipMax";
     }
 }

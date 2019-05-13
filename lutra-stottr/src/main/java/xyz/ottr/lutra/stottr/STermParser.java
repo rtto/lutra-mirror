@@ -22,9 +22,15 @@ package xyz.ottr.lutra.stottr;
  * #L%
  */
 
+import java.util.HashMap;
+import java.util.Map;
+
+import org.antlr.v4.runtime.tree.TerminalNode;
+
 import org.apache.jena.vocabulary.XSD;
 
 import xyz.ottr.lutra.model.BlankNodeTerm;
+import xyz.ottr.lutra.model.IRITerm;
 import xyz.ottr.lutra.model.LiteralTerm;
 import xyz.ottr.lutra.model.Term;
 import xyz.ottr.lutra.result.Message;
@@ -34,8 +40,10 @@ import xyz.ottr.lutra.stottr.antlr.stOTTRParser;
 
 public class STermParser extends stOTTRBaseVisitor<Result<Term>> {
 
-    public STermParser() {
-        // TODO: Should take a PrefixMapping
+    private Map<String, String> prefixes = new HashMap<>();
+
+    public STermParser(Map<String, String> prefixes) {
+        this.prefixes = prefixes;
     }
 
     @Override
@@ -80,12 +88,36 @@ public class STermParser extends stOTTRBaseVisitor<Result<Term>> {
     
     @Override
     public Result<Term> visitIri(stOTTRParser.IriContext ctx) {
-        return visitChildren(ctx);
+
+        stOTTRParser.PrefixedNameContext prefixCtx = ctx.prefixedName();
+
+        if (prefixCtx != null) {
+            return visitPrefixedName(prefixCtx);
+        } else {
+            return Result.of(new IRITerm(ctx.IRIREF().getSymbol().getText()));
+        }
     }
     
     @Override
     public Result<Term> visitPrefixedName(stOTTRParser.PrefixedNameContext ctx) {
-        return visitChildren(ctx);
+        String toSplit;
+
+        TerminalNode onlyNS = ctx.PNAME_NS();
+        if (onlyNS != null) {
+            toSplit = onlyNS.getSymbol().getText();
+        } else {
+            toSplit = ctx.PNAME_LN().getSymbol().getText();
+        }
+
+        String[] prefixAndLocal = toSplit.split(":");
+        String prefix = this.prefixes.get(prefixAndLocal[0]);
+
+        if (prefix == null) {
+            return Result.empty(Message.error("Unrecognized prefix in qname " + toSplit));
+        }
+
+        String iri = "<" + prefix + prefixAndLocal[1] + ">";
+        return Result.of(new IRITerm(iri));
     }
     
     @Override

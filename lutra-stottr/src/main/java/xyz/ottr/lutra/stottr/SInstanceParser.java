@@ -29,10 +29,10 @@ import java.util.stream.Stream;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
-import org.antlr.v4.runtime.tree.TerminalNode;
 
+import xyz.ottr.lutra.model.ArgumentList;
+import xyz.ottr.lutra.model.IRITerm;
 import xyz.ottr.lutra.model.Instance;
-import xyz.ottr.lutra.result.Message;
 import xyz.ottr.lutra.result.Result;
 import xyz.ottr.lutra.result.ResultStream;
 import xyz.ottr.lutra.stottr.antlr.stOTTRBaseVisitor;
@@ -67,11 +67,7 @@ public class SInstanceParser extends stOTTRBaseVisitor<Result<Instance>> {
             Stream<Result<Instance>> results = document
                 .statement() // List of statments
                 .stream()
-                .map(stmt -> {
-                    System.err.println(stmt.toString());
-                    System.err.println(stmt.instance().toString());
-                    return visitStatement(stmt);
-                });
+                .map(stmt -> visitStatement(stmt));
             
             return new ResultStream<>(results);
         });
@@ -90,33 +86,15 @@ public class SInstanceParser extends stOTTRBaseVisitor<Result<Instance>> {
     @Override
     public Result<Instance> visitInstance(stOTTRParser.InstanceContext ctx) {
 
-        stOTTRParser.IriContext iriCtx = ctx.templateName().iri();
-        String iri;
+        STermParser termParser = new STermParser(this.prefixes);
+        // Parse template name
+        Result<String> iriRes = termParser.visitIri(ctx.templateName().iri())
+            .map(iri -> ((IRITerm) iri).getIRI());
 
-        // TODO: Move to STermParser
-        stOTTRParser.PrefixedNameContext prefixCtx = iriCtx.prefixedName();
-        if (prefixCtx != null) {
-            // TODO: Simplify code
-            String toSplit;
+        // Parse arguments and possible list expander
+        SArgumentListParser argumentListParser = new SArgumentListParser(termParser);
+        Result<ArgumentList> argsRes = argumentListParser.visitInstance(ctx);
 
-            TerminalNode onlyNS = prefixCtx.PNAME_NS();
-            if (onlyNS != null) {
-                toSplit = onlyNS.getSymbol().getText();
-            } else {
-                toSplit = prefixCtx.PNAME_LN().getSymbol().getText();
-            }
-
-            String[] prefixAndLocal = toSplit.split(":");
-            String prefix = this.prefixes.get(prefixAndLocal[0]);
-            iri = "<" + prefix + prefixAndLocal[1] + ">";
-        } else {
-            iri = iriCtx.IRIREF().getSymbol().getText();
-        }
-
-        if (iri == null) {
-            return Result.empty(Message.error(ctx.toString()));
-        } else {
-            return Result.empty(Message.error(iri));
-        }
+        return Result.zip(iriRes, argsRes, (iri, args) -> new Instance(iri, args));
     }
 }
