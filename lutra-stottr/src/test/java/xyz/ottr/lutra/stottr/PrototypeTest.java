@@ -41,6 +41,7 @@ public class PrototypeTest {
                 + "@prefix : <http://base.org/> .\n"
                 + "<https://ex.com/T>(:a, false) .\n"
                 + "ex:H(:c, :d) .\n"
+                + "ex:H(1, 2.32, .45) .\n"
                 + "ex:T([], _:blank) .")
             .forEach(res -> System.err.println("Parsed :" + res.toString()));
     }

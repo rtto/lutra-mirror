@@ -80,7 +80,23 @@ public class STermParser extends stOTTRBaseVisitor<Result<Term>> {
     
     @Override
     public Result<Term> visitNumericLiteral(stOTTRParser.NumericLiteralContext ctx) {
-        return visitChildren(ctx);
+
+        String type;
+        TerminalNode valNode;
+
+        if (ctx.INTEGER() != null) {
+            type = XSD.integer.getURI();
+            valNode = ctx.INTEGER();
+        } else if (ctx.DECIMAL() != null) {
+            type = XSD.decimal.getURI();
+            valNode = ctx.DECIMAL();
+        } else { // ctx.DOUBLE() != null
+            type = XSD.xdouble.getURI();
+            valNode = ctx.DOUBLE();
+        }
+
+        String val = valNode.getSymbol().getText();
+        return Result.of(new LiteralTerm(val, type));
     }
     
     @Override
@@ -130,10 +146,13 @@ public class STermParser extends stOTTRBaseVisitor<Result<Term>> {
         }
 
         String label = ctx.BLANK_NODE_LABEL().getSymbol().getText();
+
         if (!this.blanks.containsKey(label)) {
+
             Term newBlank = new BlankNodeTerm();
             this.blanks.put(label, newBlank);
             return Result.of(newBlank);
+
         } else {
             return Result.of(this.blanks.get(label));
         }
