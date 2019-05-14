@@ -1,4 +1,4 @@
-package xyz.ottr.lutra.stottr;
+package xyz.ottr.lutra.stottr.io;
 
 /*-
  * #%L
@@ -32,6 +32,7 @@ import xyz.ottr.lutra.model.ArgumentList;
 import xyz.ottr.lutra.model.Term;
 import xyz.ottr.lutra.result.Message;
 import xyz.ottr.lutra.result.Result;
+import xyz.ottr.lutra.stottr.STOTTR;
 
 import xyz.ottr.lutra.stottr.antlr.stOTTRBaseVisitor;
 import xyz.ottr.lutra.stottr.antlr.stOTTRParser;

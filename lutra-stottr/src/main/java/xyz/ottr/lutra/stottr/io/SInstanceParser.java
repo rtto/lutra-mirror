@@ -1,4 +1,4 @@
-package xyz.ottr.lutra.stottr;
+package xyz.ottr.lutra.stottr.io;
 
 /*-
  * #%L
