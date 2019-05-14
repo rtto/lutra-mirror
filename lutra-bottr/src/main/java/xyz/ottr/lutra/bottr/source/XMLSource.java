@@ -1,28 +1,25 @@
 package xyz.ottr.lutra.bottr.source;
 
-//import java.io.File;
-//import java.io.FileInputStream;
-//import java.io.FileNotFoundException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
-//import javax.xml.transform.sax.SAXSource;
-
-//import net.sf.saxon.s9api.DocumentBuilder;
+import net.sf.saxon.lib.Feature;
+import net.sf.saxon.s9api.Axis;
 import net.sf.saxon.s9api.Processor;
 import net.sf.saxon.s9api.SaxonApiException;
 import net.sf.saxon.s9api.XQueryCompiler;
 import net.sf.saxon.s9api.XQueryEvaluator;
 import net.sf.saxon.s9api.XQueryExecutable;
 import net.sf.saxon.s9api.XdmItem;
-//import net.sf.saxon.s9api.XdmNode;
+import net.sf.saxon.s9api.XdmNode;
 import net.sf.saxon.s9api.XdmValue;
-
-//import org.xml.sax.InputSource;
 
 import xyz.ottr.lutra.bottr.model.Record;
 import xyz.ottr.lutra.bottr.model.Source;
+import xyz.ottr.lutra.result.Message;
+import xyz.ottr.lutra.result.Result;
 import xyz.ottr.lutra.result.ResultStream;
 
 /*-
@@ -49,58 +46,42 @@ import xyz.ottr.lutra.result.ResultStream;
 
 public class XMLSource implements Source<String> {
 
-    //private final String uri;
-    
-    //public XMLSource(String source) {
-    //    this.uri = source;
-    //}
-
     public ResultStream<Record<String>> execute(String query) {
 
-        List<Record<String>> rows = new ArrayList<Record<String>>();
+        Stream.Builder<Result<Record<String>>> rows = Stream.builder();
 
         try {
             
             Processor proc = new Processor(false);
+            proc.setConfigurationProperty(Feature.STRIP_WHITESPACE, "all"); // Remove whitespace nodes
             XQueryCompiler comp = proc.newXQueryCompiler();
             XQueryExecutable exp =  comp.compile(query);
             XQueryEvaluator qe = exp.load();
             XdmValue result = qe.evaluate();
 
             for (XdmItem item : result) {
-                rows.add(new Record<String>(nodeToList(item)));
+                rows.accept(Result.of(new Record<String>(nodeToList(item))));
             }
 
         } catch (SaxonApiException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            Result<Record<String>> err = Result.empty(Message.error(
+                    "Error when executing XML query: " + query
+                    + "\n Recieved error: " + e.getMessage()));
+            return ResultStream.of(err);
         }
 
-        return ResultStream.innerOf(rows);
+        return new ResultStream<>(rows.build());
     }
 
     protected List<String> nodeToList(XdmItem node) {
 
-        List<String> output = new ArrayList<String>();
-
-        for (XdmItem item : node) {
-            
-            // Must do some formatting on the XQuery result
-
-            // Get the result
-            String itemString = item.getStringValue();
-
-            // Get rid of tab characters and indentation spacing
-            itemString = itemString.replace("\t", "");
-            itemString = itemString.replace("  ", "");
-            
-            // Split the result using the line breaks as separators
-            List<String> row = Arrays.asList(itemString.split("\\R"));
-            output.addAll(row);
-            
-            // Remove the first element, which is empty and results from a line break
-            output.remove(0);
+        if (!(node instanceof XdmNode)) {
+            return Arrays.asList(node.getStringValue());
         }
-        return output;
+
+        XdmNode xnode = ((XdmNode) node);
+        return xnode.axisIterator(Axis.CHILD).stream()
+            .map(c -> c.getStringValue())
+            .collect(Collectors.toList());
     }
 }
