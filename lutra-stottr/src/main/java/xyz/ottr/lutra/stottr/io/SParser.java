@@ -65,7 +65,7 @@ public abstract class SParser<T> extends stOTTRBaseVisitor<Result<T>> {
         this.prefixes = prefixRes.get();
         this.termParser = new STermParser(this.prefixes);
 
-        // Parse instances
+        // Parse instances/templates
         // Below code will not be executed if prefixes are not present
         ResultStream<T> resultStream = prefixRes.mapToStream(_ignore -> {
 
