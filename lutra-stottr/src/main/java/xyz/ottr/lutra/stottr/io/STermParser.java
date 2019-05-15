@@ -34,12 +34,14 @@ import org.apache.jena.vocabulary.XSD;
 import xyz.ottr.lutra.model.BlankNodeTerm;
 import xyz.ottr.lutra.model.IRITerm;
 import xyz.ottr.lutra.model.LiteralTerm;
+import xyz.ottr.lutra.model.NoneTerm;
 import xyz.ottr.lutra.model.Term;
 import xyz.ottr.lutra.model.TermList;
 import xyz.ottr.lutra.result.Message;
 import xyz.ottr.lutra.result.Result;
 import xyz.ottr.lutra.stottr.antlr.stOTTRBaseVisitor;
 import xyz.ottr.lutra.stottr.antlr.stOTTRParser;
+import xyz.ottr.lutra.wottr.WOTTR;
 
 public class STermParser extends stOTTRBaseVisitor<Result<Term>> {
 
@@ -152,6 +154,9 @@ public class STermParser extends stOTTRBaseVisitor<Result<Term>> {
             String iriBraces = ctx.IRIREF().getSymbol().getText();
             // IRIs in Lutra are always full, so do not use surrounding '<','>'
             String iri = iriBraces.replaceAll("^<|>$", ""); 
+            if (iri.equals(WOTTR.none.getURI())) {
+                return Result.of(new NoneTerm());
+            }
             return Result.of(new IRITerm(iri));
         }
     }
@@ -176,6 +181,9 @@ public class STermParser extends stOTTRBaseVisitor<Result<Term>> {
         }
 
         String iri = prefix + prefixAndLocal[1];
+        if (iri.equals(WOTTR.none.getURI())) {
+            return Result.of(new NoneTerm());
+        }
         return Result.of(new IRITerm(iri));
     }
     

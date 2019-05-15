@@ -20,6 +20,10 @@
 			<groupId>${project.groupId}</groupId>
 			<artifactId>lutra-core</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>lutra-wottr</artifactId>
+		</dependency>
 		
 		<dependency>
 			<groupId>org.antlr</groupId>
