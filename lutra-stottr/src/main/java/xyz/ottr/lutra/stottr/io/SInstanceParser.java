@@ -22,13 +22,7 @@ package xyz.ottr.lutra.stottr.io;
  * #L%
  */
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.stream.Stream;
-
 import org.antlr.v4.runtime.CharStream;
-import org.antlr.v4.runtime.CharStreams;
-import org.antlr.v4.runtime.CommonTokenStream;
 
 import xyz.ottr.lutra.io.InstanceParser;
 import xyz.ottr.lutra.model.ArgumentList;
@@ -36,69 +30,12 @@ import xyz.ottr.lutra.model.IRITerm;
 import xyz.ottr.lutra.model.Instance;
 import xyz.ottr.lutra.result.Result;
 import xyz.ottr.lutra.result.ResultStream;
-import xyz.ottr.lutra.stottr.antlr.stOTTRBaseVisitor;
-import xyz.ottr.lutra.stottr.antlr.stOTTRLexer;
 import xyz.ottr.lutra.stottr.antlr.stOTTRParser;
 
-public class SInstanceParser extends stOTTRBaseVisitor<Result<Instance>> implements InstanceParser<CharStream> {
-
-    private Map<String, String> prefixes = new HashMap<>();
-    private STermParser termParser = new STermParser(prefixes);
-
-    public ResultStream<Instance> parseString(String str) {
-        return apply(CharStreams.fromString(str));
-    }
-
-    private stOTTRLexer makeLexer(CharStream in, ErrorToMessageListener errListener) {
-
-        stOTTRLexer lexer = new stOTTRLexer(in);
-        // Only use our own ErrorListener
-        lexer.removeErrorListeners();
-        lexer.addErrorListener(errListener);
-        return lexer;
-    }
-
-    
-    private stOTTRParser makeParser(CharStream in, ErrorToMessageListener errListener) {
-
-        stOTTRLexer lexer = makeLexer(in, errListener);
-        CommonTokenStream commonTokenStream = new CommonTokenStream(lexer);
-        stOTTRParser parser = new stOTTRParser(commonTokenStream);
-        // Only use our own ErrorListener
-        parser.removeErrorListeners();
-        parser.addErrorListener(errListener);
-        return parser;
-    }
+public class SInstanceParser extends SParser<Instance> implements InstanceParser<CharStream> {
 
     public ResultStream<Instance> apply(CharStream in) {
-
-        // Make parser
-        ErrorToMessageListener errListener = new ErrorToMessageListener();
-        stOTTRParser parser = makeParser(in, errListener);
-        stOTTRParser.StOTTRDocContext document = parser.stOTTRDoc();
-
-        // Parse prefixes
-        SPrefixParser prefixParser = new SPrefixParser();
-        Result<Map<String, String>> prefixRes = prefixParser.visit(document);
-        this.prefixes = prefixRes.get();
-        this.termParser = new STermParser(this.prefixes);
-
-        // Parse instances
-        // Below code will not be executed if prefixes are not present
-        ResultStream<Instance> instances = prefixRes.mapToStream(_ignore -> {
-
-            Stream<Result<Instance>> results = document
-                .statement() // List of statments
-                .stream()
-                .map(stmt -> visitStatement(stmt));
-            
-            return new ResultStream<>(results);
-        });
-
-        // TODO: Somehow put these messages on returned instances,
-        //       see https://gitlab.com/ottr/lutra/lutra/issues/148
-        errListener.getMessages().printMessages();
-        return instances;
+        return parseDocument(in);
     }
 
     @Override
@@ -115,12 +52,12 @@ public class SInstanceParser extends stOTTRBaseVisitor<Result<Instance>> impleme
     public Result<Instance> visitInstance(stOTTRParser.InstanceContext ctx) {
 
         // Parse template name
-        Result<String> iriRes = termParser
+        Result<String> iriRes = getTermParser()
             .visitIri(ctx.templateName().iri())
             .map(iri -> ((IRITerm) iri).getIRI());
 
         // Parse arguments and possible list expander
-        SArgumentListParser argumentListParser = new SArgumentListParser(termParser);
+        SArgumentListParser argumentListParser = new SArgumentListParser(getTermParser());
         Result<ArgumentList> argsRes = argumentListParser.visitInstance(ctx);
 
         return Result.zip(iriRes, argsRes, (iri, args) -> new Instance(iri, args));
