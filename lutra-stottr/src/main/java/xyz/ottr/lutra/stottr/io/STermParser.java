@@ -87,8 +87,6 @@ public class STermParser extends stOTTRBaseVisitor<Result<Term>> {
         return visitChildren(ctx);
     }
     
-    // TODO: Finish below methods
-    
     @Override
     public Result<Term> visitList(stOTTRParser.ListContext ctx) {
 
@@ -127,16 +125,19 @@ public class STermParser extends stOTTRBaseVisitor<Result<Term>> {
 
         String val = ctx.String().getSymbol().getText()
             .replaceAll("^\"|\"$", ""); // Remove surronding quotes for strings
-        if (ctx.LANGTAG() != null) {
+
+        if (ctx.LANGTAG() != null) { // Language tag present
             String tag = ctx.LANGTAG().getSymbol().getText();
             tag = tag.replace("@", ""); // Remove the @-prefix
             return Result.of(LiteralTerm.taggedLiteral(val, tag));
         }
+
         if (ctx.iri() != null) { // Explicit type present
             Result<Term> iriTermRes = visitIri(ctx.iri());
             return iriTermRes.flatMap(iri ->
                 Result.of(LiteralTerm.typedLiteral(val, ((IRITerm) iri).getIRI())));
         }
+
         return Result.of(new LiteralTerm(val));
     }
     
@@ -149,7 +150,8 @@ public class STermParser extends stOTTRBaseVisitor<Result<Term>> {
             return visitPrefixedName(prefixCtx);
         } else {
             String iriBraces = ctx.IRIREF().getSymbol().getText();
-            String iri = iriBraces.replaceAll("<", "").replaceAll(">", "");
+            // IRIs in Lutra are always full, so do not use surrounding '<','>'
+            String iri = iriBraces.replaceAll("^<|>$", ""); 
             return Result.of(new IRITerm(iri));
         }
     }
@@ -158,17 +160,18 @@ public class STermParser extends stOTTRBaseVisitor<Result<Term>> {
     public Result<Term> visitPrefixedName(stOTTRParser.PrefixedNameContext ctx) {
         String toSplit;
 
-        TerminalNode onlyNS = ctx.PNAME_NS();
-        if (onlyNS != null) {
+        TerminalNode onlyNS = ctx.PNAME_NS(); 
+        if (onlyNS != null) { // Of the form ex: (i.e. nothing after colon)
             toSplit = onlyNS.getSymbol().getText();
         } else {
             toSplit = ctx.PNAME_LN().getSymbol().getText();
         }
 
         String[] prefixAndLocal = toSplit.split(":");
+        // Note, empty string = base in this.prefixes
         String prefix = this.prefixes.get(prefixAndLocal[0]);
 
-        if (prefix == null) {
+        if (prefix == null) { // Prefix not found
             return Result.empty(Message.error("Unrecognized prefix in qname " + toSplit + "."));
         }
 
@@ -179,7 +182,7 @@ public class STermParser extends stOTTRBaseVisitor<Result<Term>> {
     @Override
     public Result<Term> visitBlankNode(stOTTRParser.BlankNodeContext ctx) {
 
-        if (ctx.anon() != null) {
+        if (ctx.anon() != null) { // Of the form [], i.e. no label
             return visitAnon(ctx.anon());
         }
 

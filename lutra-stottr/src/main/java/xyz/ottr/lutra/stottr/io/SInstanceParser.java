@@ -49,23 +49,41 @@ public class SInstanceParser extends stOTTRBaseVisitor<Result<Instance>> impleme
         return apply(CharStreams.fromString(str));
     }
 
-    public ResultStream<Instance> apply(CharStream in) {
-        ErrorToMessageListener errListener = new ErrorToMessageListener();
+    private stOTTRLexer makeLexer(CharStream in, ErrorToMessageListener errListener) {
+
         stOTTRLexer lexer = new stOTTRLexer(in);
+        // Only use our own ErrorListener
         lexer.removeErrorListeners();
         lexer.addErrorListener(errListener);
+        return lexer;
+    }
 
+    
+    private stOTTRParser makeParser(CharStream in, ErrorToMessageListener errListener) {
+
+        stOTTRLexer lexer = makeLexer(in, errListener);
         CommonTokenStream commonTokenStream = new CommonTokenStream(lexer);
         stOTTRParser parser = new stOTTRParser(commonTokenStream);
+        // Only use our own ErrorListener
         parser.removeErrorListeners();
         parser.addErrorListener(errListener);
+        return parser;
+    }
 
-        SPrefixParser prefixParser = new SPrefixParser();
+    public ResultStream<Instance> apply(CharStream in) {
+
+        // Make parser
+        ErrorToMessageListener errListener = new ErrorToMessageListener();
+        stOTTRParser parser = makeParser(in, errListener);
         stOTTRParser.StOTTRDocContext document = parser.stOTTRDoc();
-        Result<Map<String, String>> prefixRes = prefixParser.visit(document);
 
+        // Parse prefixes
+        SPrefixParser prefixParser = new SPrefixParser();
+        Result<Map<String, String>> prefixRes = prefixParser.visit(document);
         this.prefixes = prefixRes.get();
         this.termParser = new STermParser(this.prefixes);
+
+        // Parse instances
         // Below code will not be executed if prefixes are not present
         ResultStream<Instance> instances = prefixRes.mapToStream(_ignore -> {
 
@@ -77,6 +95,8 @@ public class SInstanceParser extends stOTTRBaseVisitor<Result<Instance>> impleme
             return new ResultStream<>(results);
         });
 
+        // TODO: Somehow put these messages on returned instances,
+        //       see https://gitlab.com/ottr/lutra/lutra/issues/148
         errListener.getMessages().printMessages();
         return instances;
     }
@@ -95,7 +115,8 @@ public class SInstanceParser extends stOTTRBaseVisitor<Result<Instance>> impleme
     public Result<Instance> visitInstance(stOTTRParser.InstanceContext ctx) {
 
         // Parse template name
-        Result<String> iriRes = termParser.visitIri(ctx.templateName().iri())
+        Result<String> iriRes = termParser
+            .visitIri(ctx.templateName().iri())
             .map(iri -> ((IRITerm) iri).getIRI());
 
         // Parse arguments and possible list expander
