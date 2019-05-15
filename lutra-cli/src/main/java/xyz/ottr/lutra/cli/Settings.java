@@ -152,6 +152,7 @@ public class Settings {
             super(Arrays.asList(
                     Format.legacy.toString(),
                     Format.wottr.toString(),
+                    Format.stottr.toString(),
                     Format.tabottr.toString()));
         }
     }

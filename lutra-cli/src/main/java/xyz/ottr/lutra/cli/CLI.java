@@ -52,6 +52,8 @@ import xyz.ottr.lutra.result.ResultStream;
 import xyz.ottr.lutra.store.DependencyGraph;
 import xyz.ottr.lutra.store.TemplateStore;
 
+import xyz.ottr.lutra.stottr.io.SFileReader;
+import xyz.ottr.lutra.stottr.io.SInstanceParser;
 import xyz.ottr.lutra.tabottr.io.TabInstanceParser;
 import xyz.ottr.lutra.wottr.WTemplateFactory;
 import xyz.ottr.lutra.wottr.io.WFileReader;
@@ -283,6 +285,8 @@ public class CLI {
                         new xyz.ottr.lutra.wottr.legacy.io.WInstanceParser()));
             case wottr:
                 return Result.of(new InstanceReader(new WFileReader(), new WInstanceParser()));
+            case stottr:
+                return Result.of(new InstanceReader(new SFileReader(), new SInstanceParser()));
             default:
                 return Result.empty(Message.error(
                         "Input format " + settings.outputFormat.toString()
