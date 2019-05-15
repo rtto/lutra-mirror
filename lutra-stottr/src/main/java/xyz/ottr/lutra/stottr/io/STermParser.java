@@ -125,15 +125,19 @@ public class STermParser extends stOTTRBaseVisitor<Result<Term>> {
     @Override
     public Result<Term> visitRdfLiteral(stOTTRParser.RdfLiteralContext ctx) {
 
-        String val = ctx.String().getSymbol().getText();
+        String val = ctx.String().getSymbol().getText()
+            .replaceAll("^\"|\"$", ""); // Remove surronding quotes for strings
         if (ctx.LANGTAG() != null) {
             String tag = ctx.LANGTAG().getSymbol().getText();
             tag = tag.replace("@", ""); // Remove the @-prefix
             return Result.of(LiteralTerm.taggedLiteral(val, tag));
         }
-        Result<Term> iriTermRes = visitIri(ctx.iri());
-        return iriTermRes.flatMap(iri ->
-            Result.of(LiteralTerm.typedLiteral(val, ((IRITerm) iri).getIRI())));
+        if (ctx.iri() != null) { // Explicit type present
+            Result<Term> iriTermRes = visitIri(ctx.iri());
+            return iriTermRes.flatMap(iri ->
+                Result.of(LiteralTerm.typedLiteral(val, ((IRITerm) iri).getIRI())));
+        }
+        return Result.of(new LiteralTerm(val));
     }
     
     @Override
