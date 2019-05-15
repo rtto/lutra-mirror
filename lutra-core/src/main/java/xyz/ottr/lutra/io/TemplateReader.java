@@ -27,10 +27,9 @@ package xyz.ottr.lutra.io;
 //import java.util.Queue;
 
 import java.util.Arrays;
+import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
-
-import org.apache.jena.shared.PrefixMapping;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,7 +51,7 @@ public class TemplateReader implements Function<String, ResultStream<TemplateSig
         this.parser = templateParser;
     }
 
-    public PrefixMapping getUsedPrefixes() {
+    public Map<String, String> getUsedPrefixes() {
         return parser.getUsedPrefixes();
     }
 
