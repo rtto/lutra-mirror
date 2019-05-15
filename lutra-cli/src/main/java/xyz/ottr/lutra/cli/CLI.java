@@ -129,8 +129,8 @@ public class CLI {
                 MessageHandler msgs = parseLibraryInto(reader, store);
                 
                 if (!Message.moreSevere(msgs.printMessages(), settings.haltOn)) {
-                    PrefixMapping usedPrefixes = reader.getUsedPrefixes();
-                    addStdPrefixes(usedPrefixes);
+                    PrefixMapping usedPrefixes = getStdPrefixes();
+                    usedPrefixes.setNsPrefixes(reader.getUsedPrefixes());
                     executeMode(store, usedPrefixes);
                 }
             }
@@ -417,10 +417,12 @@ public class CLI {
     /// UTILS                                                ///
     ////////////////////////////////////////////////////////////
 
-    private static void addStdPrefixes(PrefixMapping prefixes) {
+    private static PrefixMapping getStdPrefixes() {
 
+        PrefixMapping prefixes = PrefixMapping.Factory.create();
         prefixes.setNsPrefixes(PrefixMapping.Standard);
         prefixes.setNsPrefix(OTTR.prefix, OTTR.namespace);
+        return prefixes;
     }
 
 
