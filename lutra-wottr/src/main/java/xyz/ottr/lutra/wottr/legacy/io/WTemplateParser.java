@@ -67,8 +67,8 @@ public class WTemplateParser implements TemplateParser<Model> {
     }
 
     @Override
-    public PrefixMapping getUsedPrefixes() {
-        return this.prefixes;
+    public Map<String, String> getUsedPrefixes() {
+        return this.prefixes.getNsPrefixMap();
     }
 
     @Override
