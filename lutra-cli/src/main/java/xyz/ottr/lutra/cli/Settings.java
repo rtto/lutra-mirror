@@ -163,6 +163,7 @@ public class Settings {
 
         TplInputFormat() {
             super(Arrays.asList(
+                    Format.stottr.toString(),
                     Format.legacy.toString(),
                     Format.wottr.toString()));
         }
