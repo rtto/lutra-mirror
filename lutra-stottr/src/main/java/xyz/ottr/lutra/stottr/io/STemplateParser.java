@@ -34,6 +34,13 @@ import xyz.ottr.lutra.stottr.antlr.stOTTRParser;
 
 public class STemplateParser extends SParser<TemplateSignature> implements TemplateParser<CharStream> {
 
+    private final SParameterListParser paramsParser;
+
+    public STemplateParser() {
+        super();
+        this.paramsParser = new SParameterListParser(getTermParser());
+    }
+
     @Override
     public ResultStream<TemplateSignature> apply(CharStream in) {
         return parseDocument(in); 
@@ -54,24 +61,24 @@ public class STemplateParser extends SParser<TemplateSignature> implements Templ
         return getTermParser().visit(ctx).flatMap(term -> Result.of(((IRITerm) term).getIRI()));
     }
 
-    private Result<TemplateSignature> makeSignature(stOTTRParser.TemplateNameContext name,
-        stOTTRParser.ParameterListContext params, boolean isBase) {
+    private Result<TemplateSignature> makeSignature(stOTTRParser.TemplateNameContext nameCtx,
+        stOTTRParser.ParameterListContext paramsCtx, boolean isBase) {
         
-        Result<String> iriRes = parseName(name);
-        Result<ParameterList> parametersRes = new SParameterListParser(getTermParser()).visit(params);
+        Result<String> iriRes = parseName(nameCtx);
+        Result<ParameterList> paramsRes = paramsParser.visit(paramsCtx);
 
-        return Result.zip(iriRes, parametersRes, (iri, params) -> new TemplateSignature(iri, params, isBase));
+        return Result.zip(iriRes, paramsRes, (iri, params) -> new TemplateSignature(iri, params, isBase));
     }
 
     @Override
     public Result<TemplateSignature> visitSignature(stOTTRParser.SignatureContext ctx) {
-        return makeSignature(ctx.templateName(), ctx.parameterList, false);
+        return makeSignature(ctx.templateName(), ctx.parameterList(), false);
     }
     
     @Override
     public Result<TemplateSignature> visitBaseTemplate(stOTTRParser.BaseTemplateContext ctx) {
         stOTTRParser.SignatureContext sigCtx = ctx.signature();
-        return makeSignature(sigCtx.templateName(), sigCtx.parameterList, true);
+        return makeSignature(sigCtx.templateName(), sigCtx.parameterList(), true);
     }
     
     @Override

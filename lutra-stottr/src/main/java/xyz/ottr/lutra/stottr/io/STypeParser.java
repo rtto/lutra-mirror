@@ -22,24 +22,21 @@ package xyz.ottr.lutra.stottr.io;
  * #L%
  */
 
+import xyz.ottr.lutra.model.IRITerm;
 import xyz.ottr.lutra.model.types.TermType;
+import xyz.ottr.lutra.model.types.TypeFactory;
 import xyz.ottr.lutra.result.Result;
 import xyz.ottr.lutra.stottr.antlr.stOTTRBaseVisitor;
 import xyz.ottr.lutra.stottr.antlr.stOTTRParser;
 
 public class STypeParser extends stOTTRBaseVisitor<Result<TermType>> {
 
-    private STermParser termParser;
+    public STermParser termParser;
 
     public STypeParser(STermParser termParser) {
         this.termParser = termParser;
     }
 
-    @Override
-    public Result<TermType> visitType(stOTTRParser.TypeContext ctx) {
-        return visitChildren(ctx);
-    }
-    
     @Override
     public Result<TermType> visitListType(stOTTRParser.ListTypeContext ctx) {
         return visitChildren(ctx);
@@ -52,6 +49,7 @@ public class STypeParser extends stOTTRBaseVisitor<Result<TermType>> {
     
     @Override
     public Result<TermType> visitBasicType(stOTTRParser.BasicTypeContext ctx) {
-        return visitChildren(ctx);
+        Result<String> iriRes = this.termParser.visit(ctx).map(term -> ((IRITerm) term).getIRI());
+        return iriRes.map(iri -> TypeFactory.getByIRI(iri));
     }
 }

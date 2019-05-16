@@ -29,4 +29,9 @@ public class STOTTR {
         public static final String zipMin = "zipMin";
         public static final String zipMax = "zipMax";
     }
+
+    public static class ParameterMode {
+        public static final String optional = "?";
+        public static final String nonBlank = "!";
+    }
 }

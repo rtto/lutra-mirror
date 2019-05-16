@@ -94,7 +94,7 @@ public class SPrefixParser extends stOTTRBaseVisitor<Result<Map<String, String>>
         }
 
         private static String stripPrefix(String prefix) {
-            return prefix.replaceAll("<", "").replace(">", "");
+            return prefix.replaceAll("^<|>$", "");
         }
 
         public static PrefixPair makeBase(TerminalNode prefixNode) {
