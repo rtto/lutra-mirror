@@ -39,6 +39,11 @@ public class SInstanceParser extends SParser<Instance> implements InstanceParser
     }
 
     @Override
+    protected void initSubParsers() {
+        // No subparser needed
+    }
+
+    @Override
     public Result<Instance> visitStatement(stOTTRParser.StatementContext ctx) {
 
         if (ctx.instance() == null) { // Not an instance

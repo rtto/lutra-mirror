@@ -34,7 +34,7 @@ import xyz.ottr.lutra.stottr.antlr.stOTTRParser;
 
 public class STemplateParser extends SParser<TemplateSignature> implements TemplateParser<CharStream> {
 
-    private final SParameterListParser paramsParser;
+    private SParameterListParser paramsParser;
 
     public STemplateParser() {
         super();
@@ -42,18 +42,28 @@ public class STemplateParser extends SParser<TemplateSignature> implements Templ
     }
 
     @Override
+    protected void initSubParsers() {
+        this.paramsParser = new SParameterListParser(getTermParser());
+    }
+
+    @Override
     public ResultStream<TemplateSignature> apply(CharStream in) {
-        return parseDocument(in); 
+        return parseDocument(in);
     }
 
     @Override
     public Result<TemplateSignature> visitStatement(stOTTRParser.StatementContext ctx) {
 
+        // TODO: Improve this code (Note: visitChildren(ctx) does not work, returns null)
         if (ctx.instance() != null) { // An (outer) instance
             return Result.empty(); // TODO: Decide on error or ignore?
+        } else if (ctx.signature() != null) {
+            return visitSignature(ctx.signature());
+        } else if (ctx.baseTemplate() != null) {
+            return visitBaseTemplate(ctx.baseTemplate());
+        } else {
+            return visitTemplate(ctx.template());
         }
-        
-        return visitChildren(ctx);
     }
 
     private Result<String> parseName(stOTTRParser.TemplateNameContext ctx) {
@@ -66,7 +76,6 @@ public class STemplateParser extends SParser<TemplateSignature> implements Templ
         
         Result<String> iriRes = parseName(nameCtx);
         Result<ParameterList> paramsRes = paramsParser.visit(paramsCtx);
-
         return Result.zip(iriRes, paramsRes, (iri, params) -> new TemplateSignature(iri, params, isBase));
     }
 
@@ -77,6 +86,7 @@ public class STemplateParser extends SParser<TemplateSignature> implements Templ
     
     @Override
     public Result<TemplateSignature> visitBaseTemplate(stOTTRParser.BaseTemplateContext ctx) {
+
         stOTTRParser.SignatureContext sigCtx = ctx.signature();
         return makeSignature(sigCtx.templateName(), sigCtx.parameterList(), true);
     }

@@ -45,6 +45,16 @@ public abstract class SParser<T> extends stOTTRBaseVisitor<Result<T>> {
         return this.prefixes;
     }
 
+    /**
+     * Should initialize subparsers that depend on
+     * the prefix definitoins and this.termParser
+     * (such as ParameterParsers)
+     */
+    protected abstract void initSubParsers();
+
+    @Override
+    public abstract Result<T> visitStatement(stOTTRParser.StatementContext ctx);
+
     public ResultStream<T> parseString(String str) {
         return parseDocument(CharStreams.fromString(str));
     }
@@ -65,6 +75,8 @@ public abstract class SParser<T> extends stOTTRBaseVisitor<Result<T>> {
         this.prefixes = prefixRes.get();
         this.termParser = new STermParser(this.prefixes);
 
+        initSubParsers();
+        
         // Parse instances/templates
         // Below code will not be executed if prefixes are not present
         ResultStream<T> resultStream = prefixRes.mapToStream(_ignore -> {
@@ -73,7 +85,7 @@ public abstract class SParser<T> extends stOTTRBaseVisitor<Result<T>> {
                 .statement() // List of statments
                 .stream()
                 .map(stmt -> visitStatement(stmt));
-            
+
             return new ResultStream<>(results);
         });
 
@@ -83,7 +95,7 @@ public abstract class SParser<T> extends stOTTRBaseVisitor<Result<T>> {
         return resultStream;
     }
 
-    protected stOTTRLexer makeLexer(CharStream in, ErrorToMessageListener errListener) {
+    private stOTTRLexer makeLexer(CharStream in, ErrorToMessageListener errListener) {
 
         stOTTRLexer lexer = new stOTTRLexer(in);
         // Only use our own ErrorListener
@@ -92,7 +104,7 @@ public abstract class SParser<T> extends stOTTRBaseVisitor<Result<T>> {
         return lexer;
     }
 
-    protected stOTTRParser makeParser(CharStream in, ErrorToMessageListener errListener) {
+    private stOTTRParser makeParser(CharStream in, ErrorToMessageListener errListener) {
 
         stOTTRLexer lexer = makeLexer(in, errListener);
         CommonTokenStream commonTokenStream = new CommonTokenStream(lexer);

@@ -71,7 +71,7 @@ public class SParameterListParser extends stOTTRBaseVisitor<Result<ParameterList
 
             Result<List<Term>> paramsRes = Result.aggregate(this.resParams);
             return paramsRes.map(params ->
-                new ParameterList(params, this.optionals, this.nonBlanks, this.defaults));
+                new ParameterList(params, this.nonBlanks, this.optionals, this.defaults));
         }
     
         public void parseParameter(stOTTRParser.ParameterContext ctx) {
@@ -92,6 +92,7 @@ public class SParameterListParser extends stOTTRBaseVisitor<Result<ParameterList
                 }
             );
             varRes.ifPresent(var -> parseParameterModes(ctx.ParameterMode(), var));
+            resParams.add(varRes);
         }
 
         private void parseParameterModes(List<TerminalNode> modes, Term var) {
