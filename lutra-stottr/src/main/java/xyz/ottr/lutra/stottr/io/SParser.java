@@ -30,6 +30,7 @@ import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 
+import xyz.ottr.lutra.model.Term;
 import xyz.ottr.lutra.result.Result;
 import xyz.ottr.lutra.result.ResultStream;
 import xyz.ottr.lutra.stottr.antlr.stOTTRBaseVisitor;
@@ -43,6 +44,11 @@ public abstract class SParser<T> extends stOTTRBaseVisitor<Result<T>> {
 
     public Map<String, String> getUsedPrefixes() {
         return this.prefixes;
+    }
+
+    protected void setPrefixesAndVariables(Map<String, String> prefixes, Map<String, Term> variables) {
+        this.prefixes = prefixes;
+        this.termParser = new STermParser(prefixes, variables);
     }
 
     /**

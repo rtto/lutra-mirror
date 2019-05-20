@@ -22,12 +22,21 @@ package xyz.ottr.lutra.stottr.io;
  * #L%
  */
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 import org.antlr.v4.runtime.CharStream;
 
 import xyz.ottr.lutra.io.TemplateParser;
+import xyz.ottr.lutra.model.BlankNodeTerm;
 import xyz.ottr.lutra.model.IRITerm;
+import xyz.ottr.lutra.model.Instance;
 import xyz.ottr.lutra.model.ParameterList;
+import xyz.ottr.lutra.model.Template;
 import xyz.ottr.lutra.model.TemplateSignature;
+import xyz.ottr.lutra.model.Term;
 import xyz.ottr.lutra.result.Result;
 import xyz.ottr.lutra.result.ResultStream;
 import xyz.ottr.lutra.stottr.antlr.stOTTRParser;
@@ -93,8 +102,35 @@ public class STemplateParser extends SParser<TemplateSignature> implements Templ
     
     @Override
     public Result<TemplateSignature> visitTemplate(stOTTRParser.TemplateContext ctx) {
-        return visitChildren(ctx);
+
+        Result<TemplateSignature> sigRes = visitSignature(ctx.signature());
+        Map<String, Term> variables = makeVariablesMap(sigRes);
+
+        SInstanceParser instanceParser = new SInstanceParser(getUsedPrefixes(), variables);
+        Set<Result<Instance>> resBody = ctx.patternList()
+            .instance()
+            .stream()
+            .map(insCtx -> instanceParser.visitInstance(insCtx))
+            .collect(Collectors.toSet());
+
+        Result<Set<Instance>> bodyRes = Result.aggregate(resBody);
+
+        return Result.zip(sigRes, bodyRes, (sig, body) -> new Template(sig, body));
     }
+
+    private Map<String, Term> makeVariablesMap(Result<TemplateSignature> resSig) {
+
+        Map<String, Term> variables = new HashMap<>();
+        if (!resSig.isPresent()) {
+            return variables;
+        }
+
+        for (Term var : resSig.get().getParameters().asList()) {
+            variables.put(((BlankNodeTerm) var).getLabel(), var);
+        }
+        return variables;
+    }
+            
     
     //@Override
     //public Result<TemplateSignature> visitPatternList(stOTTRParser.PatternListContext ctx) {

@@ -22,17 +22,37 @@ package xyz.ottr.lutra.stottr.io;
  * #L%
  */
 
+import java.util.Map;
+
 import org.antlr.v4.runtime.CharStream;
 
 import xyz.ottr.lutra.io.InstanceParser;
 import xyz.ottr.lutra.model.ArgumentList;
 import xyz.ottr.lutra.model.IRITerm;
 import xyz.ottr.lutra.model.Instance;
+import xyz.ottr.lutra.model.Term;
 import xyz.ottr.lutra.result.Result;
 import xyz.ottr.lutra.result.ResultStream;
 import xyz.ottr.lutra.stottr.antlr.stOTTRParser;
 
 public class SInstanceParser extends SParser<Instance> implements InstanceParser<CharStream> {
+
+    /**
+     * Makes a fresh InstanceParser with no predefined prefixes, variables, etc.
+     * Used for parsing sets of outer (i.e. outside template bodies) instances
+     */
+    public SInstanceParser() {
+        super();
+    }
+
+    /**
+     * Makes an InstanceParser with the given set of prefixes and variables,
+     * for parsing instances within a template's body.
+     */
+    public SInstanceParser(Map<String, String> prefixes, Map<String, Term> variables) {
+        this();
+        super.setPrefixesAndVariables(prefixes, variables);
+    }
 
     public ResultStream<Instance> apply(CharStream in) {
         return parseDocument(in);

@@ -45,24 +45,36 @@ import xyz.ottr.lutra.wottr.WOTTR;
 
 public class STermParser extends stOTTRBaseVisitor<Result<Term>> {
 
-    private Map<String, String> prefixes = new HashMap<>();
-    private Map<String, Term> blanks;
+    private final Map<String, String> prefixes;
+    private final Map<String, Term> blanks;
+
+    // Maps labels to already parsed (blank node) variable terms
+    private final Map<String, Term> variables;
 
     public STermParser(Map<String, String> prefixes) {
         this.prefixes = prefixes;
+        this.variables = new HashMap<>();
+        this.blanks = new HashMap<>();
+    }
+
+    public STermParser(Map<String, String> prefixes, Map<String, Term> variables) {
+        this.prefixes = prefixes;
+        this.variables = variables;
         this.blanks = new HashMap<>();
     }
 
     private Term makeBlank(String label) {
 
-        if (!this.blanks.containsKey(label)) {
-
+        // Use shallow clone to keep objects distinct but
+        // with same identifier
+        if (this.variables.containsKey(label)) {
+            return this.variables.get(label).shallowClone();
+        } else if (this.blanks.containsKey(label)) {
+            return this.blanks.get(label).shallowClone();
+        } else {
             Term newBlank = new BlankNodeTerm();
             this.blanks.put(label, newBlank);
             return newBlank;
-
-        } else {
-            return this.blanks.get(label);
         }
     }
 
