@@ -23,6 +23,10 @@ package xyz.ottr.lutra.stottr.io;
  */
 
 import xyz.ottr.lutra.model.IRITerm;
+import xyz.ottr.lutra.model.types.BasicType;
+import xyz.ottr.lutra.model.types.LUBType;
+import xyz.ottr.lutra.model.types.ListType;
+import xyz.ottr.lutra.model.types.NEListType;
 import xyz.ottr.lutra.model.types.TermType;
 import xyz.ottr.lutra.model.types.TypeFactory;
 import xyz.ottr.lutra.result.Result;
@@ -38,13 +42,35 @@ public class STypeParser extends stOTTRBaseVisitor<Result<TermType>> {
     }
 
     @Override
+    public Result<TermType> visitType(stOTTRParser.TypeContext ctx) {
+
+        if (ctx.listType() != null) {
+            return visitListType(ctx.listType());
+        } else if (ctx.neListType() != null) {
+            return visitNeListType(ctx.neListType());
+        } else if (ctx.lubType() != null) {
+            return visitLubType(ctx.lubType());
+        } else {
+            return visitBasicType(ctx.basicType());
+        }
+    }
+
+    @Override
     public Result<TermType> visitListType(stOTTRParser.ListTypeContext ctx) {
-        return visitChildren(ctx);
+        Result<TermType> innerRes = visitType(ctx.type());
+        return innerRes.flatMap(inner -> Result.of(new ListType(inner)));
+    }
+    
+    @Override
+    public Result<TermType> visitNeListType(stOTTRParser.NeListTypeContext ctx) {
+        Result<TermType> innerRes = visitType(ctx.type());
+        return innerRes.flatMap(inner -> Result.of(new NEListType(inner)));
     }
     
     @Override
     public Result<TermType> visitLubType(stOTTRParser.LubTypeContext ctx) {
-        return visitChildren(ctx);
+        Result<TermType> innerRes = visitBasicType(ctx.basicType());
+        return innerRes.flatMap(inner -> Result.of(new LUBType((BasicType) inner)));
     }
     
     @Override
