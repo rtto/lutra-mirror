@@ -33,11 +33,9 @@ import xyz.ottr.lutra.model.Term;
 import xyz.ottr.lutra.result.Message;
 import xyz.ottr.lutra.result.Result;
 import xyz.ottr.lutra.stottr.STOTTR;
-
-import xyz.ottr.lutra.stottr.antlr.stOTTRBaseVisitor;
 import xyz.ottr.lutra.stottr.antlr.stOTTRParser;
 
-public class SArgumentListParser extends stOTTRBaseVisitor<Result<ArgumentList>> {
+public class SArgumentListParser extends SBaseParserVisitor<ArgumentList> {
 
     private final STermParser termParser;
 

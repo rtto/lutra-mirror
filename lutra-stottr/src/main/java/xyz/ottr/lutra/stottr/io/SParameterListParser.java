@@ -37,10 +37,9 @@ import xyz.ottr.lutra.model.Term;
 import xyz.ottr.lutra.model.types.TermType;
 import xyz.ottr.lutra.result.Result;
 import xyz.ottr.lutra.stottr.STOTTR;
-import xyz.ottr.lutra.stottr.antlr.stOTTRBaseVisitor;
 import xyz.ottr.lutra.stottr.antlr.stOTTRParser;
 
-public class SParameterListParser extends stOTTRBaseVisitor<Result<ParameterList>> {
+public class SParameterListParser extends SBaseParserVisitor<ParameterList> {
 
     private STypeParser typeParser;
     private STermParser termParser;

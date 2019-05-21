@@ -33,11 +33,10 @@ import org.antlr.v4.runtime.CommonTokenStream;
 import xyz.ottr.lutra.model.Term;
 import xyz.ottr.lutra.result.Result;
 import xyz.ottr.lutra.result.ResultStream;
-import xyz.ottr.lutra.stottr.antlr.stOTTRBaseVisitor;
 import xyz.ottr.lutra.stottr.antlr.stOTTRLexer;
 import xyz.ottr.lutra.stottr.antlr.stOTTRParser;
 
-public abstract class SParser<T> extends stOTTRBaseVisitor<Result<T>> {
+public abstract class SParser<T> extends SBaseParserVisitor<T> {
 
     private Map<String, String> prefixes = new HashMap<>();
     private STermParser termParser = new STermParser(prefixes);

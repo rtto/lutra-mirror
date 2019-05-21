@@ -39,11 +39,10 @@ import xyz.ottr.lutra.model.Term;
 import xyz.ottr.lutra.model.TermList;
 import xyz.ottr.lutra.result.Message;
 import xyz.ottr.lutra.result.Result;
-import xyz.ottr.lutra.stottr.antlr.stOTTRBaseVisitor;
 import xyz.ottr.lutra.stottr.antlr.stOTTRParser;
 import xyz.ottr.lutra.wottr.WOTTR;
 
-public class STermParser extends stOTTRBaseVisitor<Result<Term>> {
+public class STermParser extends SBaseParserVisitor<Term> {
 
     private final Map<String, String> prefixes;
     private final Map<String, Term> blanks;

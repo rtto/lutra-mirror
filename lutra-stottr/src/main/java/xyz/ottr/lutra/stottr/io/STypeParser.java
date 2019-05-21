@@ -30,10 +30,9 @@ import xyz.ottr.lutra.model.types.NEListType;
 import xyz.ottr.lutra.model.types.TermType;
 import xyz.ottr.lutra.model.types.TypeFactory;
 import xyz.ottr.lutra.result.Result;
-import xyz.ottr.lutra.stottr.antlr.stOTTRBaseVisitor;
 import xyz.ottr.lutra.stottr.antlr.stOTTRParser;
 
-public class STypeParser extends stOTTRBaseVisitor<Result<TermType>> {
+public class STypeParser extends SBaseParserVisitor<TermType> {
 
     public STermParser termParser;
 
@@ -43,16 +42,7 @@ public class STypeParser extends stOTTRBaseVisitor<Result<TermType>> {
 
     @Override
     public Result<TermType> visitType(stOTTRParser.TypeContext ctx) {
-
-        if (ctx.listType() != null) {
-            return visitListType(ctx.listType());
-        } else if (ctx.neListType() != null) {
-            return visitNeListType(ctx.neListType());
-        } else if (ctx.lubType() != null) {
-            return visitLubType(ctx.lubType());
-        } else {
-            return visitBasicType(ctx.basicType());
-        }
+        return visitChildren(ctx);
     }
 
     @Override

@@ -62,17 +62,7 @@ public class STemplateParser extends SParser<TemplateSignature> implements Templ
 
     @Override
     public Result<TemplateSignature> visitStatement(stOTTRParser.StatementContext ctx) {
-
-        // TODO: Improve this code (Note: visitChildren(ctx) does not work, returns null)
-        if (ctx.instance() != null) { // An (outer) instance
-            return Result.empty(); // TODO: Decide on error or ignore?
-        } else if (ctx.signature() != null) {
-            return visitSignature(ctx.signature());
-        } else if (ctx.baseTemplate() != null) {
-            return visitBaseTemplate(ctx.baseTemplate());
-        } else {
-            return visitTemplate(ctx.template());
-        }
+        return visitChildren(ctx);
     }
 
     private Result<String> parseName(stOTTRParser.TemplateNameContext ctx) {
@@ -130,10 +120,4 @@ public class STemplateParser extends SParser<TemplateSignature> implements Templ
         }
         return variables;
     }
-            
-    
-    //@Override
-    //public Result<TemplateSignature> visitPatternList(stOTTRParser.PatternListContext ctx) {
-    //    return visitChildren(ctx);
-    //}
 }
