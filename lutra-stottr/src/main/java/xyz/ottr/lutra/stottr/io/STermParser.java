@@ -136,12 +136,15 @@ public class STermParser extends SBaseParserVisitor<Term> {
     @Override
     public Result<Term> visitRdfLiteral(stOTTRParser.RdfLiteralContext ctx) {
 
-        String val = ctx.String().getSymbol().getText()
-            .replaceAll("^\"|\"$", ""); // Remove surronding quotes for strings
+        String valStr = ctx.String().getSymbol().getText();
+        // valStr might be a String containing surrounding quotes, so we remove these:
+        String val = valStr.matches("^\".*\"$") // Only replace if both first and last char is \"
+            ? valStr.replaceAll("^\"|\"$", "")
+            : valStr;
 
         if (ctx.LANGTAG() != null) { // Language tag present
             String tag = ctx.LANGTAG().getSymbol().getText();
-            tag = tag.replace("@", ""); // Remove the @-prefix
+            tag = tag.replace("^@", ""); // Remove the @-prefix
             return Result.of(LiteralTerm.taggedLiteral(val, tag));
         }
 
@@ -174,24 +177,24 @@ public class STermParser extends SBaseParserVisitor<Term> {
     
     @Override
     public Result<Term> visitPrefixedName(stOTTRParser.PrefixedNameContext ctx) {
-        String toSplit;
 
+        String qname;
         TerminalNode onlyNS = ctx.PNAME_NS(); 
         if (onlyNS != null) { // Of the form ex: (i.e. nothing after colon)
-            toSplit = onlyNS.getSymbol().getText();
+            qname = onlyNS.getSymbol().getText();
         } else {
-            toSplit = ctx.PNAME_LN().getSymbol().getText();
+            qname = ctx.PNAME_LN().getSymbol().getText();
         }
 
-        String[] prefixAndLocal = toSplit.split(":");
-        // Note, empty string = base in this.prefixes
-        String prefix = this.prefixes.get(prefixAndLocal[0]);
+        int lastColon = qname.indexOf(':'); // Cannot simply split, can e.g. have ex:local:name
+        String prefix = this.prefixes.get(qname.substring(0, lastColon));
 
         if (prefix == null) { // Prefix not found
-            return Result.empty(Message.error("Unrecognized prefix in qname " + toSplit + "."));
+            return Result.empty(Message.error("Unrecognized prefix in qname " + qname + "."));
         }
 
-        String iri = prefix + prefixAndLocal[1];
+        String local = qname.substring(lastColon + 1, qname.length());
+        String iri = prefix + local;
         if (iri.equals(WOTTR.none.getURI())) {
             return Result.of(new NoneTerm());
         }

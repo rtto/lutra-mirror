@@ -90,7 +90,7 @@ public class SPrefixParser extends stOTTRBaseVisitor<Result<Map<String, String>>
         }
 
         private static String stripNamespace(String ns) {
-            return ns.replaceAll(":", "");
+            return ns.replaceAll(":$", "");
         }
 
         private static String stripPrefix(String prefix) {
