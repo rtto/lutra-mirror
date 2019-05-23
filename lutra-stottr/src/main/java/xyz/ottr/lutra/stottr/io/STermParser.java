@@ -85,9 +85,10 @@ public class STermParser extends SBaseParserVisitor<Term> {
         }
 
         Result<Term> trm = visitChildren(ctx);
-        return trm != null // TODO: Should never happen once all methods are implemented?
+        return trm != null 
             ? trm
-            : Result.empty(Message.error("Expected term but found: " + ctx.toString()));
+            : Result.empty(Message.error("Expected term but found " + ctx.getText()
+                    + " at line " + getLineOf(ctx) + " column " + getColumnOf(ctx)));
     }
     
     @Override
@@ -187,10 +188,13 @@ public class STermParser extends SBaseParserVisitor<Term> {
         }
 
         int lastColon = qname.indexOf(':'); // Cannot simply split, can e.g. have ex:local:name
-        String prefix = this.prefixes.get(qname.substring(0, lastColon));
+        String prefixName = qname.substring(0, lastColon);
+        String prefix = this.prefixes.get(prefixName);
 
         if (prefix == null) { // Prefix not found
-            return Result.empty(Message.error("Unrecognized prefix in qname " + qname + "."));
+            return Result.empty(Message.error("Unrecognized prefix " + prefixName
+                    + " in qname " + qname + " at line "
+                    + getLineOf(ctx) + " column " + getColumnOf(ctx)));
         }
 
         String local = qname.substring(lastColon + 1, qname.length());
