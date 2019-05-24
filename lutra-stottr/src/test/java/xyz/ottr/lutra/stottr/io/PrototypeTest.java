@@ -22,7 +22,6 @@ package xyz.ottr.lutra.stottr.io;
  * #L%
  */
 
-import java.io.IOException;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
