@@ -51,9 +51,7 @@ public class STermParser extends SBaseParserVisitor<Term> {
     private final Map<String, Term> variables;
 
     public STermParser(Map<String, String> prefixes) {
-        this.prefixes = prefixes;
-        this.variables = new HashMap<>();
-        this.blanks = new HashMap<>();
+        this(prefixes, new HashMap<>());
     }
 
     public STermParser(Map<String, String> prefixes, Map<String, Term> variables) {
@@ -93,7 +91,7 @@ public class STermParser extends SBaseParserVisitor<Term> {
         return trm != null 
             ? trm
             : Result.empty(Message.error("Expected term but found " + ctx.getText()
-                    + " at line " + getLineOf(ctx) + " column " + getColumnOf(ctx)));
+                    + SParserUtils.getLineAndColumnString(ctx)));
     }
     
     @Override
@@ -198,8 +196,7 @@ public class STermParser extends SBaseParserVisitor<Term> {
 
         if (prefix == null) { // Prefix not found
             return Result.empty(Message.error("Unrecognized prefix " + prefixName
-                    + " in qname " + qname + " at line "
-                    + getLineOf(ctx) + " column " + getColumnOf(ctx)));
+                    + " in qname " + qname + SParserUtils.getLineAndColumnString(ctx)));
         }
 
         String local = qname.substring(lastColon + 1, qname.length());

@@ -22,7 +22,6 @@ package xyz.ottr.lutra.stottr.io;
  * #L%
  */
 
-import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.RuleNode;
 
 import xyz.ottr.lutra.result.Result;
@@ -33,17 +32,5 @@ public abstract class SBaseParserVisitor<T> extends stOTTRBaseVisitor<Result<T>>
     @Override
     protected boolean shouldVisitNextChild(RuleNode node, Result<T> current) {
         return current == null;
-    }
-
-    ///
-    /// Utility methods used for making error messages
-    ///
-
-    protected int getLineOf(ParserRuleContext ctx) {
-        return ctx.getStart().getLine();
-    }
-
-    protected int getColumnOf(ParserRuleContext ctx) {
-        return ctx.getStart().getCharPositionInLine();
     }
 }

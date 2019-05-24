@@ -28,12 +28,10 @@ import java.util.stream.Stream;
 
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
-import org.antlr.v4.runtime.CommonTokenStream;
 
 import xyz.ottr.lutra.model.Term;
 import xyz.ottr.lutra.result.Result;
 import xyz.ottr.lutra.result.ResultStream;
-import xyz.ottr.lutra.stottr.antlr.stOTTRLexer;
 import xyz.ottr.lutra.stottr.antlr.stOTTRParser;
 
 public abstract class SParser<T> extends SBaseParserVisitor<T> {
@@ -71,7 +69,7 @@ public abstract class SParser<T> extends SBaseParserVisitor<T> {
     protected ResultStream<T> parseDocument(CharStream in) {
         // Make parser
         ErrorToMessageListener errListener = new ErrorToMessageListener();
-        stOTTRParser parser = makeParser(in, errListener);
+        stOTTRParser parser = SParserUtils.makeParser(in, errListener);
         stOTTRParser.StOTTRDocContext document = parser.stOTTRDoc();
 
         // Parse prefixes
@@ -98,25 +96,5 @@ public abstract class SParser<T> extends SBaseParserVisitor<T> {
         //       see https://gitlab.com/ottr/lutra/lutra/issues/148
         errListener.getMessages().printMessages();
         return resultStream;
-    }
-
-    private stOTTRLexer makeLexer(CharStream in, ErrorToMessageListener errListener) {
-
-        stOTTRLexer lexer = new stOTTRLexer(in);
-        // Only use our own ErrorListener
-        lexer.removeErrorListeners();
-        lexer.addErrorListener(errListener);
-        return lexer;
-    }
-
-    private stOTTRParser makeParser(CharStream in, ErrorToMessageListener errListener) {
-
-        stOTTRLexer lexer = makeLexer(in, errListener);
-        CommonTokenStream commonTokenStream = new CommonTokenStream(lexer);
-        stOTTRParser parser = new stOTTRParser(commonTokenStream);
-        // Only use our own ErrorListener
-        parser.removeErrorListeners();
-        parser.addErrorListener(errListener);
-        return parser;
     }
 }
