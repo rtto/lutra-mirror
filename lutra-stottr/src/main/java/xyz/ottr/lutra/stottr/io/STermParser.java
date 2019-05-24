@@ -78,6 +78,11 @@ public class STermParser extends SBaseParserVisitor<Term> {
     }
 
     @Override
+    public Result<Term> visitNone(stOTTRParser.NoneContext ctx) {
+        return Result.of(new NoneTerm());
+    }
+
+    @Override
     public Result<Term> visitTerm(stOTTRParser.TermContext ctx) {
 
         if (ctx.Variable() != null) {
