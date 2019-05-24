@@ -148,7 +148,7 @@ public class STermParser extends SBaseParserVisitor<Term> {
 
         if (ctx.LANGTAG() != null) { // Language tag present
             String tag = ctx.LANGTAG().getSymbol().getText();
-            tag = tag.replace("^@", ""); // Remove the @-prefix
+            tag = tag.replaceAll("@", ""); // Remove the @-prefix
             return Result.of(LiteralTerm.taggedLiteral(val, tag));
         }
 

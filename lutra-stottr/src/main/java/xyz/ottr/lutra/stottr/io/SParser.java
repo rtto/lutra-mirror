@@ -75,7 +75,10 @@ public abstract class SParser<T> extends SBaseParserVisitor<T> {
         // Parse prefixes
         SPrefixParser prefixParser = new SPrefixParser();
         Result<Map<String, String>> prefixRes = prefixParser.visit(document);
-        this.prefixes = prefixRes.get();
+        if (!prefixRes.isPresent()) {
+            return ResultStream.of(prefixRes.map(obj -> (T) obj));
+        }
+        this.prefixes.putAll(prefixRes.get());
         this.termParser = new STermParser(this.prefixes);
 
         initSubParsers();

@@ -32,7 +32,7 @@ import xyz.ottr.lutra.result.ResultStream;
 import xyz.ottr.lutra.stottr.antlr.stOTTRBaseVisitor;
 import xyz.ottr.lutra.stottr.antlr.stOTTRParser;
 
-public class SPrefixParser extends stOTTRBaseVisitor<Result<Map<String, String>>> {
+public class SPrefixParser extends SBaseParserVisitor<Map<String, String>> {
 
     @Override
     public Result<Map<String, String>> visitStOTTRDoc(stOTTRParser.StOTTRDocContext ctx) {
