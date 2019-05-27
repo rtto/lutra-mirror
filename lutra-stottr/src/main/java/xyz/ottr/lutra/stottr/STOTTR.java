@@ -24,12 +24,36 @@ package xyz.ottr.lutra.stottr;
 
 public class STOTTR {
 
-    public static final String indent = "\t";
+    // Terms
+    public static class Terms {
+        public static final String none = "none";
+        public static final String listStart = "(";
+        public static final String listEnd = ")";
+        public static final String listSep = ",";
+        public static final String variablePrefix = "?";
+        public static final String insArgStart = "(";
+        public static final String insArgEnd = ")";
+        public static final String insArgSep = ",";
+    }
 
-    public static final String none = "none";
-    public static final String listStart = "(";
-    public static final String listEnd = ")";
-    public static final String variablePrefix = "?";
+    public static class Types {
+        public static final String lub = "LUB";
+        public static final String list = "List";
+        public static final String neList = "NEList";
+        public static final String innerTypeStart = "<";
+        public static final String innerTypeEnd = ">";
+    }
+
+    // Statements
+    public static class Statements {
+        public static final String indent = "\t";
+        public static final String bodyStart = "{";
+        public static final String bodyEnd = "}";
+        public static final String bodyInsSep = ",";
+        public static final String baseBody = "BASE";
+        public static final String signatureSep = "::";
+        public static final String statementEnd = ".";
+    }
 
     public static class Expanders {
         public static final String cross = "cross";
@@ -39,8 +63,12 @@ public class STOTTR {
         public static final String expander = "++";
     }
 
-    public static class ParameterMode {
+    public static class Parameters {
+        public static final String sigParamsStart = "[";
+        public static final String sigParamsEnd = "]";
+        public static final String paramSep = ",";
         public static final String optional = "?";
         public static final String nonBlank = "!";
+        public static final String defaultValSep = "=";
     }
 }
