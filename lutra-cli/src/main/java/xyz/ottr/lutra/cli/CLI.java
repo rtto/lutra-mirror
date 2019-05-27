@@ -313,7 +313,7 @@ public class CLI {
             case wottr:
                 return Result.of(new WInstanceWriter(usedPrefixes));
             case stottr:
-                return Result.of(new SInstanceWriter(usedPrefixes.getNsPrefixMap()));
+                return Result.of(SInstanceWriter.makeOuterInstanceWriter(usedPrefixes.getNsPrefixMap()));
             default:
                 return Result.empty(Message.error(
                         "Output format " + settings.outputFormat.toString()
@@ -426,7 +426,6 @@ public class CLI {
     private static PrefixMapping getStdPrefixes() {
 
         PrefixMapping prefixes = PrefixMapping.Factory.create();
-        prefixes.setNsPrefixes(PrefixMapping.Standard);
         prefixes.setNsPrefix(OTTR.prefix, OTTR.namespace);
         return prefixes;
     }
