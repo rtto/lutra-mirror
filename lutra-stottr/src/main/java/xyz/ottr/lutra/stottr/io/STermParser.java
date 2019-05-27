@@ -39,6 +39,7 @@ import xyz.ottr.lutra.model.Term;
 import xyz.ottr.lutra.model.TermList;
 import xyz.ottr.lutra.result.Message;
 import xyz.ottr.lutra.result.Result;
+import xyz.ottr.lutra.stottr.STOTTR;
 import xyz.ottr.lutra.stottr.antlr.stOTTRParser;
 import xyz.ottr.lutra.wottr.WOTTR;
 
@@ -84,7 +85,7 @@ public class STermParser extends SBaseParserVisitor<Term> {
     public Result<Term> visitTerm(stOTTRParser.TermContext ctx) {
 
         if (ctx.Variable() != null) {
-            return Result.of(makeBlank(ctx.Variable().getSymbol().getText()));
+            return Result.of(makeBlank(getVariableLabel(ctx.Variable())));
         }
 
         Result<Term> trm = visitChildren(ctx);
@@ -92,6 +93,12 @@ public class STermParser extends SBaseParserVisitor<Term> {
             ? trm
             : Result.empty(Message.error("Expected term but found " + ctx.getText()
                     + SParserUtils.getLineAndColumnString(ctx)));
+    }
+
+    public String getVariableLabel(TerminalNode var) {
+        String label = var.getSymbol().getText();
+        // Need to remove variablePrefix to get label
+        return  label.substring(STOTTR.Terms.variablePrefix.length());
     }
     
     @Override

@@ -79,7 +79,7 @@ public class SParameterListParser extends SBaseParserVisitor<ParameterList> {
             Result<TermType> typeRes = parseType(ctx.type());
             Result<Term> varRes = Result.zipNullables(typeRes, defaultRes, (type, deflt) -> {
 
-                    Term var = new BlankNodeTerm(ctx.Variable().getSymbol().getText());
+                    Term var = new BlankNodeTerm(termParser.getVariableLabel(ctx.Variable()));
                     var.setIsVariable(true);
                     if (type != null) {
                         var.setType(type);
