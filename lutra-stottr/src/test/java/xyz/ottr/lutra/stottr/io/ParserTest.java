@@ -137,7 +137,6 @@ public class ParserTest {
 
         for (int i = 0; i < parsed.size(); i++) {
             Result<Instance> insRes = parsed.get(i);
-            System.err.println("INSRES: " + insRes.getAllMessages().toString());
             assertTrue(insRes.isPresent());
             Instance pins = insRes.get();
             Instance mins = made.get(i);
