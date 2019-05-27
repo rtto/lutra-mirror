@@ -50,10 +50,14 @@ public class STermWriter {
         this(prefixes, new HashSet<>());
     }
 
+    public Map<String, String> getPrefixes() {
+        return this.prefixes;
+    }
+
     public String write(Term term) {
 
         if (term instanceof NoneTerm) {
-            return STOTTR.none;
+            return STOTTR.Terms.none;
         } else if (term instanceof IRITerm) {
             return writeIRI(((IRITerm) term).getIRI());
         } else if (term instanceof LiteralTerm) {
@@ -94,7 +98,7 @@ public class STermWriter {
     
     public String writeBlank(BlankNodeTerm blank) {
         String label = blank.getLabel();
-        String prefix = this.variables.contains(blank) ? STOTTR.variablePrefix : "_:";
+        String prefix = this.variables.contains(blank) ? STOTTR.Terms.variablePrefix : "_:";
         return  prefix + label;
     }
 
@@ -105,6 +109,8 @@ public class STermWriter {
             .map(trm -> write(trm))
             .collect(Collectors.toList());
 
-        return STOTTR.listStart + String.join(", ", terms) + STOTTR.listEnd;
+        return STOTTR.Terms.listStart
+            + String.join(STOTTR.Terms.listSep, terms)
+            + STOTTR.Terms.listEnd;
     }
 }

@@ -100,9 +100,9 @@ public class SParameterListParser extends SBaseParserVisitor<ParameterList> {
                 return;
             }
             for (TerminalNode mode : modes) {
-                if (mode.getSymbol().getText().equals(STOTTR.ParameterMode.optional)) {
+                if (mode.getSymbol().getText().equals(STOTTR.Parameters.optional)) {
                     this.optionals.add(var);
-                } else if (mode.getSymbol().getText().equals(STOTTR.ParameterMode.nonBlank)) {
+                } else if (mode.getSymbol().getText().equals(STOTTR.Parameters.nonBlank)) {
                     this.nonBlanks.add(var);
                 }
             }

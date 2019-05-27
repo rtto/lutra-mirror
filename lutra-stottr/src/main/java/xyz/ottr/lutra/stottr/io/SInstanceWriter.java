@@ -27,7 +27,6 @@ import java.io.StringWriter;
 import java.io.Writer;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 
 import xyz.ottr.lutra.io.InstanceWriter;
 import xyz.ottr.lutra.model.ArgumentList;
@@ -49,42 +48,49 @@ public class SInstanceWriter implements InstanceWriter {
     private final Writer writer;
     private final STermWriter termWriter;
     private final boolean inDefinition;
+
+    private boolean firstInstance;
        
-    private SInstanceWriter(Writer writer, Map<String, String> prefixes, Set<Term> variables, boolean inDefinition) {
+    private SInstanceWriter(Writer writer, STermWriter termWriter, boolean inDefinition) {
         this.writer = writer;
-        this.termWriter = variables == null ? new STermWriter(prefixes) : new STermWriter(prefixes, variables);
+        this.termWriter = termWriter;
         this.inDefinition = inDefinition;
-        writePrefixes(prefixes);
+        this.firstInstance = true;
     }
 
-    public SInstanceWriter(Map<String, String> prefixes) {
-        this(new StringWriter(), prefixes, null, false);
+    public static SInstanceWriter makeOuterInstanceWriter(Writer writer, Map<String, String> prefixes) {
+        return new SInstanceWriter(writer, new STermWriter(prefixes), false);
     }
 
-    public SInstanceWriter(Writer writer, Map<String, String> prefixes) {
-        this(writer, prefixes, null, false);
+    public static SInstanceWriter makeOuterInstanceWriter(Map<String, String> prefixes) {
+        return makeOuterInstanceWriter(new StringWriter(), prefixes);
     }
 
-    public SInstanceWriter(Writer writer, Map<String, String> prefixes, Set<Term> variables) {
-        this(writer, prefixes, variables, true);
+    public static SInstanceWriter makeBodyInstanceWriter(Writer writer, STermWriter termWriter) {
+        return new SInstanceWriter(writer, termWriter, true);
     }
 
     @Override
     public void accept(Instance instance) {
         try {
-            this.writer.write(write(instance) + "\n");
-        } catch (IOException ex) {
-            System.err.println(ex.toString()); // TODO
-        }
-    }
+            if (this.inDefinition) {
 
-    public void writePrefixes(Map<String, String> prefixes) {
+                if (this.firstInstance) {
+                    SPrefixWriter.write(this.termWriter.getPrefixes(), writer);
+                }
+                this.writer.write(write(instance) + STOTTR.Statements.statementEnd + "\n");
 
-        try {
-            for (Map.Entry<String, String> nsln : prefixes.entrySet()) {
-                this.writer.write("@prefix " + nsln.getKey() + ": " + nsln.getValue() + " .\n");
+            } else {
+
+                this.writer.write(STOTTR.Statements.indent);
+                if (this.firstInstance) {
+                    this.writer.write(write(instance));
+                } else {
+                    this.writer.write(STOTTR.Statements.bodyInsSep + "\n" + write(instance));
+                }
+
             }
-            this.writer.write("\n");
+            this.firstInstance = false;
         } catch (IOException ex) {
             System.err.println(ex.toString()); // TODO
         }
@@ -95,22 +101,20 @@ public class SInstanceWriter implements InstanceWriter {
         return this.writer.toString();
     }
 
-    public String write(Instance instance) {
+    private String write(Instance instance) {
 
         StringBuilder out = new StringBuilder();
-        if (this.inDefinition) {
-            out.append(STOTTR.indent);
-        }
 
         ArgumentList args = instance.getArguments();
         if (args.hasListExpander()) {
             String expander = expanders.get(args.getListExpander());
             out.append(expander + " " + STOTTR.Expanders.expanderSep + " ");
         }
+
         out.append(this.termWriter.writeIRI(instance.getIRI()));
-        out.append("(");
+        out.append(STOTTR.Terms.insArgStart);
         out.append(writeArguments(args));
-        out.append(") .");
+        out.append(STOTTR.Terms.insArgEnd);
 
         return out.toString();
     }
@@ -126,7 +130,7 @@ public class SInstanceWriter implements InstanceWriter {
                 out.append(STOTTR.Expanders.expander);
             }
             out.append(this.termWriter.write(arg));
-            sep = ", ";
+            sep = STOTTR.Terms.insArgSep + " ";
         }
         return out.toString();
     }
