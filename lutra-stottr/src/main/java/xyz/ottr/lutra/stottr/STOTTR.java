@@ -24,10 +24,19 @@ package xyz.ottr.lutra.stottr;
 
 public class STOTTR {
 
+    public static final String indent = "\t";
+
+    public static final String none = "none";
+    public static final String listStart = "(";
+    public static final String listEnd = ")";
+    public static final String variablePrefix = "?";
+
     public static class Expanders {
         public static final String cross = "cross";
         public static final String zipMin = "zipMin";
         public static final String zipMax = "zipMax";
+        public static final String expanderSep = "|";
+        public static final String expander = "++";
     }
 
     public static class ParameterMode {
