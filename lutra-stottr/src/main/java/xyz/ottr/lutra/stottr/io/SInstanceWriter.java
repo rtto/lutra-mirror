@@ -73,7 +73,7 @@ public class SInstanceWriter implements InstanceWriter {
     @Override
     public void accept(Instance instance) {
         try {
-            if (this.inDefinition) {
+            if (!this.inDefinition) {
 
                 if (this.firstInstance) {
                     SPrefixWriter.write(this.termWriter.getPrefixes(), writer);
@@ -82,11 +82,12 @@ public class SInstanceWriter implements InstanceWriter {
 
             } else {
 
-                this.writer.write(STOTTR.Statements.indent);
                 if (this.firstInstance) {
+                    this.writer.write(STOTTR.Statements.indent);
                     this.writer.write(write(instance));
                 } else {
-                    this.writer.write(STOTTR.Statements.bodyInsSep + "\n" + write(instance));
+                    this.writer.write(STOTTR.Statements.bodyInsSep + "\n");
+                    this.writer.write(STOTTR.Statements.indent + write(instance));
                 }
 
             }

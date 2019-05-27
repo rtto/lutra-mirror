@@ -62,6 +62,12 @@ public class STemplateWriter implements TemplateWriter {
 
     public String write(String iri) {
 
+        StringBuilder writer = new StringBuilder();
+
+        StringWriter strWriter = new StringWriter();
+        SPrefixWriter.write(this.prefixes, strWriter);
+        writer.append(strWriter.toString());
+
         TemplateSignature template = this.templates.get(iri);
 
         if  (template == null) {
@@ -70,7 +76,6 @@ public class STemplateWriter implements TemplateWriter {
 
         Set<Term> variables = new HashSet<>(template.getParameters().asList());
         STermWriter termWriter = new STermWriter(this.prefixes, variables);
-        StringBuilder writer = new StringBuilder();
 
         writeSignature(template, writer, termWriter);
 
@@ -99,7 +104,6 @@ public class STemplateWriter implements TemplateWriter {
 
             writer.append(sep);
             writeModes(params.isNonBlank(param), params.isOptional(param), writer);
-            writer.append(" ");
             writeType(param.getType(), writer, termWriter);
             writer.append(" ");
             writer.append(termWriter.write(param));
@@ -111,16 +115,24 @@ public class STemplateWriter implements TemplateWriter {
 
             sep = STOTTR.Parameters.paramSep + " ";
         }
+        writer.append(STOTTR.Parameters.sigParamsEnd);
     }
 
     private void writeModes(boolean isNonBlank, boolean isOptional, StringBuilder writer) {
 
+        boolean written = false;
         if (isNonBlank) {
             writer.append(STOTTR.Parameters.nonBlank);
+            written = true;
         }
 
         if (isOptional) {
             writer.append(STOTTR.Parameters.optional);
+            written = true;
+        }
+
+        if (written) {
+            writer.append(" ");
         }
     }
 

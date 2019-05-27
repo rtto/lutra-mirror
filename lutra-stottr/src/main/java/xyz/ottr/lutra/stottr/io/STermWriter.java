@@ -35,6 +35,7 @@ import xyz.ottr.lutra.model.NoneTerm;
 import xyz.ottr.lutra.model.Term;
 import xyz.ottr.lutra.model.TermList;
 import xyz.ottr.lutra.stottr.STOTTR;
+import xyz.ottr.lutra.wottr.WOTTR;
 
 public class STermWriter {
 
@@ -72,6 +73,10 @@ public class STermWriter {
     }
 
     public String writeIRI(String iri) {
+
+        if (iri.equals(WOTTR.none.getURI())) {
+            return STOTTR.Terms.none;
+        }
 
         String out = iri;
         // Shorten to qname if possible
