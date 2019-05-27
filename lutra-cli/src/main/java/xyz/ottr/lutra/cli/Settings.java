@@ -176,6 +176,7 @@ public class Settings {
         OutputFormat() {
             super(Arrays.asList(
                     Format.legacy.toString(),
+                    Format.stottr.toString(),
                     Format.wottr.toString()));
         }
     }

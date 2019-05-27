@@ -23,6 +23,7 @@ package xyz.ottr.lutra.stottr.io;
  */
 
 import java.io.IOException;
+import java.io.StringWriter;
 import java.io.Writer;
 import java.util.HashMap;
 import java.util.Map;
@@ -54,6 +55,10 @@ public class SInstanceWriter implements InstanceWriter {
         this.termWriter = variables == null ? new STermWriter(prefixes) : new STermWriter(prefixes, variables);
         this.inDefinition = inDefinition;
         writePrefixes(prefixes);
+    }
+
+    public SInstanceWriter(Map<String, String> prefixes) {
+        this(new StringWriter(), prefixes, null, false);
     }
 
     public SInstanceWriter(Writer writer, Map<String, String> prefixes) {
