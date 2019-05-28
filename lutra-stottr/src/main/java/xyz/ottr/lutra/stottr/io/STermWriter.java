@@ -40,11 +40,13 @@ import xyz.ottr.lutra.wottr.WOTTR;
 public class STermWriter {
 
     private final Map<String, String> prefixes;
+    private final Set<String> usedPrefixes;
     private final Set<Term> variables;
 
     public STermWriter(Map<String, String> prefixes, Set<Term> variables) {
         this.prefixes = prefixes;
         this.variables = variables;
+        this.usedPrefixes = new HashSet<>();
     }
 
     public STermWriter(Map<String, String> prefixes) {
@@ -53,6 +55,10 @@ public class STermWriter {
 
     public Map<String, String> getPrefixes() {
         return this.prefixes;
+    }
+
+    public Set<String> getUsedPrefixes() {
+        return this.usedPrefixes;
     }
 
     public String write(Term term) {
@@ -84,6 +90,7 @@ public class STermWriter {
             if (out.startsWith(nsln.getValue())) {
                 String suffix = out.substring(nsln.getValue().length());
                 out = nsln.getKey() + ":" + suffix;
+                this.usedPrefixes.add(nsln.getKey());
                 break;
             }
         }

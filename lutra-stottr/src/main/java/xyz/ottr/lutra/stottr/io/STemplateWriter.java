@@ -63,11 +63,6 @@ public class STemplateWriter implements TemplateWriter {
     public String write(String iri) {
 
         StringBuilder writer = new StringBuilder();
-
-        StringWriter strWriter = new StringWriter();
-        SPrefixWriter.write(this.prefixes, strWriter);
-        writer.append(strWriter.toString());
-
         TemplateSignature template = this.templates.get(iri);
 
         if  (template == null) {
@@ -89,7 +84,24 @@ public class STemplateWriter implements TemplateWriter {
 
         writer.append(STOTTR.Statements.statementEnd);
 
+        // Write used prefixes at start of String
+        writer.insert(0, writeUsedPrefixes(termWriter.getUsedPrefixes()));
+
         return writer.toString();
+    }
+
+    private String writeUsedPrefixes(Set<String> usedPrefixes) {
+
+        Map<String, String> usedPrefixMap = new HashMap<>();
+        for (Map.Entry<String, String> nsln : this.prefixes.entrySet()) {
+            if (usedPrefixes.contains(nsln.getKey())) {
+                usedPrefixMap.put(nsln.getKey(), nsln.getValue());
+            }
+        }
+
+        StringWriter strWriter = new StringWriter();
+        SPrefixWriter.write(usedPrefixMap, strWriter);
+        return strWriter.toString();
     }
 
     private void writeSignature(TemplateSignature template, StringBuilder writer, STermWriter termWriter) {
