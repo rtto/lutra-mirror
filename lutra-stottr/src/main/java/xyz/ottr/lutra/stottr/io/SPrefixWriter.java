@@ -26,6 +26,9 @@ import java.io.IOException;
 import java.io.Writer;
 import java.util.Map;
 
+import xyz.ottr.lutra.result.Message;
+import xyz.ottr.lutra.result.MessageHandler;
+
 public class SPrefixWriter {
 
     public static void write(Map<String, String> prefixes, Writer writer) {
@@ -36,7 +39,9 @@ public class SPrefixWriter {
             }
             writer.write("\n");
         } catch (IOException ex) {
-            System.err.println(ex.toString()); // TODO
+            MessageHandler.printMessage(Message.error(
+                "Error when writing prefixes "
+                + ": " + ex.toString()));
         }
     }
 }

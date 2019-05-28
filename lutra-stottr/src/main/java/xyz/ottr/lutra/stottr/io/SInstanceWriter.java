@@ -32,6 +32,8 @@ import xyz.ottr.lutra.io.InstanceWriter;
 import xyz.ottr.lutra.model.ArgumentList;
 import xyz.ottr.lutra.model.Instance;
 import xyz.ottr.lutra.model.Term;
+import xyz.ottr.lutra.result.Message;
+import xyz.ottr.lutra.result.MessageHandler;
 import xyz.ottr.lutra.stottr.STOTTR;
 
 public class SInstanceWriter implements InstanceWriter {
@@ -93,7 +95,9 @@ public class SInstanceWriter implements InstanceWriter {
             }
             this.firstInstance = false;
         } catch (IOException ex) {
-            System.err.println(ex.toString()); // TODO
+            MessageHandler.printMessage(Message.error(
+                "Error when writing instance "
+                + instance.toString() + ": " + ex.toString()));
         }
     }
 
