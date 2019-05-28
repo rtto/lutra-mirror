@@ -44,13 +44,13 @@ import xyz.ottr.lutra.result.Message;
         + " translating between different formats and for checking the integrity of a template library.",
     footer = "@|bold EXAMPLES:|@%n"
         + "The following command reads all .ttl and .owl-files in ./lib as a template library and checks its intergrity:%n%n"
-        + "    lutra -l wottr -m lint -L ./lib -e \"ttl,owl\"%n%n"
+        + "    lutra -L wottr -m lint -l ./lib -e \"ttl,owl\"%n%n"
         + "The following translates all template files (with .ttl-extension) in ./lib from the legacy format to wottr,"
         + " and writes them to ./wottr:%n%n"
-        + "    lutra -l legacy -O wottr -m formatLibrary -L ./lib -o ./wottr%n%n"
+        + "    lutra -L legacy -O wottr -m formatLibrary -l ./lib -o ./wottr%n%n"
         + "The following expands all instances in ins1.xlsx and ins2.xlsx in tabOTTR using the templates in ./lib and writes"
         + " the expanded instances to exp.ttl in the wOTTR format:%n%n"
-        + "    lutra -I tabottr -O wottr -m expand -L ./lib -o exp.ttl ins1.xlsx ins2.xlsx"
+        + "    lutra -I tabottr -O wottr -m expand -l ./lib -o exp.ttl ins1.xlsx ins2.xlsx"
         + "%n%n@|bold DISCUSSION:|@%n"
         + "Note that with -O wottr all triple-instances outside of template definitions are written as normal RDF triples,"
         + " thus to expand a set of instances into an RDF graph this is what should be used."
@@ -76,7 +76,7 @@ public class Settings {
     @Option(names = {"--extension", "-e"}, split = ",",
         description = {"File extension of files to use as input to template library.%n"
                        + "(default: ${DEFAULT-VALUE})"})
-    public String[] extensions = new String[]{ "ttl" };
+    public String[] extensions = new String[]{ };
 
     @Option(names = {"--ignoreExtension", "-E"}, split = ",",
         description = {"File extensions of files to ignore as input to template library.%n"
@@ -95,7 +95,7 @@ public class Settings {
                        + "default: ${DEFAULT-VALUE})"})
     public Format outputFormat = Format.wottr;
 
-    @Option(names = {"-l", "--libraryFormat"}, completionCandidates = TplInputFormat.class,
+    @Option(names = {"-L", "--libraryFormat"}, completionCandidates = TplInputFormat.class,
         description = {"The input format of the library.%n"
                        + "(legal values: ${COMPLETION-CANDIDATES}; "
                        + "default: ${DEFAULT-VALUE})"})
@@ -109,7 +109,7 @@ public class Settings {
                        + "(default: ${DEFAULT-VALUE})"})
     public boolean fetchMissingDependencies = false;
 
-    @Option(names = {"-L", "--library"}, description = {"Folder containing templates to use as library."})
+    @Option(names = {"-l", "--library"}, description = {"Folder containing templates to use as library."})
     public String library;
 
     @Parameters(description = {"Files of instances to which operations are to be applied."})
