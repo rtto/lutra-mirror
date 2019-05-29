@@ -78,7 +78,7 @@ public class SInstanceWriter implements InstanceWriter {
             if (!this.inDefinition) {
 
                 if (this.firstInstance) {
-                    SPrefixWriter.write(this.termWriter.getPrefixes(), writer);
+                    SPrefixWriter.write(this.termWriter.getPrefixes(), this.writer);
                 }
                 this.writer.write(write(instance) + STOTTR.Statements.statementEnd + "\n");
 
@@ -113,7 +113,7 @@ public class SInstanceWriter implements InstanceWriter {
         ArgumentList args = instance.getArguments();
         if (args.hasListExpander()) {
             String expander = expanders.get(args.getListExpander());
-            out.append(expander + " " + STOTTR.Expanders.expanderSep + " ");
+            out.append(expander).append(" ").append(STOTTR.Expanders.expanderSep).append(" ");
         }
 
         out.append(this.termWriter.writeIRI(instance.getIRI()));

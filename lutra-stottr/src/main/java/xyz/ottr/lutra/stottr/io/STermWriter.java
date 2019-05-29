@@ -118,7 +118,7 @@ public class STermWriter {
 
         List<String> terms = list.asList()
             .stream()
-            .map(trm -> write(trm))
+            .map(this::write)
             .collect(Collectors.toList());
 
         return STOTTR.Terms.listStart

@@ -47,7 +47,7 @@ public class SPrefixParser extends SBaseParserVisitor<Map<String, String>> {
             .innerMap(dir -> dirParser.visit(dir))
             .aggregate()
             .flatMap(pfs -> {
-                Map<String, String> m = new HashMap<String, String>();
+                Map<String, String> m = new HashMap<>();
                 pfs.forEach(pair -> m.put(pair.ns, pair.prefix)); // TODO: Check for collitions
                 // TODO: Check if ns-prefix-pair is non-standard combination and give error
                 return Result.of(m);

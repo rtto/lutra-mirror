@@ -43,7 +43,7 @@ public class ErrorToMessageListener extends BaseErrorListener {
         int charPositionInLine, String msg, RecognitionException e) {
         
         String err = "Syntax error at line " + line  + " col " + charPositionInLine + ": " + msg;
-        messageHandler.add(Result.empty(Message.error(err)));
+        this.messageHandler.add(Result.empty(Message.error(err)));
     }
 
     public MessageHandler getMessages() {

@@ -52,7 +52,7 @@ public class STemplateWriter implements TemplateWriter {
 
     @Override
     public Set<String> getIRIs() {
-        return templates.keySet();
+        return this.templates.keySet();
     }
 
     @Override
@@ -121,8 +121,7 @@ public class STemplateWriter implements TemplateWriter {
             writer.append(termWriter.write(param));
 
             if (params.hasDefaultValue(param)) {
-                writer.append(STOTTR.Parameters.defaultValSep
-                    + termWriter.write(params.getDefaultValue(param)));
+                writer.append(STOTTR.Parameters.defaultValSep).append(termWriter.write(params.getDefaultValue(param)));
             }
 
             sep = STOTTR.Parameters.paramSep + " ";
@@ -168,7 +167,7 @@ public class STemplateWriter implements TemplateWriter {
                 innerType = ((NEListType) type).getInner();
             } 
 
-            writer.append(typeStr + STOTTR.Types.innerTypeStart);
+            writer.append(typeStr).append(STOTTR.Types.innerTypeStart);
             writeType(innerType, writer, termWriter);
             writer.append(STOTTR.Types.innerTypeEnd);
         }

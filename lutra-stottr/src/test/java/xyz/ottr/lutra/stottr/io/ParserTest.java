@@ -86,7 +86,7 @@ public class ParserTest {
     public void prefixParserTest() {
         Result<Map<String, String>> parsed = parsePrefixes();
         assertTrue(parsed.isPresent());
-        assertTrue(makePrefixes().equals(parsed.get()));
+        assertEquals(makePrefixes(), parsed.get());
     }
 
     ///
@@ -95,7 +95,7 @@ public class ParserTest {
 
     private List<Result<Instance>> parseInstances() {
 
-        SInstanceParser parser = new SInstanceParser(makePrefixes(), new HashMap<String, Term>());
+        SInstanceParser parser = new SInstanceParser(makePrefixes(), new HashMap<>());
 
         String instances = ":T1(true, none, rdf:type, <http://some.uri/with#part>) . "
             + "cross | ex:T2(\"hello\"@no, ++ (\"one\", \"two\", \"three\")) . "

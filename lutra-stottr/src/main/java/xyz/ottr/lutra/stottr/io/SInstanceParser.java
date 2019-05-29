@@ -85,6 +85,6 @@ public class SInstanceParser extends SParser<Instance> implements InstanceParser
         SArgumentListParser argumentListParser = new SArgumentListParser(getTermParser());
         Result<ArgumentList> argsRes = argumentListParser.visitInstance(ctx);
 
-        return Result.zip(iriRes, argsRes, (iri, args) -> new Instance(iri, args));
+        return Result.zip(iriRes, argsRes, Instance::new);
     }
 }

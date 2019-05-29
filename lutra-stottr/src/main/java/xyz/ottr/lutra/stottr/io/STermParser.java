@@ -120,7 +120,7 @@ public class STermParser extends SBaseParserVisitor<Term> {
             .collect(Collectors.toList());
 
         Result<List<Term>> termLstRes = Result.aggregate(termResLst);
-        return termLstRes.map(terms -> new TermList(terms));
+        return termLstRes.map(TermList::new);
     }
     
     @Override
@@ -206,7 +206,7 @@ public class STermParser extends SBaseParserVisitor<Term> {
                     + " in qname " + qname + SParserUtils.getLineAndColumnString(ctx)));
         }
 
-        String local = qname.substring(lastColon + 1, qname.length());
+        String local = qname.substring(lastColon + 1);
         String iri = prefix + local;
         if (iri.equals(WOTTR.none.getURI())) {
             return Result.of(new NoneTerm());

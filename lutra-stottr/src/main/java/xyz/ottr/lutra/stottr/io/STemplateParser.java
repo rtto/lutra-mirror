@@ -74,7 +74,7 @@ public class STemplateParser extends SParser<TemplateSignature> implements Templ
         stOTTRParser.ParameterListContext paramsCtx, boolean isBase) {
         
         Result<String> iriRes = parseName(nameCtx);
-        Result<ParameterList> paramsRes = paramsParser.visit(paramsCtx);
+        Result<ParameterList> paramsRes = this.paramsParser.visit(paramsCtx);
         return Result.zip(iriRes, paramsRes, (iri, params) -> new TemplateSignature(iri, params, isBase));
     }
 
@@ -105,7 +105,7 @@ public class STemplateParser extends SParser<TemplateSignature> implements Templ
 
         Result<Set<Instance>> bodyRes = Result.aggregate(resBody);
 
-        return Result.zip(sigRes, bodyRes, (sig, body) -> new Template(sig, body));
+        return Result.zip(sigRes, bodyRes, Template::new);
     }
 
     private Map<String, Term> makeVariablesMap(Result<TemplateSignature> resSig) {
