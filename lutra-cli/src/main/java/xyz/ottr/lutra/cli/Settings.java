@@ -76,12 +76,12 @@ public class Settings {
     @Option(names = {"--extension", "-e"}, split = ",",
         description = {"File extension of files to use as input to template library.%n"
                        + "(default: ${DEFAULT-VALUE})"})
-    public String[] extensions = new String[]{ };
+    public String[] extensions = { };
 
     @Option(names = {"--ignoreExtension", "-E"}, split = ",",
         description = {"File extensions of files to ignore as input to template library.%n"
                        + "(default: ${DEFAULT-VALUE})"})
-    public String[] ignoreExtensions = new String[]{ };
+    public String[] ignoreExtensions = { };
 
     @Option(names = {"-I", "--inputFormat"}, completionCandidates = InsInputFormat.class,
         description = {"Input format of instances.%n"

@@ -299,7 +299,7 @@ public class CLI {
                 : settings.fetchFormat;
             return makeTemplateReader(format).map(fun);
         } else {
-            return Result.of(ins -> store.expandInstance(ins));
+            return Result.of(store::expandInstance);
         }
     }
 
@@ -400,11 +400,7 @@ public class CLI {
             String iriPath = iriToPath(iri);
             Files.createDirectories(Paths.get(settings.out, iriToDirectory(iriPath)));
             Files.write(Paths.get(settings.out, iriPath + ".ttl"), output.getBytes(Charset.forName("UTF-8")));
-        } catch (IOException ex) {
-            Message err = Message.error(
-                "Error when writing output -- " + ex.getMessage());
-            MessageHandler.printMessage(err);
-        } catch (URISyntaxException ex) {
+        } catch (IOException | URISyntaxException ex) {
             Message err = Message.error(
                 "Error when writing output -- " + ex.getMessage());
             MessageHandler.printMessage(err);
@@ -427,7 +423,7 @@ public class CLI {
         return settings.stdout || settings.out == null;
     }
 
-    private static String iriToDirectory(String pathStr) throws URISyntaxException {
+    private static String iriToDirectory(String pathStr) {
         Path folder = Paths.get(pathStr).getParent();
         return folder == null ? null : folder.toString();
     }
@@ -438,9 +434,9 @@ public class CLI {
 
     private static int checkTemplates(TemplateStore store) {
         List<Message> msgs = store.checkTemplates();
-        msgs.forEach(msg -> MessageHandler.printMessage(msg));
+        msgs.forEach(MessageHandler::printMessage);
         int mostSevere = msgs.stream()
-            .mapToInt(msg -> msg.getLevel())
+            .mapToInt(Message::getLevel)
             .min()
             .orElse(Message.INFO);
         return mostSevere;
