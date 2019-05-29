@@ -39,7 +39,6 @@ public class PrototypeTest {
 
     @Test 
     public void shouldWork() {
-        System.err.println("Should work...");
         TabInstanceParser parser = new TabInstanceParser();
         ResultStream<Instance> instances = parser.apply(ROOT + "test1.xlsx");
         ResultConsumer<Instance> consumer = new ResultConsumer<>();
@@ -49,7 +48,6 @@ public class PrototypeTest {
 
     @Test
     public void prefixConflicts() {
-        System.err.println("Testing for conflicts...");
         String filename = ROOT + "testConflictingPrefixes.xlsx";
 
         TabInstanceParser parser = new TabInstanceParser();

@@ -75,9 +75,9 @@ public abstract class WTemplateFactory {
     // TODO Check if the s, p, o blanks must be fresh.
     public static TemplateSignature createTripleTemplateHead() {
         Term sub = new BlankNodeTerm("_:s");
-        sub.setType(TypeFactory.getByName("IRI"));
+        sub.setType(TypeFactory.getType(OTTR.Types.IRI));
         Term pred = new BlankNodeTerm("_:p");
-        pred.setType(TypeFactory.getByName("IRI"));
+        pred.setType(TypeFactory.getType(OTTR.Types.IRI));
         Term obj = new BlankNodeTerm("_:o");
         obj.setType(TypeFactory.getVariableType(obj));
         Set<Term> nonBlanks = new HashSet<>();

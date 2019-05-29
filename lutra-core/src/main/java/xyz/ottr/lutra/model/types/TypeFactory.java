@@ -23,23 +23,21 @@ package xyz.ottr.lutra.model.types;
  */
 
 import java.io.InputStream;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Stream;
-
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
-import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.reasoner.Reasoner;
 import org.apache.jena.reasoner.ReasonerRegistry;
 import org.apache.jena.vocabulary.RDF;
+import org.apache.jena.vocabulary.RDFS;
 
 import xyz.ottr.lutra.OTTR;
 import xyz.ottr.lutra.model.BlankNodeTerm;
@@ -47,22 +45,22 @@ import xyz.ottr.lutra.model.IRITerm;
 import xyz.ottr.lutra.model.LiteralTerm;
 import xyz.ottr.lutra.model.Term;
 import xyz.ottr.lutra.model.TermList;
-import xyz.ottr.lutra.result.Message;
-import xyz.ottr.lutra.result.MessageHandler;
-
 
 public class TypeFactory {
-    
+
     private static Map<String, BasicType> iris;
-    private static Map<String, BasicType> names;
     private static Map<BasicType, Set<BasicType>> superTypes;
-    private static BasicType top;
-    private static BasicType bot;
     
     static {
         init();
     }
     
+    private static final BasicType topType = getType(RDFS.Resource);
+    private static final BasicType botType = getType(OTTR.Types.Bot);
+    private static final BasicType iriType = getType(OTTR.Types.IRI);
+    private static final BasicType literalType = getType(RDFS.Literal);
+
+
     private static void init() {
         InputStream filename = TypeFactory.class.getClassLoader().getResourceAsStream(OTTR.Files.StdTypes);
         Model types = ModelFactory.createDefaultModel();
@@ -70,55 +68,31 @@ public class TypeFactory {
         Reasoner owlMicro = ReasonerRegistry.getOWLMicroReasoner();
         Model model = ModelFactory.createInfModel(owlMicro, types);
 
-        initNames(model);
+        initTypes(model);
         initSuperTypes(model);
-
-    }
-    
-    private static void initNames(Model model) {
-        iris = new HashMap<>();
-        names = new HashMap<>();
-        superTypes = new HashMap<>();
-        
-        getBasicTypes(model).forEach(tp -> initName(tp));
-
-        top = getByName("Resource");
-        bot = getByName("Bot");
     }
 
-    private static void initName(BasicType type) {
-
-        String uri = type.getIRI();
-        iris.put(uri, type);
-        
-        String name = type.getName();
-        if (names.containsKey(name)) {
-            Message msg = Message.error("Error: duplicate name: " + name + ". Conflicts with " + names.get(name));
-            MessageHandler.printMessage(msg);
-            // TODO log error
-        }
-        names.put(name, type);
-        superTypes.put(type, new HashSet<>());
+    private static void initTypes(Model model) {
+        iris = model.listResourcesWithProperty(RDF.type, model.createResource(OTTR.Types.Type))
+                .toSet().stream()
+                .map(RDFNode::asResource)
+                .map(BasicType::new)
+                .collect(Collectors.toMap(BasicType::getIRI, Function.identity()));
     }
 
     private static void initSuperTypes(Model model) {
 
+        // prepare the map of types -> set of supertypes
+        superTypes = iris.values().stream().collect(
+                Collectors.toMap(Function.identity(), _x -> new HashSet<BasicType>()));
+        
         Property subTypeOf = model.createProperty(OTTR.Types.subTypeOf);
         model.listStatements((Resource) null, subTypeOf, (RDFNode) null)
-            .forEachRemaining(stmt -> initSuperType(stmt));
-    }
-
-    private static void initSuperType(Statement stmt) {
-        BasicType subType = iris.get(stmt.getSubject().asResource().getURI());
-        BasicType superType = iris.get(stmt.getObject().asResource().getURI());
-        superTypes.get(subType).add(superType);
-    }
-
-    private static Stream<BasicType> getBasicTypes(Model model) {
-        return model.listResourcesWithProperty(RDF.type, model.createResource(OTTR.Types.Type))
-            .toSet().stream()
-            .map(RDFNode::asResource)
-            .map(BasicType::new);
+            .forEachRemaining(stmt ->  {
+                BasicType subType = getType(stmt.getSubject().asResource());
+                BasicType superType = getType(stmt.getObject().asResource());
+                superTypes.get(subType).add(superType);
+            });
     }
 
     /**
@@ -129,28 +103,26 @@ public class TypeFactory {
     public static TermType getConstantType(Term term) {
 
         if (term instanceof BlankNodeTerm) {
-            return new LUBType(top);
+            return new LUBType(topType);
         } else if (term instanceof IRITerm) {
-            return new LUBType(TypeFactory.getByName("IRI"));
+            return new LUBType(iriType);
         } else if (term instanceof LiteralTerm) {
 
             String datatypeStr = ((LiteralTerm) term).getDatatype();
-            TermType datatype = datatypeStr != null
-                ? TypeFactory.getByIRI(datatypeStr)
-                : null;
-            return datatype == null ? TypeFactory.getByName("Literal") : datatype;
+            TermType datatype = datatypeStr != null ? TypeFactory.getType(datatypeStr) : null;
+            return datatype == null ? literalType : datatype;
 
         } else if (term instanceof TermList) {
 
             List<Term> terms = ((TermList) term).asList();
             if (terms.isEmpty()) {
-                return new ListType(bot);
+                return new ListType(botType);
             } else {
-                return new NEListType(new LUBType(top));
+                return new NEListType(new LUBType(topType));
             }
 
         } else {
-            return new LUBType(top);
+            return new LUBType(topType);
         }
     }
 
@@ -174,36 +146,32 @@ public class TypeFactory {
             return constantType;
         } else if (constantType instanceof NEListType) {
             return new NEListType(
-                removeLUB(((NEListType) constantType).getInner()));
+                    removeLUB(((NEListType) constantType).getInner()));
         } else {
             return new ListType(
-                removeLUB(((ListType) constantType).getInner()));
+                    removeLUB(((ListType) constantType).getInner()));
         } 
     }
 
-    protected static String normaliseName(String name) {
-        return name.toLowerCase(Locale.ENGLISH); 
-    }
-    
     public static boolean isSubTypeOf(BasicType subType, BasicType superType) {
         return subType.equals(superType) || superTypes.get(subType).contains(superType);
     }
-    
+
     /**
-     * Get a term type by its localname, ignoring casing.
-     * @param name the localname of the term type to get
-     * @return the mathcing termtype, or null if no such termtype
+     * Get a term type by its Resource.
+     * @param resource the Resource of the term type to get
+     * @return the matching termtype, or null if no such termtype
      */
-    public static BasicType getByName(String name) {
-        return names.get(normaliseName(name));
+    public static BasicType getType(Resource resource)  {
+        return getType(resource.getURI());
     }
-    
+
     /**
      * Get a term type by its IRI.
      * @param iri the iri of the term type to get
      * @return the matching termtype, or null if no such termtype
      */
-    public static BasicType getByIRI(String iri)  {
+    public static BasicType getType(String iri)  {
         return iris.get(iri);
     }
 
@@ -212,7 +180,7 @@ public class TypeFactory {
      * of all other types.
      */
     public static BasicType getTopType() {
-        return top;
+        return topType;
     }
 
     /**
@@ -220,6 +188,7 @@ public class TypeFactory {
      * of all other types.
      */
     public static BasicType getBotType() {
-        return bot;
+        return botType;
     }
+
 }

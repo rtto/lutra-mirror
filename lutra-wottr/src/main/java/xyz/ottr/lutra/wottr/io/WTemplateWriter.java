@@ -80,14 +80,6 @@ public class WTemplateWriter extends AbstractWWriter implements TemplateWriter {
     }
     
     @Override
-    public void printDefinitions() {
-        for (Model model : models.values()) {
-            System.out.println("==========\nModel\n==========");
-            model.write(System.out, "TTL");
-        }
-    }
-
-    @Override
     public String write(String iri) {
         return ModelIO.writeModel(this.models.get(iri));
     }

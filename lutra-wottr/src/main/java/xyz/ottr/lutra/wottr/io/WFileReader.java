@@ -22,6 +22,9 @@ package xyz.ottr.lutra.wottr.io;
  * #L%
  */
 
+import java.nio.file.Paths;
+
+import org.apache.commons.io.FilenameUtils;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.shared.JenaException;
 import org.apache.jena.shared.PrefixMapping;
@@ -49,9 +52,10 @@ public class WFileReader implements InputReader<String, Model> {
     }
 
     public Result<Model> parse(String url) {
+        String path = FilenameUtils.separatorsToSystem(Paths.get(url).toAbsolutePath().toString());
         Result<Model> result = null;
         try {
-            Model model = ModelIO.readModel(url);
+            Model model = ModelIO.readModel(path);
             this.prefixes.setNsPrefixes(model);
             result = Result.ofNullable(model);
             log.info("Adding model " + model.hashCode() + " with URI " + url);
