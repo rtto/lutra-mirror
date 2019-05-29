@@ -121,7 +121,7 @@ public class CLI {
     private static void execute() {
 
         TemplateStore store = new DependencyGraph();
-        ResultConsumer.use(makeTemplateReader(),
+        ResultConsumer.use(makeTemplateReader(settings.libraryFormat),
             reader -> {
 
                 MessageHandler msgs = parseLibraryInto(reader, store);
@@ -257,8 +257,8 @@ public class CLI {
     ////////////////////////////////////////////////////////////
 
 
-    private static Result<TemplateReader> makeTemplateReader() {
-        switch (settings.libraryFormat) {
+    private static Result<TemplateReader> makeTemplateReader(Settings.Format format) {
+        switch (format) {
             case legacy:
                 return Result.of(new TemplateReader(new WFileReader(),
                         new xyz.ottr.lutra.wottr.legacy.io.WTemplateParser()));
@@ -294,7 +294,10 @@ public class CLI {
         if (settings.fetchMissingDependencies) {
             Function<TemplateReader, Function<Instance, ResultStream<Instance>>> fun =
                 reader -> ins -> store.expandInstance(ins, reader);
-            return makeTemplateReader().map(fun);
+            Settings.Format format = settings.fetchFormat == null
+                ? settings.libraryFormat
+                : settings.fetchFormat;
+            return makeTemplateReader(format).map(fun);
         } else {
             return Result.of(ins -> store.expandInstance(ins));
         }

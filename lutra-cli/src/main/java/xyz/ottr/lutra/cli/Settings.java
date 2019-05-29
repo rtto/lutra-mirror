@@ -102,12 +102,16 @@ public class Settings {
     public Format libraryFormat = Format.wottr;
 
 
-    @Option(names = {"-F", "--fetchMissing"},
+    @Option(names = {"-f", "--fetchMissing"},
         description = {"Fetch missing template dependencies. It is here assumed that"
                        + " templates' definitions are accessible via their IRI, that is, the IRI is"
                        + " either a path to a file, a URL, or similar.%n"
                        + "(default: ${DEFAULT-VALUE})"})
     public boolean fetchMissingDependencies = false;
+
+    @Option(names = {"-F", "--fetchFormat"},
+        description = {"The input format of the templates fetched via the -f flag."})
+    public Format fetchFormat;
 
     @Option(names = {"-l", "--library"}, description = {"Folder containing templates to use as library."})
     public String library;
