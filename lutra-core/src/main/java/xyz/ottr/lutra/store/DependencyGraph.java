@@ -656,7 +656,9 @@ public class DependencyGraph implements TemplateStore {
 
             // Should discard this instance if it contains none at a non-optional position
             for (int i = 0; i < this.argumentList.size(); i++) {
-                if (this.argumentList.get(i) instanceof NoneTerm  && !this.to.isOptional(i)) { 
+                if (this.argumentList.get(i) instanceof NoneTerm
+                    && !this.to.isOptional(i)
+                    && !this.to.getParameters().hasDefaultValue(i)) { 
                     return true;
                 }
             }
