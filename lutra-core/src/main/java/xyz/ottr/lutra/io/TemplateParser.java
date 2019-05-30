@@ -30,5 +30,5 @@ import xyz.ottr.lutra.result.ResultStream;
 
 public interface TemplateParser<E> extends Function<E, ResultStream<TemplateSignature>> {
 
-    Map<String, String> getUsedPrefixes();
+    Map<String, String> getPrefixes();
 }

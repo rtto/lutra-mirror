@@ -39,7 +39,7 @@ public abstract class SParser<T> extends SBaseParserVisitor<T> {
     private Map<String, String> prefixes = new HashMap<>();
     private STermParser termParser = new STermParser(this.prefixes);
 
-    public Map<String, String> getUsedPrefixes() {
+    public Map<String, String> getPrefixes() {
         return this.prefixes;
     }
 

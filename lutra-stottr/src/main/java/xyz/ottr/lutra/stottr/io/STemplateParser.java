@@ -96,7 +96,7 @@ public class STemplateParser extends SParser<TemplateSignature> implements Templ
         Result<TemplateSignature> sigRes = visitSignature(ctx.signature());
         Map<String, Term> variables = makeVariablesMap(sigRes);
 
-        SInstanceParser instanceParser = new SInstanceParser(getUsedPrefixes(), variables);
+        SInstanceParser instanceParser = new SInstanceParser(getPrefixes(), variables);
         Set<Result<Instance>> resBody = ctx.patternList()
             .instance()
             .stream()

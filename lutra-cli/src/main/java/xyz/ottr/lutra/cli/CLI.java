@@ -133,7 +133,7 @@ public class CLI {
                 
                 if (!Message.moreSevere(msgs.printMessages(), settings.haltOn)) {
                     PrefixMapping usedPrefixes = getStdPrefixes();
-                    usedPrefixes.setNsPrefixes(reader.getUsedPrefixes());
+                    usedPrefixes.setNsPrefixes(reader.getPrefixes());
                     executeMode(store, usedPrefixes);
                 }
             }

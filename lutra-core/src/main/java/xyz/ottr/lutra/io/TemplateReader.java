@@ -51,8 +51,8 @@ public class TemplateReader implements Function<String, ResultStream<TemplateSig
         this.parser = templateParser;
     }
 
-    public Map<String, String> getUsedPrefixes() {
-        return parser.getUsedPrefixes();
+    public Map<String, String> getPrefixes() {
+        return parser.getPrefixes();
     }
 
     public ResultStream<TemplateSignature> apply(String file) {
