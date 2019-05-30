@@ -121,7 +121,7 @@ public class CLI {
     private static void execute() {
 
         TemplateStore store = new DependencyGraph();
-        ResultConsumer.use(makeTemplateReader(),
+        ResultConsumer.use(makeTemplateReader(settings.libraryFormat),
             reader -> {
 
                 MessageHandler msgs = parseLibraryInto(reader, store);
@@ -257,8 +257,8 @@ public class CLI {
     ////////////////////////////////////////////////////////////
 
 
-    private static Result<TemplateReader> makeTemplateReader() {
-        switch (settings.libraryFormat) {
+    private static Result<TemplateReader> makeTemplateReader(Settings.Format format) {
+        switch (format) {
             case legacy:
                 return Result.of(new TemplateReader(new WFileReader(),
                         new xyz.ottr.lutra.wottr.legacy.io.WTemplateParser()));
@@ -294,9 +294,12 @@ public class CLI {
         if (settings.fetchMissingDependencies) {
             Function<TemplateReader, Function<Instance, ResultStream<Instance>>> fun =
                 reader -> ins -> store.expandInstance(ins, reader);
-            return makeTemplateReader().map(fun);
+            Settings.Format format = settings.fetchFormat == null
+                ? settings.libraryFormat
+                : settings.fetchFormat;
+            return makeTemplateReader(format).map(fun);
         } else {
-            return Result.of(ins -> store.expandInstance(ins));
+            return Result.of(store::expandInstance);
         }
     }
 
@@ -397,11 +400,7 @@ public class CLI {
             String iriPath = iriToPath(iri);
             Files.createDirectories(Paths.get(settings.out, iriToDirectory(iriPath)));
             Files.write(Paths.get(settings.out, iriPath + ".ttl"), output.getBytes(Charset.forName("UTF-8")));
-        } catch (IOException ex) {
-            Message err = Message.error(
-                "Error when writing output -- " + ex.getMessage());
-            MessageHandler.printMessage(err);
-        } catch (URISyntaxException ex) {
+        } catch (IOException | URISyntaxException ex) {
             Message err = Message.error(
                 "Error when writing output -- " + ex.getMessage());
             MessageHandler.printMessage(err);
@@ -424,7 +423,7 @@ public class CLI {
         return settings.stdout || settings.out == null;
     }
 
-    private static String iriToDirectory(String pathStr) throws URISyntaxException {
+    private static String iriToDirectory(String pathStr) {
         Path folder = Paths.get(pathStr).getParent();
         return folder == null ? null : folder.toString();
     }
@@ -435,9 +434,9 @@ public class CLI {
 
     private static int checkTemplates(TemplateStore store) {
         List<Message> msgs = store.checkTemplates();
-        msgs.forEach(msg -> MessageHandler.printMessage(msg));
+        msgs.forEach(MessageHandler::printMessage);
         int mostSevere = msgs.stream()
-            .mapToInt(msg -> msg.getLevel())
+            .mapToInt(Message::getLevel)
             .min()
             .orElse(Message.INFO);
         return mostSevere;
