@@ -11,6 +11,7 @@
 		<module>lutra-core</module>
 		<module>lutra-wottr</module>
 		<module>lutra-tab</module>
+		<module>lutra-stottr</module>
 		<module>lutra-cli</module>
 	</modules>
 
@@ -158,6 +159,9 @@
 					</execution>
 				</executions>
 				<configuration>
+                                        <sourceDirectories>
+                                            <sourceDirectory>src/</sourceDirectory> <!-- Skip checking generated sources -->
+                                        </sourceDirectories>
 					<encoding>UTF-8</encoding>
 					<configLocation>config/checkstyle.xml</configLocation>
 					<suppressionsLocation>config/checkstyle-suppressions.xml</suppressionsLocation>
@@ -183,7 +187,10 @@
 				<artifactId>maven-pmd-plugin</artifactId>
 				<version>3.8</version>
 				<configuration>
-					<printFailingErrors>true</printFailingErrors>
+                                            <excludeRoots>
+                                              <excludeRoot>target/generated-sources/</excludeRoot> <!-- Skip checking generated sources -->
+                                            </excludeRoots>
+					    <printFailingErrors>true</printFailingErrors>
 				</configuration>
 				<executions>
 					<execution>
@@ -378,6 +385,11 @@
 			<dependency>
 				<groupId>${project.groupId}</groupId>
 				<artifactId>lutra-tab</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>${project.groupId}</groupId>
+				<artifactId>lutra-stottr</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 

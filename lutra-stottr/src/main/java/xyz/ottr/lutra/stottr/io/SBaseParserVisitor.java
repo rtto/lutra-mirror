@@ -1,8 +1,8 @@
-package xyz.ottr.lutra.io;
+package xyz.ottr.lutra.stottr.io;
 
 /*-
  * #%L
- * lutra-core
+ * lutra-stottr
  * %%
  * Copyright (C) 2018 - 2019 University of Oslo
  * %%
@@ -22,13 +22,15 @@ package xyz.ottr.lutra.io;
  * #L%
  */
 
-import java.util.Map;
-import java.util.function.Function;
+import org.antlr.v4.runtime.tree.RuleNode;
 
-import xyz.ottr.lutra.model.TemplateSignature;
-import xyz.ottr.lutra.result.ResultStream;
+import xyz.ottr.lutra.result.Result;
+import xyz.ottr.lutra.stottr.antlr.stOTTRBaseVisitor;
 
-public interface TemplateParser<E> extends Function<E, ResultStream<TemplateSignature>> {
+public abstract class SBaseParserVisitor<T> extends stOTTRBaseVisitor<Result<T>> {
 
-    Map<String, String> getPrefixes();
+    @Override
+    protected boolean shouldVisitNextChild(RuleNode node, Result<T> current) {
+        return current == null;
+    }
 }

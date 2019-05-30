@@ -1,8 +1,8 @@
-package xyz.ottr.lutra.io;
+package xyz.ottr.lutra.stottr.io;
 
 /*-
  * #%L
- * lutra-core
+ * lutra-stottr
  * %%
  * Copyright (C) 2018 - 2019 University of Oslo
  * %%
@@ -22,13 +22,24 @@ package xyz.ottr.lutra.io;
  * #L%
  */
 
-import java.util.Map;
-import java.util.function.Function;
+import java.io.IOException;
 
-import xyz.ottr.lutra.model.TemplateSignature;
+import org.antlr.v4.runtime.CharStream;
+import org.antlr.v4.runtime.CharStreams;
+
+import xyz.ottr.lutra.io.InputReader;
+import xyz.ottr.lutra.result.Message;
+import xyz.ottr.lutra.result.Result;
 import xyz.ottr.lutra.result.ResultStream;
 
-public interface TemplateParser<E> extends Function<E, ResultStream<TemplateSignature>> {
+public class SFileReader implements InputReader<String, CharStream> {
 
-    Map<String, String> getPrefixes();
+    public ResultStream<CharStream> apply(String filename) {
+
+        try {
+            return ResultStream.innerOf(CharStreams.fromFileName(filename));
+        } catch (IOException ex) {
+            return ResultStream.of(Result.empty(Message.error(ex.getMessage())));
+        }
+    }
 }

@@ -56,7 +56,7 @@ public class ResultConsumer<T> implements Consumer<Result<T>> {
     @Override
     public void accept(Result<T> result) {
 
-        if (valueConsumer != null) {
+        if (valueConsumer != null && result != null) {
             result.ifPresent(valueConsumer);
         }
 

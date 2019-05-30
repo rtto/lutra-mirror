@@ -156,6 +156,7 @@ public class Settings {
             super(Arrays.asList(
                     Format.legacy.toString(),
                     Format.wottr.toString(),
+                    Format.stottr.toString(),
                     Format.tabottr.toString()));
         }
     }
@@ -166,6 +167,7 @@ public class Settings {
 
         TplInputFormat() {
             super(Arrays.asList(
+                    Format.stottr.toString(),
                     Format.legacy.toString(),
                     Format.wottr.toString()));
         }
@@ -178,6 +180,7 @@ public class Settings {
         OutputFormat() {
             super(Arrays.asList(
                     Format.legacy.toString(),
+                    Format.stottr.toString(),
                     Format.wottr.toString()));
         }
     }

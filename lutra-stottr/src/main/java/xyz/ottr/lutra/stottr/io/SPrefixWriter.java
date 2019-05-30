@@ -1,8 +1,8 @@
-package xyz.ottr.lutra.io;
+package xyz.ottr.lutra.stottr.io;
 
 /*-
  * #%L
- * lutra-core
+ * lutra-stottr
  * %%
  * Copyright (C) 2018 - 2019 University of Oslo
  * %%
@@ -22,13 +22,26 @@ package xyz.ottr.lutra.io;
  * #L%
  */
 
+import java.io.IOException;
+import java.io.Writer;
 import java.util.Map;
-import java.util.function.Function;
 
-import xyz.ottr.lutra.model.TemplateSignature;
-import xyz.ottr.lutra.result.ResultStream;
+import xyz.ottr.lutra.result.Message;
+import xyz.ottr.lutra.result.MessageHandler;
 
-public interface TemplateParser<E> extends Function<E, ResultStream<TemplateSignature>> {
+public class SPrefixWriter {
 
-    Map<String, String> getPrefixes();
+    public static void write(Map<String, String> prefixes, Writer writer) {
+
+        try {
+            for (Map.Entry<String, String> nsln : prefixes.entrySet()) {
+                writer.write("@prefix " + nsln.getKey() + ": <" + nsln.getValue() + "> .\n");
+            }
+            writer.write("\n");
+        } catch (IOException ex) {
+            MessageHandler.printMessage(Message.error(
+                "Error when writing prefixes "
+                + ": " + ex.toString()));
+        }
+    }
 }

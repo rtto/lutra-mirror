@@ -52,6 +52,11 @@ import xyz.ottr.lutra.result.ResultStream;
 import xyz.ottr.lutra.store.DependencyGraph;
 import xyz.ottr.lutra.store.TemplateStore;
 
+import xyz.ottr.lutra.stottr.io.SFileReader;
+import xyz.ottr.lutra.stottr.io.SInstanceParser;
+import xyz.ottr.lutra.stottr.io.SInstanceWriter;
+import xyz.ottr.lutra.stottr.io.STemplateParser;
+import xyz.ottr.lutra.stottr.io.STemplateWriter;
 import xyz.ottr.lutra.tabottr.io.TabInstanceParser;
 import xyz.ottr.lutra.wottr.WTemplateFactory;
 import xyz.ottr.lutra.wottr.io.WFileReader;
@@ -127,8 +132,8 @@ public class CLI {
                 MessageHandler msgs = parseLibraryInto(reader, store);
                 
                 if (!Message.moreSevere(msgs.printMessages(), settings.haltOn)) {
-                    PrefixMapping usedPrefixes = reader.getUsedPrefixes();
-                    addStdPrefixes(usedPrefixes);
+                    PrefixMapping usedPrefixes = getStdPrefixes();
+                    usedPrefixes.setNsPrefixes(reader.getPrefixes());
                     executeMode(store, usedPrefixes);
                 }
             }
@@ -264,6 +269,8 @@ public class CLI {
                         new xyz.ottr.lutra.wottr.legacy.io.WTemplateParser()));
             case wottr:
                 return Result.of(new TemplateReader(new WFileReader(), new WTemplateParser()));
+            case stottr:
+                return Result.of(new TemplateReader(new SFileReader(), new STemplateParser()));
             default:
                 return Result.empty(Message.error(
                         "Library format " + settings.libraryFormat + " not yet supported as input format."));
@@ -283,6 +290,8 @@ public class CLI {
                         new xyz.ottr.lutra.wottr.legacy.io.WInstanceParser()));
             case wottr:
                 return Result.of(new InstanceReader(new WFileReader(), new WInstanceParser()));
+            case stottr:
+                return Result.of(new InstanceReader(new SFileReader(), new SInstanceParser()));
             default:
                 return Result.empty(Message.error(
                         "Input format " + settings.outputFormat.toString()
@@ -307,6 +316,8 @@ public class CLI {
         switch (settings.outputFormat) {
             case wottr:
                 return Result.of(new WInstanceWriter(usedPrefixes));
+            case stottr:
+                return Result.of(SInstanceWriter.makeOuterInstanceWriter(usedPrefixes.getNsPrefixMap()));
             default:
                 return Result.empty(Message.error(
                         "Output format " + settings.outputFormat.toString()
@@ -318,6 +329,8 @@ public class CLI {
         switch (settings.outputFormat) {
             case wottr:
                 return Result.of(new WTemplateWriter(usedPrefixes));
+            case stottr:
+                return Result.of(new STemplateWriter(usedPrefixes.getNsPrefixMap()));
             default:
                 return Result.empty(Message.error(
                         "Output format " + settings.outputFormat.toString()
@@ -412,10 +425,11 @@ public class CLI {
     /// UTILS                                                ///
     ////////////////////////////////////////////////////////////
 
-    private static void addStdPrefixes(PrefixMapping prefixes) {
+    private static PrefixMapping getStdPrefixes() {
 
-        prefixes.setNsPrefixes(PrefixMapping.Standard);
+        PrefixMapping prefixes = PrefixMapping.Factory.create();
         prefixes.setNsPrefix(OTTR.prefix, OTTR.namespace);
+        return prefixes;
     }
 
 
