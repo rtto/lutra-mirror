@@ -66,6 +66,6 @@ public class STypeParser extends SBaseParserVisitor<TermType> {
     @Override
     public Result<TermType> visitBasicType(stOTTRParser.BasicTypeContext ctx) {
         Result<String> iriRes = this.termParser.visit(ctx).map(term -> ((IRITerm) term).getIRI());
-        return iriRes.map(TypeFactory::getByIRI);
+        return iriRes.map(TypeFactory::getType);
     }
 }
