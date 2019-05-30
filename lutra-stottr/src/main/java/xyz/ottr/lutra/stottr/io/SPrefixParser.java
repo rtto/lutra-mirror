@@ -24,6 +24,7 @@ package xyz.ottr.lutra.stottr.io;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import org.antlr.v4.runtime.tree.TerminalNode;
 
@@ -80,6 +81,8 @@ public class SPrefixParser extends SBaseParserVisitor<Map<String, String>> {
     private static class PrefixPair {
 
         private static final String BASE_PREFIX = ""; // TODO: correct rep. of (empty) base?
+        private static final Pattern colonPat = Pattern.compile(":$");
+        private static final Pattern angularPat = Pattern.compile("^<|>$");
 
         public final String ns;
         public final String prefix;
@@ -90,11 +93,11 @@ public class SPrefixParser extends SBaseParserVisitor<Map<String, String>> {
         }
 
         private static String stripNamespace(String ns) {
-            return ns.replaceAll(":$", "");
+            return colonPat.matcher(ns).replaceAll("");
         }
 
         private static String stripPrefix(String prefix) {
-            return prefix.replaceAll("^<|>$", "");
+            return angularPat.matcher(prefix).replaceAll("");
         }
 
         public static PrefixPair makeBase(TerminalNode prefixNode) {

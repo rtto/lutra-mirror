@@ -25,6 +25,7 @@ package xyz.ottr.lutra.stottr.io;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.antlr.v4.runtime.tree.TerminalNode;
@@ -44,6 +45,11 @@ import xyz.ottr.lutra.stottr.antlr.stOTTRParser;
 import xyz.ottr.lutra.wottr.WOTTR;
 
 public class STermParser extends SBaseParserVisitor<Term> {
+
+    private static final Pattern quotedStringPat = Pattern.compile("^\".*\"$");
+    private static final Pattern quotesPat = Pattern.compile("^\"|\"$");
+    private static final Pattern atPat = Pattern.compile("@");
+    private static final Pattern angularPat = Pattern.compile("^<|>$");
 
     private final Map<String, String> prefixes;
     private final Map<String, Term> blanks;
@@ -149,13 +155,13 @@ public class STermParser extends SBaseParserVisitor<Term> {
 
         String valStr = ctx.String().getSymbol().getText();
         // valStr might be a String containing surrounding quotes, so we remove these:
-        String val = valStr.matches("^\".*\"$") // Only replace if both first and last char is \"
-            ? valStr.replaceAll("^\"|\"$", "")
+        String val = quotedStringPat.matcher(valStr).matches() // Only replace if both first and last char is \"
+            ? quotesPat.matcher(valStr).replaceAll("")
             : valStr;
 
         if (ctx.LANGTAG() != null) { // Language tag present
             String tag = ctx.LANGTAG().getSymbol().getText();
-            tag = tag.replaceAll("@", ""); // Remove the @-prefix
+            tag = atPat.matcher(tag).replaceFirst(""); // Remove the @-prefix
             return Result.of(LiteralTerm.taggedLiteral(val, tag));
         }
 
@@ -178,7 +184,7 @@ public class STermParser extends SBaseParserVisitor<Term> {
         } else {
             String iriBraces = ctx.IRIREF().getSymbol().getText();
             // IRIs in Lutra are always full, so do not use surrounding '<','>'
-            String iri = iriBraces.replaceAll("^<|>$", ""); 
+            String iri = angularPat.matcher(iriBraces).replaceAll(""); 
             if (iri.equals(WOTTR.none.getURI())) {
                 return Result.of(new NoneTerm());
             }
