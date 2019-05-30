@@ -28,6 +28,8 @@ import org.junit.Test;
 
 import xyz.ottr.lutra.io.TemplateReader;
 import xyz.ottr.lutra.model.Template;
+import xyz.ottr.lutra.result.Message;
+import xyz.ottr.lutra.result.MessageHandler;
 
 public class PrototypeTest {
 
@@ -47,6 +49,6 @@ public class PrototypeTest {
                 + "ex:H4(1, 2.32, .45) .\n"
                 + "ex:H5(\"1\"^^xsd:int, \"hello\"@en) .\n"
                 + "ex:T6([], _:blank) .")
-            .forEach(res -> System.err.println("Parsed :" + res.toString()));
+            .forEach(res -> MessageHandler.printMessage(Message.info(("Parsed :" + res.toString()))));
     }
 }
