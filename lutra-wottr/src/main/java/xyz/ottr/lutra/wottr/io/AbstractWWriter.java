@@ -74,13 +74,19 @@ public abstract class AbstractWWriter {
             String uri = ((IRITerm) term).getIRI();
             return m.createResource(uri);
         } else if (term instanceof LiteralTerm) {
-            String val = ((LiteralTerm) term).getPureValue();
+            LiteralTerm lit = (LiteralTerm) term;
+            String val = lit.getPureValue();
             // TODO: Check correctness of typing below
-            String type = ((LiteralTerm) term).getDatatype();
-            TypeMapper tm = TypeMapper.getInstance();
-            return type == null
-                ? m.createLiteral(val)
-                : m.createTypedLiteral(val, tm.getSafeTypeByName(type));
+            if (lit.getDatatype() != null) { // Typed literal
+                String type = lit.getDatatype();
+                TypeMapper tm = TypeMapper.getInstance();
+                return m.createTypedLiteral(val, tm.getSafeTypeByName(type));
+            } else if (lit.getLangTag() != null) { // Literal with language tag
+                String tag = lit.getLangTag();
+                return m.createLiteral(val, tag);
+            } else { // Untyped literal (just a string)
+                return m.createLiteral(val);
+            }
         } else if (term instanceof BlankNodeTerm) {
             String label = ((BlankNodeTerm) term).getLabel();
             if (blankNodes.containsKey(label)) {
