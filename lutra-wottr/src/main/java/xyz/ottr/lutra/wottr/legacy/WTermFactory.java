@@ -98,12 +98,6 @@ public class WTermFactory implements Function<RDFNode, Result<Term>> {
         // Mint new labels, but keep map of which term was created
         // for which original (system) label
         String id = resource.getId().getBlankNodeId().getLabelString();
-        if (blanks.containsKey(id)) {
-            return blanks.get(id);
-        } else {
-            BlankNodeTerm nb = new BlankNodeTerm();
-            blanks.put(id, nb);
-            return nb;
-        }
+        return blanks.computeIfAbsent(id, _k -> new BlankNodeTerm());
     }
 }
