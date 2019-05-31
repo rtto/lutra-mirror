@@ -49,6 +49,7 @@ public class WTermFactory implements Function<RDFNode, Result<Term>> {
     // TODO: Verify that this is correct: This only gives correct results if blank nodes
     // across Jena models are unique.
     private static Map<RDFList, Result<TermList>> createdLists = new HashMap<>();
+    private static Map<String, BlankNodeTerm> blanks = new HashMap<>();
 
     public Result<Term> apply(RDFNode node) {
         if (node.isURIResource()) {
@@ -95,6 +96,13 @@ public class WTermFactory implements Function<RDFNode, Result<Term>> {
 
     public static BlankNodeTerm createBlankNodeTerm(Resource resource) {
         // mint new labels?
-        return new BlankNodeTerm(resource.getId().getBlankNodeId().getLabelString());
+        String id = resource.getId().getBlankNodeId().getLabelString();
+        if (blanks.containsKey(id)) {
+            return blanks.get(id);
+        } else {
+            BlankNodeTerm nb = new BlankNodeTerm();
+            blanks.put(id, nb);
+            return nb;
+        }
     }
 }
