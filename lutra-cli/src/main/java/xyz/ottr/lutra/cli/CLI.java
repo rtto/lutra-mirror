@@ -155,7 +155,15 @@ public class CLI {
                 settings.extensions, settings.ignoreExtensions);
 
         if (settings.fetchMissingDependencies) {
-            msgs = msgs.combine(store.fetchMissingDependencies(reader));
+
+            Result<TemplateReader> fetchReader = settings.fetchFormat == null
+                ? Result.of(reader)
+                : makeTemplateReader(settings.fetchFormat);
+
+            msgs.add(fetchReader);
+            if (fetchReader.isPresent()) {
+                msgs = msgs.combine(store.fetchMissingDependencies(fetchReader.get()));
+            }
         }
         return msgs;
     } 
