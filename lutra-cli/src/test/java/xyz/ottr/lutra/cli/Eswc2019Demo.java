@@ -26,7 +26,7 @@ import org.junit.Test;
 
 public class Eswc2019Demo {
 
-    private final String ROOT = "src/test/resources/eswc2019/";
+    private static final String ROOT = "src/test/resources/eswc2019/";
     
     @Test
     public void expandNamedPizzaInstances() {
