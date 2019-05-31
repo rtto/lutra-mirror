@@ -20,6 +20,12 @@
 			<groupId>${project.groupId}</groupId>
 			<artifactId>lutra-core</artifactId>
 		</dependency>
+
+		<dependency>
+			<groupId>commons-validator</groupId>
+			<artifactId>commons-validator</artifactId>
+		</dependency>
+
 		
 		<!-- Needed for RDFDataMgr, RDF I/O -->
 		<dependency>

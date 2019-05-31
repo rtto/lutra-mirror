@@ -25,6 +25,7 @@ package xyz.ottr.lutra.wottr.io;
 import java.nio.file.Paths;
 
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.validator.routines.UrlValidator;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.shared.JenaException;
 import org.apache.jena.shared.PrefixMapping;
@@ -42,6 +43,7 @@ public class WFileReader implements InputReader<String, Model> {
 
     private final Logger log = LoggerFactory.getLogger(WFileReader.class);
     private final PrefixMapping prefixes; // Gathers prefixes parsed for later output
+    private static UrlValidator urlValidator = new UrlValidator();
 
     public WFileReader() {
         this.prefixes = PrefixMapping.Factory.create();
@@ -52,7 +54,12 @@ public class WFileReader implements InputReader<String, Model> {
     }
 
     public Result<Model> parse(String url) {
-        String path = FilenameUtils.separatorsToSystem(Paths.get(url).toAbsolutePath().toString());
+        String path;
+        if (isURL(url)) {
+            path = url; 
+        } else {
+            path = FilenameUtils.separatorsToSystem(Paths.get(url).toAbsolutePath().toString());
+        }
         Result<Model> result = null;
         try {
             Model model = ModelIO.readModel(path);
@@ -68,6 +75,10 @@ public class WFileReader implements InputReader<String, Model> {
                 "Unable to parse model " + url + ": " + e.getMessage()));
         }
         return result;
+    }
+
+    public static boolean isURL(String value) {
+        return urlValidator.isValid(value);
     }
 
     public ResultStream<Model> apply(String url) {
