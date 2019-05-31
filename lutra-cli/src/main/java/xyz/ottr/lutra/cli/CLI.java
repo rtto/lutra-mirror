@@ -33,6 +33,10 @@ import java.util.List;
 import java.util.function.Function;
 
 import org.apache.jena.shared.PrefixMapping;
+import org.apache.jena.vocabulary.OWL;
+import org.apache.jena.vocabulary.RDF;
+import org.apache.jena.vocabulary.RDFS;
+import org.apache.jena.vocabulary.XSD;
 
 import picocli.CommandLine;
 import picocli.CommandLine.ParameterException;
@@ -429,6 +433,10 @@ public class CLI {
 
         PrefixMapping prefixes = PrefixMapping.Factory.create();
         prefixes.setNsPrefix(OTTR.prefix, OTTR.namespace);
+        prefixes.setNsPrefix("rdf", RDF.uri);
+        prefixes.setNsPrefix("rdfs", RDFS.uri);
+        prefixes.setNsPrefix("owl", OWL.NS);
+        prefixes.setNsPrefix("xsd", XSD.NS);
         return prefixes;
     }
 
