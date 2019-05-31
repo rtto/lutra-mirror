@@ -22,14 +22,13 @@ package xyz.ottr.lutra.io;
  * #L%
  */
 
+import java.util.Map;
 import java.util.function.Function;
-
-import org.apache.jena.shared.PrefixMapping;
 
 import xyz.ottr.lutra.model.TemplateSignature;
 import xyz.ottr.lutra.result.ResultStream;
 
 public interface TemplateParser<E> extends Function<E, ResultStream<TemplateSignature>> {
 
-    PrefixMapping getUsedPrefixes();
+    Map<String, String> getPrefixes();
 }

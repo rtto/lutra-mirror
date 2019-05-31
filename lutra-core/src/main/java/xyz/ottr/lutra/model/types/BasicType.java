@@ -36,10 +36,6 @@ public class BasicType implements TermType {
         return iri.toString();
     }
 
-    public String getName() {
-        return TypeFactory.normaliseName(iri.getLocalName());
-    }
-
     @Override
     public boolean isSubTypeOf(TermType supertype) {
         if (this.equals(TypeFactory.getBotType())) {

@@ -5,4 +5,13 @@
     <Class name="xyz.ottr.lutra.store.TemplateNode" />
     <Bug pattern="EQ_DOESNT_OVERRIDE_EQUALS" />
   </Match>
+  <Match>
+    <!-- Generated sources -->
+    <Source name="~.*stOTTR.*"/>
+  </Match>
+  <Match>
+    <!-- try with resources with Java 11 triggers RCN warnings https://github.com/spotbugs/spotbugs/issues/756 -->
+    <Class name="xyz.ottr.lutra.tabottr.io.excel.ExcelReader" />
+    <Bug pattern="RCN_REDUNDANT_NULLCHECK_WOULD_HAVE_BEEN_A_NPE" />
+  </Match>
 </FindBugsFilter>

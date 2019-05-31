@@ -57,7 +57,7 @@ public class WTypeParser implements Function<RDFNode, Result<TermType>> {
 
     private Result<TermType> parseSimpleType(Resource node) {
 
-        TermType type = TypeFactory.getByIRI(node.getURI()); 
+        TermType type = TypeFactory.getType(node.getURI()); 
 
         if (type == null) {
             return Result.empty(Message.error(

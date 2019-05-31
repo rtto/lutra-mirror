@@ -24,6 +24,7 @@ package xyz.ottr.lutra.wottr.io;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assume.assumeTrue;
 
 import java.util.List;
 import java.util.Set;
@@ -31,11 +32,11 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.commons.io.FilenameUtils;
-import org.apache.jena.rdf.model.Model;
 
-import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameters;
 
 import xyz.ottr.lutra.io.Files;
 import xyz.ottr.lutra.io.InstanceReader;
@@ -48,27 +49,31 @@ import xyz.ottr.lutra.result.ResultStream;
 import xyz.ottr.lutra.store.DependencyGraph;
 import xyz.ottr.lutra.store.TemplateStore;
 
-import xyz.ottr.lutra.wottr.io.WFileReader;
-import xyz.ottr.lutra.wottr.io.WInstanceParser;
-import xyz.ottr.lutra.wottr.io.WTemplateParser;
 
+@RunWith(Parameterized.class)
 public class ShaclEquivalenceTest {
 
     private static final String correct = FilenameUtils.separatorsToSystem("src/test/resources/spec/tests/correct/");
     private static final String incorrect = FilenameUtils.separatorsToSystem("src/test/resources/spec/tests/incorrect/");
 
-    private static Set<String> unsupportedTests;
-    private static Set<String> instanceTests;
-    private static TemplateReader tempReader;
-    private static InstanceReader insReader;
-
-    @BeforeClass
-    public static void populateUnsupported() {
-
-        tempReader = new TemplateReader(new WFileReader(), new WTemplateParser());
-        insReader = new InstanceReader(new WFileReader(), new WInstanceParser());
-
-        instanceTests = Stream.of(
+    private static Set<String> unsupportedTests = Stream.of(
+            correct + "basetemplate03.ttl", // Annotations
+            correct + "signature10.ttl", // Annotations
+            correct + "signature11.ttl", // Annotations
+            incorrect + "basic01a.ttl", // Prefixes 
+            incorrect + "basic01b.ttl", // Prefixes 
+            incorrect + "basic01c.ttl", // Prefixes 
+            incorrect + "basic01d.ttl", // Prefixes 
+            incorrect + "basic01e.ttl", // Prefixes 
+            incorrect + "basic02.ttl",  // Prefixes
+            incorrect + "basic03.ttl",  // Prefixes
+            incorrect + "basic04.ttl",  // Prefixes
+            incorrect + "instance10.ttl", // Instance checking on types
+            incorrect + "signature06.ttl", // TODO: Fix somehow
+            incorrect + "signature12.ttl" // Annotation
+        ).collect(Collectors.toSet());
+    
+    private static Set<String> instanceTests = Stream.of(
             correct + "argument02.ttl", 
             correct + "argument03.ttl", 
             correct + "instance01.ttl", 
@@ -93,26 +98,49 @@ public class ShaclEquivalenceTest {
             incorrect + "instance11.ttl", 
             incorrect + "instance12.ttl" 
         ).collect(Collectors.toSet());
-
-        unsupportedTests = Stream.of(
-            correct + "basetemplate03.ttl", // Annotations
-            correct + "signature10.ttl", // Annotations
-            correct + "signature11.ttl", // Annotations
-            incorrect + "basic01a.ttl", // Prefixes 
-            incorrect + "basic01b.ttl", // Prefixes 
-            incorrect + "basic01c.ttl", // Prefixes 
-            incorrect + "basic01d.ttl", // Prefixes 
-            incorrect + "basic01e.ttl", // Prefixes 
-            incorrect + "basic02.ttl",  // Prefixes
-            incorrect + "basic03.ttl",  // Prefixes
-            incorrect + "basic04.ttl",  // Prefixes
-            incorrect + "instance10.ttl", // Instance checking on types
-            incorrect + "signature06.ttl", // TODO: Fix somehow
-            incorrect + "signature12.ttl" // Annotation
-        ).collect(Collectors.toSet());
+    
+    private TemplateReader tempReader;
+    private InstanceReader insReader;
+    
+    private String filename;
+    private boolean isCorrect;
+    
+    public ShaclEquivalenceTest(String filename, boolean isCorrect) {
+        this.filename = filename;
+        this.isCorrect = isCorrect;
+        
+        this.tempReader = new TemplateReader(new WFileReader(), new WTemplateParser());
+        this.insReader = new InstanceReader(new WFileReader(), new WInstanceParser());
+    }
+    
+    @Parameters(name = "{index}: {0} is {1}")
+    public static List<Object[]> data() {
+        List<Object[]> input = Files.loadFromFolder(correct, new String[] { "ttl" }, new String[0])
+                .getStream()
+                .map(r -> new Object[]{ r.get(), true })
+                .collect(Collectors.toList());
+                
+        input.addAll(Files.loadFromFolder(incorrect, new String[] { "ttl" }, new String[0])
+                .getStream()
+                .map(r -> new Object[]{ r.get(), false })
+                .collect(Collectors.toList()));
+                
+        return input;   
+    }
+    
+    
+    @Test
+    public void checkFile() {
+        assumeTrue(!unsupportedTests.contains(filename));
+        
+        if (instanceTests.contains(filename)) {
+            checkInstance(filename, isCorrect);
+        } else {
+            checkTemplate(filename, isCorrect);
+        }
     }
 
-    private static void checkTemplate(String file, boolean correct) {
+    private void checkTemplate(String file, boolean correct) {
 
         ResultStream<TemplateSignature> templates = tempReader.apply(file);
 
@@ -139,7 +167,7 @@ public class ShaclEquivalenceTest {
         }
     }
 
-    private static void checkInstance(String file, boolean correct) {
+    private void checkInstance(String file, boolean correct) {
         ResultStream<Instance> instances = insReader.apply(file);
 
         ResultConsumer<Instance> insErrorMessages = new ResultConsumer<>();
@@ -162,22 +190,4 @@ public class ShaclEquivalenceTest {
         }
     }
 
-    private void check(String folder, boolean correct) {
-        Files.loadFromFolder(folder, new String[] { "ttl" }, new String[0])
-            .innerFilter(filename -> !instanceTests.contains(filename) && !unsupportedTests.contains(filename))
-            .innerForEach(file -> checkTemplate(file, correct));
-        Files.loadFromFolder(folder, new String[] { "ttl" }, new String[0])
-            .innerFilter(filename -> instanceTests.contains(filename) && !unsupportedTests.contains(filename))
-            .innerForEach(file -> checkInstance(file, correct));
-    }
-
-    @Test
-    public void correct() {
-        check(correct, true);
-    }
-
-    @Test
-    public void incorrect() {
-        check(incorrect, false);
-    }
 }

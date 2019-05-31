@@ -59,15 +59,16 @@ public class TabTemplateInstanceParserToRDFTest {
         Model out = WReader.getCanonicalModel(ModelIO.readModel(outFile));
         out.setNsPrefixes(PrefixMapping.Standard);
 
-        // print if error:
         boolean isIsomorphic = in.isIsomorphicWith(out);
+        /*
+        // For debugging:
         if (!isIsomorphic) {
             System.out.println("Error: inFile " + inFile + " not isomorphic to outFile " + outFile);
             System.out.println("IN:");
-            ModelIO.printModel(in);
+            in.write(System.out);
             System.out.println("OUT:");
-            ModelIO.printModel(out);
-        }
+            out.write(System.out);
+        }*/
         assertTrue(isIsomorphic);
     }
     

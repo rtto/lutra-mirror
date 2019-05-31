@@ -33,6 +33,10 @@ import java.util.List;
 import java.util.function.Function;
 
 import org.apache.jena.shared.PrefixMapping;
+import org.apache.jena.vocabulary.OWL;
+import org.apache.jena.vocabulary.RDF;
+import org.apache.jena.vocabulary.RDFS;
+import org.apache.jena.vocabulary.XSD;
 
 import picocli.CommandLine;
 import picocli.CommandLine.ParameterException;
@@ -52,6 +56,11 @@ import xyz.ottr.lutra.result.ResultStream;
 import xyz.ottr.lutra.store.DependencyGraph;
 import xyz.ottr.lutra.store.TemplateStore;
 
+import xyz.ottr.lutra.stottr.io.SFileReader;
+import xyz.ottr.lutra.stottr.io.SInstanceParser;
+import xyz.ottr.lutra.stottr.io.SInstanceWriter;
+import xyz.ottr.lutra.stottr.io.STemplateParser;
+import xyz.ottr.lutra.stottr.io.STemplateWriter;
 import xyz.ottr.lutra.tabottr.io.TabInstanceParser;
 import xyz.ottr.lutra.wottr.WTemplateFactory;
 import xyz.ottr.lutra.wottr.io.WFileReader;
@@ -121,14 +130,14 @@ public class CLI {
     private static void execute() {
 
         TemplateStore store = new DependencyGraph();
-        ResultConsumer.use(makeTemplateReader(),
+        ResultConsumer.use(makeTemplateReader(settings.libraryFormat),
             reader -> {
 
                 MessageHandler msgs = parseLibraryInto(reader, store);
                 
                 if (!Message.moreSevere(msgs.printMessages(), settings.haltOn)) {
-                    PrefixMapping usedPrefixes = reader.getUsedPrefixes();
-                    addStdPrefixes(usedPrefixes);
+                    PrefixMapping usedPrefixes = getStdPrefixes();
+                    usedPrefixes.setNsPrefixes(reader.getPrefixes());
                     executeMode(store, usedPrefixes);
                 }
             }
@@ -150,7 +159,15 @@ public class CLI {
                 settings.extensions, settings.ignoreExtensions);
 
         if (settings.fetchMissingDependencies) {
-            msgs = msgs.combine(store.fetchMissingDependencies(reader));
+
+            Result<TemplateReader> fetchReader = settings.fetchFormat == null
+                ? Result.of(reader)
+                : makeTemplateReader(settings.fetchFormat);
+
+            msgs.add(fetchReader);
+            if (fetchReader.isPresent()) {
+                msgs = msgs.combine(store.fetchMissingDependencies(fetchReader.get()));
+            }
         }
         return msgs;
     } 
@@ -257,13 +274,15 @@ public class CLI {
     ////////////////////////////////////////////////////////////
 
 
-    private static Result<TemplateReader> makeTemplateReader() {
-        switch (settings.libraryFormat) {
+    private static Result<TemplateReader> makeTemplateReader(Settings.Format format) {
+        switch (format) {
             case legacy:
                 return Result.of(new TemplateReader(new WFileReader(),
                         new xyz.ottr.lutra.wottr.legacy.io.WTemplateParser()));
             case wottr:
                 return Result.of(new TemplateReader(new WFileReader(), new WTemplateParser()));
+            case stottr:
+                return Result.of(new TemplateReader(new SFileReader(), new STemplateParser()));
             default:
                 return Result.empty(Message.error(
                         "Library format " + settings.libraryFormat + " not yet supported as input format."));
@@ -283,6 +302,8 @@ public class CLI {
                         new xyz.ottr.lutra.wottr.legacy.io.WInstanceParser()));
             case wottr:
                 return Result.of(new InstanceReader(new WFileReader(), new WInstanceParser()));
+            case stottr:
+                return Result.of(new InstanceReader(new SFileReader(), new SInstanceParser()));
             default:
                 return Result.empty(Message.error(
                         "Input format " + settings.outputFormat.toString()
@@ -294,9 +315,12 @@ public class CLI {
         if (settings.fetchMissingDependencies) {
             Function<TemplateReader, Function<Instance, ResultStream<Instance>>> fun =
                 reader -> ins -> store.expandInstance(ins, reader);
-            return makeTemplateReader().map(fun);
+            Settings.Format format = settings.fetchFormat == null
+                ? settings.libraryFormat
+                : settings.fetchFormat;
+            return makeTemplateReader(format).map(fun);
         } else {
-            return Result.of(ins -> store.expandInstance(ins));
+            return Result.of(store::expandInstance);
         }
     }
 
@@ -304,6 +328,8 @@ public class CLI {
         switch (settings.outputFormat) {
             case wottr:
                 return Result.of(new WInstanceWriter(usedPrefixes));
+            case stottr:
+                return Result.of(SInstanceWriter.makeOuterInstanceWriter(usedPrefixes.getNsPrefixMap()));
             default:
                 return Result.empty(Message.error(
                         "Output format " + settings.outputFormat.toString()
@@ -315,6 +341,8 @@ public class CLI {
         switch (settings.outputFormat) {
             case wottr:
                 return Result.of(new WTemplateWriter(usedPrefixes));
+            case stottr:
+                return Result.of(new STemplateWriter(usedPrefixes.getNsPrefixMap()));
             default:
                 return Result.empty(Message.error(
                         "Output format " + settings.outputFormat.toString()
@@ -397,11 +425,7 @@ public class CLI {
             String iriPath = iriToPath(iri);
             Files.createDirectories(Paths.get(settings.out, iriToDirectory(iriPath)));
             Files.write(Paths.get(settings.out, iriPath + ".ttl"), output.getBytes(Charset.forName("UTF-8")));
-        } catch (IOException ex) {
-            Message err = Message.error(
-                "Error when writing output -- " + ex.getMessage());
-            MessageHandler.printMessage(err);
-        } catch (URISyntaxException ex) {
+        } catch (IOException | URISyntaxException ex) {
             Message err = Message.error(
                 "Error when writing output -- " + ex.getMessage());
             MessageHandler.printMessage(err);
@@ -413,10 +437,15 @@ public class CLI {
     /// UTILS                                                ///
     ////////////////////////////////////////////////////////////
 
-    private static void addStdPrefixes(PrefixMapping prefixes) {
+    private static PrefixMapping getStdPrefixes() {
 
-        prefixes.setNsPrefixes(PrefixMapping.Standard);
+        PrefixMapping prefixes = PrefixMapping.Factory.create();
         prefixes.setNsPrefix(OTTR.prefix, OTTR.namespace);
+        prefixes.setNsPrefix("rdf", RDF.uri);
+        prefixes.setNsPrefix("rdfs", RDFS.uri);
+        prefixes.setNsPrefix("owl", OWL.NS);
+        prefixes.setNsPrefix("xsd", XSD.NS);
+        return prefixes;
     }
 
 
@@ -424,7 +453,7 @@ public class CLI {
         return settings.stdout || settings.out == null;
     }
 
-    private static String iriToDirectory(String pathStr) throws URISyntaxException {
+    private static String iriToDirectory(String pathStr) {
         Path folder = Paths.get(pathStr).getParent();
         return folder == null ? null : folder.toString();
     }
@@ -435,9 +464,9 @@ public class CLI {
 
     private static int checkTemplates(TemplateStore store) {
         List<Message> msgs = store.checkTemplates();
-        msgs.forEach(msg -> MessageHandler.printMessage(msg));
+        msgs.forEach(MessageHandler::printMessage);
         int mostSevere = msgs.stream()
-            .mapToInt(msg -> msg.getLevel())
+            .mapToInt(Message::getLevel)
             .min()
             .orElse(Message.INFO);
         return mostSevere;

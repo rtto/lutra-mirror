@@ -40,14 +40,6 @@ public abstract class ModelIO {
 
     private static Lang defaultLang = Lang.TURTLE;
 
-    public static void printModel(Model model) {
-        printModel(model, defaultLang);
-    }
-
-    public static void printModel(Model model, Lang language) {
-        System.out.println(writeModel(model, language));
-    }
-
     public static Model readModel(String file) {
         return readModel(file, FileUtils.guessLang(file, defaultLang.getLabel()));
     }

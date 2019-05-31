@@ -87,7 +87,9 @@ public class Result<E> {
     }
 
     private Result(Result<E> other, Result<?> newParsedFrom) {
-        this(other.result, other.messages, other.parsedFrom);
+        this(other == null ? Optional.empty() : other.result,
+            other == null ? new LinkedList<>() : other.messages,
+            other == null ? null : other.parsedFrom);
         addParsedFrom(newParsedFrom);
     }
 

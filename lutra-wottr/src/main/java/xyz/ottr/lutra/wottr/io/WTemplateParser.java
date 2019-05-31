@@ -23,6 +23,7 @@ package xyz.ottr.lutra.wottr.io;
  */
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -60,8 +61,8 @@ public class WTemplateParser implements TemplateParser<Model> {
     }
 
     @Override
-    public PrefixMapping getUsedPrefixes() {
-        return this.prefixes;
+    public Map<String, String> getPrefixes() {
+        return this.prefixes.getNsPrefixMap();
     }
 
     @Override

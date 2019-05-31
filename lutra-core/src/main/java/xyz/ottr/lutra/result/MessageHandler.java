@@ -42,6 +42,10 @@ public class MessageHandler {
     }
 
     public void add(Result<?> result) {
+        if (result == null) {
+            return;
+        }
+
         Result<?> res = result.deriveContext();
         while (res != null && !this.results.contains(res)) {
             this.results.add(res);

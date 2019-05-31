@@ -34,7 +34,10 @@ import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.Statement;
+import org.apache.jena.vocabulary.OWL;
+import org.apache.jena.vocabulary.RDFS;
 
+import xyz.ottr.lutra.OTTR;
 import xyz.ottr.lutra.model.Term;
 import xyz.ottr.lutra.model.types.TypeFactory;
 import xyz.ottr.lutra.result.Message;
@@ -104,21 +107,21 @@ public class WParameterParser implements Function<Resource, Result<Term>> {
 
     private void setType(Term term, Property type) {
         if (type.equals(WOTTR.literalVariable)) {
-            term.setType(TypeFactory.getByName("literal"));
+            term.setType(TypeFactory.getType(RDFS.Literal));
         } else if (type.equals(WOTTR.classVariable)) {
-            term.setType(TypeFactory.getByName("class"));
+            term.setType(TypeFactory.getType(OWL.Class));
         } else if (type.equals(WOTTR.individualVariable)) {
-            term.setType(TypeFactory.getByName("namedindividual"));
+            term.setType(TypeFactory.getType(OWL.NS + "NamedIndividual"));
         } else if (type.equals(WOTTR.propertyVariable)) { 
-            term.setType(TypeFactory.getByName("iri"));
+            term.setType(TypeFactory.getType(OTTR.Types.IRI));
         } else if (type.equals(WOTTR.dataPropertyVariable)) {
-            term.setType(TypeFactory.getByName("datatypeproperty"));
+            term.setType(TypeFactory.getType(OWL.DatatypeProperty));
         } else if (type.equals(WOTTR.annotationPropertyVariable)) {
-            term.setType(TypeFactory.getByName("annotationproperty"));
+            term.setType(TypeFactory.getType(OWL.AnnotationProperty));
         } else if (type.equals(WOTTR.objectPropertyVariable)) {
-            term.setType(TypeFactory.getByName("objectproperty"));
+            term.setType(TypeFactory.getType(OWL.ObjectProperty));
         } else if (type.equals(WOTTR.datatypeVariable)) {
-            term.setType(TypeFactory.getByName("datatype"));
+            term.setType(TypeFactory.getType(RDFS.Datatype));
         } else if (type.equals(WOTTR.variable)) {
             term.setType(TypeFactory.getTopType());
         } else {

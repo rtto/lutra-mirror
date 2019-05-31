@@ -217,7 +217,7 @@ public class ResultStream<E> {
 
         for (Result<E> r : this.results.collect(Collectors.toList())) {
             msgs.accept(r);
-            if (unpacked != null && r.isPresent()) {
+            if (unpacked != null && r != null && r.isPresent()) {
                 unpacked.add(r.get());
             } else {
                 // No elements should be kept

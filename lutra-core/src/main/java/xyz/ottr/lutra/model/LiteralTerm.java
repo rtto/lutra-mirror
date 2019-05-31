@@ -30,23 +30,52 @@ public class LiteralTerm extends ResourceTerm {
 
     private final String value;
     private final String datatype; // Might be an undefined TermType, thus not used for type-checking
+    private final String langtag;
 
     public LiteralTerm(String value) {
-        this(value, null);
+        this(value, null, null);
     }
 
+    // TODO: Remove, and replace calls with this#typedLiteral
     public LiteralTerm(String value, String datatype) {
         this.value = value;
         this.datatype = datatype;
+        this.langtag = null;
         super.type = TypeFactory.getConstantType(this);
+    }
+
+    private LiteralTerm(String value, String datatype, String langtag) {
+        this.value = value;
+        this.datatype = datatype;
+        this.langtag = langtag;
+        super.type = TypeFactory.getConstantType(this);
+    }
+
+    public static LiteralTerm taggedLiteral(String value, String langtag) {
+        return new LiteralTerm(value, null, langtag);
+    }
+
+    public static LiteralTerm typedLiteral(String value, String datatype) {
+        return new LiteralTerm(value, datatype, null);
     }
 
     public String getDatatype() {
         return this.datatype;
     }
 
+    public String getLangTag() {
+        return this.langtag;
+    }
+
     public String getValue() {
-        return this.value + (getDatatype() == null ? "" : " : " + getDatatype());
+
+        String suffix = "";
+        if (getLangTag() != null) {
+            suffix = "@" + getLangTag();
+        } else if (getDatatype() != null) {
+            suffix = " : " + getDatatype();
+        }
+        return this.value + suffix;
     }
 
     public String getPureValue() {
@@ -60,7 +89,7 @@ public class LiteralTerm extends ResourceTerm {
 
     @Override
     public LiteralTerm shallowClone() {
-        LiteralTerm trm = new LiteralTerm(this.value, getDatatype());
+        LiteralTerm trm = new LiteralTerm(this.value, getDatatype(), getLangTag());
         trm.setIsVariable(super.isVariable());
         return trm;
     }
