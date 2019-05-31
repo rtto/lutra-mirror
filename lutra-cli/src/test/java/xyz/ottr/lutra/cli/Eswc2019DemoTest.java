@@ -24,7 +24,7 @@ package xyz.ottr.lutra.cli;
 
 import org.junit.Test;
 
-public class Eswc2019Demo {
+public class Eswc2019DemoTest {
 
     private static final String ROOT = "src/test/resources/eswc2019/";
     
