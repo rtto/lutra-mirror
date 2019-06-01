@@ -23,6 +23,7 @@ package xyz.ottr.lutra.result;
  */
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 //import java.util.Objects;
@@ -203,10 +204,14 @@ public class Result<E> {
         }
         Result<?> context = other.deriveContext();
         Result<?> r = this;
-        while (r.parsedFrom != null && !r.parsedFrom.equals(context)) {
+        Set<Result<?>> visited = new HashSet<>();
+        while (r.parsedFrom != null && !r.parsedFrom.equals(context) && !visited.contains(r)) {
             r = r.parsedFrom;
+            visited.add(r);
         }
-        r.parsedFrom = context;
+        if (r.parsedFrom == null) {
+            r.parsedFrom = context;
+        }
     }
 
     /**

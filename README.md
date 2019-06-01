@@ -1,8 +1,8 @@
-[![BCH compliance](https://bettercodehub.com/edge/badge/rtto/lutra-mirror?branch=develop-mirror)](https://bettercodehub.com/results/rtto/lutra-mirror)
-[![CodeFactor](https://www.codefactor.io/repository/github/rtto/lutra-mirror/badge)](https://www.codefactor.io/repository/github/rtto/lutra-mirror)
-[![codebeat badge](https://codebeat.co/badges/c51b77d6-c316-4067-b27a-2d41c322bafb)](https://codebeat.co/projects/github-com-rtto-lutra-mirror-develop)
+
+[![codebeat badge](https://codebeat.co/badges/6bafc41c-75e1-4bb3-8e6e-9cddbc36f297)](https://codebeat.co/projects/github-com-rtto-lutra-mirror-develop)[![CodeFactor](https://www.codefactor.io/repository/github/rtto/lutra-mirror/badge)](https://www.codefactor.io/repository/github/rtto/lutra-mirror)
 [![Total alerts](https://img.shields.io/lgtm/alerts/g/rtto/lutra-mirror.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/rtto/lutra-mirror/alerts/)
 [![Language grade: Java](https://img.shields.io/lgtm/grade/java/g/rtto/lutra-mirror.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/rtto/lutra-mirror/context:java)
+[![BCH compliance](https://bettercodehub.com/edge/badge/rtto/lutra-mirror?branch=develop-mirror)](https://bettercodehub.com/results/rtto/lutra-mirror)
 [![Known Vulnerabilities](https://snyk.io/test/github/rtto/lutra-mirror/develop/badge.svg)](https://snyk.io/test/github/rtto/lutra-mirror/develop) 
 
 # Lutra – Reasonable Ontology Template (OTTR) reference implementation
@@ -44,12 +44,6 @@ To build, clone the project and use Maven: `mvn package`. This will produce the 
 
 Note that the default branch of the project is the `develop` branch.
 
-If you are building on Windows and get the following exception during build:
-```
-PKIX path building failed: sun.security.provider.certpath.SunCertPathBuilderException: unable to find valid certification path to requested target
-```
-then see [this](https://gitlab.com/ottr/lutra/lutra/issues/94#note_153568457) comment on [Issue 94](https://gitlab.com/ottr/lutra/lutra/issues/94) for possible work-arounds.
-
 Requirements:
 
 * Java 8, for instance [OpenJDK][1]
@@ -67,6 +61,14 @@ The project depends on the following external libraries:
 * [Apache POI](https://poi.apache.org/) for handling spreadsheet files
 
 See [pom.xml](pom.xml) for details.
+
+### Building on Windows
+
+If you are building on Windows and get the following exception during build:
+```
+PKIX path building failed: sun.security.provider.certpath.SunCertPathBuilderException: unable to find valid certification path to requested target
+```
+then see [this](https://gitlab.com/ottr/lutra/lutra/issues/94#note_153568457) comment on [Issue 94](https://gitlab.com/ottr/lutra/lutra/issues/94) for possible work-arounds.
 
 ## Contributing
 
