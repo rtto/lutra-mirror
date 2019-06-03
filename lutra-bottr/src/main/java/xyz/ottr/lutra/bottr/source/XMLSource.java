@@ -4,7 +4,7 @@ package xyz.ottr.lutra.bottr.source;
 //import java.io.FileInputStream;
 //import java.io.FileNotFoundException;
 import java.util.ArrayList;
-import java.util.Arrays;
+//import java.util.Arrays;
 import java.util.List;
 
 //import javax.xml.transform.sax.SAXSource;
@@ -85,7 +85,7 @@ public class XMLSource implements Source<String> {
 
         for (XdmItem item : node) {
             
-            // Must do some formatting on the XQuery result
+            // Must do some formatting on the XQuery result, might want to comment these in order to debug the JSON issues
 
             // Get the result
             String itemString = item.getStringValue();
@@ -96,7 +96,7 @@ public class XMLSource implements Source<String> {
             
             // Split the result using the line breaks as separators
             List<String> row = Arrays.asList(itemString.split("\\R"));
-            output.addAll(row);
+            output.add(itemString);
             
             // Remove the first element, which is empty and results from a line break
             output.remove(0);

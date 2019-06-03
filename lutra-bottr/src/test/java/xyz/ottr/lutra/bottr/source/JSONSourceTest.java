@@ -8,9 +8,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.junit.Assert;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
 
 import xyz.ottr.lutra.bottr.model.Record;
 import xyz.ottr.lutra.result.ResultStream;
@@ -46,9 +44,9 @@ public class JSONSourceTest {
     public void prototypeTest() {
         
         Path root = Paths.get("src", "test", "resources");
-        String file = "books.xml";
+        String file = "books.json";
         
-        JSONSource source = new JSONSource(root.toUri().toString() + file);
+        XMLSource source = new XMLSource();
 
         //Create expected result
         Set<Record<String>> expected = new HashSet<>();
@@ -56,7 +54,8 @@ public class JSONSourceTest {
         expected.add(new Record<>(Arrays.asList("Harry Potter", "J K. Rowling", "2005", "29.99")));
         
         ResultStream<Record<String>> rowStream = 
-                source.execute("doc(resolve-uri('" + file + "', '" + root.toUri().toString() + "'))/bookstore/book[price<35]");
+                source.execute("json-to-xml(unparsed-text(resolve-uri('" + file + "', '" + root.toUri().toString() 
+                        + "')), map {'liberal':true()})");
         Set<Record<String>> dbOutput = rowStream.innerCollect(Collectors.toSet());
 
         //Compare dbOutput to expected result

@@ -1,20 +1,14 @@
 package xyz.ottr.lutra.bottr.source;
 
-import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.xml.transform.Source;
-import javax.xml.transform.stream.StreamSource;
-
-import net.sf.saxon.s9api.DocumentBuilder;
 import net.sf.saxon.s9api.Processor;
 import net.sf.saxon.s9api.SaxonApiException;
 import net.sf.saxon.s9api.XQueryCompiler;
 import net.sf.saxon.s9api.XQueryEvaluator;
 import net.sf.saxon.s9api.XQueryExecutable;
 import net.sf.saxon.s9api.XdmItem;
-import net.sf.saxon.s9api.XdmNode;
 import net.sf.saxon.s9api.XdmValue;
 import xyz.ottr.lutra.bottr.model.Record;
 import xyz.ottr.lutra.result.ResultStream;
@@ -45,12 +39,12 @@ import xyz.ottr.lutra.result.ResultStream;
 
 public class JSONSource extends XMLSource {
 
-    private final String uri;
-    
+    //private final String uri;
+    /*
     public JSONSource(String source) {
         this.uri = source;
     }
-
+    */
     public ResultStream<Record<String>> execute(String query) {
         
         // Load JSON file
@@ -69,14 +63,14 @@ public class JSONSource extends XMLSource {
 
 
             // parse the string as a document node
-            DocumentBuilder builder = saxon.newDocumentBuilder();
-            Source src = new StreamSource(new StringReader(uri));
-            XdmNode doc = builder.build(src);
+            //DocumentBuilder builder = saxon.newDocumentBuilder();
+            //Source src = new StreamSource(new StringReader(uri));
+            //XdmNode doc = builder.build(src);
             //XdmNode doc = builder.build(src);
 
             // instantiate the query, bind the input and evaluate
             XQueryEvaluator xquery = exec.load();
-            xquery.setContextItem(doc);
+            //xquery.setContextItem(doc);
             XdmValue result = xquery.evaluate();
             
             for (XdmItem item : result) {

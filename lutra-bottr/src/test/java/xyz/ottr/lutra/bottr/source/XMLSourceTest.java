@@ -46,7 +46,7 @@ public class XMLSourceTest {
     public void prototypeTest() {
         
         Path root = Paths.get("src", "test", "resources");
-        String file = "books.xml";
+        String file = "books.json";
         
         XMLSource source = new XMLSource();
 
