@@ -61,7 +61,7 @@ import xyz.ottr.lutra.stottr.io.SInstanceParser;
 import xyz.ottr.lutra.stottr.io.SInstanceWriter;
 import xyz.ottr.lutra.stottr.io.STemplateParser;
 import xyz.ottr.lutra.stottr.io.STemplateWriter;
-import xyz.ottr.lutra.tabottr.io.TabInstanceParser;
+import xyz.ottr.lutra.tabottr.parser.TInstanceParser;
 import xyz.ottr.lutra.wottr.WTemplateFactory;
 import xyz.ottr.lutra.wottr.io.WFileReader;
 import xyz.ottr.lutra.wottr.io.WInstanceParser;
@@ -296,7 +296,7 @@ public class CLI {
         }
         switch (settings.inputFormat) {
             case tabottr:
-                return Result.of(new InstanceReader(new TabInstanceParser()));
+                return Result.of(new InstanceReader(new TInstanceParser()));
             case legacy:
                 return Result.of(new InstanceReader(new WFileReader(),
                         new xyz.ottr.lutra.wottr.legacy.io.WInstanceParser()));

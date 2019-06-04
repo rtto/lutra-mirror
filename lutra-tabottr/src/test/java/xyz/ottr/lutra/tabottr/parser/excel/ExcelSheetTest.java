@@ -1,4 +1,5 @@
-package xyz.ottr.lutra.tabottr.io.excel;
+package xyz.ottr.lutra.tabottr.parser.excel;
+
 
 /*-
  * #%L
@@ -22,28 +23,26 @@ package xyz.ottr.lutra.tabottr.io.excel;
  * #L%
  */
 
-import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertEquals;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.junit.Test;
 
-import xyz.ottr.lutra.result.Message;
+import xyz.ottr.lutra.model.Instance;
 import xyz.ottr.lutra.result.Result;
-import xyz.ottr.lutra.result.ResultConsumer;
-import xyz.ottr.lutra.tabottr.io.excel.ExcelReader;
-import xyz.ottr.lutra.tabottr.model.Table;
+import xyz.ottr.lutra.tabottr.parser.TInstanceParser;
 
-public class PrototypeTest {
+public class ExcelSheetTest {
     
     private static final String ROOT = "src/test/resources/";
     
     @Test
-    public void shouldWork() {
-        String filename = ROOT + "test1.xlsx";
-        Result<List<Table>> tables = ExcelReader.parseTables(filename);
-        ResultConsumer<List<Table>> consumer = new ResultConsumer<>();
-        consumer.accept(tables);
-        assertFalse(Message.moreSevere(consumer.getMessageHandler().printMessages(), Message.ERROR));
+    public void shouldHandleEmptySheets() {
+        TInstanceParser parser = new TInstanceParser();
+        List<Result<Instance>> result = parser.apply(ROOT + "blank.xlsx").collect(Collectors.toList());
+        assertEquals(0, result.size());
     }
+
 }

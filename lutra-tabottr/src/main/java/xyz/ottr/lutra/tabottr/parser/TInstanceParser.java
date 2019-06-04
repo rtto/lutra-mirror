@@ -1,5 +1,4 @@
-package xyz.ottr.lutra.tabottr.io.excel;
-
+package xyz.ottr.lutra.tabottr.parser;
 
 /*-
  * #%L
@@ -23,26 +22,16 @@ package xyz.ottr.lutra.tabottr.io.excel;
  * #L%
  */
 
-import static org.junit.Assert.assertEquals;
-
-import java.util.List;
-import java.util.stream.Collectors;
-
-import org.junit.Test;
-
+import xyz.ottr.lutra.io.InstanceParser;
 import xyz.ottr.lutra.model.Instance;
-import xyz.ottr.lutra.result.Result;
-import xyz.ottr.lutra.tabottr.io.TabInstanceParser;
+import xyz.ottr.lutra.result.ResultStream;
+import xyz.ottr.lutra.tabottr.parser.excel.ExcelReader;
 
-public class ExcelSheetTest {
-    
-    private static final String ROOT = "src/test/resources/";
-    
-    @Test
-    public void shouldHandleEmptySheets() {
-        TabInstanceParser parser = new TabInstanceParser();
-        List<Result<Instance>> result = parser.apply(ROOT + "blank.xlsx").collect(Collectors.toList());
-        assertEquals(0, result.size());
+// TODO extend to other file types such as CSV when we support reading these formats.
+public class TInstanceParser implements InstanceParser<String> {
+
+    @Override
+    public ResultStream<Instance> apply(String filename) {
+        return ExcelReader.parseTables(filename).mapToStream(TableParser::processInstructions);
     }
-
 }

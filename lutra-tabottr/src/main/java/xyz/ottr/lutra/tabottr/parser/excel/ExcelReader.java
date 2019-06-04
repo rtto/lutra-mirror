@@ -1,4 +1,4 @@
-package xyz.ottr.lutra.tabottr.io.excel;
+package xyz.ottr.lutra.tabottr.parser.excel;
 
 import java.io.File;
 

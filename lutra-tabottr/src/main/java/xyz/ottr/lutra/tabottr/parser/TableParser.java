@@ -1,4 +1,4 @@
-package xyz.ottr.lutra.tabottr.io;
+package xyz.ottr.lutra.tabottr.parser;
 
 /*-
  * #%L
@@ -38,7 +38,6 @@ import xyz.ottr.lutra.model.Instance;
 import xyz.ottr.lutra.result.Message;
 import xyz.ottr.lutra.result.Result;
 import xyz.ottr.lutra.result.ResultStream;
-import xyz.ottr.lutra.tabottr.io.rdf.TemplateInstanceFactory;
 import xyz.ottr.lutra.tabottr.model.Instruction;
 import xyz.ottr.lutra.tabottr.model.PrefixInstruction;
 import xyz.ottr.lutra.tabottr.model.Table;

@@ -1,4 +1,4 @@
-package xyz.ottr.lutra.tabottr.io.rdf;
+package xyz.ottr.lutra.tabottr.parser.rdf;
 
 /*-
  * #%L
@@ -31,7 +31,7 @@ import xyz.ottr.lutra.model.Instance;
 import xyz.ottr.lutra.result.Message;
 import xyz.ottr.lutra.result.ResultConsumer;
 import xyz.ottr.lutra.result.ResultStream;
-import xyz.ottr.lutra.tabottr.io.TabInstanceParser;
+import xyz.ottr.lutra.tabottr.parser.TInstanceParser;
 
 public class PrototypeTest {
     
@@ -39,7 +39,7 @@ public class PrototypeTest {
 
     @Test 
     public void shouldWork() {
-        TabInstanceParser parser = new TabInstanceParser();
+        TInstanceParser parser = new TInstanceParser();
         ResultStream<Instance> instances = parser.apply(ROOT + "test1.xlsx");
         ResultConsumer<Instance> consumer = new ResultConsumer<>();
         instances.forEach(consumer);
@@ -50,7 +50,7 @@ public class PrototypeTest {
     public void prefixConflicts() {
         String filename = ROOT + "testConflictingPrefixes.xlsx";
 
-        TabInstanceParser parser = new TabInstanceParser();
+        TInstanceParser parser = new TInstanceParser();
         ResultStream<Instance> instances = parser.apply(filename);
         ResultConsumer<Instance> consumer = new ResultConsumer<>(instance ->
                 assertFalse("Parsing should fail, but succeeded with e.g. " + instance.toString(), true));

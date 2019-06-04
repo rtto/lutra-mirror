@@ -1,4 +1,4 @@
-package xyz.ottr.lutra.tabottr.io.rdf;
+package xyz.ottr.lutra.tabottr.parser;
 
 /*-
  * #%L
@@ -43,8 +43,8 @@ import xyz.ottr.lutra.wottr.WOTTR;
 
 public class RDFNodeFactory {
 
-    private Model model;
-    private DataValidator validator;
+    private final Model model;
+    private final DataValidator validator;
     
     public RDFNodeFactory(PrefixMapping prefixes) {
         this.model = ModelFactory.createDefaultModel();
@@ -53,9 +53,7 @@ public class RDFNodeFactory {
     }
 
     public Result<RDFNode> toRDFNode(String value, String type) {
-        // TODO: Wrap return value in Result and make empty Results
-        //       with error message on Exception
-        
+
         // if is a list, split in to values and parse into RDF nodes with a recursive call.
         if (type.endsWith(TabOTTR.TYPE_LIST_POSTFIX)) {
             type = type.substring(0, type.length() - 1).trim(); // remove list operator from type
@@ -85,7 +83,7 @@ public class RDFNodeFactory {
                 return toRDFNode(value, getAutoType(value));
             }
         } else { // literal
-            if (!validator.isIRI(type)) {
+            if (!this.validator.isIRI(type)) {
                 Message msg = Message.error("Type " + type + " is not a recognised type.");
                 return Result.empty(msg);
             }
@@ -102,7 +100,7 @@ public class RDFNodeFactory {
             return XSD.decimal.toString();
         } else if (DataValidator.isBlank(value)) {
             return TabOTTR.TYPE_BLANK;
-        } else if (validator.isIRI(value)) {
+        } else if (this.validator.isIRI(value)) {
             return TabOTTR.TYPE_IRI;
         } else { // default
             return TabOTTR.TYPE_TEXT;
@@ -110,36 +108,36 @@ public class RDFNodeFactory {
     }
     
     public RDFList toList(List<RDFNode> nodes) {
-        return model.createList(nodes.iterator());
+        return this.model.createList(nodes.iterator());
     }
 
     public Resource toResource(String qname) {
-        return model.createResource(model.expandPrefix(qname));
+        return this.model.createResource(this.model.expandPrefix(qname));
     }
 
     private Resource toBlank(String value) {
         if (DataValidator.isFreshBlank(value)) {
-            return model.createResource();
+            return this.model.createResource();
         } else {
             // remove trailing "_:"
             if (value.startsWith(TabOTTR.VALUE_BLANK_NODE_PREFIX)) {
                 value = value.substring(TabOTTR.VALUE_BLANK_NODE_PREFIX.length());
             }
-            return model.createResource(AnonId.create(value));
+            return this.model.createResource(AnonId.create(value));
         }
     }
 
     private Literal toTypedLiteral(String value, String type) {
         // default:
-        Literal literal = model.createTypedLiteral(value, model.expandPrefix(type));
+        Literal literal = this.model.createTypedLiteral(value, this.model.expandPrefix(type));
 
         // overwrite default if ...
         // xsd:boolean and value is "1" or any capitalisation of "TRUE" (and similar for false):
-        if (XSD.xboolean.toString().equals(model.expandPrefix(type))) {
+        if (XSD.xboolean.toString().equals(this.model.expandPrefix(type))) {
             if (value.equals("1") || Boolean.parseBoolean(value) == true) {
-                literal = model.createTypedLiteral(true);
+                literal =this. model.createTypedLiteral(true);
             } else if (value.equals("0") || Boolean.parseBoolean(value) == false) {
-                literal = model.createTypedLiteral(false);
+                literal = this.model.createTypedLiteral(false);
             }
         }
         return literal;
@@ -147,7 +145,7 @@ public class RDFNodeFactory {
     
     private Literal toUntypedLiteral(String value) {
         // default:
-        Literal literal = model.createLiteral(value);
+        Literal literal = this.model.createLiteral(value);
         
         // overwrite default if ...
         // has language tag:
@@ -155,7 +153,7 @@ public class RDFNodeFactory {
         if (langTagIndex != -1) {
             String lang = value.substring(langTagIndex + TabOTTR.VALUE_LANGUAGE_TAG_PREFIX.length());
             if (DataValidator.isLanguageTag(lang)) {
-                literal = model.createLiteral(value.substring(0, langTagIndex), lang);
+                literal = this.model.createLiteral(value.substring(0, langTagIndex), lang);
             }
         }
         return literal;

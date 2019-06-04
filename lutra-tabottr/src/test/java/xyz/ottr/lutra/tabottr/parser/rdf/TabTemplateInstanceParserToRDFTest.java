@@ -1,4 +1,4 @@
-package xyz.ottr.lutra.tabottr.io.rdf;
+package xyz.ottr.lutra.tabottr.parser.rdf;
 
 /*-
  * #%L
@@ -31,7 +31,7 @@ import org.junit.Test;
 import xyz.ottr.lutra.model.Instance;
 import xyz.ottr.lutra.result.ResultConsumer;
 import xyz.ottr.lutra.result.ResultStream;
-import xyz.ottr.lutra.tabottr.io.TabInstanceParser;
+import xyz.ottr.lutra.tabottr.parser.TInstanceParser;
 import xyz.ottr.lutra.wottr.legacy.io.WInstanceWriter;
 import xyz.ottr.lutra.wottr.legacy.io.WReader;
 import xyz.ottr.lutra.wottr.util.ModelIO;
@@ -41,7 +41,7 @@ public class TabTemplateInstanceParserToRDFTest {
     private static final String ROOT = "src/test/resources/";
     
     private Model getExcelReaderRDFWriterModel(String filename) {
-        TabInstanceParser parser = new TabInstanceParser();
+        TInstanceParser parser = new TInstanceParser();
         ResultStream<Instance> instances = parser.apply(filename);
         WInstanceWriter writer = new WInstanceWriter();
         ResultConsumer<Instance> consumer = new ResultConsumer<>(writer);

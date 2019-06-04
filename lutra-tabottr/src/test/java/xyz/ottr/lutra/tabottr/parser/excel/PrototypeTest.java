@@ -1,4 +1,4 @@
-package xyz.ottr.lutra.tabottr.io;
+package xyz.ottr.lutra.tabottr.parser.excel;
 
 /*-
  * #%L
@@ -22,16 +22,27 @@ package xyz.ottr.lutra.tabottr.io;
  * #L%
  */
 
-import xyz.ottr.lutra.io.InstanceParser;
-import xyz.ottr.lutra.model.Instance;
-import xyz.ottr.lutra.result.ResultStream;
-import xyz.ottr.lutra.tabottr.io.excel.ExcelReader;
+import static org.junit.Assert.assertFalse;
 
-// TODO extend to other file types such as CSV when we support reading these formats.
-public class TabInstanceParser implements InstanceParser<String> {
+import java.util.List;
 
-    @Override
-    public ResultStream<Instance> apply(String filename) {
-        return ExcelReader.parseTables(filename).mapToStream(TableParser::processInstructions);
+import org.junit.Test;
+
+import xyz.ottr.lutra.result.Message;
+import xyz.ottr.lutra.result.Result;
+import xyz.ottr.lutra.result.ResultConsumer;
+import xyz.ottr.lutra.tabottr.model.Table;
+
+public class PrototypeTest {
+    
+    private static final String ROOT = "src/test/resources/";
+    
+    @Test
+    public void shouldWork() {
+        String filename = ROOT + "test1.xlsx";
+        Result<List<Table>> tables = ExcelReader.parseTables(filename);
+        ResultConsumer<List<Table>> consumer = new ResultConsumer<>();
+        consumer.accept(tables);
+        assertFalse(Message.moreSevere(consumer.getMessageHandler().printMessages(), Message.ERROR));
     }
 }

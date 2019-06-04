@@ -1,4 +1,4 @@
-package xyz.ottr.lutra.tabottr.io.rdf;
+package xyz.ottr.lutra.tabottr.parser;
 
 /*-
  * #%L
@@ -29,9 +29,9 @@ import xyz.ottr.lutra.tabottr.TabOTTR;
 
 public class DataValidator {
 
-    private Model model;
+    private final Model model;
 
-    private static UrlValidator urlValidator = new UrlValidator();
+    private static final UrlValidator urlValidator = new UrlValidator();
 
     // need model as argument in order to check prefixes of QNames
     public DataValidator(Model model) {
@@ -55,7 +55,7 @@ public class DataValidator {
     }
 
     public boolean isQName(String value) {
-        return !value.equals(model.expandPrefix(value));
+        return !value.equals(this.model.expandPrefix(value));
     }
 
     public static boolean isURL(String value) {

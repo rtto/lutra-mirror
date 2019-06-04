@@ -1,4 +1,4 @@
-package xyz.ottr.lutra.tabottr.io.rdf;
+package xyz.ottr.lutra.tabottr.parser;
 
 /*-
  * #%L
