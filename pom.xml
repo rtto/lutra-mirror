@@ -9,7 +9,7 @@
 	<modules>
 		<module>lutra-core</module>
 		<module>lutra-wottr</module>
-		<module>lutra-tab</module>
+		<module>lutra-tabottr</module>
 		<module>lutra-stottr</module>
 		<module>lutra-cli</module>
 	</modules>
