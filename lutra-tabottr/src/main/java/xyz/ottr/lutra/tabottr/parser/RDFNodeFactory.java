@@ -135,7 +135,7 @@ public class RDFNodeFactory {
         // xsd:boolean and value is "1" or any capitalisation of "TRUE" (and similar for false):
         if (XSD.xboolean.toString().equals(this.model.expandPrefix(type))) {
             if (value.equals("1") || Boolean.parseBoolean(value) == true) {
-                literal =this. model.createTypedLiteral(true);
+                literal = this. model.createTypedLiteral(true);
             } else if (value.equals("0") || Boolean.parseBoolean(value) == false) {
                 literal = this.model.createTypedLiteral(false);
             }

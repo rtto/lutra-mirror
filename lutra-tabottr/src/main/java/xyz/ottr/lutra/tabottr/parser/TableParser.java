@@ -22,18 +22,12 @@ package xyz.ottr.lutra.tabottr.parser;
  * #L%
  */
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.jena.shared.PrefixMapping;
 
-import xyz.ottr.lutra.OTTR;
 import xyz.ottr.lutra.model.Instance;
 import xyz.ottr.lutra.result.Message;
 import xyz.ottr.lutra.result.Result;
@@ -44,6 +38,8 @@ import xyz.ottr.lutra.tabottr.model.Table;
 import xyz.ottr.lutra.tabottr.model.TemplateInstruction;
 
 public class TableParser {
+
+    private static final PrefixMapping stdPrefixes = PrefixMapping.Standard; // TODO use OTTR standard
 
     /**
      * Parses the list of tables into a ResultStream of Instances, but returns
@@ -56,119 +52,55 @@ public class TableParser {
             .flatMap(table -> table.getInstructions().stream())
             .collect(Collectors.toList());
 
-        List<PrefixInstruction> prefixInstructions = instructions.stream()
+        // process all prefixes first
+        Result<PrefixMapping> prefixes = instructions.stream()
             .filter(ins -> ins instanceof PrefixInstruction)
             .map(ins -> (PrefixInstruction) ins)
-            .collect(Collectors.toList());
+            .map(TableParser::processPrefixInstruction)
+            .reduce(Result.of(PrefixMapping.Factory.create()), (sum, part) -> sum); // TODO BUG!
 
-        List<TemplateInstruction> templateInstructions = instructions.stream()
-            .filter(ins -> ins instanceof TemplateInstruction)
-            .map(ins -> (TemplateInstruction) ins)
-            .collect(Collectors.toList());
+        // process instances, with prefixes as input
+        ResultStream<Instance> instances = prefixes.mapToStream(pfs ->
+            new ResultStream(
+                instructions.stream()
+                        .filter(ins -> ins instanceof TemplateInstruction)
+                        .map(ins -> (TemplateInstruction) ins)
+                        .flatMap(ins -> processTemplateInstruction(ins, pfs))));
 
-        // process all prefixes first
-        Result<PrefixMapping> prefixes = processPrefixes(prefixInstructions);
-
-        // process template instances
-        return prefixes.mapToStream(pfs -> processInstanceInstructions(templateInstructions, pfs));
+        return instances;
     }
 
-    private static Result<PrefixMapping> processPrefixes(List<PrefixInstruction> instructions) {
+    private static List<Message> getMergeConflicts(PrefixMapping base, PrefixMapping addition) {
+        return addition.getNsPrefixMap().keySet().stream()
+                .filter(key -> !addition.getNsPrefixURI(key).equalsIgnoreCase(base.getNsPrefixURI(key)))
+                .map(key -> "Conflicting prefix declaration: prefix "
+                        + key + " has values "
+                        + base.getNsPrefixURI(key) + " and "
+                        + addition.getNsPrefixURI(key))
+                .map(Message::error)
+                .collect(Collectors.toList());
+    }
 
+    private static Result<PrefixMapping> processPrefixInstruction(PrefixInstruction instruction) {
         PrefixMapping prefixes = PrefixMapping.Factory.create();
-        Map<String, List<String[]>> definedPrefixes = new HashMap<>(); // Used for conflict messages
-
-        for (PrefixInstruction instruction : instructions) {
-
-            int[] coord = instruction.getStartCoordinates();
-            int row = coord[1] + 2; // Rows start at 1 and instruction is 1 row
-            for (String[] pf : instruction.getPrefixes()) {
-
-                definedPrefixes.putIfAbsent(pf[0], new LinkedList<>());
-                // Store a definition of prefix with URI, table index and row
-                definedPrefixes.get(pf[0]).add(new String[]{pf[1], coord[0] + "", row + ""});
-                prefixes.setNsPrefix(pf[0], pf[1]);
-                row++;
-            }
+        int[] coord = instruction.getStartCoordinates();
+        for (String[] pf : instruction.getPrefixes()) {
+            prefixes.setNsPrefix(pf[0], pf[1]);
         }
 
-        // TODO move this into a more generic package
-        PrefixMapping stdPrefixes = PrefixMapping.Factory.create();
-        stdPrefixes.setNsPrefixes(PrefixMapping.Standard);
-        stdPrefixes.setNsPrefix(OTTR.prefix, OTTR.namespace);
-
-        List<Message> conflicts = checkForConflicts(definedPrefixes, stdPrefixes);
-
-        prefixes.setNsPrefixes(stdPrefixes);
-        return conflicts.isEmpty() ? Result.of(prefixes) : Result.empty(conflicts);
+        // check conflicts against standard prefixes
+        List<Message> mergeConflicts = getMergeConflicts(stdPrefixes, prefixes);
+        return mergeConflicts.isEmpty() ? Result.of(prefixes) : Result.empty(mergeConflicts);
     }
 
-    /**
-     * Checks for conflicts in prefix definitions between definitions in definedPrefixes as well
-     * as conflicts with the standards definitions from stdPrefixes.
-     */
-    private static List<Message> checkForConflicts(Map<String, List<String[]>> definedPrefixes,
-            PrefixMapping stdPrefixes) {
-        List<Message> conflicts = new LinkedList<>();
-
-        for (Map.Entry<String, List<String[]>> defs : definedPrefixes.entrySet()) {
-
-            String standardNs = stdPrefixes.getNsPrefixURI(defs.getKey());
-
-            if (defs.getValue().size() > 1) { // Conflicting definitions
-
-                Set<String> differentDefs = new HashSet<String>();
-                StringBuilder msg = new StringBuilder("Conflicting definition of prefix "
-                        + defs.getKey() + ":\n");
-                for (String[] def : defs.getValue()) {
-                    differentDefs.add(def[0]);
-                    msg.append(" - " + def[0] + " at row " + def[2]
-                            + " in table " + def[1] + "\n");
-                }
-                if (differentDefs.size() > 1) {
-                    conflicts.add(Message.error(msg.toString()));
-                }
-            }
-            if (standardNs != null) { // Definition conflicting with standard prefix
-
-                StringBuilder msg = new StringBuilder("Conflicting definition of prefix " + defs.getKey()
-                        + ": standard definition " + standardNs + " conflicts with the following:\n");
-                boolean actualConflict = false;
-                
-                for (String[] def : defs.getValue()) {
-                    if (!def[0].equals(standardNs)) {
-                        msg.append(" - " + def[0] + " at row " + def[2]
-                            + " in table " + def[1] + "\n");
-                        actualConflict = true;
-                    }
-                }
-                if (actualConflict) {
-                    conflicts.add(Message.error(msg.toString()));
-                }
-            } 
-        }
-        return conflicts;
-    }
-
-    private static ResultStream<Instance> processInstanceInstructions(
-            List<TemplateInstruction> instructions,
-            PrefixMapping prefixes) {
-        return new ResultStream<Instance>(instructions.stream()
-                .flatMap(ins -> processInstanceInstruction(ins, prefixes)));
-    }
-
-    private static Stream<Result<Instance>> processInstanceInstruction(
-            TemplateInstruction instruction,
-            PrefixMapping prefixes) {
-        TemplateInstanceFactory builder = new TemplateInstanceFactory(
+    private static Stream<Result<Instance>> processTemplateInstruction(TemplateInstruction instruction, PrefixMapping prefixes) {
+        TemplateInstanceFactory factory = new TemplateInstanceFactory(
                 prefixes,
                 instruction.getTemplateIRI(),
                 instruction.getArgumentTypes());
-        
-        Stream.Builder<Result<Instance>> ins = Stream.builder();
-        for (List<String> arguments : instruction.getTemplateInstances()) {
-            ins.add(builder.createTemplateInstance(arguments));
-        }
-        return ins.build();
+
+        return instruction.getTemplateInstanceRows().stream()
+                .map(factory::createTemplateInstance);
     }
+
 }

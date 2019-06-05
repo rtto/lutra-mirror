@@ -75,7 +75,7 @@ public class TemplateInstruction extends Instruction {
         return super.getRow(this.rowStart + 3, this.colIndices);
     }
 
-    public List<List<String>> getTemplateInstances() {
+    public List<List<String>> getTemplateInstanceRows() {
         return super.getRows(this.rowStart + 4, this.rowEnd, this.colIndices);
     }
 

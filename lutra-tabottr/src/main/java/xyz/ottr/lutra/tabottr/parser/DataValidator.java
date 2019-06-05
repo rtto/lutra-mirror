@@ -22,6 +22,8 @@ package xyz.ottr.lutra.tabottr.parser;
  * #L%
  */
 
+import java.util.Objects;
+
 import org.apache.commons.validator.routines.UrlValidator;
 import org.apache.jena.rdf.model.Model;
 
@@ -39,7 +41,7 @@ public class DataValidator {
     }
 
     public static boolean isEmpty(String value) {
-        return value == null || value.isEmpty();
+        return Objects.isNull(value) || value.isEmpty();
     }
 
     public static boolean isBlank(String value) {
