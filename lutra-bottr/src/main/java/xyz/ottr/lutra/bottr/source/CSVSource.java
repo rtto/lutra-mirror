@@ -47,14 +47,16 @@ public class CSVSource extends JDBCSource {
     private String eolChar;
     private char separator;
     private char encloser;
+    private boolean hasHeader;
 
-    public CSVSource(String in, char sep, char enc) {
+    public CSVSource(String in, char sep, char enc, boolean header) {
 
         super("org.h2.Driver", "jdbc:h2:" + testFolder.getAbsolutePath() + "/db", "user", "pass");
 
         this.input = in;
         this.separator = sep;
         this.encloser = enc;
+        this.hasHeader = header;
     }
     
     @Override
@@ -84,12 +86,15 @@ public class CSVSource extends JDBCSource {
             // Load CSV into database
             Statement stmt = conn.createStatement();
             stmt.execute("DROP TABLE IF EXISTS " + input);
-            stmt.execute("LOAD DATA INFILE '" + input
-                         + " INTO TABLE " + input + " "
-                         + " FIELDS TERMINATED BY '" + separator + "'"
-                         + " ENCLOSED BY '" + encloser + "'"
-                         + " LINES TERMINATED BY '" + eolChar + "'"
-                         + " IGNORE 1 ROWS;");
+            String loaderQuery = "LOAD DATA INFILE '" + input
+                                 + " INTO TABLE " + input + " "
+                                 + " FIELDS TERMINATED BY '" + separator + "'"
+                                 + " ENCLOSED BY '" + encloser + "'"
+                                 + " LINES TERMINATED BY '" + eolChar + "'";
+            if (hasHeader == true) {
+                loaderQuery = loaderQuery + " IGNORE 1 ROWS;";
+            }
+            stmt.execute(loaderQuery);
             
             return super.execute(query);
 
