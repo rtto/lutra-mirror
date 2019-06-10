@@ -2,17 +2,21 @@ package xyz.ottr.lutra.bottr.source;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
-
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
 import xyz.ottr.lutra.bottr.model.Record;
+import xyz.ottr.lutra.bottr.source.CSVSource;
 import xyz.ottr.lutra.result.ResultStream;
 
 /*-
@@ -37,29 +41,34 @@ import xyz.ottr.lutra.result.ResultStream;
  * #L%
  */
 
-public class XMLSourceTest {
-    
+public class CSVSourceTestUnix {
+  
     @Rule
     public TemporaryFolder testFolder = new TemporaryFolder();
 
     @Test
-    public void prototypeTest() {
-        
-        Path root = Paths.get("src", "test", "resources");
-        String file = "books.xml";
-        
-        XMLSource source = new XMLSource();
+    public void prototypeTest() throws ClassNotFoundException, SQLException {
 
+        Path root = Paths.get("src", "test", "resources");
+        String file = "win.csv";
+        
         //Create expected result
         Set<Record<String>> expected = new HashSet<>();
-        expected.add(new Record<>(Arrays.asList("Everyday Italian", "Giada De Laurentiis", "2005", "30.00")));
-        expected.add(new Record<>(Arrays.asList("Harry Potter", "J K. Rowling", "2005", "29.99")));
-        
-        ResultStream<Record<String>> rowStream = 
-                source.execute("doc(resolve-uri('" + file + "', '" + root.toUri().toString() + "'))/bookstore/book[price<35]");
+        expected.add(new Record<>(Arrays.asList("1", "Paulo", "2500")));
+        expected.add(new Record<>(Arrays.asList("2", "Pedro", "2700")));
+        expected.add(new Record<>(Arrays.asList("3", "Joao", "2800")));
+        expected.add(new Record<>(Arrays.asList("4", "Maria", "2000")));
+        expected.add(new Record<>(Arrays.asList("5", "Joselito", "1500")));
+        expected.add(new Record<>(Arrays.asList("6", "Linhares", "2200")));
+        expected.add(new Record<>(Arrays.asList("7", "Lagreca", "1000")));
+
+        //Run the source
+        CSVSource csvTest = new  CSVSource(root.toUri() + file, ',', '\'', true);
+        ResultStream<Record<String>> rowStream = csvTest.execute("SELECT ID, NAME, SALARY FROM CUSTOMER;");
         Set<Record<String>> dbOutput = rowStream.innerCollect(Collectors.toSet());
 
         //Compare dbOutput to expected result
-        Assert.assertEquals(expected, dbOutput);
+        Assert.assertEquals(dbOutput, expected);
     }
+
 }
