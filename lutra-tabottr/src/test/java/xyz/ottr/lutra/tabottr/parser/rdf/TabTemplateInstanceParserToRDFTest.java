@@ -52,23 +52,23 @@ public class TabTemplateInstanceParserToRDFTest {
     
     private void runAtomicTest(String name) {
         String folder = ROOT + "atomic/";
-        String inFile = folder + name + ".xlsx";
-        String outFile = folder + name + ".ttl";
-        Model in = getExcelReaderRDFWriterModel(inFile);
-        in.setNsPrefix("ex", "http://example.org#");
-        Model out = WReader.getCanonicalModel(ModelIO.readModel(outFile));
-        out.setNsPrefixes(PrefixMapping.Standard);
+        String excelFile = folder + name + ".xlsx";
+        String rdfFile = folder + name + ".ttl";
+        Model excelModel = getExcelReaderRDFWriterModel(excelFile);
+        excelModel.setNsPrefix("ex", "http://example.org#");
+        Model rdfModel = WReader.getCanonicalModel(ModelIO.readModel(rdfFile));
+        rdfModel.setNsPrefixes(PrefixMapping.Standard);
 
-        boolean isIsomorphic = in.isIsomorphicWith(out);
-        /*
+        boolean isIsomorphic = excelModel.isIsomorphicWith(rdfModel);
+
         // For debugging:
         if (!isIsomorphic) {
-            System.out.println("Error: inFile " + inFile + " not isomorphic to outFile " + outFile);
-            System.out.println("IN:");
-            in.write(System.out);
-            System.out.println("OUT:");
-            out.write(System.out);
-        }*/
+            System.out.println("Error: excelFile " + excelFile + " not isomorphic to rdfFile " + rdfFile);
+            System.out.println("excelFile:");
+            excelModel.write(System.out, "TTL");
+            System.out.println("rdfFile:");
+            rdfModel.write(System.out, "TTL");
+        }
         assertTrue(isIsomorphic);
     }
     
