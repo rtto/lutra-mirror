@@ -22,7 +22,7 @@ package xyz.ottr.lutra.tabottr.parser;
  * #L%
  */
 
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -39,7 +39,6 @@ import xyz.ottr.lutra.tabottr.model.TemplateInstruction;
 
 public class TableParser {
 
-    private static final PrefixMapping stdPrefixes = PrefixMapping.Standard; // TODO use OTTR standard
 
     /**
      * Parses the list of tables into a ResultStream of Instances, but returns
@@ -52,49 +51,21 @@ public class TableParser {
             .flatMap(table -> table.getInstructions().stream())
             .collect(Collectors.toList());
 
-        // process all prefixes first
-        Result<PrefixMapping> prefixes = instructions.stream()
-            .filter(ins -> ins instanceof PrefixInstruction)
-            .map(ins -> (PrefixInstruction) ins)
-            .map(TableParser::processPrefixInstruction)
-            .reduce(Result.of(PrefixMapping.Factory.create()), (sum, part) -> sum); // TODO BUG!
+        Result<PrefixMapping> prefixes = new PrefixParser().processPrefixInstructions(instructions);
 
         // process instances, with prefixes as input
         ResultStream<Instance> instances = prefixes.mapToStream(pfs ->
-            new ResultStream(
+            new ResultStream<>(
                 instructions.stream()
-                        .filter(ins -> ins instanceof TemplateInstruction)
-                        .map(ins -> (TemplateInstruction) ins)
-                        .flatMap(ins -> processTemplateInstruction(ins, pfs))));
+                    .filter(ins -> ins instanceof TemplateInstruction)
+                    .map(ins -> (TemplateInstruction) ins)
+                    .flatMap(ins -> processTemplateInstruction(ins, pfs))));
 
         return instances;
     }
 
-    private static List<Message> getMergeConflicts(PrefixMapping base, PrefixMapping addition) {
-        return addition.getNsPrefixMap().keySet().stream()
-                .filter(key -> !addition.getNsPrefixURI(key).equalsIgnoreCase(base.getNsPrefixURI(key)))
-                .map(key -> "Conflicting prefix declaration: prefix "
-                        + key + " has values "
-                        + base.getNsPrefixURI(key) + " and "
-                        + addition.getNsPrefixURI(key))
-                .map(Message::error)
-                .collect(Collectors.toList());
-    }
-
-    private static Result<PrefixMapping> processPrefixInstruction(PrefixInstruction instruction) {
-        PrefixMapping prefixes = PrefixMapping.Factory.create();
-        int[] coord = instruction.getStartCoordinates();
-        for (String[] pf : instruction.getPrefixes()) {
-            prefixes.setNsPrefix(pf[0], pf[1]);
-        }
-
-        // check conflicts against standard prefixes
-        List<Message> mergeConflicts = getMergeConflicts(stdPrefixes, prefixes);
-        return mergeConflicts.isEmpty() ? Result.of(prefixes) : Result.empty(mergeConflicts);
-    }
-
     private static Stream<Result<Instance>> processTemplateInstruction(TemplateInstruction instruction, PrefixMapping prefixes) {
-        TemplateInstanceFactory factory = new TemplateInstanceFactory(
+            TemplateInstanceFactory factory = new TemplateInstanceFactory(
                 prefixes,
                 instruction.getTemplateIRI(),
                 instruction.getArgumentTypes());

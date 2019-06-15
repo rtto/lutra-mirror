@@ -22,8 +22,10 @@ package xyz.ottr.lutra.tabottr.model;
  * #L%
  */
 
+import java.util.AbstractMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 public class PrefixInstruction extends Instruction {
 
@@ -34,18 +36,19 @@ public class PrefixInstruction extends Instruction {
     }
 
     /**
-     * Returns a list of pairs (represented by arrays of length 2) of Strings, the first
+     * Returns a list of pairs of Strings, the first
      * entry in each pair being the prefix and the second the namespace. A list
      * of pairs is chosen over a map, as this allows all prefix conflicts to be detected
      * in a single parse, which TableParser is responsible for detecting.
      */
-    public List<String[]> getPrefixes() {
-        List<String[]> prefixes = new LinkedList<>();
-        
+    public List<Map.Entry<String,String>> getPrefixPairs() {
+
+        List<Map.Entry<String,String>> prefixes = new LinkedList<>();
+
         for (List<String> pair : super.getRows(this.rowStart + 1, this.rowEnd, colIndices)) {
             String prefix = pair.get(0);
             String ns = pair.get(1);
-            prefixes.add(new String[]{prefix, ns});
+            prefixes.add(new AbstractMap.SimpleEntry(prefix, ns));
         }
         return prefixes;
     }
