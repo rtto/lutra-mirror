@@ -33,7 +33,7 @@ public abstract class Instruction {
     protected int rowStart;
     protected int rowEnd;
 
-    public Instruction(Table table, int rowStart, int rowEnd) {
+    protected Instruction(Table table, int rowStart, int rowEnd) {
         this.table = table;
         this.rowStart = rowStart;
         this.rowEnd = rowEnd;
@@ -67,12 +67,12 @@ public abstract class Instruction {
         
         List<String> row = new ArrayList<>(colIndices.length);
         for (int colIndex : colIndices) {
-            row.add(table.getCellValue(rowIndex, colIndex));
+            row.add(this.table.getCellValue(rowIndex, colIndex));
         }
         return Collections.unmodifiableList(row);
     }
     
     protected List<String> getRow(int rowIndex) {
-        return getRow(rowIndex, IntStream.range(0, table.getWidth()).toArray());
+        return getRow(rowIndex, IntStream.range(0, this.table.getWidth()).toArray());
     }
 }

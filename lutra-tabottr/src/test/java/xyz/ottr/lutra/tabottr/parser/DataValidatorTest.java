@@ -37,7 +37,7 @@ public class DataValidatorTest {
     private void accept(Predicate<String> func, String value) {
         boolean result = func.test(value);
         if (!result) {
-            log.error("Error testing value: " + value);
+            this.log.error("Error testing value: " + value);
         }
         assertTrue(result);
     }

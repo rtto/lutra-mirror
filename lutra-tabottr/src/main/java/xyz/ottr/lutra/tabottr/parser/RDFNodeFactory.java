@@ -23,6 +23,7 @@ package xyz.ottr.lutra.tabottr.parser;
  */
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -49,18 +50,18 @@ public class RDFNodeFactory {
     public RDFNodeFactory(PrefixMapping prefixes) {
         this.model = ModelFactory.createDefaultModel();
         this.model.setNsPrefixes(prefixes);
-        this.validator = new DataValidator(model);
+        this.validator = new DataValidator(this.model);
     }
 
     public Result<RDFNode> toRDFNode(String value, String type) {
 
         // if is a list, split in to values and parse into RDF nodes with a recursive call.
         if (type.endsWith(TabOTTR.TYPE_LIST_POSTFIX)) {
-            type = type.substring(0, type.length() - 1).trim(); // remove list operator from type
+            String singleType = type.substring(0, type.length() - 1).trim(); // remove list operator from type
             List<Result<RDFNode>> nodes = new ArrayList<>();
             for (String item : value.split(Pattern.quote(TabOTTR.VALUE_LIST_SEPARATOR))) {
                 item = item.trim();
-                nodes.add(toRDFNode(item, type));
+                nodes.add(toRDFNode(item, singleType));
             }
             Result<List<RDFNode>> resNodes = Result.aggregate(nodes);
             return resNodes.map(this::toList);
@@ -77,8 +78,8 @@ public class RDFNodeFactory {
             int typeIndex = value.lastIndexOf(TabOTTR.VALUE_DATATYPE_TAG_PREFIX);
             if (typeIndex != -1) {
                 String explicitType = value.substring(typeIndex + TabOTTR.VALUE_LANGUAGE_TAG_PREFIX.length());
-                value = value.substring(0, typeIndex);
-                return toRDFNode(value, explicitType);
+                String noLangvalue = value.substring(0, typeIndex);
+                return toRDFNode(noLangvalue, explicitType);
             } else { // auto-get datatype:
                 return toRDFNode(value, getAutoType(value));
             }
@@ -107,7 +108,7 @@ public class RDFNodeFactory {
         }
     }
     
-    public RDFList toList(List<RDFNode> nodes) {
+    public RDFList toList(Collection<RDFNode> nodes) {
         return this.model.createList(nodes.iterator());
     }
 

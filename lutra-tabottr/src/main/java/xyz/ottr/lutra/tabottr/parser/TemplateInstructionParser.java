@@ -57,7 +57,7 @@ public class TemplateInstructionParser {
                 new Instance(templateIRI, new ArgumentList(args)));
     }
 
-    public Stream<Result<Instance>> processTemplateInstruction(TemplateInstruction instruction) {
+    Stream<Result<Instance>> processTemplateInstruction(TemplateInstruction instruction) {
 
         String templateIRI = this.dataFactory.toResource(instruction.getTemplateIRI()).toString();
         List<String> argumentTypes = instruction.getArgumentTypes();

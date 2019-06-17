@@ -47,9 +47,15 @@ import xyz.ottr.lutra.tabottr.model.Table;
 
 public class ExcelReader implements InstanceParser<String> {
 
+    private TableParser tableParser;
+
+    public ExcelReader() {
+        this.tableParser = new TableParser();
+    }
+
     @Override
     public ResultStream<Instance> apply(String filename) {
-        return ExcelReader.parseTables(filename).mapToStream(TableParser::processInstructions);
+        return parseTables(filename).mapToStream(this.tableParser::processInstructions);
     }
     
     /**
@@ -73,16 +79,7 @@ public class ExcelReader implements InstanceParser<String> {
                 tables.add(parseTable(workbook.getSheetAt(index), index + 1));
             }
             return Result.of(tables);
-        } catch (IOException ex) {
-            Message msg = Message.error(ex.getMessage());
-            return Result.empty(msg);
-        } catch (InvalidOperationException ex) {
-            Message msg = Message.error(ex.getMessage());
-            return Result.empty(msg);
-        } catch (NotOfficeXmlFileException ex) {
-            Message msg = Message.error(ex.getMessage());
-            return Result.empty(msg);
-        } catch (EncryptedDocumentException ex) {
+        } catch (IOException | EncryptedDocumentException | NotOfficeXmlFileException | InvalidOperationException ex) {
             Message msg = Message.error(ex.getMessage());
             return Result.empty(msg);
         }
@@ -96,7 +93,7 @@ public class ExcelReader implements InstanceParser<String> {
         DataFormatter formatter = new DataFormatter();
 
         // initialise empty table:
-        int height = getTableHeigth(sheet);
+        int height = getTableHeight(sheet);
         int width = getTableWidth(sheet);
         Table table = new Table(index, height, width);
 
@@ -112,7 +109,7 @@ public class ExcelReader implements InstanceParser<String> {
         return table;
     }
 
-    private static int getTableHeigth(Sheet sheet) {
+    private static int getTableHeight(Sheet sheet) {
         return sheet.getLastRowNum() + 1;
     }
 

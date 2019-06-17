@@ -35,18 +35,18 @@ public class Table {
     private int index;
     private String rowNumberFormat;
 
-    public Table(int index, int heigth, int width) {
+    public Table(int index, int height, int width) {
         this.index = index;
-        this.data = new String[heigth][width];
-        this.rowNumberFormat = "%0" + String.valueOf(heigth).length() + "d";
+        this.data = new String[height][width];
+        this.rowNumberFormat = "%0" + String.valueOf(height).length() + "d";
     }
     
     public int getHeight() {
-        return data.length;
+        return this.data.length;
     }
     
     public int getWidth() {
-        return data.length != 0 ? data[0].length : 0;
+        return this.data.length != 0 ? this.data[0].length : 0;
     }
     
     /**
@@ -56,11 +56,11 @@ public class Table {
      * @param value
      */
     public void setCellValue(int row, int col, String value) {
-        data[row][col] = value.trim();
+        this.data[row][col] = value.trim();
     }
     
     public String getCellValue(int row, int col) {
-        return data[row][col];
+        return this.data[row][col];
     }
 
     public int getIndex() {
@@ -73,11 +73,12 @@ public class Table {
         // counter for row numbering:
         int rowNo = 1;
 
-        for (String[] row : data) {
-            str.append(getFormattedRowNumber(rowNo++))
+        for (String[] row : this.data) {
+            str.append(getFormattedRowNumber(rowNo))
                 .append(": ")
                 .append(Arrays.toString(row))
                 .append("\n");
+            rowNo += 1;
         }
         return str.toString();
     }
@@ -88,8 +89,8 @@ public class Table {
 
         // collect row numbers containing OTTR token:
         List<Integer> tokenIndices = new ArrayList<>();
-        for (int rowIndex = 0; rowIndex < data.length; rowIndex += 1) {
-            if (data[rowIndex].length > 1 && TabOTTR.TOKEN.equals(data[rowIndex][0])) {
+        for (int rowIndex = 0; rowIndex < this.data.length; rowIndex += 1) {
+            if (this.data[rowIndex].length > 1 && TabOTTR.TOKEN.equals(this.data[rowIndex][0])) {
                 tokenIndices.add(rowIndex);
             }
         }
@@ -97,7 +98,7 @@ public class Table {
         // split table into instruction according to OTTR tokens indices:
         for (int i = 0; i < tokenIndices.size(); i += 1) {
             int start = tokenIndices.get(i);
-            String name = data[start][1];
+            String name = this.data[start][1];
 
             // ignore end instructions
             if (TabOTTR.INSTRUCTION_END.equals(name)) {
@@ -105,7 +106,7 @@ public class Table {
             }
 
             // find last instruction row -- either last table row or row before next instruction:
-            int end = (i + 1 == tokenIndices.size()) ? data.length - 1 : tokenIndices.get(i + 1) - 1;
+            int end = (i + 1 == tokenIndices.size()) ? this.data.length - 1 : tokenIndices.get(i + 1) - 1;
             
             instructions.add(createInstruction(name, start, end));
         }
@@ -120,12 +121,12 @@ public class Table {
                 return new PrefixInstruction(this, start, end);
             default:
                 throw new IllegalArgumentException(
-                        "Unreckognised instruction: " + name + " at " + getFormattedRowNumber(start));
+                        "Unrecognised instruction: " + name + " at " + getFormattedRowNumber(start));
         }
     }
 
     private String getFormattedRowNumber(int rowNo) {
-        return index + "." + String.format(Locale.getDefault(), this.rowNumberFormat, rowNo);
+        return this.index + "." + String.format(Locale.getDefault(), this.rowNumberFormat, rowNo);
     }
 
 }

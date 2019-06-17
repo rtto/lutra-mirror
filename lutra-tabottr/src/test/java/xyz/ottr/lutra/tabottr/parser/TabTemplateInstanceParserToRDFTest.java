@@ -32,7 +32,6 @@ import xyz.ottr.lutra.io.InstanceParser;
 import xyz.ottr.lutra.model.Instance;
 import xyz.ottr.lutra.result.ResultConsumer;
 import xyz.ottr.lutra.result.ResultStream;
-import xyz.ottr.lutra.tabottr.parser.ExcelReader;
 import xyz.ottr.lutra.wottr.legacy.io.WInstanceWriter;
 import xyz.ottr.lutra.wottr.legacy.io.WReader;
 import xyz.ottr.lutra.wottr.util.ModelIO;

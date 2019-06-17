@@ -29,7 +29,7 @@ import java.util.Map;
 
 public class PrefixInstruction extends Instruction {
 
-    private int[] colIndices = { 0, 1 };
+    private static final int[] colIndices = { 0, 1 };
     
     public PrefixInstruction(Table table, int rowStart, int rowEnd) {
         super(table, rowStart, rowEnd);
@@ -45,7 +45,7 @@ public class PrefixInstruction extends Instruction {
 
         List<Map.Entry<String,String>> prefixes = new LinkedList<>();
 
-        for (List<String> pair : super.getRows(this.rowStart + 1, this.rowEnd, colIndices)) {
+        for (List<String> pair : super.getRows(this.rowStart + 1, this.rowEnd, this.colIndices)) {
             String prefix = pair.get(0);
             String ns = pair.get(1);
             prefixes.add(new AbstractMap.SimpleEntry(prefix, ns));

@@ -38,7 +38,7 @@ import xyz.ottr.lutra.tabottr.model.Instruction;
 import xyz.ottr.lutra.tabottr.model.PrefixInstruction;
 
 
-public final class PrefixInstructionParser {
+public class PrefixInstructionParser {
 
     private static final PrefixMapping stdPrefixes = PrefixMapping.Standard; // TODO use OTTR standard
 
@@ -56,8 +56,7 @@ public final class PrefixInstructionParser {
 
     private static Result<PrefixMapping> mergePrefixResults(Result<PrefixMapping> base, Result<PrefixMapping> add) {
         Result<Set<Map.Entry<String, String>>> pairs = Result.zip(base, add, (px1, px2) -> union(getPrefixPairs(px1), getPrefixPairs(px2)));
-        Result<PrefixMapping> prefixes = pairs.flatMap(PrefixInstructionParser::buildPrefixMapping);
-        return prefixes;
+        return pairs.flatMap(PrefixInstructionParser::buildPrefixMapping);
     }
 
     /**
@@ -72,8 +71,8 @@ public final class PrefixInstructionParser {
         // build a map of the pairs, while collect conflicts if there are
         Map<String, String> pxMap = pairs.stream()
                 .collect(Collectors.toMap(
-                    pair -> pair.getKey(),
-                    pair -> pair.getValue(),
+                        Map.Entry::getKey,
+                        Map.Entry::getValue,
                     (ns1, ns2) -> {  // run merge function on values if identical keys
                         if (!ns1.equals(ns2)) {
                             errors.add(Message.error("Conflicting prefix instruction: "
@@ -88,14 +87,14 @@ public final class PrefixInstructionParser {
         return prefixes;
     }
 
-    static Result<PrefixMapping> processPrefixInstructions(Collection<Instruction> instructions) {
+    Result<PrefixMapping> processPrefixInstructions(Collection<Instruction> instructions) {
         return instructions.stream()
                 .filter(ins -> ins instanceof PrefixInstruction)
                 .map(ins -> (PrefixInstruction) ins)
-                .map(ins -> ins.getPrefixPairs())
+                .map(PrefixInstruction::getPrefixPairs)
                 .map(PrefixInstructionParser::buildPrefixMapping) // checks for local conflicts
                 // check for standard prefix conflicts:
-                .map(prefixes -> PrefixInstructionParser.mergePrefixResults(Result.of(stdPrefixes), prefixes))
+                .map(prefixes -> mergePrefixResults(Result.of(stdPrefixes), prefixes))
                 // check for conflicts when merging prefix instructions:
                 .reduce(Result.of(PrefixMapping.Factory.create()), PrefixInstructionParser::mergePrefixResults);
     }

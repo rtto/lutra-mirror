@@ -33,7 +33,6 @@ import org.junit.Test;
 import xyz.ottr.lutra.io.InstanceParser;
 import xyz.ottr.lutra.model.Instance;
 import xyz.ottr.lutra.result.Result;
-import xyz.ottr.lutra.tabottr.parser.ExcelReader;
 
 public class ExcelSheetTest {
     

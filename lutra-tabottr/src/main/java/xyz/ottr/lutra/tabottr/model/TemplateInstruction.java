@@ -38,7 +38,7 @@ public class TemplateInstruction extends Instruction {
     }
 
     public String getTemplateIRI() {
-        return table.getCellValue(this.rowStart, 2);
+        return this.table.getCellValue(this.rowStart, 2);
     }
 
     /**

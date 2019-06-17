@@ -41,7 +41,7 @@ public class TableParser {
      * Parses the list of tables into a ResultStream of Instances, but returns
      * empty Results if conflicts of defined prefixes or errors in terms occur.
      */
-    public static ResultStream<Instance> processInstructions(List<Table> tables) {
+    ResultStream<Instance> processInstructions(List<Table> tables) {
 
         // collect all instructions
         List<Instruction> instructions = tables.stream()
@@ -57,7 +57,7 @@ public class TableParser {
                 new ResultStream<>(instructions.stream()
                     .filter(ins -> ins instanceof TemplateInstruction)
                     .map(ins -> (TemplateInstruction) ins)
-                    .flatMap(ins -> parser.processTemplateInstruction(ins))));
+                    .flatMap(parser::processTemplateInstruction)));
 
         return instances;
     }

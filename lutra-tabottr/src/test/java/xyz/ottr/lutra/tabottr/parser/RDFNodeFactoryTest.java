@@ -40,7 +40,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 import xyz.ottr.lutra.tabottr.TabOTTR;
-import xyz.ottr.lutra.tabottr.parser.RDFNodeFactory;
 import xyz.ottr.lutra.wottr.WOTTR;
 
 public class RDFNodeFactoryTest {
@@ -51,49 +50,49 @@ public class RDFNodeFactoryTest {
     private RDFNodeFactory factory;
     
     @Before
-    public void setUp() throws Exception {
-        model = ModelFactory.createDefaultModel();
-        model.setNsPrefix("ex", "http://example.net#");
-        factory = new RDFNodeFactory(model);
+    public void setUp() {
+        this.model = ModelFactory.createDefaultModel();
+        this.model.setNsPrefix("ex", "http://example.net#");
+        this.factory = new RDFNodeFactory(this.model);
     }
 
     @After
-    public void tearDown() throws Exception {
-        model.close();
+    public void tearDown() {
+        this.model.close();
     }
 
     @Test
     public void shouldGetNoValue() {
-        assertEquals(WOTTR.none, factory.toRDFNode("", TabOTTR.TYPE_AUTO).get());
-        assertEquals(WOTTR.none, factory.toRDFNode("", TabOTTR.TYPE_IRI).get());
-        assertEquals(WOTTR.none, factory.toRDFNode("", TabOTTR.TYPE_BLANK).get());
-        assertEquals(WOTTR.none, factory.toRDFNode("", TabOTTR.TYPE_TEXT).get());
+        assertEquals(WOTTR.none, this.factory.toRDFNode("", TabOTTR.TYPE_AUTO).get());
+        assertEquals(WOTTR.none, this.factory.toRDFNode("", TabOTTR.TYPE_IRI).get());
+        assertEquals(WOTTR.none, this.factory.toRDFNode("", TabOTTR.TYPE_BLANK).get());
+        assertEquals(WOTTR.none, this.factory.toRDFNode("", TabOTTR.TYPE_TEXT).get());
     }
     
     @Test
     public void shouldGetIRI() {
         Resource ann = ResourceFactory.createResource(NS + "Ann");
         
-        assertEquals(ann, factory.toRDFNode("ex:Ann", TabOTTR.TYPE_AUTO).get());
-        assertEquals(ann, factory.toRDFNode("ex:Ann", TabOTTR.TYPE_IRI).get());
-        assertEquals(ann, factory.toRDFNode("http://example.net#Ann", TabOTTR.TYPE_AUTO).get());
-        assertEquals(ann, factory.toRDFNode("http://example.net#Ann", TabOTTR.TYPE_IRI).get());
+        assertEquals(ann, this.factory.toRDFNode("ex:Ann", TabOTTR.TYPE_AUTO).get());
+        assertEquals(ann, this.factory.toRDFNode("ex:Ann", TabOTTR.TYPE_IRI).get());
+        assertEquals(ann, this.factory.toRDFNode("http://example.net#Ann", TabOTTR.TYPE_AUTO).get());
+        assertEquals(ann, this.factory.toRDFNode("http://example.net#Ann", TabOTTR.TYPE_IRI).get());
     }
     
     @Test
     public void shouldGetNamedBlank() {
-        Resource myBlank = model.createResource(AnonId.create("myBlank"));
+        Resource myBlank = this.model.createResource(AnonId.create("myBlank"));
         
-        assertEquals(myBlank, factory.toRDFNode("_:myBlank", TabOTTR.TYPE_AUTO).get());
-        assertEquals(myBlank, factory.toRDFNode("_:myBlank", TabOTTR.TYPE_BLANK).get());
-        assertEquals(myBlank, factory.toRDFNode("myBlank", TabOTTR.TYPE_BLANK).get());
+        assertEquals(myBlank, this.factory.toRDFNode("_:myBlank", TabOTTR.TYPE_AUTO).get());
+        assertEquals(myBlank, this.factory.toRDFNode("_:myBlank", TabOTTR.TYPE_BLANK).get());
+        assertEquals(myBlank, this.factory.toRDFNode("myBlank", TabOTTR.TYPE_BLANK).get());
     }
     
     @Test
     public void shouldGetFreshBlank() {
         // untyped:
-        RDFNode fresh1 = factory.toRDFNode(TabOTTR.VALUE_FRESH_BLANK, TabOTTR.TYPE_AUTO).get();
-        RDFNode fresh2 = factory.toRDFNode(TabOTTR.VALUE_FRESH_BLANK, TabOTTR.TYPE_AUTO).get();
+        RDFNode fresh1 = this.factory.toRDFNode(TabOTTR.VALUE_FRESH_BLANK, TabOTTR.TYPE_AUTO).get();
+        RDFNode fresh2 = this.factory.toRDFNode(TabOTTR.VALUE_FRESH_BLANK, TabOTTR.TYPE_AUTO).get();
         
         assertTrue(fresh1.isAnon());
         assertTrue(fresh2.isAnon());
@@ -101,8 +100,8 @@ public class RDFNodeFactoryTest {
         assertTrue(!fresh1.equals(fresh2)); // The above is not found by compiler
         
         // typed:
-        RDFNode fresh3 = factory.toRDFNode(TabOTTR.VALUE_FRESH_BLANK, TabOTTR.TYPE_BLANK).get();
-        RDFNode fresh4 = factory.toRDFNode(TabOTTR.VALUE_FRESH_BLANK, TabOTTR.TYPE_BLANK).get();
+        RDFNode fresh3 = this.factory.toRDFNode(TabOTTR.VALUE_FRESH_BLANK, TabOTTR.TYPE_BLANK).get();
+        RDFNode fresh4 = this.factory.toRDFNode(TabOTTR.VALUE_FRESH_BLANK, TabOTTR.TYPE_BLANK).get();
         
         assertTrue(fresh3.isAnon());
         assertTrue(fresh4.isAnon());
@@ -112,61 +111,61 @@ public class RDFNodeFactoryTest {
     
     @Test
     public void shouldGetTypedLiteralsInteger() {
-        Literal literal = model.createTypedLiteral(3, XSD.integer.toString());
+        Literal literal = this.model.createTypedLiteral(3, XSD.integer.toString());
         
-        assertEquals(literal, factory.toRDFNode("3", TabOTTR.TYPE_AUTO).get());
-        assertEquals(literal, factory.toRDFNode("3", XSD.integer.toString()).get());
+        assertEquals(literal, this.factory.toRDFNode("3", TabOTTR.TYPE_AUTO).get());
+        assertEquals(literal, this.factory.toRDFNode("3", XSD.integer.toString()).get());
     }
     
     @Test
     public void shouldGetTypedLiteralsDecimal() {
-        Literal literal = model.createTypedLiteral("3.14", XSD.decimal.toString());
+        Literal literal = this.model.createTypedLiteral("3.14", XSD.decimal.toString());
         
-        assertEquals(literal, factory.toRDFNode("3.14", TabOTTR.TYPE_AUTO).get());
-        assertEquals(literal, factory.toRDFNode("3.14", XSD.decimal.toString()).get());
+        assertEquals(literal, this.factory.toRDFNode("3.14", TabOTTR.TYPE_AUTO).get());
+        assertEquals(literal, this.factory.toRDFNode("3.14", XSD.decimal.toString()).get());
     }
     
     @Test
     public void shouldGetTypedLiteralsBoolean() {
-        Literal literal = model.createTypedLiteral(true);
+        Literal literal = this.model.createTypedLiteral(true);
         
-        assertEquals(literal, factory.toRDFNode("true", TabOTTR.TYPE_AUTO).get());
-        assertEquals(literal, factory.toRDFNode("1", XSD.xboolean.toString()).get());
-        assertEquals(literal, factory.toRDFNode("true", XSD.xboolean.toString()).get());
-        assertEquals(literal, factory.toRDFNode("True", XSD.xboolean.toString()).get());
-        assertEquals(literal, factory.toRDFNode("TRUE", XSD.xboolean.toString()).get());
+        assertEquals(literal, this.factory.toRDFNode("true", TabOTTR.TYPE_AUTO).get());
+        assertEquals(literal, this.factory.toRDFNode("1", XSD.xboolean.toString()).get());
+        assertEquals(literal, this.factory.toRDFNode("true", XSD.xboolean.toString()).get());
+        assertEquals(literal, this.factory.toRDFNode("True", XSD.xboolean.toString()).get());
+        assertEquals(literal, this.factory.toRDFNode("TRUE", XSD.xboolean.toString()).get());
     }
     
     @Test
     public void shouldGetTypedLiteralsString() {
-        Literal literal = model.createTypedLiteral("hello");
+        Literal literal = this.model.createTypedLiteral("hello");
         
-        assertEquals(literal, factory.toRDFNode("hello", XSD.xstring.toString()).get());
+        assertEquals(literal, this.factory.toRDFNode("hello", XSD.xstring.toString()).get());
     }
     
     @Test
     public void shouldGetUntypedLiteral() {
-        Literal literal = model.createLiteral("hello");
+        Literal literal = this.model.createLiteral("hello");
         
-        assertEquals(literal, factory.toRDFNode("hello", TabOTTR.TYPE_AUTO).get());
-        assertEquals(literal, factory.toRDFNode("hello", TabOTTR.TYPE_TEXT).get());
+        assertEquals(literal, this.factory.toRDFNode("hello", TabOTTR.TYPE_AUTO).get());
+        assertEquals(literal, this.factory.toRDFNode("hello", TabOTTR.TYPE_TEXT).get());
     }
     
     @Test
     public void shouldGetUntypedLiteralWLang() {
-        Literal literal = model.createLiteral("hello", "en-GB");
+        Literal literal = this.model.createLiteral("hello", "en-GB");
         
-        assertEquals(literal, factory.toRDFNode("hello@@en-GB", TabOTTR.TYPE_AUTO).get());
-        assertEquals(literal, factory.toRDFNode("hello@@en-GB", TabOTTR.TYPE_TEXT).get());
+        assertEquals(literal, this.factory.toRDFNode("hello@@en-GB", TabOTTR.TYPE_AUTO).get());
+        assertEquals(literal, this.factory.toRDFNode("hello@@en-GB", TabOTTR.TYPE_TEXT).get());
     }
     
     @Test
     public void shouldThrowEmptyType() {
-        assertFalse(factory.toRDFNode("hello@@en-GB", "").isPresent());
+        assertFalse(this.factory.toRDFNode("hello@@en-GB", "").isPresent());
     }
     
     @Test
     public void shouldThrowNonIRIType() {
-        assertFalse(factory.toRDFNode("hello@@en-GB", "1234567890").isPresent());
+        assertFalse(this.factory.toRDFNode("hello@@en-GB", "1234567890").isPresent());
     }
 }
