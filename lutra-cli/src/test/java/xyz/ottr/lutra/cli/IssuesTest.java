@@ -33,12 +33,23 @@ public class IssuesTest {
     }
 
 
+    // ****
     // ISSUE 156: Formal parameters of templates are not supported in list operators
+
+    // Verifying issue:
     @Test
     public void issue156stottr() {
         runCLI("-I stottr -f -F wottr -l "
                 + ROOT + "156/lib.stottr" + " -L stottr --stdout "
                 + ROOT + "156/instance.stottr/instance1.stottr");
+    }
+
+    // Assuming bug is due to error in stOTTR grammar; testing wOTTR equivalent:
+    @Test
+    public void issue156wottr() {
+        runCLI("-I wottr -f -F wottr -l "
+                + ROOT + "156/lib.wottr" + " -L wottr --stdout "
+                + ROOT + "156/instance.wottr/instance1.wottr");
     }
 
 
