@@ -1,4 +1,4 @@
-package xyz.ottr.lutra.tabottr.parser.rdf;
+package xyz.ottr.lutra.tabottr.parser;
 
 /*-
  * #%L
@@ -29,7 +29,6 @@ import java.util.function.Predicate;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import xyz.ottr.lutra.tabottr.parser.DataValidator;
 
 public class DataValidatorTest {
     

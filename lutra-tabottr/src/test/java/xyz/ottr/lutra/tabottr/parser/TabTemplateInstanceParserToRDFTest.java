@@ -1,4 +1,4 @@
-package xyz.ottr.lutra.tabottr.parser.rdf;
+package xyz.ottr.lutra.tabottr.parser;
 
 /*-
  * #%L
@@ -28,10 +28,11 @@ import org.apache.jena.rdf.model.Model;
 import org.apache.jena.shared.PrefixMapping;
 import org.junit.Test;
 
+import xyz.ottr.lutra.io.InstanceParser;
 import xyz.ottr.lutra.model.Instance;
 import xyz.ottr.lutra.result.ResultConsumer;
 import xyz.ottr.lutra.result.ResultStream;
-import xyz.ottr.lutra.tabottr.parser.TInstanceParser;
+import xyz.ottr.lutra.tabottr.parser.ExcelReader;
 import xyz.ottr.lutra.wottr.legacy.io.WInstanceWriter;
 import xyz.ottr.lutra.wottr.legacy.io.WReader;
 import xyz.ottr.lutra.wottr.util.ModelIO;
@@ -41,7 +42,7 @@ public class TabTemplateInstanceParserToRDFTest {
     private static final String ROOT = "src/test/resources/";
     
     private Model getExcelReaderRDFWriterModel(String filename) {
-        TInstanceParser parser = new TInstanceParser();
+        InstanceParser<String> parser = new ExcelReader();
         ResultStream<Instance> instances = parser.apply(filename);
         WInstanceWriter writer = new WInstanceWriter();
         ResultConsumer<Instance> consumer = new ResultConsumer<>(writer);
@@ -60,7 +61,7 @@ public class TabTemplateInstanceParserToRDFTest {
         rdfModel.setNsPrefixes(PrefixMapping.Standard);
 
         boolean isIsomorphic = excelModel.isIsomorphicWith(rdfModel);
-
+        /*
         // For debugging:
         if (!isIsomorphic) {
             System.out.println("Error: excelFile " + excelFile + " not isomorphic to rdfFile " + rdfFile);
@@ -68,7 +69,7 @@ public class TabTemplateInstanceParserToRDFTest {
             excelModel.write(System.out, "TTL");
             System.out.println("rdfFile:");
             rdfModel.write(System.out, "TTL");
-        }
+        }*/
         assertTrue(isIsomorphic);
     }
     

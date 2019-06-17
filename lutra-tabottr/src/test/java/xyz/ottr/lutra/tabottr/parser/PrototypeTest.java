@@ -1,4 +1,4 @@
-package xyz.ottr.lutra.tabottr.parser.rdf;
+package xyz.ottr.lutra.tabottr.parser;
 
 /*-
  * #%L
@@ -25,21 +25,25 @@ package xyz.ottr.lutra.tabottr.parser.rdf;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import java.util.List;
+
 import org.junit.Test;
 
+import xyz.ottr.lutra.io.InstanceParser;
 import xyz.ottr.lutra.model.Instance;
 import xyz.ottr.lutra.result.Message;
+import xyz.ottr.lutra.result.Result;
 import xyz.ottr.lutra.result.ResultConsumer;
 import xyz.ottr.lutra.result.ResultStream;
-import xyz.ottr.lutra.tabottr.parser.TInstanceParser;
+import xyz.ottr.lutra.tabottr.model.Table;
 
 public class PrototypeTest {
     
     private static final String ROOT = "src/test/resources/";
 
     @Test 
-    public void shouldWork() {
-        TInstanceParser parser = new TInstanceParser();
+    public void shouldParseToInstances() {
+        InstanceParser<String> parser = new ExcelReader();
         ResultStream<Instance> instances = parser.apply(ROOT + "test1.xlsx");
         ResultConsumer<Instance> consumer = new ResultConsumer<>();
         instances.forEach(consumer);
@@ -47,15 +51,21 @@ public class PrototypeTest {
     }
 
     @Test
+    public void shouldParseToTables() {
+        String filename = ROOT + "test1.xlsx";
+        Result<List<Table>> tables = ExcelReader.parseTables(filename);
+        ResultConsumer<List<Table>> consumer = new ResultConsumer<>();
+        consumer.accept(tables);
+        assertFalse(Message.moreSevere(consumer.getMessageHandler().printMessages(), Message.ERROR));
+    }
+
+    @Test
     public void prefixConflicts() {
         String filename = ROOT + "testConflictingPrefixes.xlsx";
 
-        TInstanceParser parser = new TInstanceParser();
+        InstanceParser<String> parser = new ExcelReader();
         ResultStream<Instance> instances = parser.apply(filename);
         ResultConsumer<Instance> consumer = new ResultConsumer<>();
-                //instance ->
-                //assertFalse("Parsing should fail, but succeeded with e.g. " + instance.toString(), true));
-
         instances.forEach(consumer);
         assertTrue(Message.moreSevere(consumer.getMessageHandler().printMessages(), Message.ERROR));
     }

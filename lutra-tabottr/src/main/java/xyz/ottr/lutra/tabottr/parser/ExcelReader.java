@@ -1,4 +1,4 @@
-package xyz.ottr.lutra.tabottr.parser.excel;
+package xyz.ottr.lutra.tabottr.parser;
 
 import java.io.File;
 
@@ -38,11 +38,19 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
+import xyz.ottr.lutra.io.InstanceParser;
+import xyz.ottr.lutra.model.Instance;
 import xyz.ottr.lutra.result.Message;
 import xyz.ottr.lutra.result.Result;
+import xyz.ottr.lutra.result.ResultStream;
 import xyz.ottr.lutra.tabottr.model.Table;
 
-public class ExcelReader {
+public class ExcelReader implements InstanceParser<String> {
+
+    @Override
+    public ResultStream<Instance> apply(String filename) {
+        return ExcelReader.parseTables(filename).mapToStream(TableParser::processInstructions);
+    }
     
     /**
      * Parses the spreadsheet at given filename into a list

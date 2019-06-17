@@ -24,39 +24,45 @@ package xyz.ottr.lutra.tabottr.parser;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Stream;
 
 import org.apache.jena.rdf.model.RDFNode;
-import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.shared.PrefixMapping;
 
 import xyz.ottr.lutra.model.ArgumentList;
 import xyz.ottr.lutra.model.Instance;
 import xyz.ottr.lutra.model.Term;
 import xyz.ottr.lutra.result.Result;
+import xyz.ottr.lutra.tabottr.model.TemplateInstruction;
 import xyz.ottr.lutra.wottr.WTermFactory;
 
-public class TemplateInstanceFactory {
-    
+public class TemplateInstructionParser {
+
     private RDFNodeFactory dataFactory;
-    private Resource templateIRI;
-    private List<String> types;
     private WTermFactory termFactory;
     
-    public TemplateInstanceFactory(PrefixMapping prefixes, String templateIRI, List<String> types) {
+    public TemplateInstructionParser(PrefixMapping prefixes) {
         this.dataFactory = new RDFNodeFactory(prefixes);
-        this.templateIRI = dataFactory.toResource(templateIRI);
-        this.types = types;
         this.termFactory = new WTermFactory();
     }
     
-    public Result<Instance> createTemplateInstance(List<String> arguments) {
+    private Result<Instance> createTemplateInstance(String templateIRI, List<String> argumentTypes, List<String> arguments) {
         List<Result<Term>> members = new LinkedList<>();
         for (int i = 0; i < arguments.size(); i += 1) {
-            Result<RDFNode> rdfNode = dataFactory.toRDFNode(arguments.get(i), types.get(i));
-            members.add(rdfNode.flatMap(termFactory));
+            Result<RDFNode> rdfNode = this.dataFactory.toRDFNode(arguments.get(i), argumentTypes.get(i));
+            members.add(rdfNode.flatMap(this.termFactory));
         }
         Result<List<Term>> rsArguments = Result.aggregate(members);
         return rsArguments.map(args ->
-                new Instance(this.templateIRI.toString(), new ArgumentList(args)));
+                new Instance(templateIRI, new ArgumentList(args)));
+    }
+
+    public Stream<Result<Instance>> processTemplateInstruction(TemplateInstruction instruction) {
+
+        String templateIRI = this.dataFactory.toResource(instruction.getTemplateIRI()).toString();
+        List<String> argumentTypes = instruction.getArgumentTypes();
+
+        return instruction.getTemplateInstanceRows().stream()
+                .map(argList -> createTemplateInstance(templateIRI, argumentTypes, argList));
     }
 }

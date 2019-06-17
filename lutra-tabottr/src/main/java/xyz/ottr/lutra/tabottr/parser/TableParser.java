@@ -22,18 +22,15 @@ package xyz.ottr.lutra.tabottr.parser;
  * #L%
  */
 
-import java.util.*;
+import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import org.apache.jena.shared.PrefixMapping;
 
 import xyz.ottr.lutra.model.Instance;
-import xyz.ottr.lutra.result.Message;
 import xyz.ottr.lutra.result.Result;
 import xyz.ottr.lutra.result.ResultStream;
 import xyz.ottr.lutra.tabottr.model.Instruction;
-import xyz.ottr.lutra.tabottr.model.PrefixInstruction;
 import xyz.ottr.lutra.tabottr.model.Table;
 import xyz.ottr.lutra.tabottr.model.TemplateInstruction;
 
@@ -51,27 +48,20 @@ public class TableParser {
             .flatMap(table -> table.getInstructions().stream())
             .collect(Collectors.toList());
 
-        Result<PrefixMapping> prefixes = new PrefixParser().processPrefixInstructions(instructions);
+        PrefixInstructionParser prefixParser = new PrefixInstructionParser();
+        Result<PrefixMapping> prefixes = prefixParser.processPrefixInstructions(instructions);
 
         // process instances, with prefixes as input
-        ResultStream<Instance> instances = prefixes.mapToStream(pfs ->
-            new ResultStream<>(
-                instructions.stream()
+        ResultStream<Instance> instances = prefixes.map(TemplateInstructionParser::new)
+            .mapToStream(parser ->
+                new ResultStream<>(instructions.stream()
                     .filter(ins -> ins instanceof TemplateInstruction)
                     .map(ins -> (TemplateInstruction) ins)
-                    .flatMap(ins -> processTemplateInstruction(ins, pfs))));
+                    .flatMap(ins -> parser.processTemplateInstruction(ins))));
 
         return instances;
     }
 
-    private static Stream<Result<Instance>> processTemplateInstruction(TemplateInstruction instruction, PrefixMapping prefixes) {
-            TemplateInstanceFactory factory = new TemplateInstanceFactory(
-                prefixes,
-                instruction.getTemplateIRI(),
-                instruction.getArgumentTypes());
 
-        return instruction.getTemplateInstanceRows().stream()
-                .map(factory::createTemplateInstance);
-    }
 
 }
