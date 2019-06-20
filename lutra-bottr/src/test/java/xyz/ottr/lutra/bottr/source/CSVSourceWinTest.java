@@ -41,7 +41,7 @@ import xyz.ottr.lutra.result.ResultStream;
  * #L%
  */
 
-public class CSVSourceTestNoHeader {
+public class CSVSourceWinTest {
   
     @Rule
     public TemporaryFolder testFolder = new TemporaryFolder();
@@ -50,7 +50,8 @@ public class CSVSourceTestNoHeader {
     public void prototypeTest() throws ClassNotFoundException, SQLException {
 
         Path root = Paths.get("src", "test", "resources");
-        String file = "noheader.csv";
+        String file = "win.csv";
+        String input = root.toAbsolutePath().toString() + '\\' + file;
         
         //Create expected result
         Set<Record<String>> expected = new HashSet<>();
@@ -63,8 +64,8 @@ public class CSVSourceTestNoHeader {
         expected.add(new Record<>(Arrays.asList("7", "Lagreca", "1000")));
 
         //Run the source
-        CSVSource csvTest = new  CSVSource(root.toUri() + file, ',', '\'', true);
-        ResultStream<Record<String>> rowStream = csvTest.execute("SELECT ID, NAME, SALARY FROM CUSTOMER;");
+        CSVSource csvTest = new CSVSource(input, ',', '\'', true);
+        ResultStream<Record<String>> rowStream = csvTest.execute("SELECT ID, NAME, SALARY FROM " + input + ";");
         Set<Record<String>> dbOutput = rowStream.innerCollect(Collectors.toSet());
 
         //Compare dbOutput to expected result

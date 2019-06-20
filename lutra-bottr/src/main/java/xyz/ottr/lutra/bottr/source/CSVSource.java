@@ -7,13 +7,17 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 import org.apache.commons.dbcp2.BasicDataSource;
+import org.apache.commons.dbutils.QueryRunner;
+import org.apache.commons.dbutils.handlers.ArrayListHandler;
 import org.apache.jena.ext.com.google.common.io.Files;
 
 import xyz.ottr.lutra.bottr.model.Record;
-import xyz.ottr.lutra.result.Message;
-import xyz.ottr.lutra.result.Result;
 import xyz.ottr.lutra.result.ResultStream;
 
 /*-
@@ -41,7 +45,6 @@ import xyz.ottr.lutra.result.ResultStream;
 public class CSVSource extends JDBCSource {
 
     public static File testFolder = Files.createTempDir();
-
     private BasicDataSource dataSource;
     private String input;
     private String eolChar;
@@ -64,7 +67,7 @@ public class CSVSource extends JDBCSource {
 
         // Determine EOL character
         BufferedReader reader;
-              
+             
         try {
             reader = new BufferedReader(new FileReader(input));
             String line = reader.readLine();
@@ -80,9 +83,7 @@ public class CSVSource extends JDBCSource {
             e.printStackTrace();
         }
         
-
         try (Connection conn = this.dataSource.getConnection()) {
-
             // Load CSV into database
             Statement stmt = conn.createStatement();
             stmt.execute("DROP TABLE IF EXISTS " + input);
@@ -96,13 +97,20 @@ public class CSVSource extends JDBCSource {
             }
             stmt.execute(loaderQuery);
             
-            return super.execute(query);
+            List<Record<String>> rows = new QueryRunner().query(conn, query, new ArrayListHandler())
+                    .stream()
+                    .map(array -> Arrays.asList(array)
+                            .stream()
+                            .map(value -> Objects.toString(value, null)) // the string value of null is (the object) null.
+                            .collect(Collectors.toList()))
+                    .map(Record::new)
+                    .collect(Collectors.toList());
+            
+            return ResultStream.innerOf(rows);
 
         } catch (SQLException ex) {
-            return ResultStream.of(Result.empty(Message.error(
-                    "Error running query " + query 
-                    + " over database " + this.dataSource.getUrl() 
-                    + ": " + ex.getMessage())));
-        }
+            ex.printStackTrace();
+        } 
+        return null;
     }
 }
