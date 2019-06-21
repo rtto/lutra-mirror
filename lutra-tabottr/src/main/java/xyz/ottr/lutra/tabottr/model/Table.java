@@ -68,19 +68,19 @@ public class Table {
     }
 
     public String toString() {
-        StringBuilder str = new StringBuilder();
+        StringBuilder strBuilder = new StringBuilder();
 
         // counter for row numbering:
         int rowNo = 1;
 
         for (String[] row : this.data) {
-            str.append(getFormattedRowNumber(rowNo))
+            strBuilder.append(getFormattedRowNumber(rowNo))
                 .append(": ")
                 .append(Arrays.toString(row))
-                .append("\n");
+                .append(System.lineSeparator());
             rowNo += 1;
         }
-        return str.toString();
+        return strBuilder.toString();
     }
 
     public List<Instruction> getInstructions() {

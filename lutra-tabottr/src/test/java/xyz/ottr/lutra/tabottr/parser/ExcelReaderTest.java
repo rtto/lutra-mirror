@@ -24,6 +24,9 @@ package xyz.ottr.lutra.tabottr.parser;
 
 import static org.junit.Assert.assertTrue;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.shared.PrefixMapping;
 import org.junit.Test;
@@ -36,9 +39,9 @@ import xyz.ottr.lutra.wottr.legacy.io.WInstanceWriter;
 import xyz.ottr.lutra.wottr.legacy.io.WReader;
 import xyz.ottr.lutra.wottr.util.ModelIO;
 
-public class TabTemplateInstanceParserToRDFTest {
-    
-    private static final String ROOT = "src/test/resources/";
+public class ExcelReaderTest {
+
+    private static final Path ROOT = Paths.get("src", "test", "resources");
     
     private Model getExcelReaderRDFWriterModel(String filename) {
         InstanceParser<String> parser = new ExcelReader();
@@ -51,9 +54,9 @@ public class TabTemplateInstanceParserToRDFTest {
     }
     
     private void runAtomicTest(String name) {
-        String folder = ROOT + "atomic/";
-        String excelFile = folder + name + ".xlsx";
-        String rdfFile = folder + name + ".ttl";
+        Path folder = ROOT.resolve("atomic");
+        String excelFile = folder.resolve(name + ".xlsx").toString();
+        String rdfFile = folder.resolve(name + ".ttl").toString();
         Model excelModel = getExcelReaderRDFWriterModel(excelFile);
         excelModel.setNsPrefix("ex", "http://example.org#");
         Model rdfModel = WReader.getCanonicalModel(ModelIO.readModel(rdfFile));

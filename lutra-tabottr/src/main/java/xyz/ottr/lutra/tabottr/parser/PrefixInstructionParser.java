@@ -43,10 +43,10 @@ public class PrefixInstructionParser {
     private static final PrefixMapping stdPrefixes = PrefixMapping.Standard; // TODO use OTTR standard
 
     // TODO must be a java method for this?
-    private static <T> Set<T> union(Set<T> a, Set<T> b) {
+    private static <T> Set<T> union(Set<T> one, Set<T> two) {
         Set<T> union = new HashSet<>();
-        union.addAll(a);
-        union.addAll(b);
+        union.addAll(one);
+        union.addAll(two);
         return union;
     }
 

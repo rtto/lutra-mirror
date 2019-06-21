@@ -25,6 +25,8 @@ package xyz.ottr.lutra.tabottr.parser;
 
 import static org.junit.Assert.assertEquals;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -35,13 +37,13 @@ import xyz.ottr.lutra.model.Instance;
 import xyz.ottr.lutra.result.Result;
 
 public class ExcelSheetTest {
-    
-    private static final String ROOT = "src/test/resources/";
+
+    private static final Path ROOT = Paths.get("src", "test", "resources");
     
     @Test
     public void shouldHandleEmptySheets() {
         InstanceParser<String> parser = new ExcelReader();
-        List<Result<Instance>> result = parser.apply(ROOT + "blank.xlsx").collect(Collectors.toList());
+        List<Result<Instance>> result = parser.apply(ROOT.resolve("blank.xlsx").toString()).collect(Collectors.toList());
         assertEquals(0, result.size());
     }
 

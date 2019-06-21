@@ -25,6 +25,8 @@ package xyz.ottr.lutra.tabottr.parser;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 
 import org.junit.Test;
@@ -38,13 +40,13 @@ import xyz.ottr.lutra.result.ResultStream;
 import xyz.ottr.lutra.tabottr.model.Table;
 
 public class PrototypeTest {
-    
-    private static final String ROOT = "src/test/resources/";
+
+    private static final Path ROOT = Paths.get("src", "test", "resources");
 
     @Test 
     public void shouldParseToInstances() {
         InstanceParser<String> parser = new ExcelReader();
-        ResultStream<Instance> instances = parser.apply(ROOT + "test1.xlsx");
+        ResultStream<Instance> instances = parser.apply(ROOT.resolve("test1.xlsx").toString());
         ResultConsumer<Instance> consumer = new ResultConsumer<>();
         instances.forEach(consumer);
         assertFalse(Message.moreSevere(consumer.getMessageHandler().printMessages(), Message.ERROR));
@@ -52,7 +54,7 @@ public class PrototypeTest {
 
     @Test
     public void shouldParseToTables() {
-        String filename = ROOT + "test1.xlsx";
+        String filename = ROOT.resolve("test1.xlsx").toString();
         Result<List<Table>> tables = ExcelReader.parseTables(filename);
         ResultConsumer<List<Table>> consumer = new ResultConsumer<>();
         consumer.accept(tables);
@@ -61,7 +63,7 @@ public class PrototypeTest {
 
     @Test
     public void prefixConflicts() {
-        String filename = ROOT + "testConflictingPrefixes.xlsx";
+        String filename = ROOT.resolve("testConflictingPrefixes.xlsx").toString();
 
         InstanceParser<String> parser = new ExcelReader();
         ResultStream<Instance> instances = parser.apply(filename);

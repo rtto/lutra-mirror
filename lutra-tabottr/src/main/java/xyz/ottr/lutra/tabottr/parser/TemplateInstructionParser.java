@@ -46,7 +46,7 @@ public class TemplateInstructionParser {
         this.termFactory = new WTermFactory();
     }
     
-    private Result<Instance> createTemplateInstance(String templateIRI, List<String> argumentTypes, List<String> arguments) {
+    private Result<Instance> createTemplateInstance(String templateIRI, List<String> arguments, List<String> argumentTypes) {
         List<Result<Term>> members = new LinkedList<>();
         for (int i = 0; i < arguments.size(); i += 1) {
             Result<RDFNode> rdfNode = this.dataFactory.toRDFNode(arguments.get(i), argumentTypes.get(i));
@@ -63,6 +63,6 @@ public class TemplateInstructionParser {
         List<String> argumentTypes = instruction.getArgumentTypes();
 
         return instruction.getTemplateInstanceRows().stream()
-                .map(argList -> createTemplateInstance(templateIRI, argumentTypes, argList));
+                .map(argList -> createTemplateInstance(templateIRI, argList, argumentTypes));
     }
 }

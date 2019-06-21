@@ -80,8 +80,7 @@ public class ExcelReader implements InstanceParser<String> {
             }
             return Result.of(tables);
         } catch (IOException | EncryptedDocumentException | NotOfficeXmlFileException | InvalidOperationException ex) {
-            Message msg = Message.error(ex.getMessage());
-            return Result.empty(msg);
+            return Result.empty(Message.error(ex.getMessage()));
         }
     }
 

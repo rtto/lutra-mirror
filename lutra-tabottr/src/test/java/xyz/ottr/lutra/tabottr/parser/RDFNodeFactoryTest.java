@@ -23,8 +23,8 @@ package xyz.ottr.lutra.tabottr.parser;
  */
 
 import static org.junit.Assert.assertEquals;
-//import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 
 import org.apache.jena.rdf.model.AnonId;
@@ -96,17 +96,15 @@ public class RDFNodeFactoryTest {
         
         assertTrue(fresh1.isAnon());
         assertTrue(fresh2.isAnon());
-        //assertNotEquals(fresh1, fresh2); // two freshs must no be equal
-        assertTrue(!fresh1.equals(fresh2)); // The above is not found by compiler
-        
+        assertNotEquals(fresh1, fresh2); // two freshs must no be equal
+
         // typed:
         RDFNode fresh3 = this.factory.toRDFNode(TabOTTR.VALUE_FRESH_BLANK, TabOTTR.TYPE_BLANK).get();
         RDFNode fresh4 = this.factory.toRDFNode(TabOTTR.VALUE_FRESH_BLANK, TabOTTR.TYPE_BLANK).get();
         
         assertTrue(fresh3.isAnon());
         assertTrue(fresh4.isAnon());
-        //assertNotEquals(fresh3, fresh4);
-        assertTrue(!fresh3.equals(fresh4)); // The above is not found by compiler
+        assertNotEquals(fresh3, fresh4);
     }
     
     @Test
