@@ -45,7 +45,6 @@ import xyz.ottr.lutra.result.ResultStream;
 public class CSVSource extends JDBCSource {
 
     public static File testFolder = Files.createTempDir();
-    private BasicDataSource dataSource;
     private String input;
     private String eolChar;
     private char separator;
@@ -83,11 +82,11 @@ public class CSVSource extends JDBCSource {
             e.printStackTrace();
         }
         
-        try (Connection conn = this.dataSource.getConnection()) {
+        try (Connection conn = super.dataSource.getConnection()) {
             // Load CSV into database
             Statement stmt = conn.createStatement();
-            stmt.execute("DROP TABLE IF EXISTS " + input);
-            String loaderQuery = "LOAD DATA INFILE '" + input
+            //stmt.execute("DROP TABLE IF EXISTS " + input + ";");
+            String loaderQuery = "LOAD DATA INFILE '" + input + "'"
                                  + " INTO TABLE " + input + " "
                                  + " FIELDS TERMINATED BY '" + separator + "'"
                                  + " ENCLOSED BY '" + encloser + "'"
