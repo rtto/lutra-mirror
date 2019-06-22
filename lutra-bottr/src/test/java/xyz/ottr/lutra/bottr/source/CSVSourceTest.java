@@ -41,18 +41,14 @@ import xyz.ottr.lutra.result.ResultStream;
  * #L%
  */
 
-public class CSVSourceWinTest {
-  
+public class CSVSourceTest {
+
+    private static final Path ROOT = Paths.get("src", "test", "resources");
+
     @Rule
     public TemporaryFolder testFolder = new TemporaryFolder();
 
-    @Test
-    public void prototypeTest() throws ClassNotFoundException, SQLException {
-
-        Path root = Paths.get("src", "test", "resources");
-        String file = "win.csv";
-        String input = root.toAbsolutePath().toString() + '\\' + file;
-        
+    private Set<Record<String>> getExpectedResult() {
         //Create expected result
         Set<Record<String>> expected = new HashSet<>();
         expected.add(new Record<>(Arrays.asList("1", "Paulo", "2500")));
@@ -62,14 +58,38 @@ public class CSVSourceWinTest {
         expected.add(new Record<>(Arrays.asList("5", "Joselito", "1500")));
         expected.add(new Record<>(Arrays.asList("6", "Linhares", "2200")));
         expected.add(new Record<>(Arrays.asList("7", "Lagreca", "1000")));
+        return expected;
+    }
 
-        //Run the source
+
+    @Test
+    public void noHeader() {
+        String input = getAbsolutePath("noheader.csv");
         CSVSource csvTest = new CSVSource(input, ',', '\'', true);
-        ResultStream<Record<String>> rowStream = csvTest.execute("SELECT ID, NAME, SALARY FROM " + input + ";");
-        Set<Record<String>> dbOutput = rowStream.innerCollect(Collectors.toSet());
+        testAgainstExpectedResult(csvTest.execute("SELECT ID, NAME, SALARY FROM " + input + ";"));
+    }
 
-        //Compare dbOutput to expected result
-        Assert.assertEquals(dbOutput, expected);
+    @Test
+    public void linuxSeparator() {
+        String input = getAbsolutePath("linux.csv");
+        CSVSource csvTest = new CSVSource(input, ',', '\'', true);
+        testAgainstExpectedResult(csvTest.execute("SELECT ID, NAME, SALARY FROM " + input + ";"));
+    }
+
+    @Test
+    public void windowsSeparator() {
+        String input = getAbsolutePath("win.csv");
+        CSVSource csvTest = new CSVSource(input, ',', '\'', true);
+        testAgainstExpectedResult(csvTest.execute("SELECT ID, NAME, SALARY FROM " + input + ";"));
+    }
+
+    private String getAbsolutePath(String file) {
+        return ROOT.resolve(file).toAbsolutePath().toString();
+    }
+
+    private void testAgainstExpectedResult(ResultStream<Record<String>> actualResult) {
+        Set<Record<String>> dbOutput = actualResult.innerCollect(Collectors.toSet());
+        Assert.assertEquals(dbOutput, getExpectedResult());
     }
 
 }
