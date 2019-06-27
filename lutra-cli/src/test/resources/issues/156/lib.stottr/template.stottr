@@ -1,4 +1,4 @@
-@prefix ex: <http://example.com/ns> .
+@prefix ex: <http://example.com/ns#> .
 @prefix ax: <http://tpl.ottr.xyz/owl/axiom/0.1/> .
 @prefix owl:   <http://www.w3.org/2002/07/owl#> .
 
