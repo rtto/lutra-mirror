@@ -1,472 +1,479 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
-	<modelVersion>4.0.0</modelVersion>
+    <modelVersion>4.0.0</modelVersion>
 
-	<groupId>xyz.ottr.lutra</groupId>
-	<artifactId>lutra</artifactId>
-	<version>0.6.0-beta-2-SNAPSHOT</version>
-	<packaging>pom</packaging>
-	<modules>
-		<module>lutra-core</module>
-		<module>lutra-wottr</module>
-		<module>lutra-tab</module>
-		<module>lutra-stottr</module>
-		<module>lutra-cli</module>
-	</modules>
+    <groupId>xyz.ottr.lutra</groupId>
+    <artifactId>lutra</artifactId>
+    <version>0.6.0-beta-2-SNAPSHOT</version>
+    <packaging>pom</packaging>
+    <modules>
+        <module>lutra-core</module>
+        <module>lutra-wottr</module>
+        <module>lutra-tab</module>
+        <module>lutra-stottr</module>
+        <module>lutra-cli</module>
+    </modules>
 
-	<issueManagement>
-		<url>/issues</url>
-		<system>GitLab Issues</system>
-	</issueManagement>
+    <issueManagement>
+        <url>/issues</url>
+        <system>GitLab Issues</system>
+    </issueManagement>
 
-	<licenses>
-		<license>
-			<name>GNU Lesser General Public License</name>
-			<url>https://www.gnu.org/licenses/old-licenses/lgpl-2.1.html</url>
-			<distribution>repo</distribution>
-		</license>
-	</licenses>
+    <licenses>
+        <license>
+            <name>GNU Lesser General Public License</name>
+            <url>https://www.gnu.org/licenses/old-licenses/lgpl-2.1.html</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
 
-	<scm>
-		<url>https://gitlab.com/ottr/lutra/lutra</url>
-		<connection>scm:git:https://gitlab.com/ottr/lutra/lutra.git</connection>
-		<developerConnection>scm:git:https://gitlab.com/ottr/lutra/lutra.git</developerConnection>
-		<tag>v0.5.0-alpha-2</tag>
-	</scm>
+    <scm>
+        <url>https://gitlab.com/ottr/lutra/lutra</url>
+        <connection>scm:git:https://gitlab.com/ottr/lutra/lutra.git</connection>
+        <developerConnection>scm:git:https://gitlab.com/ottr/lutra/lutra.git</developerConnection>
+        <tag>v0.5.0-alpha-2</tag>
+    </scm>
 
-	<developers>
-		<developer>
-			<name>Martin G. Skjæveland</name>
-		</developer>
-		<developer>
-			<name>Leif Harald Karlsen</name>
-		</developer>
-	</developers>
+    <developers>
+        <developer>
+            <name>Martin G. Skjæveland</name>
+        </developer>
+        <developer>
+            <name>Leif Harald Karlsen</name>
+        </developer>
+    </developers>
 
-	<properties>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		
-		<maven.compiler.target>1.8</maven.compiler.target>
-		<maven.javadoc.skip>true</maven.javadoc.skip>
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-		<jena.version>3.11.0</jena.version>		
-	</properties>
+        <maven.compiler.target>1.8</maven.compiler.target>
+        <maven.javadoc.skip>true</maven.javadoc.skip>
 
-	<build>
-		<plugins>
+        <jena.version>3.12.0</jena.version>
+    </properties>
 
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.8.1</version>
-				<configuration>
-					<source>1.8</source>
-					<target>1.8</target>
-				</configuration>
-			</plugin>
+    <build>
+        <plugins>
 
-			<plugin>
-				<groupId>external.atlassian.jgitflow</groupId>
-				<artifactId>jgitflow-maven-plugin</artifactId>
-				<version>1.0-m5.1</version>
-				<configuration>
-					<flowInitContext>
-						<versionTagPrefix>v</versionTagPrefix>
-					</flowInitContext>
-					<autoVersionSubmodules>true</autoVersionSubmodules>
-					<enableSshAgent>true</enableSshAgent>
-					<noDeploy>true</noDeploy>
-					<scmCommentPrefix>[jgitflow] </scmCommentPrefix>
-				</configuration>
-			</plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.8.1</version>
+                <configuration>
+                    <source>1.8</source>
+                    <target>1.8</target>
+                </configuration>
+            </plugin>
 
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-jar-plugin</artifactId>
-				<version>3.1.1</version>
-				<configuration>
-					<archive>
-						<manifest>
-							<addDefaultImplementationEntries>true</addDefaultImplementationEntries>
-							<addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
-						</manifest>
-					</archive>
-				</configuration>
-			</plugin>
+            <plugin>
+                <groupId>external.atlassian.jgitflow</groupId>
+                <artifactId>jgitflow-maven-plugin</artifactId>
+                <version>1.0-m5.1</version>
+                <configuration>
+                    <flowInitContext>
+                        <versionTagPrefix>v</versionTagPrefix>
+                    </flowInitContext>
+                    <autoVersionSubmodules>true</autoVersionSubmodules>
+                    <enableSshAgent>true</enableSshAgent>
+                    <noDeploy>true</noDeploy>
+                    <scmCommentPrefix>[jgitflow] </scmCommentPrefix>
+                </configuration>
+            </plugin>
 
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-source-plugin</artifactId>
-				<version>3.0.1</version>
-				<executions>
-					<execution>
-						<goals>
-							<goal>jar</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>3.1.2</version>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+                            <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
+                        </manifest>
+                    </archive>
+                </configuration>
+            </plugin>
 
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-surefire-plugin</artifactId>
-				<version>2.22.2</version>
-				<!-- <configuration> <useSystemClassLoader>false</useSystemClassLoader> 
-					</configuration> --> <!-- For Debian, see https://stackoverflow.com/questions/13170860/failed-to-execute-goal-org-apache-maven-pluginsmaven-surefire-plugin2-10test/41666587#41666587 -->
-				<!-- <configuration> <argLine>-Xms15512m -Xmx15512m</argLine> </configuration> --> <!-- To increase memory -->
-			</plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>3.1.0</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
 
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>license-maven-plugin</artifactId>
-				<version>1.20</version>
-				<configuration>
-					<verbose>false</verbose>
-					<licenseName>lgpl_v2_1</licenseName>
-					<inceptionYear>2018</inceptionYear>
-					<organizationName>University of Oslo</organizationName>
-				</configuration>
-				<executions>
-					<execution>
-						<id>first</id>
-						<goals>
-							<goal>update-file-header</goal>
-						</goals>
-						<phase>process-sources</phase>
-						<configuration>
-							<roots>
-								<root>src/main/java</root>
-								<root>src/test/java</root>
-							</roots>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.22.2</version>
+                <!-- <configuration> <useSystemClassLoader>false</useSystemClassLoader>
+                    </configuration> --> <!-- For Debian, see https://stackoverflow.com/questions/13170860/failed-to-execute-goal-org-apache-maven-pluginsmaven-surefire-plugin2-10test/41666587#41666587 -->
+                <!-- <configuration> <argLine>-Xms15512m -Xmx15512m</argLine> </configuration> --> <!-- To increase memory -->
+            </plugin>
 
-			<!-- code checks -->
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-checkstyle-plugin</artifactId>
-				<version>3.0.0</version>
-				<executions>
-					<execution>
-						<id>verify-style</id>
-						<phase>process-classes</phase>
-						<goals>
-							<goal>check</goal>
-						</goals>
-					</execution>
-				</executions>
-				<configuration>
-                                        <sourceDirectories>
-                                            <sourceDirectory>src/</sourceDirectory> <!-- Skip checking generated sources -->
-                                        </sourceDirectories>
-					<encoding>UTF-8</encoding>
-					<configLocation>config/checkstyle.xml</configLocation>
-					<suppressionsLocation>config/checkstyle-suppressions.xml</suppressionsLocation>
-					<suppressionsFileExpression>checkstyle.suppressions.file</suppressionsFileExpression>
-					<includeTestSourceDirectory>true</includeTestSourceDirectory>
-					<consoleOutput>true</consoleOutput>
-					<linkXRef>false</linkXRef>
-					<violationSeverity>error</violationSeverity>
-					<failsOnError>true</failsOnError>
-					<failOnViolation>true</failOnViolation>
-				</configuration>
-				<dependencies>
-					<dependency>
-						<groupId>com.puppycrawl.tools</groupId>
-						<artifactId>checkstyle</artifactId>
-						<version>8.20</version>
-					</dependency>
-				</dependencies>
-			</plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>license-maven-plugin</artifactId>
+                <version>1.20</version>
+                <configuration>
+                    <verbose>false</verbose>
+                    <licenseName>lgpl_v2_1</licenseName>
+                    <inceptionYear>2018</inceptionYear>
+                    <organizationName>University of Oslo</organizationName>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>first</id>
+                        <goals>
+                            <goal>update-file-header</goal>
+                        </goals>
+                        <phase>process-sources</phase>
+                        <configuration>
+                            <roots>
+                                <root>src/main/java</root>
+                                <root>src/test/java</root>
+                            </roots>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
 
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-pmd-plugin</artifactId>
-				<version>3.8</version>
-				<configuration>
-                                            <excludeRoots>
-                                              <excludeRoot>target/generated-sources/</excludeRoot> <!-- Skip checking generated sources -->
-                                            </excludeRoots>
-					    <printFailingErrors>true</printFailingErrors>
-				</configuration>
-				<executions>
-					<execution>
-						<phase>validate</phase>
-						<goals>
-							<goal>check</goal>
-							<goal>cpd-check</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
+            <!-- code checks -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-checkstyle-plugin</artifactId>
+                <version>3.1.0</version>
+                <executions>
+                    <execution>
+                        <id>verify-style</id>
+                        <phase>process-classes</phase>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <sourceDirectories>
+                        <sourceDirectory>src/</sourceDirectory> <!-- Skip checking generated sources -->
+                    </sourceDirectories>
+                    <encoding>UTF-8</encoding>
+                    <configLocation>config/checkstyle.xml</configLocation>
+                    <suppressionsLocation>config/checkstyle-suppressions.xml</suppressionsLocation>
+                    <suppressionsFileExpression>checkstyle.suppressions.file</suppressionsFileExpression>
+                    <includeTestSourceDirectory>true</includeTestSourceDirectory>
+                    <consoleOutput>true</consoleOutput>
+                    <linkXRef>false</linkXRef>
+                    <violationSeverity>error</violationSeverity>
+                    <failsOnError>true</failsOnError>
+                    <failOnViolation>true</failOnViolation>
+                </configuration>
+                <dependencies>
+                    <dependency>
+                        <groupId>com.puppycrawl.tools</groupId>
+                        <artifactId>checkstyle</artifactId>
+                        <version>8.22</version>
+                    </dependency>
+                </dependencies>
+            </plugin>
 
-			<plugin>
-				<groupId>com.github.spotbugs</groupId>
-				<artifactId>spotbugs-maven-plugin</artifactId>
-				<version>3.1.11</version>
-				<configuration>
-					<effort>Max</effort>
-					<threshold>Low</threshold>
-					<xmlOutput>true</xmlOutput>
-					<excludeFilterFile>config/spotbugs-exclude.xml</excludeFilterFile>
-				</configuration>
-				<executions>
-					<execution>
-						<phase>verify</phase>
-						<goals>
-							<goal>check</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-pmd-plugin</artifactId>
+                <version>3.8</version>
+                <configuration>
+                    <excludeRoots>
+                        <excludeRoot>target/generated-sources/</excludeRoot> <!-- Skip checking generated sources -->
+                    </excludeRoots>
+                    <printFailingErrors>true</printFailingErrors>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>check</goal>
+                            <goal>cpd-check</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
 
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-enforcer-plugin</artifactId>
-				<version>1.4.1</version>
-				<executions>
-					<execution>
-						<id>enforce-versions</id>
-						<goals>
-							<goal>enforce</goal>
-						</goals>
-						<configuration>
-							<rules>
-								<requireJavaVersion>
-									<version>1.8</version>
-								</requireJavaVersion>
-								<requireMavenVersion>
-									<version>3.0.1</version>
-								</requireMavenVersion>
-							</rules>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
+            <plugin>
+                <groupId>com.github.spotbugs</groupId>
+                <artifactId>spotbugs-maven-plugin</artifactId>
+                <version>3.1.12</version>
+                <configuration>
+                    <effort>Max</effort>
+                    <threshold>Low</threshold>
+                    <xmlOutput>true</xmlOutput>
+                    <excludeFilterFile>config/spotbugs-exclude.xml</excludeFilterFile>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
 
-			<plugin>
-				<groupId>de.thetaphi</groupId>
-				<artifactId>forbiddenapis</artifactId>
-				<version>2.6</version>
-				<configuration>
-					<failOnUnsupportedJava>false</failOnUnsupportedJava>
-					<bundledSignatures>
-						<!-- https://github.com/policeman-tools/forbidden-apis/wiki/BundledSignatures -->
-						<bundledSignature>jdk-unsafe</bundledSignature>
-						<bundledSignature>jdk-deprecated</bundledSignature>
-						<bundledSignature>jdk-internal</bundledSignature>
-						<bundledSignature>jdk-system-out</bundledSignature>
-						<bundledSignature>jdk-non-portable</bundledSignature>
-						<bundledSignature>jdk-reflection</bundledSignature>
-					</bundledSignatures>
-					<excludes>
-						<!-- MessageHandler uses System.err: -->
-						<exclude>**/xyz/ottr/lutra/result/MessageHandler.class</exclude>
-						
-						<!-- CLI uses System.out: -->
-						<exclude>**/xyz/ottr/lutra/cli/CLI.class</exclude>
-					</excludes>
-				</configuration>
-				<executions>
-					<execution>
-						<goals>
-							<goal>check</goal>
-							<goal>testCheck</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-enforcer-plugin</artifactId>
+                <version>1.4.1</version>
+                <executions>
+                    <execution>
+                        <id>enforce-versions</id>
+                        <goals>
+                            <goal>enforce</goal>
+                        </goals>
+                        <configuration>
+                            <rules>
+                                <requireJavaVersion>
+                                    <version>1.8</version>
+                                </requireJavaVersion>
+                                <requireMavenVersion>
+                                    <version>3.0.1</version>
+                                </requireMavenVersion>
+                            </rules>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
 
-		</plugins>
+            <plugin>
+                <groupId>de.thetaphi</groupId>
+                <artifactId>forbiddenapis</artifactId>
+                <version>2.6</version>
+                <configuration>
+                    <failOnUnsupportedJava>false</failOnUnsupportedJava>
+                    <bundledSignatures>
+                        <!-- https://github.com/policeman-tools/forbidden-apis/wiki/BundledSignatures -->
+                        <bundledSignature>jdk-unsafe</bundledSignature>
+                        <bundledSignature>jdk-deprecated</bundledSignature>
+                        <bundledSignature>jdk-internal</bundledSignature>
+                        <bundledSignature>jdk-system-out</bundledSignature>
+                        <bundledSignature>jdk-non-portable</bundledSignature>
+                        <bundledSignature>jdk-reflection</bundledSignature>
+                    </bundledSignatures>
+                    <excludes>
+                        <!-- MessageHandler uses System.err: -->
+                        <exclude>**/xyz/ottr/lutra/result/MessageHandler.class</exclude>
 
-		<pluginManagement>
-			<plugins>
+                        <!-- CLI uses System.out: -->
+                        <exclude>**/xyz/ottr/lutra/cli/CLI.class</exclude>
+                    </excludes>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>check</goal>
+                            <goal>testCheck</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
 
-				<!-- https://github.com/maven-download-plugin/maven-download-plugin -->
-				<plugin>
-					<groupId>com.googlecode.maven-download-plugin</groupId>
-					<artifactId>download-maven-plugin</artifactId>
-					<version>1.3.0</version>
-				</plugin>
+        </plugins>
 
-				<plugin>
-					<groupId>com.coderplus.maven.plugins</groupId>
-					<artifactId>copy-rename-maven-plugin</artifactId>
-					<version>1.0.1</version>
-				</plugin>
+        <pluginManagement>
+            <plugins>
 
-				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-shade-plugin</artifactId>
-					<version>3.2.1</version>
-				</plugin>
+                <!-- https://github.com/maven-download-plugin/maven-download-plugin -->
+                <plugin>
+                    <groupId>com.googlecode.maven-download-plugin</groupId>
+                    <artifactId>download-maven-plugin</artifactId>
+                    <version>1.3.0</version>
+                </plugin>
 
-			</plugins>
-		</pluginManagement>
+                <plugin>
+                    <groupId>com.coderplus.maven.plugins</groupId>
+                    <artifactId>copy-rename-maven-plugin</artifactId>
+                    <version>1.0.1</version>
+                </plugin>
 
-	</build>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-shade-plugin</artifactId>
+                    <version>3.2.1</version>
+                </plugin>
 
-	<reporting>
-		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-project-info-reports-plugin</artifactId>
-				<version>3.0.0</version>
-				<configuration>
-					<dependencyDetailsEnabled>true</dependencyDetailsEnabled>
-					<dependencyLocationsEnabled>true</dependencyLocationsEnabled>
-				</configuration>
-			</plugin>
+            </plugins>
+        </pluginManagement>
 
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-jxr-plugin</artifactId>
-				<version>3.0.0</version>
-			</plugin>
+    </build>
 
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-surefire-report-plugin</artifactId>
-				<version>2.22.2</version>
-			</plugin>
+    <reporting>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-project-info-reports-plugin</artifactId>
+                <version>3.0.0</version>
+                <configuration>
+                    <dependencyDetailsEnabled>true</dependencyDetailsEnabled>
+                    <dependencyLocationsEnabled>true</dependencyLocationsEnabled>
+                </configuration>
+            </plugin>
 
-			<plugin>
-				<artifactId>maven-pmd-plugin</artifactId>
-				<version>3.8</version>
-				<reportSets>
-					<reportSet>
-						<reports>
-							<report>pmd</report>
-							<report>cpd</report>
-						</reports>
-					</reportSet>
-				</reportSets>
-			</plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jxr-plugin</artifactId>
+                <version>3.0.0</version>
+            </plugin>
 
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>findbugs-maven-plugin</artifactId>
-				<version>3.0.5</version>
-				<configuration>
-					<xmlOutput>true</xmlOutput>
-				</configuration>
-			</plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-report-plugin</artifactId>
+                <version>2.22.2</version>
+            </plugin>
 
-		</plugins>
-	</reporting>
+            <plugin>
+                <artifactId>maven-pmd-plugin</artifactId>
+                <version>3.8</version>
+                <reportSets>
+                    <reportSet>
+                        <reports>
+                            <report>pmd</report>
+                            <report>cpd</report>
+                        </reports>
+                    </reportSet>
+                </reportSets>
+            </plugin>
 
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>findbugs-maven-plugin</artifactId>
+                <version>3.0.5</version>
+                <configuration>
+                    <xmlOutput>true</xmlOutput>
+                </configuration>
+            </plugin>
 
-	<dependencies>
-		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<scope>test</scope>
-		</dependency>
-	</dependencies>
+        </plugins>
+    </reporting>
 
 
-
-	<dependencyManagement>
-		<dependencies>
-
-			<dependency>
-				<groupId>${project.groupId}</groupId>
-				<artifactId>lutra-core</artifactId>
-				<version>${project.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>${project.groupId}</groupId>
-				<artifactId>lutra-wottr</artifactId>
-				<version>${project.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>${project.groupId}</groupId>
-				<artifactId>lutra-tab</artifactId>
-				<version>${project.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>${project.groupId}</groupId>
-				<artifactId>lutra-stottr</artifactId>
-				<version>${project.version}</version>
-			</dependency>
+    <dependencies>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
 
 
-			<!-- Apache commons -->
-			<dependency>
-				<groupId>org.apache.commons</groupId>
-				<artifactId>commons-collections4</artifactId>
-				<version>4.3</version>
-			</dependency>
-			<dependency>
-				<groupId>org.apache.commons</groupId>
-				<artifactId>commons-math3</artifactId>
-				<version>3.6.1</version>
-			</dependency>
 
-			<dependency>
-				<groupId>commons-io</groupId>
-				<artifactId>commons-io</artifactId>
-				<version>2.6</version>
-			</dependency>
+    <dependencyManagement>
+        <dependencies>
 
-
-			<!-- JENA -->
-			<dependency>
-				<groupId>org.apache.jena</groupId>
-				<artifactId>jena-core</artifactId>
-				<version>${jena.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>org.apache.jena</groupId>
-				<artifactId>jena-arq</artifactId>
-				<version>${jena.version}</version>
-			</dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>lutra-core</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>lutra-wottr</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>lutra-tab</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>lutra-stottr</artifactId>
+                <version>${project.version}</version>
+            </dependency>
 
 
-			<!-- TabOTTR -->
+            <!-- Apache commons -->
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-collections4</artifactId>
+                <version>4.3</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-math3</artifactId>
+                <version>3.6.1</version>
+            </dependency>
 
-			<dependency>
-				<groupId>commons-validator</groupId>
-				<artifactId>commons-validator</artifactId>
-				<version>1.6</version>
-			</dependency>
+            <dependency>
+                <groupId>commons-io</groupId>
+                <artifactId>commons-io</artifactId>
+                <version>2.6</version>
+            </dependency>
 
-			<!-- apache poi -->
-			<dependency>
-				<groupId>org.apache.poi</groupId>
-				<artifactId>poi</artifactId>
-				<version>4.1.0</version>
-			</dependency>
 
-			<dependency>
-				<groupId>org.apache.poi</groupId>
-				<artifactId>poi-ooxml</artifactId>
-				<version>4.1.0</version>
-			</dependency>
+            <!-- JENA -->
+            <dependency>
+                <groupId>org.apache.jena</groupId>
+                <artifactId>jena-core</artifactId>
+                <version>${jena.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.jena</groupId>
+                <artifactId>jena-arq</artifactId>
+                <version>${jena.version}</version>
+            </dependency>
 
-			<!-- CLI -->
-			<!-- https://mvnrepository.com/artifact/info.picocli/picocli -->
-			<dependency>
-				<groupId>info.picocli</groupId>
-				<artifactId>picocli</artifactId>
-				<version>3.9.6</version>
-			</dependency>
+            <!-- stOTTR -->
+            <dependency>
+                <groupId>org.antlr</groupId>
+                <artifactId>antlr4-maven-plugin</artifactId>
+                <version>4.7.2</version>
+            </dependency>
 
-			<dependency>
-				<groupId>org.slf4j</groupId>
-				<artifactId>slf4j-log4j12</artifactId>
-				<version>1.7.26</version>
-			</dependency>
 
-			<dependency>
-				<groupId>junit</groupId>
-				<artifactId>junit</artifactId>
-				<version>4.12</version>
-			</dependency>
+            <!-- TabOTTR -->
 
-		</dependencies>
-	</dependencyManagement>
+            <dependency>
+                <groupId>commons-validator</groupId>
+                <artifactId>commons-validator</artifactId>
+                <version>1.6</version>
+            </dependency>
+
+            <!-- apache poi -->
+            <dependency>
+                <groupId>org.apache.poi</groupId>
+                <artifactId>poi</artifactId>
+                <version>4.1.0</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.poi</groupId>
+                <artifactId>poi-ooxml</artifactId>
+                <version>4.1.0</version>
+            </dependency>
+
+            <!-- CLI -->
+            <!-- https://mvnrepository.com/artifact/info.picocli/picocli -->
+            <dependency>
+                <groupId>info.picocli</groupId>
+                <artifactId>picocli</artifactId>
+                <version>3.9.6</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-log4j12</artifactId>
+                <version>1.7.26</version>
+            </dependency>
+
+            <dependency>
+                <groupId>junit</groupId>
+                <artifactId>junit</artifactId>
+                <version>4.12</version>
+            </dependency>
+
+        </dependencies>
+    </dependencyManagement>
 
 </project>
