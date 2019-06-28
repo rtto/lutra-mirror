@@ -11,7 +11,7 @@
     <packaging>jar</packaging>
 
     <properties>
-        <url.stottrspec>https://dev.spec.ottr.xyz/stOTTR/</url.stottrspec>
+        <url.stottrspec>https://spec.ottr.xyz/stOTTR/0.1/</url.stottrspec>
         <local.stottrspec>${project.basedir}/src/main/antlr4/</local.stottrspec>
     </properties>
 
