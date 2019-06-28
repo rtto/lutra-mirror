@@ -20,6 +20,10 @@ test:
   stage: test
   script:
     - mvn $MAVEN_CLI_OPTS verify
+  artifacts:
+    expire_in: 2day
+    paths:
+      - lutra-cli/target/lutra.jar
 
 .deploy: &deploy
   stage: deploy
@@ -41,6 +45,7 @@ release:
   only:
     - tags
   artifacts:
+    expire_in: 48 mos 1day
     paths:
     - lutra.jar
 
