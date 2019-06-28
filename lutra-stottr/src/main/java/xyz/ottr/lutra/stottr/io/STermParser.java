@@ -120,9 +120,9 @@ public class STermParser extends SBaseParserVisitor<Term> {
     @Override
     public Result<Term> visitList(stOTTRParser.ListContext ctx) {
 
-        List<Result<Term>> termResLst = ctx.constant()
+        List<Result<Term>> termResLst = ctx.term()
             .stream()
-            .map(cnst -> visitConstant(cnst))
+            .map(cnst -> visitTerm(cnst))
             .collect(Collectors.toList());
 
         Result<List<Term>> termLstRes = Result.aggregate(termResLst);

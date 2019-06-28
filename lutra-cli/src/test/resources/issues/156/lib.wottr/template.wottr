@@ -1,0 +1,13 @@
+@prefix ex: <http://example.com/ns#> .
+@prefix ax: <http://tpl.ottr.xyz/owl/axiom/0.1/> .
+@prefix owl:   <http://www.w3.org/2002/07/owl#> .
+@prefix ottr:   <http://ns.ottr.xyz/0.4/> .
+
+ex:intersect a ottr:Template ;
+  ottr:parameters (
+    [ ottr:type owl:Class; ottr:variable _:A ]
+    [ ottr:type owl:Class; ottr:variable _:B ]	
+    [ ottr:type owl:Class; ottr:variable _:AB ] ) ;
+  ottr:pattern [
+    ottr:of ax:EquivObjectIntersectionOf ;
+    ottr:values (_:AB (_:A _:B)) ] .
