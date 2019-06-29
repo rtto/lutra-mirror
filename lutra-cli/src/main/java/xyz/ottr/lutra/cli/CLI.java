@@ -424,7 +424,7 @@ public class CLI {
             // TODO: cli-arg to decide extension
             String iriPath = iriToPath(iri);
             Files.createDirectories(Paths.get(settings.out, iriToDirectory(iriPath)));
-            Files.write(Paths.get(settings.out, iriPath + ".ttl"), output.getBytes(Charset.forName("UTF-8")));
+            Files.write(Paths.get(settings.out, iriPath + getFileSuffix()), output.getBytes(Charset.forName("UTF-8")));
         } catch (IOException | URISyntaxException ex) {
             Message err = Message.error(
                 "Error when writing output -- " + ex.getMessage());
@@ -448,6 +448,19 @@ public class CLI {
         return prefixes;
     }
 
+    private static String getFileSuffix() {
+
+        switch (settings.outputFormat) {
+            case legacy:
+            case wottr:
+                return ".ttl";
+            case stottr:
+                return ".stottr";
+            default:
+                return "";
+        }
+    }
+        
 
     private static boolean shouldPrintOutput() {
         return settings.stdout || settings.out == null;
