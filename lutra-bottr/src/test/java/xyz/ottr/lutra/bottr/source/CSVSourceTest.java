@@ -65,22 +65,23 @@ public class CSVSourceTest {
     @Test
     public void noHeader() {
         String input = getAbsolutePath("noheader.csv");
-        CSVSource csvTest = new CSVSource(input, ',', '\'', true);
-        testAgainstExpectedResult(csvTest.execute("SELECT ID, NAME, SALARY FROM " + input + ";"));
+        CSVSource csvTest = new CSVSource();
+        testAgainstExpectedResult(csvTest.execute("SELECT ID, NAME, SALARY FROM CSVREAD('" + input + "',"
+                + "'ID,NAME,AGE,ADDRESS,SALARY', 'fieldSeparator=,');"));
     }
 
     @Test
     public void linuxSeparator() {
         String input = getAbsolutePath("linux.csv");
-        CSVSource csvTest = new CSVSource(input, ',', '\'', true);
-        testAgainstExpectedResult(csvTest.execute("SELECT ID, NAME, SALARY FROM " + input + ";"));
+        CSVSource csvTest = new CSVSource();
+        testAgainstExpectedResult(csvTest.execute("SELECT ID, NAME, SALARY FROM CSVREAD('" + input + "');"));
     }
 
     @Test
     public void windowsSeparator() {
         String input = getAbsolutePath("win.csv");
-        CSVSource csvTest = new CSVSource(input, ',', '\'', true);
-        testAgainstExpectedResult(csvTest.execute("SELECT ID, NAME, SALARY FROM " + input + ";"));
+        CSVSource csvTest = new CSVSource();
+        testAgainstExpectedResult(csvTest.execute("SELECT ID, NAME, SALARY FROM CSVREAD('" + input + "');"));
     }
 
     private String getAbsolutePath(String file) {
@@ -89,7 +90,7 @@ public class CSVSourceTest {
 
     private void testAgainstExpectedResult(ResultStream<Record<String>> actualResult) {
         Set<Record<String>> dbOutput = actualResult.innerCollect(Collectors.toSet());
-        Assert.assertEquals(dbOutput, getExpectedResult());
+        Assert.assertEquals(getExpectedResult(), dbOutput);
     }
 
 }
