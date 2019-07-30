@@ -1,5 +1,9 @@
 package xyz.ottr.lutra.bottr.source;
 
+import static org.junit.Assert.assertEquals;
+
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.Connection;
@@ -10,14 +14,21 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import org.apache.jena.shared.PrefixMapping;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
+import xyz.ottr.lutra.bottr.model.InstanceMap;
 import xyz.ottr.lutra.bottr.model.Record;
+import xyz.ottr.lutra.bottr.model.Source;
+import xyz.ottr.lutra.bottr.model.ValueMap;
 import xyz.ottr.lutra.bottr.source.CSVSource;
 import xyz.ottr.lutra.result.ResultStream;
+import xyz.ottr.lutra.tabottr.TabOTTR;
+import xyz.ottr.lutra.wottr.WOTTR;
 
 /*-
  * #%L
@@ -48,6 +59,40 @@ public class CSVSourceTest {
     @Rule
     public TemporaryFolder testFolder = new TemporaryFolder();
 
+    @Test
+    public void prototypeTest() throws IOException {
+
+        // define prefixes
+        PrefixMapping prefixes = PrefixMapping.Factory.create();
+        prefixes.setNsPrefix("ex", "http://example.com/ns#");
+
+        // Write CSV file
+        String root = testFolder.getRoot().getAbsolutePath();
+        String csvFilename = root + "/data.csv";
+        String csvContent = "Subject,Predicate,Object\n" // first row contains column names
+            + "ex:A1,ex:B1,ex:C1\n"
+            + "ex:A2,ex:B2,ex:C2\n"
+            + "ex:A3,ex:B3,ex:C3\n";
+        Files.write(Paths.get(csvFilename), csvContent.getBytes());
+
+        // Set up map to translate source to triple instances
+        ValueMap valMap = new ValueMap(prefixes, Arrays.asList(TabOTTR.TYPE_IRI, TabOTTR.TYPE_IRI, TabOTTR.TYPE_IRI));
+
+        // H2 database to load CSV file
+        Source<String> csvSource = new CSVSource();
+
+        // map data to triples
+        InstanceMap map = new InstanceMap(
+            csvSource,
+            "SELECT * FROM CSVREAD('" + csvFilename + "');",
+            WOTTR.triple.toString(),
+            valMap
+        );
+
+        // there should be three triples
+        assertEquals(3, map.get().getStream().filter(r -> r.isPresent()).count());
+    }
+
     private Set<Record<String>> getExpectedResult() {
         //Create expected result
         Set<Record<String>> expected = new HashSet<>();
@@ -60,7 +105,6 @@ public class CSVSourceTest {
         expected.add(new Record<>(Arrays.asList("7", "Lagreca", "1000")));
         return expected;
     }
-
 
     @Test
     public void noHeader() {

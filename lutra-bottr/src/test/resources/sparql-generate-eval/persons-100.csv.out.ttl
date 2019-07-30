@@ -1,0 +1,908 @@
+@prefix schema: <http://schema.org/> .
+@prefix ex:    <http://example.com/ns#> .
+@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix owl:   <http://www.w3.org/2002/07/owl#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix foaf:  <http://xmlns.com/foaf/0.1/> .
+@prefix dc:    <http://purl.org/dc/elements/1.1/> .
+
+<http://example.com/person/41>
+        a                 foaf:Person ;
+        schema:birthDate  "1962-10-13T01:57:16+01:00"^^xsd:dateTime ;
+        schema:height     165.17233122502 ;
+        schema:weight     73.735837027786 ;
+        foaf:mbox         <tel:1-160-909-4617> ;
+        foaf:name         "Austin Burns" ;
+        foaf:phone        <mailto:augue.ac.ipsum@tempus.com> .
+
+<http://example.com/person/13>
+        a                 foaf:Person ;
+        schema:birthDate  "1957-07-12T12:45:49+01:00"^^xsd:dateTime ;
+        schema:height     167.64477196223 ;
+        schema:weight     68.508448542432 ;
+        foaf:mbox         <tel:1-902-948-6135> ;
+        foaf:name         "Jared Boone" ;
+        foaf:phone        <mailto:Vivamus.nibh@tellusSuspendisse.org> .
+
+<http://example.com/person/82>
+        a                 foaf:Person ;
+        schema:birthDate  "1975-08-07T08:02:49+01:00"^^xsd:dateTime ;
+        schema:height     166.30429396164 ;
+        schema:weight     67.331052349638 ;
+        foaf:mbox         <tel:604-3331> ;
+        foaf:name         "Hasad Sweeney" ;
+        foaf:phone        <mailto:sociosqu@dolorvitaedolor.edu> .
+
+<http://example.com/person/54>
+        a                 foaf:Person ;
+        schema:birthDate  "1988-05-11T09:20:33+02:00"^^xsd:dateTime ;
+        schema:height     160.93516099011 ;
+        schema:weight     63.693404927605 ;
+        foaf:mbox         <tel:1-391-992-9156> ;
+        foaf:name         "Stewart Mcgowan" ;
+        foaf:phone        <mailto:Sed.nulla@quamafelis.ca> .
+
+<http://example.com/person/26>
+        a                 foaf:Person ;
+        schema:birthDate  "1980-10-10T07:46:41+01:00"^^xsd:dateTime ;
+        schema:height     161.42391144182 ;
+        schema:weight     66.808554425312 ;
+        foaf:mbox         <tel:227-5214> ;
+        foaf:name         "Keane Wiley" ;
+        foaf:phone        <mailto:nunc@scelerisquesed.co.uk> .
+
+<http://example.com/person/95>
+        a                 foaf:Person ;
+        schema:birthDate  "1948-02-20T15:54:32+01:00"^^xsd:dateTime ;
+        schema:height     165.07443455344 ;
+        schema:weight     65.589214219642 ;
+        foaf:mbox         <tel:1-317-586-2922> ;
+        foaf:name         "Ryan Blair" ;
+        foaf:phone        <mailto:Aliquam.ornare@natoquepenatibus.co.uk> .
+
+<http://example.com/person/67>
+        a                 foaf:Person ;
+        schema:birthDate  "1960-02-05T14:50:34+01:00"^^xsd:dateTime ;
+        schema:height     165.34589749408 ;
+        schema:weight     67.267198626028 ;
+        foaf:mbox         <tel:425-7854> ;
+        foaf:name         "John Greene" ;
+        foaf:phone        <mailto:laoreet.ipsum@Aenean.org> .
+
+<http://example.com/person/39>
+        a                 foaf:Person ;
+        schema:birthDate  "1959-10-09T13:49:54+01:00"^^xsd:dateTime ;
+        schema:height     156.38559792299 ;
+        schema:weight     64.618619179573 ;
+        foaf:mbox         <tel:520-3663> ;
+        foaf:name         "Timon Hale" ;
+        foaf:phone        <mailto:malesuada@musAenean.edu> .
+
+<http://example.com/person/4>
+        a                 foaf:Person ;
+        schema:birthDate  "1996-06-23T01:02:19+02:00"^^xsd:dateTime ;
+        schema:height     164.29879257543 ;
+        schema:weight     71.974297306501 ;
+        foaf:mbox         <tel:1-782-875-0201> ;
+        foaf:name         "Emerson Bass" ;
+        foaf:phone        <mailto:aliquet.metus@hymenaeosMauris.edu> .
+
+<http://example.com/person/20>
+        a                 foaf:Person ;
+        schema:birthDate  "1957-08-17T03:00:26+01:00"^^xsd:dateTime ;
+        schema:height     165.52616482801 ;
+        schema:weight     68.819259950997 ;
+        foaf:mbox         <tel:1-600-255-4880> ;
+        foaf:name         "Daquan Patton" ;
+        foaf:phone        <mailto:dui@eratvel.org> .
+
+<http://example.com/person/61>
+        a                 foaf:Person ;
+        schema:birthDate  "1947-07-23T21:56:31+01:00"^^xsd:dateTime ;
+        schema:height     169.60590127197 ;
+        schema:weight     66.710400065181 ;
+        foaf:mbox         <tel:1-874-889-9228> ;
+        foaf:name         "Garth Farrell" ;
+        foaf:phone        <mailto:Integer@Craslorem.org> .
+
+<http://example.com/person/33>
+        a                 foaf:Person ;
+        schema:birthDate  "1942-10-24T12:06:39+02:00"^^xsd:dateTime ;
+        schema:height     167.032399966 ;
+        schema:weight     61.884355050408 ;
+        foaf:mbox         <tel:284-6251> ;
+        foaf:name         "Xenos Kidd" ;
+        foaf:phone        <mailto:orci.Ut.sagittis@magnis.edu> .
+
+<http://example.com/person/74>
+        a                 foaf:Person ;
+        schema:birthDate  "1958-01-24T17:36:57+01:00"^^xsd:dateTime ;
+        schema:height     155.84251136208 ;
+        schema:weight     72.03751674102 ;
+        foaf:mbox         <tel:253-1406> ;
+        foaf:name         "Wang French" ;
+        foaf:phone        <mailto:a@egetmagna.net> .
+
+<http://example.com/person/46>
+        a                 foaf:Person ;
+        schema:birthDate  "1944-11-23T11:32:08+01:00"^^xsd:dateTime ;
+        schema:height     166.56663857613 ;
+        schema:weight     66.699172299754 ;
+        foaf:mbox         <tel:891-3632> ;
+        foaf:name         "Aidan Ayala" ;
+        foaf:phone        <mailto:massa@atauctorullamcorper.co.uk> .
+
+<http://example.com/person/18>
+        a                 foaf:Person ;
+        schema:birthDate  "1970-07-26T18:27:17+01:00"^^xsd:dateTime ;
+        schema:height     165.55139700264 ;
+        schema:weight     71.94883822915 ;
+        foaf:mbox         <tel:1-702-391-4601> ;
+        foaf:name         "Giacomo Townsend" ;
+        foaf:phone        <mailto:tortor.nibh.sit@incursuset.com> .
+
+<http://example.com/person/87>
+        a                 foaf:Person ;
+        schema:birthDate  "1950-06-01T07:41:59+01:00"^^xsd:dateTime ;
+        schema:height     168.0706919717 ;
+        schema:weight     72.127877408957 ;
+        foaf:mbox         <tel:196-3819> ;
+        foaf:name         "Vladimir Gillespie" ;
+        foaf:phone        <mailto:pharetra.ut.pharetra@Proinnisl.edu> .
+
+<http://example.com/person/59>
+        a                 foaf:Person ;
+        schema:birthDate  "1944-06-01T15:57:52+02:00"^^xsd:dateTime ;
+        schema:height     167.18785688054 ;
+        schema:weight     70.357795390868 ;
+        foaf:mbox         <tel:1-999-670-0198> ;
+        foaf:name         "Curran Mcleod" ;
+        foaf:phone        <mailto:arcu.Vestibulum@et.org> .
+
+<http://example.com/person/40>
+        a                 foaf:Person ;
+        schema:birthDate  "1984-01-10T23:24:55+01:00"^^xsd:dateTime ;
+        schema:height     165.2924489733 ;
+        schema:weight     75.306079207018 ;
+        foaf:mbox         <tel:1-923-875-4466> ;
+        foaf:name         "Tate Snyder" ;
+        foaf:phone        <mailto:Suspendisse.aliquet.sem@ornareplaceratorci.ca> .
+
+<http://example.com/person/12>
+        a                 foaf:Person ;
+        schema:birthDate  "1977-07-13T12:50:55+02:00"^^xsd:dateTime ;
+        schema:height     167.93457852643 ;
+        schema:weight     65.655099165817 ;
+        foaf:mbox         <tel:1-104-421-7240> ;
+        foaf:name         "Tanner Strong" ;
+        foaf:phone        <mailto:varius.Nam@eratvolutpatNulla.co.uk> .
+
+<http://example.com/person/9>
+        a                 foaf:Person ;
+        schema:birthDate  "1965-04-29T19:15:38+01:00"^^xsd:dateTime ;
+        schema:height     163.27719591459 ;
+        schema:weight     69.74419350177 ;
+        foaf:mbox         <tel:237-7855> ;
+        foaf:name         "Hunter Howell" ;
+        foaf:phone        <mailto:augue.id.ante@tinciduntnequevitae.edu> .
+
+<http://example.com/person/81>
+        a                 foaf:Person ;
+        schema:birthDate  "1967-11-14T12:47:10+01:00"^^xsd:dateTime ;
+        schema:height     168.7386031727 ;
+        schema:weight     84.565535529823 ;
+        foaf:mbox         <tel:680-6617> ;
+        foaf:name         "Abdul Richardson" ;
+        foaf:phone        <mailto:Sed@leoMorbi.edu> .
+
+<http://example.com/person/53>
+        a                 foaf:Person ;
+        schema:birthDate  "1992-12-30T08:26:21+01:00"^^xsd:dateTime ;
+        schema:height     165.70256425957 ;
+        schema:weight     73.038337231051 ;
+        foaf:mbox         <tel:1-798-875-2246> ;
+        foaf:name         "Zachary Coleman" ;
+        foaf:phone        <mailto:Nunc.quis@netuset.net> .
+
+<http://example.com/person/100>
+        a                 foaf:Person ;
+        schema:birthDate  "1978-09-18T00:37:04+02:00"^^xsd:dateTime ;
+        schema:height     166.38729242003 ;
+        schema:weight     70.924985544348 ;
+        foaf:mbox         <tel:534-9030> ;
+        foaf:name         "Dylan Johnson" ;
+        foaf:phone        <mailto:sagittis.Duis.gravida@arcuvel.ca> .
+
+<http://example.com/person/25>
+        a                 foaf:Person ;
+        schema:birthDate  "1939-12-02T17:25:20+00:00"^^xsd:dateTime ;
+        schema:height     162.14304326027 ;
+        schema:weight     68.484684405203 ;
+        foaf:mbox         <tel:1-776-153-3669> ;
+        foaf:name         "Kieran Drake" ;
+        foaf:phone        <mailto:tortor.nibh@nequevenenatis.edu> .
+
+<http://example.com/person/94>
+        a                 foaf:Person ;
+        schema:birthDate  "1977-12-19T16:13:11+01:00"^^xsd:dateTime ;
+        schema:height     168.38034845312 ;
+        schema:weight     72.770002101233 ;
+        foaf:mbox         <tel:1-902-493-3943> ;
+        foaf:name         "Stephen Abbott" ;
+        foaf:phone        <mailto:nisi@vel.ca> .
+
+<http://example.com/person/66>
+        a                 foaf:Person ;
+        schema:birthDate  "1975-04-11T09:33:13+01:00"^^xsd:dateTime ;
+        schema:height     165.00016300496 ;
+        schema:weight     74.28344056959 ;
+        foaf:mbox         <tel:1-219-527-1498> ;
+        foaf:name         "Brock Hart" ;
+        foaf:phone        <mailto:at.auctor.ullamcorper@turpis.co.uk> .
+
+<http://example.com/person/38>
+        a                 foaf:Person ;
+        schema:birthDate  "1940-04-18T03:18:52+01:00"^^xsd:dateTime ;
+        schema:height     158.00406575294 ;
+        schema:weight     67.15658902412 ;
+        foaf:mbox         <tel:1-226-132-6307> ;
+        foaf:name         "Nathan Bond" ;
+        foaf:phone        <mailto:eu@Aliquamultrices.edu> .
+
+<http://example.com/person/79>
+        a                 foaf:Person ;
+        schema:birthDate  "1973-08-09T14:35:01+01:00"^^xsd:dateTime ;
+        schema:height     165.78581667885 ;
+        schema:weight     69.709592490143 ;
+        foaf:mbox         <tel:843-6576> ;
+        foaf:name         "Wesley Lowery" ;
+        foaf:phone        <mailto:Duis.mi@feugiat.ca> .
+
+<http://example.com/person/3>
+        a                 foaf:Person ;
+        schema:birthDate  "1956-03-05T15:57:29+01:00"^^xsd:dateTime ;
+        schema:height     163.47434097479 ;
+        schema:weight     64.217840002146 ;
+        foaf:mbox         <tel:240-1629> ;
+        foaf:name         "Travis Wilkerson" ;
+        foaf:phone        <mailto:felis@Duisac.co.uk> .
+
+<http://example.com/person/60>
+        a                 foaf:Person ;
+        schema:birthDate  "1965-05-02T16:26:04+01:00"^^xsd:dateTime ;
+        schema:height     162.069362051 ;
+        schema:weight     67.007973571676 ;
+        foaf:mbox         <tel:1-112-700-5723> ;
+        foaf:name         "Hammett Wood" ;
+        foaf:phone        <mailto:sagittis.Nullam@ettristiquepellentesque.edu> .
+
+<http://example.com/person/32>
+        a                 foaf:Person ;
+        schema:birthDate  "1937-01-12T18:40:10+00:00"^^xsd:dateTime ;
+        schema:height     166.50188689037 ;
+        schema:weight     75.822223334994 ;
+        foaf:mbox         <tel:1-964-109-4442> ;
+        foaf:name         "Chancellor Cortez" ;
+        foaf:phone        <mailto:Vivamus@acfacilisisfacilisis.ca> .
+
+<http://example.com/person/73>
+        a                 foaf:Person ;
+        schema:birthDate  "1955-07-15T21:29:50+01:00"^^xsd:dateTime ;
+        schema:height     167.69989576865 ;
+        schema:weight     71.420342204557 ;
+        foaf:mbox         <tel:682-1008> ;
+        foaf:name         "Burke Kidd" ;
+        foaf:phone        <mailto:ac.mattis@consectetuer.edu> .
+
+<http://example.com/person/45>
+        a                 foaf:Person ;
+        schema:birthDate  "1992-04-16T19:50:42+02:00"^^xsd:dateTime ;
+        schema:height     153.54197545648 ;
+        schema:weight     66.101819260866 ;
+        foaf:mbox         <tel:158-9754> ;
+        foaf:name         "Walter Gross" ;
+        foaf:phone        <mailto:egestas.blandit@ultricesposuerecubilia.org> .
+
+<http://example.com/person/17>
+        a                 foaf:Person ;
+        schema:birthDate  "1939-05-18T19:55:03+01:00"^^xsd:dateTime ;
+        schema:height     166.37746859684 ;
+        schema:weight     74.65513299803 ;
+        foaf:mbox         <tel:1-856-716-0081> ;
+        foaf:name         "Ian Dale" ;
+        foaf:phone        <mailto:ac.arcu@Incondimentum.co.uk> .
+
+<http://example.com/person/86>
+        a                 foaf:Person ;
+        schema:birthDate  "1972-12-13T15:09:21+01:00"^^xsd:dateTime ;
+        schema:height     158.87566800149 ;
+        schema:weight     77.396871320511 ;
+        foaf:mbox         <tel:1-220-630-6240> ;
+        foaf:name         "Bruno Fitzpatrick" ;
+        foaf:phone        <mailto:aliquet.sem@utnisia.com> .
+
+<http://example.com/person/58>
+        a                 foaf:Person ;
+        schema:birthDate  "1955-04-15T15:24:22+01:00"^^xsd:dateTime ;
+        schema:height     162.59354332851 ;
+        schema:weight     70.202024588068 ;
+        foaf:mbox         <tel:241-2176> ;
+        foaf:name         "Dylan Whitehead" ;
+        foaf:phone        <mailto:consectetuer.mauris.id@Fusce.com> .
+
+<http://example.com/person/99>
+        a                 foaf:Person ;
+        schema:birthDate  "1943-12-29T14:59:48+01:00"^^xsd:dateTime ;
+        schema:height     163.71192074544 ;
+        schema:weight     68.036286286443 ;
+        foaf:mbox         <tel:1-999-541-4912> ;
+        foaf:name         "Alvin Winters" ;
+        foaf:phone        <mailto:Sed.pharetra.felis@magnisdisparturient.edu> .
+
+<http://example.com/person/11>
+        a                 foaf:Person ;
+        schema:birthDate  "1996-11-27T00:46:05+01:00"^^xsd:dateTime ;
+        schema:height     158.82905751789 ;
+        schema:weight     72.198552967841 ;
+        foaf:mbox         <tel:620-2228> ;
+        foaf:name         "Allistair Barker" ;
+        foaf:phone        <mailto:ut.quam@aliquam.org> .
+
+<http://example.com/person/8>
+        a                 foaf:Person ;
+        schema:birthDate  "1996-02-02T01:42:38+01:00"^^xsd:dateTime ;
+        schema:height     167.6070585433 ;
+        schema:weight     67.448295111418 ;
+        foaf:mbox         <tel:769-6793> ;
+        foaf:name         "Slade Davis" ;
+        foaf:phone        <mailto:ultrices.Duis@nuncest.edu> .
+
+<http://example.com/person/80>
+        a                 foaf:Person ;
+        schema:birthDate  "1982-09-15T17:26:23+02:00"^^xsd:dateTime ;
+        schema:height     164.76737936186 ;
+        schema:weight     73.251564569481 ;
+        foaf:mbox         <tel:477-5322> ;
+        foaf:name         "Axel Rose" ;
+        foaf:phone        <mailto:montes.nascetur@dis.edu> .
+
+<http://example.com/person/52>
+        a                 foaf:Person ;
+        schema:birthDate  "1936-12-07T01:14:04+00:00"^^xsd:dateTime ;
+        schema:height     166.15264173118 ;
+        schema:weight     70.845639446282 ;
+        foaf:mbox         <tel:581-0581> ;
+        foaf:name         "Duncan Blanchard" ;
+        foaf:phone        <mailto:Vivamus.rhoncus.Donec@facilisislorem.edu> .
+
+<http://example.com/person/24>
+        a                 foaf:Person ;
+        schema:birthDate  "1978-10-21T23:30:37+01:00"^^xsd:dateTime ;
+        schema:height     164.18829915735 ;
+        schema:weight     72.395964466 ;
+        foaf:mbox         <tel:231-3031> ;
+        foaf:name         "Jakeem Hansen" ;
+        foaf:phone        <mailto:ut.mi.Duis@mi.org> .
+
+<http://example.com/person/93>
+        a                 foaf:Person ;
+        schema:birthDate  "1952-06-13T00:05:08+01:00"^^xsd:dateTime ;
+        schema:height     167.51952600071 ;
+        schema:weight     61.846747981852 ;
+        foaf:mbox         <tel:1-563-866-7061> ;
+        foaf:name         "Ishmael Giles" ;
+        foaf:phone        <mailto:auctor.nunc@molestie.co.uk> .
+
+<http://example.com/person/65>
+        a                 foaf:Person ;
+        schema:birthDate  "1945-05-15T05:23:11+02:00"^^xsd:dateTime ;
+        schema:height     165.41008899427 ;
+        schema:weight     81.335682552425 ;
+        foaf:mbox         <tel:594-4491> ;
+        foaf:name         "Sean Martin" ;
+        foaf:phone        <mailto:tincidunt@lacusNulla.co.uk> .
+
+<http://example.com/person/37>
+        a                 foaf:Person ;
+        schema:birthDate  "1988-08-15T06:32:20+02:00"^^xsd:dateTime ;
+        schema:height     165.10597498572 ;
+        schema:weight     68.589234288165 ;
+        foaf:mbox         <tel:1-693-299-1979> ;
+        foaf:name         "Calvin Mack" ;
+        foaf:phone        <mailto:dui.in.sodales@natoquepenatibus.net> .
+
+<http://example.com/person/78>
+        a                 foaf:Person ;
+        schema:birthDate  "1955-01-22T13:11:20+01:00"^^xsd:dateTime ;
+        schema:height     167.01740589878 ;
+        schema:weight     63.518397112505 ;
+        foaf:mbox         <tel:595-0423> ;
+        foaf:name         "Christopher Mayer" ;
+        foaf:phone        <mailto:lectus.pede@Maecenas.ca> .
+
+<http://example.com/person/2>
+        a                 foaf:Person ;
+        schema:birthDate  "1961-11-18T02:18:23+01:00"^^xsd:dateTime ;
+        schema:height     164.38438947455 ;
+        schema:weight     68.907470544061 ;
+        foaf:mbox         <tel:1-772-516-9633> ;
+        foaf:name         "Ulric Obrien" ;
+        foaf:phone        <mailto:non.arcu@velit.co.uk> .
+
+<http://example.com/person/31>
+        a                 foaf:Person ;
+        schema:birthDate  "1967-02-03T22:51:55+01:00"^^xsd:dateTime ;
+        schema:height     161.6596723279 ;
+        schema:weight     69.531938147088 ;
+        foaf:mbox         <tel:1-919-130-2264> ;
+        foaf:name         "Neil Langley" ;
+        foaf:phone        <mailto:leo@litora.net> .
+
+<http://example.com/person/72>
+        a                 foaf:Person ;
+        schema:birthDate  "1936-06-08T12:05:20+01:00"^^xsd:dateTime ;
+        schema:height     171.59506713324 ;
+        schema:weight     62.937578958929 ;
+        foaf:mbox         <tel:689-9873> ;
+        foaf:name         "Noble Hamilton" ;
+        foaf:phone        <mailto:ipsum.ac.mi@congue.edu> .
+
+<http://example.com/person/44>
+        a                 foaf:Person ;
+        schema:birthDate  "1975-08-17T18:27:07+01:00"^^xsd:dateTime ;
+        schema:height     164.5181277326 ;
+        schema:weight     63.660270929426 ;
+        foaf:mbox         <tel:782-1643> ;
+        foaf:name         "Garrett Keith" ;
+        foaf:phone        <mailto:non.dapibus.rutrum@quisurna.com> .
+
+<http://example.com/person/16>
+        a                 foaf:Person ;
+        schema:birthDate  "1977-01-31T13:09:15+01:00"^^xsd:dateTime ;
+        schema:height     166.68002447342 ;
+        schema:weight     68.431396169844 ;
+        foaf:mbox         <tel:521-4608> ;
+        foaf:name         "Eagan Malone" ;
+        foaf:phone        <mailto:nec@senectuset.net> .
+
+<http://example.com/person/85>
+        a                 foaf:Person ;
+        schema:birthDate  "1943-07-18T07:13:27+02:00"^^xsd:dateTime ;
+        schema:height     166.88978400021 ;
+        schema:weight     66.162583531855 ;
+        foaf:mbox         <tel:988-9582> ;
+        foaf:name         "Russell Chen" ;
+        foaf:phone        <mailto:ante.dictum.cursus@adipiscingfringilla.co.uk> .
+
+<http://example.com/person/57>
+        a                 foaf:Person ;
+        schema:birthDate  "1947-04-14T03:41:52+01:00"^^xsd:dateTime ;
+        schema:height     169.32683325083 ;
+        schema:weight     62.861589408616 ;
+        foaf:mbox         <tel:1-275-564-6378> ;
+        foaf:name         "Eagan Hewitt" ;
+        foaf:phone        <mailto:non.leo.Vivamus@eudoloregestas.net> .
+
+<http://example.com/person/29>
+        a                 foaf:Person ;
+        schema:birthDate  "1990-06-21T20:35:57+02:00"^^xsd:dateTime ;
+        schema:height     158.08777106382 ;
+        schema:weight     74.767203557982 ;
+        foaf:mbox         <tel:1-685-945-6605> ;
+        foaf:name         "Barclay Huffman" ;
+        foaf:phone        <mailto:cursus.diam@faucibusorciluctus.ca> .
+
+<http://example.com/person/98>
+        a                 foaf:Person ;
+        schema:birthDate  "1964-12-07T07:34:08+01:00"^^xsd:dateTime ;
+        schema:height     165.53828563498 ;
+        schema:weight     69.756190243878 ;
+        foaf:mbox         <tel:1-132-955-7856> ;
+        foaf:name         "Austin Navarro" ;
+        foaf:phone        <mailto:libero.mauris@ornareFuscemollis.net> .
+
+<http://example.com/person/10>
+        a                 foaf:Person ;
+        schema:birthDate  "1938-06-18T17:19:01+01:00"^^xsd:dateTime ;
+        schema:height     170.29595560716 ;
+        schema:weight     67.133894657783 ;
+        foaf:mbox         <tel:292-7586> ;
+        foaf:name         "Lionel Melendez" ;
+        foaf:phone        <mailto:posuere.cubilia.Curae@augue.edu> .
+
+<http://example.com/person/7>
+        a                 foaf:Person ;
+        schema:birthDate  "1969-08-08T13:59:17+01:00"^^xsd:dateTime ;
+        schema:height     169.23327712391 ;
+        schema:weight     69.218201975682 ;
+        foaf:mbox         <tel:504-1301> ;
+        foaf:name         "Gregory Pearson" ;
+        foaf:phone        <mailto:convallis.convallis@penatibusetmagnis.com> .
+
+<http://example.com/person/51>
+        a                 foaf:Person ;
+        schema:birthDate  "1964-06-20T08:17:44+01:00"^^xsd:dateTime ;
+        schema:height     160.40382059996 ;
+        schema:weight     67.84717416666 ;
+        foaf:mbox         <tel:1-288-408-1217> ;
+        foaf:name         "Rigel Hernandez" ;
+        foaf:phone        <mailto:ornare@infaucibus.com> .
+
+<http://example.com/person/23>
+        a                 foaf:Person ;
+        schema:birthDate  "1988-06-04T15:23:00+02:00"^^xsd:dateTime ;
+        schema:height     162.57195273165 ;
+        schema:weight     78.199185132216 ;
+        foaf:mbox         <tel:794-0027> ;
+        foaf:name         "Ethan Hill" ;
+        foaf:phone        <mailto:Curabitur@Integer.org> .
+
+<http://example.com/person/92>
+        a                 foaf:Person ;
+        schema:birthDate  "1953-05-15T22:06:47+01:00"^^xsd:dateTime ;
+        schema:height     160.44422148412 ;
+        schema:weight     72.151840442856 ;
+        foaf:mbox         <tel:1-610-343-2784> ;
+        foaf:name         "Darius Poole" ;
+        foaf:phone        <mailto:aliquam.eros.turpis@Proin.org> .
+
+<http://example.com/person/64>
+        a                 foaf:Person ;
+        schema:birthDate  "1982-10-05T00:26:28+01:00"^^xsd:dateTime ;
+        schema:height     167.34608983036 ;
+        schema:weight     79.542710189344 ;
+        foaf:mbox         <tel:319-7301> ;
+        foaf:name         "Stewart Cline" ;
+        foaf:phone        <mailto:imperdiet@erat.ca> .
+
+<http://example.com/person/36>
+        a                 foaf:Person ;
+        schema:birthDate  "1991-01-14T18:33:52+01:00"^^xsd:dateTime ;
+        schema:height     168.80665912993 ;
+        schema:weight     71.364442257737 ;
+        foaf:mbox         <tel:1-965-755-9885> ;
+        foaf:name         "Judah Bowman" ;
+        foaf:phone        <mailto:diam.at.pretium@adipiscingelitCurabitur.org> .
+
+<http://example.com/person/77>
+        a                 foaf:Person ;
+        schema:birthDate  "1952-06-09T09:20:14+01:00"^^xsd:dateTime ;
+        schema:height     164.42485350988 ;
+        schema:weight     69.222000211885 ;
+        foaf:mbox         <tel:1-970-113-4419> ;
+        foaf:name         "Orson Osborne" ;
+        foaf:phone        <mailto:Cum.sociis@lacusEtiambibendum.com> .
+
+<http://example.com/person/49>
+        a                 foaf:Person ;
+        schema:birthDate  "1946-05-20T15:08:31+01:00"^^xsd:dateTime ;
+        schema:height     162.9355802469 ;
+        schema:weight     68.658971082262 ;
+        foaf:mbox         <tel:188-4005> ;
+        foaf:name         "Seth Norman" ;
+        foaf:phone        <mailto:vehicula.aliquet.libero@sagittislobortismauris.com> .
+
+<http://example.com/person/1>
+        a                 foaf:Person ;
+        schema:birthDate  "1990-10-23T09:39:36+01:00"^^xsd:dateTime ;
+        schema:height     166.58961852476 ;
+        schema:weight     72.523064012179 ;
+        foaf:mbox         <tel:374-5365> ;
+        foaf:name         "Jin Lott" ;
+        foaf:phone        <mailto:nonummy@nonsollicitudina.net> .
+
+<http://example.com/person/30>
+        a                 foaf:Person ;
+        schema:birthDate  "1947-04-02T09:41:38+01:00"^^xsd:dateTime ;
+        schema:height     164.18371823796 ;
+        schema:weight     67.175847186928 ;
+        foaf:mbox         <tel:1-696-325-6691> ;
+        foaf:name         "Merritt Oneil" ;
+        foaf:phone        <mailto:lacus.pede.sagittis@Sedeueros.org> .
+
+<http://example.com/person/71>
+        a                 foaf:Person ;
+        schema:birthDate  "1956-09-09T07:57:00+01:00"^^xsd:dateTime ;
+        schema:height     161.33389920737 ;
+        schema:weight     65.713414405499 ;
+        foaf:mbox         <tel:1-501-943-0456> ;
+        foaf:name         "Acton Stafford" ;
+        foaf:phone        <mailto:lectus.Nullam.suscipit@uterat.co.uk> .
+
+<http://example.com/person/43>
+        a                 foaf:Person ;
+        schema:birthDate  "1958-11-23T13:39:43+01:00"^^xsd:dateTime ;
+        schema:height     159.69889346232 ;
+        schema:weight     75.216450854082 ;
+        foaf:mbox         <tel:1-681-925-3827> ;
+        foaf:name         "Melvin Guy" ;
+        foaf:phone        <mailto:massa.rutrum@amifringilla.ca> .
+
+<http://example.com/person/15>
+        a                 foaf:Person ;
+        schema:birthDate  "1958-06-02T01:30:32+01:00"^^xsd:dateTime ;
+        schema:height     166.09175983191 ;
+        schema:weight     56.844346520368 ;
+        foaf:mbox         <tel:1-151-944-3373> ;
+        foaf:name         "Burke Moody" ;
+        foaf:phone        <mailto:In.at.pede@nibhsit.com> .
+
+<http://example.com/person/84>
+        a                 foaf:Person ;
+        schema:birthDate  "1968-01-23T02:33:05+01:00"^^xsd:dateTime ;
+        schema:height     167.29542513729 ;
+        schema:weight     74.978457575552 ;
+        foaf:mbox         <tel:1-291-409-5241> ;
+        foaf:name         "Kennan Alvarez" ;
+        foaf:phone        <mailto:In.ornare@at.co.uk> .
+
+<http://example.com/person/56>
+        a                 foaf:Person ;
+        schema:birthDate  "1988-07-01T04:24:08+02:00"^^xsd:dateTime ;
+        schema:height     162.84711181195 ;
+        schema:weight     71.945314847831 ;
+        foaf:mbox         <tel:1-825-162-3892> ;
+        foaf:name         "Nissim Davenport" ;
+        foaf:phone        <mailto:sodales.purus@Etiamligula.net> .
+
+<http://example.com/person/28>
+        a                 foaf:Person ;
+        schema:birthDate  "1987-07-06T23:43:48+02:00"^^xsd:dateTime ;
+        schema:height     165.72430875158 ;
+        schema:weight     63.571308334078 ;
+        foaf:mbox         <tel:461-3882> ;
+        foaf:name         "Chandler Rowe" ;
+        foaf:phone        <mailto:vitae@laoreetlibero.edu> .
+
+<http://example.com/person/97>
+        a                 foaf:Person ;
+        schema:birthDate  "1956-03-23T23:05:43+01:00"^^xsd:dateTime ;
+        schema:height     164.46805112553 ;
+        schema:weight     74.826020615442 ;
+        foaf:mbox         <tel:478-8319> ;
+        foaf:name         "Wayne Cooke" ;
+        foaf:phone        <mailto:vel.venenatis@Vestibulumaccumsan.edu> .
+
+<http://example.com/person/69>
+        a                 foaf:Person ;
+        schema:birthDate  "1968-07-10T14:59:52+01:00"^^xsd:dateTime ;
+        schema:height     167.55864412222 ;
+        schema:weight     66.033661984752 ;
+        foaf:mbox         <tel:533-4398> ;
+        foaf:name         "Brock Glass" ;
+        foaf:phone        <mailto:pede.Suspendisse@ultriciesligulaNullam.com> .
+
+<http://example.com/person/6>
+        a                 foaf:Person ;
+        schema:birthDate  "1974-01-07T04:34:44+01:00"^^xsd:dateTime ;
+        schema:height     165.25115131786 ;
+        schema:weight     66.292234202668 ;
+        foaf:mbox         <tel:628-2603> ;
+        foaf:name         "Gil Chang" ;
+        foaf:phone        <mailto:sit.amet.orci@justo.co.uk> .
+
+<http://example.com/person/50>
+        a                 foaf:Person ;
+        schema:birthDate  "1995-07-13T00:15:12+02:00"^^xsd:dateTime ;
+        schema:height     152.89560951743 ;
+        schema:weight     74.982144704641 ;
+        foaf:mbox         <tel:1-697-251-2752> ;
+        foaf:name         "Herman Chaney" ;
+        foaf:phone        <mailto:Nunc.lectus@Aenean.ca> .
+
+<http://example.com/person/22>
+        a                 foaf:Person ;
+        schema:birthDate  "1993-04-30T00:11:57+02:00"^^xsd:dateTime ;
+        schema:height     162.14024048887 ;
+        schema:weight     69.463119683631 ;
+        foaf:mbox         <tel:1-518-171-5485> ;
+        foaf:name         "Brandon Lowery" ;
+        foaf:phone        <mailto:egestas@non.net> .
+
+<http://example.com/person/91>
+        a                 foaf:Person ;
+        schema:birthDate  "1940-11-24T16:39:53+02:00"^^xsd:dateTime ;
+        schema:height     166.5959604361 ;
+        schema:weight     71.94418999617 ;
+        foaf:mbox         <tel:859-8365> ;
+        foaf:name         "Brett Horn" ;
+        foaf:phone        <mailto:odio@veliteget.org> .
+
+<http://example.com/person/63>
+        a                 foaf:Person ;
+        schema:birthDate  "1953-04-21T22:43:32+01:00"^^xsd:dateTime ;
+        schema:height     162.07167423823 ;
+        schema:weight     70.149077022852 ;
+        foaf:mbox         <tel:207-6580> ;
+        foaf:name         "Ivan Rosales" ;
+        foaf:phone        <mailto:Mauris.vel@Donecfeugiatmetus.org> .
+
+<http://example.com/person/35>
+        a                 foaf:Person ;
+        schema:birthDate  "1995-08-17T13:58:32+02:00"^^xsd:dateTime ;
+        schema:height     161.54476648568 ;
+        schema:weight     65.951194884111 ;
+        foaf:mbox         <tel:1-496-373-5363> ;
+        foaf:name         "Kieran Harris" ;
+        foaf:phone        <mailto:purus@congueIn.co.uk> .
+
+<http://example.com/person/76>
+        a                 foaf:Person ;
+        schema:birthDate  "1966-01-21T18:14:32+01:00"^^xsd:dateTime ;
+        schema:height     172.5061944313 ;
+        schema:weight     63.639004157562 ;
+        foaf:mbox         <tel:1-272-353-4779> ;
+        foaf:name         "Kadeem Perez" ;
+        foaf:phone        <mailto:malesuada.malesuada@sed.ca> .
+
+<http://example.com/person/48>
+        a                 foaf:Person ;
+        schema:birthDate  "1949-04-17T19:26:00+01:00"^^xsd:dateTime ;
+        schema:height     160.82023602724 ;
+        schema:weight     68.813680667665 ;
+        foaf:mbox         <tel:270-4951> ;
+        foaf:name         "Wallace Sargent" ;
+        foaf:phone        <mailto:eu@pharetraQuisque.net> .
+
+<http://example.com/person/89>
+        a                 foaf:Person ;
+        schema:birthDate  "1967-03-11T04:32:26+01:00"^^xsd:dateTime ;
+        schema:height     164.98504369591 ;
+        schema:weight     69.161056953734 ;
+        foaf:mbox         <tel:1-991-943-4137> ;
+        foaf:name         "Zahir Jimenez" ;
+        foaf:phone        <mailto:eu.arcu@Crasdictumultricies.edu> .
+
+<http://example.com/person/70>
+        a                 foaf:Person ;
+        schema:birthDate  "1939-02-26T12:54:37+00:00"^^xsd:dateTime ;
+        schema:height     166.20987431579 ;
+        schema:weight     78.370812335927 ;
+        foaf:mbox         <tel:1-683-722-0818> ;
+        foaf:name         "Herman Hood" ;
+        foaf:phone        <mailto:lectus@commodoat.edu> .
+
+<http://example.com/person/42>
+        a                 foaf:Person ;
+        schema:birthDate  "1974-05-12T08:13:07+01:00"^^xsd:dateTime ;
+        schema:height     165.78789888837 ;
+        schema:weight     75.20539286237 ;
+        foaf:mbox         <tel:1-445-116-8049> ;
+        foaf:name         "Amery Rowland" ;
+        foaf:phone        <mailto:elit@mollislectuspede.net> .
+
+<http://example.com/person/14>
+        a                 foaf:Person ;
+        schema:birthDate  "1939-01-12T21:44:01+00:00"^^xsd:dateTime ;
+        schema:height     166.68555003074 ;
+        schema:weight     64.485738952436 ;
+        foaf:mbox         <tel:599-5623> ;
+        foaf:name         "Steel Austin" ;
+        foaf:phone        <mailto:a.tortor.Nunc@vehiculaetrutrum.org> .
+
+<http://example.com/person/83>
+        a                 foaf:Person ;
+        schema:birthDate  "1992-08-09T14:18:36+02:00"^^xsd:dateTime ;
+        schema:height     166.02572906596 ;
+        schema:weight     73.965582011129 ;
+        foaf:mbox         <tel:714-3781> ;
+        foaf:name         "Bruce Kemp" ;
+        foaf:phone        <mailto:in@dis.org> .
+
+<http://example.com/person/55>
+        a                 foaf:Person ;
+        schema:birthDate  "1983-03-28T09:56:17+02:00"^^xsd:dateTime ;
+        schema:height     168.36520741807 ;
+        schema:weight     74.703175591219 ;
+        foaf:mbox         <tel:1-955-101-1448> ;
+        foaf:name         "Graham Macdonald" ;
+        foaf:phone        <mailto:sed.orci.lobortis@Nuncmauriselit.net> .
+
+<http://example.com/person/27>
+        a                 foaf:Person ;
+        schema:birthDate  "1969-03-30T03:51:04+01:00"^^xsd:dateTime ;
+        schema:height     166.16869030927 ;
+        schema:weight     68.826921136779 ;
+        foaf:mbox         <tel:1-958-601-7304> ;
+        foaf:name         "Oleg Wise" ;
+        foaf:phone        <mailto:placerat.eget@anteiaculis.ca> .
+
+<http://example.com/person/96>
+        a                 foaf:Person ;
+        schema:birthDate  "1954-01-09T04:28:25+01:00"^^xsd:dateTime ;
+        schema:height     161.18475180184 ;
+        schema:weight     77.781209674023 ;
+        foaf:mbox         <tel:941-7404> ;
+        foaf:name         "Neville Whitfield" ;
+        foaf:phone        <mailto:nibh.sit@vulputate.org> .
+
+<http://example.com/person/68>
+        a                 foaf:Person ;
+        schema:birthDate  "1956-08-08T20:33:14+01:00"^^xsd:dateTime ;
+        schema:height     165.0975703585 ;
+        schema:weight     73.297952324934 ;
+        foaf:mbox         <tel:933-5327> ;
+        foaf:name         "Geoffrey Henry" ;
+        foaf:phone        <mailto:condimentum.eget@ametmassaQuisque.com> .
+
+<http://example.com/person/5>
+        a                 foaf:Person ;
+        schema:birthDate  "1939-02-08T18:30:06+00:00"^^xsd:dateTime ;
+        schema:height     169.42790140759 ;
+        schema:weight     68.742803975349 ;
+        foaf:mbox         <tel:849-7651> ;
+        foaf:name         "Nathaniel Mendoza" ;
+        foaf:phone        <mailto:turpis.nec@Praesentluctus.co.uk> .
+
+<http://example.com/person/21>
+        a                 foaf:Person ;
+        schema:birthDate  "1952-12-21T20:35:45+01:00"^^xsd:dateTime ;
+        schema:height     162.01754905732 ;
+        schema:weight     66.793927936721 ;
+        foaf:mbox         <tel:1-680-649-5175> ;
+        foaf:name         "Abdul Kim" ;
+        foaf:phone        <mailto:enim.Sed@erat.edu> .
+
+<http://example.com/person/90>
+        a                 foaf:Person ;
+        schema:birthDate  "1942-10-30T15:28:01+02:00"^^xsd:dateTime ;
+        schema:height     167.78924118423 ;
+        schema:weight     74.598858028884 ;
+        foaf:mbox         <tel:1-999-100-2751> ;
+        foaf:name         "Oleg Hale" ;
+        foaf:phone        <mailto:cursus@vitaeorci.org> .
+
+<http://example.com/person/62>
+        a                 foaf:Person ;
+        schema:birthDate  "1974-01-30T01:40:35+01:00"^^xsd:dateTime ;
+        schema:height     164.06114764986 ;
+        schema:weight     69.652940079579 ;
+        foaf:mbox         <tel:204-6173> ;
+        foaf:name         "Kasimir Short" ;
+        foaf:phone        <mailto:elit@tempusscelerisque.com> .
+
+<http://example.com/person/34>
+        a                 foaf:Person ;
+        schema:birthDate  "1973-09-19T20:08:04+01:00"^^xsd:dateTime ;
+        schema:height     158.68891939988 ;
+        schema:weight     81.156358734651 ;
+        foaf:mbox         <tel:733-2053> ;
+        foaf:name         "Ira Perkins" ;
+        foaf:phone        <mailto:auctor.velit@molestieorci.org> .
+
+<http://example.com/person/75>
+        a                 foaf:Person ;
+        schema:birthDate  "1991-02-04T01:00:22+01:00"^^xsd:dateTime ;
+        schema:height     162.90456360827 ;
+        schema:weight     67.599682920798 ;
+        foaf:mbox         <tel:696-0824> ;
+        foaf:name         "Elvis Armstrong" ;
+        foaf:phone        <mailto:facilisis@Duisdignissimtempor.org> .
+
+<http://example.com/person/47>
+        a                 foaf:Person ;
+        schema:birthDate  "1974-03-20T16:36:20+01:00"^^xsd:dateTime ;
+        schema:height     161.46215580248 ;
+        schema:weight     68.936847004248 ;
+        foaf:mbox         <tel:606-0929> ;
+        foaf:name         "Cain Holman" ;
+        foaf:phone        <mailto:mauris.id@Donecluctusaliquet.co.uk> .
+
+<http://example.com/person/19>
+        a                 foaf:Person ;
+        schema:birthDate  "1947-04-14T05:34:21+01:00"^^xsd:dateTime ;
+        schema:height     159.10800356753 ;
+        schema:weight     62.041205076943 ;
+        foaf:mbox         <tel:316-8991> ;
+        foaf:name         "Nissim Pickett" ;
+        foaf:phone        <mailto:tristique.pharetra.Quisque@pedeac.edu> .
+
+<http://example.com/person/88>
+        a                 foaf:Person ;
+        schema:birthDate  "1975-07-08T00:34:17+01:00"^^xsd:dateTime ;
+        schema:height     165.86694775283 ;
+        schema:weight     69.050484715886 ;
+        foaf:mbox         <tel:1-157-945-8392> ;
+        foaf:name         "Garrison Neal" ;
+        foaf:phone        <mailto:sem.ut.dolor@ametorciUt.co.uk> .
