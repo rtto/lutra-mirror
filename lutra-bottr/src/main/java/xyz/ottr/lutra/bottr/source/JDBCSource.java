@@ -60,12 +60,11 @@ public class JDBCSource implements Source<String> {
     public ResultStream<Record<String>> execute(String query) {
 
         try (Connection conn = this.dataSource.getConnection()) {
-            log.info("Running query: " + query);
+            this.log.info("Running query: " + query);
             
             List<Record<String>> rows = new QueryRunner().query(conn, query, new ArrayListHandler())
                     .stream()
-                    .map(array -> Arrays.asList(array)
-                            .stream()
+                    .map(array -> Arrays.stream(array)
                             .map(value -> Objects.toString(value, null)) // the string value of null is (the object) null.
                             .collect(Collectors.toList()))
                     .map(Record::new)

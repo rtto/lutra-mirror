@@ -41,7 +41,7 @@ public class BInstanceMapParserTest {
         
         List<InstanceMap> maps = parser.apply(model).innerCollect(Collectors.toList());
                 
-        assertEquals(maps.size(), 1);
+        assertEquals(1, maps.size());
         assertEquals("SELECT name, age, company FROM TABLE tblEmployee", maps.get(0).getQuery());
         assertEquals("http://example.com/tpl#MyTemplate", maps.get(0).getTemplateIRI());
     }

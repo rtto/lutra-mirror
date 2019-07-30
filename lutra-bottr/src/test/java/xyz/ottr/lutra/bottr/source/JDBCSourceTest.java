@@ -14,7 +14,6 @@ import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
 import xyz.ottr.lutra.bottr.model.Record;
-import xyz.ottr.lutra.bottr.source.JDBCSource;
 import xyz.ottr.lutra.result.ResultStream;
 
 /*-
@@ -48,7 +47,7 @@ public class JDBCSourceTest {
     public void prototypeTest() throws ClassNotFoundException, SQLException {
 
         final String driver = "org.h2.Driver";
-        final String url = "jdbc:h2:" + testFolder.getRoot().getAbsolutePath() + "/db";
+        final String url = "jdbc:h2:" + this.testFolder.getRoot().getAbsolutePath() + "/db";
         final String user = "user";
         final String pass = "pass";
 
@@ -83,7 +82,7 @@ public class JDBCSourceTest {
         Set<Record<String>> dbOutput = rowStream.innerCollect(Collectors.toSet());
 
         //Compare dbOutput to expected result
-        Assert.assertEquals(dbOutput, expected);
+        Assert.assertEquals(expected, dbOutput);
 
         //Clean up
         stmt.close();

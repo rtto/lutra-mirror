@@ -13,8 +13,6 @@ import org.apache.jena.shared.PrefixMapping;
 import org.junit.Test;
 
 import xyz.ottr.lutra.OTTR;
-import xyz.ottr.lutra.bottr.model.InstanceMap;
-import xyz.ottr.lutra.bottr.model.Source;
 import xyz.ottr.lutra.model.ArgumentList;
 import xyz.ottr.lutra.model.IRITerm;
 import xyz.ottr.lutra.model.Instance;
@@ -65,7 +63,7 @@ public class MapTest {
             // NB! Returns same rows regardless of query
             @Override
             public ResultStream<Record<String>> execute(String query) {
-                return new ResultStream<Record<String>>(rows.stream().map(Result::of));
+                return new ResultStream<>(this.rows.stream().map(Result::of));
             }
         }
 
@@ -98,7 +96,7 @@ public class MapTest {
         Set<Instance> input = myMap.get().innerCollect(Collectors.toSet());
         
         assertEquals(2, input.size());
-        assertEquals(input, output);
+        assertEquals(output, input);
     }
 
 }

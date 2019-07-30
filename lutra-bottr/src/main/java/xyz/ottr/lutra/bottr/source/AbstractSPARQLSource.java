@@ -62,7 +62,7 @@ public abstract class AbstractSPARQLSource implements Source<RDFNode> {
                         return getResultSetStream(resultSet);
                     } else if (q.isAskType()) {
                         boolean result = exec.execAsk();
-                        return ResultStream.innerOf(new Record<RDFNode>(result ? TRUE : FALSE));
+                        return ResultStream.innerOf(new Record<>(result ? TRUE : FALSE));
                     } else {
                         return ResultStream.of(Result.empty(Message.error(
                                 "Unsupported SPARQL query type. Query must be SELECT or ASK.")));
@@ -76,7 +76,7 @@ public abstract class AbstractSPARQLSource implements Source<RDFNode> {
         // TODO: does this work when a get returns null? will there be a hole in the list? Must test.
         final Function<QuerySolution, Result<Record<RDFNode>>> rowCreator = (sol) -> Result.of(new Record<>(
                 columns.stream()
-                .map(c -> sol.get(c))
+                .map(sol::get)
                 .collect(Collectors.toList())));
 
         return new ResultStream<>(StreamSupport.stream(

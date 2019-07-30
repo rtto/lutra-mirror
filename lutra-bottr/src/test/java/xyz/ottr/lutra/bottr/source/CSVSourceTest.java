@@ -6,10 +6,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
@@ -25,7 +21,7 @@ import xyz.ottr.lutra.bottr.model.InstanceMap;
 import xyz.ottr.lutra.bottr.model.Record;
 import xyz.ottr.lutra.bottr.model.Source;
 import xyz.ottr.lutra.bottr.model.ValueMap;
-import xyz.ottr.lutra.bottr.source.CSVSource;
+import xyz.ottr.lutra.result.Result;
 import xyz.ottr.lutra.result.ResultStream;
 import xyz.ottr.lutra.tabottr.TabOTTR;
 import xyz.ottr.lutra.wottr.WOTTR;
@@ -67,7 +63,7 @@ public class CSVSourceTest {
         prefixes.setNsPrefix("ex", "http://example.com/ns#");
 
         // Write CSV file
-        String root = testFolder.getRoot().getAbsolutePath();
+        String root = this.testFolder.getRoot().getAbsolutePath();
         String csvFilename = root + "/data.csv";
         String csvContent = "Subject,Predicate,Object\n" // first row contains column names
             + "ex:A1,ex:B1,ex:C1\n"
@@ -90,7 +86,7 @@ public class CSVSourceTest {
         );
 
         // there should be three triples
-        assertEquals(3, map.get().getStream().filter(r -> r.isPresent()).count());
+        assertEquals(3, map.get().getStream().filter(Result::isPresent).count());
     }
 
     private Set<Record<String>> getExpectedResult() {

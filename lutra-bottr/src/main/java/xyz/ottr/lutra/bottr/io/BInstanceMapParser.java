@@ -97,14 +97,14 @@ public class BInstanceMapParser implements Function<Model, ResultStream<Instance
         Result<Resource> resValueMapIRI = BModelSelector.getRequiredResourceOfProperty(model, instanceMap, BOTTR.valueMap);
         if (!resValueMapIRI.isPresent()) {
             return Result.empty(Message.error("Error parsing InstanceMap's source"));
-        } else if (resValueMapIRI.isPresent() && !resValueMapIRI.get().canAs(RDFList.class)) {
+        } else if (!resValueMapIRI.get().canAs(RDFList.class)) {
             return Result.empty(Message.error("InstanceMap's valueMap is not a list."));
         } else {
             List<RDFNode> valueMapList = resValueMapIRI.get().as(RDFList.class).asJavaList();
             List<Result<String>> typeList = valueMapList.stream()
-                    .map(n -> n.asResource())
+                    .map(RDFNode::asResource)
                     .map(r -> BModelSelector.getRequiredResourceOfProperty(model, r, BOTTR.type))
-                    .map(r -> r.map(g -> g.getURI())) // TODO: is this correct?
+                    .map(r -> r.map(Resource::getURI)) // TODO: is this correct?
                     .collect(Collectors.toList());
             return Result.aggregate(typeList).map(types -> new ValueMap(model, types));
         }

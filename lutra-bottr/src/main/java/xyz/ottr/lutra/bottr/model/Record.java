@@ -49,7 +49,7 @@ public class Record<V> {
     }
 
     public String toString() {
-        return values.toString();
+        return this.values.toString();
     }
 
     /* (non-Javadoc)
@@ -59,7 +59,7 @@ public class Record<V> {
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = prime * result + ((values == null) ? 0 : values.hashCode());
+        result = prime * result + ((this.values == null) ? 0 : this.values.hashCode());
         return result;
     }
 
@@ -78,11 +78,11 @@ public class Record<V> {
             return false;
         }
         Record<?> other = (Record<?>) obj;
-        if (values == null) {
+        if (this.values == null) {
             if (other.values != null) {
                 return false;
             }
-        } else if (!values.equals(other.values)) {
+        } else if (!this.values.equals(other.values)) {
             return false;
         }
         return true;

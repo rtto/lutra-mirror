@@ -41,11 +41,12 @@ import org.junit.rules.TemporaryFolder;
 import xyz.ottr.lutra.bottr.model.InstanceMap;
 import xyz.ottr.lutra.bottr.model.Source;
 import xyz.ottr.lutra.bottr.model.ValueMap;
-import xyz.ottr.lutra.bottr.source.JDBCSource;
+import xyz.ottr.lutra.bottr.source.CSVSource;
 import xyz.ottr.lutra.io.TemplateReader;
 import xyz.ottr.lutra.model.Instance;
 import xyz.ottr.lutra.result.Message;
 import xyz.ottr.lutra.result.MessageHandler;
+import xyz.ottr.lutra.result.Result;
 import xyz.ottr.lutra.result.ResultConsumer;
 import xyz.ottr.lutra.result.ResultStream;
 import xyz.ottr.lutra.store.DependencyGraph;
@@ -76,16 +77,11 @@ public class SPARQLGenerateEval {
 
 
         // H2 database to load CSV file
-        String temp = tempFolder.getRoot().getAbsolutePath();
-        Source h2 = new JDBCSource(
-                "org.h2.Driver",
-                "jdbc:h2:" + temp + "/db",
-                "user",
-                "");
+        Source h2 = new CSVSource();
         
         String inFile = "persons-100.csv";
         
-        Path csvFile = testRoot.resolve(inFile);
+        Path csvFile = this.testRoot.resolve(inFile);
 
         // Set up map to translate source to triple instances
         ValueMap valMap = new ValueMap(prefixes, Arrays.asList(
@@ -107,25 +103,25 @@ public class SPARQLGenerateEval {
                         valMap
                 );
 
-        assertEquals(100, map.get().getStream().filter(r -> r.isPresent()).count());
+        assertEquals(100, map.get().getStream().filter(Result::isPresent).count());
 
         TemplateStore store = new DependencyGraph();
         store.addTemplateSignature(WTemplateFactory.createTripleTemplateHead());
 
         // Read templates
         TemplateReader tempReader = new TemplateReader(new WFileReader(), new WTemplateParser());
-        ResultStream<String> tempIRI = ResultStream.innerOf(testRoot.resolve("person.ttl").toString());
+        ResultStream<String> tempIRI = ResultStream.innerOf(this.testRoot.resolve("person.ttl").toString());
         MessageHandler errorMessages = tempReader.populateTemplateStore(store, tempIRI);
         assertFalse(Message.moreSevere(errorMessages.printMessages(),
                 Message.ERROR)); // No errors when parsing
 
         ResultStream<Instance> expandedInInstances = 
                 map.get()
-                .innerFlatMap(ins -> store.expandInstance(ins));
+                .innerFlatMap(store::expandInstance);
 
         // Write expanded instances to model
         WInstanceWriter insWriter = new WInstanceWriter();
-        ResultConsumer<Instance> expansionErrors = new ResultConsumer<Instance>(insWriter);
+        ResultConsumer<Instance> expansionErrors = new ResultConsumer<>(insWriter);
         expandedInInstances.forEach(expansionErrors);
         assertFalse(Message.moreSevere(expansionErrors.getMessageHandler().printMessages(),
                 Message.ERROR)); // No errors when expanding
@@ -135,6 +131,6 @@ public class SPARQLGenerateEval {
         // print model
         String outFile = inFile + ".out.ttl";
         //ModelIO.printModel(in);
-        Files.write(testRoot.resolve(outFile), ModelIO.writeModel(in).getBytes(), StandardOpenOption.CREATE);
+        Files.write(this.testRoot.resolve(outFile), ModelIO.writeModel(in).getBytes(), StandardOpenOption.CREATE);
     }
 }

@@ -65,13 +65,13 @@ public class ValueMap implements Function<Record<?>, Result<ArgumentList>> {
         List<Result<Term>> args = new LinkedList<>();
         for (int i = 0; i < record.getValues().size(); i += 1) {
             Result<RDFNode> rdfNode = getRDFNode(record.getValue(i), this.maps.get(i).getType());
-            args.add(rdfNode.flatMap(termFactory));
+            args.add(rdfNode.flatMap(this.termFactory));
         }
         return Result.aggregate(args).map(ArgumentList::new);
     }
 
     private Result<RDFNode> getRDFNode(Object value, String type) {
-        return dataFactory.toRDFNode(getStringValue(value), type);
+        return this.dataFactory.toRDFNode(getStringValue(value), type);
     }
 
     // TODO: can we do this better, without instanceof?

@@ -40,7 +40,7 @@ public class RDFSourceTest {
     private final Path root = Paths.get("src", "test", "resources", "rdfsource");
 
     private String getResourceFile(String file) {
-        return root.resolve(file).toString();
+        return this.root.resolve(file).toString();
     }
 
     @Test
