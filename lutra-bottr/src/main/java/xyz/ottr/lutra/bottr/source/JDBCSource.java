@@ -45,7 +45,7 @@ public class JDBCSource implements Source<String> {
 
     private final Logger log = LoggerFactory.getLogger(JDBCSource.class);
 
-    private BasicDataSource dataSource;
+    protected BasicDataSource dataSource;
 
     public JDBCSource(String databaseDriver, String databaseURL, String username, String password) {
         this.dataSource = new BasicDataSource();
