@@ -25,52 +25,20 @@ package xyz.ottr.lutra.wottr;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.apache.jena.rdf.model.RDFList;
-import org.apache.jena.rdf.model.Statement;
-import org.apache.jena.vocabulary.RDF;
-
 import xyz.ottr.lutra.OTTR;
-import xyz.ottr.lutra.model.ArgumentList;
 import xyz.ottr.lutra.model.BlankNodeTerm;
-import xyz.ottr.lutra.model.Instance;
 import xyz.ottr.lutra.model.ParameterList;
 import xyz.ottr.lutra.model.TemplateSignature;
 import xyz.ottr.lutra.model.Term;
 import xyz.ottr.lutra.model.TermList;
 import xyz.ottr.lutra.model.types.TypeFactory;
-import xyz.ottr.lutra.result.Result;
 
 public abstract class WTemplateFactory {
 
     // TODO Possible generalisation a a generic TemplateFactory provided with with a
     // generic TermFactory
 
-    public static Result<Instance> createTripleInstance(Statement stmt) {
 
-        WTermFactory rdfTermFactory = new WTermFactory();
-        Result<Term> sub = rdfTermFactory.apply(stmt.getSubject());
-        Result<Term> pred = rdfTermFactory.apply(stmt.getPredicate());
-        Result<Term> obj = rdfTermFactory.apply(stmt.getObject());
-
-        ArgumentList as = sub.isPresent() && pred.isPresent() && obj.isPresent()
-            ? new ArgumentList(sub.get(), pred.get(), obj.get()) : null;
-        Result<ArgumentList> asRes = Result.ofNullable(as);
-        asRes.addMessages(sub.getMessages());
-        asRes.addMessages(pred.getMessages());
-        asRes.addMessages(obj.getMessages());
-
-        return asRes.map(asVal -> new Instance(OTTR.Bases.Triple, asVal));
-    }
-
-    /**
-     * Returns true if the argument is a redundant list-triple, that is,
-     * on one of the forms "(:a :b) rdf:first :a" or "(:a :b) rdf:rest (:b)".
-     */
-    public static boolean isRedundant(Statement s) {
-        return s.getSubject().canAs(RDFList.class)
-            && (s.getPredicate().equals(RDF.first)
-                || s.getPredicate().equals(RDF.rest));
-    }
 
     // TODO Check if the s, p, o blanks must be fresh.
     public static TemplateSignature createTripleTemplateHead() {

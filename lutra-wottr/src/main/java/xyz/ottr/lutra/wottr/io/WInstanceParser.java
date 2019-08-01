@@ -76,7 +76,7 @@ public class WInstanceParser implements InstanceParser<Model> {
         ResultStream<Instance> parsedInstances = parseInstances(model, ins);
         
         Model triples = WReader.getNonTemplateTriples(model, null, new LinkedList<>(), ins);
-        return ResultStream.concat(parsedInstances, new TripleParser().apply(triples));
+        return ResultStream.concat(parsedInstances, new WTripleInstanceParser(triples).get());
     }
 
     private ResultStream<Instance> parseInstances(Model model, List<Resource> templateInstances) {
