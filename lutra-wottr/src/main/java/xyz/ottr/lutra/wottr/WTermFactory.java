@@ -85,8 +85,18 @@ public class WTermFactory implements Function<RDFNode, Result<Term>> {
     }
 
     public static LiteralTerm createLiteralTerm(Literal literal) {
-        // TODO get datatype and lang.
-        return new LiteralTerm(literal.getLexicalForm(), literal.getDatatypeURI());
+
+        String value = literal.getLexicalForm();
+        String datatype = literal.getDatatypeURI();
+        String language = literal.getLanguage();
+
+        if (language != null && !language.isEmpty()) {
+            return LiteralTerm.taggedLiteral(value, language);
+        } else if (datatype != null && !datatype.isEmpty()) {
+            return LiteralTerm.typedLiteral(value, datatype);
+        } else {
+            return new LiteralTerm(value);
+        }
     }
 
     public static IRITerm createIRITerm(Resource resource) {
