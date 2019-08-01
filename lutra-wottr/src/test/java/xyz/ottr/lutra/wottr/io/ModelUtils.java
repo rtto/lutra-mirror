@@ -22,54 +22,52 @@ package xyz.ottr.lutra.wottr.io;
  * #L%
  */
 
+import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 
 import org.apache.jena.rdf.model.Model;
-import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import org.apache.jena.riot.Lang;
+import org.junit.Assert;
 import xyz.ottr.lutra.io.InstanceReader;
-import xyz.ottr.lutra.io.TemplateReader;
 import xyz.ottr.lutra.model.Instance;
 import xyz.ottr.lutra.result.Message;
-import xyz.ottr.lutra.result.MessageHandler;
-import xyz.ottr.lutra.result.Result;
 import xyz.ottr.lutra.result.ResultConsumer;
 import xyz.ottr.lutra.result.ResultStream;
 import xyz.ottr.lutra.store.DependencyGraph;
 import xyz.ottr.lutra.store.TemplateStore;
+import xyz.ottr.lutra.wottr.util.ModelIO;
 
-public class BlankNodeTest {
+public class ModelUtils {
 
-    private final Logger log = LoggerFactory.getLogger(BlankNodeTest.class);
+    public static void testIsomorphicModels(Model actual, Model expected) {
 
-    // Tests if a template including a blank node is correctly instantiated.
+        boolean isIsomorphic = actual.isIsomorphicWith(expected);
 
-    // Input:
-    //   * instances: correct/instances/blank1/in.ttl
-    //   * template definition: correct/definitions/Blank.ttl
-    // Check that the expansion is isomorphic to:
-    // instances: correct/instances/blank1/out.ttl
+        if (isIsomorphic) {
+            Assert.assertTrue(isIsomorphic);
+        } else { // if error, i.e., models are different, print nice error message
 
-    @Test
-    public void shouldBeIsomorphic() {
+            // clear prefixes to better diff-ing
+            actual.clearNsPrefixMap();
+            expected.clearNsPrefixMap();
+
+            String rdfActual = ModelIO.writeModel(actual, Lang.TURTLE);
+            String rdfExpected = ModelIO.writeModel(expected, Lang.TURTLE);
+
+            Assert.assertThat(rdfActual, is(rdfExpected));
+        }
+    }
+
+
+    // read RDF file, expand instances (only base instances), and return OTTR parsed RDF model
+    public static Model getOTTRParsedRDFModel(String filename) {
 
         TemplateStore store = new DependencyGraph();
         store.addOTTRBaseTemplates();
 
-        // Read templates
-        TemplateReader tempReader = new TemplateReader(new WFileReader(), new WTemplateParser());
-        ResultStream<String> tempIRI = ResultStream.innerOf("src/test/resources/correct/definitions/core/Blank.ttl");
-        MessageHandler errorMessages = tempReader.populateTemplateStore(store, tempIRI);
-        assertFalse(Message.moreSevere(errorMessages.printMessages(),
-                Message.ERROR)); // No errors when parsing
-
-        // Read in-instances and expand
         InstanceReader insReader = new InstanceReader(new WFileReader(), new WInstanceParser());
         ResultStream<Instance> expandedInInstances = insReader
-            .apply("src/test/resources/correct/instances/blank1/in.ttl")
+            .apply(filename)
             .innerFlatMap(ins -> store.expandInstance(ins));
 
         // Write expanded instances to model
@@ -77,17 +75,10 @@ public class BlankNodeTest {
         ResultConsumer<Instance> expansionErrors = new ResultConsumer<Instance>(insWriter);
         expandedInInstances.forEach(expansionErrors);
         assertFalse(Message.moreSevere(expansionErrors.getMessageHandler().printMessages(),
-                Message.ERROR)); // No errors when expanding
-        Model in = insWriter.writeToModel();
-
-        // Read out-model
-        Result<Model> outRes = new WFileReader().parse("src/test/resources/correct/instances/blank1/out.ttl");
-        if (!outRes.isPresent()) {
-            log.error(outRes.toString());
-        }
-        assertTrue(outRes.isPresent());
-        Model out = outRes.get();
-
-        ModelUtils.testIsomorphicModels(in, out);
+            Message.ERROR)); // No errors when expanding
+        Model ottrModel = insWriter.writeToModel();
+        return ottrModel;
     }
+
+
 }
