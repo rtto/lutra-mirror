@@ -1,7 +1,7 @@
 package xyz.ottr.lutra.wottr.io;
 
+import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 
 /*-
  * #%L
@@ -35,6 +35,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.apache.jena.rdf.model.Model;
+import org.apache.jena.riot.Lang;
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -86,7 +88,19 @@ public class RDFtoOTTRtoRDFParserTest {
 
         Model ottrModel = getOTTRParsedRDFModel(this.filename);
 
-        assertTrue(ottrModel.isIsomorphicWith(rdfModel));
+        boolean isIsoMorphic = ottrModel.isIsomorphicWith(rdfModel);
+
+        if (!ottrModel.isIsomorphicWith(rdfModel)) {
+            // if error, print nice error message:
+            rdfModel.clearNsPrefixMap();
+            ottrModel.clearNsPrefixMap();
+
+            String expected = ModelIO.writeModel(rdfModel, Lang.TURTLE);
+            String actual = ModelIO.writeModel(ottrModel, Lang.TURTLE);
+            Assert.assertThat(actual, is(expected));
+        } else {
+            Assert.assertTrue(isIsoMorphic);
+        }
     }
 
     // read RDF file and return OTTR parsed RDF model
