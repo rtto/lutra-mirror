@@ -1,0 +1,9 @@
+@prefix ottr: <http://ns.ottr.xyz/0.4/> .
+@prefix ex:   <http://example.net/ns#> .
+
+ex:B1 ex:B2 ex:B3  .
+
+ex:C1 ex:C2 ottr:none .
+
+ex:D1 ex:D2 ex:D3  .
+
