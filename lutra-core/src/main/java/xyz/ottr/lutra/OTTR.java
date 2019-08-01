@@ -22,6 +22,16 @@ package xyz.ottr.lutra;
  * #L%
  */
 
+import java.util.HashSet;
+import java.util.Set;
+
+import xyz.ottr.lutra.model.BlankNodeTerm;
+import xyz.ottr.lutra.model.ParameterList;
+import xyz.ottr.lutra.model.TemplateSignature;
+import xyz.ottr.lutra.model.Term;
+import xyz.ottr.lutra.model.TermList;
+import xyz.ottr.lutra.model.types.TypeFactory;
+
 public class OTTR  {
 
     private static final String ns = "http://ns.ottr.xyz/0.4/";
@@ -29,11 +39,12 @@ public class OTTR  {
     public static final String prefix = "ottr";
     public static final String namespace = ns;
     
-    public static class Bases {
+    public static class BaseURI {
         public static final String Triple = ns + "Triple";
+        public static final String NullableTriple = ns + "NullableTriple";
     }
 
-    public static class Types {
+    public static class TypeURI {
         public static final String Type = ns + "Type";
         public static final String subTypeOf = ns + "subTypeOf";
         
@@ -43,6 +54,36 @@ public class OTTR  {
 
         public static final String IRI = ns + "IRI";
         public static final String Bot = ns + "Bot";
+    }
+
+    public static class BaseTemplate {
+        public static final TemplateSignature Triple;
+        public static final TemplateSignature NullableTriple;
+
+        static {
+            Term sub = new BlankNodeTerm("_:s");
+            sub.setType(TypeFactory.getType(OTTR.TypeURI.IRI));
+            Term pred = new BlankNodeTerm("_:p");
+            pred.setType(TypeFactory.getType(OTTR.TypeURI.IRI));
+            Term obj = new BlankNodeTerm("_:o");
+            obj.setType(TypeFactory.getVariableType(obj));
+
+            Set<Term> nonBlanks = new HashSet<>();
+            nonBlanks.add(pred);
+            Triple = new TemplateSignature(
+                OTTR.BaseURI.Triple,
+                new ParameterList(new TermList(sub, pred, obj), nonBlanks, null, null),
+                true);
+
+            Set<Term> optionals = new HashSet<>();
+            optionals.add(sub);
+            optionals.add(pred);
+            optionals.add(obj);
+            NullableTriple = new TemplateSignature(
+                OTTR.BaseURI.NullableTriple,
+                new ParameterList(new TermList(sub, pred, obj), nonBlanks, optionals, null),
+                true);
+        }
     }
     
     public static class Files {

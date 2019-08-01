@@ -39,7 +39,7 @@ public class WOTTR {
     public static final Resource TemplateInstance = getResource(ns + "TemplateInstance");
 
     // Individuals
-    public static final Resource triple = getResource(OTTR.Bases.Triple);
+    public static final Resource triple = getResource(OTTR.BaseURI.Triple);
     public static final Resource none = getResource(ns + "none");
     public static final Resource optional = getResource(ns + "optional");
     public static final Resource nonBlank = getResource(ns + "nonBlank");

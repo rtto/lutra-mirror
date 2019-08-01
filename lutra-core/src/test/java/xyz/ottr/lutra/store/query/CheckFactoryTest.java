@@ -199,7 +199,7 @@ public class CheckFactoryTest {
         DependencyGraph store = new DependencyGraph();
 
         Term varBase1 = new IRITerm("ex.com/var1");
-        varBase1.setType(TypeFactory.getType(OTTR.Types.IRI));
+        varBase1.setType(TypeFactory.getType(OTTR.TypeURI.IRI));
         Term varBase2 = new IRITerm("ex.com/var2");
         varBase2.setType(TypeFactory.getType(OWL.ObjectProperty));
         Term varBase3 = new LiteralTerm("7", TypeFactory.getType(XSD.integer).getIRI());
@@ -209,7 +209,7 @@ public class CheckFactoryTest {
                 new ParameterList(varBase1, varBase2, varBase3)));
 
         Term varC1 = new IRITerm("ex.com/iri");
-        varC1.setType(TypeFactory.getType(OTTR.Types.IRI));
+        varC1.setType(TypeFactory.getType(OTTR.TypeURI.IRI));
         Term varC2 = new LiteralTerm("1", TypeFactory.getType(XSD.integer).getIRI());
 
         Term varC1b = new IRITerm("ex.com/iri");
@@ -293,7 +293,7 @@ public class CheckFactoryTest {
                 new ParameterList(varBase1, varBase2, varBase3)));
 
         Term var1 = new IRITerm("ex.com/iri");
-        var1.setType(TypeFactory.getType(OTTR.Types.IRI));
+        var1.setType(TypeFactory.getType(OTTR.TypeURI.IRI));
         Term var2 = new LiteralTerm("1", TypeFactory.getType(XSD.integer).getIRI());
 
         Term var1b = new IRITerm("ex.com/iri");

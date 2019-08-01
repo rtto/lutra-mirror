@@ -49,7 +49,6 @@ import xyz.ottr.lutra.result.ResultConsumer;
 import xyz.ottr.lutra.result.ResultStream;
 import xyz.ottr.lutra.store.DependencyGraph;
 import xyz.ottr.lutra.store.TemplateStore;
-import xyz.ottr.lutra.wottr.WTemplateFactory;
 import xyz.ottr.lutra.wottr.util.ModelIO;
 
 @RunWith(Parameterized.class)
@@ -107,7 +106,7 @@ public class RDFtoOTTRtoRDFParserTest {
     private Model getOTTRParsedRDFModel(String filename) {
 
         TemplateStore store = new DependencyGraph();
-        store.addTemplateSignature(WTemplateFactory.createTripleTemplateHead());
+        store.addOTTRBaseTemplates();
 
         InstanceReader insReader = new InstanceReader(new WFileReader(), new WInstanceParser());
         ResultStream<Instance> expandedInInstances = insReader

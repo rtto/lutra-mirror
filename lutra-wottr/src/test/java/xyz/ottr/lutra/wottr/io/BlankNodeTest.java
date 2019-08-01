@@ -41,12 +41,6 @@ import xyz.ottr.lutra.result.ResultStream;
 import xyz.ottr.lutra.store.DependencyGraph;
 import xyz.ottr.lutra.store.TemplateStore;
 
-import xyz.ottr.lutra.wottr.WTemplateFactory;
-import xyz.ottr.lutra.wottr.io.WFileReader;
-import xyz.ottr.lutra.wottr.io.WInstanceParser;
-import xyz.ottr.lutra.wottr.io.WInstanceWriter;
-import xyz.ottr.lutra.wottr.io.WTemplateParser;
-
 public class BlankNodeTest {
 
     private final Logger log = LoggerFactory.getLogger(BlankNodeTest.class);
@@ -63,7 +57,7 @@ public class BlankNodeTest {
     public void shouldBeIsomorphic() {
 
         TemplateStore store = new DependencyGraph();
-        store.addTemplateSignature(WTemplateFactory.createTripleTemplateHead());
+        store.addOTTRBaseTemplates();
 
         // Read templates
         TemplateReader tempReader = new TemplateReader(new WFileReader(), new WTemplateParser());
