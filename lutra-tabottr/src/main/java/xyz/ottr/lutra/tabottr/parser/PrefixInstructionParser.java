@@ -30,6 +30,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.apache.commons.collections4.SetUtils;
 import org.apache.jena.shared.PrefixMapping;
 
 import xyz.ottr.lutra.result.Message;
@@ -42,20 +43,13 @@ public class PrefixInstructionParser {
 
     private static final PrefixMapping stdPrefixes = PrefixMapping.Standard; // TODO use OTTR standard
 
-    // TODO must be a java method for this?
-    private static <T> Set<T> union(Set<T> one, Set<T> two) {
-        Set<T> union = new HashSet<>();
-        union.addAll(one);
-        union.addAll(two);
-        return union;
-    }
-
     private static Set<Map.Entry<String, String>> getPrefixPairs(PrefixMapping prefixes) {
         return prefixes.getNsPrefixMap().entrySet();
     }
 
+    // Tip: Think of Map.Entry as Java's Pair implementation. Map.Entry<String, String> is here one prefix declaration.
     private static Result<PrefixMapping> mergePrefixResults(Result<PrefixMapping> base, Result<PrefixMapping> add) {
-        Result<Set<Map.Entry<String, String>>> pairs = Result.zip(base, add, (px1, px2) -> union(getPrefixPairs(px1), getPrefixPairs(px2)));
+        Result<Set<Map.Entry<String, String>>> pairs = Result.zip(base, add, (px1, px2) -> SetUtils.union(getPrefixPairs(px1), getPrefixPairs(px2)));
         return pairs.flatMap(PrefixInstructionParser::buildPrefixMapping);
     }
 
@@ -68,7 +62,7 @@ public class PrefixInstructionParser {
     private static Result<PrefixMapping> buildPrefixMapping(Collection<Map.Entry<String,String>> pairs) {
 
         List<Message> errors = new ArrayList<>();
-        // build a map of the pairs, while collect conflicts if there are
+        // build a map of the pairs, while collecting conflicts if there are any
         Map<String, String> pxMap = pairs.stream()
                 .collect(Collectors.toMap(
                         Map.Entry::getKey,
@@ -78,7 +72,7 @@ public class PrefixInstructionParser {
                             errors.add(Message.error("Conflicting prefix instruction: "
                                 + ns1 + " and " + ns2 + " share the same prefix."));
                         }
-                        return ns1;
+                        return ns1; // if both are equal, then the first one will do.
                     }));
 
         // NOTE: we keep the result even though there are errors in other to collect more possible errors.
