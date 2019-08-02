@@ -99,7 +99,10 @@ public abstract class AbstractWWriter {
                 return b;
             }
         } else if (term instanceof NoneTerm) {
-            return WOTTR.none;
+            // Note: the resource is recreated *in/by the model* to allow the none-resource
+            // to be cast to Property (by as(Property.class)). If we return the resource without
+            // no "hosting" model, then the cast throws a UnsupportedPolymorphismException.
+            return m.createResource(WOTTR.none.getURI());
         } else {
             return null; // TODO: Throw exception
         }

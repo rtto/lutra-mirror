@@ -44,10 +44,8 @@ public class BaseInstanceExpansionTest {
         List<String[]> data = new ArrayList<>();
 
         Path root = Paths.get("src",  "test", "resources", "baseinstances");
-        Path inFolder = root.resolve("in");
-        Path outFolder = root.resolve("out");
 
-        data.add(new String[]{ inFolder.resolve("test1.ttl").toString(), outFolder.resolve("test1.ttl").toString() });
+        data.add(new String[]{ root.resolve("test1-in.ttl").toString(), root.resolve("test1-out.ttl").toString() });
         return data;
     }
 
