@@ -43,6 +43,7 @@ import xyz.ottr.lutra.model.Term;
 import xyz.ottr.lutra.model.TermList;
 import xyz.ottr.lutra.result.Message;
 import xyz.ottr.lutra.result.Result;
+import xyz.ottr.lutra.wottr.parser.v04.WOTTR;
 
 public class WTermFactory implements Function<RDFNode, Result<Term>> {
 

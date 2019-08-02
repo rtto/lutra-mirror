@@ -1,4 +1,4 @@
-package xyz.ottr.lutra.wottr.legacy;
+package xyz.ottr.lutra.wottr.parser;
 
 /*-
  * #%L
@@ -22,31 +22,57 @@ package xyz.ottr.lutra.wottr.legacy;
  * #L%
  */
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.function.Supplier;
 
+import org.apache.jena.rdf.model.Model;
+
+import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.RDFList;
+import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.Statement;
+import org.apache.jena.util.iterator.ExtendedIterator;
 import org.apache.jena.vocabulary.RDF;
-
 import xyz.ottr.lutra.OTTR;
 import xyz.ottr.lutra.model.ArgumentList;
-import xyz.ottr.lutra.model.BlankNodeTerm;
 import xyz.ottr.lutra.model.Instance;
-import xyz.ottr.lutra.model.ParameterList;
-import xyz.ottr.lutra.model.TemplateSignature;
 import xyz.ottr.lutra.model.Term;
-import xyz.ottr.lutra.model.TermList;
-import xyz.ottr.lutra.model.types.TypeFactory;
 import xyz.ottr.lutra.result.Result;
+import xyz.ottr.lutra.result.ResultStream;
+import xyz.ottr.lutra.wottr.WTermFactory;
 
-@SuppressWarnings("CPD-START")
-public abstract class WTemplateFactory {
+public class WTripleInstanceFactory implements Supplier<ResultStream<Instance>> {
 
-    // TODO Possible generalisation a a generic TemplateFactory provided with with a
-    // generic TermFactory
+    private final Model model;
 
-    public static Result<Instance> createTripleInstance(Statement stmt) {
+    public WTripleInstanceFactory(Model model) {
+        this.model = model;
+    }
+
+    @Override
+    public ResultStream<Instance> get() {
+
+        ExtendedIterator<Result<Instance>> parsedTriples = this.model.listStatements()
+            .filterDrop(this::isPartOfRDFList)
+            .mapWith(WTripleInstanceFactory::createTripleInstance);
+        return new ResultStream<>(parsedTriples.toSet());
+    }
+
+    /**
+     * Returns true if the argument is a redundant list-triple, that is,
+     * on one of the forms "(:a :b) rdf:first :a" or "(:a :b) rdf:rest (:b)".
+     * These statements are redundant as they will be parsed as part of a listterm.
+     */
+    private boolean isPartOfRDFList(Statement statement) {
+
+        Resource subject = statement.getSubject();
+        Property predicate = statement.getPredicate();
+
+        return subject.canAs(RDFList.class)
+            && (predicate.equals(RDF.first) && this.model.contains(subject, RDF.rest))
+                || predicate.equals(RDF.rest) && this.model.contains(subject, RDF.first);
+    }
+
+    private static Result<Instance> createTripleInstance(Statement stmt) {
 
         WTermFactory rdfTermFactory = new WTermFactory();
         Result<Term> sub = rdfTermFactory.apply(stmt.getSubject());
@@ -61,31 +87,5 @@ public abstract class WTemplateFactory {
         asRes.addMessages(obj.getMessages());
 
         return asRes.map(asVal -> new Instance(OTTR.Bases.Triple, asVal));
-    }
-
-    /**
-     * Returns true if the argument is a redundant list-triple, that is,
-     * on one of the forms "(:a :b) rdf:first :a" or "(:a :b) rdf:rest (:b)".
-     */
-    public static boolean isRedundant(Statement s) {
-        return s.getSubject().canAs(RDFList.class)
-            && (s.getPredicate().equals(RDF.first)
-                || s.getPredicate().equals(RDF.rest));
-    }
-
-    // TODO Check if the s, p, o blanks must be fresh.
-    public static TemplateSignature createTripleTemplateHead() {
-        Term sub = new BlankNodeTerm("_:s");
-        sub.setType(TypeFactory.getType(OTTR.Types.IRI));
-        Term pred = new BlankNodeTerm("_:p");
-        pred.setType(TypeFactory.getType(OTTR.Types.IRI));
-        Term obj = new BlankNodeTerm("_:o");
-        obj.setType(TypeFactory.getVariableType(obj));
-        Set<Term> nonBlanks = new HashSet<>();
-        nonBlanks.add(pred);
-        return new TemplateSignature(
-            OTTR.Bases.Triple,
-            new ParameterList(new TermList(sub, pred, obj), nonBlanks, null, null),
-            true);
     }
 }

@@ -32,9 +32,9 @@ import xyz.ottr.lutra.model.Instance;
 import xyz.ottr.lutra.result.ResultConsumer;
 import xyz.ottr.lutra.result.ResultStream;
 import xyz.ottr.lutra.tabottr.io.TabInstanceParser;
-import xyz.ottr.lutra.wottr.legacy.io.WInstanceWriter;
-import xyz.ottr.lutra.wottr.legacy.io.WReader;
+import xyz.ottr.lutra.wottr.parser.v03.WReader;
 import xyz.ottr.lutra.wottr.util.ModelIO;
+import xyz.ottr.lutra.wottr.writer.v03.WInstanceWriter;
 
 public class TabTemplateInstanceParserToRDFTest {
     

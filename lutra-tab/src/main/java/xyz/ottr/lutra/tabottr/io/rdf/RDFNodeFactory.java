@@ -39,7 +39,7 @@ import org.apache.jena.vocabulary.XSD;
 import xyz.ottr.lutra.result.Message;
 import xyz.ottr.lutra.result.Result;
 import xyz.ottr.lutra.tabottr.TabOTTR;
-import xyz.ottr.lutra.wottr.WOTTR;
+import xyz.ottr.lutra.wottr.parser.v04.WOTTR;
 
 public class RDFNodeFactory {
 

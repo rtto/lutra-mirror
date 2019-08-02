@@ -1,4 +1,4 @@
-package xyz.ottr.lutra.wottr.legacy.io;
+package xyz.ottr.lutra.wottr.writer.v03;
 
 /*-
  * #%L
@@ -51,7 +51,7 @@ import xyz.ottr.lutra.model.NoneTerm;
 import xyz.ottr.lutra.model.ParameterList;
 import xyz.ottr.lutra.model.Term;
 import xyz.ottr.lutra.model.TermList;
-import xyz.ottr.lutra.wottr.legacy.WOTTR;
+import xyz.ottr.lutra.wottr.parser.v03.WOTTR;
 
 @SuppressWarnings("CPD-START")
 public abstract class AbstractWriter {

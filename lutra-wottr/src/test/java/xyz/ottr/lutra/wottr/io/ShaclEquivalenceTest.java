@@ -48,6 +48,8 @@ import xyz.ottr.lutra.result.ResultConsumer;
 import xyz.ottr.lutra.result.ResultStream;
 import xyz.ottr.lutra.store.DependencyGraph;
 import xyz.ottr.lutra.store.TemplateStore;
+import xyz.ottr.lutra.wottr.parser.v04.WInstanceParser;
+import xyz.ottr.lutra.wottr.parser.v04.WTemplateParser;
 
 
 @RunWith(Parameterized.class)
@@ -109,8 +111,8 @@ public class ShaclEquivalenceTest {
         this.filename = filename;
         this.isCorrect = isCorrect;
         
-        this.tempReader = new TemplateReader(new WFileReader(), new WTemplateParser());
-        this.insReader = new InstanceReader(new WFileReader(), new WInstanceParser());
+        this.tempReader = new TemplateReader(new RDFFileReader(), new WTemplateParser());
+        this.insReader = new InstanceReader(new RDFFileReader(), new WInstanceParser());
     }
     
     @Parameters(name = "{index}: {0} is {1}")

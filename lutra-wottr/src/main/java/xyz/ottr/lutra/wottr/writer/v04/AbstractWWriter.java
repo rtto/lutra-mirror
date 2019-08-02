@@ -1,4 +1,4 @@
-package xyz.ottr.lutra.wottr.io;
+package xyz.ottr.lutra.wottr.writer.v04;
 
 /*-
  * #%L
@@ -51,7 +51,7 @@ import xyz.ottr.lutra.model.types.LUBType;
 import xyz.ottr.lutra.model.types.ListType;
 import xyz.ottr.lutra.model.types.NEListType;
 import xyz.ottr.lutra.model.types.TermType;
-import xyz.ottr.lutra.wottr.WOTTR;
+import xyz.ottr.lutra.wottr.parser.v04.WOTTR;
 
 public abstract class AbstractWWriter {
 

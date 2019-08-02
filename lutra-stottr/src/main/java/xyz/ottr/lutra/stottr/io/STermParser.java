@@ -42,7 +42,7 @@ import xyz.ottr.lutra.result.Message;
 import xyz.ottr.lutra.result.Result;
 import xyz.ottr.lutra.stottr.STOTTR;
 import xyz.ottr.lutra.stottr.antlr.stOTTRParser;
-import xyz.ottr.lutra.wottr.WOTTR;
+import xyz.ottr.lutra.wottr.parser.v04.WOTTR;
 
 public class STermParser extends SBaseParserVisitor<Term> {
 

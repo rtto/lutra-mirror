@@ -1,4 +1,4 @@
-package xyz.ottr.lutra.wottr.io;
+package xyz.ottr.lutra.wottr.parser.v04;
 
 /*-
  * #%L
@@ -48,8 +48,8 @@ import xyz.ottr.lutra.model.Term;
 import xyz.ottr.lutra.result.Message;
 import xyz.ottr.lutra.result.Result;
 import xyz.ottr.lutra.result.ResultStream;
-import xyz.ottr.lutra.wottr.WOTTR;
 import xyz.ottr.lutra.wottr.WTermFactory;
+import xyz.ottr.lutra.wottr.parser.WTripleInstanceFactory;
 import xyz.ottr.lutra.wottr.util.ModelSelector;
 import xyz.ottr.lutra.wottr.util.ModelSelectorException;
 
@@ -76,7 +76,7 @@ public class WInstanceParser implements InstanceParser<Model> {
         ResultStream<Instance> parsedInstances = parseInstances(model, ins);
         
         Model triples = WReader.getNonTemplateTriples(model, null, new LinkedList<>(), ins);
-        return ResultStream.concat(parsedInstances, new WTripleInstanceParser(triples).get());
+        return ResultStream.concat(parsedInstances, new WTripleInstanceFactory(triples).get());
     }
 
     private ResultStream<Instance> parseInstances(Model model, List<Resource> templateInstances) {

@@ -1,4 +1,4 @@
-package xyz.ottr.lutra.wottr.legacy.io;
+package xyz.ottr.lutra.wottr.parser.v03;
 
 /*-
  * #%L
@@ -51,7 +51,6 @@ import xyz.ottr.lutra.model.TermList;
 import xyz.ottr.lutra.result.Message;
 import xyz.ottr.lutra.result.Result;
 import xyz.ottr.lutra.result.ResultStream;
-import xyz.ottr.lutra.wottr.legacy.WOTTR;
 import xyz.ottr.lutra.wottr.util.ModelSelector;
 import xyz.ottr.lutra.wottr.util.ModelSelectorException;
 

@@ -1,4 +1,4 @@
-package xyz.ottr.lutra.wottr.io;
+package xyz.ottr.lutra.wottr.writer.v04;
 
 /*-
  * #%L
@@ -37,7 +37,7 @@ import xyz.ottr.lutra.model.Instance;
 import xyz.ottr.lutra.model.ParameterList;
 import xyz.ottr.lutra.model.Template;
 import xyz.ottr.lutra.model.TemplateSignature;
-import xyz.ottr.lutra.wottr.WOTTR;
+import xyz.ottr.lutra.wottr.parser.v04.WOTTR;
 import xyz.ottr.lutra.wottr.util.ModelIO;
 import xyz.ottr.lutra.wottr.util.PrefixMappings;
 

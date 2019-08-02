@@ -63,11 +63,11 @@ import xyz.ottr.lutra.stottr.io.STemplateParser;
 import xyz.ottr.lutra.stottr.io.STemplateWriter;
 import xyz.ottr.lutra.tabottr.io.TabInstanceParser;
 import xyz.ottr.lutra.wottr.WTemplateFactory;
-import xyz.ottr.lutra.wottr.io.WFileReader;
-import xyz.ottr.lutra.wottr.io.WInstanceParser;
-import xyz.ottr.lutra.wottr.io.WInstanceWriter;
-import xyz.ottr.lutra.wottr.io.WTemplateParser;
-import xyz.ottr.lutra.wottr.io.WTemplateWriter;
+import xyz.ottr.lutra.wottr.io.RDFFileReader;
+import xyz.ottr.lutra.wottr.parser.v04.WInstanceParser;
+import xyz.ottr.lutra.wottr.parser.v04.WTemplateParser;
+import xyz.ottr.lutra.wottr.writer.v04.WInstanceWriter;
+import xyz.ottr.lutra.wottr.writer.v04.WTemplateWriter;
 
 public class CLI {
 
@@ -277,10 +277,10 @@ public class CLI {
     private static Result<TemplateReader> makeTemplateReader(Settings.Format format) {
         switch (format) {
             case legacy:
-                return Result.of(new TemplateReader(new WFileReader(),
-                        new xyz.ottr.lutra.wottr.legacy.io.WTemplateParser()));
+                return Result.of(new TemplateReader(new RDFFileReader(),
+                        new xyz.ottr.lutra.wottr.parser.v03.WTemplateParser()));
             case wottr:
-                return Result.of(new TemplateReader(new WFileReader(), new WTemplateParser()));
+                return Result.of(new TemplateReader(new RDFFileReader(), new WTemplateParser()));
             case stottr:
                 return Result.of(new TemplateReader(new SFileReader(), new STemplateParser()));
             default:
@@ -298,10 +298,10 @@ public class CLI {
             case tabottr:
                 return Result.of(new InstanceReader(new TabInstanceParser()));
             case legacy:
-                return Result.of(new InstanceReader(new WFileReader(),
-                        new xyz.ottr.lutra.wottr.legacy.io.WInstanceParser()));
+                return Result.of(new InstanceReader(new RDFFileReader(),
+                        new xyz.ottr.lutra.wottr.parser.v03.WInstanceParser()));
             case wottr:
-                return Result.of(new InstanceReader(new WFileReader(), new WInstanceParser()));
+                return Result.of(new InstanceReader(new RDFFileReader(), new WInstanceParser()));
             case stottr:
                 return Result.of(new InstanceReader(new SFileReader(), new SInstanceParser()));
             default:

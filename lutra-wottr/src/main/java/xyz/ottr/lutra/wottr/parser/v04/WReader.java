@@ -1,4 +1,4 @@
-package xyz.ottr.lutra.wottr.io;
+package xyz.ottr.lutra.wottr.parser.v04;
 
 /*-
  * #%L
@@ -32,7 +32,6 @@ import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdf.model.StmtIterator;
 
-import xyz.ottr.lutra.wottr.WOTTR;
 import xyz.ottr.lutra.wottr.util.ModelSelector;
 import xyz.ottr.lutra.wottr.util.Models;
 

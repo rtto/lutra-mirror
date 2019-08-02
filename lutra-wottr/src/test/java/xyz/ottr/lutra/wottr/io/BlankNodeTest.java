@@ -42,10 +42,9 @@ import xyz.ottr.lutra.store.DependencyGraph;
 import xyz.ottr.lutra.store.TemplateStore;
 
 import xyz.ottr.lutra.wottr.WTemplateFactory;
-import xyz.ottr.lutra.wottr.io.WFileReader;
-import xyz.ottr.lutra.wottr.io.WInstanceParser;
-import xyz.ottr.lutra.wottr.io.WInstanceWriter;
-import xyz.ottr.lutra.wottr.io.WTemplateParser;
+import xyz.ottr.lutra.wottr.parser.v04.WInstanceParser;
+import xyz.ottr.lutra.wottr.parser.v04.WTemplateParser;
+import xyz.ottr.lutra.wottr.writer.v04.WInstanceWriter;
 
 public class BlankNodeTest {
 
@@ -66,14 +65,14 @@ public class BlankNodeTest {
         store.addTemplateSignature(WTemplateFactory.createTripleTemplateHead());
 
         // Read templates
-        TemplateReader tempReader = new TemplateReader(new WFileReader(), new WTemplateParser());
+        TemplateReader tempReader = new TemplateReader(new RDFFileReader(), new WTemplateParser());
         ResultStream<String> tempIRI = ResultStream.innerOf("src/test/resources/correct/definitions/core/Blank.ttl");
         MessageHandler errorMessages = tempReader.populateTemplateStore(store, tempIRI);
         assertFalse(Message.moreSevere(errorMessages.printMessages(),
                 Message.ERROR)); // No errors when parsing
 
         // Read in-instances and expand
-        InstanceReader insReader = new InstanceReader(new WFileReader(), new WInstanceParser());
+        InstanceReader insReader = new InstanceReader(new RDFFileReader(), new WInstanceParser());
         ResultStream<Instance> expandedInInstances = insReader
             .apply("src/test/resources/correct/instances/blank1/in.ttl")
             .innerFlatMap(ins -> store.expandInstance(ins));
@@ -87,7 +86,7 @@ public class BlankNodeTest {
         Model in = insWriter.writeToModel();
 
         // Read out-model
-        Result<Model> outRes = new WFileReader().parse("src/test/resources/correct/instances/blank1/out.ttl");
+        Result<Model> outRes = new RDFFileReader().parse("src/test/resources/correct/instances/blank1/out.ttl");
         if (!outRes.isPresent()) {
             log.error(outRes.toString());
         }

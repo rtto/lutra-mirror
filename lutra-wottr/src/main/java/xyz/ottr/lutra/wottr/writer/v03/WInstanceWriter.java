@@ -1,4 +1,4 @@
-package xyz.ottr.lutra.wottr.io;
+package xyz.ottr.lutra.wottr.writer.v03;
 
 /*-
  * #%L
@@ -22,41 +22,26 @@ package xyz.ottr.lutra.wottr.io;
  * #L%
  */
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.shared.PrefixMapping;
+//import org.apache.jena.vocabulary.RDF;
 
 import xyz.ottr.lutra.io.InstanceWriter;
 import xyz.ottr.lutra.model.ArgumentList;
 import xyz.ottr.lutra.model.Instance;
-import xyz.ottr.lutra.wottr.WOTTR;
+import xyz.ottr.lutra.wottr.parser.v03.WOTTR;
 import xyz.ottr.lutra.wottr.util.ModelIO;
-import xyz.ottr.lutra.wottr.util.PrefixMappings;
 
-public class WInstanceWriter extends AbstractWWriter implements InstanceWriter {
-
-    private static Map<ArgumentList.Expander, Resource> expanders;
-
-    static {
-        expanders = new HashMap<>();
-        expanders.put(ArgumentList.Expander.CROSS, WOTTR.cross);
-        expanders.put(ArgumentList.Expander.ZIPMIN, WOTTR.zipMin);
-        expanders.put(ArgumentList.Expander.ZIPMAX, WOTTR.zipMax);
-    }
+public class WInstanceWriter extends AbstractWriter implements InstanceWriter {
 
     private Model model;
 
     public WInstanceWriter() {
-        this(PrefixMapping.Factory.create());
-    }
-
-    public WInstanceWriter(PrefixMapping prefixes) {
         this.model = ModelFactory.createDefaultModel();
-        this.model.setNsPrefixes(prefixes); // Will trim unused before write
+        this.model.setNsPrefixes(PrefixMapping.Standard);
+        this.model.setNsPrefix("ottr", WOTTR.namespace);
     }
 
     @Override
@@ -64,33 +49,38 @@ public class WInstanceWriter extends AbstractWWriter implements InstanceWriter {
         if (isTriple(i)) {
             this.model.add(getTriple(model, i));
         } else {
-            makeWottrInstance(this.model, i);
+            this.model.add(makeWottrInstance(i));
         }
     }
 
     @Override
     public String write() {
-        PrefixMappings.trim(this.model);
         return ModelIO.writeModel(this.model);
     }
 
     public Model writeToModel() {
-        PrefixMappings.trim(this.model);
         return this.model;
     }
 
-    public Resource makeWottrInstance(Model model, Instance i) {
-        Resource templateIRI = model.createResource(i.getIRI());
-        Resource instance = model.createResource();
+    public Model makeWottrTripleOrInstance(Instance i) {
+        if (isTriple(i)) {
+            Model m = ModelFactory.createDefaultModel();
+            m.add(getTriple(m, i));
+            return m;
+        } else {
+            return makeWottrInstance(i);
+        }
+    }
+
+    public Model makeWottrInstance(Instance i) {
+        Model m = ModelFactory.createDefaultModel();
+        Resource templateIRI = m.createResource(i.getIRI());
+        Resource instance = m.createResource();
         //m.add(m.createStatement(instance, RDF.type, WOTTR.Instance));
-        model.add(model.createStatement(instance, WOTTR.of, templateIRI));
+        m.add(m.createStatement(instance, WOTTR.templateRef, templateIRI));
 
         ArgumentList arguments = i.getArguments();
-        addArguments(arguments, instance, model);
-        if (arguments.hasListExpander()) {
-            model.add(model.createStatement(
-                    instance, WOTTR.modifier, expanders.get(arguments.getListExpander())));
-        }
-        return instance;
+        addArguments(arguments, instance, m);
+        return m;
     }
 }

@@ -33,21 +33,20 @@ import org.slf4j.LoggerFactory;
 
 import xyz.ottr.lutra.result.Result;
 import xyz.ottr.lutra.result.ResultStream;
-import xyz.ottr.lutra.wottr.io.WFileReader;
 import xyz.ottr.lutra.wottr.util.ModelIO;
 
-public class WFileReaderTest {
+public class RDFFileReaderTest {
     
     private static final String nonExistent = "src/test/resources/thisFileDoesNotExist.ttl";
     private static final String faultyRDF = "src/test/resources/incorrect/faultyRDF.ttl";
     private static final String emptyFile = "src/test/resources/correct/emptyFile.ttl";
-    private static WFileReader reader;
+    private static RDFFileReader reader;
 
-    private final Logger log = LoggerFactory.getLogger(WFileReaderTest.class);
+    private final Logger log = LoggerFactory.getLogger(RDFFileReaderTest.class);
     
     @BeforeClass    
     public static void load() {
-        reader = new WFileReader();
+        reader = new RDFFileReader();
     }
 
     @Test

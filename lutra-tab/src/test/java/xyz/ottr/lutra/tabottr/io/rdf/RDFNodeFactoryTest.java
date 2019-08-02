@@ -40,8 +40,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import xyz.ottr.lutra.tabottr.TabOTTR;
-import xyz.ottr.lutra.tabottr.io.rdf.RDFNodeFactory;
-import xyz.ottr.lutra.wottr.WOTTR;
+import xyz.ottr.lutra.wottr.parser.v04.WOTTR;
 
 public class RDFNodeFactoryTest {
 

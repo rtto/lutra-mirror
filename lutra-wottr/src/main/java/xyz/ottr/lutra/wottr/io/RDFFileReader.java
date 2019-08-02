@@ -39,13 +39,13 @@ import xyz.ottr.lutra.result.Result;
 import xyz.ottr.lutra.result.ResultStream;
 import xyz.ottr.lutra.wottr.util.ModelIO;
 
-public class WFileReader implements InputReader<String, Model> {
+public class RDFFileReader implements InputReader<String, Model> {
 
-    private final Logger log = LoggerFactory.getLogger(WFileReader.class);
+    private final Logger log = LoggerFactory.getLogger(RDFFileReader.class);
     private final PrefixMapping prefixes; // Gathers prefixes parsed for later output
     private static UrlValidator urlValidator = new UrlValidator();
 
-    public WFileReader() {
+    public RDFFileReader() {
         this.prefixes = PrefixMapping.Factory.create();
     }
 

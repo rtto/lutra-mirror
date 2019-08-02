@@ -1,4 +1,4 @@
-package xyz.ottr.lutra.wottr.legacy;
+package xyz.ottr.lutra.wottr.parser.v03;
 
 /*-
  * #%L
