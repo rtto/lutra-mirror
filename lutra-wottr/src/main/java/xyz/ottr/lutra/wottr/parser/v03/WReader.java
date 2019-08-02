@@ -24,7 +24,7 @@ package xyz.ottr.lutra.wottr.parser.v03;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map.Entry;
+import java.util.Map;
 
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Property;
@@ -48,11 +48,12 @@ public class WReader {
      * Turtle lists (a b c ...) into its full RDF-representation using rdf:first and
      * rdf:rest.
      */
-    public static Model getCanonicalModel(Model model) throws ReaderException {
+
+    public static Model getCanonicalModel(Model model) {
         Model canonical = Models.duplicate(model, Models.BlankCopy.KEEP);
 
         // replacing t:with... list properties with indexed lists:
-        for (Entry<Property, List<Property>> m : WOTTR.listPropertiesMap.entrySet()) {
+        for (Map.Entry<Property, List<Property>> m : WOTTR.listPropertiesMap.entrySet()) {
             for (Statement t : canonical.listStatements(null, m.getKey(), (RDFNode) null).toList()) {
                 Resource s = t.getSubject();
                 RDFNode o = t.getObject();

@@ -42,20 +42,20 @@ import xyz.ottr.lutra.model.Term;
 import xyz.ottr.lutra.model.types.TypeFactory;
 import xyz.ottr.lutra.result.Message;
 import xyz.ottr.lutra.result.Result;
-import xyz.ottr.lutra.wottr.WTermFactory;
+import xyz.ottr.lutra.wottr.parser.TermFactory;
 import xyz.ottr.lutra.wottr.util.ModelSelector;
 import xyz.ottr.lutra.wottr.util.ModelSelectorException;
 
 public class WParameterParser implements Function<Resource, Result<Term>> {
 
     private final Model model;
-    private final WTermFactory rdfTermFactory;
+    private final TermFactory rdfTermFactory;
     private final Set<Term> optionals;
     private final Map<Term, Term> defaultValues;
 
     public WParameterParser(Model model) {
         this.model = model;
-        this.rdfTermFactory = new WTermFactory();
+        this.rdfTermFactory = new TermFactory(WOTTR.theInstance);
         this.optionals = new HashSet<>();
         this.defaultValues = new HashMap<>();
     }

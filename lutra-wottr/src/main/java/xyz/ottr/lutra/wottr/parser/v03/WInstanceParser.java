@@ -30,21 +30,16 @@ import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 
-//import org.slf4j.Logger;
-//import org.slf4j.LoggerFactory;
-
 import xyz.ottr.lutra.io.InstanceParser;
 import xyz.ottr.lutra.model.ArgumentList;
 import xyz.ottr.lutra.model.Instance;
 import xyz.ottr.lutra.result.Message;
 import xyz.ottr.lutra.result.Result;
 import xyz.ottr.lutra.result.ResultStream;
-import xyz.ottr.lutra.wottr.parser.WTripleInstanceFactory;
+import xyz.ottr.lutra.wottr.parser.TripleInstanceFactory;
 import xyz.ottr.lutra.wottr.util.ModelSelector;
 
 public class WInstanceParser implements InstanceParser<Model> {
-
-    //private final Logger log = LoggerFactory.getLogger(WInstanceParser.class);
 
     public WInstanceParser() {
     }
@@ -52,28 +47,29 @@ public class WInstanceParser implements InstanceParser<Model> {
     @Override
     public ResultStream<Instance> apply(Model model) {
 
-        if (!WReader.isTemplateDefinition(model)) {
+        Model canonModel = WReader.getCanonicalModel(model);
 
-            List<Resource> ins = WReader.getInstances(model);
-            ResultStream<Instance> parsedInstances = parseInstances(model, ins);
-
-            Model triples = WReader.getNonTemplateTriples(model, null, new LinkedList<>(), ins);
-            return ResultStream.concat(parsedInstances, new WTripleInstanceFactory(triples).get());
-        } else {
+        if (WReader.isTemplateDefinition(canonModel)) {
             return ResultStream.empty();
+        } else {
+            List<Resource> ins = WReader.getInstances(canonModel);
+            ResultStream<Instance> parsedInstances = parseInstances(canonModel, ins);
+
+            Model triples = WReader.getNonTemplateTriples(canonModel, null, new LinkedList<>(), ins);
+            return ResultStream.concat(parsedInstances, new TripleInstanceFactory(triples).get());
         }
     }
 
     private ResultStream<Instance> parseInstances(Model model, List<Resource> templateInstances) {
         Stream<Result<Instance>> parsedInstances = templateInstances.stream()
-            .map(i -> parseInstance(model, i));
+            .map(instance -> parseInstance(model, instance));
         return new ResultStream<>(parsedInstances);
     }
 
     public Result<Instance> parseInstance(Model model, RDFNode templateInstanceNode) {
 
         if (!templateInstanceNode.isResource()) {
-            return Result.empty(new Message(Message.ERROR,
+            return Result.empty(Message.error(
                         "Expected instance to be a resource, found non-resource "
                         + templateInstanceNode.toString() + " in model " + model.toString() + "."));
         }

@@ -72,11 +72,13 @@ public class WTemplateParser implements TemplateParser<Model> {
 
     @Override
     public ResultStream<TemplateSignature> apply(Model model) {
-        if (model.listStatements((Resource) null, WOTTR.hasPattern, (RDFNode) null).hasNext()) {
-            return parseTemplatesWithExplicitBody(model)
+
+        Model canonModel = WReader.getCanonicalModel(model);
+        if (canonModel.listStatements((Resource) null, WOTTR.hasPattern, (RDFNode) null).hasNext()) {
+            return parseTemplatesWithExplicitBody(canonModel)
                 .innerMap(tpl -> changeListVariablesToBlanks(tpl));
         } else {
-            return ResultStream.of(parseTemplateWithImplicitBody(model))
+            return ResultStream.of(parseTemplateWithImplicitBody(canonModel))
                 .innerMap(tpl -> changeListVariablesToBlanks(tpl));
         }
     }

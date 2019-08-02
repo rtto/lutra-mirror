@@ -22,8 +22,10 @@ package xyz.ottr.lutra.wottr.writer.v03;
  * #L%
  */
 
+import org.apache.jena.datatypes.xsd.XSDDatatype;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.shared.PrefixMapping;
 //import org.apache.jena.vocabulary.RDF;
@@ -31,25 +33,29 @@ import org.apache.jena.shared.PrefixMapping;
 import xyz.ottr.lutra.io.InstanceWriter;
 import xyz.ottr.lutra.model.ArgumentList;
 import xyz.ottr.lutra.model.Instance;
+import xyz.ottr.lutra.model.Term;
 import xyz.ottr.lutra.wottr.parser.v03.WOTTR;
 import xyz.ottr.lutra.wottr.util.ModelIO;
+import xyz.ottr.lutra.wottr.writer.RDFFactory;
 
-public class WInstanceWriter extends AbstractWriter implements InstanceWriter {
+public class WInstanceWriter implements InstanceWriter {
 
     private Model model;
+    private RDFFactory rdfFactory;
 
     public WInstanceWriter() {
         this.model = ModelFactory.createDefaultModel();
         this.model.setNsPrefixes(PrefixMapping.Standard);
-        this.model.setNsPrefix("ottr", WOTTR.namespace);
+        this.model.setNsPrefix(WOTTR.prefix, WOTTR.namespace);
+        this.rdfFactory = new RDFFactory(WOTTR.theInstance);
     }
 
     @Override
     public synchronized void accept(Instance i) { // Cannot write in parallel, Jena breaks
-        if (isTriple(i)) {
-            this.model.add(getTriple(model, i));
+        if (this.rdfFactory.isTriple(i)) {
+            this.model.add(this.rdfFactory.createTriple(this.model, i));
         } else {
-            this.model.add(makeWottrInstance(i));
+            addInstance(i, this.model);
         }
     }
 
@@ -62,25 +68,48 @@ public class WInstanceWriter extends AbstractWriter implements InstanceWriter {
         return this.model;
     }
 
-    public Model makeWottrTripleOrInstance(Instance i) {
-        if (isTriple(i)) {
-            Model m = ModelFactory.createDefaultModel();
-            m.add(getTriple(m, i));
-            return m;
+    /*
+    public Model makeWottrTripleOrInstance(Instance instance) {
+        if (rdfFactory.isTriple(instance)) {
+            Model model = ModelFactory.createDefaultModel();
+            model.add(rdfFactory.createTriple(model, instance));
+            return model;
         } else {
-            return makeWottrInstance(i);
+            return createInstance(instance);
         }
+    }*/
+
+    private void addInstance(Instance instance, Model model) {
+
+        Resource templateNode = model.createResource(instance.getIRI());
+        Resource instanceNode = model.createResource();
+
+        model.add(instanceNode, WOTTR.templateRef, templateNode);
+
+        ArgumentList arguments = instance.getArguments();
+        addArguments(arguments, instanceNode, model);
     }
 
-    public Model makeWottrInstance(Instance i) {
-        Model m = ModelFactory.createDefaultModel();
-        Resource templateIRI = m.createResource(i.getIRI());
-        Resource instance = m.createResource();
-        //m.add(m.createStatement(instance, RDF.type, WOTTR.Instance));
-        m.add(m.createStatement(instance, WOTTR.templateRef, templateIRI));
+    private void addArguments(ArgumentList arguments, Resource iri, Model model) {
 
-        ArgumentList arguments = i.getArguments();
-        addArguments(arguments, instance, m);
-        return m;
+        if (arguments == null) {
+            return; // TODO: Perhaps throw exception(?)
+        }
+
+        int index = 1; // Start index count on 1
+
+        for (Term arg : arguments.asList()) {
+            Resource argumentNode = model.createResource();
+            RDFNode valueNode = rdfFactory.createRDFNode(model, arg);
+
+            model.add(iri, WOTTR.hasArgument, argumentNode);
+            if (arguments.hasListExpander(arg) && arguments.hasCrossExpander()) {
+                model.add(argumentNode, WOTTR.eachValue, valueNode);
+            } else {
+                model.add(argumentNode, WOTTR.value, valueNode);
+            }
+            model.add(argumentNode, WOTTR.index, model.createTypedLiteral(index, XSDDatatype.XSDint));
+            index++;
+        }
     }
 }

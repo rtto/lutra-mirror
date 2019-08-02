@@ -48,8 +48,8 @@ import xyz.ottr.lutra.model.Term;
 import xyz.ottr.lutra.result.Message;
 import xyz.ottr.lutra.result.Result;
 import xyz.ottr.lutra.result.ResultStream;
-import xyz.ottr.lutra.wottr.WTermFactory;
-import xyz.ottr.lutra.wottr.parser.WTripleInstanceFactory;
+import xyz.ottr.lutra.wottr.parser.TermFactory;
+import xyz.ottr.lutra.wottr.parser.TripleInstanceFactory;
 import xyz.ottr.lutra.wottr.util.ModelSelector;
 import xyz.ottr.lutra.wottr.util.ModelSelectorException;
 
@@ -76,7 +76,7 @@ public class WInstanceParser implements InstanceParser<Model> {
         ResultStream<Instance> parsedInstances = parseInstances(model, ins);
         
         Model triples = WReader.getNonTemplateTriples(model, null, new LinkedList<>(), ins);
-        return ResultStream.concat(parsedInstances, new WTripleInstanceFactory(triples).get());
+        return ResultStream.concat(parsedInstances, new TripleInstanceFactory(triples).get());
     }
 
     private ResultStream<Instance> parseInstances(Model model, List<Resource> templateInstances) {
@@ -180,7 +180,7 @@ public class WInstanceParser implements InstanceParser<Model> {
 
     private Result<ArgumentList> parseValueTerms(Resource valuesRes, Result<ArgumentList.Expander> expander) {
         
-        WTermFactory termFactory = new WTermFactory();
+        TermFactory termFactory = new TermFactory(WOTTR.theInstance);
         Result<List<Term>> resParsedValues = parseTermsWith(valuesRes, termFactory);
         if (expander != null) {
             return Result.zip(resParsedValues, expander,

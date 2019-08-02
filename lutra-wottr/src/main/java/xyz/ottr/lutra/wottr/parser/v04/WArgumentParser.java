@@ -34,19 +34,19 @@ import xyz.ottr.lutra.model.NoneTerm;
 import xyz.ottr.lutra.model.Term;
 import xyz.ottr.lutra.result.Message;
 import xyz.ottr.lutra.result.Result;
-import xyz.ottr.lutra.wottr.WTermFactory;
+import xyz.ottr.lutra.wottr.parser.TermFactory;
 import xyz.ottr.lutra.wottr.util.ModelSelector;
 import xyz.ottr.lutra.wottr.util.ModelSelectorException;
 
 public class WArgumentParser implements Function<RDFNode, Result<Term>> {
 
     private final Model model;
-    private final WTermFactory rdfTermFactory;
+    private final TermFactory rdfTermFactory;
     private final Set<Term> expanderValues;
 
     public WArgumentParser(Model model) {
         this.model = model;
-        this.rdfTermFactory = new WTermFactory();
+        this.rdfTermFactory = new TermFactory(WOTTR.theInstance);
         this.expanderValues = new HashSet<>();
     }
 

@@ -33,20 +33,21 @@ import xyz.ottr.lutra.model.ArgumentList;
 import xyz.ottr.lutra.model.Instance;
 import xyz.ottr.lutra.model.Term;
 import xyz.ottr.lutra.result.Result;
-import xyz.ottr.lutra.wottr.WTermFactory;
+import xyz.ottr.lutra.wottr.parser.TermFactory;
+import xyz.ottr.lutra.wottr.parser.v04.WOTTR;
 
 public class TemplateInstanceFactory {
     
     private RDFNodeFactory dataFactory;
     private Resource templateIRI;
     private List<String> types;
-    private WTermFactory termFactory;
+    private TermFactory termFactory;
     
     public TemplateInstanceFactory(PrefixMapping prefixes, String templateIRI, List<String> types) {
         this.dataFactory = new RDFNodeFactory(prefixes);
         this.templateIRI = dataFactory.toResource(templateIRI);
         this.types = types;
-        this.termFactory = new WTermFactory();
+        this.termFactory = new TermFactory(WOTTR.theInstance);
     }
     
     public Result<Instance> createTemplateInstance(List<String> arguments) {

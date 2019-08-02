@@ -1,4 +1,4 @@
-package xyz.ottr.lutra.wottr.parser.v04;
+package xyz.ottr.lutra.wottr.parser;
 
 /*-
  * #%L
@@ -42,7 +42,7 @@ import xyz.ottr.lutra.model.types.TypeFactory;
 import xyz.ottr.lutra.result.Message;
 import xyz.ottr.lutra.result.Result;
 
-public class WTypeParser implements Function<RDFNode, Result<TermType>> {
+public class TermTypeFactory implements Function<RDFNode, Result<TermType>> {
 
     public Result<TermType> apply(RDFNode node) {
 

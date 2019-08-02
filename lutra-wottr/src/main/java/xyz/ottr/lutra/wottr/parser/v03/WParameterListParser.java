@@ -40,7 +40,7 @@ import xyz.ottr.lutra.model.Term;
 import xyz.ottr.lutra.model.types.TypeFactory;
 import xyz.ottr.lutra.result.Message;
 import xyz.ottr.lutra.result.Result;
-import xyz.ottr.lutra.wottr.WTermFactory;
+import xyz.ottr.lutra.wottr.parser.TermFactory;
 import xyz.ottr.lutra.wottr.util.ModelSelector;
 import xyz.ottr.lutra.wottr.util.ModelSelectorException;
 
@@ -109,7 +109,7 @@ public class WParameterListParser {
             return Result.empty(Message.error("Expected ottr:withValues-related element to be an RDF-list "
                     + "but found " + argsList.toString()));
         }
-        WTermFactory termFactory = new WTermFactory();
+        TermFactory termFactory = new TermFactory(WOTTR.theInstance);
         List<Result<Term>> arguments = argsList
             .as(RDFList.class)
             .asJavaList()

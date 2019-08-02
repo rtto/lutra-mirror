@@ -1,4 +1,4 @@
-package xyz.ottr.lutra.wottr;
+package xyz.ottr.lutra.wottr.parser;
 
 /*-
  * #%L
@@ -43,19 +43,24 @@ import xyz.ottr.lutra.model.Term;
 import xyz.ottr.lutra.model.TermList;
 import xyz.ottr.lutra.result.Message;
 import xyz.ottr.lutra.result.Result;
-import xyz.ottr.lutra.wottr.parser.v04.WOTTR;
 
-public class WTermFactory implements Function<RDFNode, Result<Term>> {
+public class TermFactory implements Function<RDFNode, Result<Term>> {
 
     // TODO: Verify that this is correct. This only gives correct results if blank nodes
     // across Jena models are unique.
     private static Map<RDFList, Result<TermList>> createdLists = new HashMap<>();
     private static Map<String, BlankNodeTerm> createdBlanks = new HashMap<>();
 
+    private OTTRVocabulary vocabulary;
+
+    public TermFactory(OTTRVocabulary vocabulary) {
+        this.vocabulary = vocabulary;
+    }
+
     public Result<Term> apply(RDFNode node) {
 
         if (node.isURIResource()) {
-            if (node.toString().equals(WOTTR.none.getURI())) {
+            if (node.toString().equals(vocabulary.getNoneResource().getURI())) {
                 return Result.of(new NoneTerm());
             } else if (node.equals(RDF.nil)) {
                 return Result.of(new TermList());

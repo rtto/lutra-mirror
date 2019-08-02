@@ -39,14 +39,15 @@ import xyz.ottr.lutra.model.types.TermType;
 import xyz.ottr.lutra.model.types.TypeFactory;
 import xyz.ottr.lutra.result.Message;
 import xyz.ottr.lutra.result.Result;
-import xyz.ottr.lutra.wottr.WTermFactory;
+import xyz.ottr.lutra.wottr.parser.TermFactory;
+import xyz.ottr.lutra.wottr.parser.TermTypeFactory;
 import xyz.ottr.lutra.wottr.util.ModelSelector;
 import xyz.ottr.lutra.wottr.util.ModelSelectorException;
 
 public class WParameterParser implements Function<RDFNode, Result<Term>> {
 
     private final Model model;
-    private final WTermFactory rdfTermFactory;
+    private final TermFactory rdfTermFactory;
     private final Set<Term> optionals;
     private final Set<Term> nonBlanks;
     private final Map<Term, Term> defaultValues;
@@ -54,7 +55,7 @@ public class WParameterParser implements Function<RDFNode, Result<Term>> {
 
     public WParameterParser(Model model) {
         this.model = model;
-        this.rdfTermFactory = new WTermFactory();
+        this.rdfTermFactory = new TermFactory(WOTTR.theInstance);
         this.optionals = new HashSet<>();
         this.nonBlanks = new HashSet<>();
         this.defaultValues = new HashMap<>();
@@ -94,7 +95,7 @@ public class WParameterParser implements Function<RDFNode, Result<Term>> {
         Resource type = ModelSelector.getOptionalResourceOfProperty(this.model, param, WOTTR.type);
 
         if (type != null) {
-            Result<TermType> termType = new WTypeParser().apply(type);
+            Result<TermType> termType = new TermTypeFactory().apply(type);
             termType.ifPresent(tt -> term.setType(tt));
             this.msgs.addAll(termType.getAllMessages());
         } else {

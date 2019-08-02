@@ -38,20 +38,20 @@ import xyz.ottr.lutra.model.NoneTerm;
 import xyz.ottr.lutra.model.Term;
 import xyz.ottr.lutra.result.Message;
 import xyz.ottr.lutra.result.Result;
-import xyz.ottr.lutra.wottr.WTermFactory;
+import xyz.ottr.lutra.wottr.parser.TermFactory;
 import xyz.ottr.lutra.wottr.util.ModelSelector;
 import xyz.ottr.lutra.wottr.util.ModelSelectorException;
 
 public class WArgumentParser implements Function<Resource, Result<Term>> {
 
     private final Model model;
-    private final WTermFactory rdfTermFactory;
+    private final TermFactory rdfTermFactory;
     private final Set<Term> expanderValues;
     private ArgumentList.Expander listExpander;
 
     public WArgumentParser(Model model) {
         this.model = model;
-        this.rdfTermFactory = new WTermFactory();
+        this.rdfTermFactory = new TermFactory(WOTTR.theInstance);
         this.expanderValues = new HashSet<>();
     }
 
@@ -63,7 +63,7 @@ public class WArgumentParser implements Function<Resource, Result<Term>> {
             // Property type;
             
             // Must have a variable/value:
-            Collection<Property> valueProperties = Arrays.asList(new Property[] { WOTTR.value, WOTTR.eachValue });
+            Collection<Property> valueProperties = Arrays.asList(WOTTR.value, WOTTR.eachValue);
             Statement varAssignment = ModelSelector.getOptionalStatementWithProperties(model, p,
                     valueProperties);
             // type = varAssignment.getPredicate();

@@ -38,13 +38,13 @@ import xyz.ottr.lutra.model.Instance;
 import xyz.ottr.lutra.model.Term;
 import xyz.ottr.lutra.result.Result;
 import xyz.ottr.lutra.result.ResultStream;
-import xyz.ottr.lutra.wottr.WTermFactory;
+import xyz.ottr.lutra.wottr.parser.v04.WOTTR;
 
-public class WTripleInstanceFactory implements Supplier<ResultStream<Instance>> {
+public class TripleInstanceFactory implements Supplier<ResultStream<Instance>> {
 
     private final Model model;
 
-    public WTripleInstanceFactory(Model model) {
+    public TripleInstanceFactory(Model model) {
         this.model = model;
     }
 
@@ -53,7 +53,7 @@ public class WTripleInstanceFactory implements Supplier<ResultStream<Instance>> 
 
         ExtendedIterator<Result<Instance>> parsedTriples = this.model.listStatements()
             .filterDrop(this::isPartOfRDFList)
-            .mapWith(WTripleInstanceFactory::createTripleInstance);
+            .mapWith(TripleInstanceFactory::createTripleInstance);
         return new ResultStream<>(parsedTriples.toSet());
     }
 
@@ -74,7 +74,7 @@ public class WTripleInstanceFactory implements Supplier<ResultStream<Instance>> 
 
     private static Result<Instance> createTripleInstance(Statement stmt) {
 
-        WTermFactory rdfTermFactory = new WTermFactory();
+        TermFactory rdfTermFactory = new TermFactory(WOTTR.theInstance);
         Result<Term> sub = rdfTermFactory.apply(stmt.getSubject());
         Result<Term> pred = rdfTermFactory.apply(stmt.getPredicate());
         Result<Term> obj = rdfTermFactory.apply(stmt.getObject());

@@ -27,10 +27,12 @@ import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.ResourceFactory;
 
 import xyz.ottr.lutra.OTTR;
+import xyz.ottr.lutra.wottr.parser.OTTRVocabulary;
 
-public class WOTTR {
+public class WOTTR implements OTTRVocabulary {
 
     private static final String ns = OTTR.namespace;
+    public static final String prefix = "ottr";
    
     // Classes
     public static final Resource Template = getResource(ns + "Template");
@@ -71,4 +73,19 @@ public class WOTTR {
     private static Property getProperty(String uri) {
         return ResourceFactory.createProperty(uri);
     }
+
+    public static final OTTRVocabulary theInstance = new WOTTR();
+
+    private WOTTR() {
+        // hide constructor, use theInstance.
+    }
+
+    @Override
+    public Resource getNoneResource() {
+
+        return none;
+    }
+
+
+
 }

@@ -32,31 +32,30 @@ import xyz.ottr.lutra.model.Instance;
 import xyz.ottr.lutra.result.ResultConsumer;
 import xyz.ottr.lutra.result.ResultStream;
 import xyz.ottr.lutra.tabottr.io.TabInstanceParser;
-import xyz.ottr.lutra.wottr.parser.v03.WReader;
+import xyz.ottr.lutra.wottr.parser.v03.WInstanceParser;
 import xyz.ottr.lutra.wottr.util.ModelIO;
-import xyz.ottr.lutra.wottr.writer.v03.WInstanceWriter;
+import xyz.ottr.lutra.wottr.writer.v04.WInstanceWriter;
 
 public class TabTemplateInstanceParserToRDFTest {
     
     private static final String ROOT = "src/test/resources/";
-    
-    private Model getExcelReaderRDFWriterModel(String filename) {
-        TabInstanceParser parser = new TabInstanceParser();
-        ResultStream<Instance> instances = parser.apply(filename);
+
+    private Model writeToModel(ResultStream<Instance> instances) {
         WInstanceWriter writer = new WInstanceWriter();
         ResultConsumer<Instance> consumer = new ResultConsumer<>(writer);
         instances.forEach(consumer);
-        Model model = WReader.getCanonicalModel(writer.writeToModel()); 
-        return model;
+        return writer.writeToModel();
     }
     
     private void runAtomicTest(String name) {
         String folder = ROOT + "atomic/";
         String inFile = folder + name + ".xlsx";
         String outFile = folder + name + ".ttl";
-        Model in = getExcelReaderRDFWriterModel(inFile);
+
+        Model in = writeToModel(new TabInstanceParser().apply(inFile));
         in.setNsPrefix("ex", "http://example.org#");
-        Model out = WReader.getCanonicalModel(ModelIO.readModel(outFile));
+
+        Model out = writeToModel(new WInstanceParser().apply(ModelIO.readModel(outFile)));
         out.setNsPrefixes(PrefixMapping.Standard);
 
         boolean isIsomorphic = in.isIsomorphicWith(out);

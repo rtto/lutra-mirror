@@ -54,12 +54,9 @@ public class RDFFileReader implements InputReader<String, Model> {
     }
 
     public Result<Model> parse(String url) {
-        String path;
-        if (isURL(url)) {
-            path = url; 
-        } else {
-            path = FilenameUtils.separatorsToSystem(Paths.get(url).toAbsolutePath().toString());
-        }
+
+        String path = isURL(url) ? url : FilenameUtils.separatorsToSystem(Paths.get(url).toAbsolutePath().toString());
+
         Result<Model> result = null;
         try {
             Model model = ModelIO.readModel(path);
