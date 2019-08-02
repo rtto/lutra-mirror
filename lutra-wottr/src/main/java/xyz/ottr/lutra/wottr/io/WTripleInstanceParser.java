@@ -86,6 +86,6 @@ public class WTripleInstanceParser implements Supplier<ResultStream<Instance>> {
         asRes.addMessages(pred.getMessages());
         asRes.addMessages(obj.getMessages());
 
-        return asRes.map(asVal -> new Instance(OTTR.Bases.Triple, asVal));
+        return asRes.map(asVal -> new Instance(OTTR.BaseURI.NullableTriple, asVal));
     }
 }

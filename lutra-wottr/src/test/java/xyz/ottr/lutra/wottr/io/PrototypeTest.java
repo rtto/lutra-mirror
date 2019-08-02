@@ -31,7 +31,6 @@ import xyz.ottr.lutra.io.TemplateReader;
 import xyz.ottr.lutra.model.Template;
 import xyz.ottr.lutra.result.ResultConsumer;
 import xyz.ottr.lutra.store.DependencyGraph;
-import xyz.ottr.lutra.wottr.WTemplateFactory;
 
 public class PrototypeTest {
 
@@ -53,7 +52,7 @@ public class PrototypeTest {
 
     @Test
     public void shouldParse() throws IOException {
-        graph.addTemplateSignature(WTemplateFactory.createTripleTemplateHead());
+        graph.addOTTRBaseTemplates();
         //templateReader.loadTemplatesFromFolder(graph, inFolder, new String []{"ttl"}, new String []{});
         legacyReader.loadTemplatesFromFolder(graph, inFolder, new String []{"ttl"}, new String []{});
         //int f = 0;

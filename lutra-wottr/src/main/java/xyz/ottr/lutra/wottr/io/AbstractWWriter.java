@@ -60,7 +60,9 @@ public abstract class AbstractWWriter {
     private Map<String, Resource> blankNodes = new HashMap<String, Resource>(); // Maps label -> resource for reuse
 
     protected boolean isTriple(Instance node) {
-        return WOTTR.triple.toString().equals(node.getIRI());
+
+        String nodeIRI = node.getIRI();
+        return OTTR.BaseURI.Triple.equals(nodeIRI) || OTTR.BaseURI.NullableTriple.equals(nodeIRI);
     }
 
     protected RDFNode toRDFNode(Model m, Term term) {
@@ -97,7 +99,10 @@ public abstract class AbstractWWriter {
                 return b;
             }
         } else if (term instanceof NoneTerm) {
-            return WOTTR.none;
+            // Note: the resource is recreated *in/by the model* to allow the none-resource
+            // to be cast to Property (by as(Property.class)). If we return the resource without
+            // no "hosting" model, then the cast throws a UnsupportedPolymorphismException.
+            return m.createResource(WOTTR.none.getURI());
         } else {
             return null; // TODO: Throw exception
         }
@@ -119,10 +124,10 @@ public abstract class AbstractWWriter {
             return rest.cons(RDF.List);
         } else if (type instanceof NEListType) {
             RDFList rest = toComplexRDFType(model, ((NEListType) type).getInner());
-            return rest.cons(model.createResource(OTTR.Types.NEList));
+            return rest.cons(model.createResource(OTTR.TypeURI.NEList));
         } else if (type instanceof LUBType) {
             RDFList rest = toComplexRDFType(model, ((LUBType) type).getInner());
-            return rest.cons(model.createResource(OTTR.Types.LUB));
+            return rest.cons(model.createResource(OTTR.TypeURI.LUB));
         } else {
             RDFList nil = model.createList();
             Resource rdfType = model.createResource(((BasicType) type).getIRI());

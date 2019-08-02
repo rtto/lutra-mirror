@@ -1,0 +1,28 @@
+@prefix ottr: <http://ns.ottr.xyz/0.4/> .
+@prefix ex:   <http://example.net/ns#> .
+
+[] ottr:of ottr:Triple ;
+   ottr:values ( ex:A1 ex:A2 ottr:none ) .
+
+[] ottr:of ottr:Triple ;
+   ottr:values ( ex:B1 ottr:none ex:B2 ) .
+
+[] ottr:of ottr:Triple ;
+   ottr:values ( ex:C1 ex:C2 ex:C3 ) .
+
+
+[] ottr:of ottr:NullableTriple ;
+   ottr:values ( ex:D1 ex:D2 ex:D3 ) .
+
+[] ottr:of ottr:NullableTriple ;
+   ottr:values ( ottr:none ex:E2 ex:E3 ) .
+
+[] ottr:of ottr:NullableTriple ;
+   ottr:values ( ex:F1 ottr:none ex:F3 ) .
+
+[] ottr:of ottr:NullableTriple ;
+   ottr:values ( ex:G1 ex:G2 ottr:none ) .
+
+[] ottr:of ottr:NullableTriple ;
+   ottr:values ( ottr:none ottr:none ottr:none ) .
+

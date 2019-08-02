@@ -81,11 +81,11 @@ public class WTypeParser implements Function<RDFNode, Result<TermType>> {
         Resource type = typeNode.asResource();
 
         Result<TermType> rest = parseComplexType(complexType);
-        if (type.getURI().equals(OTTR.Types.NEList)) {
+        if (type.getURI().equals(OTTR.TypeURI.NEList)) {
             return rest.flatMap(inner -> Result.of(new NEListType(inner)));
         } else if (type.equals(RDF.List)) {
             return rest.flatMap(inner -> Result.of(new ListType(inner)));
-        } else if (type.getURI().equals(OTTR.Types.LUB)) {
+        } else if (type.getURI().equals(OTTR.TypeURI.LUB)) {
             if (rest.isPresent() && !(rest.get() instanceof BasicType)) {
                 return Result.empty(Message.error(
                     "Expected simple type as argument to LUB-type, but got "

@@ -62,7 +62,6 @@ import xyz.ottr.lutra.stottr.io.SInstanceWriter;
 import xyz.ottr.lutra.stottr.io.STemplateParser;
 import xyz.ottr.lutra.stottr.io.STemplateWriter;
 import xyz.ottr.lutra.tabottr.io.TabInstanceParser;
-import xyz.ottr.lutra.wottr.WTemplateFactory;
 import xyz.ottr.lutra.wottr.io.WFileReader;
 import xyz.ottr.lutra.wottr.io.WInstanceParser;
 import xyz.ottr.lutra.wottr.io.WInstanceWriter;
@@ -149,7 +148,7 @@ public class CLI {
      */
     private static MessageHandler parseLibraryInto(TemplateReader reader, TemplateStore store) {
 
-        store.addTemplateSignature(WTemplateFactory.createTripleTemplateHead());
+        store.addOTTRBaseTemplates();
 
         if (settings.library == null) {
             return new MessageHandler();

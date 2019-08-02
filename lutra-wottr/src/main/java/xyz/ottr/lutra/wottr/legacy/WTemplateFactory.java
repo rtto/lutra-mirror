@@ -60,7 +60,7 @@ public abstract class WTemplateFactory {
         asRes.addMessages(pred.getMessages());
         asRes.addMessages(obj.getMessages());
 
-        return asRes.map(asVal -> new Instance(OTTR.Bases.Triple, asVal));
+        return asRes.map(asVal -> new Instance(OTTR.BaseURI.Triple, asVal));
     }
 
     /**
@@ -76,15 +76,15 @@ public abstract class WTemplateFactory {
     // TODO Check if the s, p, o blanks must be fresh.
     public static TemplateSignature createTripleTemplateHead() {
         Term sub = new BlankNodeTerm("_:s");
-        sub.setType(TypeFactory.getType(OTTR.Types.IRI));
+        sub.setType(TypeFactory.getType(OTTR.TypeURI.IRI));
         Term pred = new BlankNodeTerm("_:p");
-        pred.setType(TypeFactory.getType(OTTR.Types.IRI));
+        pred.setType(TypeFactory.getType(OTTR.TypeURI.IRI));
         Term obj = new BlankNodeTerm("_:o");
         obj.setType(TypeFactory.getVariableType(obj));
         Set<Term> nonBlanks = new HashSet<>();
         nonBlanks.add(pred);
         return new TemplateSignature(
-            OTTR.Bases.Triple,
+            OTTR.BaseURI.Triple,
             new ParameterList(new TermList(sub, pred, obj), nonBlanks, null, null),
             true);
     }
