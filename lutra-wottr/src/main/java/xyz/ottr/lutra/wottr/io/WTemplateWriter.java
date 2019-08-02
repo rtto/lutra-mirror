@@ -70,13 +70,13 @@ public class WTemplateWriter extends AbstractWWriter implements TemplateWriter {
         Resource tempNode = makeWottrHead(model, template);
         if (template instanceof Template) {
             for (Instance ins : ((Template) template).getBody()) {
-                Resource insNode = instanceWriter.makeWottrInstance(model, ins);
+                Resource insNode = this.instanceWriter.makeWottrInstance(model, ins);
                 model.add(model.createStatement(tempNode, WOTTR.pattern, insNode));
             }
         }
 
         PrefixMappings.trim(model);
-        models.put(template.getIRI(), model);
+        this.models.put(template.getIRI(), model);
     }
     
     @Override
@@ -86,15 +86,17 @@ public class WTemplateWriter extends AbstractWWriter implements TemplateWriter {
 
     private Resource makeWottrHead(Model model, TemplateSignature template) {
 
-        Resource templateIRI = model.createResource(template.getIRI());
+        Resource templateType;
         if (template instanceof Template) {
-            model.add(model.createStatement(templateIRI, RDF.type, WOTTR.Template));
+            templateType = WOTTR.Template;
         } else if (template.isBaseTemplate()) {
-            model.add(model.createStatement(templateIRI, RDF.type, WOTTR.BaseTemplate));
+            templateType = WOTTR.BaseTemplate;
         } else {
-            model.add(model.createStatement(templateIRI, RDF.type, WOTTR.TemplateSignature));
+            templateType = WOTTR.TemplateSignature;
         }
 
+        Resource templateIRI = model.createResource(template.getIRI());
+        model.add(templateIRI, RDF.type, templateType);
         ParameterList parameters = template.getParameters();
         addParameters(parameters, templateIRI, model);
         return templateIRI;

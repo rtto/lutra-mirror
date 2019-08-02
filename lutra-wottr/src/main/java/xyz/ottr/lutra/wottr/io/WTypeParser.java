@@ -69,6 +69,7 @@ public class WTypeParser implements Function<RDFNode, Result<TermType>> {
     }
 
     private Result<TermType> parseComplexType(Iterator<RDFNode> complexType) {
+
         if (!complexType.hasNext()) {
             return Result.empty(Message.error(
                 "Expected a resource denoting a basic or complex type, but got nothing."));
@@ -76,7 +77,7 @@ public class WTypeParser implements Function<RDFNode, Result<TermType>> {
         RDFNode typeNode = complexType.next();
         if (!typeNode.isResource() || typeNode.asResource().getURI() == null) {
             return Result.empty(Message.error(
-                    "A type constructor must be denoted by an IRI, got " + typeNode.toString()));
+                    "A type constructor must be denoted by an IRI, but got " + typeNode.toString()));
         }
         Resource type = typeNode.asResource();
 

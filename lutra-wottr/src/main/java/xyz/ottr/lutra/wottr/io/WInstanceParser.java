@@ -57,7 +57,7 @@ public class WInstanceParser implements InstanceParser<Model> {
 
     //private final Logger log = LoggerFactory.getLogger(WInstanceParser.class);
 
-    private static Map<Resource, ArgumentList.Expander> expanders;
+    private static final Map<Resource, ArgumentList.Expander> expanders;
 
     static {
         expanders = new HashMap<>();
@@ -82,7 +82,7 @@ public class WInstanceParser implements InstanceParser<Model> {
     private ResultStream<Instance> parseInstances(Model model, List<Resource> templateInstances) {
         Stream<Result<Instance>> parsedInstances = templateInstances
             .stream()
-            .map(i -> parseInstance(model, i));
+            .map(instance -> parseInstance(model, instance));
         return new ResultStream<>(parsedInstances);
     }
 

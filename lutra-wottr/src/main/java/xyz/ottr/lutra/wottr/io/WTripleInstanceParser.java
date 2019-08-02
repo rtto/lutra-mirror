@@ -52,7 +52,7 @@ public class WTripleInstanceParser implements Supplier<ResultStream<Instance>> {
     public ResultStream<Instance> get() {
 
         ExtendedIterator<Result<Instance>> parsedTriples = this.model.listStatements()
-            .filterDrop(statement -> isPartOfRDFList(statement))
+            .filterDrop(this::isPartOfRDFList)
             .mapWith(WTripleInstanceParser::createTripleInstance);
         return new ResultStream<>(parsedTriples.toSet());
     }

@@ -28,6 +28,7 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.rdf.model.RDFList;
 import org.apache.jena.rdf.model.RDFNode;
@@ -45,12 +46,13 @@ import xyz.ottr.lutra.result.Result;
 
 public class WTermFactory implements Function<RDFNode, Result<Term>> {
 
-    // TODO: Verify that this is correct: This only gives correct results if blank nodes
+    // TODO: Verify that this is correct. This only gives correct results if blank nodes
     // across Jena models are unique.
     private static Map<RDFList, Result<TermList>> createdLists = new HashMap<>();
-    private static Map<String, BlankNodeTerm> blanks = new HashMap<>();
+    private static Map<String, BlankNodeTerm> createdBlanks = new HashMap<>();
 
     public Result<Term> apply(RDFNode node) {
+
         if (node.isURIResource()) {
             if (node.toString().equals(WOTTR.none.getURI())) {
                 return Result.of(new NoneTerm());
@@ -72,27 +74,31 @@ public class WTermFactory implements Function<RDFNode, Result<Term>> {
     }
 
     public Result<TermList> createTermList(RDFList list) {
+
         if (createdLists.containsKey(list)) {
             return createdLists.get(list);
         } else {
-            List<Result<Term>> terms = list.asJavaList().stream().map(t ->
-                    this.apply(t)).collect(Collectors.toList());
+            List<Result<Term>> terms = list.asJavaList().stream()
+                .map(this)
+                .collect(Collectors.toList());
             Result<List<Term>> aggTerms = Result.aggregate(terms);
-            Result<TermList> resTermList = aggTerms.map(ts -> new TermList(ts));
+            Result<TermList> resTermList = aggTerms.map(TermList::new);
             createdLists.put(list, resTermList);
             return resTermList;
         }
     }
-
+    
     public static LiteralTerm createLiteralTerm(Literal literal) {
 
+        // collect all "components" of literal, some may be blank or null
         String value = literal.getLexicalForm();
         String datatype = literal.getDatatypeURI();
         String language = literal.getLanguage();
 
-        if (language != null && !language.isEmpty()) {
+        // determine type of literal based on available "components"
+        if (StringUtils.isNotEmpty(language)) {
             return LiteralTerm.taggedLiteral(value, language);
-        } else if (datatype != null && !datatype.isEmpty()) {
+        } else if (StringUtils.isNotEmpty(datatype)) {
             return LiteralTerm.typedLiteral(value, datatype);
         } else {
             return new LiteralTerm(value);
@@ -100,13 +106,15 @@ public class WTermFactory implements Function<RDFNode, Result<Term>> {
     }
 
     public static IRITerm createIRITerm(Resource resource) {
+
         return new IRITerm(resource.getURI());
     }
 
     public static BlankNodeTerm createBlankNodeTerm(Resource resource) {
+
         // Mint new labels, but keep map of which term was created
         // for which original (system) label
         String id = resource.getId().getBlankNodeId().getLabelString();
-        return blanks.computeIfAbsent(id, _k -> new BlankNodeTerm());
+        return createdBlanks.computeIfAbsent(id, _fresh -> new BlankNodeTerm());
     }
 }

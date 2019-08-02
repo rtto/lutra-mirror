@@ -22,10 +22,8 @@ package xyz.ottr.lutra.wottr.io;
  * #L%
  */
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
  
 import org.apache.jena.datatypes.TypeMapper;
@@ -57,22 +55,22 @@ import xyz.ottr.lutra.wottr.WOTTR;
 
 public abstract class AbstractWWriter {
 
-    private Map<String, Resource> blankNodes = new HashMap<String, Resource>(); // Maps label -> resource for reuse
+    private final Map<String, Resource> createdBlankNodes = new HashMap<String, Resource>(); // Maps label -> resource for reuse
 
     protected boolean isTriple(Instance node) {
         return WOTTR.triple.toString().equals(node.getIRI());
     }
 
-    protected RDFNode toRDFNode(Model m, Term term) {
+    protected RDFNode toRDFNode(Model model, Term term) {
 
         if (term instanceof TermList) {
-            List<RDFNode> lst = new ArrayList<RDFNode>();
-            ((TermList) term).asList().stream().forEach(t -> lst.add(toRDFNode(m, t)));
-            Iterator<RDFNode> iter = lst.iterator();
-            return m.createList(iter);
+            Iterator<RDFNode> iterator = ((TermList) term).asList().stream()
+                .map(t -> toRDFNode(model, t))
+                .iterator();
+            return model.createList(iterator);
         } else if (term instanceof IRITerm) {
             String uri = ((IRITerm) term).getIRI();
-            return m.createResource(uri);
+            return model.createResource(uri);
         } else if (term instanceof LiteralTerm) {
             LiteralTerm lit = (LiteralTerm) term;
             String val = lit.getPureValue();
@@ -80,22 +78,17 @@ public abstract class AbstractWWriter {
             if (lit.getDatatype() != null) { // Typed literal
                 String type = lit.getDatatype();
                 TypeMapper tm = TypeMapper.getInstance();
-                return m.createTypedLiteral(val, tm.getSafeTypeByName(type));
+                return model.createTypedLiteral(val, tm.getSafeTypeByName(type));
             } else if (lit.getLangTag() != null) { // Literal with language tag
                 String tag = lit.getLangTag();
-                return m.createLiteral(val, tag);
+                return model.createLiteral(val, tag);
             } else { // Untyped literal (just a string)
-                return m.createLiteral(val);
+                return model.createLiteral(val);
             }
         } else if (term instanceof BlankNodeTerm) {
             String label = ((BlankNodeTerm) term).getLabel();
-            if (blankNodes.containsKey(label)) {
-                return blankNodes.get(label);
-            } else {
-                Resource b = m.createResource(new AnonId(label));
-                blankNodes.put(label, b);
-                return b;
-            }
+            return createdBlankNodes.computeIfAbsent(label,
+                blankLabel -> model.createResource(new AnonId(blankLabel)));
         } else if (term instanceof NoneTerm) {
             return WOTTR.none;
         } else {
@@ -130,12 +123,12 @@ public abstract class AbstractWWriter {
         }
     }
 
-    protected Statement getTriple(Model m, Instance i) {
+    protected Statement getTriple(Model model, Instance instance) {
         // TODO use functions in Terms?
-        Resource s = toRDFNode(m, i.getArguments().get(0)).asResource();
-        Property p = toRDFNode(m, i.getArguments().get(1)).as(Property.class);
-        RDFNode o = toRDFNode(m, i.getArguments().get(2));
-        return m.createStatement(s, p, o);
+        Resource s = toRDFNode(model, instance.getArguments().get(0)).asResource();
+        Property p = toRDFNode(model, instance.getArguments().get(1)).as(Property.class);
+        RDFNode o = toRDFNode(model, instance.getArguments().get(2));
+        return model.createStatement(s, p, o);
     }
 
     protected void addArguments(ArgumentList arguments, Resource iri, Model model) {
