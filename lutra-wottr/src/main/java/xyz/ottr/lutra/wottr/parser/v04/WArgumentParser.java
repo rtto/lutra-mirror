@@ -22,6 +22,7 @@ package xyz.ottr.lutra.wottr.parser.v04;
  * #L%
  */
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.function.Function;
@@ -63,9 +64,9 @@ public class WArgumentParser implements Function<RDFNode, Result<Term>> {
 
         try {
 
-            RDFNode var = ModelSelector.getRequiredObjectOfProperty(this.model, arg, WOTTR.value);
-            resultTerm = var != null
-                ? this.rdfTermFactory.apply(var)
+            RDFNode value = ModelSelector.getRequiredObjectOfProperty(this.model, arg, WOTTR.value);
+            resultTerm = value != null
+                ? this.rdfTermFactory.apply(value)
                 : Result.of(new NoneTerm());
 
             Resource expand = ModelSelector.getOptionalResourceOfProperty(this.model, arg, WOTTR.modifier);
@@ -88,6 +89,6 @@ public class WArgumentParser implements Function<RDFNode, Result<Term>> {
     }
 
     public Set<Term> getExpanderValues() {
-        return this.expanderValues;
+        return Collections.unmodifiableSet(this.expanderValues);
     }
 }

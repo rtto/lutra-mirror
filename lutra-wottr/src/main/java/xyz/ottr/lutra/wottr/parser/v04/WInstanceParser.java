@@ -52,9 +52,6 @@ import xyz.ottr.lutra.wottr.vocabulary.v04.WOTTR;
 
 public class WInstanceParser implements InstanceParser<Model> {
 
-    public WInstanceParser() {
-    }
-
     @Override
     public ResultStream<Instance> apply(Model model) {
 

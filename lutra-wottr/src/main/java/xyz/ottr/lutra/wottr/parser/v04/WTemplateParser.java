@@ -147,7 +147,7 @@ public class WTemplateParser implements TemplateParser<Model> {
         
         Result<TemplateSignature> signature = parseSignature(model, res, false);
         Set<Result<Instance>> instancesRes = model.listObjectsOfProperty(res, WOTTR.pattern)
-            .mapWith(ins -> instanceParser.parseInstance(model, ins))
+            .mapWith(ins -> this.instanceParser.parseInstance(model, ins))
             .toSet();
         Result<Set<Instance>> instances = Result.aggregate(instancesRes);
         return Result.zip(signature, instances, (sig, is) -> (TemplateSignature) new Template(sig, is));

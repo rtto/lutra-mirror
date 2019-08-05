@@ -22,6 +22,7 @@ package xyz.ottr.lutra.wottr.parser.v04;
  * #L%
  */
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -75,8 +76,8 @@ public class WParameterParser implements Function<RDFNode, Result<Term>> {
 
         try {
             // Must have a variable/value:
-            RDFNode variable = ModelSelector.getRequiredObjectOfProperty(model, param, WOTTR.variable);
-            resultTerm = rdfTermFactory.apply(variable);
+            RDFNode variable = ModelSelector.getRequiredObjectOfProperty(this.model, param, WOTTR.variable);
+            resultTerm = this.rdfTermFactory.apply(variable);
 
             resultTerm.ifPresent(term -> {
                 setType(term, param);
@@ -97,7 +98,7 @@ public class WParameterParser implements Function<RDFNode, Result<Term>> {
 
         if (type != null) {
             Result<TermType> termType = new TermTypeFactory().apply(type);
-            termType.ifPresent(tt -> term.setType(tt));
+            termType.ifPresent(term::setType);
             this.msgs.addAll(termType.getAllMessages());
         } else {
             term.setType(TypeFactory.getVariableType(term));
@@ -131,14 +132,14 @@ public class WParameterParser implements Function<RDFNode, Result<Term>> {
     }
 
     public Set<Term> getOptionals() {
-        return this.optionals;
+        return Collections.unmodifiableSet(this.optionals);
     }
 
     public Set<Term> getNonBlanks() {
-        return this.nonBlanks;
+        return Collections.unmodifiableSet(this.nonBlanks);
     }
 
     public Map<Term, Term> getDefaultValues() {
-        return this.defaultValues;
+        return Collections.unmodifiableMap(this.defaultValues);
     }
 }

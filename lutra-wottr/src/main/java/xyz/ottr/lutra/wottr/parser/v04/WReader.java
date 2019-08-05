@@ -51,17 +51,17 @@ public class WReader {
             modelCopy.remove(getNeighbourhood(model, p));
         }
         // Remove all instances
-        for (Resource i : templateInstances) {
-            List<Statement> ineigh = getNeighbourhood(model, i);
+        for (Resource instance : templateInstances) {
+            List<Statement> ineigh = getNeighbourhood(model, instance);
             modelCopy.remove(ineigh);
-            for (Statement s : ineigh) {
-                if (s.getPredicate().equals(WOTTR.arguments)
-                    || s.getPredicate().equals(WOTTR.values)) {
+            for (Statement statement : ineigh) {
+                if (statement.getPredicate().equals(WOTTR.arguments)
+                    || statement.getPredicate().equals(WOTTR.values)) {
 
-                    RDFNode o = s.getObject();
+                    RDFNode o = statement.getObject();
                     modelCopy.remove(getNeighbourhood(model, o.asResource()));
-                    if (s.getPredicate().equals(WOTTR.arguments)) {
-                        model.listStatements(o.asResource(), WOTTR.value, (Resource) null)
+                    if (statement.getPredicate().equals(WOTTR.arguments)) {
+                        model.listStatements(o.asResource(), WOTTR.value, (RDFNode) null)
                             .forEachRemaining(valStmt ->
                                 modelCopy.remove(getNeighbourhood(model, valStmt.getObject().asResource())));
                     }
@@ -76,7 +76,7 @@ public class WReader {
 
         Model head = Models.empty();
         head.add(getNeighbourhood(model, template));
-        parameters.stream().forEach(r -> head.add(getNeighbourhood(model, r)));
+        parameters.forEach(r -> head.add(getNeighbourhood(model, r)));
         head.setNsPrefixes(model);
         return head;
     }
@@ -105,25 +105,25 @@ public class WReader {
     }
 
     private static void addTermStatements(Model model, Resource res, List<Statement> neighbourhood) {
-        if (model.contains(res, WOTTR.modifier, (Resource) null)) {
+        if (model.contains(res, WOTTR.modifier, (RDFNode) null)) {
             neighbourhood.addAll(
-                model.listStatements(res, WOTTR.modifier, (Resource) null).toList());
+                model.listStatements(res, WOTTR.modifier, (RDFNode) null).toList());
         }
-        if (model.contains(res, WOTTR.type, (Resource) null)) {
+        if (model.contains(res, WOTTR.type, (RDFNode) null)) {
             neighbourhood.addAll(
-                model.listStatements(res, WOTTR.type, (Resource) null).toList());
+                model.listStatements(res, WOTTR.type, (RDFNode) null).toList());
         }
-        if (model.contains(res, WOTTR.defaultVal, (Resource) null)) {
+        if (model.contains(res, WOTTR.defaultVal, (RDFNode) null)) {
             neighbourhood.addAll(
-                model.listStatements(res, WOTTR.defaultVal, (Resource) null).toList());
+                model.listStatements(res, WOTTR.defaultVal, (RDFNode) null).toList());
         }
-        if (model.contains(res, WOTTR.value, (Resource) null)) {
+        if (model.contains(res, WOTTR.value, (RDFNode) null)) {
             neighbourhood.addAll(
-                model.listStatements(res, WOTTR.value, (Resource) null).toList());
+                model.listStatements(res, WOTTR.value, (RDFNode) null).toList());
         }
-        if (model.contains(res, WOTTR.variable, (Resource) null)) {
+        if (model.contains(res, WOTTR.variable, (RDFNode) null)) {
             neighbourhood.addAll(
-                model.listStatements(res, WOTTR.variable, (Resource) null).toList());
+                model.listStatements(res, WOTTR.variable, (RDFNode) null).toList());
         }
     }
 }
