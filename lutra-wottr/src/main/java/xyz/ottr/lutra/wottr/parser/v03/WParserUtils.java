@@ -41,7 +41,7 @@ import xyz.ottr.lutra.wottr.util.Models;
 import xyz.ottr.lutra.wottr.vocabulary.v03.WOTTR;
 
 @SuppressWarnings("CPD-START")
-public class WReader {
+public class WParserUtils {
 
 
     /**
@@ -92,7 +92,7 @@ public class WReader {
 
         Model head = Models.empty();
         head.add(getNeighbourhood(model, template));
-        parameters.stream().forEach(r -> head.add(getNeighbourhood(model, r)));
+        parameters.forEach(r -> head.add(getNeighbourhood(model, r)));
         head.setNsPrefixes(model);
         return head;
     }

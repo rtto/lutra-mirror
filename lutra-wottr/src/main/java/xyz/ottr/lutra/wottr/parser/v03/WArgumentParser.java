@@ -24,6 +24,7 @@ package xyz.ottr.lutra.wottr.parser.v03;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.function.Function;
@@ -61,27 +62,23 @@ public class WArgumentParser implements Function<Resource, Result<Term>> {
         Result<Term> resultTerm;
 
         try {
-            // Property type;
-            
             // Must have a variable/value:
             Collection<Property> valueProperties = Arrays.asList(WOTTR.value, WOTTR.eachValue);
-            Statement varAssignment = ModelSelector.getOptionalStatementWithProperties(model, p,
+            Statement varAssignment = ModelSelector.getOptionalStatementWithProperties(this.model, p,
                     valueProperties);
-            // type = varAssignment.getPredicate();
 
             resultTerm = varAssignment != null
-                ? rdfTermFactory.apply(varAssignment.getObject())
+                ? this.rdfTermFactory.apply(varAssignment.getObject())
                 : Result.of(new NoneTerm());
 
             // Add to eachValue if necessary
             if (varAssignment != null && varAssignment.getPredicate().equals(WOTTR.eachValue)) {
-                resultTerm.ifPresent(term -> this.expanderValues.add(term));
-                if (this.listExpander == null || this.listExpander.equals(ArgumentList.Expander.CROSS)) {
+                resultTerm.ifPresent(this.expanderValues::add);
+                if (this.listExpander == null || this.listExpander == ArgumentList.Expander.CROSS) {
                     this.listExpander = ArgumentList.Expander.CROSS;
                 } else {
-                    resultTerm = Result.empty(new Message(Message.ERROR,
-                                "Error parsing instance " + p.toString()
-                                + ": An instance cannot have two different list expanders set. "));
+                    resultTerm = Result.empty(Message.error("Error parsing instance " + p.toString()
+                                + ": An instance cannot have two different list expanders. "));
                 }
             }
         } catch (ModelSelectorException ex) {
@@ -93,7 +90,7 @@ public class WArgumentParser implements Function<Resource, Result<Term>> {
     }
 
     public Set<Term> getExpanderValues() {
-        return this.expanderValues;
+        return Collections.unmodifiableSet(this.expanderValues);
     }
 
     public ArgumentList.Expander getListExpander() {

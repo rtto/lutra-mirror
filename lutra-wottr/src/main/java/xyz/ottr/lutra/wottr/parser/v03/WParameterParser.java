@@ -22,6 +22,7 @@ package xyz.ottr.lutra.wottr.parser.v03;
  * #L%
  */
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -39,6 +40,7 @@ import org.apache.jena.vocabulary.RDFS;
 
 import xyz.ottr.lutra.OTTR;
 import xyz.ottr.lutra.model.Term;
+import xyz.ottr.lutra.model.types.TermType;
 import xyz.ottr.lutra.model.types.TypeFactory;
 import xyz.ottr.lutra.result.Message;
 import xyz.ottr.lutra.result.Result;
@@ -53,6 +55,8 @@ public class WParameterParser implements Function<Resource, Result<Term>> {
     private final TermFactory rdfTermFactory;
     private final Set<Term> optionals;
     private final Map<Term, Term> defaultValues;
+
+
 
     public WParameterParser(Model model) {
         this.model = model;
@@ -69,12 +73,12 @@ public class WParameterParser implements Function<Resource, Result<Term>> {
             Property type;
             
             // Must have a variable/value:
-            Statement varAssignment = ModelSelector.getOptionalStatementWithProperties(model, p,
+            Statement varAssignment = ModelSelector.getOptionalStatementWithProperties(this.model, p,
                     WOTTR.ALL_variable);
             type = varAssignment != null ? varAssignment.getPredicate() : null;
 
             resultTerm = varAssignment != null
-                ? rdfTermFactory.apply(varAssignment.getObject())
+                ? this.rdfTermFactory.apply(varAssignment.getObject())
                 : Result.empty(new Message(Message.ERROR, "No variable for parameter " + p.toString() + "."));
 
             // Set default variable type, as legacy does not have a notion of types
@@ -84,49 +88,44 @@ public class WParameterParser implements Function<Resource, Result<Term>> {
 
             // Add to optional if necessary
             Optional<Literal> optionalLit = Optional.ofNullable(
-                    ModelSelector.getOptionalLiteralOfProperty(model, p, WOTTR.optional));
-            if (optionalLit.filter(lit -> lit.getBoolean()).isPresent()) {
-                resultTerm.ifPresent(term -> optionals.add(term));
+                    ModelSelector.getOptionalLiteralOfProperty(this.model, p, WOTTR.optional));
+            if (optionalLit.filter(Literal::getBoolean).isPresent()) {
+                resultTerm.ifPresent(this.optionals::add);
             }
             // TODO: Check and add default values
         } catch (ModelSelectorException ex) {
             // TODO: Correct lvl and good message?
-            resultTerm = Result.empty(new Message(Message.ERROR, "Error parsing parameter. " + ex.getMessage()));
+            resultTerm = Result.empty(Message.error("Error parsing parameter. " + ex.getMessage()));
         }
 
         return resultTerm;
     }
 
     public Set<Term> getOptionals() {
-        return optionals;
+        return Collections.unmodifiableSet(this.optionals);
     }
 
     public Map<Term, Term> getDefaultValues() {
-        return this.defaultValues;
+        return Collections.unmodifiableMap(this.defaultValues);
     }
 
-    private void setType(Term term, Property type) {
-        if (type.equals(WOTTR.literalVariable)) {
-            term.setType(TypeFactory.getType(RDFS.Literal));
-        } else if (type.equals(WOTTR.classVariable)) {
-            term.setType(TypeFactory.getType(OWL.Class));
-        } else if (type.equals(WOTTR.individualVariable)) {
-            term.setType(TypeFactory.getType(OWL.NS + "NamedIndividual"));
-        } else if (type.equals(WOTTR.propertyVariable)) { 
-            term.setType(TypeFactory.getType(OTTR.TypeURI.IRI));
-        } else if (type.equals(WOTTR.dataPropertyVariable)) {
-            term.setType(TypeFactory.getType(OWL.DatatypeProperty));
-        } else if (type.equals(WOTTR.annotationPropertyVariable)) {
-            term.setType(TypeFactory.getType(OWL.AnnotationProperty));
-        } else if (type.equals(WOTTR.objectPropertyVariable)) {
-            term.setType(TypeFactory.getType(OWL.ObjectProperty));
-        } else if (type.equals(WOTTR.datatypeVariable)) {
-            term.setType(TypeFactory.getType(RDFS.Datatype));
-        } else if (type.equals(WOTTR.variable)) {
-            term.setType(TypeFactory.getTopType());
-        } else {
-            term.setType(TypeFactory.getVariableType(term));
-        }
+    private static final Map<Property, TermType> PROPERTY_TERM_TYPE_MAP;
 
+    static {
+        Map<Property, TermType> typeMap = new HashMap<>();
+        typeMap.put(WOTTR.literalVariable, TypeFactory.getType(RDFS.Literal));
+        typeMap.put(WOTTR.classVariable, TypeFactory.getType(OWL.Class));
+        typeMap.put(WOTTR.individualVariable, TypeFactory.getType(OWL.NS + "NamedIndividual"));
+        typeMap.put(WOTTR.propertyVariable, TypeFactory.getType(OTTR.TypeURI.IRI));
+        typeMap.put(WOTTR.dataPropertyVariable, TypeFactory.getType(OWL.DatatypeProperty));
+        typeMap.put(WOTTR.annotationPropertyVariable, TypeFactory.getType(OWL.AnnotationProperty));
+        typeMap.put(WOTTR.objectPropertyVariable, TypeFactory.getType(OWL.ObjectProperty));
+        typeMap.put(WOTTR.datatypeVariable, TypeFactory.getType(RDFS.Datatype));
+        typeMap.put(WOTTR.variable, TypeFactory.getTopType());
+        PROPERTY_TERM_TYPE_MAP = Collections.unmodifiableMap(typeMap);
+    }
+
+    private void setType(Term term, Property property) {
+        term.setType(PROPERTY_TERM_TYPE_MAP.getOrDefault(property, TypeFactory.getVariableType(term)));
     }
 }

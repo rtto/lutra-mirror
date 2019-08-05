@@ -42,21 +42,18 @@ import xyz.ottr.lutra.wottr.vocabulary.v03.WOTTR;
 
 public class WInstanceParser implements InstanceParser<Model> {
 
-    public WInstanceParser() {
-    }
-
     @Override
     public ResultStream<Instance> apply(Model model) {
 
-        Model canonModel = WReader.getCanonicalModel(model);
+        Model canonModel = WParserUtils.getCanonicalModel(model);
 
-        if (WReader.isTemplateDefinition(canonModel)) {
+        if (WParserUtils.isTemplateDefinition(canonModel)) {
             return ResultStream.empty();
         } else {
-            List<Resource> ins = WReader.getInstances(canonModel);
+            List<Resource> ins = WParserUtils.getInstances(canonModel);
             ResultStream<Instance> parsedInstances = parseInstances(canonModel, ins);
 
-            Model triples = WReader.getNonTemplateTriples(canonModel, null, new LinkedList<>(), ins);
+            Model triples = WParserUtils.getNonTemplateTriples(canonModel, null, new LinkedList<>(), ins);
             return ResultStream.concat(parsedInstances, new TripleInstanceFactory(triples).get());
         }
     }
@@ -72,25 +69,25 @@ public class WInstanceParser implements InstanceParser<Model> {
         if (!templateInstanceNode.isResource()) {
             return Result.empty(Message.error(
                         "Expected instance to be a resource, found non-resource "
-                        + templateInstanceNode.toString() + " in model " + model.toString() + "."));
+                        + templateInstanceNode.toString() + "."));
         }
 
         Resource templateInstance = templateInstanceNode.asResource();
         Resource templateRef = ModelSelector.getRequiredResourceOfProperty(model, templateInstance,
             WOTTR.templateRef);
 
-        WParameterListParser rdfParameterListParser = new WParameterListParser(model);
+        WParameterListParser parameterListParser = new WParameterListParser(model);
         Result<ArgumentList> resArgumentList;
         if (model.contains(templateInstance, WOTTR.hasArgument, (RDFNode) null)) {
             List<Resource> arguments = ModelSelector.listResourcesOfProperty(model, templateInstance,
                 WOTTR.hasArgument);
-            resArgumentList = rdfParameterListParser.parseArguments(arguments);
+            resArgumentList = parameterListParser.parseArguments(arguments);
         } else if (model.contains(templateInstance, WOTTR.withValues, (RDFNode) null)) {
             Resource argsList = ModelSelector.getRequiredResourceOfProperty(model, templateInstance,
                 WOTTR.withValues);
-            resArgumentList = rdfParameterListParser.parseValues(argsList);
+            resArgumentList = parameterListParser.parseValues(argsList);
         } else {
-            return Result.empty(Message.error("Found no arguments for instance in instance of "
+            return Result.empty(Message.error("Found no arguments for instance of "
                     + templateRef.getURI()));
         }
 

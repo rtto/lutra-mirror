@@ -57,7 +57,6 @@ import xyz.ottr.lutra.wottr.vocabulary.v03.WOTTR;
 
 public class WTemplateParser implements TemplateParser<Model> {
 
-    //private final Logger log = LoggerFactory.getLogger(WOTTRParser.class);
     private final WInstanceParser instanceParser;
     private final PrefixMapping prefixes;
 
@@ -74,13 +73,13 @@ public class WTemplateParser implements TemplateParser<Model> {
     @Override
     public ResultStream<TemplateSignature> apply(Model model) {
 
-        Model canonModel = WReader.getCanonicalModel(model);
+        Model canonModel = WParserUtils.getCanonicalModel(model);
         if (canonModel.listStatements((Resource) null, WOTTR.hasPattern, (RDFNode) null).hasNext()) {
             return parseTemplatesWithExplicitBody(canonModel)
-                .innerMap(tpl -> changeListVariablesToBlanks(tpl));
+                .innerMap(this::changeListVariablesToBlanks);
         } else {
             return ResultStream.of(parseTemplateWithImplicitBody(canonModel))
-                .innerMap(tpl -> changeListVariablesToBlanks(tpl));
+                .innerMap(this::changeListVariablesToBlanks);
         }
     }
 
@@ -98,24 +97,24 @@ public class WTemplateParser implements TemplateParser<Model> {
         }
         String templateURI = template.getURI();
 
-        WParameterListParser rdfParameterListParser = new WParameterListParser(model);
+        WParameterListParser parameterListParser = new WParameterListParser(model);
         Result<ParameterList> parsedParameters;
         Model withoutHead;
         if (model.contains(template, WOTTR.hasParameter)) {
             List<Resource> parameters = ModelSelector.listResourcesOfProperty(model, template, WOTTR.hasParameter);
-            parsedParameters = rdfParameterListParser.parseParameters(parameters);
-            withoutHead = model.difference(WReader.getTemplateHeadWParam(model, template, parameters));
+            parsedParameters = parameterListParser.parseParameters(parameters);
+            withoutHead = model.difference(WParserUtils.getTemplateHeadWParam(model, template, parameters));
         } else if (model.contains(template, WOTTR.withVariables)) {
             Resource parameters = ModelSelector.getRequiredResourceOfProperty(model, template, WOTTR.withVariables);
-            parsedParameters = rdfParameterListParser.parseVariables(parameters);
-            withoutHead = model.difference(WReader.getTemplateHeadWVars(model, template));
+            parsedParameters = parameterListParser.parseVariables(parameters);
+            withoutHead = model.difference(WParserUtils.getTemplateHeadWVars(model, template));
         } else {
             return Result.empty(Message.error("Template with IRI " + templateURI + " does not have any parameters."));
         }
 
         // Parse template's body's instances
         withoutHead.setNsPrefixes(model);
-        Result<Set<Instance>> instances = instanceParser.apply(withoutHead)
+        Result<Set<Instance>> instances = this.instanceParser.apply(withoutHead)
             .aggregate()
             .map(strm -> strm.collect(Collectors.toSet()));
 
@@ -131,11 +130,11 @@ public class WTemplateParser implements TemplateParser<Model> {
 
             String templateURI = template.getURI();
             List<Resource> parameters = ModelSelector.listResourcesOfProperty(model, template, WOTTR.hasParameter);
-            WParameterListParser rdfParameterListParser = new WParameterListParser(model);
-            Result<ParameterList> parsedParameters = rdfParameterListParser.parseParameters(parameters);
+            WParameterListParser parameterListParser = new WParameterListParser(model);
+            Result<ParameterList> parsedParameters = parameterListParser.parseParameters(parameters);
 
             Set<Result<Instance>> instancesRes = model.listObjectsOfProperty(template, WOTTR.hasPattern)
-                .mapWith(res -> instanceParser.parseInstance(model, res))
+                .mapWith(res -> this.instanceParser.parseInstance(model, res))
                 .toSet();
             Result<Set<Instance>> instances = Result.aggregate(instancesRes);
 
