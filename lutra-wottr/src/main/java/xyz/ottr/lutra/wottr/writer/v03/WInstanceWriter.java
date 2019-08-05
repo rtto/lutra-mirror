@@ -39,8 +39,8 @@ import xyz.ottr.lutra.wottr.writer.RDFFactory;
 
 public class WInstanceWriter implements InstanceWriter {
 
-    private Model model;
-    private RDFFactory rdfFactory;
+    private final Model model;
+    private final RDFFactory rdfFactory;
 
     public WInstanceWriter() {
         this.model = ModelFactory.createDefaultModel();
@@ -50,11 +50,11 @@ public class WInstanceWriter implements InstanceWriter {
     }
 
     @Override
-    public synchronized void accept(Instance i) { // Cannot write in parallel, Jena breaks
-        if (this.rdfFactory.isTriple(i)) {
-            this.model.add(this.rdfFactory.createTriple(this.model, i));
+    public synchronized void accept(Instance instance) { // Cannot write in parallel, Jena breaks
+        if (RDFFactory.isTriple(instance)) {
+            this.model.add(this.rdfFactory.createTriple(this.model, instance));
         } else {
-            addInstance(i, this.model);
+            addInstance(instance, this.model);
         }
     }
 
@@ -88,7 +88,7 @@ public class WInstanceWriter implements InstanceWriter {
 
         for (Term arg : arguments.asList()) {
             Resource argumentNode = model.createResource();
-            RDFNode valueNode = rdfFactory.createRDFNode(model, arg);
+            RDFNode valueNode = this.rdfFactory.createRDFNode(model, arg);
 
             model.add(iri, WOTTR.hasArgument, argumentNode);
             if (arguments.hasListExpander(arg) && arguments.hasCrossExpander()) {
