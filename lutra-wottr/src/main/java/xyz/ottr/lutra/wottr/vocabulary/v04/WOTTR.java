@@ -1,4 +1,4 @@
-package xyz.ottr.lutra.wottr.parser.v04;
+package xyz.ottr.lutra.wottr.vocabulary.v04;
 
 /*-
  * #%L
@@ -27,9 +27,9 @@ import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.ResourceFactory;
 
 import xyz.ottr.lutra.OTTR;
-import xyz.ottr.lutra.wottr.parser.OTTRVocabulary;
+import xyz.ottr.lutra.wottr.vocabulary.WOTTRVocabulary;
 
-public class WOTTR implements OTTRVocabulary {
+public class WOTTR implements WOTTRVocabulary {
 
     private static final String ns = OTTR.namespace;
     public static final String prefix = "ottr";
@@ -74,7 +74,7 @@ public class WOTTR implements OTTRVocabulary {
         return ResourceFactory.createProperty(uri);
     }
 
-    public static final OTTRVocabulary theInstance = new WOTTR();
+    public static final WOTTRVocabulary theInstance = new WOTTR();
 
     private WOTTR() {
         // hide constructor, use theInstance.

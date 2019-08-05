@@ -35,7 +35,7 @@ import xyz.ottr.lutra.model.Term;
 import xyz.ottr.lutra.result.Result;
 import xyz.ottr.lutra.tabottr.model.TemplateInstruction;
 import xyz.ottr.lutra.wottr.parser.TermFactory;
-import xyz.ottr.lutra.wottr.parser.v04.WOTTR;
+import xyz.ottr.lutra.wottr.vocabulary.v04.WOTTR;
 
 public class TemplateInstructionParser {
 

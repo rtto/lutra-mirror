@@ -38,7 +38,7 @@ import xyz.ottr.lutra.model.Instance;
 import xyz.ottr.lutra.model.Term;
 import xyz.ottr.lutra.result.Result;
 import xyz.ottr.lutra.result.ResultStream;
-import xyz.ottr.lutra.wottr.parser.v04.WOTTR;
+import xyz.ottr.lutra.wottr.vocabulary.v04.WOTTR;
 
 public class TripleInstanceFactory implements Supplier<ResultStream<Instance>> {
 

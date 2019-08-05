@@ -42,16 +42,16 @@ import xyz.ottr.lutra.model.LiteralTerm;
 import xyz.ottr.lutra.model.NoneTerm;
 import xyz.ottr.lutra.model.Term;
 import xyz.ottr.lutra.model.TermList;
-import xyz.ottr.lutra.wottr.parser.OTTRVocabulary;
+import xyz.ottr.lutra.wottr.vocabulary.WOTTRVocabulary;
 
 public class RDFFactory {
 
     // TODO should this be static?
     private final Map<String, Resource> createdBlankNodes = new HashMap<String, Resource>(); // reuse blank nodes
 
-    private OTTRVocabulary vocaulary;
+    private WOTTRVocabulary vocaulary;
 
-    public RDFFactory(OTTRVocabulary vocaulary) {
+    public RDFFactory(WOTTRVocabulary vocaulary) {
         this.vocaulary = vocaulary;
     }
 

@@ -34,6 +34,7 @@ import org.apache.jena.rdf.model.StmtIterator;
 
 import xyz.ottr.lutra.wottr.util.ModelSelector;
 import xyz.ottr.lutra.wottr.util.Models;
+import xyz.ottr.lutra.wottr.vocabulary.v04.WOTTR;
 
 // TODO: Remove this class, rename to WReaderUtils or move methods into other classes
 public class WReader {

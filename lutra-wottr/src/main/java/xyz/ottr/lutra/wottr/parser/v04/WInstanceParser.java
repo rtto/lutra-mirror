@@ -52,6 +52,7 @@ import xyz.ottr.lutra.wottr.parser.TermFactory;
 import xyz.ottr.lutra.wottr.parser.TripleInstanceFactory;
 import xyz.ottr.lutra.wottr.util.ModelSelector;
 import xyz.ottr.lutra.wottr.util.ModelSelectorException;
+import xyz.ottr.lutra.wottr.vocabulary.v04.WOTTR;
 
 public class WInstanceParser implements InstanceParser<Model> {
 

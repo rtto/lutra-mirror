@@ -45,6 +45,7 @@ import xyz.ottr.lutra.result.Result;
 import xyz.ottr.lutra.wottr.parser.TermFactory;
 import xyz.ottr.lutra.wottr.util.ModelSelector;
 import xyz.ottr.lutra.wottr.util.ModelSelectorException;
+import xyz.ottr.lutra.wottr.vocabulary.v03.WOTTR;
 
 public class WParameterParser implements Function<Resource, Result<Term>> {
 

@@ -38,6 +38,7 @@ import org.apache.jena.vocabulary.RDF;
 import xyz.ottr.lutra.io.ReaderException;
 import xyz.ottr.lutra.wottr.util.ModelSelector;
 import xyz.ottr.lutra.wottr.util.Models;
+import xyz.ottr.lutra.wottr.vocabulary.v03.WOTTR;
 
 @SuppressWarnings("CPD-START")
 public class WReader {

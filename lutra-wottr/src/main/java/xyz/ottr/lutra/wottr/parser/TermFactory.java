@@ -43,6 +43,7 @@ import xyz.ottr.lutra.model.Term;
 import xyz.ottr.lutra.model.TermList;
 import xyz.ottr.lutra.result.Message;
 import xyz.ottr.lutra.result.Result;
+import xyz.ottr.lutra.wottr.vocabulary.WOTTRVocabulary;
 
 public class TermFactory implements Function<RDFNode, Result<Term>> {
 
@@ -51,9 +52,9 @@ public class TermFactory implements Function<RDFNode, Result<Term>> {
     private static Map<RDFList, Result<TermList>> createdLists = new HashMap<>();
     private static Map<String, BlankNodeTerm> createdBlanks = new HashMap<>();
 
-    private OTTRVocabulary vocabulary;
+    private WOTTRVocabulary vocabulary;
 
-    public TermFactory(OTTRVocabulary vocabulary) {
+    public TermFactory(WOTTRVocabulary vocabulary) {
         this.vocabulary = vocabulary;
     }
 

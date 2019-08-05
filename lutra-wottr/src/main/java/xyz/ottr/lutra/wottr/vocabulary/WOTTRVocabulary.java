@@ -1,4 +1,4 @@
-package xyz.ottr.lutra.wottr.parser;
+package xyz.ottr.lutra.wottr.vocabulary;
 
 /*-
  * #%L
@@ -24,6 +24,6 @@ package xyz.ottr.lutra.wottr.parser;
 
 import org.apache.jena.rdf.model.Resource;
 
-public interface OTTRVocabulary {
+public interface WOTTRVocabulary {
     Resource getNoneResource();
 }

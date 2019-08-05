@@ -36,9 +36,9 @@ import xyz.ottr.lutra.io.InstanceWriter;
 import xyz.ottr.lutra.model.ArgumentList;
 import xyz.ottr.lutra.model.Instance;
 import xyz.ottr.lutra.model.Term;
-import xyz.ottr.lutra.wottr.parser.v04.WOTTR;
 import xyz.ottr.lutra.wottr.util.ModelIO;
 import xyz.ottr.lutra.wottr.util.PrefixMappings;
+import xyz.ottr.lutra.wottr.vocabulary.v04.WOTTR;
 import xyz.ottr.lutra.wottr.writer.RDFFactory;
 
 public class WInstanceWriter implements InstanceWriter {

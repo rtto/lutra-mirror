@@ -38,6 +38,7 @@ import xyz.ottr.lutra.result.Result;
 import xyz.ottr.lutra.result.ResultStream;
 import xyz.ottr.lutra.wottr.parser.TripleInstanceFactory;
 import xyz.ottr.lutra.wottr.util.ModelSelector;
+import xyz.ottr.lutra.wottr.vocabulary.v03.WOTTR;
 
 public class WInstanceParser implements InstanceParser<Model> {
 

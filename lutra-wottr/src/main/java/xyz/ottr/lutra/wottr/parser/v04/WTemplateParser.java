@@ -47,6 +47,7 @@ import xyz.ottr.lutra.result.Result;
 import xyz.ottr.lutra.result.ResultStream;
 import xyz.ottr.lutra.wottr.util.ModelSelector;
 import xyz.ottr.lutra.wottr.util.ModelSelectorException;
+import xyz.ottr.lutra.wottr.vocabulary.v04.WOTTR;
 
 public class WTemplateParser implements TemplateParser<Model> {
 
