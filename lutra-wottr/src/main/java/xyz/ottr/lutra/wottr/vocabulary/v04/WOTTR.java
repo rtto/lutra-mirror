@@ -22,16 +22,12 @@ package xyz.ottr.lutra.wottr.vocabulary.v04;
  * #L%
  */
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.apache.commons.collections4.BidiMap;
 import org.apache.commons.collections4.bidimap.DualHashBidiMap;
 import org.apache.commons.collections4.bidimap.UnmodifiableBidiMap;
 import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.ResourceFactory;
-
 import xyz.ottr.lutra.OTTR;
 import xyz.ottr.lutra.model.ArgumentList;
 import xyz.ottr.lutra.wottr.vocabulary.WOTTRVocabulary;

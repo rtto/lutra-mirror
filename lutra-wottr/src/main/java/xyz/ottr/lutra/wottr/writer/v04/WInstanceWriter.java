@@ -22,9 +22,6 @@ package xyz.ottr.lutra.wottr.writer.v04;
  * #L%
  */
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.RDFList;
