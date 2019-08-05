@@ -22,11 +22,18 @@ package xyz.ottr.lutra.wottr.vocabulary.v04;
  * #L%
  */
 
+import java.util.HashMap;
+import java.util.Map;
+
+import org.apache.commons.collections4.BidiMap;
+import org.apache.commons.collections4.bidimap.DualHashBidiMap;
+import org.apache.commons.collections4.bidimap.UnmodifiableBidiMap;
 import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.ResourceFactory;
 
 import xyz.ottr.lutra.OTTR;
+import xyz.ottr.lutra.model.ArgumentList;
 import xyz.ottr.lutra.wottr.vocabulary.WOTTRVocabulary;
 
 public class WOTTR implements WOTTRVocabulary {
@@ -63,7 +70,16 @@ public class WOTTR implements WOTTRVocabulary {
     public static final Property values = getProperty(ns + "values");
     public static final Property value = getProperty(ns + "value");
     public static final Property annotation = getProperty(ns + "annotation");
- 
+
+    public static final BidiMap<Resource, ArgumentList.Expander> listExpanders;
+
+    static {
+        BidiMap map = new DualHashBidiMap<>();
+        map.put(WOTTR.cross, ArgumentList.Expander.CROSS);
+        map.put(WOTTR.zipMin, ArgumentList.Expander.ZIPMIN);
+        map.put(WOTTR.zipMax, ArgumentList.Expander.ZIPMAX);
+        listExpanders = UnmodifiableBidiMap.unmodifiableBidiMap(map);
+    }
     
     // Utility methods
     private static Resource getResource(String uri) {

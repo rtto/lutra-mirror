@@ -22,10 +22,8 @@ package xyz.ottr.lutra.wottr.parser.v04;
  * #L%
  */
 
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -34,12 +32,7 @@ import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.RDFList;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
-
 import xyz.ottr.lutra.OTTR;
-
-//import org.slf4j.Logger;
-//import org.slf4j.LoggerFactory;
-
 import xyz.ottr.lutra.io.InstanceParser;
 import xyz.ottr.lutra.model.ArgumentList;
 import xyz.ottr.lutra.model.IRITerm;
@@ -54,18 +47,10 @@ import xyz.ottr.lutra.wottr.util.ModelSelector;
 import xyz.ottr.lutra.wottr.util.ModelSelectorException;
 import xyz.ottr.lutra.wottr.vocabulary.v04.WOTTR;
 
+//import org.slf4j.Logger;
+//import org.slf4j.LoggerFactory;
+
 public class WInstanceParser implements InstanceParser<Model> {
-
-    //private final Logger log = LoggerFactory.getLogger(WInstanceParser.class);
-
-    private static final Map<Resource, ArgumentList.Expander> expanders;
-
-    static {
-        expanders = new HashMap<>();
-        expanders.put(WOTTR.cross, ArgumentList.Expander.CROSS);
-        expanders.put(WOTTR.zipMin, ArgumentList.Expander.ZIPMIN);
-        expanders.put(WOTTR.zipMax, ArgumentList.Expander.ZIPMAX);
-    }
 
     public WInstanceParser() {
     }
@@ -199,7 +184,7 @@ public class WInstanceParser implements InstanceParser<Model> {
             return null;
         }
         
-        ArgumentList.Expander listExpander = expanders.get(listExpanderRes);
+        ArgumentList.Expander listExpander = WOTTR.listExpanders.get(listExpanderRes);
 
         if (listExpander == null) {
             Message msg = Message.error(

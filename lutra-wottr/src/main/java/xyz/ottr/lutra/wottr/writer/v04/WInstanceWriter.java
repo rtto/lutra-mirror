@@ -43,15 +43,6 @@ import xyz.ottr.lutra.wottr.writer.RDFFactory;
 
 public class WInstanceWriter implements InstanceWriter {
 
-    private static Map<ArgumentList.Expander, Resource> expanders;
-
-    static {
-        expanders = new HashMap<>();
-        expanders.put(ArgumentList.Expander.CROSS, WOTTR.cross);
-        expanders.put(ArgumentList.Expander.ZIPMIN, WOTTR.zipMin);
-        expanders.put(ArgumentList.Expander.ZIPMAX, WOTTR.zipMax);
-    }
-
     private Model model;
     private RDFFactory rdfFactory;
 
@@ -97,7 +88,7 @@ public class WInstanceWriter implements InstanceWriter {
         ArgumentList arguments = i.getArguments();
         addArguments(arguments, instance, model);
         if (arguments.hasListExpander()) {
-            model.add(instance, WOTTR.modifier, expanders.get(arguments.getListExpander()));
+            model.add(instance, WOTTR.modifier, WOTTR.listExpanders.getKey(arguments.getListExpander()));
         }
         return instance;
     }
