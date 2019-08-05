@@ -47,9 +47,9 @@ import xyz.ottr.lutra.wottr.vocabulary.WOTTRVocabulary;
 public class RDFFactory {
 
     // TODO should this be static?
-    private final Map<String, Resource> createdBlankNodes = new HashMap<String, Resource>(); // reuse blank nodes
+    private final Map<String, Resource> createdBlankNodes = new HashMap<>(); // reuse blank nodes
 
-    private WOTTRVocabulary vocaulary;
+    private final WOTTRVocabulary vocaulary;
 
     public RDFFactory(WOTTRVocabulary vocaulary) {
         this.vocaulary = vocaulary;
@@ -81,7 +81,7 @@ public class RDFFactory {
             }
         } else if (term instanceof BlankNodeTerm) {
             String label = ((BlankNodeTerm) term).getLabel();
-            return createdBlankNodes.computeIfAbsent(label,
+            return this.createdBlankNodes.computeIfAbsent(label,
                 blankLabel -> model.createResource(new AnonId(blankLabel)));
         } else if (term instanceof NoneTerm) {
             // Note: the resource is recreated *in/by the model* to allow the none-resource

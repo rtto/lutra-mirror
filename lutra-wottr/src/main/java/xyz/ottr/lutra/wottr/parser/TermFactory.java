@@ -49,10 +49,10 @@ public class TermFactory implements Function<RDFNode, Result<Term>> {
 
     // TODO: Verify that this is correct. This only gives correct results if blank nodes
     // across Jena models are unique.
-    private static Map<RDFList, Result<TermList>> createdLists = new HashMap<>();
-    private static Map<String, BlankNodeTerm> createdBlanks = new HashMap<>();
+    private static final Map<RDFList, Result<TermList>> createdLists = new HashMap<>();
+    private static final Map<String, BlankNodeTerm> createdBlanks = new HashMap<>();
 
-    private WOTTRVocabulary vocabulary;
+    private final WOTTRVocabulary vocabulary;
 
     public TermFactory(WOTTRVocabulary vocabulary) {
         this.vocabulary = vocabulary;
@@ -61,7 +61,7 @@ public class TermFactory implements Function<RDFNode, Result<Term>> {
     public Result<Term> apply(RDFNode node) {
 
         if (node.isURIResource()) {
-            if (node.toString().equals(vocabulary.getNoneResource().getURI())) {
+            if (node.toString().equals(this.vocabulary.getNoneResource().getURI())) {
                 return Result.of(new NoneTerm());
             } else if (node.equals(RDF.nil)) {
                 return Result.of(new TermList());
