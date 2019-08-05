@@ -59,7 +59,7 @@ public class TermTypeTest {
 
     @Test
     public void shouldBeCompatible() {
-        assertTrue(owlOProp.isCompatibleWith(byIRI(OTTR.Types.IRI)));
+        assertTrue(owlOProp.isCompatibleWith(byIRI(OTTR.TypeURI.IRI)));
         assertTrue(owlOProp.isCompatibleWith(byIRI(RDFS.Resource)));
         assertTrue(owlOProp.isCompatibleWith(byIRI(OWL.ObjectProperty)));
     }

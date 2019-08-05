@@ -84,14 +84,19 @@ public class RDFFactory {
             return createdBlankNodes.computeIfAbsent(label,
                 blankLabel -> model.createResource(new AnonId(blankLabel)));
         } else if (term instanceof NoneTerm) {
-            return this.vocaulary.getNoneResource();
+            // Note: the resource is recreated *in/by the model* to allow the none-resource
+            // to be cast to Property (by as(Property.class)). If we return the resource without
+            // no "hosting" model, then the cast throws a UnsupportedPolymorphismException.
+            return model.createResource(this.vocaulary.getNoneResource().getURI());
         } else {
             return null; // TODO: Throw exception
         }
     }
 
-    public static boolean isTriple(Instance node) {
-        return OTTR.Bases.Triple.equals(node.getIRI());
+    public static boolean isTriple(Instance instance) {
+        String templateIRI = instance.getIRI();
+        return OTTR.BaseURI.Triple.equals(templateIRI)
+            || OTTR.BaseURI.NullableTriple.equals(templateIRI);
     }
 
     public Statement createTriple(Model model, Instance instance) {

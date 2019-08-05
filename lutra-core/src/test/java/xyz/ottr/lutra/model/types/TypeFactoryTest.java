@@ -54,7 +54,7 @@ public class TypeFactoryTest {
     public void simpleTypeSetting1() {
         assertEquals(
                 new IRITerm("example.com/v").getType(),
-                new LUBType(TypeFactory.getType(OTTR.Types.IRI)));
+                new LUBType(TypeFactory.getType(OTTR.TypeURI.IRI)));
     }
 
     @Test

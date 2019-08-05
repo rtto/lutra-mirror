@@ -56,8 +56,8 @@ public class TypeFactory {
     }
     
     private static final BasicType topType = getType(RDFS.Resource);
-    private static final BasicType botType = getType(OTTR.Types.Bot);
-    private static final BasicType iriType = getType(OTTR.Types.IRI);
+    private static final BasicType botType = getType(OTTR.TypeURI.Bot);
+    private static final BasicType iriType = getType(OTTR.TypeURI.IRI);
     private static final BasicType literalType = getType(RDFS.Literal);
 
 
@@ -73,7 +73,7 @@ public class TypeFactory {
     }
 
     private static void initTypes(Model model) {
-        iris = model.listResourcesWithProperty(RDF.type, model.createResource(OTTR.Types.Type))
+        iris = model.listResourcesWithProperty(RDF.type, model.createResource(OTTR.TypeURI.Type))
                 .toSet().stream()
                 .map(RDFNode::asResource)
                 .map(BasicType::new)
@@ -86,7 +86,7 @@ public class TypeFactory {
         superTypes = iris.values().stream().collect(
                 Collectors.toMap(Function.identity(), _x -> new HashSet<BasicType>()));
         
-        Property subTypeOf = model.createProperty(OTTR.Types.subTypeOf);
+        Property subTypeOf = model.createProperty(OTTR.TypeURI.subTypeOf);
         model.listStatements((Resource) null, subTypeOf, (RDFNode) null)
             .forEachRemaining(stmt ->  {
                 BasicType subType = getType(stmt.getSubject().asResource());

@@ -23,8 +23,6 @@ package xyz.ottr.lutra.io;
  */
 
 import java.io.File;
-//import java.io.IOException;
-//import java.util.Collection;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.function.Function;

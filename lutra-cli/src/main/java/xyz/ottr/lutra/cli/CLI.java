@@ -61,8 +61,7 @@ import xyz.ottr.lutra.stottr.io.SInstanceParser;
 import xyz.ottr.lutra.stottr.io.SInstanceWriter;
 import xyz.ottr.lutra.stottr.io.STemplateParser;
 import xyz.ottr.lutra.stottr.io.STemplateWriter;
-import xyz.ottr.lutra.tabottr.io.TabInstanceParser;
-import xyz.ottr.lutra.wottr.WTemplateFactory;
+import xyz.ottr.lutra.tabottr.parser.ExcelReader;
 import xyz.ottr.lutra.wottr.io.RDFFileReader;
 import xyz.ottr.lutra.wottr.parser.v04.WInstanceParser;
 import xyz.ottr.lutra.wottr.parser.v04.WTemplateParser;
@@ -149,7 +148,7 @@ public class CLI {
      */
     private static MessageHandler parseLibraryInto(TemplateReader reader, TemplateStore store) {
 
-        store.addTemplateSignature(WTemplateFactory.createTripleTemplateHead());
+        store.addOTTRBaseTemplates();
 
         if (settings.library == null) {
             return new MessageHandler();
@@ -296,7 +295,7 @@ public class CLI {
         }
         switch (settings.inputFormat) {
             case tabottr:
-                return Result.of(new InstanceReader(new TabInstanceParser()));
+                return Result.of(new InstanceReader(new ExcelReader()));
             case legacy:
                 return Result.of(new InstanceReader(new RDFFileReader(),
                         new xyz.ottr.lutra.wottr.parser.v03.WInstanceParser()));

@@ -9,7 +9,7 @@
     <modules>
         <module>lutra-core</module>
         <module>lutra-wottr</module>
-        <module>lutra-tab</module>
+        <module>lutra-tabottr</module>
         <module>lutra-stottr</module>
         <module>lutra-cli</module>
     </modules>
@@ -383,7 +383,7 @@
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>lutra-tab</artifactId>
+                <artifactId>lutra-tabottr</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>

@@ -106,7 +106,7 @@ public class DependencyGraph implements TemplateStore {
     }
 
     private void addInstanceToIndex(String instance, ArgumentList args, String template) {
-        if (instance.equals(OTTR.Bases.Triple)) {
+        if (instance.equals(OTTR.BaseURI.Triple)) {
             addInstanceToIndex(args.get(1).toString(), template);
         } else {
             addInstanceToIndex(instance, template);
@@ -118,7 +118,7 @@ public class DependencyGraph implements TemplateStore {
     }
 
     private void removeInstanceFromIndex(String instance, ArgumentList args, String template) {
-        if (instance.equals(OTTR.Bases.Triple)) {
+        if (instance.equals(OTTR.BaseURI.Triple)) {
             removeInstanceFromIndex(args.get(1).toString(), template);
         } else {
             removeInstanceFromIndex(instance, template);
@@ -236,7 +236,7 @@ public class DependencyGraph implements TemplateStore {
         this.dependencies.get(dependency.from).remove(dependency);
         String instance = dependency.to.getIRI();
         removeInstanceFromIndex(instance, dependency.argumentList, dependency.from.getIRI());
-        if (!instance.equals(OTTR.Bases.Triple) && this.instanceIndex.get(instance).isEmpty()) {
+        if (!instance.equals(OTTR.BaseURI.Triple) && this.instanceIndex.get(instance).isEmpty()) {
             this.roots.add(dependency.to);
         }
     }
