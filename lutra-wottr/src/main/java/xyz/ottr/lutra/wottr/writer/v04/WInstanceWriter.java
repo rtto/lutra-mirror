@@ -40,8 +40,8 @@ import xyz.ottr.lutra.wottr.writer.RDFFactory;
 
 public class WInstanceWriter implements InstanceWriter {
 
-    private Model model;
-    private RDFFactory rdfFactory;
+    private final Model model;
+    private final RDFFactory rdfFactory;
 
     public WInstanceWriter() {
         this(PrefixMapping.Factory.create());
@@ -58,11 +58,11 @@ public class WInstanceWriter implements InstanceWriter {
     }
 
     @Override
-    public synchronized void accept(Instance i) { // Cannot write in parallel, Jena breaks
-        if (RDFFactory.isTriple(i)) {
-            this.model.add(rdfFactory.createTriple(this.model, i));
+    public synchronized void accept(Instance instance) { // Cannot write in parallel, Jena breaks
+        if (RDFFactory.isTriple(instance)) {
+            this.model.add(this.rdfFactory.createTriple(this.model, instance));
         } else {
-            makeWottrInstance(this.model, i);
+            createInstanceNode(this.model, instance);
         }
     }
 
@@ -77,17 +77,17 @@ public class WInstanceWriter implements InstanceWriter {
         return this.model;
     }
 
-    public Resource makeWottrInstance(Model model, Instance i) {
-        Resource templateIRI = model.createResource(i.getIRI());
-        Resource instance = model.createResource();
-        model.add(instance, WOTTR.of, templateIRI);
+    public Resource createInstanceNode(Model model, Instance instance) {
+        Resource templateIRI = model.createResource(instance.getIRI());
+        Resource instanceNode = model.createResource();
+        model.add(instanceNode, WOTTR.of, templateIRI);
 
-        ArgumentList arguments = i.getArguments();
-        addArguments(arguments, instance, model);
+        ArgumentList arguments = instance.getArguments();
+        addArguments(arguments, instanceNode, model);
         if (arguments.hasListExpander()) {
-            model.add(instance, WOTTR.modifier, WOTTR.listExpanders.getKey(arguments.getListExpander()));
+            model.add(instanceNode, WOTTR.modifier, WOTTR.listExpanders.getKey(arguments.getListExpander()));
         }
-        return instance;
+        return instanceNode;
     }
 
     private void addArguments(ArgumentList arguments, Resource iri, Model model) {
@@ -99,7 +99,7 @@ public class WInstanceWriter implements InstanceWriter {
         RDFList argsLst = model.createList();
 
         for (Term arg : arguments.asList()) {
-            RDFNode val = rdfFactory.createRDFNode(model, arg);
+            RDFNode val = this.rdfFactory.createRDFNode(model, arg);
 
             Resource argNode = model.createResource();
             model.add(argNode, WOTTR.value, val);

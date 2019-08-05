@@ -62,7 +62,7 @@ public class WTemplateWriter implements TemplateWriter {
     }
 
     public WTemplateWriter(PrefixMapping prefixes, RDFFactory rdfFactory) {
-        this.models = new HashMap<String, Model>();
+        this.models = new HashMap<>();
         this.rdfFactory = rdfFactory;
         this.instanceWriter = new WInstanceWriter(prefixes, rdfFactory);
         this.prefixes = prefixes;
@@ -81,7 +81,7 @@ public class WTemplateWriter implements TemplateWriter {
         Resource signatureNode = createSignature(model, template);
         if (template instanceof Template) {
             for (Instance instance : ((Template) template).getBody()) {
-                Resource instanceNode = this.instanceWriter.makeWottrInstance(model, instance);
+                Resource instanceNode = this.instanceWriter.createInstanceNode(model, instance);
                 model.add(signatureNode, WOTTR.pattern, instanceNode);
             }
         }
@@ -122,11 +122,11 @@ public class WTemplateWriter implements TemplateWriter {
         RDFList paramLst = model.createList();
 
         for (Term param : parameters.asList()) {
-            RDFNode var = rdfFactory.createRDFNode(model, param);
+            RDFNode variable = this.rdfFactory.createRDFNode(model, param);
             Resource type = TypeFactory.createRDFType(model, param.getType());
 
             Resource paramNode = model.createResource();
-            model.add(paramNode, WOTTR.variable, var);
+            model.add(paramNode, WOTTR.variable, variable);
             model.add(paramNode, WOTTR.type, type);
 
             if (parameters.isOptional(param)) {
@@ -136,7 +136,7 @@ public class WTemplateWriter implements TemplateWriter {
                 model.add(paramNode, WOTTR.modifier, WOTTR.nonBlank);
             }
             if (parameters.hasDefaultValue(param)) {
-                RDFNode def = rdfFactory.createRDFNode(model, parameters.getDefaultValue(param));
+                RDFNode def = this.rdfFactory.createRDFNode(model, parameters.getDefaultValue(param));
                 model.add(paramNode, WOTTR.defaultVal, def);
             }
             paramLst = paramLst.with(paramNode);
