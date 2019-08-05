@@ -68,17 +68,6 @@ public class WInstanceWriter implements InstanceWriter {
         return this.model;
     }
 
-    /*
-    public Model makeWottrTripleOrInstance(Instance instance) {
-        if (rdfFactory.isTriple(instance)) {
-            Model model = ModelFactory.createDefaultModel();
-            model.add(rdfFactory.createTriple(model, instance));
-            return model;
-        } else {
-            return createInstance(instance);
-        }
-    }*/
-
     private void addInstance(Instance instance, Model model) {
 
         Resource templateNode = model.createResource(instance.getIRI());

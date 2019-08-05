@@ -60,13 +60,15 @@ public class TripleInstanceFactory implements Supplier<ResultStream<Instance>> {
     /**
      * Returns true if the argument is a redundant list-triple, that is,
      * on one of the forms "(:a :b) rdf:first :a" or "(:a :b) rdf:rest (:b)".
-     * These statements are redundant as they will be parsed as part of a listterm.
+     * These statements are redundant as they will be parsed as part of a list term.
      */
     private boolean isPartOfRDFList(Statement statement) {
 
         Resource subject = statement.getSubject();
         Property predicate = statement.getPredicate();
 
+        // TODO: possible fix, add check to see that subject is "used", ie. is also an triple object.
+        // there must be a rdf:rest for each rdf:first, and vice versa.
         return subject.canAs(RDFList.class)
             && (predicate.equals(RDF.first) && this.model.contains(subject, RDF.rest))
                 || predicate.equals(RDF.rest) && this.model.contains(subject, RDF.first);

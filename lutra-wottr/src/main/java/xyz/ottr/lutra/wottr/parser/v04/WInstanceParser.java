@@ -90,8 +90,8 @@ public class WInstanceParser implements InstanceParser<Model> {
 
         if (!instanceNode.isResource()) {
             return Result.empty(Message.error(
-                        "Expected instance to be a resource, found non-resource "
-                        + instanceNode.toString() + " in model " + model.toString() + "."));
+                "Error parsing instance, expected instance node to be a resource, "
+                    + "but got non-resource " + instanceNode.toString() + "."));
         }
 
         Resource instance = instanceNode.asResource();
@@ -109,7 +109,7 @@ public class WInstanceParser implements InstanceParser<Model> {
         Result<Instance> ins = resArgumentList.map(args -> new Instance(ofIRI, args));
 
         if (ofIRI == null) {
-            ins.addMessage(Message.error("Instance references template with non-IRI."));
+            ins.addMessage(Message.error("Error parsing instance, expected template reference to be an IRI."));
         }
 
         return ins;

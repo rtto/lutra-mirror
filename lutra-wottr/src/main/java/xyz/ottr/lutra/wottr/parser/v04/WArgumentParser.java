@@ -54,7 +54,7 @@ public class WArgumentParser implements Function<RDFNode, Result<Term>> {
 
         if (!argNode.isResource()) {
             return Result.empty(Message.error(
-                "Argument node cannot be non-resource node, for argument " + argNode.toString() + "."));
+                "Error parsing argument, expected resource for argument node, but got " + argNode.toString() + "."));
         }
 
         Resource arg = argNode.asResource();
@@ -72,8 +72,8 @@ public class WArgumentParser implements Function<RDFNode, Result<Term>> {
             if (expand != null) {
                 if (!expand.equals(WOTTR.listExpand)) {
                     resultTerm.addMessage(Message.error(
-                        "Only " + WOTTR.listExpand.toString() + " can be used as modifier on arguments, got "
-                        + expand.toString() + "."));
+                        "Error parsing argument, expected " + WOTTR.listExpand.toString() + " as argument modifier, "
+                            + "but got " + expand.toString() + "."));
                 } else if (resultTerm.isPresent()) {
                     this.expanderValues.add(resultTerm.get());
                 }
