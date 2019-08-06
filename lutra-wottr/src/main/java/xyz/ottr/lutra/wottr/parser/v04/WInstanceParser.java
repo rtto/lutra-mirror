@@ -22,13 +22,13 @@ package xyz.ottr.lutra.wottr.parser.v04;
  * #L%
  */
 
-import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.RDFList;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
@@ -47,24 +47,25 @@ import xyz.ottr.lutra.wottr.util.ModelSelector;
 import xyz.ottr.lutra.wottr.util.ModelSelectorException;
 import xyz.ottr.lutra.wottr.vocabulary.v04.WOTTR;
 
-//import org.slf4j.Logger;
-//import org.slf4j.LoggerFactory;
-
 public class WInstanceParser implements InstanceParser<Model> {
 
     @Override
     public ResultStream<Instance> apply(Model model) {
 
-        List<Resource> ins = ModelSelector.listResourcesWithProperty(model, WOTTR.of);
-        ResultStream<Instance> parsedInstances = parseInstances(model, ins);
-        
-        Model triples = WReader.getNonTemplateTriples(model, null, new LinkedList<>(), ins);
-        return ResultStream.concat(parsedInstances, new TripleInstanceFactory(triples).get());
+        List<Resource> instances = ModelSelector.listResourcesWithProperty(model, WOTTR.of);
+        ResultStream<Instance> parsedInstances = parseInstances(model, instances);
+
+        // Get triples which are not part of any of the instances:
+        WTripleSerialiser tripleSerialiser = new WTripleSerialiser(model);
+        Model instanceModel = ModelFactory.createDefaultModel();
+        instances.forEach(instance -> instanceModel.add(tripleSerialiser.serialiseInstance(instance)));
+        Model tripleModel = model.difference(instanceModel);
+
+        return ResultStream.concat(parsedInstances, new TripleInstanceFactory(tripleModel).get());
     }
 
     private ResultStream<Instance> parseInstances(Model model, List<Resource> templateInstances) {
-        Stream<Result<Instance>> parsedInstances = templateInstances
-            .stream()
+        Stream<Result<Instance>> parsedInstances = templateInstances.stream()
             .map(instance -> parseInstance(model, instance));
         return new ResultStream<>(parsedInstances);
     }

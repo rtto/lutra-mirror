@@ -153,27 +153,4 @@ public class WTemplateParser implements TemplateParser<Model> {
         return Result.zip(signature, instances, (sig, is) -> (TemplateSignature) new Template(sig, is));
     }
 
-    // public Result<TemplateSignature> parseTemplateWithImplicitBody(Model model) {
-    //     // Parse template's head
-    //     Resource template;
-    //     try {
-    //         template = ModelSelector.getRequiredInstanceOfClass(model, WOTTR.Template);
-    //     } catch (ModelSelectorException ex) {
-    //         return Result.empty(Message.error( "No element of type " + WOTTR.Template + " found in model."));
-    //     }
-    //     String templateURI = template.getURI();
-
-    //     List<Resource> parameters = ModelSelector.listResourcesOfProperty(model, template, WOTTR.hasParameter);
-    //     WParameterListParser rdfParameterListParser = new WParameterListParser(model);
-    //     Result<ParameterList> parsedParameters = rdfParameterListParser.parseParameters(parameters);
-
-    //     // Parse template's body's instances
-    //     Model withoutHead = model.difference(WReader.getTemplateHead(model, template, parameters));
-    //     withoutHead.setNsPrefixes(model);
-    //     Result<Set<Instance>> instances = instanceParser.apply(withoutHead)
-    //         .aggregate()
-    //         .map(strm -> strm.collect(Collectors.toSet()));
-
-    //     return makeTemplateFromResults(templateURI, parsedParameters, instances);
-    // }
 }
