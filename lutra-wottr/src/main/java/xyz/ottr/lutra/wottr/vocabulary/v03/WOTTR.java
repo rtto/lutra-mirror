@@ -73,7 +73,7 @@ public class WOTTR implements WOTTRVocabulary {
     public static final Property dataPropertyVariable = getProperty(ns + "dataPropertyVariable");
     public static final Property annotationPropertyVariable = getProperty(ns + "annotationPropertyVariable");
     
-    public static final List<Property> ALL_variable = Collections.unmodifiableList(Arrays.asList(new Property[] { 
+    public static final List<Property> ALL_variable = Collections.unmodifiableList(Arrays.asList(
         variable, 
         literalVariable,
         nonLiteralVariable, 
@@ -85,34 +85,7 @@ public class WOTTR implements WOTTRVocabulary {
         objectPropertyVariable, 
         dataPropertyVariable, 
         annotationPropertyVariable
-        }));
-
-    // All vocabulary elements in the OTTR 
-    public static final List<Resource> ALL = Collections.unmodifiableList(Arrays.asList(
-        Template, 
-        TemplateInstance, 
-        hasParameter, 
-        hasArgument, 
-        templateRef,
-        index, 
-        optional, 
-        status, 
-        incomplete, 
-        value, 
-        eachValue, 
-        variable, 
-        withValues, 
-        withVariables, 
-        literalVariable,
-        nonLiteralVariable, 
-        classVariable, 
-        listVariable, 
-        individualVariable, 
-        datatypeVariable, 
-        propertyVariable,
-        objectPropertyVariable, 
-        dataPropertyVariable, 
-        annotationPropertyVariable));
+        ));
 
     public static final Map<Property, List<Property>> listPropertiesMap;
    

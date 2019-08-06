@@ -1,7 +1,5 @@
 package xyz.ottr.lutra.wottr.util;
 
-import java.io.StringWriter;
-
 /*-
  * #%L
  * lutra-wottr
@@ -24,6 +22,7 @@ import java.io.StringWriter;
  * #L%
  */
 
+import java.io.StringWriter;
 import java.util.List;
 import java.util.StringJoiner;
 
@@ -52,6 +51,20 @@ public abstract class ModelIO {
         return FileManager.get().loadModel(file, format);
     }
 
+    public static String writeModel(Model model) {
+        return writeRDFModel(model, defaultLang);
+    }
+
+    public static String writeModel(Model model, Lang language) {
+        return writeRDFModel(model, language);
+    }
+
+    private static String writeRDFModel(Model model, Lang language) {
+        StringWriter out = new StringWriter();
+        RDFDataMgr.write(out, model, language);
+        return out.toString();
+    }
+
     public static String shortForm(Model model, List<? extends RDFNode> nodes) {
         StringJoiner sj = new StringJoiner(", ", "[", "]");
         for (RDFNode node : nodes) {
@@ -78,20 +91,6 @@ public abstract class ModelIO {
     public static String shortForm(RDFNode node) {
         Model model = node.getModel();
         return model == null ? node.toString() : shortForm(model, node.asNode());
-    }
-
-    public static String writeModel(Model model) {
-        return writeRDFModel(model, defaultLang);
-    }
-
-    public static String writeModel(Model model, Lang language) {
-        return writeRDFModel(model, language);
-    }
-
-    private static String writeRDFModel(Model model, Lang language) {
-        StringWriter out = new StringWriter();
-        RDFDataMgr.write(out, model, language);
-        return out.toString();
     }
 
 }

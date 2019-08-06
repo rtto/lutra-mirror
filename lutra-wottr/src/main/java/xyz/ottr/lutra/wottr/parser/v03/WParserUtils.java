@@ -33,7 +33,6 @@ import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdf.model.StmtIterator;
-import org.apache.jena.vocabulary.RDF;
 
 import xyz.ottr.lutra.io.ReaderException;
 import xyz.ottr.lutra.wottr.util.ModelSelector;
@@ -80,28 +79,19 @@ public class WParserUtils {
         return canonical;
     }
 
-    public static List<Resource> getInstances(Model model) {
-        return ModelSelector.listResourcesWithProperty(model, WOTTR.templateRef);
-    }
-
-    public static boolean isTemplateDefinition(Model model) {
-        return model.contains(null, RDF.type, WOTTR.Template);
-    }
-
-    public static Model getTemplateHeadWParam(Model model, Resource template, List<Resource> parameters) {
-
-        Model head = Models.empty();
-        head.add(getNeighbourhood(model, template));
-        parameters.forEach(r -> head.add(getNeighbourhood(model, r)));
-        head.setNsPrefixes(model);
-        return head;
-    }
 
     public static Model getTemplateHeadWVars(Model model, Resource template) {
 
         Model head = Models.empty();
         head.add(getNeighbourhood(model, template));
         head.setNsPrefixes(model);
+        return head;
+    }
+
+    public static Model getTemplateHeadWParam(Model model, Resource template, List<Resource> parameters) {
+
+        Model head = getTemplateHeadWVars(model, template);
+        parameters.forEach(r -> head.add(getNeighbourhood(model, r)));
         return head;
     }
 

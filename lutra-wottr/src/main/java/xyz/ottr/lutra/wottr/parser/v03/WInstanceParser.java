@@ -30,6 +30,7 @@ import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 
+import org.apache.jena.vocabulary.RDF;
 import xyz.ottr.lutra.io.InstanceParser;
 import xyz.ottr.lutra.model.ArgumentList;
 import xyz.ottr.lutra.model.Instance;
@@ -42,15 +43,23 @@ import xyz.ottr.lutra.wottr.vocabulary.v03.WOTTR;
 
 public class WInstanceParser implements InstanceParser<Model> {
 
+    private static List<Resource> getInstances(Model model) {
+        return ModelSelector.listResourcesWithProperty(model, WOTTR.templateRef);
+    }
+
+    private static boolean isTemplateDefinition(Model model) {
+        return model.contains(null, RDF.type, WOTTR.Template);
+    }
+
     @Override
     public ResultStream<Instance> apply(Model model) {
 
         Model canonModel = WParserUtils.getCanonicalModel(model);
 
-        if (WParserUtils.isTemplateDefinition(canonModel)) {
+        if (isTemplateDefinition(canonModel)) {
             return ResultStream.empty();
         } else {
-            List<Resource> ins = WParserUtils.getInstances(canonModel);
+            List<Resource> ins = getInstances(canonModel);
             ResultStream<Instance> parsedInstances = parseInstances(canonModel, ins);
 
             Model triples = WParserUtils.getNonTemplateTriples(canonModel, null, new LinkedList<>(), ins);
