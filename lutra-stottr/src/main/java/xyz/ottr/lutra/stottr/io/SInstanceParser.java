@@ -27,6 +27,8 @@ import java.util.Map;
 import org.antlr.v4.runtime.CharStream;
 
 import xyz.ottr.lutra.io.InstanceParser;
+import xyz.ottr.lutra.io.InstanceReader;
+import xyz.ottr.lutra.io.ReaderRegistry;
 import xyz.ottr.lutra.model.ArgumentList;
 import xyz.ottr.lutra.model.IRITerm;
 import xyz.ottr.lutra.model.Instance;
@@ -43,6 +45,7 @@ public class SInstanceParser extends SParser<Instance> implements InstanceParser
      */
     public SInstanceParser() {
         super();
+        ReaderRegistry.registerInstanceReader(new InstanceReader(new SFileReader(), this));
     }
 
     /**

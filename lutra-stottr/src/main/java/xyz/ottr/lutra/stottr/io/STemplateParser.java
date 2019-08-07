@@ -29,7 +29,9 @@ import java.util.stream.Collectors;
 
 import org.antlr.v4.runtime.CharStream;
 
+import xyz.ottr.lutra.io.ReaderRegistry;
 import xyz.ottr.lutra.io.TemplateParser;
+import xyz.ottr.lutra.io.TemplateReader;
 import xyz.ottr.lutra.model.BlankNodeTerm;
 import xyz.ottr.lutra.model.IRITerm;
 import xyz.ottr.lutra.model.Instance;
@@ -48,6 +50,7 @@ public class STemplateParser extends SParser<TemplateSignature> implements Templ
     public STemplateParser() {
         super();
         this.paramsParser = new SParameterListParser(getTermParser());
+        ReaderRegistry.registerTemplateReader(new TemplateReader(new SFileReader(), this));
     }
 
     @Override
