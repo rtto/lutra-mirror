@@ -41,8 +41,6 @@ import xyz.ottr.lutra.OTTR;
 //import org.slf4j.LoggerFactory;
 
 import xyz.ottr.lutra.io.InstanceParser;
-import xyz.ottr.lutra.io.InstanceReader;
-import xyz.ottr.lutra.io.ReaderRegistry;
 import xyz.ottr.lutra.model.ArgumentList;
 import xyz.ottr.lutra.model.IRITerm;
 import xyz.ottr.lutra.model.Instance;
@@ -69,7 +67,6 @@ public class WInstanceParser implements InstanceParser<Model> {
     }
 
     public WInstanceParser() {
-        ReaderRegistry.registerInstanceReader(new InstanceReader(new WFileReader(), this));
     }
 
     @Override

@@ -33,12 +33,7 @@ import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.shared.PrefixMapping;
 
-//import org.slf4j.Logger;
-//import org.slf4j.LoggerFactory;
-
-import xyz.ottr.lutra.io.ReaderRegistry;
 import xyz.ottr.lutra.io.TemplateParser;
-import xyz.ottr.lutra.io.TemplateReader;
 import xyz.ottr.lutra.model.Instance;
 import xyz.ottr.lutra.model.ParameterList;
 import xyz.ottr.lutra.model.Template;
@@ -52,7 +47,7 @@ import xyz.ottr.lutra.wottr.util.ModelSelector;
 import xyz.ottr.lutra.wottr.util.ModelSelectorException;
 
 public class WTemplateParser implements TemplateParser<Model> {
-
+    
     //private final Logger log = LoggerFactory.getLogger(WOTTRParser.class);
     private final WInstanceParser instanceParser;
     private final PrefixMapping prefixes;
@@ -60,7 +55,6 @@ public class WTemplateParser implements TemplateParser<Model> {
     public WTemplateParser() {
         this.instanceParser = new WInstanceParser();
         this.prefixes = PrefixMapping.Factory.create();
-        ReaderRegistry.registerTemplateReader(new TemplateReader(new WFileReader(), this));
     }
 
     @Override

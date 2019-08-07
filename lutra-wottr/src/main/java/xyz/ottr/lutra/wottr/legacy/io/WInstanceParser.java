@@ -22,7 +22,7 @@ package xyz.ottr.lutra.wottr.legacy.io;
  * #L%
  */
 
-import java.util.LinkedList;
+import java.util.LinkedList; 
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -45,7 +45,7 @@ import xyz.ottr.lutra.wottr.util.ModelSelector;
 public class WInstanceParser implements InstanceParser<Model> {
 
     //private final Logger log = LoggerFactory.getLogger(WInstanceParser.class);
-
+    
     public WInstanceParser() {
     }
 

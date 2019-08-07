@@ -84,10 +84,18 @@ public class MessageHandler {
      * the level of the most severe Message.
      */
     public int printMessages() {
+        return iterateMessages(!quiet);
+    }
+    
+    public int getMostSevere() {
+        return iterateMessages(false);
+    }
+    
+    private int iterateMessages(boolean printMsgs) {
         int mostSevere = Integer.MAX_VALUE;
         for (Result<?> res : results) {
             for (Message msg : res.getMessages()) {
-                if (!quiet) {
+                if (printMsgs) {
                     printMessage(msg);
                 }
                 if (Message.moreSevere(msg.getLevel(), mostSevere)) {

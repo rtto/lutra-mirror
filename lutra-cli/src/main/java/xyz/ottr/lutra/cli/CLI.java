@@ -22,14 +22,16 @@ package xyz.ottr.lutra.cli;
  * #L%
  */
 
-import java.io.IOException;
+import java.io.IOException; 
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 
 import org.apache.jena.shared.PrefixMapping;
@@ -57,13 +59,10 @@ import xyz.ottr.lutra.store.DependencyGraph;
 import xyz.ottr.lutra.store.TemplateStore;
 
 import xyz.ottr.lutra.stottr.io.SFileReader;
-import xyz.ottr.lutra.stottr.io.SInstanceParser;
 import xyz.ottr.lutra.stottr.io.SInstanceWriter;
 import xyz.ottr.lutra.stottr.io.STemplateParser;
 import xyz.ottr.lutra.stottr.io.STemplateWriter;
-import xyz.ottr.lutra.tabottr.parser.ExcelReader;
 import xyz.ottr.lutra.wottr.io.WFileReader;
-import xyz.ottr.lutra.wottr.io.WInstanceParser;
 import xyz.ottr.lutra.wottr.io.WInstanceWriter;
 import xyz.ottr.lutra.wottr.io.WTemplateParser;
 import xyz.ottr.lutra.wottr.io.WTemplateWriter;
@@ -129,14 +128,14 @@ public class CLI {
     private static void execute() {
 
         TemplateStore store = new DependencyGraph();
-        ResultConsumer.use(makeTemplateReader(settings.libraryFormat),
-            reader -> {
+        ResultConsumer.use(makeTemplateReaders(settings.libraryFormat),
+            readers -> {
 
-                MessageHandler msgs = parseLibraryInto(reader, store);
+                TemplateReader successfullReader = parseLibraryInto(readers, store);
                 
-                if (!Message.moreSevere(msgs.printMessages(), settings.haltOn)) {
+                if (successfullReader != null) {
                     PrefixMapping usedPrefixes = getStdPrefixes();
-                    usedPrefixes.setNsPrefixes(reader.getPrefixes());
+                    usedPrefixes.setNsPrefixes(successfullReader.getPrefixes());
                     executeMode(store, usedPrefixes);
                 }
             }
@@ -144,32 +143,65 @@ public class CLI {
     }
 
     /**
-     * Populated store with parsed templates, and returns true if error occured, and false otherwise.
+     * Populated store with parsed templates, and returns true if error occurred, and false otherwise.
      */
-    private static MessageHandler parseLibraryInto(TemplateReader reader, TemplateStore store) {
-
+    private static TemplateReader parseLibraryInto(List<TemplateReader> readers, TemplateStore store) {
+        
         store.addOTTRBaseTemplates();
 
         if (settings.library == null) {
-            return new MessageHandler();
+            return readers.iterator().next(); // TODO: Fix in case of empty readers
+        }
+        
+        Map<TemplateReader, MessageHandler> unsuccessfull = new HashMap<>();
+        TemplateReader successfull = attemptAllReaders(readers, unsuccessfull, store);
+
+        if (successfull == null) {
+            printUnsuccuessfullAttempts(unsuccessfull);
+            return null;
         }
 
-        MessageHandler msgs = reader.loadTemplatesFromFolder(store, settings.library,
-                settings.extensions, settings.ignoreExtensions);
+        // TODO: Implement all attempts also for fetching 
+        //if (settings.fetchMissingDependencies) {
 
-        if (settings.fetchMissingDependencies) {
+        //    Result<TemplateReader> fetchReader = settings.fetchFormat == null
+        //        ? Result.of(reader)
+        //        : makeTemplateReader(settings.fetchFormat);
 
-            Result<TemplateReader> fetchReader = settings.fetchFormat == null
-                ? Result.of(reader)
-                : makeTemplateReader(settings.fetchFormat);
+        //    msgs.add(fetchReader);
+        //    if (fetchReader.isPresent()) {
+        //        msgs = msgs.combine(store.fetchMissingDependencies(fetchReader.get()));
+        //    }
+        //}
+        return successfull;
+    } 
+    
+    private static TemplateReader attemptAllReaders(List<TemplateReader> readers,
+            Map<TemplateReader, MessageHandler> unsuccessfull, TemplateStore store) {
+        
+        for (TemplateReader reader : readers) {
 
-            msgs.add(fetchReader);
-            if (fetchReader.isPresent()) {
-                msgs = msgs.combine(store.fetchMissingDependencies(fetchReader.get()));
+            MessageHandler msgs = reader.loadTemplatesFromFolder(store, settings.library,
+                    settings.extensions, settings.ignoreExtensions);
+
+            if (Message.moreSevere(msgs.getMostSevere(), Message.ERROR)) {
+                unsuccessfull.put(reader, msgs);
+            } else {
+                return reader;
             }
         }
-        return msgs;
-    } 
+        return null;
+    }
+    
+    private static void printUnsuccuessfullAttempts(Map<TemplateReader, MessageHandler> unsuccessfull) {
+        
+        MessageHandler.printMessage(Message.error("Unable to parse library."));
+        for (Map.Entry<TemplateReader, MessageHandler> u : unsuccessfull.entrySet()) {
+            MessageHandler.printMessage(Message.error("With the template reader for "
+                    + ReaderRegistry.getTemplateReaderFormat(u.getKey()).toString() + " got the following errors:"));
+            u.getValue().printMessages();
+        }
+    }
 
     private static void executeExpand(TemplateStore store, PrefixMapping usedPrefixes) {
 
@@ -272,20 +304,20 @@ public class CLI {
     /// MAKER-METHODS, MAKING THINGS BASED ON FLAGS          ///
     ////////////////////////////////////////////////////////////
 
-
-    private static Result<TemplateReader> makeTemplateReader(Settings.Format format) {
-        switch (format) {
-            case legacy:
-                return Result.of(new TemplateReader(new WFileReader(),
-                        new xyz.ottr.lutra.wottr.legacy.io.WTemplateParser()));
-            case wottr:
-                return Result.of(new TemplateReader(new WFileReader(), new WTemplateParser()));
-            case stottr:
-                return Result.of(new TemplateReader(new SFileReader(), new STemplateParser()));
-            default:
-                return Result.empty(Message.error(
-                        "Library format " + settings.libraryFormat + " not yet supported as input format."));
-        }
+    /**
+     * Either returns a Result containing the singleton set of a template reader of the
+     * specified format if not null, otherwise the set of all readers registered in the
+     * ReaderRegistry
+     * @param format
+     *   The format the user specified, and null if no format was specified
+     * @return
+     *   Either returns a Result containing the singleton set of a template reader of the
+     *   specified format if not null, otherwise the set of all readers registered in the
+     *   ReaderRegistry
+     * 
+     */
+    private static Result<List<TemplateReader>> makeTemplateReaders(Settings.Format format) {
+        return ReaderRegistry.getTemplateReaders(format);
     }
             
     private static Result<InstanceReader> makeInstanceReader() {
@@ -293,21 +325,7 @@ public class CLI {
             return Result.empty(Message.error(
                     "No input file provided."));
         }
-        switch (settings.inputFormat) {
-            case tabottr:
-                return Result.of(new InstanceReader(new ExcelReader()));
-            case legacy:
-                return Result.of(new InstanceReader(new WFileReader(),
-                        new xyz.ottr.lutra.wottr.legacy.io.WInstanceParser()));
-            case wottr:
-                return Result.of(new InstanceReader(new WFileReader(), new WInstanceParser()));
-            case stottr:
-                return Result.of(new InstanceReader(new SFileReader(), new SInstanceParser()));
-            default:
-                return Result.empty(Message.error(
-                        "Input format " + settings.outputFormat.toString()
-                            + " not yet supported for instances."));
-        }
+        return ReaderRegistry.getInstanceReader(settings.inputFormat);
     }
 
     private static Result<Function<Instance, ResultStream<Instance>>> makeExpander(TemplateStore store) {

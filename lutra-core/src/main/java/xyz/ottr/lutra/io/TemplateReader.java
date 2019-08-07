@@ -113,4 +113,9 @@ public class TemplateReader implements Function<String, ResultStream<TemplateSig
         return Files.loadFromFolder(folder, includeExtensions, excludeExtensions)
             .innerFlatMap(this.templatePipeline);
     }
+    
+    @Override
+    public String toString() {
+        return parser.toString();
+    }
 }
