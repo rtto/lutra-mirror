@@ -44,58 +44,51 @@ public class ReaderRegistry {
     
     private static Map<Settings.Format, TemplateReader> templateReaders = new HashMap<>();
     private static Map<Settings.Format, InstanceReader> instanceReaders = new HashMap<>();
-    private static Map<TemplateReader, Settings.Format> templateReaderFormat = new HashMap<>();
-    private static Map<InstanceReader, Settings.Format> instanceReaderFormat = new HashMap<>();
     
     static {
 
         // Add template readers
         
         // wottr
-        TemplateReader wottrTemplateReader = 
-                new TemplateReader(new WFileReader(), new WTemplateParser());
+        TemplateReader wottrTemplateReader = new TemplateReader(
+                new WFileReader(), new WTemplateParser(), Settings.Format.wottr.toString());
         templateReaders.put(Settings.Format.wottr, wottrTemplateReader);
-        templateReaderFormat.put(wottrTemplateReader, Settings.Format.wottr);
 
         // legacy
-        TemplateReader legacyTemplateReader =
-                new TemplateReader(new xyz.ottr.lutra.wottr.legacy.io.WFileReader(),
-                        new xyz.ottr.lutra.wottr.legacy.io.WTemplateParser());
+        TemplateReader legacyTemplateReader = new TemplateReader(
+                new xyz.ottr.lutra.wottr.legacy.io.WFileReader(),
+                new xyz.ottr.lutra.wottr.legacy.io.WTemplateParser(),
+                Settings.Format.legacy.toString());
         templateReaders.put(Settings.Format.legacy, legacyTemplateReader);
-        templateReaderFormat.put(legacyTemplateReader, Settings.Format.legacy);
 
         // stottr
-
-        TemplateReader stottrTemplateReader = 
-                new TemplateReader(new SFileReader(), new STemplateParser());
+        TemplateReader stottrTemplateReader = new TemplateReader(
+                new SFileReader(), new STemplateParser(),Settings.Format.stottr.toString());
         templateReaders.put(Settings.Format.stottr, stottrTemplateReader);
-        templateReaderFormat.put(stottrTemplateReader, Settings.Format.stottr);
         
         // Add instance readers
         
         // wottr
-        InstanceReader wottrInstanceReader = 
-                new InstanceReader(new WFileReader(), new WInstanceParser());
+        InstanceReader wottrInstanceReader = new InstanceReader(
+                new WFileReader(), new WInstanceParser(), Settings.Format.wottr.toString());
         instanceReaders.put(Settings.Format.wottr, wottrInstanceReader);
-        instanceReaderFormat.put(wottrInstanceReader, Settings.Format.wottr);
         
         // legacy
-        InstanceReader legacyInstanceReader = 
-                new InstanceReader(new xyz.ottr.lutra.wottr.legacy.io.WFileReader(),
-                        new xyz.ottr.lutra.wottr.legacy.io.WInstanceParser());
+        InstanceReader legacyInstanceReader = new InstanceReader(
+                new xyz.ottr.lutra.wottr.legacy.io.WFileReader(),
+                new xyz.ottr.lutra.wottr.legacy.io.WInstanceParser(),
+                Settings.Format.legacy.toString());
         instanceReaders.put(Settings.Format.legacy, legacyInstanceReader);
-        instanceReaderFormat.put(legacyInstanceReader, Settings.Format.legacy);
         
         // stottr
-        InstanceReader stottrInstanceReader =
-                new InstanceReader(new SFileReader(), new SInstanceParser());
+        InstanceReader stottrInstanceReader = new InstanceReader(
+                new SFileReader(), new SInstanceParser(), Settings.Format.stottr.toString());
         instanceReaders.put(Settings.Format.stottr, stottrInstanceReader);
-        instanceReaderFormat.put(stottrInstanceReader, Settings.Format.stottr);
         
         // tabottr
-        InstanceReader tabInstanceReader = new InstanceReader(new ExcelReader());
+        InstanceReader tabInstanceReader = new InstanceReader(
+                new ExcelReader(), Settings.Format.tabottr.toString());
         instanceReaders.put(Settings.Format.tabottr, tabInstanceReader);
-        instanceReaderFormat.put(tabInstanceReader, Settings.Format.tabottr);
     }
     
     public static Result<List<TemplateReader>> getTemplateReaders(Settings.Format format) {
@@ -116,14 +109,6 @@ public class ReaderRegistry {
                 "Format " + format + " not yet supported as input format for instances."));
         }
         return Result.of(instanceReaders.get(format));
-    }
-    
-    public static Settings.Format getTemplateReaderFormat(TemplateReader reader) {
-        return templateReaderFormat.get(reader);
-    }
-    
-    public static Settings.Format getInstanceReaderFormat(InstanceReader reader) {
-        return instanceReaderFormat.get(reader);
     }
     
     protected static void registerTemplateReader(Settings.Format format, TemplateReader reader) {

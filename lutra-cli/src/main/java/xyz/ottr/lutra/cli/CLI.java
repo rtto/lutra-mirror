@@ -58,13 +58,9 @@ import xyz.ottr.lutra.result.ResultStream;
 import xyz.ottr.lutra.store.DependencyGraph;
 import xyz.ottr.lutra.store.TemplateStore;
 
-import xyz.ottr.lutra.stottr.io.SFileReader;
 import xyz.ottr.lutra.stottr.io.SInstanceWriter;
-import xyz.ottr.lutra.stottr.io.STemplateParser;
 import xyz.ottr.lutra.stottr.io.STemplateWriter;
-import xyz.ottr.lutra.wottr.io.WFileReader;
 import xyz.ottr.lutra.wottr.io.WInstanceWriter;
-import xyz.ottr.lutra.wottr.io.WTemplateParser;
 import xyz.ottr.lutra.wottr.io.WTemplateWriter;
 
 public class CLI {
@@ -198,7 +194,7 @@ public class CLI {
         MessageHandler.printMessage(Message.error("Unable to parse library."));
         for (Map.Entry<TemplateReader, MessageHandler> u : unsuccessfull.entrySet()) {
             MessageHandler.printMessage(Message.error("With the template reader for "
-                    + ReaderRegistry.getTemplateReaderFormat(u.getKey()).toString() + " got the following errors:"));
+                    + u.getKey().getFormat() + " got the following errors:"));
             u.getValue().printMessages();
         }
     }
@@ -330,12 +326,12 @@ public class CLI {
 
     private static Result<Function<Instance, ResultStream<Instance>>> makeExpander(TemplateStore store) {
         if (settings.fetchMissingDependencies) {
-            Function<TemplateReader, Function<Instance, ResultStream<Instance>>> fun =
-                reader -> ins -> store.expandInstance(ins, reader);
+            Function<List<TemplateReader>, Function<Instance, ResultStream<Instance>>> fun =
+                readers -> ins -> store.expandInstance(ins, readers);
             Settings.Format format = settings.fetchFormat == null
                 ? settings.libraryFormat
                 : settings.fetchFormat;
-            return makeTemplateReader(format).map(fun);
+            return ReaderRegistry.getTemplateReaders(format).map(fun);
         } else {
             return Result.of(store::expandInstance);
         }

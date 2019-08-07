@@ -43,20 +43,36 @@ import xyz.ottr.lutra.store.TemplateStore;
 public class TemplateReader implements Function<String, ResultStream<TemplateSignature>> {
 
     private final Function<String, ResultStream<TemplateSignature>> templatePipeline;
-    private final TemplateParser parser; // Needed for retrieving used prefixes
+    private final TemplateParser<?> parser; // Needed for retrieving used prefixes
     private final Logger log = LoggerFactory.getLogger(TemplateReader.class);
+    private final String format;
 
-    public <M> TemplateReader(InputReader<String, M> templateInputReader, TemplateParser<M> templateParser) {
+    public <M> TemplateReader(InputReader<String, M> templateInputReader,
+            TemplateParser<M> templateParser, String format) {
         this.templatePipeline = ResultStream.innerFlatMapCompose(templateInputReader, templateParser);
         this.parser = templateParser;
+        this.format = format;
+    }
+
+    public <M> TemplateReader(InputReader<String, M> templateInputReader,
+            TemplateParser<M> templateParser) {
+        this(templateInputReader, templateParser, "unknown");
     }
 
     public Map<String, String> getPrefixes() {
         return parser.getPrefixes();
     }
+    
+    public String getFormat() {
+        return this.format;
+    }
 
     public ResultStream<TemplateSignature> apply(String file) {
         return templatePipeline.apply(file);
+    }
+
+    public MessageHandler populateTemplateStore(TemplateStore store, String iri) {
+        return populateTemplateStore(store, ResultStream.innerOf(iri));
     }
 
     public MessageHandler populateTemplateStore(TemplateStore store, Set<String> iris) {

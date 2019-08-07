@@ -42,15 +42,29 @@ public class InstanceReader implements Function<String, ResultStream<Instance>> 
 
     private final String[] includeExtensions = new String[0]; // TODO: Set via arguments
     private final String[] excludeExtensions = new String[0]; // TODO: Set via arguments
+    private final String format;
+
+    public InstanceReader(Function<String, ResultStream<Instance>> instancePipeline, String format) {
+        this.instancePipeline = instancePipeline;
+        this.format = format;
+    }
 
     public InstanceReader(Function<String, ResultStream<Instance>> instancePipeline) {
-        this.instancePipeline = instancePipeline;
+        this(instancePipeline, "unknown");
     }
 
     public <M> InstanceReader(InputReader<String, M> inputReader,
+            InstanceParser<M> instanceParser, String format) {
+        this(ResultStream.innerFlatMapCompose(inputReader, instanceParser), format);
+    }
+    
+    public <M> InstanceReader(InputReader<String, M> inputReader,
             InstanceParser<M> instanceParser) {
-        // Need to explicitly assign it, to feed compiler the types.
-        this.instancePipeline = ResultStream.innerFlatMapCompose(inputReader, instanceParser);
+        this(inputReader, instanceParser, "unknown");
+    }
+    
+    public String getFormat() {
+        return this.format;
     }
 
     public ResultStream<Instance> readInstances(ResultStream<String> files) {
