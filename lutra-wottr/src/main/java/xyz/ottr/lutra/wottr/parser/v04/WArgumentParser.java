@@ -31,13 +31,11 @@ import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 
-import xyz.ottr.lutra.model.NoneTerm;
 import xyz.ottr.lutra.model.Term;
-import xyz.ottr.lutra.result.Message;
 import xyz.ottr.lutra.result.Result;
 import xyz.ottr.lutra.wottr.parser.TermFactory;
 import xyz.ottr.lutra.wottr.util.ModelSelector;
-import xyz.ottr.lutra.wottr.util.ModelSelectorException;
+import xyz.ottr.lutra.wottr.util.RDFNodes;
 import xyz.ottr.lutra.wottr.vocabulary.v04.WOTTR;
 
 public class WArgumentParser implements Function<RDFNode, Result<Term>> {
@@ -52,40 +50,30 @@ public class WArgumentParser implements Function<RDFNode, Result<Term>> {
         this.expanderValues = new HashSet<>();
     }
 
-    public Result<Term> apply(RDFNode argNode) {
+    public Result<Term> apply(RDFNode argumentNode) {
 
-        if (!argNode.isResource()) {
-            return Result.empty(Message.error(
-                "Error parsing argument, expected resource for argument node, but got " + argNode.toString() + "."));
-        }
+        Result<Resource> argumentResource = RDFNodes.cast(argumentNode, Resource.class);
 
-        Resource arg = argNode.asResource();
-        Result<Term> resultTerm;
+        Result<Term> term = argumentResource.flatMap(this::getArgumentTerm);
+        Result<Resource> listExpanderResource = argumentResource.flatMap(this::getListExpander);
 
-        try {
+        // if present, addResult term to listexpander, and copy any messages to term result
+        term.addResult(listExpanderResource, (t, l) -> this.expanderValues.add(t));
 
-            RDFNode value = ModelSelector.getRequiredObjectOfProperty(this.model, arg, WOTTR.value);
-            resultTerm = value != null
-                ? this.rdfTermFactory.apply(value)
-                : Result.of(new NoneTerm());
+        return term;
+    }
 
-            Resource expand = ModelSelector.getOptionalResourceOfProperty(this.model, arg, WOTTR.modifier);
+    private Result<Term> getArgumentTerm(Resource argument) {
+        return ModelSelector.getRequiredObject(this.model, argument, WOTTR.value)
+            .flatMap(this.rdfTermFactory);
+    }
 
-            if (expand != null) {
-                if (!expand.equals(WOTTR.listExpand)) {
-                    resultTerm.addMessage(Message.error(
-                        "Error parsing argument, expected " + WOTTR.listExpand.toString() + " as argument modifier, "
-                            + "but got " + expand.toString() + "."));
-                } else if (resultTerm.isPresent()) {
-                    this.expanderValues.add(resultTerm.get());
-                }
-            }
-        } catch (ModelSelectorException ex) {
-            // TODO: Correct lvl and good message?
-            resultTerm = Result.empty(Message.error("Error parsing argument: " + ex.getMessage()));
-        }
-
-        return resultTerm;
+    private Result<Resource> getListExpander(Resource argument) {
+        return ModelSelector.getOptionalResourceObject(this.model, argument, WOTTR.modifier)
+            .flatMap(r -> r.equals(WOTTR.listExpand)
+                ? Result.of(r)
+                : Result.error("Error parsing argument modifier, expected " + WOTTR.listExpand.toString()
+                + ", but got " + r.toString() + "."));
     }
 
     public Set<Term> getExpanderValues() {

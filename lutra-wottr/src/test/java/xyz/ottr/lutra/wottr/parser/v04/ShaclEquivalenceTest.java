@@ -44,6 +44,7 @@ import xyz.ottr.lutra.io.TemplateReader;
 import xyz.ottr.lutra.model.Instance;
 import xyz.ottr.lutra.model.TemplateSignature;
 import xyz.ottr.lutra.result.Message;
+import xyz.ottr.lutra.result.Result;
 import xyz.ottr.lutra.result.ResultConsumer;
 import xyz.ottr.lutra.result.ResultStream;
 import xyz.ottr.lutra.store.DependencyGraph;
@@ -118,16 +119,22 @@ public class ShaclEquivalenceTest {
     
     @Parameters(name = "{index}: {0} is {1}")
     public static List<Object[]> data() {
+
         List<Object[]> input = Files.loadFromFolder(correct, new String[] { "ttl" }, new String[0])
-                .getStream()
-                .map(r -> new Object[]{ r.get(), true })
-                .collect(Collectors.toList());
-                
+            .getStream()
+            .map(Result::get)
+            .sorted()
+            .map(r -> new Object[]{ r, true })
+            .collect(Collectors.toList());
+
         input.addAll(Files.loadFromFolder(incorrect, new String[] { "ttl" }, new String[0])
-                .getStream()
-                .map(r -> new Object[]{ r.get(), false })
-                .collect(Collectors.toList()));
-                
+            .getStream()
+            //.filter(x -> false) // for debugging
+            .map(Result::get)
+            .sorted()
+            .map(s -> new Object[]{ s, false })
+            .collect(Collectors.toList()));
+
         return input;   
     }
     
@@ -184,7 +191,7 @@ public class ShaclEquivalenceTest {
 
         int msgLvl = insErrorMessages.getMessageHandler().printMessages();
         if (!correct) {
-            assertTrue("Should have error messages: " + file, Message.moreSevere(msgLvl, Message.ERROR));
+            assertTrue("Should produce error messages: " + file, Message.moreSevere(msgLvl, Message.ERROR));
         }
         if (correct) {
             assertFalse("File " + file + " should not produce any error messages, but gave:\n"

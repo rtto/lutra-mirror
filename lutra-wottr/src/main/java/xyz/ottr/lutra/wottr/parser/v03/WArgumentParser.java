@@ -40,8 +40,8 @@ import xyz.ottr.lutra.model.Term;
 import xyz.ottr.lutra.result.Message;
 import xyz.ottr.lutra.result.Result;
 import xyz.ottr.lutra.wottr.parser.TermFactory;
-import xyz.ottr.lutra.wottr.util.ModelSelector;
-import xyz.ottr.lutra.wottr.util.ModelSelectorException;
+import xyz.ottr.lutra.wottr.parser.v03.util.ModelSelector;
+import xyz.ottr.lutra.wottr.parser.v03.util.ModelSelectorException;
 import xyz.ottr.lutra.wottr.vocabulary.v03.WOTTR;
 
 public class WArgumentParser implements Function<Resource, Result<Term>> {

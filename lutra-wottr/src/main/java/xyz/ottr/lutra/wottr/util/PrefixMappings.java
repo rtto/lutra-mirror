@@ -120,7 +120,7 @@ public class PrefixMappings {
     }
 
     public static void trim(Model model) {
-        Set<String> namespaces = ModelSelector.getNamespaces(model);
+        Set<String> namespaces = model.listNameSpaces().toSet();
         for (String prefixNamespace : model.getNsPrefixMap().values()) {
             if (!namespaces.contains(prefixNamespace)) {
                 model.removeNsPrefix(model.getNsURIPrefix(prefixNamespace));

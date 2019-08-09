@@ -23,7 +23,9 @@ package xyz.ottr.lutra.wottr.parser.v04;
  */
 
 import java.util.List;
+import java.util.Set;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -32,10 +34,10 @@ import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.RDFList;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
+
 import xyz.ottr.lutra.OTTR;
 import xyz.ottr.lutra.io.InstanceParser;
 import xyz.ottr.lutra.model.ArgumentList;
-import xyz.ottr.lutra.model.IRITerm;
 import xyz.ottr.lutra.model.Instance;
 import xyz.ottr.lutra.model.Term;
 import xyz.ottr.lutra.result.Message;
@@ -44,7 +46,7 @@ import xyz.ottr.lutra.result.ResultStream;
 import xyz.ottr.lutra.wottr.parser.TermFactory;
 import xyz.ottr.lutra.wottr.parser.TripleInstanceFactory;
 import xyz.ottr.lutra.wottr.util.ModelSelector;
-import xyz.ottr.lutra.wottr.util.ModelSelectorException;
+import xyz.ottr.lutra.wottr.util.RDFNodes;
 import xyz.ottr.lutra.wottr.vocabulary.v04.WOTTR;
 
 public class WInstanceParser implements InstanceParser<Model> {
@@ -52,7 +54,7 @@ public class WInstanceParser implements InstanceParser<Model> {
     @Override
     public ResultStream<Instance> apply(Model model) {
 
-        List<Resource> instances = ModelSelector.listResourcesWithProperty(model, WOTTR.of);
+        List<Resource> instances = ModelSelector.getSubjects(model, WOTTR.of);
         ResultStream<Instance> parsedInstances = parseInstances(model, instances);
 
         // Get triples which are not part of any of the instances:
@@ -72,143 +74,95 @@ public class WInstanceParser implements InstanceParser<Model> {
 
     protected Result<Instance> parseInstance(Model model, RDFNode instanceNode) {
 
-        if (!instanceNode.isResource()) {
-            return Result.empty(Message.error(
-                "Error parsing instance, expected instance node to be a resource, "
-                    + "but got non-resource " + instanceNode.toString() + "."));
-        }
+        // cast to resource
+        Result<Resource> instanceResource = RDFNodes.cast(instanceNode, Resource.class);
 
-        Resource instance = instanceNode.asResource();
+        // get signature URI
+        Result<String> signatureURI = instanceResource
+            .flatMap(ins -> ModelSelector.getRequiredURIResourceObject(model, ins, WOTTR.of))
+            .map(Resource::getURI);
 
-        Resource ofIRIRes;
-        try {
-            ofIRIRes = ModelSelector.getRequiredResourceOfProperty(model, instance, WOTTR.of);
-        } catch (ModelSelectorException ex) {
-            return Result.empty(Message.error(
-                    "Error parsing template IRI of instance: " + ex.getMessage()));
-        }
+        // parse argument list
+        Result<ArgumentList> argumentList = instanceResource
+            .flatMap(ins -> parseArguments(model, ins));
 
-        Result<ArgumentList> resArgumentList = parseArguments(model, instance);
-        String ofIRI = ofIRIRes.getURI();
-        Result<Instance> ins = resArgumentList.map(args -> new Instance(ofIRI, args));
-
-        if (ofIRI == null) {
-            ins.addMessage(Message.error("Error parsing instance, expected template reference to be an IRI."));
-        }
-
-        return ins;
+        return Result.zip(signatureURI, argumentList, Instance::new);
     }
 
     private Result<ArgumentList> parseArguments(Model model, Resource instance) {
-        
-        Result<ArgumentList> resArgumentList;
 
-        try {
-            Result<ArgumentList.Expander> expander = parseExpander(model, instance);
-            if (model.contains(instance, WOTTR.arguments)) {
-                Resource arguments = ModelSelector.getRequiredResourceOfProperty(model, instance, WOTTR.arguments);
-                resArgumentList = parseArgumentTerms(model, arguments, expander);
-                if (model.contains(instance, WOTTR.values, (RDFNode) null)) {
-                    resArgumentList.addMessage(Message.error(
-                            "An instance cannot have both arguments (via " + WOTTR.arguments.toString()
-                                + ") and values (via " + WOTTR.values + ")."));
-                }
-            } else {
-                Resource arguments = ModelSelector.getRequiredResourceOfProperty(model, instance, WOTTR.values);
-                resArgumentList = parseValueTerms(arguments, expander);
+        Result<ArgumentList.Expander> expander = getExpander(model, instance);
+
+        // An instance must have arguments or values, but not both
+        Result<RDFList> arguments = ModelSelector.getRequiredListObject(model, instance, WOTTR.arguments);
+        Result<RDFList> values = ModelSelector.getRequiredListObject(model, instance, WOTTR.values);
+
+        Result<ArgumentList> argumentList;
+        if (arguments.isPresent() && values.isPresent()) {
+            return Result.error("An instance cannot have both " + WOTTR.arguments + " and " + WOTTR.values + ".");
+        } else if (!arguments.isPresent() && !values.isPresent()) {
+            return Result.error("An instance must have either " + WOTTR.arguments + " or " + WOTTR.values + ".");
+        } else if (arguments.isPresent()) {
+            argumentList = arguments.flatMap(args -> getArguments(model, args, expander));
+        } else { //if (values.isPresent()) {
+            argumentList = values.flatMap(vals -> getValues(vals, expander));
+        }
+
+        argumentList.ifPresent(list -> {
+            if (list.hasListExpander() == list.getExpanderValues().isEmpty()) {
+                argumentList.addMessage(Message.error(
+                    "An instance must have a list expander if and only if it as one or more expander values."));
             }
-        } catch (ModelSelectorException ex) {
-            return Result.empty(Message.error(
-                    "Error parsing argument list of instance of template with IRI: " + ex.getMessage()));
-        }
+        });
 
-        checkForExpanderErrors(resArgumentList);
-        return resArgumentList;
+        return argumentList;
     }
 
-    public Result<List<Term>> parseTermsWith(Resource lstRes, Function<RDFNode, Result<Term>> parser) {
-        List<Result<Term>> parsedRes = lstRes
-            .as(RDFList.class)
-            .asJavaList()
-            .stream()
-            .map(parser)
-            .map(termRes -> termRes.flatMap(term -> {
-                Result<Term> toAddErr = Result.of(term);
-                // Check for arguments in the ottr-namespace, as this might
-                // be unintended by user
-                if (term instanceof IRITerm) {
-                    String iri = ((IRITerm) term).getIRI();
-                    if (iri.startsWith(OTTR.namespace) && !iri.equals(WOTTR.none.getURI())) {
-                        toAddErr.addMessage(Message.warning("Instance argument in ottr namespace: " + iri));
-                    }
-                }
-                return toAddErr;
-            }))
-            .collect(Collectors.toList());
-        return Result.aggregate(parsedRes);
+    /**
+     * Note that the expander result may be null both when there is no
+     * expanders and when are errors.
+     */
+    private Result<ArgumentList.Expander> getExpander(Model model, Resource instance) {
+        return ModelSelector.getOptionalResourceObject(model, instance, WOTTR.modifier)
+            .flatMap(r -> WOTTR.listExpanders.keySet().contains(r)
+                ? Result.ofNullable(WOTTR.listExpanders.get(r))
+                : Result.error("Unknown expander " + r.toString() + " in instance " + instance.toString() + "."));
     }
 
-    private Result<ArgumentList> parseArgumentTerms(Model model, Resource argsRes,
-        Result<ArgumentList.Expander> expander) {
-        
+    private Result<ArgumentList> getArguments(Model model, RDFList arguments, Result<ArgumentList.Expander> expander) {
         WArgumentParser argumentParser = new WArgumentParser(model);
-        Result<List<Term>> resParsedArguments = parseTermsWith(argsRes, argumentParser);
-        if (expander != null) {
-            return Result.zip(resParsedArguments, expander,
-                (terms, exp) -> new ArgumentList(terms, argumentParser.getExpanderValues(), exp));
-        } else {
-            return resParsedArguments.map(
-                terms -> new ArgumentList(terms, argumentParser.getExpanderValues(), null));
-        }
+        Result<List<Term>> termList = parseTermsWith(arguments, argumentParser);
+        return getArgumentList(termList, expander, argumentParser.getExpanderValues());
     }
 
-    private Result<ArgumentList> parseValueTerms(Resource valuesRes, Result<ArgumentList.Expander> expander) {
-        
-        TermFactory termFactory = new TermFactory(WOTTR.theInstance);
-        Result<List<Term>> resParsedValues = parseTermsWith(valuesRes, termFactory);
-        if (expander != null) {
-            return Result.zip(resParsedValues, expander,
-                (terms, exp) -> new ArgumentList(terms, null, exp));
-        } else {
-            return resParsedValues.map(terms -> new ArgumentList(terms, null, null));
-        }
+    private Result<ArgumentList> getValues(RDFList values, Result<ArgumentList.Expander> expander) {
+        Function<RDFNode, Result<Term>> termFactory = new TermFactory(WOTTR.theInstance);
+        Result<List<Term>> termList = parseTermsWith(values, termFactory);
+        return getArgumentList(termList, expander,null);
     }
 
-    private Result<ArgumentList.Expander> parseExpander(Model model, Resource instance) {
-
-        Resource listExpanderRes =
-            ModelSelector.getOptionalResourceOfProperty(model, instance, WOTTR.modifier);
-        if (listExpanderRes == null) {
-            return null;
-        }
-        
-        ArgumentList.Expander listExpander = WOTTR.listExpanders.get(listExpanderRes);
-
-        if (listExpander == null) {
-            Message msg = Message.error(
-                "Instance of template has unknown list expander " + listExpanderRes.toString() + ".");
-            return Result.empty(msg);
-        }
-        return Result.of(listExpander);
+    private Result<ArgumentList> getArgumentList(Result<List<Term>> argumentList, Result<ArgumentList.Expander> expander,
+                                                 Set<Term> expanderValues) {
+        return Result.conditionalZip(argumentList, expander,
+            (terms, exp) -> terms.isPresent() && exp.getMessages().isEmpty(), // check that there are no errors
+            (terms, exp) -> new ArgumentList(terms, expanderValues, exp));
     }
 
-    private void checkForExpanderErrors(Result<ArgumentList> resArgumentList) {
+    private static final Predicate<RDFNode> illegalArgumentValue = node ->
+        node.isURIResource()
+            && node.asResource().getNameSpace().equals(OTTR.namespace)
+            && !node.asResource().equals(WOTTR.none)
+        ;
 
-        if (!resArgumentList.isPresent()) {
-            return;
-        }
+    private static Result<List<Term>> parseTermsWith(RDFList lstRes, Function<RDFNode, Result<Term>> parser) {
 
-        boolean hasListExpander = resArgumentList.get().hasListExpander();
-        boolean hasExpanderValues = !resArgumentList.get().getExpanderValues().isEmpty();
-
-        if (hasListExpander && !hasExpanderValues) {
-            Message msg = Message.error(
-                "Instance of template has list expander, but no expander values.");
-            resArgumentList.addMessage(msg);
-        } else if (!hasListExpander && hasExpanderValues) {
-            Message msg = Message.error(
-                "Instance of template has no list expander, but has expander values.");
-            resArgumentList.addMessage(msg);
-        } 
+        List<Result<Term>> x = ResultStream
+            .innerOf(lstRes.asJavaList())
+            .mapFlatMap(node -> illegalArgumentValue.test(node)
+                ? Result.error("Illegal argument, argument value " + node + " is in the ottr namespace: " + OTTR.namespace)
+                : Result.of(node))
+            .mapFlatMap(parser)
+            .collect(Collectors.toList());
+        return Result.aggregate(x);
     }
 }

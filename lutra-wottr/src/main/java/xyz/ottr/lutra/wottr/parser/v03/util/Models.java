@@ -1,4 +1,4 @@
-package xyz.ottr.lutra.wottr.util;
+package xyz.ottr.lutra.wottr.parser.v03.util;
 
 /*-
  * #%L
@@ -29,6 +29,7 @@ import org.apache.jena.graph.Triple;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.shared.PrefixMapping;
+import xyz.ottr.lutra.wottr.util.PrefixMappings;
 
 public abstract class Models {
 

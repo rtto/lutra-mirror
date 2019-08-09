@@ -22,6 +22,7 @@ package xyz.ottr.lutra.wottr.parser.v04;
  * #L%
  */
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -33,9 +34,6 @@ import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.shared.PrefixMapping;
 
-//import org.slf4j.Logger;
-//import org.slf4j.LoggerFactory;
-
 import xyz.ottr.lutra.io.TemplateParser;
 import xyz.ottr.lutra.model.Instance;
 import xyz.ottr.lutra.model.ParameterList;
@@ -46,12 +44,13 @@ import xyz.ottr.lutra.result.Message;
 import xyz.ottr.lutra.result.Result;
 import xyz.ottr.lutra.result.ResultStream;
 import xyz.ottr.lutra.wottr.util.ModelSelector;
-import xyz.ottr.lutra.wottr.util.ModelSelectorException;
+import xyz.ottr.lutra.wottr.util.RDFNodes;
 import xyz.ottr.lutra.wottr.vocabulary.v04.WOTTR;
 
 public class WTemplateParser implements TemplateParser<Model> {
 
-    //private final Logger log = LoggerFactory.getLogger(WOTTRParser.class);
+    private static final List<Resource> templateTypes = Arrays.asList(WOTTR.Template, WOTTR.TemplateSignature, WOTTR.BaseTemplate);
+
     private final WInstanceParser instanceParser;
     private final PrefixMapping prefixes;
 
@@ -68,60 +67,45 @@ public class WTemplateParser implements TemplateParser<Model> {
     @Override
     public ResultStream<TemplateSignature> apply(Model model) {
 
-        ResultStream<TemplateSignature> sigs = ResultStream
-            .innerOf(ModelSelector.listInstancesOfClass(model, WOTTR.TemplateSignature))
-            .mapFlatMap(res -> this.parseNonDefintion(model, res, false));
-            
-        ResultStream<TemplateSignature> bases = ResultStream
-            .innerOf(ModelSelector.listInstancesOfClass(model, WOTTR.BaseTemplate))
-            .mapFlatMap(res -> this.parseNonDefintion(model, res, true));
-            
-        ResultStream<TemplateSignature> tpls = ResultStream
-            .innerOf(ModelSelector.listInstancesOfClass(model, WOTTR.Template))
-            .mapFlatMap(res -> this.parseTemplateDefinition(model, res));
-
         this.prefixes.setNsPrefixes(model);
-            
-        return ResultStream.concat(sigs, ResultStream.concat(bases, tpls));
+
+        ResultStream<TemplateSignature> allSignatures = ResultStream.empty(); // for accumulating parsed objects
+
+        // parse each of the types of templates:
+        for (Resource type : templateTypes) {
+            ResultStream<TemplateSignature> newSignatures = ResultStream.innerOf(ModelSelector.getInstancesOfClass(model, type))
+                .mapFlatMap(res -> this.parseSignature(model, res, type));
+            allSignatures = ResultStream.concat(allSignatures, newSignatures);
+        }
+
+        return allSignatures;
     }
 
-    private Result<TemplateSignature> parseNonDefintion(Model model, Resource res, boolean isBase) {
-        Result<TemplateSignature> signature = parseSignature(model, res, isBase);
+    private Result<TemplateSignature> parseSignature(Model model, Resource signatureResource, Resource type) {
 
-        if (model.contains(res, WOTTR.pattern, (RDFNode) null)) {
-            String type = isBase ? "Base template " : "Template signature ";
-            signature.addMessage(Message.error(type + res.getURI() + " should not have a pattern."));
+        Result<String> signatureURI = RDFNodes.castURIResource(signatureResource)
+            .map(Resource::getURI);
+
+        Result<ParameterList> parameterList = ModelSelector.getRequiredListObject(model, signatureResource, WOTTR.parameters)
+            .flatMap(list -> parseParameters(model, list));
+
+        Result<TemplateSignature> signature = Result.zip(signatureURI, parameterList,
+            (sURI, pList) -> new TemplateSignature(sURI, pList, type.equals(WOTTR.BaseTemplate)));
+
+        // include pattern if template, or check that no pattern exists
+        if (type.equals(WOTTR.Template)) {
+            Result<Set<Instance>> pattern = parsePattern(model, signatureResource);
+            signature = Result.zip(signature, pattern, Template::new);
+        } else if (model.contains(signatureResource, WOTTR.pattern, (RDFNode) null)) {
+            signature.addMessage(Message.error(
+                type.getLocalName() + " " + signatureURI.orElse("") + " cannot have a pattern."));
         }
+
+        if (model.contains(signatureResource, WOTTR.annotation, (RDFNode) null)) {
+            signature.addMessage(Message.warning("Annotations are not yet supported."));
+        }
+
         return signature;
-    }
-
-    private Result<TemplateSignature> parseSignature(Model model, Resource res, boolean isBase) {
-
-        String templateURI = res.getURI();
-        Resource paramsRes;
-        try {
-            paramsRes = ModelSelector.getRequiredResourceOfProperty(model, res, WOTTR.parameters);
-        } catch (ModelSelectorException ex) {
-            return Result.empty(Message.error(
-                    "Error when parsing parameters of template with IRI " + templateURI + ": " + ex.getMessage()));
-        }
-        if (!paramsRes.canAs(RDFList.class)) {
-            return Result.empty(Message.error(
-                    "Parameters of template with IRI " + templateURI + " is not a proper RDF-list."));
-        }
-
-        Result<ParameterList> parsedParameters = parseParameters(model, paramsRes);
-
-        if (model.contains(res, WOTTR.annotation, (RDFNode) null)) {
-            parsedParameters.addMessage(Message.error("Annotations are not yet supported."));
-        }
-        if (templateURI == null) {
-            parsedParameters.addMessage(Message.error(
-                    "Template name was blank node " + res.toString()
-                    + ", but a template should be denoted by an IRI."));
-        }
-
-        return parsedParameters.map(params -> new TemplateSignature(templateURI, params, isBase));
     }
 
     private Result<ParameterList> parseParameters(Model model, Resource paramsRes) {
@@ -143,14 +127,12 @@ public class WTemplateParser implements TemplateParser<Model> {
                     parameterParser.getDefaultValues()));
     }
 
-    private Result<TemplateSignature> parseTemplateDefinition(Model model, Resource res) {
-        
-        Result<TemplateSignature> signature = parseSignature(model, res, false);
-        Set<Result<Instance>> instancesRes = model.listObjectsOfProperty(res, WOTTR.pattern)
+    private Result<Set<Instance>> parsePattern(Model model, Resource template) {
+
+        Set<Result<Instance>> instancesRes = model.listObjectsOfProperty(template, WOTTR.pattern)
             .mapWith(ins -> this.instanceParser.parseInstance(model, ins))
             .toSet();
-        Result<Set<Instance>> instances = Result.aggregate(instancesRes);
-        return Result.zip(signature, instances, (sig, is) -> (TemplateSignature) new Template(sig, is));
+        return Result.aggregate(instancesRes);
     }
 
 }

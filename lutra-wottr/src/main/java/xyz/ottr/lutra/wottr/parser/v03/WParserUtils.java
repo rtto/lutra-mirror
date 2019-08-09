@@ -35,13 +35,12 @@ import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdf.model.StmtIterator;
 
 import xyz.ottr.lutra.io.ReaderException;
-import xyz.ottr.lutra.wottr.util.ModelSelector;
-import xyz.ottr.lutra.wottr.util.Models;
+import xyz.ottr.lutra.wottr.parser.v03.util.ModelSelector;
+import xyz.ottr.lutra.wottr.parser.v03.util.Models;
 import xyz.ottr.lutra.wottr.vocabulary.v03.WOTTR;
 
 @SuppressWarnings("CPD-START")
 public class WParserUtils {
-
 
     /**
      * Constructs a canonical representation of the argument model by expanding

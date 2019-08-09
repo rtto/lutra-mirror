@@ -25,11 +25,11 @@ package xyz.ottr.lutra.wottr.parser.v04;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.RDFNode;
@@ -38,97 +38,90 @@ import org.apache.jena.rdf.model.Resource;
 import xyz.ottr.lutra.model.Term;
 import xyz.ottr.lutra.model.types.TermType;
 import xyz.ottr.lutra.model.types.TypeFactory;
-import xyz.ottr.lutra.result.Message;
 import xyz.ottr.lutra.result.Result;
+import xyz.ottr.lutra.result.ResultStream;
 import xyz.ottr.lutra.wottr.parser.TermFactory;
 import xyz.ottr.lutra.wottr.parser.TermTypeFactory;
 import xyz.ottr.lutra.wottr.util.ModelSelector;
-import xyz.ottr.lutra.wottr.util.ModelSelectorException;
+import xyz.ottr.lutra.wottr.util.RDFNodes;
 import xyz.ottr.lutra.wottr.vocabulary.v04.WOTTR;
 
 public class WParameterParser implements Function<RDFNode, Result<Term>> {
 
     private final Model model;
     private final TermFactory rdfTermFactory;
+    private final TermTypeFactory typeFactory;
     private final Set<Term> optionals;
     private final Set<Term> nonBlanks;
     private final Map<Term, Term> defaultValues;
-    private final List<Message> msgs;
 
     public WParameterParser(Model model) {
         this.model = model;
         this.rdfTermFactory = new TermFactory(WOTTR.theInstance);
+        this.typeFactory = new TermTypeFactory();
         this.optionals = new HashSet<>();
         this.nonBlanks = new HashSet<>();
         this.defaultValues = new HashMap<>();
-        this.msgs = new LinkedList<>();
     }
 
     public Result<Term> apply(RDFNode paramNode) {
 
-        if (!paramNode.isResource()) {
-            return Result.empty(Message.error(
-                "Parameter node cannot be non-resource node, for parameter " + paramNode.toString() + "."));
-        }
+        Result<Resource> parameter = RDFNodes.cast(paramNode, Resource.class);
 
-        Resource param = paramNode.asResource();
-        Result<Term> resultTerm;
+        Result<Term> term = parameter.flatMap(this::getParameterTerm);
 
-        try {
-            // Must have a variable/value:
-            RDFNode variable = ModelSelector.getRequiredObjectOfProperty(this.model, param, WOTTR.variable);
-            resultTerm = this.rdfTermFactory.apply(variable);
+        // get and set term type
+        Result<TermType> termtype = Result.apply(parameter, term, this::getParameterType);
+        term.addResult(termtype, Term::setType);
 
-            resultTerm.ifPresent(term -> {
-                setType(term, param);
-                setModifiers(term, param);
-                setDefaultValue(term, param);
-            });
-        } catch (ModelSelectorException ex) {
-            resultTerm = Result.empty(Message.error("Error parsing parameter: " + ex.getMessage()));
-        }
+        // get and set modifiers
+        Result<List<Resource>> modifiers = parameter.flatMap(this::getModifiers);
+        term.addResult(modifiers, this::setModifiers);
 
-        resultTerm.addMessages(this.msgs);
-        return resultTerm;
+        // get and set default value
+        Result<Term> defaultValue = parameter.flatMap(this::getDefaultValue);
+        term.addResult(defaultValue, this.defaultValues::put);
+
+        return term;
     }
 
-    private void setType(Term term, Resource param) {
-
-        Resource type = ModelSelector.getOptionalResourceOfProperty(this.model, param, WOTTR.type);
-
-        if (type != null) {
-            Result<TermType> termType = new TermTypeFactory().apply(type);
-            termType.ifPresent(term::setType);
-            this.msgs.addAll(termType.getAllMessages());
-        } else {
-            term.setType(TypeFactory.getVariableType(term));
-        }
+    private Result<Term> getParameterTerm(Resource parameter) {
+        return ModelSelector.getRequiredObject(this.model, parameter, WOTTR.variable)
+            .flatMap(this.rdfTermFactory);
     }
 
-    private void setModifiers(Term term, Resource param) {
+    private Result<TermType> getParameterType(Resource parameter, Term term) {
+        Result<TermType> type = ModelSelector.getOptionalResourceObject(this.model, parameter, WOTTR.type)
+            .flatMap(this.typeFactory);
+        return Result.of(type.orElse(TypeFactory.getVariableType(term)), type);
+    }
 
-        List<Resource> modifiers = ModelSelector.listResourcesOfProperty(this.model, param, WOTTR.modifier);
+    private Result<List<Resource>> getModifiers(Resource parameter) {
+
+        List<Result<Resource>> modifiers = ResultStream
+            .of(ModelSelector.getResourceObjects(this.model, parameter, WOTTR.modifier))
+            .mapFlatMap(r -> WOTTR.argumentModifiers.contains(r)
+                ? Result.of(r)
+                : Result.error("Unknown modifier " + r.toString() + " in parameter " + parameter.toString() + "."))
+            .collect(Collectors.toList());
+
+        return Result.aggregate(modifiers);
+    }
+
+    private void setModifiers(Term term, List<Resource> modifiers) {
 
         for (Resource modifier : modifiers) {
             if (modifier.equals(WOTTR.optional)) {
                 this.optionals.add(term);
             } else if (modifier.equals(WOTTR.nonBlank)) {
                 this.nonBlanks.add(term);
-            } else {
-                this.msgs.add(Message.error(
-                    "Unknown modifier " + modifier.toString() + " in parameter " + param.toString() + "."));
             }
         }
     }
 
-    private void setDefaultValue(Term term, Resource param) {
-        
-        RDFNode defRes = ModelSelector.getOptionalObjectOfProperty(this.model, param, WOTTR.defaultVal);
-        if (defRes != null) {
-            Result<Term> defVal = this.rdfTermFactory.apply(defRes);
-            defVal.ifPresent(val -> this.defaultValues.put(term, val));
-            this.msgs.addAll(defVal.getAllMessages());
-        }
+    private Result<Term> getDefaultValue(Resource param) {
+        return ModelSelector.getOptionalObject(this.model, param, WOTTR.defaultVal)
+            .flatMap(this.rdfTermFactory);
     }
 
     public Set<Term> getOptionals() {

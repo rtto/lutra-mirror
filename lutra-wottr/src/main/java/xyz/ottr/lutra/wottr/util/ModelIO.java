@@ -37,7 +37,7 @@ import org.apache.jena.util.FileUtils;
 
 public abstract class ModelIO {
 
-    private static Lang defaultLang = Lang.TURTLE;
+    private static final Lang defaultLang = Lang.TURTLE;
 
     public static Model readModel(String file) {
         return readModel(file, FileUtils.guessLang(file, defaultLang.getLabel()));
@@ -81,11 +81,10 @@ public abstract class ModelIO {
     }
 
     public static String shortForm(Model model, RDFNode node) {
-        if (node.canAs(RDFList.class)) {
-            return shortForm(model, node.as(RDFList.class).asJavaList());
-        } else {
-            return shortForm(model, node.asNode());
-        }
+
+        return node.canAs(RDFList.class)
+            ? shortForm(model, node.as(RDFList.class).asJavaList())
+            : shortForm(model, node.asNode());
     }
 
     public static String shortForm(RDFNode node) {

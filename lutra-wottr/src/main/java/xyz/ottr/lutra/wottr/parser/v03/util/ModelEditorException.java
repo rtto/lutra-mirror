@@ -1,4 +1,4 @@
-package xyz.ottr.lutra.wottr.util;
+package xyz.ottr.lutra.wottr.parser.v03.util;
 
 /*-
  * #%L
@@ -25,15 +25,16 @@ package xyz.ottr.lutra.wottr.util;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 
-public class ModelSelectorException extends RuntimeException {
+public class ModelEditorException extends RuntimeException {
 
-    private static final long serialVersionUID = 1277837142317376514L;
+    private static final long serialVersionUID = -5954271867312442704L;
 
-    public ModelSelectorException(Object... message) {
+    public ModelEditorException(Object... message) {
         this(Arrays.asList(message).stream().map(m -> m.toString()).collect(Collectors.joining()));
     }
 
-    public ModelSelectorException(String string) {
-        super(string);
+    public ModelEditorException(String s) {
+        super(s);
     }
+
 }
