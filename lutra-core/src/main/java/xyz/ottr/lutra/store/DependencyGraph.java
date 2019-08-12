@@ -366,26 +366,26 @@ public class DependencyGraph implements TemplateStore {
      * according to argument predicate and adds all expanded dependencies into expanded
      * set and all unexpanded into the unexpanded set.
      */
-    private void expandEdges(Set<Dependency> toExpand, Set<Result<Dependency>> expanded,
+    private void expandEdges(Set<Result<Dependency>> toExpand, Set<Result<Dependency>> expanded,
             Set<Result<Dependency>> unexpanded, Predicate<Dependency> shouldExpand) {
 
-        for (Dependency edge : toExpand) {
+        for (Result<Dependency> edgeRes : toExpand) {
 
             // Check that we can and should expand
-            List<Message> errors = checkForExpansionErrors(edge);
-            if (!errors.isEmpty()) {
-                Result res = Result.of(edge);
-                res.addMessages(errors);
-                unexpanded.add(res);
+            edgeRes = edgeRes.flatMap(edge -> checkForExpansionErrors(edge));
+            // TODO: May loose messages on edgeRes if present, but contains messages
+            if (!edgeRes.isPresent()) {
+                unexpanded.add(edgeRes);
                 continue;
-            } else if (edge.shouldDiscard()) {
-                continue;
-            } else if (!shouldExpand.test(edge)) {
-                unexpanded.add(Result.of(edge));
+            } else if (!edgeRes.filter(shouldExpand).isPresent()) {
+                unexpanded.add(edgeRes);
+                continue; 
+            } else if (edgeRes.filter(edge -> edge.shouldDiscard()).isPresent()) {
                 continue;
             }
 
             // Then expand instance
+            Dependency edge = edgeRes.get();
             if (edge.argumentList.hasListExpander()) {
                 if (edge.canExpandExpander()) {
                     expandEdges(edge.expandListExpander(), expanded, unexpanded, shouldExpand); 
@@ -400,29 +400,29 @@ public class DependencyGraph implements TemplateStore {
         }
     }
 
-    private List<Message> checkForExpansionErrors(Dependency edge) {
+    private Result<Dependency> checkForExpansionErrors(Dependency edge) {
 
-        List<Message> errors = new LinkedList<>();
+        Result<Dependency> res = Result.of(edge);
 
         if (edge.argumentList.hasListExpander()
             && !edge.canExpandExpander()
             && edge.isInstance()) {
 
-            errors.add(Message.error(
+            res = Result.empty(Message.error(
                     "Cannot expand expander on instance of template " + edge.to.getIRI()
                     + " with arguments " + edge.argumentList.toString()
-                    + ": it contains blank nodes."));
+                    + ": it contains blank nodes."), res);
         }
 
         if (edge.to.isUndefined() || edge.isInstance() && edge.to.isSignature()) {
-            errors.add(Message.error(
+            res = Result.empty(Message.error(
                     "Cannot expand instance of template " + edge.to.getIRI()
                     + " with arguments " + edge.argumentList.toString()
                     + (edge.from == null ? "" : " in body of " + edge.from.getIRI())
-                    + ": missing definition."));
+                    + ": missing definition."), res);
         }
 
-        return errors;
+        return res;
     }
 
     /**
@@ -536,15 +536,8 @@ public class DependencyGraph implements TemplateStore {
 
         while (!toExpandRes.isEmpty()) {
 
-            Result<Set<Dependency>> resToExpand = Result.aggregateNullable(toExpandRes);
-
-            if (!resToExpand.getAllMessages().isEmpty()) {
-                // Add errors and warnings to Result in resulting stream
-                finalExpansion.add(Result.empty(resToExpand.getAllMessages()));
-            }
-
             Set<Result<Dependency>> expanded = new HashSet<>();
-            expandEdges(resToExpand.get(), expanded, finalExpansion, shouldExpand);
+            expandEdges(toExpandRes, expanded, finalExpansion, shouldExpand);
             toExpandRes = expanded;
         }
 
@@ -568,23 +561,22 @@ public class DependencyGraph implements TemplateStore {
 
         log.info("Expanding definitions.");
         List<TemplateNode> sorted = topologicallySort();
-        List<Message> msgs = new LinkedList<>();
 
         DependencyGraph ngraph = new DependencyGraph();
+        Result<DependencyGraph> graphRes = Result.of(ngraph);
+
         for (TemplateNode n : sorted) {
 
             ngraph.addNode(n);
             if (!isLeafNode(n)) {
                 Set<Result<Dependency>> expanded = new HashSet<>(); // Used for both expanded and unexpanded
-                ngraph.expandEdges(this.dependencies.get(n), expanded, expanded, shouldExpand);
+                ngraph.expandEdges(Result.lift(this.dependencies.get(n)), expanded, expanded, shouldExpand);
                 Result<Set<Dependency>> resExpanded = Result.aggregate(expanded);
 
-                msgs.addAll(resExpanded.getAllMessages());
+                graphRes.addToTrace(resExpanded);
                 resExpanded.ifPresent(deps -> deps.forEach(ngraph::addDependency));
             }
         }
-        Result<DependencyGraph> graphRes = Result.of(ngraph);
-        graphRes.addMessages(msgs);
         return graphRes;
     }
 
@@ -704,10 +696,10 @@ public class DependencyGraph implements TemplateStore {
             return true;
         }
 
-        public Set<Dependency> expandListExpander() {
-            Set<Dependency> expanded = new HashSet<>();
+        public Set<Result<Dependency>> expandListExpander() {
+            Set<Result<Dependency>> expanded = new HashSet<>();
             for (ArgumentList args : this.argumentList.expandListExpander()) {
-                expanded.add(new Dependency(this.from, args, this.to));
+                expanded.add(Result.of(new Dependency(this.from, args, this.to)));
             }
             return expanded;
         }

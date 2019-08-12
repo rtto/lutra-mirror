@@ -35,21 +35,21 @@ public class MessageHandler {
         quiet = shouldBeQuiet;
     }
 
-    private final Set<Result<?>> results;
+    private final Set<Trace> traces;
 
     public MessageHandler() {
-        this.results = new HashSet<>();
+        this.traces = new HashSet<>();
+    }
+
+    public void add(Trace trace) {
+        if (trace != null) {
+            this.traces.add(trace);
+        }
     }
 
     public void add(Result<?> result) {
-        if (result == null) {
-            return;
-        }
-
-        Result<?> res = result.deriveContext();
-        while (res != null && !this.results.contains(res)) {
-            this.results.add(res);
-            res = res.getParsedFrom();
+        if (result != null) {
+            this.traces.add(Trace.from(result));
         }
     }
 
@@ -58,20 +58,20 @@ public class MessageHandler {
      * and returns this (for chaining).
      */
     public MessageHandler combine(MessageHandler other) {
-        other.results.forEach(this::add);
+        other.traces.forEach(this::add);
         return this;
     }
 
     /**
      * Returns a list of all Messages on any accepted Result,
-     * and all Results reachable via parsedFrom-pointers from
+     * and all Traces reachable via traces-pointers from
      * accepted Results. That is, it returns all Message-s
      * relevant for accepted Result-s.
      */
     public List<Message> getMessages() {
         List<Message> msgs = new LinkedList<>();
-        for (Result<?> res : results) {
-            msgs.addAll(res.getMessages());
+        for (Trace trace : traces) { // TODO: Traverse trace's traces
+            msgs.addAll(trace.getMessages());
         }
         return msgs;
     }
@@ -85,8 +85,8 @@ public class MessageHandler {
      */
     public int printMessages() {
         int mostSevere = Integer.MAX_VALUE;
-        for (Result<?> res : results) {
-            for (Message msg : res.getMessages()) {
+        for (Trace trace : traces) {
+            for (Message msg : trace.getMessages()) { // TODO: Traverse trace's traces
                 if (!quiet) {
                     printMessage(msg);
                 }
@@ -94,8 +94,8 @@ public class MessageHandler {
                     mostSevere = msg.getLevel();
                 }
             }
-            if (!res.getMessages().isEmpty() && !quiet) {
-                printContext(res);
+            if (!trace.getMessages().isEmpty() && !quiet) {
+                printLocation(trace);
             }
         }
         return mostSevere;
@@ -107,24 +107,24 @@ public class MessageHandler {
         }
     }
 
-    private static String getContext(Result<?> res) {
+    private static String getLocation(Trace trace) {
         StringBuilder context = new StringBuilder();
-        getContextRecur(context, res);
+        getLocationRecur(context, trace);
         return context.toString();
     }
 
-    private static void getContextRecur(StringBuilder context, Result<?> res) {
-        if (res.isPresent()) {
-            context.append(" >>> in context: " + res.getContext() + "\n");
+    private static void getLocationRecur(StringBuilder context, Trace trace) {
+        if (trace.hasLocation()) {
+            context.append(" >>> at " + trace.getLocation().toString() + "\n");
         }
-        if (res.getParsedFrom() != null) {
-            getContextRecur(context, res.getParsedFrom());
+        if (trace.getTraces() != null) {
+            getLocationRecur(context, trace.getTraces()); // TODO: Fix recur call (need branching)
         }
     }
 
-    public static void printContext(Result<?> res) {
+    public static void printLocation(Trace trace) {
         if (!quiet) {
-            System.err.print(getContext(res));
+            System.err.print(getLocation(trace));
         }
     }
 }
