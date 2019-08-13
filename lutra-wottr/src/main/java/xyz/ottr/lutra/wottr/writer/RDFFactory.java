@@ -28,8 +28,10 @@ import java.util.Map;
  
 import org.apache.jena.datatypes.TypeMapper;
 import org.apache.jena.rdf.model.AnonId;
+import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Property;
+import org.apache.jena.rdf.model.RDFList;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 
@@ -55,44 +57,6 @@ public class RDFFactory {
         this.vocabulary = vocabulary;
     }
 
-    public RDFNode createRDFNode(Model model, Term term) {
-
-        if (term instanceof TermList) {
-            Iterator<RDFNode> iterator = ((TermList) term).asList().stream()
-                .map(t -> createRDFNode(model, t))
-                .iterator();
-            return model.createList(iterator);
-        } else if (term instanceof IRITerm) {
-            String uri = ((IRITerm) term).getIRI();
-            return model.createResource(uri);
-        } else if (term instanceof LiteralTerm) {
-            LiteralTerm lit = (LiteralTerm) term;
-            String val = lit.getPureValue();
-            // TODO: Check correctness of typing below
-            if (lit.getDatatype() != null) { // Typed literal
-                String type = lit.getDatatype();
-                TypeMapper tm = TypeMapper.getInstance();
-                return model.createTypedLiteral(val, tm.getSafeTypeByName(type));
-            } else if (lit.getLangTag() != null) { // Literal with language tag
-                String tag = lit.getLangTag();
-                return model.createLiteral(val, tag);
-            } else { // Untyped literal (just a string)
-                return model.createLiteral(val);
-            }
-        } else if (term instanceof BlankNodeTerm) {
-            String label = ((BlankNodeTerm) term).getLabel();
-            return this.createdBlankNodes.computeIfAbsent(label,
-                blankLabel -> model.createResource(new AnonId(blankLabel)));
-        } else if (term instanceof NoneTerm) {
-            // Note: the resource is recreated *in/by the model* to allow the none-resource
-            // to be cast to Property (by as(Property.class)). If we return the resource without
-            // no "hosting" model, then the cast throws a UnsupportedPolymorphismException.
-            return model.createResource(this.vocabulary.getNoneResource().getURI());
-        } else {
-            return null; // TODO: Throw exception
-        }
-    }
-
     public static boolean isTriple(Instance instance) {
         String templateIRI = instance.getIRI();
         return OTTR.BaseURI.Triple.equals(templateIRI)
@@ -100,10 +64,64 @@ public class RDFFactory {
     }
 
     public Statement createTriple(Model model, Instance instance) {
-        // TODO use functions in Terms?
         Resource s = createRDFNode(model, instance.getArguments().get(0)).asResource();
         Property p = createRDFNode(model, instance.getArguments().get(1)).as(Property.class);
         RDFNode o = createRDFNode(model, instance.getArguments().get(2));
         return model.createStatement(s, p, o);
+    }
+
+
+    public RDFNode createRDFNode(Model model, Term term) {
+
+        if (term instanceof TermList) {
+            return createRDFList(model, (TermList) term);
+        } else if (term instanceof IRITerm) {
+            return createURIResource(model, (IRITerm) term);
+        } else if (term instanceof LiteralTerm) {
+            return createLiteral(model, (LiteralTerm) term);
+        } else if (term instanceof BlankNodeTerm) {
+            return createBlankNode(model, (BlankNodeTerm) term);
+        } else if (term instanceof NoneTerm) {
+            return createNone(model, (NoneTerm) term);
+        } else {
+            return null; // TODO: Throw exception
+        }
+    }
+
+    public RDFList createRDFList(Model model, TermList term) {
+        Iterator<RDFNode> iterator = term.asList().stream()
+            .map(t -> createRDFNode(model, t))
+            .iterator();
+        return model.createList(iterator);
+    }
+
+    public Resource createURIResource(Model model, IRITerm term) {
+        return model.createResource(term.getIRI());
+    }
+
+    public Literal createLiteral(Model model, LiteralTerm term) {
+        String val = term.getPureValue();
+        // TODO: Check correctness of typing below
+        if (term.getDatatype() != null) { // Typed literal
+            String type = term.getDatatype();
+            TypeMapper tm = TypeMapper.getInstance();
+            return model.createTypedLiteral(val, tm.getSafeTypeByName(type));
+        } else if (term.getLangTag() != null) { // Literal with language tag
+            String tag = term.getLangTag();
+            return model.createLiteral(val, tag);
+        } else { // Untyped literal (just a string)
+            return model.createLiteral(val);
+        }
+    }
+
+    public Resource createBlankNode(Model model, BlankNodeTerm term) {
+        return this.createdBlankNodes.computeIfAbsent(term.getLabel(), l -> model.createResource(new AnonId(l)));
+    }
+
+    public Resource createNone(Model model, NoneTerm term) {
+        // Note: the resource is recreated *in/by the model* to allow the none-resource
+        // to be cast to Property (by as(Property.class)). If we return the resource without
+        // no "hosting" model, then the cast throws a UnsupportedPolymorphismException.
+        return model.createResource(this.vocabulary.getNoneResource().getURI());
     }
 }

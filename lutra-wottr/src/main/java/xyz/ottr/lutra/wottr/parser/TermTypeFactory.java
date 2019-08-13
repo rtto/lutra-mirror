@@ -39,7 +39,6 @@ import xyz.ottr.lutra.model.types.ListType;
 import xyz.ottr.lutra.model.types.NEListType;
 import xyz.ottr.lutra.model.types.TermType;
 import xyz.ottr.lutra.model.types.TypeFactory;
-import xyz.ottr.lutra.result.Message;
 import xyz.ottr.lutra.result.Result;
 
 public class TermTypeFactory implements Function<RDFNode, Result<TermType>> {

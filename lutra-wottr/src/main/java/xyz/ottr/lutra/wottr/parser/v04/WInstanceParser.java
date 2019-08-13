@@ -54,16 +54,17 @@ public class WInstanceParser implements InstanceParser<Model> {
     @Override
     public ResultStream<Instance> apply(Model model) {
 
-        List<Resource> instances = ModelSelector.getSubjects(model, WOTTR.of);
-        ResultStream<Instance> parsedInstances = parseInstances(model, instances);
+        List<Resource> instanceResources = ModelSelector.getSubjects(model, WOTTR.of);
+        ResultStream<Instance> instances = parseInstances(model, instanceResources);
 
         // Get triples which are not part of any of the instances:
         WTripleSerialiser tripleSerialiser = new WTripleSerialiser(model);
         Model instanceModel = ModelFactory.createDefaultModel();
-        instances.forEach(instance -> instanceModel.add(tripleSerialiser.serialiseInstance(instance)));
+        instanceResources.forEach(i -> instanceModel.add(tripleSerialiser.serialiseInstance(i)));
         Model tripleModel = model.difference(instanceModel);
+        ResultStream<Instance> rdfInstances = new TripleInstanceFactory(tripleModel).get();
 
-        return ResultStream.concat(parsedInstances, new TripleInstanceFactory(tripleModel).get());
+        return ResultStream.concat(instances, rdfInstances);
     }
 
     private ResultStream<Instance> parseInstances(Model model, List<Resource> templateInstances) {

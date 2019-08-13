@@ -24,7 +24,7 @@ package xyz.ottr.lutra.wottr.util;
 
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
-import xyz.ottr.lutra.result.Message;
+
 import xyz.ottr.lutra.result.Result;
 
 public enum RDFNodes {
