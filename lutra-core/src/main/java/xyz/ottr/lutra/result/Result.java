@@ -36,7 +36,6 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class Result<E> {
 
@@ -303,9 +302,9 @@ public class Result<E> {
      * To retrieve only Message-s on this Result, use Result#getMessages().
      */
     public List<Message> getAllMessages() {
-        ResultConsumer<E> msgs = new ResultConsumer<>();
-        msgs.accept(this);
-        return msgs.getMessageHandler().getMessages();
+        MessageHandler msgs = new MessageHandler();
+        msgs.add(this);
+        return msgs.getMessages();
     }
 
     /**
