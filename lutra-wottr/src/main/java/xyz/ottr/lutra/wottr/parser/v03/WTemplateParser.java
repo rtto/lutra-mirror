@@ -109,7 +109,7 @@ public class WTemplateParser implements TemplateParser<Model> {
             parsedParameters = parameterListParser.parseVariables(parameters);
             withoutHead = model.difference(WParserUtils.getTemplateHeadWVars(model, template));
         } else {
-            return Result.empty(Message.error("Template with IRI " + templateURI + " does not have any parameters."));
+            return Result.error("Template with IRI " + templateURI + " does not have any parameters.");
         }
 
         // Parse template's body's instances

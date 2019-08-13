@@ -76,9 +76,8 @@ public class WInstanceParser implements InstanceParser<Model> {
     public Result<Instance> parseInstance(Model model, RDFNode templateInstanceNode) {
 
         if (!templateInstanceNode.isResource()) {
-            return Result.empty(Message.error(
-                        "Expected instance to be a resource, found non-resource "
-                        + templateInstanceNode.toString() + "."));
+            return Result.error("Expected instance to be a resource, found non-resource "
+                        + templateInstanceNode.toString() + ".");
         }
 
         Resource templateInstance = templateInstanceNode.asResource();
@@ -96,8 +95,8 @@ public class WInstanceParser implements InstanceParser<Model> {
                 WOTTR.withValues);
             resArgumentList = parameterListParser.parseValues(argsList);
         } else {
-            return Result.empty(Message.error("Found no arguments for instance of "
-                    + templateRef.getURI()));
+            return Result.error("Found no arguments for instance of "
+                    + templateRef.getURI());
         }
 
         String toURI = templateRef.getURI(); 

@@ -77,8 +77,8 @@ public class WArgumentParser implements Function<Resource, Result<Term>> {
                 if (this.listExpander == null || this.listExpander == ArgumentList.Expander.CROSS) {
                     this.listExpander = ArgumentList.Expander.CROSS;
                 } else {
-                    resultTerm = Result.empty(Message.error("Error parsing instance " + p.toString()
-                                + ": An instance cannot have two different list expanders. "));
+                    resultTerm = Result.error("Error parsing instance " + p.toString()
+                                + ": An instance cannot have two different list expanders. ");
                 }
             }
         } catch (ModelSelectorException ex) {

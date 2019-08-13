@@ -95,7 +95,7 @@ public class WParameterParser implements Function<Resource, Result<Term>> {
             // TODO: Check and add default values
         } catch (ModelSelectorException ex) {
             // TODO: Correct lvl and good message?
-            resultTerm = Result.empty(Message.error("Error parsing parameter. " + ex.getMessage()));
+            resultTerm = Result.error("Error parsing parameter. " + ex.getMessage());
         }
 
         return resultTerm;

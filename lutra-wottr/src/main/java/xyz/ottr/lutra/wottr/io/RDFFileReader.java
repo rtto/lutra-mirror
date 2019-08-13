@@ -65,11 +65,9 @@ public class RDFFileReader implements InputReader<String, Model> {
             log.info("Adding model " + model.hashCode() + " with URI " + url);
         } catch (JenaException ex) {
             // TODO: Correct Message level?
-            result = Result.empty(Message.error(
-                "Unable to parse model " + url + ": " + ex.getMessage()));
+            result = Result.error("Unable to parse model " + url + ": " + ex.getMessage());
         } catch (Exception e) { // TODO: Make messages for other exceptions(?)
-            result = Result.empty(Message.error(
-                "Unable to parse model " + url + ": " + e.getMessage()));
+            result = Result.error("Unable to parse model " + url + ": " + e.getMessage());
         }
         return result;
     }

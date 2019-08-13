@@ -75,8 +75,7 @@ public class TermFactory implements Function<RDFNode, Result<Term>> {
         } else if (node.isLiteral()) {
             return Result.of(createLiteralTerm(node.asLiteral()));
         } else {
-            return Result.empty(Message.error(
-                    "Unable to parse RDFNode " + node.toString() + " to Term."));
+            return Result.error("Unable to parse RDFNode " + node.toString() + " to Term.");
         }
     }
 

@@ -81,7 +81,7 @@ public class WParameterListParser {
         }
         for (int i = 0; i < toParse.size(); i++) {
             if (parsed.get(i) == null) {
-                parsed.set(i, Result.empty(Message.error("Missing term for index " + (i + 1) + ".")));
+                parsed.set(i, Result.error("Missing term for index " + (i + 1) + "."));
             }
         }
 
@@ -110,8 +110,8 @@ public class WParameterListParser {
 
     public Result<List<Term>> parseTermList(Resource argsList, boolean isVariables) {
         if (!argsList.canAs(RDFList.class)) {
-            return Result.empty(Message.error("Expected ottr:withValues-related element to be an RDF-list, "
-                    + "but found " + argsList.toString()));
+            return Result.error("Expected ottr:withValues-related element to be an RDF-list, "
+                    + "but found " + argsList.toString());
         }
         TermFactory termFactory = new TermFactory(WOTTR.theInstance);
         List<Result<Term>> arguments = argsList

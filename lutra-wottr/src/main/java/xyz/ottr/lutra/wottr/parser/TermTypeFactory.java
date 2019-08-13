@@ -60,9 +60,8 @@ public class TermTypeFactory implements Function<RDFNode, Result<TermType>> {
         TermType type = TypeFactory.getType(node.getURI()); 
 
         if (type == null) {
-            return Result.empty(Message.error(
-                "Expected a resource denoting a simple type, but no simple type with IRI "
-                + node.getURI() + " exists."));
+            return Result.error("Expected a resource denoting a simple type, but no simple type with IRI "
+                + node.getURI() + " exists.");
         } else {
             return Result.of(type);
         }
@@ -71,13 +70,11 @@ public class TermTypeFactory implements Function<RDFNode, Result<TermType>> {
     private Result<TermType> parseComplexType(Iterator<RDFNode> complexType) {
 
         if (!complexType.hasNext()) {
-            return Result.empty(Message.error(
-                "Expected a resource denoting a basic or complex type, but got nothing."));
+            return Result.error("Expected a resource denoting a basic or complex type, but got nothing.");
         }
         RDFNode typeNode = complexType.next();
         if (!typeNode.isResource() || typeNode.asResource().getURI() == null) {
-            return Result.empty(Message.error(
-                    "A type constructor must be denoted by an IRI, but got " + typeNode.toString()));
+            return Result.error("A type constructor must be denoted by an IRI, but got " + typeNode.toString());
         }
         Resource type = typeNode.asResource();
 
@@ -88,16 +85,14 @@ public class TermTypeFactory implements Function<RDFNode, Result<TermType>> {
             return rest.flatMap(inner -> Result.of(new ListType(inner)));
         } else if (type.getURI().equals(OTTR.TypeURI.LUB)) {
             if (rest.isPresent() && !(rest.get() instanceof BasicType)) {
-                return Result.empty(Message.error(
-                    "Expected simple type as argument to LUB-type, but got "
-                    + rest.get().toString()));
+                return Result.error("Expected simple type as argument to LUB-type, but got "
+                    + rest.get().toString());
             }
             return rest.flatMap(inner -> Result.of(new LUBType((BasicType) inner)));
         } else if (!rest.isPresent()) {
             return parseSimpleType(type);
         } else {
-            return Result.empty(Message.error(
-                "Unrecognized type constructor " + type.toString() + "."));
+            return Result.error("Unrecognized type constructor " + type.toString() + ".");
         }
     }
 }

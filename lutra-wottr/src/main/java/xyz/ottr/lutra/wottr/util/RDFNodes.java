@@ -36,16 +36,15 @@ public enum RDFNodes {
         if (node.canAs(type)) {
             return Result.of(node.as(type));
         } else {
-            return Result.empty(Message.error("Expected instance of " + type.getSimpleName()
-                + ", but found " + node.getClass().getSimpleName() + ": " + ModelIO.shortForm(node)));
+            return Result.error("Expected instance of " + type.getSimpleName()
+                + ", but found " + node.getClass().getSimpleName() + ": " + ModelIO.shortForm(node));
         }
     }
 
     public static Result<Resource> castURIResource(RDFNode node) {
         Result<Resource> resource = cast(node, Resource.class);
         if (resource.isPresent() && !resource.get().isURIResource()) {
-            return Result.empty(Message.error("Expected instance of URIResource"
-                + ", but got " + resource.get().toString() + "."));
+            return Result.error("Expected instance of URIResource, but got " + resource.get().toString() + ".");
         } else {
             return resource;
         }
