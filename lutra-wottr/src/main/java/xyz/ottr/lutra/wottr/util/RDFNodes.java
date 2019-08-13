@@ -27,7 +27,9 @@ import org.apache.jena.rdf.model.Resource;
 import xyz.ottr.lutra.result.Message;
 import xyz.ottr.lutra.result.Result;
 
-public class RDFNodes {
+public enum RDFNodes {
+
+    ; // singleton enum
 
     public static <X extends RDFNode> Result<X> cast(RDFNode node, Class<X> type) {
 

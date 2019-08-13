@@ -35,8 +35,9 @@ import org.apache.jena.rdf.model.StmtIterator;
 import org.apache.jena.vocabulary.RDF;
 import xyz.ottr.lutra.result.Result;
 
-public abstract class ModelSelector {
+public enum ModelSelector {
 
+    ; // singleton enum
 
     enum CardinalityOne {
 

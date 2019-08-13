@@ -49,10 +49,10 @@ public class RDFFactory {
     // TODO should this be static?
     private final Map<String, Resource> createdBlankNodes = new HashMap<>(); // reuse blank nodes
 
-    private final WOTTRVocabulary vocaulary;
+    private final WOTTRVocabulary vocabulary;
 
-    public RDFFactory(WOTTRVocabulary vocaulary) {
-        this.vocaulary = vocaulary;
+    public RDFFactory(WOTTRVocabulary vocabulary) {
+        this.vocabulary = vocabulary;
     }
 
     public RDFNode createRDFNode(Model model, Term term) {
@@ -87,7 +87,7 @@ public class RDFFactory {
             // Note: the resource is recreated *in/by the model* to allow the none-resource
             // to be cast to Property (by as(Property.class)). If we return the resource without
             // no "hosting" model, then the cast throws a UnsupportedPolymorphismException.
-            return model.createResource(this.vocaulary.getNoneResource().getURI());
+            return model.createResource(this.vocabulary.getNoneResource().getURI());
         } else {
             return null; // TODO: Throw exception
         }

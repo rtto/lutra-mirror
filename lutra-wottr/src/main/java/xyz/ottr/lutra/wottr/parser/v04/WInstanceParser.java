@@ -98,10 +98,8 @@ public class WInstanceParser implements InstanceParser<Model> {
         Result<RDFList> values = ModelSelector.getRequiredListObject(model, instance, WOTTR.values);
 
         Result<ArgumentList> argumentList;
-        if (arguments.isPresent() && values.isPresent()) {
-            return Result.error("An instance cannot have both " + WOTTR.arguments + " and " + WOTTR.values + ".");
-        } else if (!arguments.isPresent() && !values.isPresent()) {
-            return Result.error("An instance must have either " + WOTTR.arguments + " or " + WOTTR.values + ".");
+        if (arguments.isPresent() == values.isPresent()) { // true if both exist or both are missing
+            return Result.error("An instance must have either one " + WOTTR.arguments + " or one " + WOTTR.values + ".");
         } else if (arguments.isPresent()) {
             argumentList = arguments.flatMap(args -> getArguments(model, args, expander));
         } else { //if (values.isPresent()) {

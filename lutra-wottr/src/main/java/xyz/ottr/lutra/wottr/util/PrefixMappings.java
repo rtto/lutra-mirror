@@ -31,7 +31,9 @@ import org.apache.jena.shared.PrefixMapping;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class PrefixMappings {
+public enum PrefixMappings {
+
+    ; // singleton enum
 
     private static Logger log = LoggerFactory.getLogger(PrefixMappings.class);
 

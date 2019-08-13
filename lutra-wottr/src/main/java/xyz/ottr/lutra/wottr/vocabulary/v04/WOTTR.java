@@ -74,10 +74,10 @@ public class WOTTR implements WOTTRVocabulary {
     public static final BidiMap<Resource, ArgumentList.Expander> listExpanders;
 
     static {
-        BidiMap map = new DualHashBidiMap<>();
-        map.put(WOTTR.cross, ArgumentList.Expander.CROSS);
-        map.put(WOTTR.zipMin, ArgumentList.Expander.ZIPMIN);
-        map.put(WOTTR.zipMax, ArgumentList.Expander.ZIPMAX);
+        BidiMap<Resource, ArgumentList.Expander> map = new DualHashBidiMap<>();
+        map.put(cross, ArgumentList.Expander.CROSS);
+        map.put(zipMin, ArgumentList.Expander.ZIPMIN);
+        map.put(zipMax, ArgumentList.Expander.ZIPMAX);
         listExpanders = UnmodifiableBidiMap.unmodifiableBidiMap(map);
     }
 

@@ -33,7 +33,9 @@ import xyz.ottr.lutra.model.types.ListType;
 import xyz.ottr.lutra.model.types.NEListType;
 import xyz.ottr.lutra.model.types.TermType;
 
-public class TypeFactory {
+public enum TypeFactory {
+
+    ; // singleton enum
 
     public static Resource createRDFType(Model model, TermType type) {
 

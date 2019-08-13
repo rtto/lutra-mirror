@@ -35,7 +35,9 @@ import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.util.FileManager;
 import org.apache.jena.util.FileUtils;
 
-public abstract class ModelIO {
+public enum ModelIO {
+
+    ; // singleton enum
 
     private static final Lang defaultLang = Lang.TURTLE;
 

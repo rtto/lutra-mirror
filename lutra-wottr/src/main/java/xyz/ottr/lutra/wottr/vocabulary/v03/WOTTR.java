@@ -91,8 +91,8 @@ public class WOTTR implements WOTTRVocabulary {
    
     static {
         Map<Property, List<Property>> tempMap = new HashMap<>();
-        tempMap.put(withVariables, Arrays.asList(WOTTR.hasParameter, WOTTR.variable));
-        tempMap.put(withValues, Arrays.asList(WOTTR.hasArgument, WOTTR.value));
+        tempMap.put(withVariables, Arrays.asList(hasParameter, variable));
+        tempMap.put(withValues, Arrays.asList(hasArgument, value));
         listPropertiesMap = Collections.unmodifiableMap(tempMap);
     }
     
