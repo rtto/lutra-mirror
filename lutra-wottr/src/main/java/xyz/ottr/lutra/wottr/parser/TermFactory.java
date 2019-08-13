@@ -29,6 +29,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.jena.graph.BlankNodeId;
 import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.rdf.model.RDFList;
 import org.apache.jena.rdf.model.RDFNode;
@@ -41,7 +42,6 @@ import xyz.ottr.lutra.model.LiteralTerm;
 import xyz.ottr.lutra.model.NoneTerm;
 import xyz.ottr.lutra.model.Term;
 import xyz.ottr.lutra.model.TermList;
-import xyz.ottr.lutra.result.Message;
 import xyz.ottr.lutra.result.Result;
 import xyz.ottr.lutra.wottr.vocabulary.WOTTRVocabulary;
 
@@ -59,23 +59,41 @@ public class TermFactory implements Function<RDFNode, Result<Term>> {
     }
 
     public Result<Term> apply(RDFNode node) {
+        return createTerm(node);
+    }
+
+    public Result<Term> createTerm(RDFNode node) {
+
+        if (node.isResource()) {
+            return createTerm(node.asResource());
+        } else if (node.isLiteral()) {
+            return createLiteralTerm(node.asLiteral()).map(tl -> (Term) tl);
+        } else {
+            return Result.error("Unable to parse RDFNode " + node.toString() + " to Term.");
+        }
+    }
+
+    public Result<Term> createTerm(Resource node) {
 
         if (node.isURIResource()) {
-            if (node.toString().equals(this.vocabulary.getNoneResource().getURI())) {
-                return Result.of(new NoneTerm());
-            } else if (node.equals(RDF.nil)) {
-                return Result.of(new TermList());
-            } else {
-                return Result.of(createIRITerm(node.asResource()));
-            }
+            return createTerm(node.getURI()).map(tl -> (Term) tl); // Need to cast to Result<Term>
         } else if (node.canAs(RDFList.class)) {
             return createTermList(node.as(RDFList.class)).map(tl -> (Term) tl); // Need to cast to Result<Term>
         } else if (node.isAnon()) {
-            return Result.of(createBlankNodeTerm(node.asResource()));
-        } else if (node.isLiteral()) {
-            return Result.of(createLiteralTerm(node.asLiteral()));
+            return createBlankNodeTerm(node.getId().getBlankNodeId()).map(tl -> (Term) tl); // Need to cast to Result<Term>
         } else {
-            return Result.error("Unable to parse RDFNode " + node.toString() + " to Term.");
+            return Result.error("Unable to parse resource " + node.toString() + " to Term.");
+        }
+    }
+
+    public Result<Term> createTerm(String uri) {
+
+        if (uri.equals(this.vocabulary.getNoneResource().getURI())) {
+            return Result.of(new NoneTerm());
+        } else if (uri.equals(RDF.nil.getURI())) {
+            return Result.of(new TermList());
+        } else {
+            return Result.of(new IRITerm(uri));
         }
     }
 
@@ -94,33 +112,31 @@ public class TermFactory implements Function<RDFNode, Result<Term>> {
         }
     }
     
-    public static LiteralTerm createLiteralTerm(Literal literal) {
+    public Result<LiteralTerm> createLiteralTerm(Literal literal) {
 
         // collect all "components" of literal, some may be blank or null
         String value = literal.getLexicalForm();
         String datatype = literal.getDatatypeURI();
         String language = literal.getLanguage();
 
+        LiteralTerm literalTerm;
         // determine type of literal based on available "components"
         if (StringUtils.isNotEmpty(language)) {
-            return LiteralTerm.taggedLiteral(value, language);
+            literalTerm = LiteralTerm.taggedLiteral(value, language);
         } else if (StringUtils.isNotEmpty(datatype)) {
-            return LiteralTerm.typedLiteral(value, datatype);
+            literalTerm = LiteralTerm.typedLiteral(value, datatype);
         } else {
-            return new LiteralTerm(value);
+            literalTerm = new LiteralTerm(value);
         }
+        return Result.of(literalTerm);
     }
 
-    public static IRITerm createIRITerm(Resource resource) {
 
-        return new IRITerm(resource.getURI());
-    }
-
-    public static BlankNodeTerm createBlankNodeTerm(Resource resource) {
+    public Result<BlankNodeTerm> createBlankNodeTerm(BlankNodeId blankNodeId) {
 
         // Mint new labels, but keep map of which term was created
         // for which original (system) label
-        String id = resource.getId().getBlankNodeId().getLabelString();
-        return createdBlanks.computeIfAbsent(id, _fresh -> new BlankNodeTerm());
+        String id = blankNodeId.getLabelString();
+        return Result.of(createdBlanks.computeIfAbsent(id, _fresh -> new BlankNodeTerm()));
     }
 }

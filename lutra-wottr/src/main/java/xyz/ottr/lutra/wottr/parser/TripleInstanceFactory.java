@@ -22,16 +22,16 @@ package xyz.ottr.lutra.wottr.parser;
  * #L%
  */
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.Set;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 import org.apache.jena.rdf.model.Model;
-
-import org.apache.jena.rdf.model.Property;
-import org.apache.jena.rdf.model.RDFList;
-import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Statement;
-import org.apache.jena.util.iterator.ExtendedIterator;
-import org.apache.jena.vocabulary.RDF;
+
 import xyz.ottr.lutra.OTTR;
 import xyz.ottr.lutra.model.ArgumentList;
 import xyz.ottr.lutra.model.Instance;
@@ -42,6 +42,8 @@ import xyz.ottr.lutra.wottr.vocabulary.v04.WOTTR;
 
 public class TripleInstanceFactory implements Supplier<ResultStream<Instance>> {
 
+    private static final TermFactory rdfTermFactory = new TermFactory(WOTTR.theInstance);
+
     private final Model model;
 
     public TripleInstanceFactory(Model model) {
@@ -51,43 +53,37 @@ public class TripleInstanceFactory implements Supplier<ResultStream<Instance>> {
     @Override
     public ResultStream<Instance> get() {
 
-        ExtendedIterator<Result<Instance>> parsedTriples = this.model.listStatements()
-            .filterDrop(this::isPartOfRDFList)
-            .mapWith(TripleInstanceFactory::createTripleInstance);
-        return new ResultStream<>(parsedTriples.toSet());
-    }
-
-    /**
-     * Returns true if the argument is a redundant list-triple, that is,
-     * on one of the forms "(:a :b) rdf:first :a" or "(:a :b) rdf:rest (:b)".
-     * These statements are redundant as they will be parsed as part of a list term.
-     */
-    private boolean isPartOfRDFList(Statement statement) {
-
-        Resource subject = statement.getSubject();
-        Property predicate = statement.getPredicate();
-
-        // TODO: possible fix, add check to see that subject is "used", ie. is also an triple object.
-        // there must be a rdf:rest for each rdf:first, and vice versa.
-        return subject.canAs(RDFList.class)
-            && (predicate.equals(RDF.first) && this.model.contains(subject, RDF.rest))
-                || predicate.equals(RDF.rest) && this.model.contains(subject, RDF.first);
+        Set<Result<Instance>> parsedTriples = this.model.listStatements()
+            .mapWith(TripleInstanceFactory::createTripleInstance)
+            .toSet();
+        return new ResultStream<>(parsedTriples);
     }
 
     private static Result<Instance> createTripleInstance(Statement stmt) {
 
-        TermFactory rdfTermFactory = new TermFactory(WOTTR.theInstance);
-        Result<Term> sub = rdfTermFactory.apply(stmt.getSubject());
-        Result<Term> pred = rdfTermFactory.apply(stmt.getPredicate());
-        Result<Term> obj = rdfTermFactory.apply(stmt.getObject());
+        List<Result<Term>> args = Arrays.asList(stmt.getSubject(), stmt.getPredicate(), stmt.getObject())
+            .stream()
+            .map(TripleInstanceFactory::createTerm)
+            .collect(Collectors.toList());
 
-        ArgumentList as = sub.isPresent() && pred.isPresent() && obj.isPresent()
-            ? new ArgumentList(sub.get(), pred.get(), obj.get()) : null;
-        Result<ArgumentList> asRes = Result.ofNullable(as);
-        asRes.addMessages(sub.getMessages());
-        asRes.addMessages(pred.getMessages());
-        asRes.addMessages(obj.getMessages());
+        return Result.aggregate(args)
+            .map(ArgumentList::new)
+            .map(asVal -> new Instance(OTTR.BaseURI.NullableTriple, asVal));
+    }
 
-        return asRes.map(asVal -> new Instance(OTTR.BaseURI.NullableTriple, asVal));
+    /**
+     * Make sure that we do not create any term lists.
+     */
+    private static Result<Term> createTerm(RDFNode node) {
+
+        if (node.isURIResource()) {
+            return rdfTermFactory.createTerm(node.asResource().getURI())
+                .map(t -> (Term) t);
+        } else if (node.isAnon()) {
+            return rdfTermFactory.createBlankNodeTerm(node.asResource().getId().getBlankNodeId())
+                .map(t -> (Term) t);
+        } else { // is literal
+            return rdfTermFactory.apply(node);
+        }
     }
 }
