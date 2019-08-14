@@ -38,7 +38,7 @@ import xyz.ottr.lutra.wottr.util.ModelIO;
 public class BaseInstanceExpansionTest {
 
     @Parameterized.Parameters(name = "{index}: {0}, {1}")
-    public static List<String[]> data() throws IOException {
+    public static List<String[]> data() {
 
         List<String[]> data = new ArrayList<>();
 

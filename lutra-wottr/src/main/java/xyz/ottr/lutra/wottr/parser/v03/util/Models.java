@@ -31,7 +31,9 @@ import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.shared.PrefixMapping;
 import xyz.ottr.lutra.wottr.util.PrefixMappings;
 
-public abstract class Models {
+public enum Models {
+
+    ; // singleton emum, utility class
 
     // private static Logger log = LoggerFactory.getLogger(Models.class);
 
@@ -70,7 +72,7 @@ public abstract class Models {
     public static Model duplicate(Model model, BlankCopy blankCopyStrategy) {
         Model copy = empty();
         addStatements(model, copy);
-        if (blankCopyStrategy.equals(BlankCopy.FRESH)) {
+        if (blankCopyStrategy == BlankCopy.FRESH) {
             ModelEditor.substituteBlanks(copy);
         }
         return copy;

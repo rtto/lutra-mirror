@@ -30,7 +30,7 @@ public class ModelEditorException extends RuntimeException {
     private static final long serialVersionUID = -5954271867312442704L;
 
     public ModelEditorException(Object... message) {
-        this(Arrays.asList(message).stream().map(m -> m.toString()).collect(Collectors.joining()));
+        this(Arrays.stream(message).map(Object::toString).collect(Collectors.joining()));
     }
 
     public ModelEditorException(String s) {

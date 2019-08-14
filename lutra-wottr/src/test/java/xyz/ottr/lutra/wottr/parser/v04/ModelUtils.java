@@ -39,7 +39,9 @@ import xyz.ottr.lutra.wottr.io.RDFFileReader;
 import xyz.ottr.lutra.wottr.util.ModelIO;
 import xyz.ottr.lutra.wottr.writer.v04.WInstanceWriter;
 
-public class ModelUtils {
+public enum ModelUtils {
+
+    ; // singleton enum utility class
 
     public static void testIsomorphicModels(Model actual, Model expected) {
 
@@ -70,16 +72,15 @@ public class ModelUtils {
         InstanceReader insReader = new InstanceReader(new RDFFileReader(), new WInstanceParser());
         ResultStream<Instance> expandedInInstances = insReader
             .apply(filename)
-            .innerFlatMap(ins -> store.expandInstance(ins));
+            .innerFlatMap(store::expandInstance);
 
         // Write expanded instances to model
         WInstanceWriter insWriter = new WInstanceWriter();
-        ResultConsumer<Instance> expansionErrors = new ResultConsumer<Instance>(insWriter);
+        ResultConsumer<Instance> expansionErrors = new ResultConsumer<>(insWriter);
         expandedInInstances.forEach(expansionErrors);
         assertFalse(Message.moreSevere(expansionErrors.getMessageHandler().printMessages(),
             Message.ERROR)); // No errors when expanding
-        Model ottrModel = insWriter.writeToModel();
-        return ottrModel;
+        return insWriter.writeToModel();
     }
 
 

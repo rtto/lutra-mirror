@@ -108,7 +108,7 @@ public class WParameterListParser {
         return parseTermList(varsList, true).map(ParameterList::new);
     }
 
-    public Result<List<Term>> parseTermList(Resource argsList, boolean isVariables) {
+    private Result<List<Term>> parseTermList(Resource argsList, boolean isVariables) {
         if (!argsList.canAs(RDFList.class)) {
             return Result.error("Expected ottr:withValues-related element to be an RDF-list, "
                     + "but found " + argsList.toString());

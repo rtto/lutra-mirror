@@ -25,12 +25,8 @@ package xyz.ottr.lutra.wottr.writer;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.RDFList;
 import org.apache.jena.rdf.model.Resource;
-import org.apache.jena.vocabulary.RDF;
-import xyz.ottr.lutra.OTTR;
 import xyz.ottr.lutra.model.types.BasicType;
-import xyz.ottr.lutra.model.types.LUBType;
-import xyz.ottr.lutra.model.types.ListType;
-import xyz.ottr.lutra.model.types.NEListType;
+import xyz.ottr.lutra.model.types.ComplexType;
 import xyz.ottr.lutra.model.types.TermType;
 
 public enum TypeFactory {
@@ -46,18 +42,10 @@ public enum TypeFactory {
         }
     }
 
-    // TODO split into one method for ComplexType and add use (must add) ComplextType.getIRI,
-    // and one for BasicType.
     private static RDFList createComplexRDFType(Model model, TermType type) {
-        if (type instanceof ListType) {
-            RDFList rest = createComplexRDFType(model, ((ListType) type).getInner());
-            return rest.cons(RDF.List);
-        } else if (type instanceof NEListType) {
-            RDFList rest = createComplexRDFType(model, ((NEListType) type).getInner());
-            return rest.cons(model.createResource(OTTR.TypeURI.NEList));
-        } else if (type instanceof LUBType) {
-            RDFList rest = createComplexRDFType(model, ((LUBType) type).getInner());
-            return rest.cons(model.createResource(OTTR.TypeURI.LUB));
+        if (type instanceof ComplexType) {
+            RDFList rest = createComplexRDFType(model, ((ComplexType) type).getInner());
+            return rest.cons(model.createResource(((ComplexType) type).getOuterIRI()));
         } else {
             RDFList nil = model.createList();
             Resource rdfType = model.createResource(((BasicType) type).getIRI());

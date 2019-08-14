@@ -31,7 +31,9 @@ import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.ResourceFactory;
 
-public abstract class ModelEditor {
+public enum ModelEditor {
+
+    ; // singleton enum utility class
 
     // private static Logger log = LoggerFactory.getLogger(ModelEditor.class);
 

@@ -22,11 +22,11 @@ package xyz.ottr.lutra.wottr.parser;
  * #L%
  */
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.RDFNode;
@@ -61,8 +61,7 @@ public class TripleInstanceFactory implements Supplier<ResultStream<Instance>> {
 
     private static Result<Instance> createTripleInstance(Statement stmt) {
 
-        List<Result<Term>> args = Arrays.asList(stmt.getSubject(), stmt.getPredicate(), stmt.getObject())
-            .stream()
+        List<Result<Term>> args = Stream.of(stmt.getSubject(), stmt.getPredicate(), stmt.getObject())
             .map(TripleInstanceFactory::createTerm)
             .collect(Collectors.toList());
 

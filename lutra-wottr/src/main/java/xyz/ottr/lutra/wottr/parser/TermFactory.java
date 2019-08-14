@@ -47,8 +47,7 @@ import xyz.ottr.lutra.wottr.vocabulary.WOTTRVocabulary;
 
 public class TermFactory implements Function<RDFNode, Result<Term>> {
 
-    // TODO: Verify that this is correct. This only gives correct results if blank nodes
-    // across Jena models are unique.
+    // TODO: Verify that this is correct. This only gives correct results if blank nodes across Jena models are unique.
     private static final Map<RDFList, Result<TermList>> createdLists = new HashMap<>();
     private static final Map<String, BlankNodeTerm> createdBlanks = new HashMap<>();
 

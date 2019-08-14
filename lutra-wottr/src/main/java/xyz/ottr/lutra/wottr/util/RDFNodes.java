@@ -22,6 +22,12 @@ package xyz.ottr.lutra.wottr.util;
  * #L%
  */
 
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.apache.jena.graph.Node;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.RDFList;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 
@@ -37,16 +43,41 @@ public enum RDFNodes {
             return Result.of(node.as(type));
         } else {
             return Result.error("Expected instance of " + type.getSimpleName()
-                + ", but found " + node.getClass().getSimpleName() + ": " + ModelIO.shortForm(node));
+                + ", but found " + node.getClass().getSimpleName() + ": " + RDFNodes.toString(node));
         }
     }
 
     public static Result<Resource> castURIResource(RDFNode node) {
         Result<Resource> resource = cast(node, Resource.class);
         if (resource.isPresent() && !resource.get().isURIResource()) {
-            return Result.error("Expected instance of URIResource, but got " + resource.get().toString() + ".");
+            return Result.error("Expected instance of URIResource, but got " +  RDFNodes.toString(resource.get()) + ".");
         } else {
             return resource;
         }
+    }
+
+    public static String toString(Model model, List<? extends RDFNode> nodes) {
+        return nodes.stream()
+            .map(node -> toString(model, node))
+            .collect(Collectors.joining(", ", "[", "]"));
+    }
+
+    public static String toString(Model model, RDFNode node) {
+        return node.canAs(RDFList.class)
+            ? toString(model, node.as(RDFList.class).asJavaList())
+            : toString(model, node.asNode());
+    }
+
+    public static String toString(Model model, Node node) {
+        return node.isVariable()
+            ? node.toString()
+            : model.shortForm(node.toString());
+    }
+
+    public static String toString(RDFNode node) {
+        Model model = node.getModel();
+        return model == null
+            ? node.toString()
+            : toString(model, node.asNode());
     }
 }

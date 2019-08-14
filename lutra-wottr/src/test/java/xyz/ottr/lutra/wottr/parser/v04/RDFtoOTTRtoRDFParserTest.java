@@ -48,7 +48,7 @@ public class RDFtoOTTRtoRDFParserTest {
 
         return Files.walk(folder)
                 .filter(Files::isRegularFile)
-                .map(path -> path.toString())
+                .map(Path::toString)
                 .sorted()
                 .collect(Collectors.toList());
     }

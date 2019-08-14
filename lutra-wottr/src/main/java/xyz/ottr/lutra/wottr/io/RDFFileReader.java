@@ -40,9 +40,9 @@ import xyz.ottr.lutra.wottr.util.ModelIO;
 
 public class RDFFileReader implements InputReader<String, Model> {
 
-    private final Logger log = LoggerFactory.getLogger(RDFFileReader.class);
+    private static final Logger log = LoggerFactory.getLogger(RDFFileReader.class);
     private final PrefixMapping prefixes; // Gathers prefixes parsed for later output
-    private static UrlValidator urlValidator = new UrlValidator();
+    private static final UrlValidator urlValidator = new UrlValidator();
 
     public RDFFileReader() {
         this.prefixes = PrefixMapping.Factory.create();

@@ -46,7 +46,7 @@ import xyz.ottr.lutra.wottr.writer.v04.WInstanceWriter;
 
 public class BlankNodeTest {
 
-    private final Logger log = LoggerFactory.getLogger(BlankNodeTest.class);
+    private static final Logger log = LoggerFactory.getLogger(BlankNodeTest.class);
 
     // Tests if a template including a blank node is correctly instantiated.
 
@@ -73,11 +73,11 @@ public class BlankNodeTest {
         InstanceReader insReader = new InstanceReader(new RDFFileReader(), new WInstanceParser());
         ResultStream<Instance> expandedInInstances = insReader
             .apply("src/test/resources/correct/instances/blank1/in.ttl")
-            .innerFlatMap(ins -> store.expandInstance(ins));
+            .innerFlatMap(store::expandInstance);
 
         // Write expanded instances to model
         WInstanceWriter insWriter = new WInstanceWriter();
-        ResultConsumer<Instance> expansionErrors = new ResultConsumer<Instance>(insWriter);
+        ResultConsumer<Instance> expansionErrors = new ResultConsumer<>(insWriter);
         expandedInInstances.forEach(expansionErrors);
         assertFalse(Message.moreSevere(expansionErrors.getMessageHandler().printMessages(),
                 Message.ERROR)); // No errors when expanding

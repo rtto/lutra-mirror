@@ -23,13 +23,8 @@ package xyz.ottr.lutra.wottr.util;
  */
 
 import java.io.StringWriter;
-import java.util.List;
-import java.util.StringJoiner;
 
-import org.apache.jena.graph.Node;
 import org.apache.jena.rdf.model.Model;
-import org.apache.jena.rdf.model.RDFList;
-import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.util.FileManager;
@@ -66,32 +61,4 @@ public enum ModelIO {
         RDFDataMgr.write(out, model, language);
         return out.toString();
     }
-
-    public static String shortForm(Model model, List<? extends RDFNode> nodes) {
-        StringJoiner sj = new StringJoiner(", ", "[", "]");
-        for (RDFNode node : nodes) {
-            sj.add(shortForm(model, node));
-        }
-        return sj.toString();
-    }
-
-    public static String shortForm(Model model, Node node) {
-        if (node.isVariable()) {
-            return node.toString();
-        }
-        return model.shortForm(node.toString());
-    }
-
-    public static String shortForm(Model model, RDFNode node) {
-
-        return node.canAs(RDFList.class)
-            ? shortForm(model, node.as(RDFList.class).asJavaList())
-            : shortForm(model, node.asNode());
-    }
-
-    public static String shortForm(RDFNode node) {
-        Model model = node.getModel();
-        return model == null ? node.toString() : shortForm(model, node.asNode());
-    }
-
 }

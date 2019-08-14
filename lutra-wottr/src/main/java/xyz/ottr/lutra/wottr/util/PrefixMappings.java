@@ -35,7 +35,7 @@ public enum PrefixMappings {
 
     ; // singleton enum
 
-    private static Logger log = LoggerFactory.getLogger(PrefixMappings.class);
+    private static final Logger log = LoggerFactory.getLogger(PrefixMappings.class);
 
     private static final String NS = "ns";
     private static final String defaultNSPrefix = "";

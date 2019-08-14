@@ -40,11 +40,14 @@ import org.apache.jena.util.iterator.ExtendedIterator;
 import org.apache.jena.vocabulary.RDF;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import xyz.ottr.lutra.wottr.util.ModelIO;
 
-public abstract class ModelSelector {
+import xyz.ottr.lutra.wottr.util.RDFNodes;
 
-    private static Logger log = LoggerFactory.getLogger(ModelSelector.class);
+public enum ModelSelector {
+
+    ; // singleton enum utility class
+
+    private static final Logger log = LoggerFactory.getLogger(ModelSelector.class);
 
     public static Set<String> getNamespaces(Model model) {
         Set<String> namespaces = new HashSet<>();
@@ -270,15 +273,15 @@ public abstract class ModelSelector {
     // privates
 
     private static String qname(Model model, Collection<? extends RDFNode> nodes) {
-        String list = nodes.stream().map(n -> ModelIO.shortForm(model, n)).collect(Collectors.joining(", "));
+        String list = nodes.stream().map(n -> RDFNodes.toString(model, n)).collect(Collectors.joining(", "));
         return "[" + list + "]";
     }
 
     private static String qname(Model model, List<? extends RDFNode> nodes) {
-        return ModelIO.shortForm(model, nodes);
+        return RDFNodes.toString(model, nodes);
     }
 
     private static String qname(Model model, RDFNode node) {
-        return ModelIO.shortForm(model, node);
+        return RDFNodes.toString(model, node);
     }
 }

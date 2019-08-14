@@ -42,7 +42,7 @@ public class RDFFileReaderTest {
     private static final String emptyFile = "src/test/resources/correct/emptyFile.ttl";
     private static RDFFileReader reader;
 
-    private final Logger log = LoggerFactory.getLogger(RDFFileReaderTest.class);
+    private static final Logger log = LoggerFactory.getLogger(RDFFileReaderTest.class);
     
     @BeforeClass    
     public static void load() {

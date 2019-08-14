@@ -30,7 +30,7 @@ public class ModelSelectorException extends RuntimeException {
     private static final long serialVersionUID = 1277837142317376514L;
 
     public ModelSelectorException(Object... message) {
-        this(Arrays.asList(message).stream().map(m -> m.toString()).collect(Collectors.joining()));
+        this(Arrays.stream(message).map(Object::toString).collect(Collectors.joining()));
     }
 
     public ModelSelectorException(String string) {

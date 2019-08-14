@@ -40,7 +40,9 @@ import xyz.ottr.lutra.wottr.parser.v03.util.Models;
 import xyz.ottr.lutra.wottr.vocabulary.v03.WOTTR;
 
 @SuppressWarnings("CPD-START")
-public class WParserUtils {
+public enum WParserUtils {
+
+    ; // singleton enum utility class
 
     /**
      * Constructs a canonical representation of the argument model by expanding

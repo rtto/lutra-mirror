@@ -47,14 +47,14 @@ public class PrototypeTest {
     private static final String newTemplate = "http://data.aibel.com/ottr/tpl/etl/book/ASME_B16_9_DIM/NewTemplate";
 
     @BeforeClass    
-    public static void load() throws IOException {
+    public static void load() {
         legacyReader = new TemplateReader(new RDFFileReader(), new xyz.ottr.lutra.wottr.parser.v03.WTemplateParser());
         templateReader = new TemplateReader(new RDFFileReader(), new WTemplateParser());
         graph = new DependencyGraph();
     }
 
     @Test
-    public void shouldParse() throws IOException {
+    public void shouldParse() {
         graph.addOTTRBaseTemplates();
         //templateReader.loadTemplatesFromFolder(graph, inFolder, new String []{"ttl"}, new String []{});
         legacyReader.loadTemplatesFromFolder(graph, inFolder, new String []{"ttl"}, new String []{});

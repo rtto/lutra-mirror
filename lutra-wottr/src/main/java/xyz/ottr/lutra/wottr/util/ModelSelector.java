@@ -125,8 +125,8 @@ public enum ModelSelector {
 
     private static Result getErrorResult(Model model, Resource subject, Property predicate, String error) {
         return Result.error(
-            "Error getting property value for " + ModelIO.shortForm(model, predicate)
-                + " for subject '" + ModelIO.shortForm(model, subject) + "'. " + error);
+            "Error getting property value for " + RDFNodes.toString(model, predicate)
+                + " for subject '" + RDFNodes.toString(model, subject) + "'. " + error);
     }
 
 }
