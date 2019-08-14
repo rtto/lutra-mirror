@@ -50,8 +50,6 @@ import xyz.ottr.lutra.result.ResultStream;
 import xyz.ottr.lutra.store.DependencyGraph;
 import xyz.ottr.lutra.store.TemplateStore;
 import xyz.ottr.lutra.wottr.io.RDFFileReader;
-import xyz.ottr.lutra.wottr.parser.v04.WInstanceParser;
-import xyz.ottr.lutra.wottr.parser.v04.WTemplateParser;
 
 
 @RunWith(Parameterized.class)
@@ -141,18 +139,18 @@ public class ShaclEquivalenceTest {
     
     @Test
     public void checkFile() {
-        assumeTrue(!unsupportedTests.contains(filename));
+        assumeTrue(!unsupportedTests.contains(this.filename));
         
-        if (instanceTests.contains(filename)) {
-            checkInstance(filename, isCorrect);
+        if (instanceTests.contains(this.filename)) {
+            checkInstance(this.filename, this.isCorrect);
         } else {
-            checkTemplate(filename, isCorrect);
+            checkTemplate(this.filename, this.isCorrect);
         }
     }
 
     private void checkTemplate(String file, boolean correct) {
 
-        ResultStream<TemplateSignature> templates = tempReader.apply(file);
+        ResultStream<TemplateSignature> templates = this.tempReader.apply(file);
 
         TemplateStore store = new DependencyGraph();
         ResultConsumer<TemplateSignature> tplErrorMessages = new ResultConsumer<>(store);
@@ -178,7 +176,7 @@ public class ShaclEquivalenceTest {
     }
 
     private void checkInstance(String file, boolean correct) {
-        ResultStream<Instance> instances = insReader.apply(file);
+        ResultStream<Instance> instances = this.insReader.apply(file);
 
         ResultConsumer<Instance> insErrorMessages = new ResultConsumer<>();
         instances.forEach(ins -> {

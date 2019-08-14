@@ -34,6 +34,7 @@ import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.shared.PrefixMapping;
 
+import xyz.ottr.lutra.OTTR;
 import xyz.ottr.lutra.io.TemplateParser;
 import xyz.ottr.lutra.model.Instance;
 import xyz.ottr.lutra.model.ParameterList;
@@ -56,7 +57,7 @@ public class WTemplateParser implements TemplateParser<Model> {
 
     public WTemplateParser() {
         this.instanceParser = new WInstanceParser();
-        this.prefixes = PrefixMapping.Factory.create();
+        this.prefixes = OTTR.getDefaultPrefixes();
     }
 
     @Override
@@ -98,7 +99,7 @@ public class WTemplateParser implements TemplateParser<Model> {
             signature = Result.zip(signature, pattern, Template::new);
         } else if (model.contains(signatureResource, WOTTR.pattern, (RDFNode) null)) {
             signature.addMessage(Message.error(
-                type.getLocalName() + " " + signatureURI.orElse("") + " cannot have a pattern."));
+                RDFNodes.toString(type) + " " + signatureURI.orElse("") + " cannot have a pattern."));
         }
 
         if (model.contains(signatureResource, WOTTR.annotation, (RDFNode) null)) {

@@ -44,6 +44,7 @@ import xyz.ottr.lutra.result.Result;
 import xyz.ottr.lutra.wottr.parser.TermFactory;
 import xyz.ottr.lutra.wottr.parser.v03.util.ModelSelector;
 import xyz.ottr.lutra.wottr.parser.v03.util.ModelSelectorException;
+import xyz.ottr.lutra.wottr.util.RDFNodes;
 import xyz.ottr.lutra.wottr.vocabulary.v03.WOTTR;
 
 public class WParameterListParser {
@@ -75,7 +76,7 @@ public class WParameterListParser {
                                 "Error parsing index of term. " + ex.getMessage()), resultTerm));
             } catch (ArrayIndexOutOfBoundsException ex) {
                 String msg = "Index " + indexValue + " too large, number of terms is " + toParse.size()
-                    + (resultTerm.isPresent() ? ", for indexed element " + resultTerm.get().toString() : "");
+                    + (resultTerm.isPresent() ? ", for indexed element " + resultTerm.get() : "");
                 errors.add(Result.empty(new Message(Message.ERROR, msg), resultTerm));
             }
         }
@@ -110,8 +111,8 @@ public class WParameterListParser {
 
     private Result<List<Term>> parseTermList(Resource argsList, boolean isVariables) {
         if (!argsList.canAs(RDFList.class)) {
-            return Result.error("Expected ottr:withValues-related element to be an RDF-list, "
-                    + "but found " + argsList.toString());
+            return Result.error("Expected " + RDFNodes.toString(WOTTR.withValues) + " element to be an RDF-list, "
+                    + "but found " + RDFNodes.toString(argsList));
         }
         TermFactory termFactory = new TermFactory(WOTTR.theInstance);
         List<Result<Term>> arguments = argsList

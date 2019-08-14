@@ -42,6 +42,7 @@ import xyz.ottr.lutra.result.Result;
 import xyz.ottr.lutra.wottr.parser.TermFactory;
 import xyz.ottr.lutra.wottr.parser.v03.util.ModelSelector;
 import xyz.ottr.lutra.wottr.parser.v03.util.ModelSelectorException;
+import xyz.ottr.lutra.wottr.util.RDFNodes;
 import xyz.ottr.lutra.wottr.vocabulary.v03.WOTTR;
 
 public class WArgumentParser implements Function<Resource, Result<Term>> {
@@ -77,7 +78,7 @@ public class WArgumentParser implements Function<Resource, Result<Term>> {
                 if (this.listExpander == null || this.listExpander == ArgumentList.Expander.CROSS) {
                     this.listExpander = ArgumentList.Expander.CROSS;
                 } else {
-                    resultTerm = Result.error("Error parsing instance " + p.toString()
+                    resultTerm = Result.error("Error parsing instance " + RDFNodes.toString(p)
                                 + ": An instance cannot have two different list expanders. ");
                 }
             }

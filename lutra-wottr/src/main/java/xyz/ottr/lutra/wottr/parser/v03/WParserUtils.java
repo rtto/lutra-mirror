@@ -37,6 +37,7 @@ import org.apache.jena.rdf.model.StmtIterator;
 import xyz.ottr.lutra.io.ReaderException;
 import xyz.ottr.lutra.wottr.parser.v03.util.ModelSelector;
 import xyz.ottr.lutra.wottr.parser.v03.util.Models;
+import xyz.ottr.lutra.wottr.util.RDFNodes;
 import xyz.ottr.lutra.wottr.vocabulary.v03.WOTTR;
 
 @SuppressWarnings("CPD-START")
@@ -59,8 +60,8 @@ public enum WParserUtils {
                 Resource s = t.getSubject();
                 RDFNode o = t.getObject();
                 if (!o.canAs(RDFList.class) || o.canAs(RDFList.class) && o.as(RDFList.class).isEmpty()) {
-                    throw new ReaderException("Error parsing value of " + m.getKey().getLocalName()
-                            + ". Expecting a non-empty rdf:List, but found: " + o.toString());
+                    throw new ReaderException("Error parsing value of " + RDFNodes.toString(m.getKey())
+                            + ". Expecting a non-empty rdf:List, but found: " + RDFNodes.toString(o));
                 }
                 // TODO check this hard-coding of indices
                 RDFList objList = o.as(RDFList.class);

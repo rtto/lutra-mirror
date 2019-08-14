@@ -23,6 +23,7 @@ package xyz.ottr.lutra.wottr.parser.v04;
  */
 
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
@@ -51,13 +52,13 @@ public class RDFTemplateParserTest {
 
         Model model = ModelFactory.createDefaultModel();
         ResultStream<TemplateSignature> empty = templateParser.apply(model);
-        empty.innerForEach(none -> assertTrue(false));
+        empty.innerForEach(none -> fail());
 
         Resource templateIRI = model.createResource("http://example.org/template");
         model.add(model.createStatement(templateIRI, RDF.type, WOTTR.Template));
 
         ResultStream<TemplateSignature> onlyURI = templateParser.apply(model);
-        onlyURI.innerForEach(none -> assertTrue(false));
+        onlyURI.innerForEach(none -> fail());
 
         RDFList paramLst = model.createList();
         Resource value = model.createResource("http://example.org#param");
@@ -65,7 +66,7 @@ public class RDFTemplateParserTest {
         model.add(model.createStatement(templateIRI, WOTTR.parameters, paramLst));
 
         ResultStream<TemplateSignature> noBody = templateParser.apply(model);
-        noBody.innerForEach(none -> assertTrue(false));
+        noBody.innerForEach(none -> fail());
     }
 
     @AfterClass

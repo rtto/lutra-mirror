@@ -100,7 +100,8 @@ public class WInstanceParser implements InstanceParser<Model> {
 
         Result<ArgumentList> argumentList;
         if (arguments.isPresent() == values.isPresent()) { // true if both exist or both are missing
-            return Result.error("An instance must have either one " + WOTTR.arguments + " or one " + WOTTR.values + ".");
+            return Result.error("An instance must have either one " + RDFNodes.toString(WOTTR.arguments)
+                + " or one " + RDFNodes.toString(WOTTR.values) + ".");
         } else if (arguments.isPresent()) {
             argumentList = arguments.flatMap(args -> getArguments(model, args, expander));
         } else { //if (values.isPresent()) {
@@ -125,7 +126,7 @@ public class WInstanceParser implements InstanceParser<Model> {
         return ModelSelector.getOptionalResourceObject(model, instance, WOTTR.modifier)
             .flatMap(r -> WOTTR.listExpanders.keySet().contains(r)
                 ? Result.ofNullable(WOTTR.listExpanders.get(r))
-                : Result.error("Unknown expander " + r.toString() + " in instance " + instance.toString() + "."));
+                : Result.error("Unknown expander " + RDFNodes.toString(r) + " in instance " + RDFNodes.toString(instance) + "."));
     }
 
     private Result<ArgumentList> getArguments(Model model, RDFList arguments, Result<ArgumentList.Expander> expander) {
@@ -158,7 +159,7 @@ public class WInstanceParser implements InstanceParser<Model> {
         List<Result<Term>> x = ResultStream
             .innerOf(lstRes.asJavaList())
             .mapFlatMap(node -> illegalArgumentValue.test(node)
-                ? Result.error("Illegal argument, argument value " + node + " is in the ottr namespace: " + OTTR.namespace)
+                ? Result.error("Illegal argument, value " + RDFNodes.toString(node) + " is in the ottr namespace: " + OTTR.namespace)
                 : Result.of(node))
             .mapFlatMap(parser)
             .collect(Collectors.toList());

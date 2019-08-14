@@ -38,6 +38,7 @@ import xyz.ottr.lutra.result.Result;
 import xyz.ottr.lutra.result.ResultStream;
 import xyz.ottr.lutra.wottr.parser.TripleInstanceFactory;
 import xyz.ottr.lutra.wottr.parser.v03.util.ModelSelector;
+import xyz.ottr.lutra.wottr.util.RDFNodes;
 import xyz.ottr.lutra.wottr.vocabulary.v03.WOTTR;
 
 public class WInstanceParser implements InstanceParser<Model> {
@@ -76,7 +77,7 @@ public class WInstanceParser implements InstanceParser<Model> {
 
         if (!templateInstanceNode.isResource()) {
             return Result.error("Expected instance to be a resource, found non-resource "
-                        + templateInstanceNode.toString() + ".");
+                        + RDFNodes.toString(templateInstanceNode) + ".");
         }
 
         Resource templateInstance = templateInstanceNode.asResource();
@@ -94,8 +95,7 @@ public class WInstanceParser implements InstanceParser<Model> {
                 WOTTR.withValues);
             resArgumentList = parameterListParser.parseValues(argsList);
         } else {
-            return Result.error("Found no arguments for instance of "
-                    + templateRef.getURI());
+            return Result.error("Found no arguments for instance of " + RDFNodes.toString(templateRef));
         }
 
         String toURI = templateRef.getURI(); 

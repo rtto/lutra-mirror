@@ -40,6 +40,7 @@ import xyz.ottr.lutra.model.types.NEListType;
 import xyz.ottr.lutra.model.types.TermType;
 import xyz.ottr.lutra.model.types.TypeFactory;
 import xyz.ottr.lutra.result.Result;
+import xyz.ottr.lutra.wottr.util.RDFNodes;
 
 public class TermTypeFactory implements Function<RDFNode, Result<TermType>> {
 
@@ -59,8 +60,8 @@ public class TermTypeFactory implements Function<RDFNode, Result<TermType>> {
         TermType type = TypeFactory.getType(node.getURI()); 
 
         if (type == null) {
-            return Result.error("Expected a resource denoting a simple type, but no simple type with IRI "
-                + node.getURI() + " exists.");
+            return Result.error("Expected a resource denoting a simple type, but no simple type "
+                + RDFNodes.toString(node) + " exists.");
         } else {
             return Result.of(type);
         }
@@ -73,7 +74,7 @@ public class TermTypeFactory implements Function<RDFNode, Result<TermType>> {
         }
         RDFNode typeNode = complexType.next();
         if (!typeNode.isResource() || typeNode.asResource().getURI() == null) {
-            return Result.error("A type constructor must be denoted by an IRI, but got " + typeNode.toString());
+            return Result.error("A type constructor must be denoted by an IRI, but got " + RDFNodes.toString(typeNode));
         }
         Resource type = typeNode.asResource();
 

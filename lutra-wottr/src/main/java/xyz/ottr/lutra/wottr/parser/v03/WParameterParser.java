@@ -42,11 +42,11 @@ import xyz.ottr.lutra.OTTR;
 import xyz.ottr.lutra.model.Term;
 import xyz.ottr.lutra.model.types.TermType;
 import xyz.ottr.lutra.model.types.TypeFactory;
-import xyz.ottr.lutra.result.Message;
 import xyz.ottr.lutra.result.Result;
 import xyz.ottr.lutra.wottr.parser.TermFactory;
 import xyz.ottr.lutra.wottr.parser.v03.util.ModelSelector;
 import xyz.ottr.lutra.wottr.parser.v03.util.ModelSelectorException;
+import xyz.ottr.lutra.wottr.util.RDFNodes;
 import xyz.ottr.lutra.wottr.vocabulary.v03.WOTTR;
 
 public class WParameterParser implements Function<Resource, Result<Term>> {
@@ -79,7 +79,7 @@ public class WParameterParser implements Function<Resource, Result<Term>> {
 
             resultTerm = varAssignment != null
                 ? this.rdfTermFactory.apply(varAssignment.getObject())
-                : Result.empty(new Message(Message.ERROR, "No variable for parameter " + p.toString() + "."));
+                : Result.error("No variable for parameter " + RDFNodes.toString(p) + ".");
 
             // Set default variable type, as legacy does not have a notion of types
             if (type != null) {

@@ -31,11 +31,15 @@ import org.apache.jena.rdf.model.RDFList;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 
+import org.apache.jena.shared.PrefixMapping;
+import xyz.ottr.lutra.OTTR;
 import xyz.ottr.lutra.result.Result;
 
 public enum RDFNodes {
 
     ; // singleton enum
+
+    private static final PrefixMapping defaultPrefixes = OTTR.getDefaultPrefixes();
 
     public static <X extends RDFNode> Result<X> cast(RDFNode node, Class<X> type) {
 
@@ -68,16 +72,17 @@ public enum RDFNodes {
             : toString(model, node.asNode());
     }
 
-    public static String toString(Model model, Node node) {
-        return node.isVariable()
-            ? node.toString()
-            : model.shortForm(node.toString());
+    public static String toString(RDFNode node) {
+        return toString(node.getModel(), node.asNode());
     }
 
-    public static String toString(RDFNode node) {
-        Model model = node.getModel();
-        return model == null
-            ? node.toString()
-            : toString(model, node.asNode());
+    public static String toString(Model model, Node node) {
+        if (node.isVariable()) {
+            return node.toString();
+        } else {
+            return (model == null)
+                ? defaultPrefixes.shortForm(node.toString())
+                : model.shortForm(node.toString());
+        }
     }
 }

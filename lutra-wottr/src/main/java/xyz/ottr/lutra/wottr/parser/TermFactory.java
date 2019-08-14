@@ -43,6 +43,7 @@ import xyz.ottr.lutra.model.NoneTerm;
 import xyz.ottr.lutra.model.Term;
 import xyz.ottr.lutra.model.TermList;
 import xyz.ottr.lutra.result.Result;
+import xyz.ottr.lutra.wottr.util.RDFNodes;
 import xyz.ottr.lutra.wottr.vocabulary.WOTTRVocabulary;
 
 public class TermFactory implements Function<RDFNode, Result<Term>> {
@@ -68,7 +69,7 @@ public class TermFactory implements Function<RDFNode, Result<Term>> {
         } else if (node.isLiteral()) {
             return createLiteralTerm(node.asLiteral()).map(tl -> (Term) tl);
         } else {
-            return Result.error("Unable to parse RDFNode " + node.toString() + " to Term.");
+            return Result.error("Unable to parse RDFNode " + RDFNodes.toString(node) + " to Term.");
         }
     }
 
@@ -81,7 +82,7 @@ public class TermFactory implements Function<RDFNode, Result<Term>> {
         } else if (node.isAnon()) {
             return createBlankNodeTerm(node.getId().getBlankNodeId()).map(tl -> (Term) tl); // Need to cast to Result<Term>
         } else {
-            return Result.error("Unable to parse resource " + node.toString() + " to Term.");
+            return Result.error("Unable to parse resource " + RDFNodes.toString(node) + " to Term.");
         }
     }
 

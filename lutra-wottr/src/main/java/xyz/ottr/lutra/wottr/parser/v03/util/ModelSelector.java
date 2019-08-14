@@ -51,7 +51,7 @@ public enum ModelSelector {
 
     public static Set<String> getNamespaces(Model model) {
         Set<String> namespaces = new HashSet<>();
-        for (Resource uri : ModelSelector.getURIResources(model)) {
+        for (Resource uri : getURIResources(model)) {
             namespaces.add(uri.getNameSpace());
         }
         return namespaces;
@@ -106,7 +106,7 @@ public enum ModelSelector {
         for (Property p : properties) {
             statements.addAll(model.listStatements(subject, p, (RDFNode) null).toSet());
         }
-        return !statements.isEmpty() ? statements.iterator().next() : null;
+        return statements.isEmpty() ? null : statements.iterator().next();
     }
 
     ////////////////////////////////////

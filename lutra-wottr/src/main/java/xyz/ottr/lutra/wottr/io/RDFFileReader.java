@@ -33,6 +33,7 @@ import org.apache.jena.shared.PrefixMapping;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import xyz.ottr.lutra.OTTR;
 import xyz.ottr.lutra.io.InputReader;
 import xyz.ottr.lutra.result.Result;
 import xyz.ottr.lutra.result.ResultStream;
@@ -45,7 +46,7 @@ public class RDFFileReader implements InputReader<String, Model> {
     private static final UrlValidator urlValidator = new UrlValidator();
 
     public RDFFileReader() {
-        this.prefixes = PrefixMapping.Factory.create();
+        this.prefixes = OTTR.getDefaultPrefixes();
     }
 
     public PrefixMapping getPrefixes() {
@@ -64,9 +65,8 @@ public class RDFFileReader implements InputReader<String, Model> {
             log.info("Adding model " + model.hashCode() + " with URI " + url);
         } catch (JenaException ex) {
             // TODO: Correct Message level?
+            // TODO: Make messages for other exceptions(?)
             result = Result.error("Unable to parse model " + url + ": " + ex.getMessage());
-        } catch (Exception e) { // TODO: Make messages for other exceptions(?)
-            result = Result.error("Unable to parse model " + url + ": " + e.getMessage());
         }
         return result;
     }

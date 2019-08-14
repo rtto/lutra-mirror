@@ -39,6 +39,7 @@ import org.apache.jena.shared.PrefixMapping;
 //import org.slf4j.Logger;
 //import org.slf4j.LoggerFactory;
 
+import xyz.ottr.lutra.OTTR;
 import xyz.ottr.lutra.io.TemplateParser;
 import xyz.ottr.lutra.model.ArgumentList;
 import xyz.ottr.lutra.model.BlankNodeTerm;
@@ -62,7 +63,7 @@ public class WTemplateParser implements TemplateParser<Model> {
 
     public WTemplateParser() {
         this.instanceParser = new WInstanceParser();
-        this.prefixes = PrefixMapping.Factory.create();
+        this.prefixes = OTTR.getDefaultPrefixes();
     }
 
     @Override

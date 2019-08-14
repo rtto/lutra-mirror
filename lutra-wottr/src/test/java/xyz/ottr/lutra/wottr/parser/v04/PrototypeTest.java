@@ -22,7 +22,6 @@ package xyz.ottr.lutra.wottr.parser.v04;
  * #L%
  */
 
-import java.io.IOException;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -32,7 +31,6 @@ import xyz.ottr.lutra.model.Template;
 import xyz.ottr.lutra.result.ResultConsumer;
 import xyz.ottr.lutra.store.DependencyGraph;
 import xyz.ottr.lutra.wottr.io.RDFFileReader;
-import xyz.ottr.lutra.wottr.parser.v04.WTemplateParser;
 import xyz.ottr.lutra.wottr.writer.v04.WTemplateWriter;
 
 public class PrototypeTest {

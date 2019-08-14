@@ -22,7 +22,6 @@ package xyz.ottr.lutra.wottr.parser.v04;
  * #L%
  */
 
-import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -31,7 +30,6 @@ import java.util.List;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
-import xyz.ottr.lutra.wottr.parser.v04.ModelUtils;
 import xyz.ottr.lutra.wottr.util.ModelIO;
 
 @RunWith(Parameterized.class)

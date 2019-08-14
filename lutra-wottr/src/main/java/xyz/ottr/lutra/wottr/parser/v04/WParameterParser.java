@@ -102,7 +102,7 @@ public class WParameterParser implements Function<RDFNode, Result<Term>> {
             .of(ModelSelector.getResourceObjects(this.model, parameter, WOTTR.modifier))
             .mapFlatMap(r -> WOTTR.argumentModifiers.contains(r)
                 ? Result.of(r)
-                : Result.error("Unknown modifier " + r.toString() + " in parameter " + parameter.toString() + "."))
+                : Result.error("Unknown modifier " + RDFNodes.toString(r) + " in parameter " + RDFNodes.toString(parameter) + "."))
             .collect(Collectors.toList());
 
         return Result.aggregate(modifiers);

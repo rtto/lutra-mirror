@@ -72,8 +72,8 @@ public class WArgumentParser implements Function<RDFNode, Result<Term>> {
         return ModelSelector.getOptionalResourceObject(this.model, argument, WOTTR.modifier)
             .flatMap(r -> r.equals(WOTTR.listExpand)
                 ? Result.of(r)
-                : Result.error("Error parsing argument modifier, expected " + WOTTR.listExpand.toString()
-                + ", but got " + r.toString() + "."));
+                : Result.error("Error parsing argument modifier, expected " + RDFNodes.toString(WOTTR.listExpand)
+                + ", but got " + RDFNodes.toString(r) + "."));
     }
 
     public Set<Term> getExpanderValues() {
