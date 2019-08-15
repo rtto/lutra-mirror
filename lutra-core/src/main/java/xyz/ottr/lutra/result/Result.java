@@ -29,7 +29,9 @@ import java.util.List;
 //import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
+import java.util.function.BiPredicate;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -188,6 +190,22 @@ public class Result<E> {
         return new Result<R>(Optional.empty(), msgs, null);
     }
 
+    public static <R> Result<R> fatal(String msg) {
+        return empty(Message.fatal(msg));
+    }
+
+    public static <R> Result<R> error(String msg) {
+        return empty(Message.error(msg));
+    }
+
+    public static <R> Result<R> warning(String msg) {
+        return empty(Message.warning(msg));
+    }
+
+    public static <R> Result<R> info(String msg) {
+        return empty(Message.info(msg));
+    }
+
     protected Result<?> deriveContext() {
         if (!this.isContext) {
             Result<?> context = this.map(deriveContext);
@@ -215,16 +233,23 @@ public class Result<E> {
     }
 
     /**
+     * Add a result to this result by bi-consuming this and the other result. Adds the other result to the
+     * context of this result.
+     * @see Result#addResult(Result, BiConsumer)
+     */
+    public <B> void addResult(Result<B> other, BiConsumer<? super E, ? super B> consumer) {
+        if (this.result.isPresent() && other.isPresent()) {
+            consumer.accept(this.result.get(), other.result.get());
+        }
+        this.addParsedFrom(other);
+    }
+
+    /**
      * Applies f to the values contained in argument results if both are present, and
      * returns empty Result if not, but keeps both argument Result's messages.
      */
     public static <A,B,R> Result<R> zip(Result<A> a, Result<B> b, BiFunction<A,B,R> f) {
-        // TODO: Implement using flatMap to get parsedFrom pointers instead of addMessage
-        R r = a.isPresent() && b.isPresent() ? f.apply(a.get(), b.get()) : null;
-        Result<R> res = Result.ofNullable(r);
-        res.addParsedFrom(a);
-        res.addParsedFrom(b);
-        return res;
+        return conditionalZip(a, b, (x,y) -> x.isPresent() && y.isPresent(), f);
     }
 
     /**
@@ -232,14 +257,48 @@ public class Result<E> {
      * and keeps both argument Result's messages.
      */
     public static <A,B,R> Result<R> zipNullables(Result<A> a, Result<B> b, BiFunction<A,B,R> f) {
+        return conditionalZip(a, b, (x,y) -> true, f);
+    }
+
+
+    /**
+     * Applies f to the values (possibly null) contained in argument results if the condition is met, and
+     * returns an empty Result if not, but keeps both argument Result's messages.
+     */
+    public static <A,B,R> Result<R> conditionalZip(Result<A> a, Result<B> b, BiPredicate<Result<A>, Result<B>> p, BiFunction<A, B, R> f) {
         // TODO: Implement using flatMap to get parsedFrom pointers instead of addMessage
-        A aval = a.isPresent() ? a.get() : null;
-        B bval = b.isPresent() ? b.get() : null;
-        R r = f.apply(aval, bval);
-        Result<R> res = Result.ofNullable(r);
+        Result<R> res = p.test(a, b)
+            ? Result.ofNullable(f.apply(a.orElse(null), b.orElse(null)))
+            : Result.empty();
         res.addParsedFrom(a);
         res.addParsedFrom(b);
         return res;
+    }
+
+
+    /**
+     * Applies f to the value contained in the argument result if it is present, and
+     * returns empty Result if not.
+     */
+    public static <A,B,R> Result<R> apply(Result<A> a, Function<A, Result<R>> f) {
+        return a.isPresent() ? f.apply(a.get()) : Result.empty();
+    }
+
+    /**
+     * Applies f to the values contained in argument results if both are present, and
+     * returns empty Result if not.
+     */
+    public static <A,B,R> Result<R> apply(Result<A> a, Result<B> b, BiFunction<A, B, Result<R>> f) {
+        return a.isPresent() && b.isPresent() ? f.apply(a.get(), b.get()) : Result.empty();
+    }
+
+    /**
+     * Consumes the values contained in argument results if both are present.
+     */
+    public static <A,B> void consume(Result<A> a, Result<B> b, BiConsumer<A,B> f) {
+        if (a.isPresent() && b.isPresent()) {
+            f.accept(a.get(), b.get());
+        }
     }
 
     /**
@@ -309,6 +368,13 @@ public class Result<E> {
      */
     public E get() {
         return this.result.get();
+    }
+
+    /**
+     * @see Optional#orElse(E)
+     */
+    public E orElse(E other) {
+        return this.result.orElse(other);
     }
 
     /**

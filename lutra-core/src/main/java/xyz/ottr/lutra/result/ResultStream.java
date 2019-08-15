@@ -58,6 +58,10 @@ public class ResultStream<E> {
         return new ResultStream<R>(Stream.of(r));
     }
 
+    public static <R> ResultStream<R> of(Collection<Result<R>> results) {
+        return new ResultStream<R>(results);
+    }
+
     /**
      * Returns a ResultStream consisting of one Result per element
      * in argument Collection.
