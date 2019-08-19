@@ -63,11 +63,9 @@ public enum WParserUtils {
                     throw new ReaderException("Error parsing value of " + RDFNodes.toString(m.getKey())
                             + ". Expecting a non-empty rdf:List, but found: " + RDFNodes.toString(o));
                 }
-                // TODO check this hard-coding of indices
                 RDFList objList = o.as(RDFList.class);
                 List<RDFNode> nodes = objList.asJavaList();
                 for (int i = 0; i < nodes.size(); i += 1) {
-                    // TODO see release/0.1 for ottr:none support
                     Resource param = canonical.createResource();
                     canonical.add(s, m.getValue().get(0), param);
                     canonical.add(param, m.getValue().get(1), nodes.get(i));

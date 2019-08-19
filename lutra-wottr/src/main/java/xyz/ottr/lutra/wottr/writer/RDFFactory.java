@@ -84,7 +84,8 @@ public class RDFFactory {
         } else if (term instanceof NoneTerm) {
             return createNone(model, (NoneTerm) term);
         } else {
-            return null; // TODO: Throw exception
+            throw new IllegalArgumentException("Error converting term " + term + " to RDFNode. "
+                + "Unexpected term class: " + term.getClass().getSimpleName());
         }
     }
 

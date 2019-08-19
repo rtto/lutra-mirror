@@ -70,16 +70,10 @@ public class WTemplateParser implements TemplateParser<Model> {
 
         this.prefixes.setNsPrefixes(model);
 
-        ResultStream<TemplateSignature> allSignatures = ResultStream.empty(); // for accumulating parsed objects
-
-        // parse each of the types of templates:
-        for (Resource type : templateTypes) {
-            ResultStream<TemplateSignature> newSignatures = ResultStream.innerOf(ModelSelector.getInstancesOfClass(model, type))
-                .mapFlatMap(res -> this.parseSignature(model, res, type));
-            allSignatures = ResultStream.concat(allSignatures, newSignatures);
-        }
-
-        return allSignatures;
+        return templateTypes.stream()
+            .map(type -> ResultStream.innerOf(ModelSelector.getInstancesOfClass(model, type))
+                .mapFlatMap(res -> this.parseSignature(model, res, type)))
+            .reduce(ResultStream.empty(), ResultStream::concat);
     }
 
     private Result<TemplateSignature> parseSignature(Model model, Resource signatureResource, Resource type) {

@@ -22,6 +22,8 @@ package xyz.ottr.lutra.wottr.writer.v04;
  * #L%
  */
 
+import java.util.Objects;
+
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.RDFList;
@@ -92,9 +94,7 @@ public class WInstanceWriter implements InstanceWriter {
 
     private void addArguments(ArgumentList arguments, Resource iri, Model model) {
 
-        if (arguments == null) {
-            return; // TODO: Perhaps throw exception(?)
-        }
+        Objects.requireNonNull(arguments, "Cannot add arguments with no argument list.");
 
         RDFList argsLst = model.createList();
 

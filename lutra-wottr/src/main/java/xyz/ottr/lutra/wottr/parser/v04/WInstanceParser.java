@@ -109,9 +109,9 @@ public class WInstanceParser implements InstanceParser<Model> {
         }
 
         argumentList.ifPresent(list -> {
-            if (list.hasListExpander() == list.getExpanderValues().isEmpty()) {
+            if (list.hasListExpander() == list.getExpanderValues().isEmpty()) { // xor = not equal
                 argumentList.addMessage(Message.error(
-                    "An instance must have a list expander if and only if it as one or more expander values."));
+                    "An instance must have a list expander if and only if it has one or more expander values."));
             }
         });
 
@@ -144,15 +144,15 @@ public class WInstanceParser implements InstanceParser<Model> {
     private Result<ArgumentList> getArgumentList(Result<List<Term>> argumentList, Result<ArgumentList.Expander> expander,
                                                  Set<Term> expanderValues) {
         return Result.conditionalZip(argumentList, expander,
-            (terms, exp) -> terms.isPresent() && exp.getMessages().isEmpty(), // check that there are no errors
+            (terms, exp) -> terms.isPresent(),
             (terms, exp) -> new ArgumentList(terms, expanderValues, exp));
     }
 
+    // Finds URIs that are in the ottr namespace, except ottr:none which is allowed.
     private static final Predicate<RDFNode> illegalArgumentValue = node ->
         node.isURIResource()
             && node.asResource().getNameSpace().equals(OTTR.namespace)
-            && !node.asResource().equals(WOTTR.none)
-        ;
+            && !node.asResource().equals(WOTTR.none);
 
     private static Result<List<Term>> parseTermsWith(RDFList lstRes, Function<RDFNode, Result<Term>> parser) {
 

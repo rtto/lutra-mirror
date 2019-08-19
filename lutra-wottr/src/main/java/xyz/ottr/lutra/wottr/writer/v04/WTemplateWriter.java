@@ -24,6 +24,7 @@ package xyz.ottr.lutra.wottr.writer.v04;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 import org.apache.jena.rdf.model.Model;
@@ -115,9 +116,7 @@ public class WTemplateWriter implements TemplateWriter {
 
     private void addParameters(ParameterList parameters, Resource iri, Model model) {
 
-        if (parameters == null) {
-            return; // TODO: Perhaps throw exception(?)
-        }
+        Objects.requireNonNull(parameters, "Cannot add parameters with no parameter list.");
 
         RDFList paramLst = model.createList();
 

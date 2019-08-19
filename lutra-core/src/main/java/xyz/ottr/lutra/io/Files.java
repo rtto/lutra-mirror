@@ -25,7 +25,9 @@ package xyz.ottr.lutra.io;
 import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.function.Function;
+import java.util.stream.Stream;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOCase;
@@ -39,13 +41,13 @@ import xyz.ottr.lutra.result.Result;
 import xyz.ottr.lutra.result.ResultStream;
 
 public abstract class Files {
-    // TODO is this correct
+
     private static IOFileFilter hiddenFiles = new NotFileFilter(
             FileFilterUtils.or(new PrefixFileFilter("."), new PrefixFileFilter("#")));
     private static Function<String, IOFileFilter> extFilter = string -> FileFilterUtils.suffixFileFilter(string,
             IOCase.INSENSITIVE);
 
-    public static Message checkIsReadableFolder(String folder) throws SecurityException {
+    public static Message checkFolderReadable(String folder) throws SecurityException {
         Path path = Paths.get(folder);
 
         try {
@@ -53,7 +55,7 @@ public abstract class Files {
                 return Message.error("No folder with path " + folder + " exists.");
             }
             if (!java.nio.file.Files.isDirectory(path)) {
-                return Message.error("The path " + folder + " does not denote a folder.");
+                return Message.error("The path " + folder + " is not a folder.");
             }
             if (!java.nio.file.Files.isReadable(path)) {
                 return Message.error("The folder " + folder + " is not readable.");
@@ -69,47 +71,35 @@ public abstract class Files {
     public static ResultStream<File> getFolderContents(String folder, String[] includeExtensions,
             String[] excludeExtensions) {
 
-        Message err = checkIsReadableFolder(folder);
+        Message err = checkFolderReadable(folder);
         if (err != null) {
             return ResultStream.of(Result.empty(err));
         }
-            
-        IOFileFilter ext = null;
 
-        for (int i = 0; i < includeExtensions.length; i += 1) {
-            if (i == 0 && ext == null) {
-                ext = extFilter.apply(includeExtensions[i]);
-            }
-            ext = FileFilterUtils.or(ext, extFilter.apply(includeExtensions[i]));
-        }
+        // if there are no includes, we include all, i.e, the filter is true, else take the disjunction.
+        IOFileFilter includes = (includeExtensions.length == 0)
+            ? FileFilterUtils.trueFileFilter()
+            : Arrays.stream(includeExtensions)
+            .map(extFilter)
+            .reduce(FileFilterUtils.falseFileFilter(), FileFilterUtils::or);
 
-        for (int i = 0; i < excludeExtensions.length; i += 1) {
-            if (i == 0 && ext == null) {
-                ext = FileFilterUtils.notFileFilter(extFilter.apply(excludeExtensions[i]));
-            } else {
-                ext = FileFilterUtils.and(ext, FileFilterUtils.notFileFilter(extFilter.apply(excludeExtensions[i])));
-            }
-        }
+        // conjuction of negations
+        IOFileFilter excludes = Arrays.stream(excludeExtensions)
+            .map(extFilter)
+            .map(FileFilterUtils::notFileFilter)
+            .reduce(FileFilterUtils.trueFileFilter(), FileFilterUtils::and);
 
-        if (ext == null) {
-            ext = FileFilterUtils.trueFileFilter();
-        }
+        // conjunction of all filters:
+        IOFileFilter fileFilter = Stream.of(includes, excludes, hiddenFiles)
+            .reduce(FileFilterUtils.trueFileFilter(), FileFilterUtils::and);
 
-        return ResultStream.innerOf(
-            FileUtils.listFiles(new File(folder),
-                FileFilterUtils.and(hiddenFiles, ext),
-                hiddenFiles));
+        return ResultStream.innerOf(FileUtils.listFiles(new File(folder), fileFilter, hiddenFiles));
     }
 
     public static ResultStream<String> loadFromFolder(String folder, String[] includeExtensions,
             String[] excludeExtensions) {
 
-        Message err = checkIsReadableFolder(folder);
-        if (err != null) {
-            return ResultStream.of(Result.empty(err));
-        }
-            
-        return Files.getFolderContents(folder, includeExtensions, excludeExtensions)
+        return getFolderContents(folder, includeExtensions, excludeExtensions)
             .mapFlatMap(file -> Result.of(file.getPath()));
     }
 }

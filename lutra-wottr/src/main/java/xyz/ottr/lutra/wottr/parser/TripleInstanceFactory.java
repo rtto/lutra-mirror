@@ -38,6 +38,7 @@ import xyz.ottr.lutra.model.Instance;
 import xyz.ottr.lutra.model.Term;
 import xyz.ottr.lutra.result.Result;
 import xyz.ottr.lutra.result.ResultStream;
+import xyz.ottr.lutra.wottr.util.RDFNodes;
 import xyz.ottr.lutra.wottr.vocabulary.v04.WOTTR;
 
 public class TripleInstanceFactory implements Supplier<ResultStream<Instance>> {
@@ -81,8 +82,11 @@ public class TripleInstanceFactory implements Supplier<ResultStream<Instance>> {
         } else if (node.isAnon()) {
             return rdfTermFactory.createBlankNodeTerm(node.asResource().getId().getBlankNodeId())
                 .map(t -> (Term) t);
-        } else { // is literal
-            return rdfTermFactory.apply(node);
+        } else if (node.isLiteral()) {
+            return rdfTermFactory.createLiteralTerm(node.asLiteral())
+                .map(t -> (Term) t);
+        } else {
+            throw new IllegalArgumentException("Error converting RDFNode " + RDFNodes.toString(node) + " to Term. ");
         }
     }
 }
