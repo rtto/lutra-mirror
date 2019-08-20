@@ -256,7 +256,7 @@ public interface TemplateStore extends Consumer<TemplateSignature> {
      * @param instance
      *     the template instance to expand
      *
-     * @param reader
+     * @param readers
      *     the reader which should be used to fetch and read missing templates
      *
      * @return
