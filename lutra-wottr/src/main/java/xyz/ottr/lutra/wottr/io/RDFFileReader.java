@@ -33,7 +33,6 @@ import org.apache.jena.shared.PrefixMapping;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import xyz.ottr.lutra.OTTR;
 import xyz.ottr.lutra.io.InputReader;
 import xyz.ottr.lutra.result.Result;
 import xyz.ottr.lutra.result.ResultStream;
@@ -46,7 +45,7 @@ public class RDFFileReader implements InputReader<String, Model> {
     private static final UrlValidator urlValidator = new UrlValidator();
 
     public RDFFileReader() {
-        this.prefixes = OTTR.getDefaultPrefixes();
+        this.prefixes = PrefixMapping.Factory.create();
     }
 
     public PrefixMapping getPrefixes() {
