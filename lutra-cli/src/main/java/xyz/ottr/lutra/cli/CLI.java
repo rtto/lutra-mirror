@@ -52,13 +52,17 @@ import xyz.ottr.lutra.result.ResultStream;
 import xyz.ottr.lutra.store.DependencyGraph;
 import xyz.ottr.lutra.store.TemplateStore;
 
-import xyz.ottr.lutra.tabottr.io.TabInstanceParser;
-import xyz.ottr.lutra.wottr.WTemplateFactory;
-import xyz.ottr.lutra.wottr.io.WFileReader;
-import xyz.ottr.lutra.wottr.io.WInstanceParser;
-import xyz.ottr.lutra.wottr.io.WInstanceWriter;
-import xyz.ottr.lutra.wottr.io.WTemplateParser;
-import xyz.ottr.lutra.wottr.io.WTemplateWriter;
+import xyz.ottr.lutra.stottr.io.SFileReader;
+import xyz.ottr.lutra.stottr.io.SInstanceParser;
+import xyz.ottr.lutra.stottr.io.SInstanceWriter;
+import xyz.ottr.lutra.stottr.io.STemplateParser;
+import xyz.ottr.lutra.stottr.io.STemplateWriter;
+import xyz.ottr.lutra.tabottr.parser.ExcelReader;
+import xyz.ottr.lutra.wottr.io.RDFFileReader;
+import xyz.ottr.lutra.wottr.parser.v04.WInstanceParser;
+import xyz.ottr.lutra.wottr.parser.v04.WTemplateParser;
+import xyz.ottr.lutra.wottr.writer.v04.WInstanceWriter;
+import xyz.ottr.lutra.wottr.writer.v04.WTemplateWriter;
 
 public class CLI {
 
@@ -121,14 +125,14 @@ public class CLI {
     private static void execute() {
 
         TemplateStore store = new DependencyGraph();
-        ResultConsumer.use(makeTemplateReader(),
+        ResultConsumer.use(makeTemplateReader(settings.libraryFormat),
             reader -> {
 
                 MessageHandler msgs = parseLibraryInto(reader, store);
                 
                 if (!Message.moreSevere(msgs.printMessages(), settings.haltOn)) {
-                    PrefixMapping usedPrefixes = reader.getUsedPrefixes();
-                    addStdPrefixes(usedPrefixes);
+                    PrefixMapping usedPrefixes = OTTR.getDefaultPrefixes();
+                    usedPrefixes.setNsPrefixes(reader.getPrefixes());
                     executeMode(store, usedPrefixes);
                 }
             }
@@ -140,7 +144,7 @@ public class CLI {
      */
     private static MessageHandler parseLibraryInto(TemplateReader reader, TemplateStore store) {
 
-        store.addTemplateSignature(WTemplateFactory.createTripleTemplateHead());
+        store.addOTTRBaseTemplates();
 
         if (settings.library == null) {
             return new MessageHandler();
@@ -150,7 +154,15 @@ public class CLI {
                 settings.extensions, settings.ignoreExtensions);
 
         if (settings.fetchMissingDependencies) {
-            msgs = msgs.combine(store.fetchMissingDependencies(reader));
+
+            Result<TemplateReader> fetchReader = settings.fetchFormat == null
+                ? Result.of(reader)
+                : makeTemplateReader(settings.fetchFormat);
+
+            msgs.add(fetchReader);
+            if (fetchReader.isPresent()) {
+                msgs = msgs.combine(store.fetchMissingDependencies(fetchReader.get()));
+            }
         }
         return msgs;
     } 
@@ -257,13 +269,15 @@ public class CLI {
     ////////////////////////////////////////////////////////////
 
 
-    private static Result<TemplateReader> makeTemplateReader() {
-        switch (settings.libraryFormat) {
+    private static Result<TemplateReader> makeTemplateReader(Settings.Format format) {
+        switch (format) {
             case legacy:
-                return Result.of(new TemplateReader(new WFileReader(),
-                        new xyz.ottr.lutra.wottr.legacy.io.WTemplateParser()));
+                return Result.of(new TemplateReader(new RDFFileReader(),
+                        new xyz.ottr.lutra.wottr.parser.v03.WTemplateParser()));
             case wottr:
-                return Result.of(new TemplateReader(new WFileReader(), new WTemplateParser()));
+                return Result.of(new TemplateReader(new RDFFileReader(), new WTemplateParser()));
+            case stottr:
+                return Result.of(new TemplateReader(new SFileReader(), new STemplateParser()));
             default:
                 return Result.empty(Message.error(
                         "Library format " + settings.libraryFormat + " not yet supported as input format."));
@@ -277,12 +291,14 @@ public class CLI {
         }
         switch (settings.inputFormat) {
             case tabottr:
-                return Result.of(new InstanceReader(new TabInstanceParser()));
+                return Result.of(new InstanceReader(new ExcelReader()));
             case legacy:
-                return Result.of(new InstanceReader(new WFileReader(),
-                        new xyz.ottr.lutra.wottr.legacy.io.WInstanceParser()));
+                return Result.of(new InstanceReader(new RDFFileReader(),
+                        new xyz.ottr.lutra.wottr.parser.v03.WInstanceParser()));
             case wottr:
-                return Result.of(new InstanceReader(new WFileReader(), new WInstanceParser()));
+                return Result.of(new InstanceReader(new RDFFileReader(), new WInstanceParser()));
+            case stottr:
+                return Result.of(new InstanceReader(new SFileReader(), new SInstanceParser()));
             default:
                 return Result.empty(Message.error(
                         "Input format " + settings.outputFormat.toString()
@@ -294,9 +310,12 @@ public class CLI {
         if (settings.fetchMissingDependencies) {
             Function<TemplateReader, Function<Instance, ResultStream<Instance>>> fun =
                 reader -> ins -> store.expandInstance(ins, reader);
-            return makeTemplateReader().map(fun);
+            Settings.Format format = settings.fetchFormat == null
+                ? settings.libraryFormat
+                : settings.fetchFormat;
+            return makeTemplateReader(format).map(fun);
         } else {
-            return Result.of(ins -> store.expandInstance(ins));
+            return Result.of(store::expandInstance);
         }
     }
 
@@ -304,6 +323,8 @@ public class CLI {
         switch (settings.outputFormat) {
             case wottr:
                 return Result.of(new WInstanceWriter(usedPrefixes));
+            case stottr:
+                return Result.of(SInstanceWriter.makeOuterInstanceWriter(usedPrefixes.getNsPrefixMap()));
             default:
                 return Result.empty(Message.error(
                         "Output format " + settings.outputFormat.toString()
@@ -315,6 +336,8 @@ public class CLI {
         switch (settings.outputFormat) {
             case wottr:
                 return Result.of(new WTemplateWriter(usedPrefixes));
+            case stottr:
+                return Result.of(new STemplateWriter(usedPrefixes.getNsPrefixMap()));
             default:
                 return Result.empty(Message.error(
                         "Output format " + settings.outputFormat.toString()
@@ -396,12 +419,8 @@ public class CLI {
             // TODO: cli-arg to decide extension
             String iriPath = iriToPath(iri);
             Files.createDirectories(Paths.get(settings.out, iriToDirectory(iriPath)));
-            Files.write(Paths.get(settings.out, iriPath + ".ttl"), output.getBytes(Charset.forName("UTF-8")));
-        } catch (IOException ex) {
-            Message err = Message.error(
-                "Error when writing output -- " + ex.getMessage());
-            MessageHandler.printMessage(err);
-        } catch (URISyntaxException ex) {
+            Files.write(Paths.get(settings.out, iriPath + getFileSuffix()), output.getBytes(Charset.forName("UTF-8")));
+        } catch (IOException | URISyntaxException ex) {
             Message err = Message.error(
                 "Error when writing output -- " + ex.getMessage());
             MessageHandler.printMessage(err);
@@ -413,18 +432,25 @@ public class CLI {
     /// UTILS                                                ///
     ////////////////////////////////////////////////////////////
 
-    private static void addStdPrefixes(PrefixMapping prefixes) {
+    private static String getFileSuffix() {
 
-        prefixes.setNsPrefixes(PrefixMapping.Standard);
-        prefixes.setNsPrefix(OTTR.prefix, OTTR.namespace);
+        switch (settings.outputFormat) {
+            case legacy:
+            case wottr:
+                return ".ttl";
+            case stottr:
+                return ".stottr";
+            default:
+                return "";
+        }
     }
-
+        
 
     private static boolean shouldPrintOutput() {
         return settings.stdout || settings.out == null;
     }
 
-    private static String iriToDirectory(String pathStr) throws URISyntaxException {
+    private static String iriToDirectory(String pathStr) {
         Path folder = Paths.get(pathStr).getParent();
         return folder == null ? null : folder.toString();
     }
@@ -435,9 +461,9 @@ public class CLI {
 
     private static int checkTemplates(TemplateStore store) {
         List<Message> msgs = store.checkTemplates();
-        msgs.forEach(msg -> MessageHandler.printMessage(msg));
+        msgs.forEach(MessageHandler::printMessage);
         int mostSevere = msgs.stream()
-            .mapToInt(msg -> msg.getLevel())
+            .mapToInt(Message::getLevel)
             .min()
             .orElse(Message.INFO);
         return mostSevere;

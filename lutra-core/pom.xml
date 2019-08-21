@@ -1,75 +1,75 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
-	<parent>
-		<groupId>xyz.ottr.lutra</groupId>
-		<version>0.5.0-beta-2-SNAPSHOT</version>
-		<artifactId>lutra</artifactId>
-		<relativePath>../pom.xml</relativePath>
-	</parent>
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>xyz.ottr.lutra</groupId>
+        <version>0.6.0-beta-3-SNAPSHOT</version>
+        <artifactId>lutra</artifactId>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
 
-	<artifactId>lutra-core</artifactId>
-	<packaging>jar</packaging>
+    <artifactId>lutra-core</artifactId>
+    <packaging>jar</packaging>
 
-	<dependencies>
-	
-		<dependency>
-			<groupId>org.apache.jena</groupId>
-			<artifactId>jena-core</artifactId>
-		</dependency>
+    <dependencies>
 
-		<!-- Apache commons -->
-		<dependency>
-			<groupId>org.apache.commons</groupId>
-			<artifactId>commons-collections4</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.commons</groupId>
-			<artifactId>commons-math3</artifactId>
-		</dependency>
-		<dependency>
-			 <groupId>commons-io</groupId>
-		     <artifactId>commons-io</artifactId>
-		</dependency>
+        <dependency>
+            <groupId>org.apache.jena</groupId>
+            <artifactId>jena-core</artifactId>
+        </dependency>
 
-	</dependencies>
+        <!-- Apache commons -->
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-collections4</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-math3</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+        </dependency>
 
-	<build>
-		<plugins>
+    </dependencies>
 
-			<plugin>
-				<groupId>com.googlecode.maven-download-plugin</groupId>
-				<artifactId>download-maven-plugin</artifactId>
-				<executions>
-					<execution>
-						<id>download-types</id>
-						<phase>generate-sources</phase>
-						<goals>
-							<goal>wget</goal>
-						</goals>
-						<configuration>
-							<url>https://spec.ottr.xyz/rOTTR/0.2/types.owl.ttl</url>
-							<outputFileName>types.owl.ttl</outputFileName>
-							<outputDirectory>${project.basedir}/src/main/resources</outputDirectory>
-							<!--md5>MD5 SUM HERE</md5 -->
-							<skipCache>true</skipCache>
-						</configuration>
-					</execution>
-					<execution>
-						<id>download-puntypes</id>
-						<phase>generate-sources</phase>
-						<goals>
-							<goal>wget</goal>
-						</goals>
-						<configuration>
-							<url>https://spec.ottr.xyz/rOTTR/0.2/puntypes.owl.ttl</url>
-							<outputFileName>puntypes.owl.ttl</outputFileName>
-							<outputDirectory>${project.basedir}/src/main/resources</outputDirectory>
-							<!--md5>MD5 SUM HERE</md5 -->
-							<skipCache>true</skipCache>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-		</plugins>
-	</build>
+    <build>
+        <plugins>
+
+            <plugin>
+                <groupId>com.googlecode.maven-download-plugin</groupId>
+                <artifactId>download-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>download-types</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>wget</goal>
+                        </goals>
+                        <configuration>
+                            <url>https://spec.ottr.xyz/rOTTR/0.2/types.owl.ttl</url>
+                            <outputFileName>types.owl.ttl</outputFileName>
+                            <outputDirectory>${project.basedir}/src/main/resources</outputDirectory>
+                            <!--md5>MD5 SUM HERE</md5 -->
+                            <skipCache>true</skipCache>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>download-puntypes</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>wget</goal>
+                        </goals>
+                        <configuration>
+                            <url>https://spec.ottr.xyz/rOTTR/0.2/puntypes.owl.ttl</url>
+                            <outputFileName>puntypes.owl.ttl</outputFileName>
+                            <outputDirectory>${project.basedir}/src/main/resources</outputDirectory>
+                            <!--md5>MD5 SUM HERE</md5 -->
+                            <skipCache>true</skipCache>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 </project>

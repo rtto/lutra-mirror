@@ -58,6 +58,10 @@ public class ResultStream<E> {
         return new ResultStream<R>(Stream.of(r));
     }
 
+    public static <R> ResultStream<R> of(Collection<Result<R>> results) {
+        return new ResultStream<R>(results);
+    }
+
     /**
      * Returns a ResultStream consisting of one Result per element
      * in argument Collection.
@@ -225,7 +229,7 @@ public class ResultStream<E> {
 
         for (Result<E> r : this.results.collect(Collectors.toList())) {
             msgs.accept(r);
-            if (unpacked != null && r.isPresent()) {
+            if (unpacked != null && r != null && r.isPresent()) {
                 unpacked.add(r.get());
             } else {
                 // No elements should be kept

@@ -5,7 +5,27 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## 0.5.0 -- WIP 
+## 0.6.0
+
+### Added
+- Support for stOTTR for both reading and writing, and both instances and templates
+- CLI-flag to set format for template library fetched online
+
+### Changed
+- Switched the flags `-l` and `-L` for consistency
+- Removed default `.ttl`-filter on library files
+- Now only writes the used prefixes for template libraries
+- No longer adds the definition of Triple-template into written libraries
+- Improved formatting of RDF output
+
+### Unsupported (from specs)
+- mOTTR (version 0.?.?)
+  - Annotation instances
+  - Type-checking instances
+  - Type-checking default values
+- Cannot write (only read) tabOTTR syntax
+
+## 0.5.0
 
 This version is a complete source rewrite of previous versions of Lutra.
 

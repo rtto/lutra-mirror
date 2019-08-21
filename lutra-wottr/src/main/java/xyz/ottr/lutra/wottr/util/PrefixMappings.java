@@ -31,9 +31,11 @@ import org.apache.jena.shared.PrefixMapping;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class PrefixMappings {
+public enum PrefixMappings {
 
-    private static Logger log = LoggerFactory.getLogger(PrefixMappings.class);
+    ; // singleton enum
+
+    private static final Logger log = LoggerFactory.getLogger(PrefixMappings.class);
 
     private static final String NS = "ns";
     private static final String defaultNSPrefix = "";
@@ -120,7 +122,7 @@ public class PrefixMappings {
     }
 
     public static void trim(Model model) {
-        Set<String> namespaces = ModelSelector.getNamespaces(model);
+        Set<String> namespaces = model.listNameSpaces().toSet();
         for (String prefixNamespace : model.getNsPrefixMap().values()) {
             if (!namespaces.contains(prefixNamespace)) {
                 model.removeNsPrefix(model.getNsURIPrefix(prefixNamespace));

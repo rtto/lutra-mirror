@@ -25,4 +25,9 @@ package xyz.ottr.lutra.model.types;
 public interface ComplexType extends TermType {
 
     TermType getInner();
+
+    /**
+     * @return the IRI of the (outer) term.
+     */
+    String getOuterIRI();
 }
