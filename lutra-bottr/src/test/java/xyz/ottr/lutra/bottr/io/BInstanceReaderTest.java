@@ -24,15 +24,11 @@ package xyz.ottr.lutra.bottr.io;
 
 import static org.junit.Assert.assertEquals;
 
-import java.util.List;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.junit.Test;
-
 import xyz.ottr.lutra.model.Instance;
 import xyz.ottr.lutra.result.Result;
-import xyz.ottr.lutra.result.ResultStream;
 
 public class BInstanceReaderTest {
 

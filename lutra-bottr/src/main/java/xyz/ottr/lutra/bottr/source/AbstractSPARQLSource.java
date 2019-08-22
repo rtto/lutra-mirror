@@ -33,12 +33,15 @@ import java.util.stream.StreamSupport;
 import org.apache.jena.datatypes.xsd.XSDDatatype;
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryExecution;
+import org.apache.jena.query.QueryFactory;
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSet;
 import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.ResourceFactory;
 
+import org.apache.jena.shared.JenaException;
+import org.apache.jena.shared.PrefixMapping;
 import xyz.ottr.lutra.bottr.model.Record;
 import xyz.ottr.lutra.bottr.model.Source;
 import xyz.ottr.lutra.result.Message;
@@ -51,6 +54,29 @@ public abstract class AbstractSPARQLSource implements Source<RDFNode> {
     private static final Literal FALSE = ResourceFactory.createTypedLiteral("false", XSDDatatype.XSDboolean);
 
     protected abstract Result<QueryExecution> getQueryExecution(String query);
+
+    private final PrefixMapping prefixes;
+
+    protected AbstractSPARQLSource(PrefixMapping prefixes) {
+        this.prefixes = prefixes;
+    }
+
+    protected AbstractSPARQLSource() {
+        this(PrefixMapping.Factory.create());
+    }
+
+    protected Result<Query> getQuery(String queryString) {
+
+        // Add prefixes to an empty query to get syntax correct
+        Query prefixesOnly = QueryFactory.create();
+        prefixesOnly.setPrefixMapping(this.prefixes);
+
+        try {
+            return Result.of(QueryFactory.create(prefixesOnly.serialize() + queryString));
+        } catch (JenaException ex) {
+            return Result.error("Error creating SPARQL query: " + ex.getMessage());
+        }
+    }
 
     @Override
     public ResultStream<Record<RDFNode>> execute(String query) {

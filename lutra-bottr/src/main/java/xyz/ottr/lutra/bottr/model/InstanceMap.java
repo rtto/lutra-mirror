@@ -66,7 +66,7 @@ public class InstanceMap implements Supplier<ResultStream<Instance>> {
     }
 
     public String toString() {
-        return this.getClass().getSimpleName() + " - " + templateIRI + " - " + query;
+        return this.getClass().getSimpleName() + " - " + this.templateIRI + " - " + this.query;
     }
 
     public static class Builder {

@@ -24,6 +24,7 @@ import java.util.Arrays;
  * #L%
  */
 
+import java.util.Collections;
 import java.util.List;
 
 
@@ -45,7 +46,7 @@ public class Record<V> {
     }
 
     public List<V> getValues() {
-        return this.values;
+        return Collections.unmodifiableList(this.values);
     }
 
     public String toString() {

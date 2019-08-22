@@ -48,13 +48,13 @@ import xyz.ottr.lutra.wottr.util.RDFNodes;
 
 class BSourceParser implements Function<Resource, Result<Source<?>>> {
 
-    private Model model;
+    private final Model model;
 
     public BSourceParser(Model model) {
         this.model = model;
     }
 
-    private static Map<Resource, Result<Source<?>>> sources = new HashMap<>();
+    private static final Map<Resource, Result<Source<?>>> sources = new HashMap<>();
 
     @Override
     public Result<Source<?>> apply(Resource source) {
@@ -65,7 +65,7 @@ class BSourceParser implements Function<Resource, Result<Source<?>>> {
 
         // We allow a source to have other types than just the source classes, therefore
         // cannot use ModelSelector.getRequiredResourceObject.
-        List<RDFNode> sourceTypes = model.listStatements(source, RDF.type, (RDFNode) null)
+        List<RDFNode> sourceTypes = this.model.listStatements(source, RDF.type, (RDFNode) null)
             .mapWith(Statement::getObject)
             .filterKeep(BOTTR.sources::contains)
             .toList();
@@ -100,13 +100,13 @@ class BSourceParser implements Function<Resource, Result<Source<?>>> {
     
     private Result<Source<?>> parseSPARQLEndpointSource(Resource source) {
         return getRequiredLiteralString(source, BOTTR.sourceURL)
-            .map(SPARQLEndpointSource::new);
+            .map(url -> new SPARQLEndpointSource(this.model, url));
     }
 
     private Result<Source<?>> parseRDFSource(Resource source) {
 
         // RDFSource takes a list of sourceURLs, so must treat this differently than SPARQLEndpointSource.
-        List<RDFNode> urlNodes = model.listStatements(source, BOTTR.sourceURL, (RDFNode) null)
+        List<RDFNode> urlNodes = this.model.listStatements(source, BOTTR.sourceURL, (RDFNode) null)
             .mapWith(Statement::getObject)
             .toList();
 
@@ -116,12 +116,12 @@ class BSourceParser implements Function<Resource, Result<Source<?>>> {
             .collect(Collectors.toList());
 
         return Result.aggregate(urlStrings)
-            .map(RDFSource::new);
+            .map(url -> new RDFSource(this.model, url));
     }
 
     // Utility method
     private Result<String> getRequiredLiteralString(Resource subject, Property predicate) {
-        return ModelSelector.getRequiredLiteralObject(model, subject, predicate)
+        return ModelSelector.getRequiredLiteralObject(this.model, subject, predicate)
             .map(Literal::getLexicalForm);
     }
 

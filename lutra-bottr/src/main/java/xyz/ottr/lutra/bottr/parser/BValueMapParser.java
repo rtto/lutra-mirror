@@ -39,7 +39,7 @@ import xyz.ottr.lutra.wottr.util.RDFNodes;
 
 class BValueMapParser implements Function<RDFList, Result<ValueMap>> {
 
-    private Model model;
+    private final Model model;
 
     BValueMapParser(Model model) {
         this.model = model;

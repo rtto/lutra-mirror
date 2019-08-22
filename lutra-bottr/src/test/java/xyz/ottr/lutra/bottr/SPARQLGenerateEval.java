@@ -40,7 +40,6 @@ import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
 import xyz.ottr.lutra.bottr.model.InstanceMap;
-import xyz.ottr.lutra.bottr.model.Source;
 import xyz.ottr.lutra.bottr.model.ValueMap;
 import xyz.ottr.lutra.bottr.source.CSVSource;
 import xyz.ottr.lutra.io.TemplateReader;
@@ -77,7 +76,7 @@ public class SPARQLGenerateEval {
         prefixes.setNsPrefix("schema", "http://schema.org/");
 
         // H2 database to load CSV file
-        Source h2 = new CSVSource();
+        CSVSource h2 = new CSVSource();
         
         String inFile = "persons-100.csv";
         
@@ -98,7 +97,7 @@ public class SPARQLGenerateEval {
         InstanceMap map = new InstanceMap(
                 h2,
                 "SELECT CONCAT('http://example.com/person/', ROWNUM()), Name, CONCAT('tel:', Phone), CONCAT('mailto:', Email), Birthdate, Height, Weight " 
-                        + "FROM CSVREAD('" + csvFile.toAbsolutePath().toString() + "');",
+                        + "FROM CSVREAD('" + csvFile.toAbsolutePath() + "');",
                         "http://example.com/ns#Person",
                         valMap
                 );

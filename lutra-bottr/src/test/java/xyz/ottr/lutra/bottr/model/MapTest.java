@@ -52,7 +52,7 @@ public class MapTest {
         // Input: Set up source with some data
         class StaticTestSource implements Source<String> {
 
-            private List<Record<String>> rows;
+            private final List<Record<String>> rows;
 
             public StaticTestSource() {
                 this.rows = new ArrayList<>();

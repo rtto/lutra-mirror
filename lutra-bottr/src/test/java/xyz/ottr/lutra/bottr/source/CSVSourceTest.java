@@ -134,7 +134,7 @@ public class CSVSourceTest {
             .filter(Result::isPresent)
             .map(Result::get)
             .collect(Collectors.toSet());
-        Assert.assertEquals(getExpectedResult(), dbOutput);
+        assertEquals(getExpectedResult(), dbOutput);
     }
 
 }

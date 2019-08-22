@@ -28,13 +28,19 @@ import org.apache.jena.query.QueryExecutionFactory;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 
+import org.apache.jena.shared.PrefixMapping;
 import xyz.ottr.lutra.result.Result;
 import xyz.ottr.lutra.result.ResultStream;
 import xyz.ottr.lutra.wottr.io.RDFFileReader;
 
 public class RDFSource extends AbstractSPARQLSource {
 
-    private List<String> modelURIs;
+    private final List<String> modelURIs;
+
+    public RDFSource(PrefixMapping prefixes, List<String> modelURIs) {
+        super(prefixes);
+        this.modelURIs = modelURIs;
+    }
 
     public RDFSource(List<String> modelURIs) {
         this.modelURIs = modelURIs;
@@ -51,8 +57,10 @@ public class RDFSource extends AbstractSPARQLSource {
 
     @Override
     protected Result<QueryExecution> getQueryExecution(String query) {
-        return loadModels()
-            .map(models -> QueryExecutionFactory.create(query, models));
+        return Result.zip(
+            super.getQuery(query),
+            loadModels(),
+            QueryExecutionFactory::create);
     }
 
 }

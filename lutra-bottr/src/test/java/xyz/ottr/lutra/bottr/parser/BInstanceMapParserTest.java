@@ -42,7 +42,7 @@ public class BInstanceMapParserTest {
 
         Result<InstanceMap> maps = getInstanceMap(ROOT + "instanceMapDummySQL.ttl");
 
-        assertEquals(Collections.EMPTY_LIST, maps.getAllMessages());
+        assertEquals(Collections.emptyList(), maps.getAllMessages());
         assertEquals("SELECT name, age, company FROM TABLE tblEmployee", maps.get().getQuery());
         assertEquals("http://example.com/tpl#MyTemplate", maps.get().getTemplateIRI());
     }
@@ -52,7 +52,7 @@ public class BInstanceMapParserTest {
 
         Result<InstanceMap> maps = getInstanceMap(ROOT + "instanceMapSPARQL.ttl");
 
-        assertEquals(Collections.EMPTY_LIST, maps.getAllMessages());
+        assertEquals(Collections.emptyList(), maps.getAllMessages());
     }
 
     @Test
@@ -60,7 +60,7 @@ public class BInstanceMapParserTest {
 
         Result<InstanceMap> maps = getInstanceMap(ROOT + "instanceMapRDFSource.ttl");
 
-        assertEquals(Collections.EMPTY_LIST, maps.getAllMessages());
+        assertEquals(Collections.emptyList(), maps.getAllMessages());
     }
 
     private Result<InstanceMap> getInstanceMap(String file) {

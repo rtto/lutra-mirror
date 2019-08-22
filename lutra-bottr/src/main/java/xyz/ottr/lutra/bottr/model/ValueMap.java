@@ -83,7 +83,7 @@ public class ValueMap implements Function<Record<?>, Result<ArgumentList>> {
 
     private static class Entry {
 
-        private String type;
+        private final String type;
 
         public Entry(String type) {
             this.type = type;
