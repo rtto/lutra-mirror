@@ -254,7 +254,7 @@ public class Result<E> {
      * returns empty Result if not.
      */
     public static <A,B,R> Result<R> apply(Result<A> a, Function<A, Result<R>> f) {
-        return a.isPresent() ? f.apply(a.get()) : Result.empty();
+        return a.flatMap(f);
     }
 
     /**
@@ -262,7 +262,11 @@ public class Result<E> {
      * returns empty Result if not.
      */
     public static <A,B,R> Result<R> apply(Result<A> a, Result<B> b, BiFunction<A, B, Result<R>> f) {
-        return a.isPresent() && b.isPresent() ? f.apply(a.get(), b.get()) : Result.empty();
+        return flatten(zip(a, b, f));
+    }
+    
+    public static <R> Result<R> flatten(Result<Result<R>> r) {
+        return r.flatMap(x -> x);
     }
 
     /**
