@@ -54,4 +54,14 @@ public class BInstanceReaderTest {
         assertEquals(6, instances.count());
     }
 
+    @Test
+    public void testCSVSourceMap() {
+
+        Stream<Result<Instance>> instances = Result.of(ROOT + "maps/instanceMapH2Source.ttl")
+            .mapToStream(new BInstanceReader())
+            .getStream();
+
+        assertEquals(7, instances.count());
+    }
+
 }

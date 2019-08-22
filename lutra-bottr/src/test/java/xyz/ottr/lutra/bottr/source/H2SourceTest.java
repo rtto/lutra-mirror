@@ -13,7 +13,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.apache.jena.shared.PrefixMapping;
-import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -49,7 +48,7 @@ import xyz.ottr.lutra.wottr.vocabulary.v04.WOTTR;
  * #L%
  */
 
-public class CSVSourceTest {
+public class H2SourceTest {
 
     private static final Path ROOT = Paths.get("src", "test", "resources");
 
@@ -76,7 +75,7 @@ public class CSVSourceTest {
         ValueMap valMap = new ValueMap(prefixes, Arrays.asList(TabOTTR.TYPE_IRI, TabOTTR.TYPE_IRI, TabOTTR.TYPE_IRI));
 
         // H2 database to load CSV file
-        Source<String> csvSource = new CSVSource();
+        Source<String> csvSource = new H2Source();
 
         // map data to triples
         InstanceMap map = new InstanceMap(
@@ -106,7 +105,7 @@ public class CSVSourceTest {
     @Test
     public void noHeader() {
         String input = getAbsolutePath("sources/csv/noheader.csv");
-        CSVSource csvTest = new CSVSource();
+        H2Source csvTest = new H2Source();
         testAgainstExpectedResult(csvTest.execute("SELECT ID, NAME, SALARY FROM CSVREAD('" + input + "',"
                 + "'ID,NAME,AGE,ADDRESS,SALARY', 'fieldSeparator=,');"));
     }
@@ -114,14 +113,14 @@ public class CSVSourceTest {
     @Test
     public void linuxSeparator() {
         String input = getAbsolutePath("sources/csv/linux.csv");
-        CSVSource csvTest = new CSVSource();
+        H2Source csvTest = new H2Source();
         testAgainstExpectedResult(csvTest.execute("SELECT ID, NAME, SALARY FROM CSVREAD('" + input + "');"));
     }
 
     @Test
     public void windowsSeparator() {
         String input = getAbsolutePath("sources/csv/win.csv");
-        CSVSource csvTest = new CSVSource();
+        H2Source csvTest = new H2Source();
         testAgainstExpectedResult(csvTest.execute("SELECT ID, NAME, SALARY FROM CSVREAD('" + input + "');"));
     }
 

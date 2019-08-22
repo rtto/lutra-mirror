@@ -26,6 +26,7 @@ import java.util.List;
 
 import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.Resource;
+
 import xyz.ottr.lutra.wottr.vocabulary.v04.WOTTR;
 
 public class BOTTR extends WOTTR {
@@ -36,8 +37,9 @@ public class BOTTR extends WOTTR {
     public static final Resource JDBCSource = getResource(ns + "JDBCSource");
     public static final Resource SPARQLSource = getResource(ns + "SPARQLSource");
     public static final Resource RDFSource = getResource(ns + "RDFSource");
+    public static final Resource H2Source = getResource(ns + "H2Source");
 
-    public static final List<Resource> sources = getList(JDBCSource, SPARQLSource, RDFSource);
+    public static final List<Resource> sources = getList(JDBCSource, SPARQLSource, RDFSource, H2Source);
     
     // Properties
     public static final Property template = getProperty(ns + "template");
@@ -50,5 +52,6 @@ public class BOTTR extends WOTTR {
     public static final Property username = getProperty(ns + "username");
     public static final Property password = getProperty(ns + "password");
     public static final Property jdbcDriver = getProperty(ns + "jdbcDriver");
+
 
 }

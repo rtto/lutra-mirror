@@ -41,7 +41,7 @@ import org.junit.rules.TemporaryFolder;
 
 import xyz.ottr.lutra.bottr.model.InstanceMap;
 import xyz.ottr.lutra.bottr.model.ValueMap;
-import xyz.ottr.lutra.bottr.source.CSVSource;
+import xyz.ottr.lutra.bottr.source.H2Source;
 import xyz.ottr.lutra.io.TemplateReader;
 import xyz.ottr.lutra.model.Instance;
 import xyz.ottr.lutra.result.Message;
@@ -76,7 +76,7 @@ public class SPARQLGenerateEval {
         prefixes.setNsPrefix("schema", "http://schema.org/");
 
         // H2 database to load CSV file
-        CSVSource h2 = new CSVSource();
+        H2Source h2 = new H2Source();
         
         String inFile = "persons-100.csv";
         

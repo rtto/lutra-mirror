@@ -1,6 +1,5 @@
 package xyz.ottr.lutra.bottr.source;
 
-import java.io.File;
 import org.apache.jena.ext.com.google.common.io.Files;
 
 /*-
@@ -25,11 +24,13 @@ import org.apache.jena.ext.com.google.common.io.Files;
  * #L%
  */
 
-public class CSVSource extends JDBCSource {
+public class H2Source extends JDBCSource {
 
-    public static final File TEMP_DIR = Files.createTempDir();
+    public H2Source(String path) {
+        super("org.h2.Driver","jdbc:h2:" + path, "user", "pass");
+    }
 
-    public CSVSource() {
-        super("org.h2.Driver","jdbc:h2:" + TEMP_DIR.getAbsolutePath() + "/CSVSource", "user", "pass");
+    public H2Source() {
+        this(Files.createTempDir().getAbsolutePath() + "/H2Source");
     }
 }

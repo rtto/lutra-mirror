@@ -40,7 +40,7 @@ public class BInstanceMapParserTest {
     @Test
     public void shouldParseSQL() {
 
-        Result<InstanceMap> maps = getInstanceMap(ROOT + "instanceMapDummySQL.ttl");
+        Result<InstanceMap> maps = getInstanceMap(ROOT + "instanceMapDummyJDBC.ttl");
 
         assertEquals(Collections.emptyList(), maps.getAllMessages());
         assertEquals("SELECT name, age, company FROM TABLE tblEmployee", maps.get().getQuery());
@@ -59,6 +59,14 @@ public class BInstanceMapParserTest {
     public void shouldParseRDF() {
 
         Result<InstanceMap> maps = getInstanceMap(ROOT + "instanceMapRDFSource.ttl");
+
+        assertEquals(Collections.emptyList(), maps.getAllMessages());
+    }
+
+    @Test
+    public void shouldParseCSV() {
+
+        Result<InstanceMap> maps = getInstanceMap(ROOT + "instanceMapH2Source.ttl");
 
         assertEquals(Collections.emptyList(), maps.getAllMessages());
     }

@@ -103,6 +103,10 @@ public enum ModelSelector {
         return getObject(model, subject, predicate, CardinalityOne.ZERO_ONE, Resource.class);
     }
 
+    public static Result<Literal> getOptionalLiteralObject(Model model, Resource subject, Property predicate) {
+        return getObject(model, subject, predicate, CardinalityOne.ZERO_ONE, Literal.class);
+    }
+
     public static <X extends RDFNode> Result<X> getObject(Model model, Resource subject, Property predicate,
                                                           CardinalityOne card, Class<X> type) {
 
