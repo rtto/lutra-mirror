@@ -14,6 +14,7 @@ import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
 import xyz.ottr.lutra.bottr.model.Record;
+import xyz.ottr.lutra.result.Result;
 import xyz.ottr.lutra.result.ResultStream;
 
 /*-
@@ -79,7 +80,10 @@ public class JDBCSourceTest {
         //Run the source
         JDBCSource jdbcTest = new JDBCSource(driver, url, user, pass);
         ResultStream<Record<String>> rowStream = jdbcTest.execute("SELECT ID, NAME, SALARY FROM CUSTOMER;");
-        Set<Record<String>> dbOutput = rowStream.innerCollect(Collectors.toSet());
+        Set<Record<String>> dbOutput = rowStream.getStream()
+            .filter(Result::isPresent)
+            .map(Result::get)
+            .collect(Collectors.toSet());
 
         //Compare dbOutput to expected result
         Assert.assertEquals(expected, dbOutput);

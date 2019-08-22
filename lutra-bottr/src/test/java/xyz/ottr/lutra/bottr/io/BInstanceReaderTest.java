@@ -26,11 +26,13 @@ import static org.junit.Assert.assertEquals;
 
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.junit.Test;
 
 import xyz.ottr.lutra.model.Instance;
 import xyz.ottr.lutra.result.Result;
+import xyz.ottr.lutra.result.ResultStream;
 
 public class BInstanceReaderTest {
 
@@ -39,11 +41,21 @@ public class BInstanceReaderTest {
     @Test
     public void testSPARQLMap() {
 
-        List<Instance> instances = Result.of(ROOT + "maps/instanceMapSPARQL.ttl")
+        Stream<Result<Instance>> instances = Result.of(ROOT + "maps/instanceMapSPARQL.ttl")
             .mapToStream(new BInstanceReader())
-            .innerCollect(Collectors.toList());
+            .getStream();
 
-        assertEquals(13, instances.size());
+        assertEquals(13, instances.count());
+    }
+
+    @Test
+    public void testRDFSourceMap() {
+
+        Stream<Result<Instance>> instances = Result.of(ROOT + "maps/instanceMapRDFSource.ttl")
+            .mapToStream(new BInstanceReader())
+            .getStream();
+
+        assertEquals(6, instances.count());
     }
 
 }

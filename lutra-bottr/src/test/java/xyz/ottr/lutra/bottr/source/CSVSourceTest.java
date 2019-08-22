@@ -130,7 +130,10 @@ public class CSVSourceTest {
     }
 
     private void testAgainstExpectedResult(ResultStream<Record<String>> actualResult) {
-        Set<Record<String>> dbOutput = actualResult.innerCollect(Collectors.toSet());
+        Set<Record<String>> dbOutput = actualResult.getStream()
+            .filter(Result::isPresent)
+            .map(Result::get)
+            .collect(Collectors.toSet());
         Assert.assertEquals(getExpectedResult(), dbOutput);
     }
 

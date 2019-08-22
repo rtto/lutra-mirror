@@ -154,14 +154,6 @@ public class ResultStream<E> {
     }
 
     /**
-     * @see Similar to Stream#collect(Collector) except that the collector
-     * is applied to the inner values, instead of at each Result.
-     */
-    public <R, A> R innerCollect(Collector<E, A, R> collector) {
-        return results.map(e -> e.get()).collect(collector);
-    }
-
-    /**
      * @see Stream#forEach(Consumer)
      */
     public void forEach(Consumer<? super Result<E>> consumer) {

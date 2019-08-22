@@ -32,10 +32,12 @@ public class BOTTR extends WOTTR {
 
     // Classes
     public static final Resource InstanceMap = getResource(ns + "InstanceMap");
+
     public static final Resource JDBCSource = getResource(ns + "JDBCSource");
     public static final Resource SPARQLSource = getResource(ns + "SPARQLSource");
+    public static final Resource RDFSource = getResource(ns + "RDFSource");
 
-    public static final List<Resource> sources = getList(JDBCSource, SPARQLSource);
+    public static final List<Resource> sources = getList(JDBCSource, SPARQLSource, RDFSource);
     
     // Properties
     public static final Property template = getProperty(ns + "template");

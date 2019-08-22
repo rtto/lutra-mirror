@@ -26,6 +26,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.rdf.model.Model;
@@ -38,8 +39,10 @@ import org.apache.jena.vocabulary.RDF;
 import xyz.ottr.lutra.bottr.BOTTR;
 import xyz.ottr.lutra.bottr.model.Source;
 import xyz.ottr.lutra.bottr.source.JDBCSource;
+import xyz.ottr.lutra.bottr.source.RDFSource;
 import xyz.ottr.lutra.bottr.source.SPARQLEndpointSource;
 import xyz.ottr.lutra.result.Result;
+import xyz.ottr.lutra.result.ResultStream;
 import xyz.ottr.lutra.wottr.util.ModelSelector;
 import xyz.ottr.lutra.wottr.util.RDFNodes;
 
@@ -61,7 +64,7 @@ class BSourceParser implements Function<Resource, Result<Source<?>>> {
     private Result<Source<?>> parseSource(Resource source) {
 
         // We allow a source to have other types than just the source classes, therefore
-        // cannot use ModelSelector.getRequiredResourceObject
+        // cannot use ModelSelector.getRequiredResourceObject.
         List<RDFNode> sourceTypes = model.listStatements(source, RDF.type, (RDFNode) null)
             .mapWith(Statement::getObject)
             .filterKeep(BOTTR.sources::contains)
@@ -78,6 +81,8 @@ class BSourceParser implements Function<Resource, Result<Source<?>>> {
             return parseSQLSource(source);
         } else if (BOTTR.SPARQLSource.equals(sourceType)) {
             return parseSPARQLEndpointSource(source);
+        } else if (BOTTR.RDFSource.equals(sourceType)) {
+            return parseRDFSource(source);
         }
         return Result.error("Error parsing source. Source type " + RDFNodes.toString(sourceType) + " is not a supported source: "
          + RDFNodes.toString(BOTTR.sources));
@@ -98,9 +103,9 @@ class BSourceParser implements Function<Resource, Result<Source<?>>> {
             .map(SPARQLEndpointSource::new);
     }
 
-    /*
     private Result<Source<?>> parseRDFSource(Resource source) {
 
+        // RDFSource takes a list of sourceURLs, so must treat this differently than SPARQLEndpointSource.
         List<RDFNode> urlNodes = model.listStatements(source, BOTTR.sourceURL, (RDFNode) null)
             .mapWith(Statement::getObject)
             .toList();
@@ -112,11 +117,12 @@ class BSourceParser implements Function<Resource, Result<Source<?>>> {
 
         return Result.aggregate(urlStrings)
             .map(RDFSource::new);
-    }*/
+    }
 
     // Utility method
     private Result<String> getRequiredLiteralString(Resource subject, Property predicate) {
-        return ModelSelector.getRequiredLiteralObject(model, subject, predicate).map(Literal::getLexicalForm);
+        return ModelSelector.getRequiredLiteralObject(model, subject, predicate)
+            .map(Literal::getLexicalForm);
     }
 
 

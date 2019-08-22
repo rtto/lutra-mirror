@@ -93,7 +93,11 @@ public class MapTest {
         output.add(inst2);
 
         // get input instances
-        Set<Instance> input = myMap.get().innerCollect(Collectors.toSet());
+        Set<Instance> input = myMap.get()
+            .getStream()
+            .filter(Result::isPresent)
+            .map(Result::get)
+            .collect(Collectors.toSet());
         
         assertEquals(2, input.size());
         assertEquals(output, input);
