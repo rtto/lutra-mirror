@@ -37,7 +37,6 @@ import org.apache.jena.rdf.model.Statement;
 import xyz.ottr.lutra.model.ArgumentList;
 import xyz.ottr.lutra.model.NoneTerm;
 import xyz.ottr.lutra.model.Term;
-import xyz.ottr.lutra.result.Message;
 import xyz.ottr.lutra.result.Result;
 import xyz.ottr.lutra.wottr.parser.TermFactory;
 import xyz.ottr.lutra.wottr.parser.v03.util.ModelSelector;
@@ -84,7 +83,7 @@ public class WArgumentParser implements Function<Resource, Result<Term>> {
             }
         } catch (ModelSelectorException ex) {
             // TODO: Correct lvl and good message?
-            resultTerm = Result.empty(new Message(Message.ERROR, "Error parsing argument. " + ex.getMessage()));
+            resultTerm = Result.error("Error parsing argument. " + ex.getMessage());
         }
 
         return resultTerm;

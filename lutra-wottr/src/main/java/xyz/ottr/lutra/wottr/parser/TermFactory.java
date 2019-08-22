@@ -76,7 +76,7 @@ public class TermFactory implements Function<RDFNode, Result<Term>> {
     public Result<Term> createTerm(Resource node) {
 
         if (node.isURIResource()) {
-            return createTerm(node.getURI()).map(tl -> (Term) tl); // Need to cast to Result<Term>
+            return createTerm(node.getURI());
         } else if (node.canAs(RDFList.class)) {
             return createTermList(node.as(RDFList.class)).map(tl -> (Term) tl); // Need to cast to Result<Term>
         } else if (node.isAnon()) {
