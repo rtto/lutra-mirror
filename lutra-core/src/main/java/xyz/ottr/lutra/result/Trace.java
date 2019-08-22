@@ -1,7 +1,7 @@
 package xyz.ottr.lutra.result;
 
 /*-
- * #%L
+ * #%L 
  * lutra-core
  * %%
  * Copyright (C) 2018 - 2019 University of Oslo
@@ -22,7 +22,7 @@ package xyz.ottr.lutra.result;
  * #L%
  */
 
-import java.util.List;
+import java.util.List; 
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;

@@ -22,9 +22,11 @@ package xyz.ottr.lutra.result;
  * #L%
  */
 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
 
@@ -123,15 +125,64 @@ public class MessageHandler {
 
     private static String getLocation(Trace trace) {
         StringBuilder context = new StringBuilder();
-        getLocationRecur(context, trace);
+        getLocationRecur(context, trace, "", 1, new HashMap<>());
         return context.toString();
     }
 
-    private static void getLocationRecur(StringBuilder context, Trace trace) {
+    /**
+     * Writes out a stack trace and enumerates the elements of the stack
+     * trace with an enumeration (dot separated number sequence, e.g. 1.3.2)
+     * such that: only-childs (elements with no siblings) get the parents enumeration,
+     * but with the last number increased by 1; elements with siblings get their
+     * parents enumeration appended with a number denoting its sibling number
+     * (e.g. a node with enumeration 1.2 and three children will make the
+     * three children get enumeration 1.2.1, 1.2.2, and 1.2.3).
+     * This enumeration is then used to reference already visited trace elements.
+     */
+    private static void getLocationRecur(StringBuilder context, Trace trace,
+            String prevEnum, int prevCounter, Map<Trace, String> enumeration) {
+        
+        int curLocalCounter = prevCounter;
         if (trace.hasLocation()) {
-            context.append(" >>> at " + trace.getLocation().toString() + "\n");
+            if (enumeration.containsKey(trace)) {
+                // Already printed subtrace, just reference to its enumeration and returns
+                context.append(toReferenceString(enumeration.get(trace)));
+                return;
+            } 
+            // Assign enumeration to trace element, and append to trace
+            enumeration.put(trace, toEnumStr(prevEnum, curLocalCounter));
+            curLocalCounter++;
+            context.append(toLocationString(trace, enumeration.get(trace)));
         }
-        trace.getTrace().forEach(t -> getLocationRecur(context, t)); // TODO: Fix recur call (need branching)
+
+        // If only 1 child, simply keep enumeration, otherwise
+        // append a new number which is incremented for each child
+        // For example, if we have an enumeration 1.2, and we have one child,
+        // it will get enumeration 1.3. If we have three children, they will
+        // each get enumerations 1.2.1, 1.2.2, and 1.2.3
+        boolean moreThanOneChild = trace.getTrace().size() > 1;
+        String curEnum = moreThanOneChild ? toEnumStr(prevEnum, curLocalCounter) : prevEnum;
+        int curCounter = moreThanOneChild ? 1 : curLocalCounter;
+
+        for (Trace child : trace.getTrace()) {
+            getLocationRecur(context, child, curEnum, curCounter, enumeration); 
+            curCounter++;
+            curEnum = toEnumStr(curEnum, curCounter);
+        }
+    }
+    
+    private static String toReferenceString(String enumStr) {
+        return " >>> at [" + enumStr + "]\n";
+    }
+    
+    private static String toLocationString(Trace trace, String enumStr) {
+        return " >>> at [" + enumStr + "] " + trace.getLocation().toString() + "\n";
+    }
+    
+    private static String toEnumStr(String prevEnum, int curCounter) {
+        return prevEnum.equals("") 
+                ? "" + curCounter 
+                : prevEnum + "." + curCounter;
     }
 
     public static void printLocation(Trace trace) {

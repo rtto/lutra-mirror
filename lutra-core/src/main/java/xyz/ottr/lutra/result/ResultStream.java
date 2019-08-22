@@ -185,7 +185,7 @@ public class ResultStream<E> {
     }
 
     /**
-     * Returns a new ResultStream consisint of all this' Results,
+     * Returns a new ResultStream consisting of all this' Results,
      * but with argument function mapped over each.
      */
     public <R> ResultStream<R> innerMap(Function<? super E, R> f) {
@@ -201,10 +201,14 @@ public class ResultStream<E> {
     public Result<Stream<E>> aggregateNullable() {
 
         Stream.Builder<E> unpacked = Stream.builder();
-        ResultConsumer<E> consumer = new ResultConsumer<>(unpacked);
-        this.results.forEach(consumer);
+        Result<?> traceAggregate = Result.empty();
+        this.results.forEach(r -> {
+            r.ifPresent(unpacked);
+            traceAggregate.addToTrace(r); 
+        });
+
         Result<Stream<E>> res = Result.of(unpacked.build());
-        res.addMessages(consumer.getMessageHandler().getMessages());
+        res.addToTrace(traceAggregate);
         return res;
     }
 
@@ -216,21 +220,21 @@ public class ResultStream<E> {
      */
     public Result<Stream<E>> aggregate() {
         
-        ResultConsumer<E> msgs = new ResultConsumer<>();
         List<E> unpacked = new LinkedList<>();
+        Result<?> traceAggregate = Result.empty();
 
         for (Result<E> r : this.results.collect(Collectors.toList())) {
-            msgs.accept(r);
             if (unpacked != null && r != null && r.isPresent()) {
                 unpacked.add(r.get());
             } else {
                 // No elements should be kept
                 unpacked = null;
             }
+            traceAggregate.addToTrace(r);
         }
 
         Result<Stream<E>> res = Result.ofNullable(unpacked).map(unp -> unp.stream());
-        res.addMessages(msgs.getMessageHandler().getMessages());
+        res.addToTrace(traceAggregate);
         return res;
     }
     

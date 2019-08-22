@@ -1,6 +1,5 @@
 package xyz.ottr.lutra.result;
 
-import java.util.Arrays;
 
 /*-
  * #%L
@@ -24,6 +23,7 @@ import java.util.Arrays;
  * #L%
  */
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -70,7 +70,7 @@ public class Result<E> {
     //     this(other == null ? Optional.empty() : other.result,
     //         other == null ? new LinkedList<>() : other.messages,
     //         other == null ? null : other.parsedFrom);
-    //     addParsedFrom(newParsedFrom);
+    //     addToTrace(newParsedFrom);
     // }
 
     /**
@@ -191,13 +191,6 @@ public class Result<E> {
         return empty(Message.info(msg));
     }
     
-    private Result<E> addParsedFrom(Result<?> other) {
-        if (other != null) {
-            this.traces.add(Trace.from(other));
-        }
-        return this;
-    }
-    
     public Result<E> addToTrace(Result<?> other) {
         if (other != null) {
             this.traces.add(Trace.from(other));
@@ -214,7 +207,7 @@ public class Result<E> {
         if (this.result.isPresent() && other.isPresent()) {
             consumer.accept(this.result.get(), other.result.get());
         }
-        this.addParsedFrom(other);
+        this.addToTrace(other);
     }
 
     /**
@@ -243,8 +236,8 @@ public class Result<E> {
         Result<R> res = p.test(a, b)
             ? Result.ofNullable(f.apply(a.orElse(null), b.orElse(null)))
             : Result.empty();
-        res.addParsedFrom(a);
-        res.addParsedFrom(b);
+        res.addToTrace(a);
+        res.addToTrace(b);
         return res;
     }
 
@@ -406,7 +399,7 @@ public class Result<E> {
     public <R> Result<R> flatMap(Function<? super E, ? extends Result<R>> fun) {
 
         Result<R> newResult = result.isPresent() ? fun.apply(result.get()) : Result.empty();
-        return newResult.addParsedFrom(this);
+        return newResult.addToTrace(this);
     }
 
     /**
@@ -419,7 +412,7 @@ public class Result<E> {
         if (mapped.isPresent()) {
             // Return a stream of results with parsedFrom pointers to this
             // TODO: Fix loss of messages if mapped contains an empty ResultStream
-            return mapped.get().map(r -> r.addParsedFrom(this));
+            return mapped.get().map(r -> r.addToTrace(this));
         } else {
             // Return a stream of an empty Result, containing parsedFrom pointer to this
             return ResultStream.of(Result.empty(this));
