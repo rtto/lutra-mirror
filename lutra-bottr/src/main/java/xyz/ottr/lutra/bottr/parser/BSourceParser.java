@@ -123,15 +123,9 @@ class BSourceParser implements Function<Resource, Result<Source<?>>> {
     }
 
     private Result<Source<?>> getH2Source(Resource source) {
-
-        Result<String> url = ModelSelector.getOptionalLiteralObject(this.model, source, BOTTR.sourceURL)
-            .map(Literal::getLexicalForm);
-
-        H2Source h2 = url.isPresent()
-                ? new H2Source(url.get())
-                : new H2Source();
-
-        return Result.of(h2, url);
+        return ModelSelector.getOptionalLiteralObject(this.model, source, BOTTR.sourceURL)
+            .map(Literal::getLexicalForm)
+            .mapOrElse(url -> new H2Source(url), new H2Source());
     }
 
     // Utility method
