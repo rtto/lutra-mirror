@@ -24,26 +24,50 @@ package xyz.ottr.lutra.bottr.io;
 
 import static org.junit.Assert.assertEquals;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.apache.jena.rdf.model.Model;
 import org.junit.Test;
 
 import xyz.ottr.lutra.bottr.model.InstanceMap;
+import xyz.ottr.lutra.bottr.parser.BInstanceMapParser;
+import xyz.ottr.lutra.result.Result;
+import xyz.ottr.lutra.result.ResultStream;
+import xyz.ottr.lutra.wottr.io.RDFFileReader;
 import xyz.ottr.lutra.wottr.util.ModelIO;
 
 public class BInstanceMapParserTest {
 
+    private static final String ROOT = "src/test/resources/maps/";
+
     @Test
-    public void shouldParse() {
-        Model model = ModelIO.readModel("instanceMap1.ttl");
-        BInstanceMapParser parser = new BInstanceMapParser();
-        
-        List<InstanceMap> maps = parser.apply(model).innerCollect(Collectors.toList());
-                
+    public void shouldParse1() {
+
+        List<InstanceMap> maps = getInstanceMaps(ROOT + "instanceMapDummySQL.ttl");
+
         assertEquals(1, maps.size());
         assertEquals("SELECT name, age, company FROM TABLE tblEmployee", maps.get(0).getQuery());
         assertEquals("http://example.com/tpl#MyTemplate", maps.get(0).getTemplateIRI());
+    }
+
+    @Test
+    public void shouldParse2() {
+
+        List<InstanceMap> maps = getInstanceMaps(ROOT + "instanceMapSPARQL.ttl");
+        assertEquals(1, maps.size());
+    }
+
+    private List<InstanceMap> getInstanceMaps(String file) {
+        return ResultStream.innerOf(file)
+            .innerFlatMap(new RDFFileReader())
+            .innerFlatMap(new BInstanceMapParser())
+            .getStream()
+            //.peek(r -> System.out.println(r))
+            //.peek(r -> System.out.println(r.getAllMessages()))
+            .map(Result::get)
+            .collect(Collectors.toList());
     }
 
 }

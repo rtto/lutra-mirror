@@ -421,7 +421,7 @@
                 <artifactId>commons-validator</artifactId>
                 <version>1.6</version>
             </dependency>
-            
+
 
             <!-- JENA -->
             <dependency>

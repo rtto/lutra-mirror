@@ -73,16 +73,16 @@ public class MapTest {
         InstanceMap myMap = new InstanceMap(
                 new StaticTestSource(), 
                 "blank query", 
-                OTTR.Bases.Triple, 
+                OTTR.BaseURI.Triple,
                 valMap);
 
         // Output: "Manually" build two instances      
-        Instance inst1 = new Instance(OTTR.Bases.Triple, 
+        Instance inst1 = new Instance(OTTR.BaseURI.Triple,
                 new ArgumentList(
                         new IRITerm(ns + "A1"),
                         new IRITerm(ns + "B1"),
                         new IRITerm(ns + "C1")));
-        Instance inst2 = new Instance(OTTR.Bases.Triple, 
+        Instance inst2 = new Instance(OTTR.BaseURI.Triple,
                 new ArgumentList(
                         new IRITerm(ns + "A2"),
                         new IRITerm(ns + "B2"),

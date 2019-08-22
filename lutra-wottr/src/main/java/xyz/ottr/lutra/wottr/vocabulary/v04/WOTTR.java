@@ -38,7 +38,7 @@ import xyz.ottr.lutra.wottr.vocabulary.WOTTRVocabulary;
 
 public class WOTTR implements WOTTRVocabulary {
 
-    private static final String ns = OTTR.namespace;
+    protected static final String ns = OTTR.namespace;
     public static final String prefix = "ottr";
    
     // Classes
@@ -84,23 +84,19 @@ public class WOTTR implements WOTTRVocabulary {
     public static final List<Resource> argumentModifiers = getList(optional, nonBlank);
 
     // Utility methods
-    private static Resource getResource(String uri) {
+    protected static Resource getResource(String uri) {
         return ResourceFactory.createResource(uri);
     }
 
-    private static Property getProperty(String uri) {
+    protected static Property getProperty(String uri) {
         return ResourceFactory.createProperty(uri);
     }
 
-    private static <X> List<X> getList(X... objects) {
+    protected static <X> List<X> getList(X... objects) {
         return Collections.unmodifiableList(Arrays.asList(objects));
     }
 
     public static final WOTTRVocabulary theInstance = new WOTTR();
-
-    private WOTTR() {
-        // hide constructor, use theInstance.
-    }
 
     @Override
     public Resource getNoneResource() {

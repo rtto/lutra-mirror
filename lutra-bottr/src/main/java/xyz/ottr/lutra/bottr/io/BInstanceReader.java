@@ -22,16 +22,21 @@ package xyz.ottr.lutra.bottr.io;
  * #L%
  */
 
+import xyz.ottr.lutra.bottr.model.InstanceMap;
+import xyz.ottr.lutra.bottr.parser.BInstanceMapParser;
 import xyz.ottr.lutra.io.InstanceParser;
 import xyz.ottr.lutra.model.Instance;
 import xyz.ottr.lutra.result.ResultStream;
+import xyz.ottr.lutra.wottr.io.RDFFileReader;
 
 public class BInstanceReader implements InstanceParser<String> {
 
     @Override
-    public ResultStream<Instance> apply(String t) {
-        // TODO Auto-generated method stub
-        return null;
+    public ResultStream<Instance> apply(String file) {
+        return ResultStream.innerOf(file)
+            .innerFlatMap(new RDFFileReader())
+            .innerFlatMap(new BInstanceMapParser())
+            .innerFlatMap(InstanceMap::get);
     }
 
 }

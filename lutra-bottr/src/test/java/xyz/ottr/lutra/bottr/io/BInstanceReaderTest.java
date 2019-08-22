@@ -1,4 +1,4 @@
-package xyz.ottr.lutra.bottr.source;
+package xyz.ottr.lutra.bottr.io;
 
 /*-
  * #%L
@@ -24,35 +24,26 @@ package xyz.ottr.lutra.bottr.source;
 
 import static org.junit.Assert.assertEquals;
 
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
-import org.apache.jena.rdf.model.RDFNode;
 import org.junit.Test;
 
-import xyz.ottr.lutra.bottr.model.Source;
-import xyz.ottr.lutra.result.ResultStream;
+import xyz.ottr.lutra.model.Instance;
+import xyz.ottr.lutra.result.Result;
 
-public class RDFSourceTest {
+public class BInstanceReaderTest {
 
-    private final Path root = Paths.get("src", "test", "resources", "sources", "rdf");
-
-    private String getResourceFile(String file) {
-        return this.root.resolve(file).toString();
-    }
+    private static final String ROOT = "src/test/resources/";
 
     @Test
-    public void prototypeTest() {
+    public void testSPARQLMap() {
 
-        List<String> modelURIs = Arrays.asList(getResourceFile("a.ttl"), getResourceFile("b.ttl"));
+        List<Instance> instances = Result.of(ROOT + "maps/instanceMapSPARQL.ttl")
+            .mapToStream(new BInstanceReader())
+            .innerCollect(Collectors.toList());
 
-        Source<RDFNode> source = new RDFSource(modelURIs);
-
-        ResultStream<?> result = source.execute(
-                "PREFIX foaf: <http://xmlns.com/foaf/0.1/>  " 
-                        + "SELECT ?s WHERE { ?s a foaf:Person }");
-        assertEquals(6, result.getStream().count());
+        assertEquals(13, instances.size());
     }
+
 }

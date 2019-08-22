@@ -25,6 +25,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -52,11 +53,11 @@ import xyz.ottr.lutra.result.ResultStream;
 import xyz.ottr.lutra.store.DependencyGraph;
 import xyz.ottr.lutra.store.TemplateStore;
 import xyz.ottr.lutra.tabottr.TabOTTR;
-import xyz.ottr.lutra.wottr.WTemplateFactory;
-import xyz.ottr.lutra.wottr.io.WFileReader;
-import xyz.ottr.lutra.wottr.io.WInstanceWriter;
-import xyz.ottr.lutra.wottr.io.WTemplateParser;
+
+import xyz.ottr.lutra.wottr.io.RDFFileReader;
+import xyz.ottr.lutra.wottr.parser.v04.WTemplateParser;
 import xyz.ottr.lutra.wottr.util.ModelIO;
+import xyz.ottr.lutra.wottr.writer.v04.WInstanceWriter;
 
 public class SPARQLGenerateEval {
 
@@ -74,7 +75,6 @@ public class SPARQLGenerateEval {
         prefixes.setNsPrefix("ex", "http://example.com/ns#");
         prefixes.setNsPrefix("foaf", "http://xmlns.com/foaf/0.1/");
         prefixes.setNsPrefix("schema", "http://schema.org/");
-
 
         // H2 database to load CSV file
         Source h2 = new CSVSource();
@@ -106,10 +106,10 @@ public class SPARQLGenerateEval {
         assertEquals(100, map.get().getStream().filter(Result::isPresent).count());
 
         TemplateStore store = new DependencyGraph();
-        store.addTemplateSignature(WTemplateFactory.createTripleTemplateHead());
+        store.addOTTRBaseTemplates();
 
         // Read templates
-        TemplateReader tempReader = new TemplateReader(new WFileReader(), new WTemplateParser());
+        TemplateReader tempReader = new TemplateReader(new RDFFileReader(), new WTemplateParser());
         ResultStream<String> tempIRI = ResultStream.innerOf(this.testRoot.resolve("person.ttl").toString());
         MessageHandler errorMessages = tempReader.populateTemplateStore(store, tempIRI);
         assertFalse(Message.moreSevere(errorMessages.printMessages(),
@@ -131,6 +131,6 @@ public class SPARQLGenerateEval {
         // print model
         String outFile = inFile + ".out.ttl";
         //ModelIO.printModel(in);
-        Files.write(this.testRoot.resolve(outFile), ModelIO.writeModel(in).getBytes(), StandardOpenOption.CREATE);
+        Files.write(this.testRoot.resolve(outFile), ModelIO.writeModel(in).getBytes(Charset.forName("UTF-8")), StandardOpenOption.CREATE);
     }
 }

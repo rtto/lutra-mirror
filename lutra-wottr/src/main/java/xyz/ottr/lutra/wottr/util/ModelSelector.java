@@ -25,6 +25,7 @@ package xyz.ottr.lutra.wottr.util;
 import java.util.List;
 import java.util.Optional;
 
+import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.RDFList;
@@ -79,6 +80,10 @@ public enum ModelSelector {
 
     public static Result<Resource> getRequiredResourceObject(Model model, Resource subject, Property predicate) {
         return getObject(model, subject, predicate, CardinalityOne.ONE, Resource.class);
+    }
+
+    public static Result<Literal> getRequiredLiteralObject(Model model, Resource subject, Property predicate) {
+        return getObject(model, subject, predicate, CardinalityOne.ONE, Literal.class);
     }
 
     public static Result<RDFList> getRequiredListObject(Model model, Resource subject, Property predicate) {

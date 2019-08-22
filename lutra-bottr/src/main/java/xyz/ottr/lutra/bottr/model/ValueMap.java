@@ -1,20 +1,5 @@
 package xyz.ottr.lutra.bottr.model;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-
-import org.apache.jena.rdf.model.Literal;
-import org.apache.jena.rdf.model.RDFNode;
-import org.apache.jena.shared.PrefixMapping;
-
-import xyz.ottr.lutra.model.ArgumentList;
-import xyz.ottr.lutra.model.Term;
-import xyz.ottr.lutra.result.Result;
-import xyz.ottr.lutra.tabottr.io.rdf.RDFNodeFactory;
-import xyz.ottr.lutra.wottr.WTermFactory;
-
 /*-
  * #%L
  * lutra-bottr
@@ -37,6 +22,21 @@ import xyz.ottr.lutra.wottr.WTermFactory;
  * #L%
  */
 
+import java.util.LinkedList;
+import java.util.List;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
+import org.apache.jena.rdf.model.Literal;
+import org.apache.jena.rdf.model.RDFNode;
+import org.apache.jena.shared.PrefixMapping;
+
+import xyz.ottr.lutra.model.ArgumentList;
+import xyz.ottr.lutra.model.Term;
+import xyz.ottr.lutra.result.Result;
+import xyz.ottr.lutra.tabottr.parser.RDFNodeFactory;
+import xyz.ottr.lutra.wottr.parser.TermFactory;
+import xyz.ottr.lutra.wottr.vocabulary.v04.WOTTR;
 
 /**
  * ValueMapList currently only holds just the RDF types that the input data values
@@ -48,13 +48,13 @@ import xyz.ottr.lutra.wottr.WTermFactory;
 public class ValueMap implements Function<Record<?>, Result<ArgumentList>> {
 
     private final RDFNodeFactory dataFactory;
-    private final WTermFactory termFactory;
+    private final TermFactory termFactory;
 
     private final List<ValueMap.Entry> maps;
 
     public ValueMap(PrefixMapping prefixes, List<String> types) {
         this.dataFactory = new RDFNodeFactory(prefixes);
-        this.termFactory = new WTermFactory();
+        this.termFactory = new TermFactory(WOTTR.theInstance);
         this.maps = types.stream()
                 .map(ValueMap.Entry::new)
                 .collect(Collectors.toList());
@@ -74,7 +74,6 @@ public class ValueMap implements Function<Record<?>, Result<ArgumentList>> {
         return this.dataFactory.toRDFNode(getStringValue(value), type);
     }
 
-    // TODO: can we do this better, without instanceof?
     private String getStringValue(Object value) {
         if (value instanceof RDFNode && ((RDFNode) value).isLiteral()) {
             return ((Literal) value).getLexicalForm();

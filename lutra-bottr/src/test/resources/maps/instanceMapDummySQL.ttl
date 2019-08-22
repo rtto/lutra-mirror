@@ -13,8 +13,8 @@ ex:MyMap a :InstanceMap ;
        [ :type :IRI ] ) ;
   :source ex:PersonellDB .
 
-ex:PersonellDB a :SQLSource ;
+ex:PersonellDB a :JDBCSource ;
   :username "Bob" ;
   :password "mySecret" ;
   :jdbcDriver "com.database" ;
-  :jdbcDatabaseURL "jdbc:mysql://hostname:port" .
+  :sourceURL "jdbc:mysql://hostname:port" .

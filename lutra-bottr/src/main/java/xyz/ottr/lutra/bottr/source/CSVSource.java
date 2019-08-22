@@ -30,6 +30,6 @@ public class CSVSource extends JDBCSource {
     public static final File TEMP_DIR = Files.createTempDir();
 
     public CSVSource() {
-        super("org.h2.Driver", "jdbc:h2:" + TEMP_DIR.getAbsolutePath() + "/db", "user", "pass");
+        super("org.h2.Driver","jdbc:h2:" + TEMP_DIR.getAbsolutePath() + "/CSVSource", "user", "pass");
     }
 }

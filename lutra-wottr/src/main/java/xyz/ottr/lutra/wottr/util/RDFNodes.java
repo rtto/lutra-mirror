@@ -22,7 +22,7 @@ package xyz.ottr.lutra.wottr.util;
  * #L%
  */
 
-import java.util.List;
+import java.util.Collection;
 import java.util.stream.Collectors;
 
 import org.apache.jena.graph.Node;
@@ -60,7 +60,13 @@ public enum RDFNodes {
         }
     }
 
-    public static String toString(Model model, List<? extends RDFNode> nodes) {
+    public static String toString(Collection<? extends RDFNode> nodes) {
+        return nodes.stream()
+            .map(node -> toString(node))
+            .collect(Collectors.joining(", ", "[", "]"));
+    }
+
+    public static String toString(Model model, Collection<? extends RDFNode> nodes) {
         return nodes.stream()
             .map(node -> toString(model, node))
             .collect(Collectors.joining(", ", "[", "]"));

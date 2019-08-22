@@ -45,9 +45,9 @@ public class JDBCSource implements Source<String> {
 
     private final Logger log = LoggerFactory.getLogger(JDBCSource.class);
 
-    protected BasicDataSource dataSource;
+    private final BasicDataSource dataSource;
 
-    public JDBCSource(String databaseDriver, String databaseURL, String username, String password) {
+    protected JDBCSource(String databaseDriver, String databaseURL, String username, String password) {
         this.dataSource = new BasicDataSource();
 
         this.dataSource.setDriverClassName(databaseDriver);
@@ -77,6 +77,34 @@ public class JDBCSource implements Source<String> {
                     "Error running query " + query 
                     + " over database " + this.dataSource.getUrl() 
                     + ": " + ex.getMessage())));
+        }
+    }
+
+    public static class Builder {
+
+        private String databaseDriver;
+        private String databaseURL;
+        private String username;
+        private String password;
+
+        public void setDatabaseDriver(String databaseDriver) {
+            this.databaseDriver = Objects.requireNonNull(databaseDriver);
+        }
+
+        public void setDatabaseURL(String databaseURL) {
+            this.databaseURL = Objects.requireNonNull(databaseURL);
+        }
+
+        public void setUsername(String username) {
+            this.username = username;
+        }
+
+        public void setPassword(String password) {
+            this.password = password;
+        }
+
+        public JDBCSource build() {
+            return new JDBCSource(this.databaseDriver, this.databaseURL, this.username, this.password);
         }
     }
 }

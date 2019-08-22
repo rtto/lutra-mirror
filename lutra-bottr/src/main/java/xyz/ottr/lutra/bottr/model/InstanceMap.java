@@ -1,5 +1,6 @@
 package xyz.ottr.lutra.bottr.model;
 
+import java.util.Objects;
 import java.util.function.Supplier;
 
 import xyz.ottr.lutra.model.Instance;
@@ -44,11 +45,16 @@ public class InstanceMap implements Supplier<ResultStream<Instance>> {
     
     @Override
     public ResultStream<Instance> get() {
-        return this.source.execute(this.query).mapFlatMap(this::mapToInstance);
+        return this.source.execute(this.query)
+            .mapFlatMap(this::createInstance);
     }
 
-    private Result<Instance> mapToInstance(Record<?> record) {
-        return this.valueMap.apply(record).flatMap(argList -> Result.of(new Instance(this.templateIRI, argList)));
+    private Result<Instance> createInstance(Record<?> record) {
+        return Result.zip(
+            Result.of(this.templateIRI),
+            Result.of(record).flatMap(this.valueMap),
+            Instance::new
+        );
     }
     
     public String getQuery() {
@@ -57,6 +63,37 @@ public class InstanceMap implements Supplier<ResultStream<Instance>> {
         
     public String getTemplateIRI() {
         return this.templateIRI;
+    }
+
+    public String toString() {
+        return this.getClass().getSimpleName() + " - " + templateIRI + " - " + query;
+    }
+
+    public static class Builder {
+        private Source<?> source;
+        private String query;
+        private String templateIRI;
+        private ValueMap valueMap;
+
+        public void setSource(Source<?> source) {
+            this.source = Objects.requireNonNull(source);
+        }
+
+        public void setQuery(String query) {
+            this.query = Objects.requireNonNull(query);
+        }
+
+        public void setTemplateIRI(String templateIRI) {
+            this.templateIRI = Objects.requireNonNull(templateIRI);
+        }
+
+        public void setValueMap(ValueMap valueMap) {
+            this.valueMap = Objects.requireNonNull(valueMap);
+        }
+
+        public InstanceMap build() {
+            return new InstanceMap(this.source, this.query, this.templateIRI, this.valueMap);
+        }
     }
 
 }

@@ -3,6 +3,7 @@ package xyz.ottr.lutra.bottr.source;
 import static org.junit.Assert.assertEquals;
 
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -24,7 +25,7 @@ import xyz.ottr.lutra.bottr.model.ValueMap;
 import xyz.ottr.lutra.result.Result;
 import xyz.ottr.lutra.result.ResultStream;
 import xyz.ottr.lutra.tabottr.TabOTTR;
-import xyz.ottr.lutra.wottr.WOTTR;
+import xyz.ottr.lutra.wottr.vocabulary.v04.WOTTR;
 
 /*-
  * #%L
@@ -69,7 +70,7 @@ public class CSVSourceTest {
             + "ex:A1,ex:B1,ex:C1\n"
             + "ex:A2,ex:B2,ex:C2\n"
             + "ex:A3,ex:B3,ex:C3\n";
-        Files.write(Paths.get(csvFilename), csvContent.getBytes());
+        Files.write(Paths.get(csvFilename), csvContent.getBytes(Charset.forName("UTF-8")));
 
         // Set up map to translate source to triple instances
         ValueMap valMap = new ValueMap(prefixes, Arrays.asList(TabOTTR.TYPE_IRI, TabOTTR.TYPE_IRI, TabOTTR.TYPE_IRI));
@@ -104,7 +105,7 @@ public class CSVSourceTest {
 
     @Test
     public void noHeader() {
-        String input = getAbsolutePath("noheader.csv");
+        String input = getAbsolutePath("sources/csv/noheader.csv");
         CSVSource csvTest = new CSVSource();
         testAgainstExpectedResult(csvTest.execute("SELECT ID, NAME, SALARY FROM CSVREAD('" + input + "',"
                 + "'ID,NAME,AGE,ADDRESS,SALARY', 'fieldSeparator=,');"));
@@ -112,14 +113,14 @@ public class CSVSourceTest {
 
     @Test
     public void linuxSeparator() {
-        String input = getAbsolutePath("linux.csv");
+        String input = getAbsolutePath("sources/csv/linux.csv");
         CSVSource csvTest = new CSVSource();
         testAgainstExpectedResult(csvTest.execute("SELECT ID, NAME, SALARY FROM CSVREAD('" + input + "');"));
     }
 
     @Test
     public void windowsSeparator() {
-        String input = getAbsolutePath("win.csv");
+        String input = getAbsolutePath("sources/csv/win.csv");
         CSVSource csvTest = new CSVSource();
         testAgainstExpectedResult(csvTest.execute("SELECT ID, NAME, SALARY FROM CSVREAD('" + input + "');"));
     }

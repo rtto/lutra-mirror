@@ -22,30 +22,31 @@ package xyz.ottr.lutra.bottr;
  * #L%
  */
 
+import java.util.List;
+
 import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.Resource;
-
-import xyz.ottr.lutra.wottr.WOTTR;
+import xyz.ottr.lutra.wottr.vocabulary.v04.WOTTR;
 
 public class BOTTR extends WOTTR {
 
     // Classes
-    public static final Resource InstanceMap = getResource("InstanceMap");
-    public static final Resource SQLSource = getResource("SQLSource");
-    public static final Resource SPARQLSource = getResource("SPARQLSource");
+    public static final Resource InstanceMap = getResource(ns + "InstanceMap");
+    public static final Resource JDBCSource = getResource(ns + "JDBCSource");
+    public static final Resource SPARQLSource = getResource(ns + "SPARQLSource");
+
+    public static final List<Resource> sources = getList(JDBCSource, SPARQLSource);
     
     // Properties
-    public static final Property template = getProperty("template");
-    public static final Property valueMap = getProperty("valueMap");
-    public static final Property source = getProperty("source");
-    public static final Property query = getProperty("query");
-    
-    public static final Property username = getProperty("username");
-    public static final Property password = getProperty("password");
-    public static final Property jdbcDriver = getProperty("jdbcDriver");
-    public static final Property jdbcDatabaseURL = getProperty("jdbcDatabaseURL");
-    
-    public static final Property sparqlEndpoint = getProperty("sparqlEndpoint");
+    public static final Property template = getProperty(ns + "template");
+    public static final Property valueMap = getProperty(ns + "valueMap");
+    public static final Property source = getProperty(ns + "source");
+    public static final Property query = getProperty(ns + "query");
 
-    
+    public static final Property sourceURL = getProperty(ns + "sourceURL");
+
+    public static final Property username = getProperty(ns + "username");
+    public static final Property password = getProperty(ns + "password");
+    public static final Property jdbcDriver = getProperty(ns + "jdbcDriver");
+
 }
