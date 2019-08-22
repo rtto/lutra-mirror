@@ -38,6 +38,7 @@ import picocli.CommandLine;
 import picocli.CommandLine.ParameterException;
 
 import xyz.ottr.lutra.OTTR;
+import xyz.ottr.lutra.bottr.io.BInstanceReader;
 import xyz.ottr.lutra.io.InstanceReader;
 import xyz.ottr.lutra.io.InstanceWriter;
 import xyz.ottr.lutra.io.TemplateReader;
@@ -290,6 +291,8 @@ public class CLI {
                     "No input file provided."));
         }
         switch (settings.inputFormat) {
+            case bottr:
+                return Result.of(new InstanceReader(new BInstanceReader()));
             case tabottr:
                 return Result.of(new InstanceReader(new ExcelReader()));
             case legacy:
