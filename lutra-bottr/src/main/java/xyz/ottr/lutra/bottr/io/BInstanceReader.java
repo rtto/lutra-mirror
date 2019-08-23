@@ -35,7 +35,7 @@ public class BInstanceReader implements InstanceParser<String> {
     public ResultStream<Instance> apply(String file) {
         return ResultStream.innerOf(file)
             .innerFlatMap(new RDFFileReader())
-            .innerFlatMap(new BInstanceMapParser())
+            .innerFlatMap(new BInstanceMapParser(file))
             .innerFlatMap(InstanceMap::get);
     }
 

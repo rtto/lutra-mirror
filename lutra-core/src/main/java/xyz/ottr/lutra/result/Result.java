@@ -410,8 +410,15 @@ public class Result<E> {
      * Similar to Optional#flatMap(Function), but result's parsed from becomes this.
      */
     public <R> Result<R> flatMap(Function<? super E, ? extends Result<R>> fun) {
+        return flatMapOrElse(fun, Result.empty());
+    }
 
-        Result<R> newResult = result.isPresent() ? fun.apply(result.get()) : Result.empty();
+    /**
+     * Similar to Result#flatMap(Function), but result becomes orElse if this' result is empty.
+     */
+    public <R> Result<R> flatMapOrElse(Function<? super E, ? extends Result<R>> fun, Result<R> orElse) {
+
+        Result<R> newResult = result.isPresent() ? fun.apply(result.get()) : orElse;
         return newResult.addParsedFrom(this);
     }
 

@@ -10,7 +10,7 @@ ex:MyMap a :InstanceMap ;
   :valueMap ( 
        [ :type xsd:String ] 
        [ :type xsd:int ]
-       [ :type :IRI ] ) ;
+       [ :type "iri" ] ) ;
   :source ex:PersonellDB .
 
 ex:PersonellDB a :JDBCSource ;

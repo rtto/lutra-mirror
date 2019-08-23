@@ -8,13 +8,11 @@
 ex:MyMap a :InstanceMap ;
   :template :Triple ;
   :query "SELECT ?s ?p ?o WHERE { ?s ?p ?o } LIMIT 13" ;
-  :valueMap ( 
-       [ :type rdfs:Resource ]
-       [ :type rdfs:Resource ]
-       [ :type rdfs:Resource ]
-       ) ;
+#  :valueMap (
+#       [ :type "auto" ]
+#       [ :type "auto" ]
+#       [ :type "auto" ]
+#       ) ;
   :source
     [ a :SPARQLSource ;
       :sourceURL "https://query.wikidata.org/bigdata/namespace/wdq/sparql" ] .
-
-

@@ -22,9 +22,11 @@ package xyz.ottr.lutra.bottr.parser;
  * #L%
  */
 
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -44,15 +46,18 @@ import xyz.ottr.lutra.bottr.source.RDFSource;
 import xyz.ottr.lutra.bottr.source.SPARQLEndpointSource;
 import xyz.ottr.lutra.result.Result;
 import xyz.ottr.lutra.result.ResultStream;
+import xyz.ottr.lutra.tabottr.parser.DataValidator;
 import xyz.ottr.lutra.wottr.util.ModelSelector;
 import xyz.ottr.lutra.wottr.util.RDFNodes;
 
 class BSourceParser implements Function<Resource, Result<Source<?>>> {
 
     private final Model model;
+    private final String filePath; // @Nullable
 
-    public BSourceParser(Model model) {
+    public BSourceParser(Model model, String filePath) {
         this.model = model;
+        this.filePath = filePath;
     }
 
     private static final Map<Resource, Result<Source<?>>> sources = new HashMap<>();
@@ -108,7 +113,7 @@ class BSourceParser implements Function<Resource, Result<Source<?>>> {
 
     private Result<Source<?>> getRDFSource(Resource source) {
 
-        // RDFSource takes a list of sourceURLs, so must treat this differently than SPARQLEndpointSource.
+        // RDFSource takes a *list* of sourceURLs, therefore a bit more work than for SPARQLEndpointSource.
         List<RDFNode> urlNodes = this.model.listStatements(source, BOTTR.sourceURL, (RDFNode) null)
             .mapWith(Statement::getObject)
             .toList();
@@ -116,6 +121,7 @@ class BSourceParser implements Function<Resource, Result<Source<?>>> {
         List<Result<String>> urlStrings = ResultStream.innerOf(urlNodes)
             .mapFlatMap(node -> RDFNodes.cast(node, Literal.class))
             .innerMap(Literal::getLexicalForm)
+            .innerMap(this::getPath)
             .collect(Collectors.toList());
 
         return Result.aggregate(urlStrings)
@@ -125,7 +131,21 @@ class BSourceParser implements Function<Resource, Result<Source<?>>> {
     private Result<Source<?>> getH2Source(Resource source) {
         return ModelSelector.getOptionalLiteralObject(this.model, source, BOTTR.sourceURL)
             .map(Literal::getLexicalForm)
+            .map(this::getPath)
             .mapOrElse(url -> new H2Source(url), new H2Source());
+    }
+
+    /**
+     * Use this.filePath (if it exists) to create an absolute path of the input, if input is not a URL.
+     * Otherwise return input unaltered.
+     */
+    private String getPath(String file) {
+
+        if (Objects.isNull(this.filePath) || DataValidator.isURL(file)) {
+            return file;
+        } else {
+            return Paths.get(this.filePath).resolveSibling(file).toAbsolutePath().toString();
+        }
     }
 
     // Utility method

@@ -22,18 +22,23 @@ package xyz.ottr.lutra.bottr.model;
  * #L%
  */
 
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.shared.PrefixMapping;
 
+import org.graalvm.compiler.core.common.SuppressFBWarnings;
 import xyz.ottr.lutra.model.ArgumentList;
 import xyz.ottr.lutra.model.Term;
 import xyz.ottr.lutra.result.Result;
+import xyz.ottr.lutra.tabottr.TabOTTR;
 import xyz.ottr.lutra.tabottr.parser.RDFNodeFactory;
 import xyz.ottr.lutra.wottr.parser.TermFactory;
 import xyz.ottr.lutra.wottr.vocabulary.v04.WOTTR;
@@ -47,38 +52,57 @@ import xyz.ottr.lutra.wottr.vocabulary.v04.WOTTR;
  */
 public class ValueMap implements Function<Record<?>, Result<ArgumentList>> {
 
-    private final RDFNodeFactory dataFactory;
+    private final RDFNodeFactory rdfNodeFactory;
     private final TermFactory termFactory;
 
-    private final List<ValueMap.Entry> maps;
+    private final Map<Integer, Entry> maps;
 
     public ValueMap(PrefixMapping prefixes, List<String> types) {
-        this.dataFactory = new RDFNodeFactory(prefixes);
+        this.rdfNodeFactory = new RDFNodeFactory(prefixes);
         this.termFactory = new TermFactory(WOTTR.theInstance);
+
+        // convert list of types in to indexed map for easy access.
+        AtomicInteger index = new AtomicInteger();
         this.maps = types.stream()
-                .map(ValueMap.Entry::new)
-                .collect(Collectors.toList());
+            .collect(Collectors.toMap(s -> index.getAndIncrement(), Entry::new));
+    }
+
+    public ValueMap(PrefixMapping prefixes) {
+        this(prefixes, Collections.emptyList());
     }
 
     @Override
     public Result<ArgumentList> apply(Record<?> record) {
+
         List<Result<Term>> args = new LinkedList<>();
-        for (int i = 0; i < record.getValues().size(); i += 1) {
-            Result<RDFNode> rdfNode = getRDFNode(record.getValue(i), this.maps.get(i).getType());
-            args.add(rdfNode.flatMap(this.termFactory));
+        for (int i = 0; i < record.getValues().size(); i += 1) { // need a for-loop as we are accessing records *and* optional types.
+            Result<Term> term = getRDFNode(record.getValue(i), Optional.ofNullable(this.maps.get(i)))
+                .flatMap(this.termFactory);
+            args.add(term);
         }
-        return Result.aggregate(args).map(ArgumentList::new);
+        return Result.aggregate(args)
+            .map(ArgumentList::new);
     }
 
-    private Result<RDFNode> getRDFNode(Object value, String type) {
-        return this.dataFactory.toRDFNode(getStringValue(value), type);
+    @SuppressFBWarnings(
+        value = "UPM_UNCALLED_PRIVATE_METHOD",
+        justification = "Overloading, method is called in apply(Record)")
+    private Result<RDFNode> getRDFNode(RDFNode value, Optional<Entry> entry) {
+
+        if (!entry.isPresent() || TabOTTR.TYPE_AUTO.equals(entry.get().getType())) {
+            return Result.of(value);
+        } else {
+            return getRDFNode((Object)value, entry);
+        }
     }
 
-    private String getStringValue(Object value) {
-        if (value instanceof RDFNode && ((RDFNode) value).isLiteral()) {
-            return ((Literal) value).getLexicalForm();
-        }
-        return value.toString();
+    private Result<RDFNode> getRDFNode(Object value, Optional<Entry> entry) {
+        return getRDFNode(value.toString(), entry);
+    }
+
+    private Result<RDFNode> getRDFNode(String value, Optional<Entry> entry) {
+        String type = entry.map(Entry::getType).orElse(TabOTTR.TYPE_AUTO);
+        return this.rdfNodeFactory.toRDFNode(value, type);
     }
 
     private static class Entry {

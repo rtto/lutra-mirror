@@ -50,8 +50,8 @@ class BValueMapParser implements Function<RDFList, Result<ValueMap>> {
 
         List<Result<String>> listElements = ResultStream.innerOf(list.asJavaList())
             .mapFlatMap(node -> RDFNodes.cast(node, Resource.class))
-            .mapFlatMap(r -> ModelSelector.getRequiredURIResourceObject(this.model, r, BOTTR.type))
-            .innerMap(Resource::getURI)
+            .mapFlatMap(r -> ModelSelector.getRequiredObject(this.model, r, BOTTR.type))
+            .innerMap(r -> r.isLiteral() ? r.asLiteral().getLexicalForm() : r.toString())
             .collect(Collectors.toList());
 
         return Result.aggregate(listElements)

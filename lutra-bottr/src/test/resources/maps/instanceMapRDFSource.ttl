@@ -8,15 +8,17 @@
 
 
 ex:MyMap a :InstanceMap ;
-  :template tpl:Example ;
-  :query "SELECT ?s WHERE { ?s a foaf:Person }" ;
-  :valueMap ( 
-       [ :type rdfs:Resource ]
-       ) ;
+  :template :Triple ;
+  :query "SELECT ?s ?p ?o WHERE { ?s a foaf:Person ; ?p ?o }" ;
+#  :valueMap (
+#       [ :type "auto" ]
+#       [ :type "auto" ]
+#       [ :type "auto" ]
+#       ) ;
   :source
     [ a :RDFSource ;
       :sourceURL
-        "src/test/resources/sources/rdf/a.ttl" ,
-        "src/test/resources/sources/rdf/b.ttl" ] .
+        "../sources/rdf/a.ttl" ,
+        "../sources/rdf/b.ttl" ] .
 
 

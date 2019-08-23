@@ -8,9 +8,8 @@ ex:MyMap a :InstanceMap ;
   :template tpl:Example ;
   :query "SELECT ID, NAME, SALARY FROM CSVREAD('src/test/resources/sources/csv/linux.csv');" ;
   :valueMap ( 
-       [ :type rdfs:Resource ]
-       [ :type rdfs:Resource ]
-       [ :type rdfs:Resource ]
-  ) ;
+       [ :type xsd:String ]
+       [ :type xsd:int ]
+       [ :type "iri" ] ) ;
   :source
     [ a :H2Source ] .

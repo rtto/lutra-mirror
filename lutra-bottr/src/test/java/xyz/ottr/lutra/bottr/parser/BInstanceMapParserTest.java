@@ -51,7 +51,6 @@ public class BInstanceMapParserTest {
     public void shouldParseSPARQL() {
 
         Result<InstanceMap> maps = getInstanceMap(ROOT + "instanceMapSPARQL.ttl");
-
         assertEquals(Collections.emptyList(), maps.getAllMessages());
     }
 
@@ -59,7 +58,6 @@ public class BInstanceMapParserTest {
     public void shouldParseRDF() {
 
         Result<InstanceMap> maps = getInstanceMap(ROOT + "instanceMapRDFSource.ttl");
-
         assertEquals(Collections.emptyList(), maps.getAllMessages());
     }
 
@@ -67,14 +65,13 @@ public class BInstanceMapParserTest {
     public void shouldParseCSV() {
 
         Result<InstanceMap> maps = getInstanceMap(ROOT + "instanceMapH2Source.ttl");
-
         assertEquals(Collections.emptyList(), maps.getAllMessages());
     }
 
     private Result<InstanceMap> getInstanceMap(String file) {
         return ResultStream.innerOf(file)
             .innerFlatMap(new RDFFileReader())
-            .innerFlatMap(new BInstanceMapParser())
+            .innerFlatMap(new BInstanceMapParser(file))
             .getStream()
             //.peek(r -> System.out.println(r))
             //.peek(r -> System.out.println(r.getAllMessages()))

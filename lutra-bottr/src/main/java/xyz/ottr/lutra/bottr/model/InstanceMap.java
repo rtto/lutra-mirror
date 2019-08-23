@@ -75,20 +75,24 @@ public class InstanceMap implements Supplier<ResultStream<Instance>> {
         private String templateIRI;
         private ValueMap valueMap;
 
+        private String nullError(String variableName) {
+            return "InstanceMap's " + variableName + " cannot be null.";
+        }
+
         public void setSource(Source<?> source) {
-            this.source = Objects.requireNonNull(source);
+            this.source = Objects.requireNonNull(source, nullError("source"));
         }
 
         public void setQuery(String query) {
-            this.query = Objects.requireNonNull(query);
+            this.query = Objects.requireNonNull(query, nullError("query"));
         }
 
         public void setTemplateIRI(String templateIRI) {
-            this.templateIRI = Objects.requireNonNull(templateIRI);
+            this.templateIRI = Objects.requireNonNull(templateIRI, nullError("template"));
         }
 
         public void setValueMap(ValueMap valueMap) {
-            this.valueMap = Objects.requireNonNull(valueMap);
+            this.valueMap = Objects.requireNonNull(valueMap, nullError("valueMap"));
         }
 
         public InstanceMap build() {

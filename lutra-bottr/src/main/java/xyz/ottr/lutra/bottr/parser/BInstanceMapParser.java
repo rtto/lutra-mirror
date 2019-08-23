@@ -39,6 +39,12 @@ import xyz.ottr.lutra.wottr.util.ModelSelector;
 
 public class BInstanceMapParser implements Function<Model, ResultStream<InstanceMap>> {
 
+    private final String filePath; // @Nullable. file location of the InstanceMap, used for making correct absolute paths to sources
+
+    public BInstanceMapParser(String filePath) {
+        this.filePath = filePath;
+    }
+
     @Override
     public ResultStream<InstanceMap> apply(Model model) {
         List<Resource> instanceMaps = ModelSelector.getInstancesOfClass(model, BOTTR.InstanceMap);
@@ -72,12 +78,12 @@ public class BInstanceMapParser implements Function<Model, ResultStream<Instance
 
     private Result<Source<?>> getSource(Model model, Resource instanceMap) {
         return ModelSelector.getRequiredResourceObject(model, instanceMap, BOTTR.source)
-            .flatMap(new BSourceParser(model));
+            .flatMap(new BSourceParser(model, this.filePath));
     }
 
     private Result<ValueMap> getValueMap(Model model, Resource instanceMap) {
-        return ModelSelector.getRequiredListObject(model, instanceMap, BOTTR.valueMap)
-            .flatMap(new BValueMapParser(model));
+        return ModelSelector.getOptionalListObject(model, instanceMap, BOTTR.valueMap)
+            .flatMapOrElse(new BValueMapParser(model), Result.of(new ValueMap(model)));
     }
 
 }
