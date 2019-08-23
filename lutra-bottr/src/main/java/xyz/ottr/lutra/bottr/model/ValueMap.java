@@ -34,7 +34,6 @@ import java.util.stream.Collectors;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.shared.PrefixMapping;
 
-import org.graalvm.compiler.core.common.SuppressFBWarnings;
 import xyz.ottr.lutra.model.ArgumentList;
 import xyz.ottr.lutra.model.Term;
 import xyz.ottr.lutra.result.Result;
@@ -84,9 +83,6 @@ public class ValueMap implements Function<Record<?>, Result<ArgumentList>> {
             .map(ArgumentList::new);
     }
 
-    @SuppressFBWarnings(
-        value = "UPM_UNCALLED_PRIVATE_METHOD",
-        justification = "Overloading, method is called in apply(Record)")
     private Result<RDFNode> getRDFNode(RDFNode value, Optional<Entry> entry) {
 
         if (!entry.isPresent() || TabOTTR.TYPE_AUTO.equals(entry.get().getType())) {

@@ -14,4 +14,12 @@
     <Class name="xyz.ottr.lutra.tabottr.parser.ExcelReader" />
     <Bug pattern="RCN_REDUNDANT_NULLCHECK_WOULD_HAVE_BEEN_A_NPE" />
   </Match>
+
+  <Match>
+    <!-- This is an overloaded method, which is in fact called. -->
+    <Class name="xyz.ottr.lutra.bottr.model.ValueMap" />
+    <Method name="getRDFNode" />
+    <Bug pattern="UPM_UNCALLED_PRIVATE_METHOD" />
+  </Match>
+
 </FindBugsFilter>
