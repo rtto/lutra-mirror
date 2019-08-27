@@ -43,7 +43,7 @@ import xyz.ottr.lutra.store.TemplateStore;
 public class TemplateReader implements Function<String, ResultStream<TemplateSignature>> {
 
     private final Function<String, ResultStream<TemplateSignature>> templatePipeline;
-    private final TemplateParser parser; // Needed for retrieving used prefixes
+    private final TemplateParser<?> parser; // Needed for retrieving used prefixes
     private final Logger log = LoggerFactory.getLogger(TemplateReader.class);
 
     public <M> TemplateReader(InputReader<String, M> templateInputReader, TemplateParser<M> templateParser) {
