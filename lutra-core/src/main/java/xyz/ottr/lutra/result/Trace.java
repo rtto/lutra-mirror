@@ -1,5 +1,13 @@
 package xyz.ottr.lutra.result;
 
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.LinkedList; 
+import java.util.List; 
+import java.util.Optional;
+import java.util.Set;
+import java.util.function.Function;
+
 /*-
  * #%L 
  * lutra-core
@@ -21,11 +29,6 @@ package xyz.ottr.lutra.result;
  * <http://www.gnu.org/licenses/lgpl-2.1.html>.
  * #L%
  */
-
-import java.util.List; 
-import java.util.Optional;
-import java.util.Set;
-import java.util.function.Function;
 
 public class Trace {
 
@@ -61,15 +64,10 @@ public class Trace {
     private final Set<Trace> trace;
     private final List<Message> messages;
     
-    private Trace(Optional<?> location, Set<Trace> trace, List<Message> messages) {
-        this.location = location;
-        this.trace = trace;
-        this.messages = messages;
-    }
-    
-    public static Trace from(Result<?> result) {
-        Optional<?> location = result.getOptional().map(toLocation);
-        return new Trace(location, result.getTraces(), result.getMessages());
+    protected Trace(Optional<?> value) {
+        this.location = value.map(toLocation);
+        this.trace = new HashSet<>();
+        this.messages = new LinkedList<>();
     }
     
     public boolean hasLocation() {
@@ -86,6 +84,22 @@ public class Trace {
 
     public List<Message> getMessages() {
         return messages;
+    }
+    
+    protected void addTrace(Trace elem) {
+        this.trace.add(elem);
+    }
+
+    protected void addTraces(Collection<Trace> elems) {
+        this.trace.addAll(elems);
+    }
+
+    protected void addMessage(Message msg) {
+        this.messages.add(msg);
+    }
+
+    protected void addMessages(Collection<Message> msgs) {
+        this.messages.addAll(msgs);
     }
 
 }
