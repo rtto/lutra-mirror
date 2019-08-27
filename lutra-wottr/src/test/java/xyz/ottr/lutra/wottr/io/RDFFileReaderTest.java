@@ -65,12 +65,12 @@ public class RDFFileReaderTest {
         ResultStream<Model> nonExistentModelStream = reader.apply(nonExistent);
         Result<Stream<Model>> nonExistsentAggr = nonExistentModelStream.aggregate();
         assert !nonExistsentAggr.isPresent();
-        log.debug(nonExistsentAggr.getMessages().toString());
+        log.debug(nonExistsentAggr.getAllMessages().toString());
 
         ResultStream<Model> faultyRDFModelStream = reader.apply(faultyRDF);
         Result<Stream<Model>> faultyRDFModelAggr = faultyRDFModelStream.aggregate();
         assert !faultyRDFModelAggr.isPresent();
-        log.debug(faultyRDFModelAggr.getMessages().toString());
+        log.debug(faultyRDFModelAggr.getAllMessages().toString());
     }
 
     @AfterClass

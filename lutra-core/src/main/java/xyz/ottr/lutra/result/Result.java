@@ -356,7 +356,7 @@ public class Result<E> {
      * To retrieve all Message-s including Message-s on the Result-s
      * this is parsed from, use a ResultConsumer or Result#getAllMessages().
      */
-    public List<Message> getMessages() {
+    protected List<Message> getMessages() {
         return this.messages;
     }
 
@@ -373,7 +373,7 @@ public class Result<E> {
     /**
      * Returns the Result which this was derived from, via some form of computation.
      */
-    public Set<Trace> getTraces() {
+    protected Set<Trace> getTraces() {
         return this.traces;
     }
 
@@ -412,7 +412,7 @@ public class Result<E> {
         if (mapped.isPresent()) {
             // Return a stream of results with parsedFrom pointers to this
             // TODO: Fix loss of messages if mapped contains an empty ResultStream
-            return mapped.get().map(r -> r.addToTrace(this));
+            return mapped.get().filter(r -> r != null).map(r -> r.addToTrace(this));
         } else {
             // Return a stream of an empty Result, containing parsedFrom pointer to this
             return ResultStream.of(Result.empty(this));
@@ -439,14 +439,6 @@ public class Result<E> {
                 ? "Result(" + this.result.get().toString() + ")"
                 : "Empty") + this.messages.toString();
     }
-
-    // public String getContext() {
-    //     if (isContext) {
-    //         return get().toString();
-    //     } else {
-    //         return deriveContext.apply(get()).toString();
-    //     }
-    // }
 
     /**
      * Returns a new function that is the composition of the two argument functions, under
