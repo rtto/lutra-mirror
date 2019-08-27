@@ -34,16 +34,17 @@ import xyz.ottr.lutra.model.Instance;
 import xyz.ottr.lutra.model.Term;
 import xyz.ottr.lutra.result.Result;
 import xyz.ottr.lutra.tabottr.model.TemplateInstruction;
-import xyz.ottr.lutra.wottr.WTermFactory;
+import xyz.ottr.lutra.wottr.parser.TermFactory;
+import xyz.ottr.lutra.wottr.vocabulary.v04.WOTTR;
 
 public class TemplateInstructionParser {
 
     private RDFNodeFactory dataFactory;
-    private WTermFactory termFactory;
+    private TermFactory termFactory;
     
     public TemplateInstructionParser(PrefixMapping prefixes) {
         this.dataFactory = new RDFNodeFactory(prefixes);
-        this.termFactory = new WTermFactory();
+        this.termFactory = new TermFactory(WOTTR.theInstance);
     }
     
     private Result<Instance> createTemplateInstance(String templateIRI, List<String> arguments, List<String> argumentTypes) {

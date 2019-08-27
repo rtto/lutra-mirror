@@ -22,6 +22,8 @@ package xyz.ottr.lutra.model.types;
  * #L%
  */
 
+import xyz.ottr.lutra.OTTR;
+
 public class NEListType implements ComplexType {
 
     private final TermType inner;
@@ -32,6 +34,11 @@ public class NEListType implements ComplexType {
 
     public TermType getInner() {
         return this.inner;
+    }
+
+    @Override
+    public String getOuterIRI() {
+        return OTTR.TypeURI.NEList;
     }
 
     @Override

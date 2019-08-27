@@ -32,6 +32,7 @@ import java.util.stream.Collectors;
 import org.apache.commons.collections4.SetUtils;
 import org.apache.jena.shared.PrefixMapping;
 
+import xyz.ottr.lutra.OTTR;
 import xyz.ottr.lutra.result.Message;
 import xyz.ottr.lutra.result.Result;
 import xyz.ottr.lutra.tabottr.model.Instruction;
@@ -40,7 +41,7 @@ import xyz.ottr.lutra.tabottr.model.PrefixInstruction;
 
 public class PrefixInstructionParser {
 
-    private static final PrefixMapping stdPrefixes = PrefixMapping.Standard; // TODO use OTTR standard
+    private static final PrefixMapping stdPrefixes = OTTR.getDefaultPrefixes();
 
     private static Set<Map.Entry<String, String>> getPrefixPairs(PrefixMapping prefixes) {
         return prefixes.getNsPrefixMap().entrySet();

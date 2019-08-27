@@ -28,28 +28,23 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import org.apache.jena.rdf.model.Model;
-import org.apache.jena.shared.PrefixMapping;
 import org.junit.Test;
-
-import xyz.ottr.lutra.io.InstanceParser;
 import xyz.ottr.lutra.model.Instance;
 import xyz.ottr.lutra.result.ResultConsumer;
 import xyz.ottr.lutra.result.ResultStream;
-import xyz.ottr.lutra.wottr.legacy.io.WInstanceWriter;
-import xyz.ottr.lutra.wottr.legacy.io.WReader;
+import xyz.ottr.lutra.wottr.parser.v03.WInstanceParser;
 import xyz.ottr.lutra.wottr.util.ModelIO;
+import xyz.ottr.lutra.wottr.writer.v03.WInstanceWriter;
 
 public class ExcelReaderTest {
 
     private static final Path ROOT = Paths.get("src", "test", "resources");
-    
-    private Model getExcelReaderRDFWriterModel(String filename) {
-        InstanceParser<String> parser = new ExcelReader();
-        ResultStream<Instance> instances = parser.apply(filename);
+
+    private Model writeToModel(ResultStream<Instance> instances) {
         WInstanceWriter writer = new WInstanceWriter();
         ResultConsumer<Instance> consumer = new ResultConsumer<>(writer);
         instances.forEach(consumer);
-        Model model = WReader.getCanonicalModel(writer.writeToModel()); 
+        Model model = writer.writeToModel();
         return model;
     }
     
@@ -57,10 +52,11 @@ public class ExcelReaderTest {
         Path folder = ROOT.resolve("atomic");
         String excelFile = folder.resolve(name + ".xlsx").toString();
         String rdfFile = folder.resolve(name + ".ttl").toString();
-        Model excelModel = getExcelReaderRDFWriterModel(excelFile);
+
+        Model excelModel = writeToModel(new ExcelReader().apply(excelFile));
         excelModel.setNsPrefix("ex", "http://example.org#");
-        Model rdfModel = WReader.getCanonicalModel(ModelIO.readModel(rdfFile));
-        rdfModel.setNsPrefixes(PrefixMapping.Standard);
+
+        Model rdfModel = writeToModel(new WInstanceParser().apply(ModelIO.readModel(rdfFile)));
 
         boolean isIsomorphic = excelModel.isIsomorphicWith(rdfModel);
         /*

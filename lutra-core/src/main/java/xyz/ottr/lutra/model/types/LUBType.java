@@ -22,6 +22,8 @@ package xyz.ottr.lutra.model.types;
  * #L%
  */
 
+import xyz.ottr.lutra.OTTR;
+
 public class LUBType implements ComplexType {
 
     private BasicType inner;
@@ -32,6 +34,11 @@ public class LUBType implements ComplexType {
 
     public BasicType getInner() {
         return this.inner;
+    }
+
+    @Override
+    public String getOuterIRI() {
+        return OTTR.TypeURI.LUB;
     }
 
     @Override
