@@ -140,14 +140,14 @@ public class MessageHandler {
     private static void getLocationRecur(StringBuilder context, Trace trace,
             String curRef, Map<Trace, String> refs) {
         
+        if (refs.containsKey(trace)) {
+            // Already printed subtrace, just reference to its enumeration and returns
+            context.append(toReferenceString(refs.get(trace)));
+            return;
+        } 
+        refs.put(trace, curRef);
         if (trace.hasLocation()) {
-            if (refs.containsKey(trace)) {
-                // Already printed subtrace, just reference to its enumeration and returns
-                context.append(toReferenceString(refs.get(trace)));
-                return;
-            } 
             // Assign enumeration to trace element, and append to trace
-            refs.put(trace, curRef);
             context.append(toLocationString(trace, refs.get(trace)));
         }
 
