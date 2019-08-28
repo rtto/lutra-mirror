@@ -1,11 +1,13 @@
 package xyz.ottr.lutra.result;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedList; 
 import java.util.List; 
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 /*-
@@ -37,7 +39,7 @@ public class Trace {
     // to give a context to the Messages printed. The default is just the
     // toString-representation of the original object, but one can override
     // this to get a different context object.
-    private static Function<Object, ?> toLocation = obj -> {
+    private static Function<Object, ?> toLocation = obj -> { // TODO: Rename to identifier
         if (obj == null) {
             return null;
         }
@@ -63,11 +65,25 @@ public class Trace {
     private final Optional<?> location;
     private final Set<Trace> trace;
     private final List<Message> messages;
-    
+   
     protected Trace(Optional<?> value) {
         this.location = value.map(toLocation);
         this.trace = new HashSet<>();
         this.messages = new LinkedList<>();
+    }
+    
+    protected Trace() {
+        this(Optional.empty());
+    }
+    
+    protected static Trace fork(Collection<Trace> fs) {
+        Trace fork = new Trace();
+        fork.trace.addAll(fs);
+        return fork;
+    }
+    
+    protected static Trace fork(Trace... fs) {
+        return fork(Arrays.asList(fs));
     }
     
     public boolean hasLocation() {
@@ -79,19 +95,32 @@ public class Trace {
     }
 
     public Set<Trace> getTrace() {
-        return trace;
+        return this.trace;
     }
 
     public List<Message> getMessages() {
-        return messages;
+        return this.messages;
     }
     
     protected void addTrace(Trace elem) {
-        this.trace.add(elem);
+        Set<Trace> subTree = new HashSet<>();
+        visitTraces(Arrays.asList(elem), t -> subTree.add(t));
+        addTrace(elem, subTree);
     }
-
-    protected void addTraces(Collection<Trace> elems) {
-        this.trace.addAll(elems);
+    
+    protected void addTrace(Trace elem, Set<Trace> subTree) {
+        
+        // TODO: Fix this, not all nodes gets added.
+        //       Maybe merge subtrees, so result contains all nodes
+        if (subTree.contains(this)) {
+            return;
+        }
+        
+        if (this.trace.isEmpty()) {
+            this.trace.add(elem);
+        } else {
+            this.trace.forEach(t -> t.addTrace(elem, subTree));
+        }
     }
 
     protected void addMessage(Message msg) {
@@ -101,5 +130,20 @@ public class Trace {
     protected void addMessages(Collection<Message> msgs) {
         this.messages.addAll(msgs);
     }
+
+    protected static void visitTraces(Collection<Trace> traces, Consumer<Trace> traceConsumer) {
+
+        Set<Trace> visited = new HashSet<>();
+        LinkedList<Trace> toVisit = new LinkedList<>(traces);
+        while (!toVisit.isEmpty()) {
+            Trace trace = toVisit.poll();
+            traceConsumer.accept(trace);
+            visited.add(trace);
+            trace.getTrace().stream()
+                .filter(t -> !visited.contains(t))
+                .forEach(t -> toVisit.add(t));
+        }
+    }
+
 
 }

@@ -28,7 +28,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.function.Consumer;
 
 public class MessageHandler {
 
@@ -73,7 +72,7 @@ public class MessageHandler {
      */
     public List<Message> getMessages() {
         List<Message> msgs = new LinkedList<>();
-        visitTraces(trace -> msgs.addAll(trace.getMessages()));
+        Trace.visitTraces(this.traces, trace -> msgs.addAll(trace.getMessages()));
         return msgs;
     }
     
@@ -89,7 +88,7 @@ public class MessageHandler {
         // int is wrapped in an array as it needs to be final as used in closure below
         int[] mostSevere = new int[] {Integer.MAX_VALUE}; 
 
-        visitTraces(trace -> {
+        Trace.visitTraces(this.traces, trace -> {
             for (Message msg : trace.getMessages()) {
                 printMessage(msg);
                 if (Message.moreSevere(msg.getLevel(), mostSevere[0])) {
@@ -101,20 +100,6 @@ public class MessageHandler {
             }
         });
         return mostSevere[0];
-    }
-
-    private void visitTraces(Consumer<Trace> traceConsumer) {
-
-        Set<Trace> visited = new HashSet<>();
-        LinkedList<Trace> toVisit = new LinkedList<>(this.traces);
-        while (!toVisit.isEmpty()) {
-            Trace trace = toVisit.poll();
-            traceConsumer.accept(trace);
-            visited.add(trace);
-            trace.getTrace().stream()
-                .filter(t -> !visited.contains(t))
-                .forEach(t -> toVisit.add(t));
-        }
     }
 
     public static void printMessage(Message msg) {

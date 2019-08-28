@@ -186,6 +186,13 @@ public class Result<E> {
         return this;
     }
 
+    public Result<E> addToTrace(Trace other) {
+        if (other != null) {
+            this.trace.addTrace(other);
+        }
+        return this;
+    }
+
     /**
      * Add a result to this result by bi-consuming this and the other result. Adds the other result to the
      * context of this result.
@@ -223,8 +230,8 @@ public class Result<E> {
         Result<R> res = p.test(a, b)
             ? Result.ofNullable(f.apply(a.orElse(null), b.orElse(null)))
             : Result.empty();
-        res.addToTrace(a);
-        res.addToTrace(b);
+        Trace fork = Trace.fork(a.getTrace(), b.getTrace());
+        res.addToTrace(fork);
         return res;
     }
 
