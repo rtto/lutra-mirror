@@ -127,7 +127,7 @@ public class MessageHandler {
         
         if (refs.containsKey(trace)) {
             // Already printed subtrace, just reference to its enumeration and returns
-            context.append(toReferenceString(refs.get(trace)));
+            context.append(toReferenceString(curRef, refs.get(trace)));
             return;
         } 
         refs.put(trace, curRef);
@@ -143,8 +143,8 @@ public class MessageHandler {
         }
     }
     
-    private static String toReferenceString(String enumStr) {
-        return " >>> at [" + enumStr + "]\n";
+    private static String toReferenceString(String curRef, String eqRef) {
+        return " >>> at [" + curRef + "] = [" + eqRef + "]\n";
     }
     
     private static String toLocationString(Trace trace, String enumStr) {

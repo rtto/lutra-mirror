@@ -102,24 +102,39 @@ public class Trace {
         return this.messages;
     }
     
+    /**
+     * Adds the argument Trace at the end of the trace, so all children depend on that Trace
+     * @param elem
+     *      Trace element to add to this' trace
+     */
     protected void addTrace(Trace elem) {
-        Set<Trace> subTree = new HashSet<>();
-        visitTraces(Arrays.asList(elem), t -> subTree.add(t));
-        addTrace(elem, subTree);
+        Set<Trace> visited = new HashSet<>();
+        addTrace(elem, visited);
     }
     
-    protected void addTrace(Trace elem, Set<Trace> subTree) {
+    protected void addTrace(Trace elem, Set<Trace> visited) {
         
-        // TODO: Fix this, not all nodes gets added.
-        //       Maybe merge subtrees, so result contains all nodes
-        if (subTree.contains(this)) {
+        if (visited.contains(this)) {
+            addDirectTrace(elem);
             return;
         }
-        
+        visited.add(this);
         if (this.trace.isEmpty()) {
-            this.trace.add(elem);
+            addDirectTrace(elem);
         } else {
-            this.trace.forEach(t -> t.addTrace(elem, subTree));
+            new HashSet<>(this.trace) // To not get ConcurrentModificationException
+                .forEach(t -> t.addTrace(elem, visited));
+        }
+    }
+    
+    /**
+     * Adds the argument Trace as a direct child in this' trace
+     * @param elem
+     *      Trace element to add to this' trace
+     */
+    protected void addDirectTrace(Trace elem) {
+        if (!this.equals(elem)) {
+            this.trace.add(elem);
         }
     }
 
@@ -144,6 +159,4 @@ public class Trace {
                 .forEach(t -> toVisit.add(t));
         }
     }
-
-
 }

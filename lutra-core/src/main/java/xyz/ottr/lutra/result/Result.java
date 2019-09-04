@@ -202,7 +202,7 @@ public class Result<E> {
         if (this.result.isPresent() && other.isPresent()) {
             consumer.accept(this.result.get(), other.result.get());
         }
-        this.addToTrace(other);
+        this.trace.addDirectTrace(other.getTrace());
     }
 
     /**
