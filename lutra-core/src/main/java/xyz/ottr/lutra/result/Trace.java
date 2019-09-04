@@ -34,40 +34,40 @@ import java.util.function.Function;
 
 public class Trace {
 
-    // Used to construct a printable context, which is stored within a Result
-    // object in the parsedFrom-pointer. This is used by a ResultConsumer
-    // to give a context to the Messages printed. The default is just the
-    // toString-representation of the original object, but one can override
-    // this to get a different context object.
-    private static Function<Object, ?> toLocation = obj -> { // TODO: Rename to identifier
+    // Used to construct a printable identifier, which is stored within the Trace
+    // object to provide in the trace. This is used by a MessageHandler
+    // to give a location to the Messages printed. The default is just a slightly modified
+    // toString-representation of the original object, prefixed with the object's Class,
+    // but one can override this to get a different identifier.
+    private static Function<Object, Optional<?>> toIdentifier = obj -> { 
         if (obj == null) {
-            return null;
+            return Optional.empty();
         }
         String str = obj.toString();
         String prefix = "(" + obj.getClass().getName() + ") ";
         if (str.length() <= 60) {
-            return prefix + str;
+            return Optional.of(prefix + str);
         } else {
-            return prefix + str.substring(0, 60) + "...";
+            return Optional.of(prefix + str.substring(0, 60) + "...");
         }
     };
 
     /** 
-     * Sets the argument function to be the method to construct a printable context, which is
-     * stored within a Result object in the parsedFrom-pointer.
-     * This context is then used by a ResultConsumer to give a context to the Messages printed. 
-     * The default is just Object#toString()
+     * Sets the argument function to be the method to construct a printable identifier, which is
+     * stored within a Trace object.
+     * This identifier is then used by a MessageHandler to give a context to the Messages printed. 
+     * The default is just a slightly modifier Object#toString() prefixed with the Class-name
      */
-    public static void setToLocationFunction(Function<Object, ?> fun) {
-        toLocation = fun;
+    public static void setToIdentifierFunction(Function<Object, Optional<?>> fun) {
+        toIdentifier = fun;
     }
 
-    private final Optional<?> location;
+    private final Optional<?> identifier;
     private final Set<Trace> trace;
     private final List<Message> messages;
    
     protected Trace(Optional<?> value) {
-        this.location = value.map(toLocation);
+        this.identifier = value.flatMap(toIdentifier);
         this.trace = new HashSet<>();
         this.messages = new LinkedList<>();
     }
@@ -86,12 +86,12 @@ public class Trace {
         return fork(Arrays.asList(fs));
     }
     
-    public boolean hasLocation() {
-        return this.location.isPresent();
+    public boolean hasIdentifier() {
+        return this.identifier.isPresent();
     }
     
-    public Object getLocation() {
-        return this.location.get();
+    public Object getIdentifier() {
+        return this.identifier.get();
     }
 
     public Set<Trace> getTrace() {
