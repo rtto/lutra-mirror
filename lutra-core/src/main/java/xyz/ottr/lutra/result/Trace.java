@@ -39,7 +39,7 @@ public class Trace {
     // to give a location to the Messages printed. The default is just a slightly modified
     // toString-representation of the original object, prefixed with the object's Class,
     // but one can override this to get a different identifier.
-    private static Function<Object, Optional<?>> toIdentifier = obj -> { 
+    private static Function<Object, Optional<String>> toIdentifier = obj -> { 
         if (obj == null) {
             return Optional.empty();
         }
@@ -58,16 +58,16 @@ public class Trace {
      * This identifier is then used by a MessageHandler to give a context to the Messages printed. 
      * The default is just a slightly modifier Object#toString() prefixed with the Class-name
      */
-    public static void setToIdentifierFunction(Function<Object, Optional<?>> fun) {
+    public static void setToIdentifierFunction(Function<Object, Optional<String>> fun) {
         toIdentifier = fun;
     }
 
-    private final Optional<?> identifier;
+    private final Optional<String> identifier;
     private final Set<Trace> trace;
     private final List<Message> messages;
    
     protected Trace(Optional<?> value) {
-        this.identifier = value.flatMap(toIdentifier);
+        this.identifier = value.map(o -> (Object) o).flatMap(toIdentifier);
         this.trace = new HashSet<>();
         this.messages = new LinkedList<>();
     }
@@ -90,7 +90,7 @@ public class Trace {
         return this.identifier.isPresent();
     }
     
-    public Object getIdentifier() {
+    public String getIdentifier() {
         return this.identifier.get();
     }
 

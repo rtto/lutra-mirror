@@ -148,7 +148,7 @@ public class MessageHandler {
     }
     
     private static String toLocationString(Trace trace, String enumStr) {
-        return " >>> at [" + enumStr + "] " + trace.getIdentifier().toString() + "\n";
+        return " >>> at [" + enumStr + "] " + trace.getIdentifier() + "\n";
     }
     
     public static void printLocation(Trace trace) {
