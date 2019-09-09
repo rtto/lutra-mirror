@@ -68,7 +68,12 @@ public class Substitution {
         Map<Term, Term> termSubstitution = new HashMap<Term, Term>();
         for (int i = 0; i < args.size(); i++) {
             if (args.get(i) instanceof NoneTerm && parameters.hasDefaultValue(i)) {
-                termSubstitution.put(parameters.get(i), parameters.getDefaultValue(i));
+                Term dflt = parameters.getDefaultValue(i);
+                if (dflt instanceof BlankNodeTerm) { // Blank node default results in fresh blank node
+                    termSubstitution.put(parameters.get(i), new BlankNodeTerm());
+                } else {
+                    termSubstitution.put(parameters.get(i), dflt);
+                }
             } else {
                 termSubstitution.put(parameters.get(i), args.get(i));
             }
