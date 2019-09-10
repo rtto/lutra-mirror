@@ -58,7 +58,7 @@ public class DependencyGraphTest {
                 new ParameterList(new ObjectTerm("x", true), new ObjectTerm("y", true)),
                 true);
 
-        DependencyGraph graph = new DependencyGraph();
+        DependencyGraph graph = new DependencyGraph(null);
         graph.addTemplateSignature(base);
 
         for (Template tmpl : toExpand) {
@@ -128,7 +128,7 @@ public class DependencyGraphTest {
     @Test
     public void undefinedTemplateError() {
 
-        DependencyGraph graph = new DependencyGraph();
+        DependencyGraph graph = new DependencyGraph(null);
 
         graph.addTemplate(
             new Template(
@@ -220,7 +220,7 @@ public class DependencyGraphTest {
                 new ParameterList(new ObjectTerm("x", true), new ObjectTerm("y", true)),
                 true);
 
-        DependencyGraph graph = new DependencyGraph();
+        DependencyGraph graph = new DependencyGraph(null);
         graph.addTemplateSignature(base);
 
         for (Template tmpl : templates) {
@@ -291,7 +291,7 @@ public class DependencyGraphTest {
     @Test
     public void instanceExpansionErrors() {
 
-        DependencyGraph graph = new DependencyGraph();
+        DependencyGraph graph = new DependencyGraph(null);
         graph.addTemplateSignature(
             new TemplateSignature(
                 "base",

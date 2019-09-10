@@ -152,7 +152,7 @@ public class ShaclEquivalenceTest {
 
         ResultStream<TemplateSignature> templates = this.tempReader.apply(file);
 
-        TemplateStore store = new DependencyGraph();
+        TemplateStore store = new DependencyGraph(null);
         ResultConsumer<TemplateSignature> tplErrorMessages = new ResultConsumer<>(store);
         templates.forEach(tpl -> {
             if (correct) {

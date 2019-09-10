@@ -22,10 +22,11 @@ package xyz.ottr.lutra.wottr.io;
  * #L%
  */
 
-import java.nio.file.Paths;
+import java.nio.file.Paths; 
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.validator.routines.UrlValidator;
+import org.apache.jena.atlas.web.HttpException;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.shared.JenaException;
 import org.apache.jena.shared.PrefixMapping;
@@ -62,7 +63,7 @@ public class RDFFileReader implements InputReader<String, Model> {
             this.prefixes.setNsPrefixes(model);
             result = Result.ofNullable(model);
             log.info("Adding model " + model.hashCode() + " with URI " + url);
-        } catch (JenaException ex) {
+        } catch (JenaException | HttpException ex) {
             // TODO: Correct Message level?
             // TODO: Make messages for other exceptions(?)
             result = Result.error("Unable to parse model " + url + ": " + ex.getMessage());

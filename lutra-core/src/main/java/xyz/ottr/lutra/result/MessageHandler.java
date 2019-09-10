@@ -27,6 +27,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
 
@@ -118,7 +119,7 @@ public class MessageHandler {
      * the level of the most severe Message.
      */
     public int printMessages() {
-        return visitMessagesAndTraces(msg -> printMessage(msg), loc -> printLocation(loc));
+        return visitMessagesAndTraces(MessageHandler::printMessage, MessageHandler::printLocation);
     }
 
     public static void printMessage(Message msg) {
@@ -176,15 +177,16 @@ public class MessageHandler {
         }
     }
     
-    // TODO: Implement toSingleMessage that makes a single Message containing same
-    // info as what would be printed with a call to iterateMessages(true)
-
-    public Message toSingleMessage(String initialMessage) {
+    public Optional<Message> toSingleMessage(String initialMessage) {
         StringBuilder str = new StringBuilder();
-        str.append(initialMessage);
         int severity = visitMessagesAndTraces(
-            msg -> str.append(msg.toString()), 
+            msg -> str.append(msg.toString() + "\n"), 
             trace -> str.append(getLocation(trace)));
-        return new Message(severity, str.toString());
+
+        if (str.length() == 0) { // No messages added
+            return Optional.empty();
+        }
+        str.insert(0, initialMessage + "\n");
+        return Optional.of(new Message(severity, str.toString()));
     }
 }

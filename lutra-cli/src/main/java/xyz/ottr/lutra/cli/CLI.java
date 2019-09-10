@@ -29,6 +29,7 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Collection;
 import java.util.List;
 import java.util.function.Function;
 
@@ -117,70 +118,38 @@ public class CLI {
 
     private static void execute() {
 
-        TemplateStore store = new DependencyGraph();
-        ResultConsumer.use(makeTemplateReaders(settings.libraryFormat),
-            readers -> {
-
-                Result<TemplateReader> successfullReader = parseLibraryInto(readers, store);
-                
-                ResultConsumer.use(successfullReader, reader -> {
-                    PrefixMapping usedPrefixes = OTTR.getDefaultPrefixes();
-                    usedPrefixes.setNsPrefixes(reader.getPrefixes());
-                    executeMode(store, usedPrefixes);
-                });
-            }
-        );
+        TemplateStore store = new DependencyGraph(ReaderRegistryImpl.getReaderRegistry());
+        Result<TemplateReader> successfullReader = parseLibraryInto(store);
+        ResultConsumer.use(successfullReader, reader -> {
+            PrefixMapping usedPrefixes = OTTR.getDefaultPrefixes();
+            usedPrefixes.setNsPrefixes(reader.getPrefixes());
+            executeMode(store, usedPrefixes);
+        });
     }
 
     /**
      * Populated store with parsed templates, and returns true if error occurred, and false otherwise.
      */
-    private static Result<TemplateReader> parseLibraryInto(List<TemplateReader> readers, TemplateStore store) {
+    private static Result<TemplateReader> parseLibraryInto(TemplateStore store) {
         
         store.addOTTRBaseTemplates();
 
         if (settings.library == null) {
-            return readers.isEmpty() ? Result.empty() : Result.of(readers.get(0));
+            Collection<TemplateReader> readers = store.getReaderRegistry().getAllTemplateReaders().values();
+            return readers.isEmpty() ? Result.empty() : Result.of(readers.iterator().next());
         }
         
-        Result<TemplateReader> successfull = attemptAllReaders(readers, store);
-
+        Result<TemplateReader> successfull = store.getReaderRegistry().attemptAllReaders(reader ->
+            reader.loadTemplatesFromFolder(store, settings.library,
+                    settings.extensions, settings.ignoreExtensions));
         if (settings.fetchMissingDependencies) {
-            MessageHandler msgs = store.fetchMissingDependencies(readers);
+            MessageHandler msgs = store.fetchMissingDependencies();
             successfull.addMessages(msgs.getMessages());
         }
         
         return successfull;
     } 
     
-    private static Result<TemplateReader> attemptAllReaders(List<TemplateReader> readers, TemplateStore store) {
-        
-        MessageHandler unsuccsessfull = new MessageHandler();
-        for (TemplateReader reader : readers) {
-
-            MessageHandler msgs = reader.loadTemplatesFromFolder(store, settings.library,
-                    settings.extensions, settings.ignoreExtensions);
-
-            if (Message.moreSevere(msgs.getMostSevere(), Message.ERROR)) {
-                unsuccsessfull = unsuccsessfull.combine(msgs);
-            } else {
-                Result<TemplateReader> readerRes = Result.of(reader);
-                readerRes.addMessage(msgs.toSingleMessage("Unable to parse library."));
-            }
-        }
-        return Result.empty(unsuccsessfull.toSingleMessage("Unable to parse library."));
-    }
-    
-    // private static void printUnsuccuessfullAttempts(Map<TemplateReader, MessageHandler> unsuccessfull) {
-    //     
-    //     MessageHandler.printMessage(Message.error("Unable to parse library."));
-    //     for (Map.Entry<TemplateReader, MessageHandler> u : unsuccessfull.entrySet()) {
-    //         MessageHandler.printMessage(Message.error("With the template reader for "
-    //                 + u.getKey().getFormat() + " got the following errors:"));
-    //         u.getValue().printMessages();
-    //     }
-    // }
-
     private static void executeExpand(TemplateStore store, PrefixMapping usedPrefixes) {
 
         ResultConsumer.use(makeInstanceReader(),
@@ -191,7 +160,7 @@ public class CLI {
 
                         ResultConsumer.use(makeInstanceWriter(usedPrefixes),
                             writer -> {
-
+                                
                                 expandAndWriteInstanes(reader, writer, expander);
                             }
                         );
@@ -281,39 +250,18 @@ public class CLI {
     ////////////////////////////////////////////////////////////
     /// MAKER-METHODS, MAKING THINGS BASED ON FLAGS          ///
     ////////////////////////////////////////////////////////////
-
-    /**
-     * Either returns a Result containing the singleton set of a template reader of the
-     * specified format if not null, otherwise the set of all readers registered in the
-     * ReaderRegistry
-     * @param format
-     *   The format the user specified, and null if no format was specified
-     * @return
-     *   Either returns a Result containing the singleton set of a template reader of the
-     *   specified format if not null, otherwise the set of all readers registered in the
-     *   ReaderRegistry
-     * 
-     */
-    private static Result<List<TemplateReader>> makeTemplateReaders(Settings.Format format) {
-        return ReaderRegistry.getTemplateReaders(format);
-    }
             
     private static Result<InstanceReader> makeInstanceReader() {
         if (settings.inputs.isEmpty()) {
             return Result.empty(Message.error(
                     "No input file provided."));
         }
-        return ReaderRegistry.getInstanceReader(settings.inputFormat);
+        return ReaderRegistryImpl.getReaderRegistry().getInstanceReader(settings.inputFormat.toString());
     }
 
     private static Result<Function<Instance, ResultStream<Instance>>> makeExpander(TemplateStore store) {
         if (settings.fetchMissingDependencies) {
-            Function<List<TemplateReader>, Function<Instance, ResultStream<Instance>>> fun =
-                readers -> ins -> store.expandInstance(ins, readers);
-            Settings.Format format = settings.fetchFormat == null
-                ? settings.libraryFormat
-                : settings.fetchFormat;
-            return ReaderRegistry.getTemplateReaders(format).map(fun);
+            return Result.of(store::expandInstanceFetch);
         } else {
             return Result.of(store::expandInstance);
         }

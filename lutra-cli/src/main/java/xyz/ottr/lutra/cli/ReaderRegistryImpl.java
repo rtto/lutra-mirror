@@ -27,10 +27,13 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 
 import xyz.ottr.lutra.io.InstanceReader;
+import xyz.ottr.lutra.io.ReaderRegistry;
 import xyz.ottr.lutra.io.TemplateReader;
 import xyz.ottr.lutra.result.Message;
+import xyz.ottr.lutra.result.MessageHandler;
 import xyz.ottr.lutra.result.Result;
 import xyz.ottr.lutra.stottr.io.SFileReader;
 import xyz.ottr.lutra.stottr.io.SInstanceParser;
@@ -40,58 +43,67 @@ import xyz.ottr.lutra.wottr.io.RDFFileReader;
 import xyz.ottr.lutra.wottr.parser.v04.WInstanceParser;
 import xyz.ottr.lutra.wottr.parser.v04.WTemplateParser;
 
-public class ReaderRegistry {
+public class ReaderRegistryImpl implements ReaderRegistry {
     
-    private static Map<Settings.Format, TemplateReader> templateReaders = new HashMap<>();
-    private static Map<Settings.Format, InstanceReader> instanceReaders = new HashMap<>();
+    private static final ReaderRegistry INSTANCE = new ReaderRegistryImpl();
     
-    static {
-
+    private Map<String, TemplateReader> templateReaders;
+    private Map<String, InstanceReader> instanceReaders;
+    
+    private ReaderRegistryImpl() {
+        this.templateReaders = new HashMap<>();
+        this.instanceReaders = new HashMap<>();
+        
         // Add template readers
         
         // wottr
         TemplateReader wottrTemplateReader = new TemplateReader(
                 new RDFFileReader(), new WTemplateParser(), Settings.Format.wottr.toString());
-        templateReaders.put(Settings.Format.wottr, wottrTemplateReader);
+        this.templateReaders.put(Settings.Format.wottr.toString(), wottrTemplateReader);
 
         // legacy
         TemplateReader legacyTemplateReader = new TemplateReader(
                 new RDFFileReader(),
                 new xyz.ottr.lutra.wottr.parser.v03.WTemplateParser(),
                 Settings.Format.legacy.toString());
-        templateReaders.put(Settings.Format.legacy, legacyTemplateReader);
+        this.templateReaders.put(Settings.Format.legacy.toString(), legacyTemplateReader);
 
         // stottr
         TemplateReader stottrTemplateReader = new TemplateReader(
                 new SFileReader(), new STemplateParser(),Settings.Format.stottr.toString());
-        templateReaders.put(Settings.Format.stottr, stottrTemplateReader);
+        this.templateReaders.put(Settings.Format.stottr.toString(), stottrTemplateReader);
         
         // Add instance readers
         
         // wottr
         InstanceReader wottrInstanceReader = new InstanceReader(
                 new RDFFileReader(), new WInstanceParser(), Settings.Format.wottr.toString());
-        instanceReaders.put(Settings.Format.wottr, wottrInstanceReader);
+        this.instanceReaders.put(Settings.Format.wottr.toString(), wottrInstanceReader);
         
         // legacy
         InstanceReader legacyInstanceReader = new InstanceReader(
                 new RDFFileReader(),
                 new xyz.ottr.lutra.wottr.parser.v03.WInstanceParser(),
                 Settings.Format.legacy.toString());
-        instanceReaders.put(Settings.Format.legacy, legacyInstanceReader);
+        this.instanceReaders.put(Settings.Format.legacy.toString(), legacyInstanceReader);
         
         // stottr
         InstanceReader stottrInstanceReader = new InstanceReader(
                 new SFileReader(), new SInstanceParser(), Settings.Format.stottr.toString());
-        instanceReaders.put(Settings.Format.stottr, stottrInstanceReader);
+        this.instanceReaders.put(Settings.Format.stottr.toString(), stottrInstanceReader);
         
         // tabottr
         InstanceReader tabInstanceReader = new InstanceReader(
                 new ExcelReader(), Settings.Format.tabottr.toString());
-        instanceReaders.put(Settings.Format.tabottr, tabInstanceReader);
+        this.instanceReaders.put(Settings.Format.tabottr.toString(), tabInstanceReader);
     }
     
-    public static Result<List<TemplateReader>> getTemplateReaders(Settings.Format format) {
+    public static ReaderRegistry getReaderRegistry() {
+        return INSTANCE;
+    }
+    
+    @Override
+    public Result<List<TemplateReader>> getTemplateReaders(String format) {
         if (format != null) {
             if (!templateReaders.containsKey(format)) {
                 return Result.empty(Message.error(
@@ -99,11 +111,12 @@ public class ReaderRegistry {
             }
             return Result.of(Arrays.asList(templateReaders.get(format)));
         } else {
-            return Result.of(new LinkedList<>(ReaderRegistry.getAllTemplateReaders().values()));
+            return Result.of(new LinkedList<>(getAllTemplateReaders().values()));
         }
     }
     
-    public static Result<InstanceReader> getInstanceReader(Settings.Format format) {
+    @Override
+    public Result<InstanceReader> getInstanceReader(String format) {
         if (!instanceReaders.containsKey(format)) {
             return Result.empty(Message.error(
                 "Format " + format + " not yet supported as input format for instances."));
@@ -111,19 +124,41 @@ public class ReaderRegistry {
         return Result.of(instanceReaders.get(format));
     }
     
-    protected static void registerTemplateReader(Settings.Format format, TemplateReader reader) {
-        templateReaders.put(format, reader);
+    @Override
+    public void registerTemplateReader(String format, TemplateReader reader) {
+        this.templateReaders.put(format, reader);
     }
 
-    protected static void registerInstanceReader(Settings.Format format, InstanceReader reader) {
-        instanceReaders.put(format, reader);
+    @Override
+    public void registerInstanceReader(String format, InstanceReader reader) {
+        this.instanceReaders.put(format, reader);
     }
 
-    public static Map<Settings.Format, TemplateReader> getAllTemplateReaders() {
-        return templateReaders;
+    @Override
+    public Map<String, TemplateReader> getAllTemplateReaders() {
+        return this.templateReaders;
     }
 
-    public static Map<Settings.Format, InstanceReader> getAllInstanceReaders() {
-        return instanceReaders;
+    public Map<String, InstanceReader> getAllInstanceReaders() {
+        return this.instanceReaders;
+    }
+    
+    public Result<TemplateReader> attemptAllReaders(Function<TemplateReader, MessageHandler> todo) {
+        
+        Result<TemplateReader> unsuccsessfull = Result.empty(); // Return in case of no succeed
+        for (Map.Entry<String, TemplateReader> reader : getAllTemplateReaders().entrySet()) {
+            MessageHandler msgs = todo.apply(reader.getValue());
+
+            if (Message.moreSevere(msgs.getMostSevere(), Message.ERROR)) {
+                msgs.toSingleMessage("Parsing templates as "
+                        + reader.getKey() + " failed with following errors:")
+                    .ifPresent(unsuccsessfull::addMessage);
+            } else {
+                Result<TemplateReader> readerRes = Result.of(reader.getValue());
+                msgs.toSingleMessage("").ifPresent(readerRes::addMessage);
+                return readerRes;
+            }
+        }
+        return unsuccsessfull;
     }
 }
