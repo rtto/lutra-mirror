@@ -58,6 +58,10 @@ public class ResultStream<E> {
         return new ResultStream<R>(Stream.of(r));
     }
 
+    public static <R> ResultStream<R> of(Collection<Result<R>> results) {
+        return new ResultStream<R>(results);
+    }
+
     /**
      * Returns a ResultStream consisting of one Result per element
      * in argument Collection.
@@ -181,7 +185,7 @@ public class ResultStream<E> {
     }
 
     /**
-     * Returns a new ResultStream consisint of all this' Results,
+     * Returns a new ResultStream consisting of all this' Results,
      * but with argument function mapped over each.
      */
     public <R> ResultStream<R> innerMap(Function<? super E, R> f) {
@@ -197,10 +201,14 @@ public class ResultStream<E> {
     public Result<Stream<E>> aggregateNullable() {
 
         Stream.Builder<E> unpacked = Stream.builder();
-        ResultConsumer<E> consumer = new ResultConsumer<>(unpacked);
-        this.results.forEach(consumer);
+        List<Trace> traces = new LinkedList<>();
+        this.results.forEach(r -> {
+            r.ifPresent(unpacked);
+            traces.add(r.getTrace()); 
+        });
+
         Result<Stream<E>> res = Result.of(unpacked.build());
-        res.addMessages(consumer.getMessageHandler().getMessages());
+        res.addToTrace(Trace.fork(traces));
         return res;
     }
 
@@ -212,21 +220,23 @@ public class ResultStream<E> {
      */
     public Result<Stream<E>> aggregate() {
         
-        ResultConsumer<E> msgs = new ResultConsumer<>();
         List<E> unpacked = new LinkedList<>();
 
+        List<Trace> traces = new LinkedList<>();
         for (Result<E> r : this.results.collect(Collectors.toList())) {
-            msgs.accept(r);
             if (unpacked != null && r != null && r.isPresent()) {
                 unpacked.add(r.get());
             } else {
                 // No elements should be kept
                 unpacked = null;
             }
+            if (r != null) {
+                traces.add(r.getTrace());
+            }
         }
 
         Result<Stream<E>> res = Result.ofNullable(unpacked).map(unp -> unp.stream());
-        res.addMessages(msgs.getMessageHandler().getMessages());
+        res.addToTrace(Trace.fork(traces));
         return res;
     }
     

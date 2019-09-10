@@ -25,6 +25,11 @@ package xyz.ottr.lutra;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.apache.jena.shared.PrefixMapping;
+import org.apache.jena.vocabulary.OWL;
+import org.apache.jena.vocabulary.RDF;
+import org.apache.jena.vocabulary.RDFS;
+import org.apache.jena.vocabulary.XSD;
 import xyz.ottr.lutra.model.BlankNodeTerm;
 import xyz.ottr.lutra.model.ParameterList;
 import xyz.ottr.lutra.model.TemplateSignature;
@@ -88,5 +93,15 @@ public class OTTR  {
     
     public static class Files {
         public static final String StdTypes = "types.owl.ttl";
+    }
+
+    public static PrefixMapping getDefaultPrefixes() {
+        PrefixMapping map = PrefixMapping.Factory.create();
+        map.setNsPrefix("xsd", XSD.getURI());
+        map.setNsPrefix("rdf", RDF.getURI());
+        map.setNsPrefix("rdfs", RDFS.getURI());
+        map.setNsPrefix("owl", OWL.getURI());
+        map.setNsPrefix(OTTR.prefix, OTTR.ns);
+        return map;
     }
 }

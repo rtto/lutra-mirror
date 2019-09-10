@@ -36,9 +36,9 @@ import xyz.ottr.lutra.stottr.io.SFileReader;
 import xyz.ottr.lutra.stottr.io.SInstanceParser;
 import xyz.ottr.lutra.stottr.io.STemplateParser;
 import xyz.ottr.lutra.tabottr.parser.ExcelReader;
-import xyz.ottr.lutra.wottr.io.WFileReader;
-import xyz.ottr.lutra.wottr.io.WInstanceParser;
-import xyz.ottr.lutra.wottr.io.WTemplateParser;
+import xyz.ottr.lutra.wottr.io.RDFFileReader;
+import xyz.ottr.lutra.wottr.parser.v04.WInstanceParser;
+import xyz.ottr.lutra.wottr.parser.v04.WTemplateParser;
 
 public class ReaderRegistry {
     
@@ -51,13 +51,13 @@ public class ReaderRegistry {
         
         // wottr
         TemplateReader wottrTemplateReader = new TemplateReader(
-                new WFileReader(), new WTemplateParser(), Settings.Format.wottr.toString());
+                new RDFFileReader(), new WTemplateParser(), Settings.Format.wottr.toString());
         templateReaders.put(Settings.Format.wottr, wottrTemplateReader);
 
         // legacy
         TemplateReader legacyTemplateReader = new TemplateReader(
-                new xyz.ottr.lutra.wottr.legacy.io.WFileReader(),
-                new xyz.ottr.lutra.wottr.legacy.io.WTemplateParser(),
+                new RDFFileReader(),
+                new xyz.ottr.lutra.wottr.parser.v03.WTemplateParser(),
                 Settings.Format.legacy.toString());
         templateReaders.put(Settings.Format.legacy, legacyTemplateReader);
 
@@ -70,13 +70,13 @@ public class ReaderRegistry {
         
         // wottr
         InstanceReader wottrInstanceReader = new InstanceReader(
-                new WFileReader(), new WInstanceParser(), Settings.Format.wottr.toString());
+                new RDFFileReader(), new WInstanceParser(), Settings.Format.wottr.toString());
         instanceReaders.put(Settings.Format.wottr, wottrInstanceReader);
         
         // legacy
         InstanceReader legacyInstanceReader = new InstanceReader(
-                new xyz.ottr.lutra.wottr.legacy.io.WFileReader(),
-                new xyz.ottr.lutra.wottr.legacy.io.WInstanceParser(),
+                new RDFFileReader(),
+                new xyz.ottr.lutra.wottr.parser.v03.WInstanceParser(),
                 Settings.Format.legacy.toString());
         instanceReaders.put(Settings.Format.legacy, legacyInstanceReader);
         

@@ -22,10 +22,13 @@ package xyz.ottr.lutra.result;
  * #L%
  */
 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.function.Consumer;
 
 public class MessageHandler {
 
@@ -35,21 +38,21 @@ public class MessageHandler {
         quiet = shouldBeQuiet;
     }
 
-    private final Set<Result<?>> results;
+    private final Set<Trace> traces;
 
     public MessageHandler() {
-        this.results = new HashSet<>();
+        this.traces = new HashSet<>();
+    }
+
+    public void add(Trace trace) {
+        if (trace != null) {
+            this.traces.add(trace);
+        }
     }
 
     public void add(Result<?> result) {
-        if (result == null) {
-            return;
-        }
-
-        Result<?> res = result.deriveContext();
-        while (res != null && !this.results.contains(res)) {
-            this.results.add(res);
-            res = res.getParsedFrom();
+        if (result != null) {
+            this.traces.add(result.getTrace());
         }
     }
 
@@ -58,55 +61,64 @@ public class MessageHandler {
      * and returns this (for chaining).
      */
     public MessageHandler combine(MessageHandler other) {
-        other.results.forEach(this::add);
+        other.traces.forEach(this::add);
         return this;
     }
 
     /**
      * Returns a list of all Messages on any accepted Result,
-     * and all Results reachable via parsedFrom-pointers from
+     * and all Traces reachable via traces-pointers from
      * accepted Results. That is, it returns all Message-s
      * relevant for accepted Result-s.
      */
     public List<Message> getMessages() {
         List<Message> msgs = new LinkedList<>();
-        for (Result<?> res : results) {
-            msgs.addAll(res.getMessages());
-        }
+        Trace.visitTraces(this.traces, trace -> msgs.addAll(trace.getMessages()));
         return msgs;
     }
 
+    public int getMostSevere() {
+        return visitMessagesAndTraces(_ignore -> { }, _ignore -> { });
+    }
+    
+    /**
+     * Visits all Messages on all Traces contained in this, and feeds them to the
+     * Message consumer, and in case a Message on a Trace was fed to the Message consumer,
+     * it also feeds the Trace to the Trace consumer.
+     * @param msgConsumer
+     *      Consumer that accepts all Messages on all Traces in this MessageHandler
+     * @param traceConsumer
+     *      Consumer that accepts all Traces containing at least one Message in this MessageHandler
+     * @return
+     *      an integer representing the level of the most severe Message (see e.g. Message.ERROR)
+     */
+    private int visitMessagesAndTraces(Consumer<Message> msgConsumer, Consumer<Trace> traceConsumer) {
+
+        int[] mostSevere = new int[] {Integer.MAX_VALUE}; 
+
+        Trace.visitTraces(this.traces, trace -> {
+            for (Message msg : trace.getMessages()) {
+                msgConsumer.accept(msg);
+                if (Message.moreSevere(msg.getLevel(), mostSevere[0])) {
+                    mostSevere[0] = msg.getLevel();
+                }
+            }
+            if (!trace.getMessages().isEmpty()) {
+                traceConsumer.accept(trace);
+            }
+        });
+        return mostSevere[0];
+    }
+    
     /**
      * Prints all Message-s from all Result-s
      * as described in #getMessages() together
-     * with a context derived from each Result's
-     * parsedFrom, and returns an int representing
+     * with a location derived from each Trace's
+     * identifier, and returns an int representing
      * the level of the most severe Message.
      */
     public int printMessages() {
-        return iterateMessages(!quiet);
-    }
-    
-    public int getMostSevere() {
-        return iterateMessages(false);
-    }
-    
-    private int iterateMessages(boolean printMsgs) {
-        int mostSevere = Integer.MAX_VALUE;
-        for (Result<?> res : results) {
-            for (Message msg : res.getMessages()) {
-                if (printMsgs) {
-                    printMessage(msg);
-                }
-                if (Message.moreSevere(msg.getLevel(), mostSevere)) {
-                    mostSevere = msg.getLevel();
-                }
-            }
-            if (!res.getMessages().isEmpty() && !quiet) {
-                printContext(res);
-            }
-        }
-        return mostSevere;
+        return visitMessagesAndTraces(msg -> printMessage(msg), loc -> printLocation(loc));
     }
 
     public static void printMessage(Message msg) {
@@ -115,24 +127,52 @@ public class MessageHandler {
         }
     }
 
-    private static String getContext(Result<?> res) {
+    private static String getLocation(Trace trace) {
         StringBuilder context = new StringBuilder();
-        getContextRecur(context, res);
+        getLocationRecur(context, trace, "1", new HashMap<>());
         return context.toString();
     }
 
-    private static void getContextRecur(StringBuilder context, Result<?> res) {
-        if (res.isPresent()) {
-            context.append(" >>> in context: " + res.getContext() + "\n");
+    /**
+     * Writes out a stack trace and enumerates the elements of the stack
+     * trace with an enumeration (dot separated number sequence, e.g. 1.3.2)
+     * such that siblings get their parents enumeration appended with a number
+     * denoting its sibling number (e.g. a node with enumeration 1.2 and three
+     * children will make the three children get enumeration 1.2.1, 1.2.2, and 1.2.3).
+     * This enumeration is then used to reference already visited trace elements.
+     */
+    private static void getLocationRecur(StringBuilder context, Trace trace,
+            String curRef, Map<Trace, String> refs) {
+        
+        if (refs.containsKey(trace)) {
+            // Already printed subtrace, just reference to its enumeration and returns
+            context.append(toReferenceString(curRef, refs.get(trace)));
+            return;
+        } 
+        refs.put(trace, curRef);
+        if (trace.hasIdentifier()) {
+            // Assign enumeration to trace element, and append to trace
+            context.append(toLocationString(trace, refs.get(trace)));
         }
-        if (res.getParsedFrom() != null) {
-            getContextRecur(context, res.getParsedFrom());
+
+        int c = 1;
+        for (Trace child : trace.getTrace()) {
+            getLocationRecur(context, child, curRef + "." + c, refs); 
+            c++;
         }
     }
-
-    public static void printContext(Result<?> res) {
+    
+    private static String toReferenceString(String curRef, String eqRef) {
+        return " >>> at [" + curRef + "] = [" + eqRef + "]\n";
+    }
+    
+    private static String toLocationString(Trace trace, String enumStr) {
+        return " >>> at [" + enumStr + "] " + trace.getIdentifier() + "\n";
+    }
+    
+    public static void printLocation(Trace trace) {
         if (!quiet) {
-            System.err.print(getContext(res));
+            System.err.print(getLocation(trace));
         }
     }
     
@@ -140,7 +180,11 @@ public class MessageHandler {
     // info as what would be printed with a call to iterateMessages(true)
 
     public Message toSingleMessage(String initialMessage) {
-        // TODO Auto-generated method stub
-        return null;
+        StringBuilder str = new StringBuilder();
+        str.append(initialMessage);
+        int severity = visitMessagesAndTraces(
+            msg -> str.append(msg.toString()), 
+            trace -> str.append(getLocation(trace)));
+        return new Message(severity, str.toString());
     }
 }

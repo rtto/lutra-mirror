@@ -33,10 +33,6 @@ import java.util.List;
 import java.util.function.Function;
 
 import org.apache.jena.shared.PrefixMapping;
-import org.apache.jena.vocabulary.OWL;
-import org.apache.jena.vocabulary.RDF;
-import org.apache.jena.vocabulary.RDFS;
-import org.apache.jena.vocabulary.XSD;
 
 import picocli.CommandLine;
 import picocli.CommandLine.ParameterException;
@@ -58,8 +54,8 @@ import xyz.ottr.lutra.store.TemplateStore;
 
 import xyz.ottr.lutra.stottr.io.SInstanceWriter;
 import xyz.ottr.lutra.stottr.io.STemplateWriter;
-import xyz.ottr.lutra.wottr.io.WInstanceWriter;
-import xyz.ottr.lutra.wottr.io.WTemplateWriter;
+import xyz.ottr.lutra.wottr.writer.v04.WInstanceWriter;
+import xyz.ottr.lutra.wottr.writer.v04.WTemplateWriter;
 
 public class CLI {
 
@@ -128,7 +124,7 @@ public class CLI {
                 Result<TemplateReader> successfullReader = parseLibraryInto(readers, store);
                 
                 ResultConsumer.use(successfullReader, reader -> {
-                    PrefixMapping usedPrefixes = getStdPrefixes();
+                    PrefixMapping usedPrefixes = OTTR.getDefaultPrefixes();
                     usedPrefixes.setNsPrefixes(reader.getPrefixes());
                     executeMode(store, usedPrefixes);
                 });
@@ -435,17 +431,6 @@ public class CLI {
     ////////////////////////////////////////////////////////////
     /// UTILS                                                ///
     ////////////////////////////////////////////////////////////
-
-    private static PrefixMapping getStdPrefixes() {
-
-        PrefixMapping prefixes = PrefixMapping.Factory.create();
-        prefixes.setNsPrefix(OTTR.prefix, OTTR.namespace);
-        prefixes.setNsPrefix("rdf", RDF.uri);
-        prefixes.setNsPrefix("rdfs", RDFS.uri);
-        prefixes.setNsPrefix("owl", OWL.NS);
-        prefixes.setNsPrefix("xsd", XSD.NS);
-        return prefixes;
-    }
 
     private static String getFileSuffix() {
 
