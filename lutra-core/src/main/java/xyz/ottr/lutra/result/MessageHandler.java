@@ -135,6 +135,9 @@ public class MessageHandler {
             System.err.print(getContext(res));
         }
     }
+    
+    // TODO: Implement toSingleMessage that makes a single Message containing same
+    // info as what would be printed with a call to iterateMessages(true)
 
     public Message toSingleMessage(String initialMessage) {
         // TODO Auto-generated method stub
