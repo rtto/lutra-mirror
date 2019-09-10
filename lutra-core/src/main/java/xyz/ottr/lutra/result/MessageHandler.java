@@ -135,4 +135,9 @@ public class MessageHandler {
             System.err.print(getContext(res));
         }
     }
+
+    public Message toSingleMessage(String initialMessage) {
+        // TODO Auto-generated method stub
+        return null;
+    }
 }

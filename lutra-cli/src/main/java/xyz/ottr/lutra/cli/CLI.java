@@ -29,9 +29,7 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.function.Function;
 
 import org.apache.jena.shared.PrefixMapping;
@@ -127,13 +125,13 @@ public class CLI {
         ResultConsumer.use(makeTemplateReaders(settings.libraryFormat),
             readers -> {
 
-                TemplateReader successfullReader = parseLibraryInto(readers, store);
+                Result<TemplateReader> successfullReader = parseLibraryInto(readers, store);
                 
-                if (successfullReader != null) {
+                ResultConsumer.use(successfullReader, reader -> {
                     PrefixMapping usedPrefixes = getStdPrefixes();
-                    usedPrefixes.setNsPrefixes(successfullReader.getPrefixes());
+                    usedPrefixes.setNsPrefixes(reader.getPrefixes());
                     executeMode(store, usedPrefixes);
-                }
+                });
             }
         );
     }
@@ -141,63 +139,51 @@ public class CLI {
     /**
      * Populated store with parsed templates, and returns true if error occurred, and false otherwise.
      */
-    private static TemplateReader parseLibraryInto(List<TemplateReader> readers, TemplateStore store) {
+    private static Result<TemplateReader> parseLibraryInto(List<TemplateReader> readers, TemplateStore store) {
         
         store.addOTTRBaseTemplates();
 
         if (settings.library == null) {
-            return readers.iterator().next(); // TODO: Fix in case of empty readers
+            return readers.isEmpty() ? Result.empty() : Result.of(readers.get(0));
         }
         
-        Map<TemplateReader, MessageHandler> unsuccessfull = new HashMap<>();
-        TemplateReader successfull = attemptAllReaders(readers, unsuccessfull, store);
+        Result<TemplateReader> successfull = attemptAllReaders(readers, store);
 
-        if (successfull == null) {
-            printUnsuccuessfullAttempts(unsuccessfull);
-            return null;
+        if (settings.fetchMissingDependencies) {
+            MessageHandler msgs = store.fetchMissingDependencies(readers);
+            successfull.addMessages(msgs.getMessages());
         }
-
-        // TODO: Implement all attempts also for fetching 
-        //if (settings.fetchMissingDependencies) {
-
-        //    Result<TemplateReader> fetchReader = settings.fetchFormat == null
-        //        ? Result.of(reader)
-        //        : makeTemplateReader(settings.fetchFormat);
-
-        //    msgs.add(fetchReader);
-        //    if (fetchReader.isPresent()) {
-        //        msgs = msgs.combine(store.fetchMissingDependencies(fetchReader.get()));
-        //    }
-        //}
+        
         return successfull;
     } 
     
-    private static TemplateReader attemptAllReaders(List<TemplateReader> readers,
-            Map<TemplateReader, MessageHandler> unsuccessfull, TemplateStore store) {
+    private static Result<TemplateReader> attemptAllReaders(List<TemplateReader> readers, TemplateStore store) {
         
+        MessageHandler unsuccsessfull = new MessageHandler();
         for (TemplateReader reader : readers) {
 
             MessageHandler msgs = reader.loadTemplatesFromFolder(store, settings.library,
                     settings.extensions, settings.ignoreExtensions);
 
             if (Message.moreSevere(msgs.getMostSevere(), Message.ERROR)) {
-                unsuccessfull.put(reader, msgs);
+                unsuccsessfull = unsuccsessfull.combine(msgs);
             } else {
-                return reader;
+                Result<TemplateReader> readerRes = Result.of(reader);
+                readerRes.addMessage(msgs.toSingleMessage("Unable to parse library."));
             }
         }
-        return null;
+        return Result.empty(unsuccsessfull.toSingleMessage("Unable to parse library."));
     }
     
-    private static void printUnsuccuessfullAttempts(Map<TemplateReader, MessageHandler> unsuccessfull) {
-        
-        MessageHandler.printMessage(Message.error("Unable to parse library."));
-        for (Map.Entry<TemplateReader, MessageHandler> u : unsuccessfull.entrySet()) {
-            MessageHandler.printMessage(Message.error("With the template reader for "
-                    + u.getKey().getFormat() + " got the following errors:"));
-            u.getValue().printMessages();
-        }
-    }
+    // private static void printUnsuccuessfullAttempts(Map<TemplateReader, MessageHandler> unsuccessfull) {
+    //     
+    //     MessageHandler.printMessage(Message.error("Unable to parse library."));
+    //     for (Map.Entry<TemplateReader, MessageHandler> u : unsuccessfull.entrySet()) {
+    //         MessageHandler.printMessage(Message.error("With the template reader for "
+    //                 + u.getKey().getFormat() + " got the following errors:"));
+    //         u.getValue().printMessages();
+    //     }
+    // }
 
     private static void executeExpand(TemplateStore store, PrefixMapping usedPrefixes) {
 
