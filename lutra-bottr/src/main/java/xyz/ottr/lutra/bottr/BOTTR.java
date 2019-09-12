@@ -43,7 +43,7 @@ public class BOTTR extends WOTTR {
     
     // Properties
     public static final Property template = getProperty(ns + "template");
-    public static final Property valueMap = getProperty(ns + "valueMap");
+    public static final Property argumentMaps = getProperty(ns + "argumentMaps");
     public static final Property source = getProperty(ns + "source");
     public static final Property query = getProperty(ns + "query");
 
@@ -54,4 +54,15 @@ public class BOTTR extends WOTTR {
     public static final Property jdbcDriver = getProperty(ns + "jdbcDriver");
 
 
+    public static final Property nullValue = getProperty(ns + "nullValue");
+    public static final Property languageTag = getProperty(ns + "languageTag");
+    public static final Property labelledBlankPrefix = getProperty(ns + "labelledBlankPrefix");
+    public static final Property listSep = getProperty(ns + "listSep");
+    public static final Property listStart = getProperty(ns + "listStart");
+    public static final Property listEnd = getProperty(ns + "listEnd");
+    public static final Property translationSettings = getProperty(ns + "translationSettings");
+    public static final Property translationTable = getProperty(ns + "translationTable");
+    public static final Property inValue = getProperty(ns + "inValue");
+    public static final Property outValue = getProperty(ns + "outValue");
+    public static final Property entry = getProperty(ns + "entry");
 }

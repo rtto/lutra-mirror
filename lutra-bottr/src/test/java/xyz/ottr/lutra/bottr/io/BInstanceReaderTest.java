@@ -26,42 +26,67 @@ import static org.junit.Assert.assertEquals;
 
 import java.util.stream.Stream;
 
+import org.apache.jena.rdf.model.Model;
 import org.junit.Test;
 import xyz.ottr.lutra.model.Instance;
 import xyz.ottr.lutra.result.Result;
+import xyz.ottr.lutra.result.ResultConsumer;
+import xyz.ottr.lutra.wottr.util.ModelIO;
+import xyz.ottr.lutra.wottr.writer.v04.WInstanceWriter;
+
 
 public class BInstanceReaderTest {
 
     private static final String ROOT = "src/test/resources/";
 
+    private void testNumberOfInstances(String map, int size) {
+        Stream<Result<Instance>> instances = Result.of(map)
+            .mapToStream(new BInstanceReader())
+            .getStream()
+            .filter(Result::isPresent);
+
+        assertEquals(size, instances.count());
+    }
+
+    private Model getRDFModel(String mapFile) {
+
+        WInstanceWriter writer = new WInstanceWriter();
+        ResultConsumer<Instance> consumer = new ResultConsumer<>(writer);
+
+        Result.of(mapFile)
+            .mapToStream(new BInstanceReader())
+            .forEach(consumer);
+
+        return writer.writeToModel();
+    }
+
+    private void printRDFOutput(String file) {
+        Model model = getRDFModel(file);
+        String output = ModelIO.writeModel(model);
+        //System.out.println(output);
+    }
+
     @Test
     public void testSPARQLMap() {
-
-        Stream<Result<Instance>> instances = Result.of(ROOT + "maps/instanceMapSPARQL.ttl")
-            .mapToStream(new BInstanceReader())
-            .getStream();
-
-        assertEquals(13, instances.count());
+        String file = ROOT + "maps/instanceMapSPARQL.ttl";
+        testNumberOfInstances(file, 13);
+        printRDFOutput(file);
     }
 
     @Test
     public void testRDFSourceMap() {
-
-        Stream<Result<Instance>> instances = Result.of(ROOT + "maps/instanceMapRDFSource.ttl")
-            .mapToStream(new BInstanceReader())
-            .getStream();
-
-        assertEquals(6, instances.count());
+        String file = ROOT + "maps/instanceMapRDFSource.ttl";
+        testNumberOfInstances(file,6);
+        printRDFOutput(file);
     }
 
     @Test
     public void testCSVSourceMap() {
-
-        Stream<Result<Instance>> instances = Result.of(ROOT + "maps/instanceMapH2Source.ttl")
-            .mapToStream(new BInstanceReader())
-            .getStream();
-
-        assertEquals(7, instances.count());
+        String file = ROOT + "maps/instanceMapH2Source.ttl";
+        testNumberOfInstances(file, 14);
+        printRDFOutput(file);
     }
+
+
 
 }

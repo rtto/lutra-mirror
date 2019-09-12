@@ -10,11 +10,11 @@
 ex:MyMap a :InstanceMap ;
   :template :Triple ;
   :query "SELECT ?s ?p ?o WHERE { ?s a foaf:Person ; ?p ?o }" ;
-#  :valueMap (
-#       [ :type "auto" ]
-#       [ :type "auto" ]
-#       [ :type "auto" ]
-#       ) ;
+  :argumentMaps (
+    [ :type :IRI ]
+    [ :type :IRI ]
+    [ :type :IRI ]
+    ) ;
   :source
     [ a :RDFSource ;
       :sourceURL

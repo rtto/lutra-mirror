@@ -44,9 +44,9 @@ import xyz.ottr.lutra.bottr.source.H2Source;
 import xyz.ottr.lutra.bottr.source.JDBCSource;
 import xyz.ottr.lutra.bottr.source.RDFSource;
 import xyz.ottr.lutra.bottr.source.SPARQLEndpointSource;
+import xyz.ottr.lutra.bottr.util.DataParser;
 import xyz.ottr.lutra.result.Result;
 import xyz.ottr.lutra.result.ResultStream;
-import xyz.ottr.lutra.tabottr.parser.DataValidator;
 import xyz.ottr.lutra.wottr.util.ModelSelector;
 import xyz.ottr.lutra.wottr.util.RDFNodes;
 
@@ -98,12 +98,12 @@ class BSourceParser implements Function<Resource, Result<Source<?>>> {
 
     private Result<Source<?>> getSQLSource(Resource source) {
 
-        Result<JDBCSource.Builder> builder = Result.of(new JDBCSource.Builder());
-        builder.addResult(getRequiredLiteralString(source, BOTTR.sourceURL), JDBCSource.Builder::setDatabaseURL);
-        builder.addResult(getRequiredLiteralString(source, BOTTR.jdbcDriver), JDBCSource.Builder::setDatabaseDriver);
-        builder.addResult(getRequiredLiteralString(source, BOTTR.username), JDBCSource.Builder::setUsername);
-        builder.addResult(getRequiredLiteralString(source, BOTTR.password), JDBCSource.Builder::setPassword);
-        return builder.map(JDBCSource.Builder::build);
+        Result<JDBCSource.JDBCSourceBuilder> builder = Result.of(JDBCSource.builder());
+        builder.addResult(getRequiredLiteralString(source, BOTTR.sourceURL), JDBCSource.JDBCSourceBuilder::databaseURL);
+        builder.addResult(getRequiredLiteralString(source, BOTTR.jdbcDriver), JDBCSource.JDBCSourceBuilder::databaseDriver);
+        builder.addResult(getRequiredLiteralString(source, BOTTR.username), JDBCSource.JDBCSourceBuilder::username);
+        builder.addResult(getRequiredLiteralString(source, BOTTR.password), JDBCSource.JDBCSourceBuilder::password);
+        return builder.map(JDBCSource.JDBCSourceBuilder::build);
     }
     
     private Result<Source<?>> getSPARQLEndpointSource(Resource source) {
@@ -132,7 +132,7 @@ class BSourceParser implements Function<Resource, Result<Source<?>>> {
         return ModelSelector.getOptionalLiteralObject(this.model, source, BOTTR.sourceURL)
             .map(Literal::getLexicalForm)
             .map(this::getPath)
-            .mapOrElse(url -> new H2Source(url), new H2Source());
+            .mapOrElse(H2Source::new, new H2Source());
     }
 
     /**
@@ -141,7 +141,7 @@ class BSourceParser implements Function<Resource, Result<Source<?>>> {
      */
     private String getPath(String file) {
 
-        if (Objects.isNull(this.filePath) || DataValidator.isURL(file)) {
+        if (Objects.isNull(this.filePath) || DataParser.asURI(file).isPresent()) {
             return file;
         } else {
             return Paths.get(this.filePath).resolveSibling(file).toAbsolutePath().toString();

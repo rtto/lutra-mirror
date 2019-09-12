@@ -22,13 +22,33 @@ package xyz.ottr.lutra.bottr.model;
  * #L%
  */
 
-import org.apache.jena.shared.PrefixMapping;
-import xyz.ottr.lutra.result.ResultStream;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.function.Function;
 
-public interface Source<V> {
+import xyz.ottr.lutra.bottr.util.TermFactory;
+import xyz.ottr.lutra.model.Term;
+import xyz.ottr.lutra.result.Result;
 
-    ResultStream<Record<V>> execute(String query);
+public class TranslationTable implements Function<Term, Result<Term>> {
 
-    ArgumentMap<V> createArgumentMap(PrefixMapping prefixMapping);
+    private final Map<Term, Term> table;
+
+    public TranslationTable(Map<Term, Term> table) {
+        this.table = table;
+    }
+
+    public TranslationTable() {
+        this(new HashMap<>());
+    }
+
+    public boolean containsKey(Term value) {
+        return this.table.containsKey(value);
+    }
+
+    public Result<Term> apply(Term value) {
+        Term translation = this.table.getOrDefault(value, value);
+        return translation.isBlank() ? TermFactory.createBlankNode().map(t -> (Term) t) : Result.of(translation);
+    }
 
 }

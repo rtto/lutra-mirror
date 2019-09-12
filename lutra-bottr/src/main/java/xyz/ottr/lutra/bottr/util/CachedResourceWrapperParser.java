@@ -1,4 +1,4 @@
-package xyz.ottr.lutra.bottr.model;
+package xyz.ottr.lutra.bottr.util;
 
 /*-
  * #%L
@@ -22,13 +22,25 @@ package xyz.ottr.lutra.bottr.model;
  * #L%
  */
 
-import org.apache.jena.shared.PrefixMapping;
-import xyz.ottr.lutra.result.ResultStream;
+import java.util.AbstractMap;
+import java.util.HashMap;
+import java.util.Map;
 
-public interface Source<V> {
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.Resource;
+import xyz.ottr.lutra.result.Result;
 
-    ResultStream<Record<V>> execute(String query);
+public abstract class CachedResourceWrapperParser<X> extends ResourceWrapperParser<X> {
 
-    ArgumentMap<V> createArgumentMap(PrefixMapping prefixMapping);
+    private static final Map<Map.Entry<Model, Resource>, Result> cache = new HashMap<>();
 
+    public CachedResourceWrapperParser(Resource resource) {
+        super(resource);
+    }
+
+    @Override
+    public Result<X> get() {
+        Map.Entry<Model, Resource> key = new AbstractMap.SimpleEntry<>(this.model, this.resource);
+        return cache.computeIfAbsent(key, pair -> getResult(pair.getValue()));
+    }
 }

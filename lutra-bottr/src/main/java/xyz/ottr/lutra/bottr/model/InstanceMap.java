@@ -1,8 +1,9 @@
 package xyz.ottr.lutra.bottr.model;
 
-import java.util.Objects;
 import java.util.function.Supplier;
 
+import lombok.Builder;
+import lombok.Getter;
 import xyz.ottr.lutra.model.Instance;
 import xyz.ottr.lutra.result.Result;
 import xyz.ottr.lutra.result.ResultStream;
@@ -29,18 +30,20 @@ import xyz.ottr.lutra.result.ResultStream;
  * #L%
  */
 
+@Getter
 public class InstanceMap implements Supplier<ResultStream<Instance>> {
 
     private final Source<?> source;
     private final String query;
     private final String templateIRI;
-    private final ValueMap valueMap;
+    private final ArgumentMaps argumentMaps;
 
-    public InstanceMap(Source<?> source, String query, String templateIRI, ValueMap valueMap) {
+    @Builder
+    public InstanceMap(Source<?> source, String query, String templateIRI, ArgumentMaps argumentMaps) {
         this.source = source;
         this.query = query;
         this.templateIRI = templateIRI;
-        this.valueMap = valueMap;        
+        this.argumentMaps = argumentMaps;
     }
     
     @Override
@@ -52,52 +55,9 @@ public class InstanceMap implements Supplier<ResultStream<Instance>> {
     private Result<Instance> createInstance(Record<?> record) {
         return Result.zip(
             Result.of(this.templateIRI),
-            Result.of(record).flatMap(this.valueMap),
+            Result.of(record)
+                .flatMap(this.argumentMaps),
             Instance::new
         );
     }
-    
-    public String getQuery() {
-        return this.query;
-    }
-        
-    public String getTemplateIRI() {
-        return this.templateIRI;
-    }
-
-    public String toString() {
-        return this.getClass().getSimpleName() + " - " + this.templateIRI + " - " + this.query;
-    }
-
-    public static class Builder {
-        private Source<?> source;
-        private String query;
-        private String templateIRI;
-        private ValueMap valueMap;
-
-        private String nullError(String variableName) {
-            return "InstanceMap's " + variableName + " cannot be null.";
-        }
-
-        public void setSource(Source<?> source) {
-            this.source = Objects.requireNonNull(source, nullError("source"));
-        }
-
-        public void setQuery(String query) {
-            this.query = Objects.requireNonNull(query, nullError("query"));
-        }
-
-        public void setTemplateIRI(String templateIRI) {
-            this.templateIRI = Objects.requireNonNull(templateIRI, nullError("template"));
-        }
-
-        public void setValueMap(ValueMap valueMap) {
-            this.valueMap = Objects.requireNonNull(valueMap, nullError("valueMap"));
-        }
-
-        public InstanceMap build() {
-            return new InstanceMap(this.source, this.query, this.templateIRI, this.valueMap);
-        }
-    }
-
 }

@@ -22,62 +22,59 @@ package xyz.ottr.lutra.bottr.parser;
  * #L%
  */
 
-import static org.junit.Assert.assertEquals;
+import static org.hamcrest.CoreMatchers.is;
 
+import java.io.File;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 import java.util.stream.Collectors;
 
+import org.junit.Assert;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 import xyz.ottr.lutra.bottr.model.InstanceMap;
+import xyz.ottr.lutra.io.Files;
 import xyz.ottr.lutra.result.Result;
 import xyz.ottr.lutra.result.ResultStream;
 import xyz.ottr.lutra.wottr.io.RDFFileReader;
 
+
+@RunWith(Parameterized.class)
 public class BInstanceMapParserTest {
 
     private static final String ROOT = "src/test/resources/maps/";
+    private static final String[] EMPTY_ARRAY = {};
 
-    @Test
-    public void shouldParseSQL() {
+    @Parameterized.Parameters(name = "{index}: {0}")
+    public static Collection<String[]> data() {
+        return Files.getFolderContents(ROOT, new String[]{ "ttl" }, EMPTY_ARRAY)
+            .innerMap(File::toString)
+            .innerMap(string -> new String[] { string })
+            .aggregate()
+            .map(s -> s.collect(Collectors.toList()))
+            .get();
+    }
 
-        Result<InstanceMap> maps = getInstanceMap(ROOT + "instanceMapDummyJDBC.ttl");
+    private final String file;
 
-        assertEquals(Collections.emptyList(), maps.getAllMessages());
-        assertEquals("SELECT name, age, company FROM TABLE tblEmployee", maps.get().getQuery());
-        assertEquals("http://example.com/tpl#MyTemplate", maps.get().getTemplateIRI());
+    public BInstanceMapParserTest(String file) {
+        this.file = file;
     }
 
     @Test
-    public void shouldParseSPARQL() {
-
-        Result<InstanceMap> maps = getInstanceMap(ROOT + "instanceMapSPARQL.ttl");
-        assertEquals(Collections.emptyList(), maps.getAllMessages());
+    public void shouldParseWithoutError() {
+        Result<List<InstanceMap>> map = getInstanceMaps(this.file);
+        Assert.assertThat(map.getAllMessages(), is(Collections.emptyList()));
     }
 
-    @Test
-    public void shouldParseRDF() {
-
-        Result<InstanceMap> maps = getInstanceMap(ROOT + "instanceMapRDFSource.ttl");
-        assertEquals(Collections.emptyList(), maps.getAllMessages());
-    }
-
-    @Test
-    public void shouldParseCSV() {
-
-        Result<InstanceMap> maps = getInstanceMap(ROOT + "instanceMapH2Source.ttl");
-        assertEquals(Collections.emptyList(), maps.getAllMessages());
-    }
-
-    private Result<InstanceMap> getInstanceMap(String file) {
+    private Result<List<InstanceMap>> getInstanceMaps(String file) {
         return ResultStream.innerOf(file)
             .innerFlatMap(new RDFFileReader())
             .innerFlatMap(new BInstanceMapParser(file))
-            .getStream()
-            //.peek(r -> System.out.println(r))
-            //.peek(r -> System.out.println(r.getAllMessages()))
-            //.map(Result::get)
-            .collect(Collectors.toList())
-            .get(0);
+            .aggregate()
+            .map(stream -> stream.collect(Collectors.toList()));
     }
 
 }

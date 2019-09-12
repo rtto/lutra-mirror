@@ -1,31 +1,5 @@
 package xyz.ottr.lutra.bottr.source;
 
-import static org.junit.Assert.assertEquals;
-
-import java.io.IOException;
-import java.nio.charset.Charset;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.stream.Collectors;
-
-import org.apache.jena.shared.PrefixMapping;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
-
-import xyz.ottr.lutra.bottr.model.InstanceMap;
-import xyz.ottr.lutra.bottr.model.Record;
-import xyz.ottr.lutra.bottr.model.Source;
-import xyz.ottr.lutra.bottr.model.ValueMap;
-import xyz.ottr.lutra.result.Result;
-import xyz.ottr.lutra.result.ResultStream;
-import xyz.ottr.lutra.tabottr.TabOTTR;
-import xyz.ottr.lutra.wottr.vocabulary.v04.WOTTR;
-
 /*-
  * #%L
  * lutra-bottr
@@ -47,6 +21,31 @@ import xyz.ottr.lutra.wottr.vocabulary.v04.WOTTR;
  * <http://www.gnu.org/licenses/lgpl-2.1.html>.
  * #L%
  */
+
+import static org.junit.Assert.assertEquals;
+
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import org.apache.jena.shared.PrefixMapping;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
+
+import xyz.ottr.lutra.bottr.model.ArgumentMaps;
+import xyz.ottr.lutra.bottr.model.InstanceMap;
+import xyz.ottr.lutra.bottr.model.Record;
+import xyz.ottr.lutra.bottr.model.Source;
+import xyz.ottr.lutra.result.Result;
+import xyz.ottr.lutra.result.ResultStream;
+import xyz.ottr.lutra.wottr.vocabulary.v04.WOTTR;
 
 public class H2SourceTest {
 
@@ -71,11 +70,11 @@ public class H2SourceTest {
             + "ex:A3,ex:B3,ex:C3\n";
         Files.write(Paths.get(csvFilename), csvContent.getBytes(Charset.forName("UTF-8")));
 
-        // Set up map to translate source to triple instances
-        ValueMap valMap = new ValueMap(prefixes, Arrays.asList(TabOTTR.TYPE_IRI, TabOTTR.TYPE_IRI, TabOTTR.TYPE_IRI));
-
         // H2 database to load CSV file
         Source<String> csvSource = new H2Source();
+
+        // Set up map to translate source to triple instances
+        ArgumentMaps valMap = new ArgumentMaps(prefixes, csvSource);
 
         // map data to triples
         InstanceMap map = new InstanceMap(

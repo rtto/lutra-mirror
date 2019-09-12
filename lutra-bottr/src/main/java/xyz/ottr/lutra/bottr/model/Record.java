@@ -1,6 +1,6 @@
 package xyz.ottr.lutra.bottr.model;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 
 /*-
  * #%L
@@ -12,12 +12,12 @@ import java.util.Arrays;
  * it under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation, either version 2.1 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Lesser Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Lesser Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/lgpl-2.1.html>.
@@ -27,18 +27,20 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import lombok.EqualsAndHashCode;
 
+@EqualsAndHashCode
 public class Record<V> {
 
     private final List<V> values;
 
-    public Record(List<V> values) {
-        this.values = values;
+    public Record(V value) {
+        this.values = new ArrayList<>();
+        this.values.add(value);
     }
 
-    @SafeVarargs
-    public Record(V... values) {
-        this(Arrays.asList(values));
+    public Record(List<V> values) {
+        this.values = values;
     }
 
     public V getValue(int index) {
@@ -51,42 +53,6 @@ public class Record<V> {
 
     public String toString() {
         return this.values.toString();
-    }
-
-    /* (non-Javadoc)
-     * @see java.lang.Object#hashCode()
-     */
-    @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + ((this.values == null) ? 0 : this.values.hashCode());
-        return result;
-    }
-
-    /* (non-Javadoc)
-     * @see java.lang.Object#equals(java.lang.Object)
-     */
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (!(obj instanceof Record)) {
-            return false;
-        }
-        Record<?> other = (Record<?>) obj;
-        if (this.values == null) {
-            if (other.values != null) {
-                return false;
-            }
-        } else if (!this.values.equals(other.values)) {
-            return false;
-        }
-        return true;
     }
 
 }

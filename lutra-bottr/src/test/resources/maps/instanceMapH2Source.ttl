@@ -1,15 +1,36 @@
 @prefix : <http://ns.ottr.xyz/0.4/> .
 @prefix ex: <http://example.com/ns#> .
-@prefix tpl: <http://example.com/tpl#> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 
-ex:MyMap a :InstanceMap ;
-  :template tpl:Example ;
-  :query "SELECT ID, NAME, SALARY FROM CSVREAD('src/test/resources/sources/csv/linux.csv');" ;
-  :valueMap ( 
-       [ :type xsd:String ]
-       [ :type xsd:int ]
-       [ :type "iri" ] ) ;
-  :source
-    [ a :H2Source ] .
+##id,name,age,address,salary
+##1,Paulo,32,Niteroi,2500
+
+ex:MyMap1 a :InstanceMap ;
+      :template :Triple ;
+      :query "SELECT CONCAT('ex:', ID), 'ex:hasSalary', SALARY FROM CSVREAD('src/test/resources/sources/csv/linux.csv');" ;
+      :argumentMaps(
+        [ :type :IRI ]
+        [ :type :IRI ]
+        [ :type xsd:integer; :translationTable ex:table ]
+        ) ;
+      :source
+        [ a :H2Source ] .
+
+ex:MyMap2 a :InstanceMap ;
+    :template :Triple ;
+    :query "SELECT CONCAT('_XXX:', ID), 'rdfs:label', NAME FROM CSVREAD('src/test/resources/sources/csv/linux.csv');" ;
+    :argumentMaps(
+      [ :type :IRI; :translationSettings ex:settings ]
+      [ :type :IRI ]
+      [ :type xsd:string ]
+     ) ;
+     :source
+     [ a :H2Source ] .
+
+
+ex:table
+  :entry [ :inValue "2000"^^xsd:integer ; :outValue 9999999999999 ] .
+
+ex:settings
+  :labelledBlankPrefix "_XXX:" .

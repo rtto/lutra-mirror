@@ -7,12 +7,15 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+import lombok.Builder;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.apache.commons.dbutils.QueryRunner;
 import org.apache.commons.dbutils.handlers.ArrayListHandler;
+import org.apache.jena.shared.PrefixMapping;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import xyz.ottr.lutra.bottr.model.ArgumentMap;
 import xyz.ottr.lutra.bottr.model.Record;
 import xyz.ottr.lutra.bottr.model.Source;
 import xyz.ottr.lutra.result.Message;
@@ -47,6 +50,7 @@ public class JDBCSource implements Source<String> {
 
     private final BasicDataSource dataSource;
 
+    @Builder
     protected JDBCSource(String databaseDriver, String databaseURL, String username, String password) {
         this.dataSource = new BasicDataSource();
 
@@ -55,7 +59,7 @@ public class JDBCSource implements Source<String> {
         this.dataSource.setPassword(password);
         this.dataSource.setUrl(databaseURL);
     }
-    
+
     @Override
     public ResultStream<Record<String>> execute(String query) {
 
@@ -80,31 +84,9 @@ public class JDBCSource implements Source<String> {
         }
     }
 
-    public static class Builder {
-
-        private String databaseDriver;
-        private String databaseURL;
-        private String username;
-        private String password;
-
-        public void setDatabaseDriver(String databaseDriver) {
-            this.databaseDriver = Objects.requireNonNull(databaseDriver);
-        }
-
-        public void setDatabaseURL(String databaseURL) {
-            this.databaseURL = Objects.requireNonNull(databaseURL);
-        }
-
-        public void setUsername(String username) {
-            this.username = username;
-        }
-
-        public void setPassword(String password) {
-            this.password = password;
-        }
-
-        public JDBCSource build() {
-            return new JDBCSource(this.databaseDriver, this.databaseURL, this.username, this.password);
-        }
+    @Override
+    public ArgumentMap<String> createArgumentMap(PrefixMapping prefixMapping) {
+        return new StringArgumentMap(prefixMapping);
     }
+
 }

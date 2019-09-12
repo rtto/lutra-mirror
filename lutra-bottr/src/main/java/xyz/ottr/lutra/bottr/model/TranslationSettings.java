@@ -22,13 +22,20 @@ package xyz.ottr.lutra.bottr.model;
  * #L%
  */
 
-import org.apache.jena.shared.PrefixMapping;
-import xyz.ottr.lutra.result.ResultStream;
+import lombok.Builder;
+import lombok.Getter;
+import xyz.ottr.lutra.bottr.util.TermFactory;
+import xyz.ottr.lutra.model.Term;
 
-public interface Source<V> {
+@Getter
+@Builder
+public class TranslationSettings {
 
-    ResultStream<Record<V>> execute(String query);
+    @Builder.Default private final Term nullValue = TermFactory.createNone().get();
 
-    ArgumentMap<V> createArgumentMap(PrefixMapping prefixMapping);
+    @Builder.Default private final String labelledBlankPrefix = "_:";
 
+    @Builder.Default private final String listSep = ",";
+    @Builder.Default private final char listStart = '(';
+    @Builder.Default private final char listEnd = ')';
 }

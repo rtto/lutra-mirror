@@ -22,6 +22,7 @@ package xyz.ottr.lutra.result;
  * #L%
  */
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
@@ -68,6 +69,15 @@ public class ResultStream<E> {
      */
     public static <R> ResultStream<R> innerOf(Collection<R> col) {
         return new ResultStream<>(col.stream().map(e -> Result.of(e)));
+    }
+
+
+    /**
+     * Returns a ResultStream consisting of one Result per element
+     * in argument array.
+     */
+    public static <R> ResultStream<R> innerOf(R[] array) {
+        return innerOf(Arrays.asList(array));
     }
 
     /**

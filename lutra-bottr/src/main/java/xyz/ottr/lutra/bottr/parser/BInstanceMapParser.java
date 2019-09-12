@@ -30,9 +30,9 @@ import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Resource;
 
 import xyz.ottr.lutra.bottr.BOTTR;
+import xyz.ottr.lutra.bottr.model.ArgumentMaps;
 import xyz.ottr.lutra.bottr.model.InstanceMap;
 import xyz.ottr.lutra.bottr.model.Source;
-import xyz.ottr.lutra.bottr.model.ValueMap;
 import xyz.ottr.lutra.result.Result;
 import xyz.ottr.lutra.result.ResultStream;
 import xyz.ottr.lutra.wottr.util.ModelSelector;
@@ -58,12 +58,16 @@ public class BInstanceMapParser implements Function<Model, ResultStream<Instance
 
     private Result<InstanceMap> parseInstanceMap(Model model, Resource instanceMap) {
 
-        Result<InstanceMap.Builder> builder = Result.of(new InstanceMap.Builder());
-        builder.addResult(getTemplate(model, instanceMap), InstanceMap.Builder::setTemplateIRI);
-        builder.addResult(getQuery(model, instanceMap), InstanceMap.Builder::setQuery);
-        builder.addResult(getSource(model, instanceMap), InstanceMap.Builder::setSource);
-        builder.addResult(getValueMap(model, instanceMap), InstanceMap.Builder::setValueMap);
-        return builder.map(InstanceMap.Builder::build);
+        Result<InstanceMap.InstanceMapBuilder> builder = Result.of(InstanceMap.builder());
+        builder.addResult(getTemplate(model, instanceMap), InstanceMap.InstanceMapBuilder::templateIRI);
+        builder.addResult(getQuery(model, instanceMap), InstanceMap.InstanceMapBuilder::query);
+
+        Result<Source<?>> source = getSource(model, instanceMap);
+        builder.addResult(source, InstanceMap.InstanceMapBuilder::source);
+
+        Result<ArgumentMaps> tupleMap = source.flatMap(s -> getArgumentMaps(model, instanceMap, s));
+        builder.addResult(tupleMap, InstanceMap.InstanceMapBuilder::argumentMaps);
+        return builder.map(InstanceMap.InstanceMapBuilder::build);
     }
 
     private Result<String> getTemplate(Model model, Resource instanceMap) {
@@ -81,9 +85,12 @@ public class BInstanceMapParser implements Function<Model, ResultStream<Instance
             .flatMap(new BSourceParser(model, this.filePath));
     }
 
-    private Result<ValueMap> getValueMap(Model model, Resource instanceMap) {
-        return ModelSelector.getOptionalListObject(model, instanceMap, BOTTR.valueMap)
-            .flatMapOrElse(new BValueMapParser(model), Result.of(new ValueMap(model)));
+    private Result<ArgumentMaps> getArgumentMaps(Model model, Resource instanceMap, Source<?> source) {
+        return ModelSelector.getOptionalListObject(model, instanceMap, BOTTR.argumentMaps)
+            .flatMapOrElse(
+                new BArgumentMapsParser(model, source),
+                Result.of(new ArgumentMaps(model, source))
+            );
     }
 
 }

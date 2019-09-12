@@ -86,9 +86,18 @@ public enum RDFNodes {
         if (node.isVariable()) {
             return node.toString();
         } else {
-            return (model == null)
-                ? defaultPrefixes.shortForm(node.toString())
-                : model.shortForm(node.toString());
+            return toString(model, node.toString());
         }
     }
+
+    public static String toString(Model model, String nodeString) {
+        return (model == null)
+            ? toString(nodeString)
+            : model.shortForm(nodeString);
+    }
+
+    public static String toString(String nodeString) {
+        return defaultPrefixes.shortForm(nodeString);
+    }
+
 }

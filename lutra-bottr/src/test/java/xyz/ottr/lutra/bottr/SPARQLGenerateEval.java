@@ -39,11 +39,13 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
+import xyz.ottr.lutra.bottr.model.ArgumentMaps;
 import xyz.ottr.lutra.bottr.model.InstanceMap;
-import xyz.ottr.lutra.bottr.model.ValueMap;
 import xyz.ottr.lutra.bottr.source.H2Source;
+import xyz.ottr.lutra.bottr.source.StringArgumentMap;
 import xyz.ottr.lutra.io.TemplateReader;
 import xyz.ottr.lutra.model.Instance;
+import xyz.ottr.lutra.model.types.TypeFactory;
 import xyz.ottr.lutra.result.Message;
 import xyz.ottr.lutra.result.MessageHandler;
 import xyz.ottr.lutra.result.Result;
@@ -51,7 +53,6 @@ import xyz.ottr.lutra.result.ResultConsumer;
 import xyz.ottr.lutra.result.ResultStream;
 import xyz.ottr.lutra.store.DependencyGraph;
 import xyz.ottr.lutra.store.TemplateStore;
-import xyz.ottr.lutra.tabottr.TabOTTR;
 
 import xyz.ottr.lutra.wottr.io.RDFFileReader;
 import xyz.ottr.lutra.wottr.parser.v04.WTemplateParser;
@@ -83,15 +84,15 @@ public class SPARQLGenerateEval {
         Path csvFile = this.testRoot.resolve(inFile);
 
         // Set up map to translate source to triple instances
-        ValueMap valMap = new ValueMap(prefixes, Arrays.asList(
-                TabOTTR.TYPE_IRI,
-                XSD.xstring.toString(),
-                TabOTTR.TYPE_IRI, 
-                TabOTTR.TYPE_IRI,
-                XSD.dateTime.toString(),
-                XSD.decimal.toString(),
-                XSD.decimal.toString()
-                ));
+        ArgumentMaps valMap = new ArgumentMaps(prefixes, h2, Arrays.asList(
+            new StringArgumentMap(prefixes, TypeFactory.IRI),
+            new StringArgumentMap(prefixes),
+            new StringArgumentMap(prefixes, TypeFactory.IRI),
+            new StringArgumentMap(prefixes, TypeFactory.IRI),
+            new StringArgumentMap(prefixes, TypeFactory.getType(XSD.dateTime.toString())),
+            new StringArgumentMap(prefixes, TypeFactory.getType(XSD.decimal.toString())),
+            new StringArgumentMap(prefixes, TypeFactory.getType(XSD.decimal.toString()))
+        ));
 
         // map data to triples
         InstanceMap map = new InstanceMap(

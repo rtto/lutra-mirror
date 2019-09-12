@@ -42,6 +42,7 @@ import org.apache.jena.rdf.model.ResourceFactory;
 
 import org.apache.jena.shared.JenaException;
 import org.apache.jena.shared.PrefixMapping;
+import xyz.ottr.lutra.bottr.model.ArgumentMap;
 import xyz.ottr.lutra.bottr.model.Record;
 import xyz.ottr.lutra.bottr.model.Source;
 import xyz.ottr.lutra.result.Message;
@@ -117,6 +118,11 @@ public abstract class AbstractSPARQLSource implements Source<RDFNode> {
                         }
                     }
                 }, false));
+    }
+
+    @Override
+    public ArgumentMap<RDFNode> createArgumentMap(PrefixMapping prefixMapping) {
+        return new RDFNodeArgumentMap(prefixMapping);
     }
 
 }

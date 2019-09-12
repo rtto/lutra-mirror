@@ -15,11 +15,17 @@
     <Bug pattern="RCN_REDUNDANT_NULLCHECK_WOULD_HAVE_BEEN_A_NPE" />
   </Match>
 
+  <!-- Lombok generated methods -->
   <Match>
-    <!-- This is an overloaded method, which is in fact called. -->
-    <Class name="xyz.ottr.lutra.bottr.model.ValueMap" />
-    <Method name="getRDFNode" />
-    <Bug pattern="UPM_UNCALLED_PRIVATE_METHOD" />
+    <Class name="xyz.ottr.lutra.bottr.model.Record" />
+    <Method name="equals" />
+    <Bug pattern="RCN_REDUNDANT_NULLCHECK_OF_NONNULL_VALUE" />
   </Match>
+  <Match>
+    <Class name="xyz.ottr.lutra.bottr.model.Record" />
+    <Method name="hashCode" />
+    <Bug pattern="RCN_REDUNDANT_NULLCHECK_OF_NONNULL_VALUE" />
+  </Match>
+
 
 </FindBugsFilter>

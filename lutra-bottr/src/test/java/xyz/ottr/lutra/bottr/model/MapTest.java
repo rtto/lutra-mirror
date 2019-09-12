@@ -1,6 +1,6 @@
 package xyz.ottr.lutra.bottr.model;
 
-import static org.junit.Assert.assertEquals;
+import static org.hamcrest.CoreMatchers.is;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -10,15 +10,16 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.apache.jena.shared.PrefixMapping;
+import org.junit.Assert;
 import org.junit.Test;
-
 import xyz.ottr.lutra.OTTR;
+import xyz.ottr.lutra.bottr.source.StringArgumentMap;
 import xyz.ottr.lutra.model.ArgumentList;
 import xyz.ottr.lutra.model.IRITerm;
 import xyz.ottr.lutra.model.Instance;
+import xyz.ottr.lutra.model.types.TypeFactory;
 import xyz.ottr.lutra.result.Result;
 import xyz.ottr.lutra.result.ResultStream;
-import xyz.ottr.lutra.tabottr.TabOTTR;
 
 /*-
  * #%L
@@ -55,6 +56,7 @@ public class MapTest {
             private final List<Record<String>> rows;
 
             public StaticTestSource() {
+
                 this.rows = new ArrayList<>();
                 this.rows.add(new Record<>(Arrays.asList(ns + "A1", ns + "B1", ns + "C1")));
                 this.rows.add(new Record<>(Arrays.asList(ns + "A2", ns + "B2", ns + "C2")));
@@ -63,18 +65,31 @@ public class MapTest {
             // NB! Returns same rows regardless of query
             @Override
             public ResultStream<Record<String>> execute(String query) {
+
                 return new ResultStream<>(this.rows.stream().map(Result::of));
+            }
+
+            @Override
+            public ArgumentMap<String> createArgumentMap(PrefixMapping prefixMapping) {
+                return null;
             }
         }
 
+
+        Source<String> source = new StaticTestSource();
+        PrefixMapping prefixes = OTTR.getDefaultPrefixes();
+        StringArgumentMap iriMap = new StringArgumentMap(prefixes, TypeFactory.IRI);
+
         // Set up map to translate source to triple instances
-        ValueMap valMap = new ValueMap(PrefixMapping.Standard, Arrays.asList(TabOTTR.TYPE_IRI, TabOTTR.TYPE_IRI, TabOTTR.TYPE_IRI));
+        ArgumentMaps<String> valMap = new ArgumentMaps<>(PrefixMapping.Standard, source,
+            Arrays.asList(iriMap, iriMap, iriMap)
+        );
 
         InstanceMap myMap = new InstanceMap(
-                new StaticTestSource(), 
-                "blank query", 
-                OTTR.BaseURI.Triple,
-                valMap);
+            source,
+            "blank query",
+            OTTR.BaseURI.Triple,
+            valMap);
 
         // Output: "Manually" build two instances      
         Instance inst1 = new Instance(OTTR.BaseURI.Triple,
@@ -99,8 +114,8 @@ public class MapTest {
             .map(Result::get)
             .collect(Collectors.toSet());
         
-        assertEquals(2, input.size());
-        assertEquals(output, input);
+        Assert.assertThat(input.size(), is(2));
+        Assert.assertThat(input, is(output));
     }
 
 }
