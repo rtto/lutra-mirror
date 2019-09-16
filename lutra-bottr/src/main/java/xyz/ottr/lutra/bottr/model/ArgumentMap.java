@@ -43,7 +43,7 @@ import xyz.ottr.lutra.wottr.vocabulary.v04.WOTTR;
 
 // TODO use lombok's @SuperBuilder once it has support in IDE, and make fields final. now we simply use setter methods.
 @Setter
-public abstract class ArgumentMap<X> implements Function<X, Result<Term>> {
+public abstract class ArgumentMap<V> implements Function<V, Result<Term>> {
 
     protected TermType type;
     protected String literalLangTag;
@@ -66,15 +66,15 @@ public abstract class ArgumentMap<X> implements Function<X, Result<Term>> {
         this.type = type;
     }
 
-    public Result<Term> apply(X value) {
+    public Result<Term> apply(V value) {
         return getTerm(value, this.type);
     }
 
-    protected String toString(X value) {
+    protected String toString(V value) {
         return Objects.toString(value);
     }
 
-    private String getBlankNodeLabel(X value) {
+    private String getBlankNodeLabel(V value) {
         String prefix = this.translationSettings.getLabelledBlankPrefix();
         String stringValue = toString(value);
 
@@ -83,7 +83,7 @@ public abstract class ArgumentMap<X> implements Function<X, Result<Term>> {
             : StringUtils.EMPTY;
     }
 
-    private Result<Term> getTerm(X value, TermType type) {
+    private Result<Term> getTerm(V value, TermType type) {
 
         String blankNodeLabel = getBlankNodeLabel(value);
 
@@ -102,7 +102,7 @@ public abstract class ArgumentMap<X> implements Function<X, Result<Term>> {
         return term;//.flatMap(this.translationTable);
     }
 
-    protected abstract Result<Term> getBasicTerm(X value, BasicType type);
+    protected abstract Result<Term> getBasicTerm(V value, BasicType type);
 
     protected abstract Result<Term> getListElementTerm(String value, BasicType type);
 
@@ -127,7 +127,9 @@ public abstract class ArgumentMap<X> implements Function<X, Result<Term>> {
         return ResultStream.innerOf(valueList)
             .mapFlatMap(element -> {
                 // element is a string
-                return element instanceof List ? getListTerm((List<?>) element, type) : getListElementTerm((String) element, type);
+                return element instanceof List
+                    ? getListTerm((List<?>) element, type)
+                    : getListElementTerm((String) element, type);
             })
             .aggregate()
             .map(stream -> stream.collect(Collectors.toList()))

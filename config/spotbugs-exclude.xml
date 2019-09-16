@@ -15,17 +15,4 @@
     <Bug pattern="RCN_REDUNDANT_NULLCHECK_WOULD_HAVE_BEEN_A_NPE" />
   </Match>
 
-  <!-- Lombok generated methods -->
-  <Match>
-    <Class name="xyz.ottr.lutra.bottr.model.Record" />
-    <Method name="equals" />
-    <Bug pattern="RCN_REDUNDANT_NULLCHECK_OF_NONNULL_VALUE" />
-  </Match>
-  <Match>
-    <Class name="xyz.ottr.lutra.bottr.model.Record" />
-    <Method name="hashCode" />
-    <Bug pattern="RCN_REDUNDANT_NULLCHECK_OF_NONNULL_VALUE" />
-  </Match>
-
-
 </FindBugsFilter>

@@ -33,24 +33,24 @@ import xyz.ottr.lutra.model.ArgumentList;
 import xyz.ottr.lutra.model.Term;
 import xyz.ottr.lutra.result.Result;
 
-public class ArgumentMaps<X> implements Function<List<X>, Result<ArgumentList>> {
+public class ArgumentMaps<V> implements Function<List<V>, Result<ArgumentList>> {
 
     private final PrefixMapping prefixMapping;
-    private final List<ArgumentMap<X>> argumentMaps;
-    private final Source<X> source;
+    private final List<ArgumentMap<V>> argumentMaps;
+    private final Source<V> source;
 
-    public ArgumentMaps(PrefixMapping prefixMapping, Source<X> source, List<ArgumentMap<X>> argumentMaps) {
+    public ArgumentMaps(PrefixMapping prefixMapping, Source<V> source, List<ArgumentMap<V>> argumentMaps) {
         this.prefixMapping = prefixMapping;
         this.argumentMaps = argumentMaps;
         this.source = source;
     }
 
-    public ArgumentMaps(PrefixMapping prefixMapping, Source<X> source) {
-        this(prefixMapping, source, Collections.<ArgumentMap<X>>emptyList());
+    public ArgumentMaps(PrefixMapping prefixMapping, Source<V> source) {
+        this(prefixMapping, source, Collections.<ArgumentMap<V>>emptyList());
     }
 
     @Override
-    public Result<ArgumentList> apply(List<X> inValues) {
+    public Result<ArgumentList> apply(List<V> inValues) {
 
         List<Result<Term>> outValues;
 
