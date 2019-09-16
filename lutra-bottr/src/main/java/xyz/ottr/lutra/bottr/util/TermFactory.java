@@ -126,8 +126,9 @@ public class TermFactory {
             return createTypedLiteral(value, type.getIRI()).map(t -> (Term)t);
         } else {
             Result<LiteralTerm> result = createPlainLiteral(value);
-            result.addMessage(Message.warning("Too generic type to materialise: " + type
-                + ", defaulting to " + RDFNodes.toString(type.getIRI())));
+            result.addMessage(Message.warning("Type " + RDFNodes.toString(type.getIRI())
+                + " too generic to materialise, defaulting to "
+                + RDFNodes.toString(TypeFactory.LITERAL.getIRI())));
             return result.map(t -> (Term)t);
         }
     }

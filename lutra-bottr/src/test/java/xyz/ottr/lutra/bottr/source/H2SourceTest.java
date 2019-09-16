@@ -31,6 +31,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -41,7 +42,6 @@ import org.junit.rules.TemporaryFolder;
 
 import xyz.ottr.lutra.bottr.model.ArgumentMaps;
 import xyz.ottr.lutra.bottr.model.InstanceMap;
-import xyz.ottr.lutra.bottr.model.Record;
 import xyz.ottr.lutra.bottr.model.Source;
 import xyz.ottr.lutra.result.Result;
 import xyz.ottr.lutra.result.ResultStream;
@@ -74,30 +74,30 @@ public class H2SourceTest {
         Source<String> csvSource = new H2Source();
 
         // Set up map to translate source to triple instances
-        ArgumentMaps valMap = new ArgumentMaps(prefixes, csvSource);
+        ArgumentMaps<String> valMap = new ArgumentMaps(prefixes, csvSource);
 
         // map data to triples
-        InstanceMap map = new InstanceMap(
-            csvSource,
-            "SELECT * FROM CSVREAD('" + csvFilename + "');",
-            WOTTR.triple.toString(),
-            valMap
-        );
+        InstanceMap<String> map = InstanceMap.<String>builder()
+            .source(csvSource)
+            .query("SELECT * FROM CSVREAD('" + csvFilename + "');")
+            .templateIRI(WOTTR.triple.toString())
+            .argumentMaps(valMap)
+            .build();
 
         // there should be three triples
         assertEquals(3, map.get().getStream().filter(Result::isPresent).count());
     }
 
-    private Set<Record<String>> getExpectedResult() {
+    private Set<List<String>> getExpectedResult() {
         //Create expected result
-        Set<Record<String>> expected = new HashSet<>();
-        expected.add(new Record<>(Arrays.asList("1", "Paulo", "2500")));
-        expected.add(new Record<>(Arrays.asList("2", "Pedro", "2700")));
-        expected.add(new Record<>(Arrays.asList("3", "Joao", "2800")));
-        expected.add(new Record<>(Arrays.asList("4", "Maria", "2000")));
-        expected.add(new Record<>(Arrays.asList("5", "Joselito", "1500")));
-        expected.add(new Record<>(Arrays.asList("6", "Linhares", "2200")));
-        expected.add(new Record<>(Arrays.asList("7", "Lagreca", "1000")));
+        Set<List<String>> expected = new HashSet<>();
+        expected.add(Arrays.asList("1", "Paulo", "2500"));
+        expected.add(Arrays.asList("2", "Pedro", "2700"));
+        expected.add(Arrays.asList("3", "Joao", "2800"));
+        expected.add(Arrays.asList("4", "Maria", "2000"));
+        expected.add(Arrays.asList("5", "Joselito", "1500"));
+        expected.add(Arrays.asList("6", "Linhares", "2200"));
+        expected.add(Arrays.asList("7", "Lagreca", "1000"));
         return expected;
     }
 
@@ -127,8 +127,8 @@ public class H2SourceTest {
         return ROOT.resolve(file).toAbsolutePath().toString();
     }
 
-    private void testAgainstExpectedResult(ResultStream<Record<String>> actualResult) {
-        Set<Record<String>> dbOutput = actualResult.getStream()
+    private void testAgainstExpectedResult(ResultStream<List<String>> actualResult) {
+        Set<List<String>> dbOutput = actualResult.getStream()
             .filter(Result::isPresent)
             .map(Result::get)
             .collect(Collectors.toSet());

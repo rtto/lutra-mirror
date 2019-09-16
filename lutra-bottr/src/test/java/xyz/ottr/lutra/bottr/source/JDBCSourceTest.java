@@ -6,14 +6,19 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import org.apache.jena.shared.PrefixMapping;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
-import xyz.ottr.lutra.bottr.model.Record;
+import xyz.ottr.lutra.bottr.model.ArgumentMaps;
+import xyz.ottr.lutra.model.ArgumentList;
+import xyz.ottr.lutra.model.Term;
 import xyz.ottr.lutra.result.Result;
 import xyz.ottr.lutra.result.ResultStream;
 
@@ -68,21 +73,28 @@ public class JDBCSourceTest {
         stmt.execute("INSERT into CUSTOMER values (7, 'Lagreca', 28, 'Sao Paulo', 1000);");
 
         //Create expected result
-        Set<Record<String>> expected = new HashSet<>();
-        expected.add(new Record<>(Arrays.asList("1", "Paulo", "2500")));
-        expected.add(new Record<>(Arrays.asList("2", "Pedro", "2700")));
-        expected.add(new Record<>(Arrays.asList("3", "Joao", "2800")));
-        expected.add(new Record<>(Arrays.asList("4", "Maria", "2000")));
-        expected.add(new Record<>(Arrays.asList("5", "Joselito", "1500")));
-        expected.add(new Record<>(Arrays.asList("6", "Linhares", "2200")));
-        expected.add(new Record<>(Arrays.asList("7", "Lagreca", "1000")));
+        Set<List<String>> expected = new HashSet<>();
+        expected.add(Arrays.asList("1", "Paulo", "2500"));
+        expected.add(Arrays.asList("2", "Pedro", "2700"));
+        expected.add(Arrays.asList("3", "Joao", "2800"));
+        expected.add(Arrays.asList("4", "Maria", "2000"));
+        expected.add(Arrays.asList("5", "Joselito", "1500"));
+        expected.add(Arrays.asList("6", "Linhares", "2200"));
+        expected.add(Arrays.asList("7", "Lagreca", "1000"));
 
-        //Run the source
+        // Run the source
         JDBCSource jdbcTest = new JDBCSource(driver, url, user, pass);
-        ResultStream<Record<String>> rowStream = jdbcTest.execute("SELECT ID, NAME, SALARY FROM CUSTOMER;");
-        Set<Record<String>> dbOutput = rowStream.getStream()
+
+        ArgumentMaps<String> argMaps = new ArgumentMaps<>(PrefixMapping.Standard, jdbcTest);
+
+        ResultStream<ArgumentList> rowStream = jdbcTest.execute("SELECT ID, NAME, SALARY FROM CUSTOMER;", argMaps);
+
+        Set<List<String>> dbOutput = rowStream
+            .getStream()
             .filter(Result::isPresent)
             .map(Result::get)
+            .map(ArgumentList::asList)
+            .map(list -> list.stream().map(Term::toString).collect(Collectors.toList()))
             .collect(Collectors.toSet());
 
         //Compare dbOutput to expected result

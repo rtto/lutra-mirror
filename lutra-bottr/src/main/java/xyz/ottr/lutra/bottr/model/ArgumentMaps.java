@@ -33,7 +33,7 @@ import xyz.ottr.lutra.model.ArgumentList;
 import xyz.ottr.lutra.model.Term;
 import xyz.ottr.lutra.result.Result;
 
-public class ArgumentMaps<X> implements Function<Record<X>, Result<ArgumentList>> {
+public class ArgumentMaps<X> implements Function<List<X>, Result<ArgumentList>> {
 
     private final PrefixMapping prefixMapping;
     private final List<ArgumentMap<X>> argumentMaps;
@@ -50,9 +50,8 @@ public class ArgumentMaps<X> implements Function<Record<X>, Result<ArgumentList>
     }
 
     @Override
-    public Result<ArgumentList> apply(Record<X> record) {
+    public Result<ArgumentList> apply(List<X> inValues) {
 
-        List<X> inValues = record.getValues();
         List<Result<Term>> outValues;
 
         if (this.argumentMaps.isEmpty()) {

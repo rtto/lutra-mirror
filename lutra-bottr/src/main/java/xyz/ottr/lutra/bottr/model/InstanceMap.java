@@ -4,8 +4,8 @@ import java.util.function.Supplier;
 
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NonNull;
 import xyz.ottr.lutra.model.Instance;
-import xyz.ottr.lutra.result.Result;
 import xyz.ottr.lutra.result.ResultStream;
 
 /*-
@@ -31,33 +31,18 @@ import xyz.ottr.lutra.result.ResultStream;
  */
 
 @Getter
-public class InstanceMap implements Supplier<ResultStream<Instance>> {
+@Builder
+public class InstanceMap<V> implements Supplier<ResultStream<Instance>> {
 
-    private final Source<?> source;
-    private final String query;
-    private final String templateIRI;
-    private final ArgumentMaps argumentMaps;
+    private final @NonNull Source<V> source;
+    private final @NonNull String query;
+    private final @NonNull String templateIRI;
+    private final @NonNull ArgumentMaps<V> argumentMaps;
 
-    @Builder
-    public InstanceMap(Source<?> source, String query, String templateIRI, ArgumentMaps argumentMaps) {
-        this.source = source;
-        this.query = query;
-        this.templateIRI = templateIRI;
-        this.argumentMaps = argumentMaps;
-    }
-    
     @Override
     public ResultStream<Instance> get() {
-        return this.source.execute(this.query)
-            .mapFlatMap(this::createInstance);
+        return this.source.execute(this.query, this.argumentMaps)
+            .innerMap(args -> new Instance(this.templateIRI, args));
     }
 
-    private Result<Instance> createInstance(Record<?> record) {
-        return Result.zip(
-            Result.of(this.templateIRI),
-            Result.of(record)
-                .flatMap(this.argumentMaps),
-            Instance::new
-        );
-    }
 }

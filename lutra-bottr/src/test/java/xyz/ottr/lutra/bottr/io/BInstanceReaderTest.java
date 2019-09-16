@@ -83,8 +83,8 @@ public class BInstanceReaderTest {
     @Test
     public void testCSVSourceMap() {
         String file = ROOT + "maps/instanceMapH2Source.ttl";
-        testNumberOfInstances(file, 14);
         printRDFOutput(file);
+        testNumberOfInstances(file, 5);
     }
 
 

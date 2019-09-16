@@ -5,7 +5,9 @@ import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import lombok.Builder;
 import org.apache.commons.dbcp2.BasicDataSource;
@@ -16,9 +18,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import xyz.ottr.lutra.bottr.model.ArgumentMap;
-import xyz.ottr.lutra.bottr.model.Record;
+import xyz.ottr.lutra.bottr.model.ArgumentMaps;
 import xyz.ottr.lutra.bottr.model.Source;
-import xyz.ottr.lutra.result.Message;
+import xyz.ottr.lutra.model.ArgumentList;
 import xyz.ottr.lutra.result.Result;
 import xyz.ottr.lutra.result.ResultStream;
 
@@ -60,28 +62,34 @@ public class JDBCSource implements Source<String> {
         this.dataSource.setUrl(databaseURL);
     }
 
-    @Override
-    public ResultStream<Record<String>> execute(String query) {
-
+    private <X> ResultStream<X> streamQuery(String query, Function<List<String>, Result<X>> translationFunction) {
         try (Connection conn = this.dataSource.getConnection()) {
             this.log.info("Running query: " + query);
-            
-            List<Record<String>> rows = new QueryRunner().query(conn, query, new ArrayListHandler())
-                    .stream()
-                    .map(array -> Arrays.stream(array)
-                            .map(value -> Objects.toString(value, null)) // the string value of null is (the object) null.
-                            .collect(Collectors.toList()))
-                    .map(Record::new)
-                    .collect(Collectors.toList());
-            
-            return ResultStream.innerOf(rows);
+
+            List<Object[]> queryResult = new QueryRunner().query(conn, query, new ArrayListHandler());
+
+            Stream<Result<X>> stream = queryResult.stream()
+                .map(array -> Arrays.stream(array)
+                    .map(value -> Objects.toString(value, null)) // the string value of null is (the object) null.
+                    .collect(Collectors.toList()))
+                .map(translationFunction);
+
+            return new ResultStream<>(stream);
 
         } catch (SQLException ex) {
-            return ResultStream.of(Result.empty(Message.error(
-                    "Error running query " + query 
-                    + " over database " + this.dataSource.getUrl() 
-                    + ": " + ex.getMessage())));
+            return ResultStream.of(Result.error(
+                "Error running query " + query + " over database " + this.dataSource.getUrl() + ": " + ex.getMessage()));
         }
+    }
+
+    @Override
+    public ResultStream<List<String>> execute(String query) {
+        return streamQuery(query, Result::of);
+    }
+
+    @Override
+    public ResultStream<ArgumentList> execute(String query, ArgumentMaps<String> argumentMaps) {
+        return streamQuery(query, argumentMaps);
     }
 
     @Override

@@ -1,0 +1,26 @@
+@prefix ex: <http://example.com/ns#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+
+##id,name,age,address,salary
+##1,Paulo,32,Niteroi,2500
+
+## default map, which for h2 is plain literals = strings
+ex:map1_id1 ex:hasSalary "2500" .
+
+## create iri, "string", integer, float
+ex:map2_id1 ex:hasSalary "2500"^^xsd:float .
+
+## create labelled blank node for id2 and
+## fresh blank nodes for label and age -- use different label
+_:map3_id1 ex:hasSalary _:salary1 .
+_:map3_id1 ex:hasSalary _:salary2 .
+
+## translation table, NULL default
+## ex:map4_id1
+##    rdfs:label "Something different" ;
+##    ex:hasSalary 9999 .
+
+## translation table, NULL default
+ex:map5_id1
+    ex:nullTest ex:myNullValue .

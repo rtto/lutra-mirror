@@ -68,7 +68,15 @@ public class ResultStream<E> {
      * in argument Collection.
      */
     public static <R> ResultStream<R> innerOf(Collection<R> col) {
-        return new ResultStream<>(col.stream().map(e -> Result.of(e)));
+        return innerOf(col.stream());
+    }
+
+    /**
+     * Returns a ResultStream consisting of one Result per element
+     * in argument Stream.
+     */
+    public static <R> ResultStream<R> innerOf(Stream<R> stream) {
+        return new ResultStream<>(stream.map(e -> Result.of(e)));
     }
 
 
@@ -77,7 +85,7 @@ public class ResultStream<E> {
      * in argument array.
      */
     public static <R> ResultStream<R> innerOf(R[] array) {
-        return innerOf(Arrays.asList(array));
+        return innerOf(Arrays.stream(array));
     }
 
     /**

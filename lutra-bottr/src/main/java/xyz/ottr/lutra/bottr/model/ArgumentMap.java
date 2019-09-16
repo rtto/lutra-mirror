@@ -48,7 +48,7 @@ public abstract class ArgumentMap<X> implements Function<X, Result<Term>> {
     protected TermType type;
     protected String literalLangTag;
 
-    private TranslationTable translationTable;
+    //private TranslationTable translationTable;
     private TranslationSettings translationSettings;
 
     protected final TermFactory termFactory;
@@ -58,7 +58,7 @@ public abstract class ArgumentMap<X> implements Function<X, Result<Term>> {
         this.prefixMapping = prefixMapping;
         this.termFactory = new TermFactory(WOTTR.theInstance, prefixMapping);
         this.translationSettings = TranslationSettings.builder().build();
-        this.translationTable = new TranslationTable();
+        //this.translationTable = new TranslationTable();
     }
 
     protected ArgumentMap(PrefixMapping prefixMapping, TermType type) {
@@ -89,7 +89,9 @@ public abstract class ArgumentMap<X> implements Function<X, Result<Term>> {
 
         Result<Term> term;
 
-        if (StringUtils.isNotEmpty(blankNodeLabel)) {
+        if (Objects.isNull(value)) {
+            return Result.of(this.translationSettings.getNullValue());
+        } else if (StringUtils.isNotEmpty(blankNodeLabel)) {
             term = this.termFactory.createBlankNode(blankNodeLabel).map(t -> (Term)t);
         } else if (type.isListType()) {
             term = getListTerm(toString(value), (ComplexType)type);
@@ -97,7 +99,7 @@ public abstract class ArgumentMap<X> implements Function<X, Result<Term>> {
             term = getBasicTerm(value, (BasicType)type);
         }
 
-        return term.flatMap(this.translationTable);
+        return term;//.flatMap(this.translationTable);
     }
 
     protected abstract Result<Term> getBasicTerm(X value, BasicType type);

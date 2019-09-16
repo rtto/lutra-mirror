@@ -34,7 +34,6 @@ import xyz.ottr.lutra.bottr.model.ArgumentMap;
 import xyz.ottr.lutra.bottr.model.ArgumentMaps;
 import xyz.ottr.lutra.bottr.model.Source;
 import xyz.ottr.lutra.bottr.model.TranslationSettings;
-import xyz.ottr.lutra.bottr.model.TranslationTable;
 import xyz.ottr.lutra.bottr.util.DataParser;
 import xyz.ottr.lutra.model.types.TermType;
 import xyz.ottr.lutra.result.Message;
@@ -85,7 +84,7 @@ class BArgumentMapsParser implements Function<RDFList, Result<ArgumentMaps>> {
             argumentMap.addResult(type, ArgumentMap::setType);
             argumentMap.addResult(langTag, ArgumentMap::setLiteralLangTag);
             argumentMap.addResult(getTranslationSettings(map), ArgumentMap::setTranslationSettings);
-            argumentMap.addResult(getTranslationTable(map), ArgumentMap::setTranslationTable);
+            //argumentMap.addResult(getTranslationTable(map), ArgumentMap::setTranslationTable);
 
             return argumentMap;
         }
@@ -106,9 +105,9 @@ class BArgumentMapsParser implements Function<RDFList, Result<ArgumentMaps>> {
                 .flatMap(r -> new BTranslationSettingsParser(r).get());
         }
 
-        private Result<TranslationTable> getTranslationTable(Resource map) {
-            return ModelSelector.getOptionalResourceObject(BArgumentMapsParser.this.model, map, BOTTR.translationTable)
-                .flatMap(r -> new BTranslationTableParser(r).get());
-        }
+        //private Result<TranslationTable> getTranslationTable(Resource map) {
+        //    return ModelSelector.getOptionalResourceObject(BArgumentMapsParser.this.model, map, BOTTR.translationTable)
+        //        .flatMap(r -> new BTranslationTableParser(r).get());
+        //}
     }
 }

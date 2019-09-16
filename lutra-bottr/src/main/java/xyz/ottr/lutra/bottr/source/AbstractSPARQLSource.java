@@ -30,29 +30,28 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
-import org.apache.jena.datatypes.xsd.XSDDatatype;
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryExecution;
 import org.apache.jena.query.QueryFactory;
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSet;
-import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.rdf.model.RDFNode;
-import org.apache.jena.rdf.model.ResourceFactory;
-
 import org.apache.jena.shared.JenaException;
 import org.apache.jena.shared.PrefixMapping;
+
 import xyz.ottr.lutra.bottr.model.ArgumentMap;
-import xyz.ottr.lutra.bottr.model.Record;
+import xyz.ottr.lutra.bottr.model.ArgumentMaps;
 import xyz.ottr.lutra.bottr.model.Source;
+import xyz.ottr.lutra.model.ArgumentList;
 import xyz.ottr.lutra.result.Message;
 import xyz.ottr.lutra.result.Result;
 import xyz.ottr.lutra.result.ResultStream;
 
 public abstract class AbstractSPARQLSource implements Source<RDFNode> {
 
-    private static final Literal TRUE = ResourceFactory.createTypedLiteral("true", XSDDatatype.XSDboolean);
-    private static final Literal FALSE = ResourceFactory.createTypedLiteral("false", XSDDatatype.XSDboolean);
+    // Used for ASK queries, disabled for now.
+    //private static final Result<LiteralTerm> TRUE = TermFactory.createTypedLiteral("true", XSDDatatype.XSDboolean.getURI());
+    //private static final Result<LiteralTerm> FALSE = TermFactory.createTypedLiteral("false", XSDDatatype.XSDboolean.getURI());
 
     protected abstract Result<QueryExecution> getQueryExecution(String query);
 
@@ -79,37 +78,46 @@ public abstract class AbstractSPARQLSource implements Source<RDFNode> {
         }
     }
 
-    @Override
-    public ResultStream<Record<RDFNode>> execute(String query) {
+
+    public ResultStream<List<RDFNode>> execute(String query) {
+        return streamQuery(query, Result::of);
+    }
+
+    public ResultStream<ArgumentList> execute(String query, ArgumentMaps argumentMaps) {
+        return streamQuery(query, argumentMaps);
+    }
+
+    private <X> ResultStream<X> streamQuery(String query, Function<List<RDFNode>, Result<X>> translationFunction) {
         return getQueryExecution(query)
                 .mapToStream(exec -> {
                     Query q = exec.getQuery();
                     if (q.isSelectType()) {
                         ResultSet resultSet = exec.execSelect();
-                        return getResultSetStream(resultSet);
-                    } else if (q.isAskType()) {
-                        boolean result = exec.execAsk();
-                        return ResultStream.innerOf(new Record<>(result ? TRUE : FALSE));
+                        return getResultSetStream(resultSet, translationFunction);
+                    //} else if (q.isAskType()) {
+                    //    boolean result = exec.execAsk();
+                    //    return ResultStream.innerOf(result ? TRUE : FALSE);
                     } else {
                         return ResultStream.of(Result.empty(Message.error(
-                                "Unsupported SPARQL query type. Query must be SELECT or ASK.")));
+                                "Unsupported SPARQL query type. Query must be SELECT.")));
                     }
                 });
     }
 
-    private ResultStream<Record<RDFNode>> getResultSetStream(ResultSet resultSet) {
+    private <X> ResultStream<X> getResultSetStream(ResultSet resultSet, Function<List<RDFNode>, Result<X>> translationFunction) {
 
         final List<String> columns = resultSet.getResultVars();
         // TODO: does this work when a get returns null? will there be a hole in the list? Must test.
-        final Function<QuerySolution, Result<Record<RDFNode>>> rowCreator = (sol) -> Result.of(new Record<>(
+        final Function<QuerySolution, Result<X>> rowCreator = (sol) -> Result.of(
                 columns.stream()
                 .map(sol::get)
-                .collect(Collectors.toList())));
+                .collect(Collectors.toList()))
+            .flatMap(translationFunction);
 
         return new ResultStream<>(StreamSupport.stream(
-                new Spliterators.AbstractSpliterator<Result<Record<RDFNode>>>(Long.MAX_VALUE, Spliterator.ORDERED) {
+                new Spliterators.AbstractSpliterator<Result<X>>(Long.MAX_VALUE, Spliterator.ORDERED) {
                     @Override
-                    public boolean tryAdvance(Consumer<? super Result<Record<RDFNode>>> action) {
+                    public boolean tryAdvance(Consumer<? super Result<X>> action) {
                         if (!resultSet.hasNext()) { 
                             return false;
                         } else { 

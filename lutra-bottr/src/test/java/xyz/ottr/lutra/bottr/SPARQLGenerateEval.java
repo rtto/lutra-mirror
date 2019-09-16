@@ -84,7 +84,7 @@ public class SPARQLGenerateEval {
         Path csvFile = this.testRoot.resolve(inFile);
 
         // Set up map to translate source to triple instances
-        ArgumentMaps valMap = new ArgumentMaps(prefixes, h2, Arrays.asList(
+        ArgumentMaps<String> valMap = new ArgumentMaps<>(prefixes, h2, Arrays.asList(
             new StringArgumentMap(prefixes, TypeFactory.IRI),
             new StringArgumentMap(prefixes),
             new StringArgumentMap(prefixes, TypeFactory.IRI),
@@ -95,13 +95,13 @@ public class SPARQLGenerateEval {
         ));
 
         // map data to triples
-        InstanceMap map = new InstanceMap(
-                h2,
-                "SELECT CONCAT('http://example.com/person/', ROWNUM()), Name, CONCAT('tel:', Phone), CONCAT('mailto:', Email), Birthdate, Height, Weight " 
-                        + "FROM CSVREAD('" + csvFile.toAbsolutePath() + "');",
-                        "http://example.com/ns#Person",
-                        valMap
-                );
+        InstanceMap<String> map = InstanceMap.<String>builder()
+            .source(h2)
+            .query("SELECT CONCAT('http://example.com/person/', ROWNUM()), Name, CONCAT('tel:', Phone), CONCAT('mailto:', Email), Birthdate, Height, Weight "
+                        + "FROM CSVREAD('" + csvFile.toAbsolutePath() + "');")
+            .templateIRI("http://example.com/ns#Person")
+            .argumentMaps(valMap)
+            .build();
 
         assertEquals(100, map.get().getStream().filter(Result::isPresent).count());
 
@@ -112,8 +112,7 @@ public class SPARQLGenerateEval {
         TemplateReader tempReader = new TemplateReader(new RDFFileReader(), new WTemplateParser());
         ResultStream<String> tempIRI = ResultStream.innerOf(this.testRoot.resolve("person.ttl").toString());
         MessageHandler errorMessages = tempReader.populateTemplateStore(store, tempIRI);
-        assertFalse(Message.moreSevere(errorMessages.printMessages(),
-                Message.ERROR)); // No errors when parsing
+        assertFalse(Message.moreSevere(errorMessages.printMessages(), Message.ERROR)); // No errors when parsing
 
         ResultStream<Instance> expandedInInstances = 
                 map.get()

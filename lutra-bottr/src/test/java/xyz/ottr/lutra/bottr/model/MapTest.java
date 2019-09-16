@@ -1,26 +1,5 @@
 package xyz.ottr.lutra.bottr.model;
 
-import static org.hamcrest.CoreMatchers.is;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
-
-import org.apache.jena.shared.PrefixMapping;
-import org.junit.Assert;
-import org.junit.Test;
-import xyz.ottr.lutra.OTTR;
-import xyz.ottr.lutra.bottr.source.StringArgumentMap;
-import xyz.ottr.lutra.model.ArgumentList;
-import xyz.ottr.lutra.model.IRITerm;
-import xyz.ottr.lutra.model.Instance;
-import xyz.ottr.lutra.model.types.TypeFactory;
-import xyz.ottr.lutra.result.Result;
-import xyz.ottr.lutra.result.ResultStream;
-
 /*-
  * #%L
  * lutra-bottr
@@ -43,6 +22,27 @@ import xyz.ottr.lutra.result.ResultStream;
  * #L%
  */
 
+import static org.hamcrest.CoreMatchers.is;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import org.apache.jena.shared.PrefixMapping;
+import org.junit.Assert;
+import org.junit.Test;
+import xyz.ottr.lutra.OTTR;
+import xyz.ottr.lutra.bottr.source.StringArgumentMap;
+import xyz.ottr.lutra.model.ArgumentList;
+import xyz.ottr.lutra.model.IRITerm;
+import xyz.ottr.lutra.model.Instance;
+import xyz.ottr.lutra.model.types.TypeFactory;
+import xyz.ottr.lutra.result.Result;
+import xyz.ottr.lutra.result.ResultStream;
+
 public class MapTest {
 
     @Test
@@ -53,20 +53,25 @@ public class MapTest {
         // Input: Set up source with some data
         class StaticTestSource implements Source<String> {
 
-            private final List<Record<String>> rows;
+            private final List<List<String>> rows;
 
             public StaticTestSource() {
 
                 this.rows = new ArrayList<>();
-                this.rows.add(new Record<>(Arrays.asList(ns + "A1", ns + "B1", ns + "C1")));
-                this.rows.add(new Record<>(Arrays.asList(ns + "A2", ns + "B2", ns + "C2")));
+                this.rows.add(Arrays.asList(ns + "A1", ns + "B1", ns + "C1"));
+                this.rows.add(Arrays.asList(ns + "A2", ns + "B2", ns + "C2"));
             }
 
             // NB! Returns same rows regardless of query
             @Override
-            public ResultStream<Record<String>> execute(String query) {
-
+            public ResultStream<List<String>> execute(String query) {
                 return new ResultStream<>(this.rows.stream().map(Result::of));
+            }
+
+            @Override
+            public ResultStream<ArgumentList> execute(String query, ArgumentMaps<String> argumentMaps) {
+                return new ResultStream<>(this.rows.stream()
+                    .map(argumentMaps));
             }
 
             @Override
@@ -74,7 +79,6 @@ public class MapTest {
                 return null;
             }
         }
-
 
         Source<String> source = new StaticTestSource();
         PrefixMapping prefixes = OTTR.getDefaultPrefixes();
@@ -85,7 +89,7 @@ public class MapTest {
             Arrays.asList(iriMap, iriMap, iriMap)
         );
 
-        InstanceMap myMap = new InstanceMap(
+        InstanceMap<String> myMap = new InstanceMap<>(
             source,
             "blank query",
             OTTR.BaseURI.Triple,
