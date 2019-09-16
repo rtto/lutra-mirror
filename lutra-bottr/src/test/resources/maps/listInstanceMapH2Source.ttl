@@ -1,0 +1,26 @@
+@prefix : <http://ns.ottr.xyz/0.4/> .
+@prefix ex: <http://example.com/ns#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+
+##id,name,age,address,salary
+##1,Paulo,32,Niteroi,N/A
+
+ex:MyMap1 a :InstanceMap ;
+      :template :Triple ;
+      :query """
+        SELECT
+          'ex:test',
+          'ex:test',
+          LISTAGG(SALARY, '£') WITHIN GROUP (ORDER BY SALARY)
+        FROM CSVREAD('src/test/resources/sources/csv/linux.csv')
+       ;
+        """ ;
+       :argumentMaps(
+                [ :type :IRI ]
+                [ :type :IRI ]
+                [ :type (:NEList xsd:integer); :translationSettings [ :listSep "£" ] ]
+                ) ;
+      :source [ a :H2Source ] .
+
+

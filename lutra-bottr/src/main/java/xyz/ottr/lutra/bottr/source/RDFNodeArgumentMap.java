@@ -22,12 +22,8 @@ package xyz.ottr.lutra.bottr.source;
  * #L%
  */
 
-import org.apache.jena.graph.Node;
 import org.apache.jena.rdf.model.RDFNode;
-import org.apache.jena.riot.system.PrefixMap;
-import org.apache.jena.riot.system.PrefixMapFactory;
 import org.apache.jena.shared.PrefixMapping;
-import org.apache.jena.sparql.util.NodeFactoryExtra;
 
 import xyz.ottr.lutra.bottr.model.ArgumentMap;
 import xyz.ottr.lutra.bottr.util.TypeFactory;
@@ -71,9 +67,6 @@ public class RDFNodeArgumentMap extends ArgumentMap<RDFNode> {
 
     @Override
     protected Result<Term> getListElementTerm(String value, BasicType type) {
-        PrefixMap prefixMap = PrefixMapFactory.create(super.prefixMapping);
-        Node node = NodeFactoryExtra.parseNode(value, prefixMap);
-        // TODO: catch JenaException in case parsing fails.
-        return this.termFactory.createTerm(node);
+        return this.termFactory.createTermByType(value, type);
     }
 }

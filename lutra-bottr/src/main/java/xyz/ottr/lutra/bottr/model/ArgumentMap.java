@@ -52,10 +52,10 @@ public abstract class ArgumentMap<X> implements Function<X, Result<Term>> {
     private TranslationSettings translationSettings;
 
     protected final TermFactory termFactory;
-    protected final PrefixMapping prefixMapping;
+    //protected final PrefixMapping prefixMapping;
 
     protected ArgumentMap(PrefixMapping prefixMapping) {
-        this.prefixMapping = prefixMapping;
+        //this.prefixMapping = prefixMapping;
         this.termFactory = new TermFactory(WOTTR.theInstance, prefixMapping);
         this.translationSettings = TranslationSettings.builder().build();
         //this.translationTable = new TranslationTable();

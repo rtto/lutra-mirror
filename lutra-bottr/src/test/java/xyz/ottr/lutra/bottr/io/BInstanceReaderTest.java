@@ -57,6 +57,8 @@ public class BInstanceReaderTest {
             .mapToStream(new BInstanceReader())
             .forEach(consumer);
 
+        //System.out.println(consumer.getMessageHandler().getMessages());
+
         return writer.writeToModel();
     }
 
@@ -85,6 +87,20 @@ public class BInstanceReaderTest {
         String file = ROOT + "maps/instanceMapH2Source.ttl";
         printRDFOutput(file);
         testNumberOfInstances(file, 5);
+    }
+
+    @Test
+    public void testCSVSourceMapLists() {
+        String file = ROOT + "maps/listInstanceMapH2Source.ttl";
+        printRDFOutput(file);
+        testNumberOfInstances(file, 1);
+    }
+
+    @Test
+    public void testRDFSourceMapLists() {
+        String file = ROOT + "maps/listInstanceMapRDFSource.ttl";
+        printRDFOutput(file);
+        testNumberOfInstances(file, 1);
     }
 
 
