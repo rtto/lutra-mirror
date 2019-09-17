@@ -310,7 +310,7 @@ public interface TemplateStore extends Consumer<TemplateSignature> {
         while (!missing.isEmpty()) {
             String toFetch = missing.iterator().next();
             messages.accept(readerRegistry.attemptAllReaders(reader -> reader.populateTemplateStore(this, toFetch)));
-            missing = getMissingDependencies();
+            missing = getMissingDependencies(); // TODO: Make more efficient check for missing
         }
         return messages.getMessageHandler();
     }
