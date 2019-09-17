@@ -22,10 +22,7 @@ package xyz.ottr.lutra.cli;
  * #L%
  */
 
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
@@ -100,28 +97,6 @@ public class ReaderRegistryImpl implements ReaderRegistry {
     
     public static ReaderRegistry getReaderRegistry() {
         return INSTANCE;
-    }
-    
-    @Override
-    public Result<List<TemplateReader>> getTemplateReaders(String format) {
-        if (format != null) {
-            if (!templateReaders.containsKey(format)) {
-                return Result.empty(Message.error(
-                        "Format " + format + " not yet supported as input format for templates."));
-            }
-            return Result.of(Arrays.asList(templateReaders.get(format)));
-        } else {
-            return Result.of(new LinkedList<>(getAllTemplateReaders().values()));
-        }
-    }
-    
-    @Override
-    public Result<InstanceReader> getInstanceReader(String format) {
-        if (!instanceReaders.containsKey(format)) {
-            return Result.empty(Message.error(
-                "Format " + format + " not yet supported as input format for instances."));
-        }
-        return Result.of(instanceReaders.get(format));
     }
     
     @Override

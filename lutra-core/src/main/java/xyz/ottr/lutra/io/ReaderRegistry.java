@@ -22,7 +22,6 @@ package xyz.ottr.lutra.io;
  * #L%
  */
 
-import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
@@ -31,9 +30,13 @@ import xyz.ottr.lutra.result.Result;
 
 public interface ReaderRegistry {
 
-    Result<List<TemplateReader>> getTemplateReaders(String format);
+    default Result<TemplateReader> getTemplateReaders(String format) {
+        return Result.ofNullable(getAllTemplateReaders().get(format));
+    }
 
-    Result<InstanceReader> getInstanceReader(String format);
+    default Result<InstanceReader> getInstanceReader(String format) {
+        return Result.ofNullable(getAllInstanceReaders().get(format));
+    }
 
     void registerTemplateReader(String format, TemplateReader reader);
 
