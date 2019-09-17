@@ -27,6 +27,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
 
@@ -52,7 +53,7 @@ public class MessageHandler {
 
     public void add(Result<?> result) {
         if (result != null) {
-            this.traces.add(Trace.from(result));
+            this.traces.add(result.getTrace());
         }
     }
 
@@ -73,48 +74,52 @@ public class MessageHandler {
      */
     public List<Message> getMessages() {
         List<Message> msgs = new LinkedList<>();
-        visitTraces(trace -> msgs.addAll(trace.getMessages()));
+        Trace.visitTraces(this.traces, trace -> msgs.addAll(trace.getMessages()));
         return msgs;
+    }
+
+    public int getMostSevere() {
+        return visitMessagesAndTraces(_ignore -> { }, _ignore -> { });
     }
     
     /**
-     * Prints all Message-s from all Result-s
-     * as described in #getMessages() together
-     * with a context derived from each Result's
-     * parsedFrom, and returns an int representing
-     * the level of the most severe Message.
+     * Visits all Messages on all Traces contained in this, and feeds them to the
+     * Message consumer, and in case a Message on a Trace was fed to the Message consumer,
+     * it also feeds the Trace to the Trace consumer.
+     * @param msgConsumer
+     *      Consumer that accepts all Messages on all Traces in this MessageHandler
+     * @param traceConsumer
+     *      Consumer that accepts all Traces containing at least one Message in this MessageHandler
+     * @return
+     *      an integer representing the level of the most severe Message (see e.g. Message.ERROR)
      */
-    public int printMessages() {
+    private int visitMessagesAndTraces(Consumer<Message> msgConsumer, Consumer<Trace> traceConsumer) {
 
-        // int is wrapped in an array as it needs to be final as used in closure below
         int[] mostSevere = new int[] {Integer.MAX_VALUE}; 
 
-        visitTraces(trace -> {
+        Trace.visitTraces(this.traces, trace -> {
             for (Message msg : trace.getMessages()) {
-                printMessage(msg);
+                msgConsumer.accept(msg);
                 if (Message.moreSevere(msg.getLevel(), mostSevere[0])) {
                     mostSevere[0] = msg.getLevel();
                 }
             }
             if (!trace.getMessages().isEmpty()) {
-                printLocation(trace);
+                traceConsumer.accept(trace);
             }
         });
         return mostSevere[0];
     }
-
-    private void visitTraces(Consumer<Trace> traceConsumer) {
-
-        Set<Trace> visited = new HashSet<>();
-        LinkedList<Trace> toVisit = new LinkedList<>(this.traces);
-        while (!toVisit.isEmpty()) {
-            Trace trace = toVisit.poll();
-            traceConsumer.accept(trace);
-            visited.add(trace);
-            trace.getTrace().stream()
-                .filter(t -> !visited.contains(t))
-                .forEach(t -> toVisit.add(t));
-        }
+    
+    /**
+     * Prints all Message-s from all Result-s
+     * as described in #getMessages() together
+     * with a location derived from each Trace's
+     * identifier, and returns an int representing
+     * the level of the most severe Message.
+     */
+    public int printMessages() {
+        return visitMessagesAndTraces(MessageHandler::printMessage, MessageHandler::printLocation);
     }
 
     public static void printMessage(Message msg) {
@@ -125,69 +130,63 @@ public class MessageHandler {
 
     private static String getLocation(Trace trace) {
         StringBuilder context = new StringBuilder();
-        getLocationRecur(context, trace, "", 1, new HashMap<>());
+        getLocationRecur(context, trace, "1", new HashMap<>());
         return context.toString();
     }
 
     /**
      * Writes out a stack trace and enumerates the elements of the stack
      * trace with an enumeration (dot separated number sequence, e.g. 1.3.2)
-     * such that: only-childs (elements with no siblings) get the parents enumeration,
-     * but with the last number increased by 1; elements with siblings get their
-     * parents enumeration appended with a number denoting its sibling number
-     * (e.g. a node with enumeration 1.2 and three children will make the
-     * three children get enumeration 1.2.1, 1.2.2, and 1.2.3).
+     * such that siblings get their parents enumeration appended with a number
+     * denoting its sibling number (e.g. a node with enumeration 1.2 and three
+     * children will make the three children get enumeration 1.2.1, 1.2.2, and 1.2.3).
      * This enumeration is then used to reference already visited trace elements.
      */
     private static void getLocationRecur(StringBuilder context, Trace trace,
-            String prevEnum, int prevCounter, Map<Trace, String> enumeration) {
+            String curRef, Map<Trace, String> refs) {
         
-        int curLocalCounter = prevCounter;
-        if (trace.hasLocation()) {
-            if (enumeration.containsKey(trace)) {
-                // Already printed subtrace, just reference to its enumeration and returns
-                context.append(toReferenceString(enumeration.get(trace)));
-                return;
-            } 
+        if (refs.containsKey(trace)) {
+            // Already printed subtrace, just reference to its enumeration and returns
+            context.append(toReferenceString(curRef, refs.get(trace)));
+            return;
+        } 
+        refs.put(trace, curRef);
+        if (trace.hasIdentifier()) {
             // Assign enumeration to trace element, and append to trace
-            enumeration.put(trace, toEnumStr(prevEnum, curLocalCounter));
-            curLocalCounter++;
-            context.append(toLocationString(trace, enumeration.get(trace)));
+            context.append(toLocationString(trace, refs.get(trace)));
         }
 
-        // If only 1 child, simply keep enumeration, otherwise
-        // append a new number which is incremented for each child
-        // For example, if we have an enumeration 1.2, and we have one child,
-        // it will get enumeration 1.3. If we have three children, they will
-        // each get enumerations 1.2.1, 1.2.2, and 1.2.3
-        boolean moreThanOneChild = trace.getTrace().size() > 1;
-        String curEnum = moreThanOneChild ? toEnumStr(prevEnum, curLocalCounter) : prevEnum;
-        int curCounter = moreThanOneChild ? 1 : curLocalCounter;
-
+        int c = 1;
         for (Trace child : trace.getTrace()) {
-            getLocationRecur(context, child, curEnum, curCounter, enumeration); 
-            curCounter++;
-            curEnum = toEnumStr(curEnum, curCounter);
+            getLocationRecur(context, child, curRef + "." + c, refs); 
+            c++;
         }
     }
     
-    private static String toReferenceString(String enumStr) {
-        return " >>> at [" + enumStr + "]\n";
+    private static String toReferenceString(String curRef, String eqRef) {
+        return " >>> at [" + curRef + "] = [" + eqRef + "]\n";
     }
     
     private static String toLocationString(Trace trace, String enumStr) {
-        return " >>> at [" + enumStr + "] " + trace.getLocation().toString() + "\n";
+        return " >>> at [" + enumStr + "] " + trace.getIdentifier() + "\n";
     }
     
-    private static String toEnumStr(String prevEnum, int curCounter) {
-        return prevEnum.equals("") 
-                ? "" + curCounter 
-                : prevEnum + "." + curCounter;
-    }
-
     public static void printLocation(Trace trace) {
         if (!quiet) {
             System.err.print(getLocation(trace));
         }
+    }
+    
+    public Optional<Message> toSingleMessage(String initialMessage) {
+        StringBuilder str = new StringBuilder();
+        int severity = visitMessagesAndTraces(
+            msg -> str.append(msg.toString() + "\n"), 
+            trace -> str.append(getLocation(trace)));
+
+        if (str.length() == 0) { // No messages added
+            return Optional.empty();
+        }
+        str.insert(0, initialMessage + "\n");
+        return Optional.of(new Message(severity, str.toString()));
     }
 }

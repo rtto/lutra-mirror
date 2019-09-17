@@ -36,7 +36,7 @@ import xyz.ottr.lutra.result.ResultStream;
 import xyz.ottr.lutra.stottr.antlr.stOTTRParser;
 
 public class SInstanceParser extends SParser<Instance> implements InstanceParser<CharStream> {
-
+    
     /**
      * Makes a fresh InstanceParser with no predefined prefixes, variables, etc.
      * Used for parsing sets of outer (i.e. outside template bodies) instances

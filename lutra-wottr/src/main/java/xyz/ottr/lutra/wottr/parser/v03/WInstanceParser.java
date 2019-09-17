@@ -22,7 +22,7 @@ package xyz.ottr.lutra.wottr.parser.v03;
  * #L%
  */
 
-import java.util.LinkedList;
+import java.util.LinkedList; 
 import java.util.List;
 import java.util.stream.Stream;
 

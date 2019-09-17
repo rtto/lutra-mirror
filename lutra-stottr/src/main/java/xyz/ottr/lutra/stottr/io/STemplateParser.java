@@ -42,7 +42,7 @@ import xyz.ottr.lutra.result.ResultStream;
 import xyz.ottr.lutra.stottr.antlr.stOTTRParser;
 
 public class STemplateParser extends SParser<TemplateSignature> implements TemplateParser<CharStream> {
-
+    
     private SParameterListParser paramsParser;
 
     public STemplateParser() {

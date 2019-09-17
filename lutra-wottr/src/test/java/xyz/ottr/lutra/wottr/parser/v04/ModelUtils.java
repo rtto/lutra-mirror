@@ -66,7 +66,7 @@ public enum ModelUtils {
     // read RDF file, expand instances (only base instances), and return OTTR parsed RDF model
     public static Model getOTTRParsedRDFModel(String filename) {
 
-        TemplateStore store = new DependencyGraph();
+        TemplateStore store = new DependencyGraph(null);
         store.addOTTRBaseTemplates();
 
         InstanceReader insReader = new InstanceReader(new RDFFileReader(), new WInstanceParser());

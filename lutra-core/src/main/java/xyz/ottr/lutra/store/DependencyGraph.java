@@ -38,6 +38,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import xyz.ottr.lutra.OTTR;
+import xyz.ottr.lutra.io.ReaderRegistry;
 import xyz.ottr.lutra.model.ArgumentList;
 import xyz.ottr.lutra.model.BlankNodeTerm;
 import xyz.ottr.lutra.model.Instance;
@@ -79,21 +80,23 @@ public class DependencyGraph implements TemplateStore {
     private Map<String, TemplateNode> nodes;
     private Map<TemplateNode, Set<Dependency>> dependencies;
     private Map<String, Set<String>> instanceIndex;
+    private ReaderRegistry readerRegistry;
 
     private final Logger log = LoggerFactory.getLogger(DependencyGraph.class);
 
     /**
      * Constructs a graph representing template definitions and instances.
      */
-    public DependencyGraph() {
+    public DependencyGraph(ReaderRegistry readerRegistry) {
         this.roots = new HashSet<>();
         this.nodes = new HashMap<>();
         this.dependencies = new HashMap<>();
         this.instanceIndex = new HashMap<>();
+        this.readerRegistry = readerRegistry;
     }
-
-    public DependencyGraph(Template... ts) {
-        this();
+    
+    public DependencyGraph(ReaderRegistry readerRegistry, Template... ts) {
+        this(readerRegistry);
         for (Template t : ts) {
             addTemplate(t);
         }
@@ -561,7 +564,7 @@ public class DependencyGraph implements TemplateStore {
         log.info("Expanding definitions.");
         List<TemplateNode> sorted = topologicallySort();
 
-        DependencyGraph ngraph = new DependencyGraph();
+        DependencyGraph ngraph = new DependencyGraph(this.readerRegistry);
         Result<DependencyGraph> graphRes = Result.of(ngraph);
 
         for (TemplateNode n : sorted) {
@@ -630,6 +633,11 @@ public class DependencyGraph implements TemplateStore {
             str.append("\n\n");
         }
         return str.toString();
+    }
+
+    @Override
+    public ReaderRegistry getReaderRegistry() {
+        return this.readerRegistry;
     }
 
     static class Dependency {

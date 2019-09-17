@@ -201,14 +201,14 @@ public class ResultStream<E> {
     public Result<Stream<E>> aggregateNullable() {
 
         Stream.Builder<E> unpacked = Stream.builder();
-        Result<?> traceAggregate = Result.empty();
+        List<Trace> traces = new LinkedList<>();
         this.results.forEach(r -> {
             r.ifPresent(unpacked);
-            traceAggregate.addToTrace(r); 
+            traces.add(r.getTrace()); 
         });
 
         Result<Stream<E>> res = Result.of(unpacked.build());
-        res.addToTrace(traceAggregate);
+        res.addToTrace(Trace.fork(traces));
         return res;
     }
 
@@ -221,8 +221,8 @@ public class ResultStream<E> {
     public Result<Stream<E>> aggregate() {
         
         List<E> unpacked = new LinkedList<>();
-        Result<?> traceAggregate = Result.empty();
 
+        List<Trace> traces = new LinkedList<>();
         for (Result<E> r : this.results.collect(Collectors.toList())) {
             if (unpacked != null && r != null && r.isPresent()) {
                 unpacked.add(r.get());
@@ -230,11 +230,13 @@ public class ResultStream<E> {
                 // No elements should be kept
                 unpacked = null;
             }
-            traceAggregate.addToTrace(r);
+            if (r != null) {
+                traces.add(r.getTrace());
+            }
         }
 
         Result<Stream<E>> res = Result.ofNullable(unpacked).map(unp -> unp.stream());
-        res.addToTrace(traceAggregate);
+        res.addToTrace(Trace.fork(traces));
         return res;
     }
     

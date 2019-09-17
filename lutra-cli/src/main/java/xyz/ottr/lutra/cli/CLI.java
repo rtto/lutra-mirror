@@ -22,13 +22,14 @@ package xyz.ottr.lutra.cli;
  * #L%
  */
 
-import java.io.IOException;
+import java.io.IOException; 
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Collection;
 import java.util.List;
 import java.util.function.Function;
 
@@ -52,15 +53,8 @@ import xyz.ottr.lutra.result.ResultStream;
 import xyz.ottr.lutra.store.DependencyGraph;
 import xyz.ottr.lutra.store.TemplateStore;
 
-import xyz.ottr.lutra.stottr.io.SFileReader;
-import xyz.ottr.lutra.stottr.io.SInstanceParser;
 import xyz.ottr.lutra.stottr.io.SInstanceWriter;
-import xyz.ottr.lutra.stottr.io.STemplateParser;
 import xyz.ottr.lutra.stottr.io.STemplateWriter;
-import xyz.ottr.lutra.tabottr.parser.ExcelReader;
-import xyz.ottr.lutra.wottr.io.RDFFileReader;
-import xyz.ottr.lutra.wottr.parser.v04.WInstanceParser;
-import xyz.ottr.lutra.wottr.parser.v04.WTemplateParser;
 import xyz.ottr.lutra.wottr.writer.v04.WInstanceWriter;
 import xyz.ottr.lutra.wottr.writer.v04.WTemplateWriter;
 
@@ -124,49 +118,38 @@ public class CLI {
 
     private static void execute() {
 
-        TemplateStore store = new DependencyGraph();
-        ResultConsumer.use(makeTemplateReader(settings.libraryFormat),
-            reader -> {
-
-                MessageHandler msgs = parseLibraryInto(reader, store);
-                
-                if (!Message.moreSevere(msgs.printMessages(), settings.haltOn)) {
-                    PrefixMapping usedPrefixes = OTTR.getDefaultPrefixes();
-                    usedPrefixes.setNsPrefixes(reader.getPrefixes());
-                    executeMode(store, usedPrefixes);
-                }
-            }
-        );
+        TemplateStore store = new DependencyGraph(ReaderRegistryImpl.getReaderRegistry());
+        Result<TemplateReader> successfullReader = parseLibraryInto(store);
+        ResultConsumer.use(successfullReader, reader -> {
+            PrefixMapping usedPrefixes = OTTR.getDefaultPrefixes();
+            usedPrefixes.setNsPrefixes(reader.getPrefixes());
+            executeMode(store, usedPrefixes);
+        });
     }
 
     /**
-     * Populated store with parsed templates, and returns true if error occured, and false otherwise.
+     * Populated store with parsed templates, and returns true if error occurred, and false otherwise.
      */
-    private static MessageHandler parseLibraryInto(TemplateReader reader, TemplateStore store) {
-
+    private static Result<TemplateReader> parseLibraryInto(TemplateStore store) {
+        
         store.addOTTRBaseTemplates();
 
         if (settings.library == null) {
-            return new MessageHandler();
+            Collection<TemplateReader> readers = store.getReaderRegistry().getAllTemplateReaders().values();
+            return readers.isEmpty() ? Result.empty() : Result.of(readers.iterator().next());
         }
-
-        MessageHandler msgs = reader.loadTemplatesFromFolder(store, settings.library,
-                settings.extensions, settings.ignoreExtensions);
-
+        
+        Result<TemplateReader> successfull = store.getReaderRegistry().attemptAllReaders(reader ->
+            reader.loadTemplatesFromFolder(store, settings.library,
+                    settings.extensions, settings.ignoreExtensions));
         if (settings.fetchMissingDependencies) {
-
-            Result<TemplateReader> fetchReader = settings.fetchFormat == null
-                ? Result.of(reader)
-                : makeTemplateReader(settings.fetchFormat);
-
-            msgs.add(fetchReader);
-            if (fetchReader.isPresent()) {
-                msgs = msgs.combine(store.fetchMissingDependencies(fetchReader.get()));
-            }
+            MessageHandler msgs = store.fetchMissingDependencies();
+            successfull.addMessages(msgs.getMessages());
         }
-        return msgs;
+        
+        return successfull;
     } 
-
+    
     private static void executeExpand(TemplateStore store, PrefixMapping usedPrefixes) {
 
         ResultConsumer.use(makeInstanceReader(),
@@ -177,7 +160,7 @@ public class CLI {
 
                         ResultConsumer.use(makeInstanceWriter(usedPrefixes),
                             writer -> {
-
+                                
                                 expandAndWriteInstanes(reader, writer, expander);
                             }
                         );
@@ -267,53 +250,18 @@ public class CLI {
     ////////////////////////////////////////////////////////////
     /// MAKER-METHODS, MAKING THINGS BASED ON FLAGS          ///
     ////////////////////////////////////////////////////////////
-
-
-    private static Result<TemplateReader> makeTemplateReader(Settings.Format format) {
-        switch (format) {
-            case legacy:
-                return Result.of(new TemplateReader(new RDFFileReader(),
-                        new xyz.ottr.lutra.wottr.parser.v03.WTemplateParser()));
-            case wottr:
-                return Result.of(new TemplateReader(new RDFFileReader(), new WTemplateParser()));
-            case stottr:
-                return Result.of(new TemplateReader(new SFileReader(), new STemplateParser()));
-            default:
-                return Result.empty(Message.error(
-                        "Library format " + settings.libraryFormat + " not yet supported as input format."));
-        }
-    }
             
     private static Result<InstanceReader> makeInstanceReader() {
         if (settings.inputs.isEmpty()) {
             return Result.empty(Message.error(
                     "No input file provided."));
         }
-        switch (settings.inputFormat) {
-            case tabottr:
-                return Result.of(new InstanceReader(new ExcelReader()));
-            case legacy:
-                return Result.of(new InstanceReader(new RDFFileReader(),
-                        new xyz.ottr.lutra.wottr.parser.v03.WInstanceParser()));
-            case wottr:
-                return Result.of(new InstanceReader(new RDFFileReader(), new WInstanceParser()));
-            case stottr:
-                return Result.of(new InstanceReader(new SFileReader(), new SInstanceParser()));
-            default:
-                return Result.empty(Message.error(
-                        "Input format " + settings.outputFormat.toString()
-                            + " not yet supported for instances."));
-        }
+        return ReaderRegistryImpl.getReaderRegistry().getInstanceReader(settings.inputFormat.toString());
     }
 
     private static Result<Function<Instance, ResultStream<Instance>>> makeExpander(TemplateStore store) {
         if (settings.fetchMissingDependencies) {
-            Function<TemplateReader, Function<Instance, ResultStream<Instance>>> fun =
-                reader -> ins -> store.expandInstance(ins, reader);
-            Settings.Format format = settings.fetchFormat == null
-                ? settings.libraryFormat
-                : settings.fetchFormat;
-            return makeTemplateReader(format).map(fun);
+            return Result.of(store::expandInstanceFetch);
         } else {
             return Result.of(store::expandInstance);
         }

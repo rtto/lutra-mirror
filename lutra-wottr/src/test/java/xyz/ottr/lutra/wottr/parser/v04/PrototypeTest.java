@@ -48,7 +48,7 @@ public class PrototypeTest {
     public static void load() {
         legacyReader = new TemplateReader(new RDFFileReader(), new xyz.ottr.lutra.wottr.parser.v03.WTemplateParser());
         templateReader = new TemplateReader(new RDFFileReader(), new WTemplateParser());
-        graph = new DependencyGraph();
+        graph = new DependencyGraph(null);
     }
 
     @Test

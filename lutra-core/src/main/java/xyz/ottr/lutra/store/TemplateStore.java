@@ -23,14 +23,15 @@ package xyz.ottr.lutra.store;
  */
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
-import org.apache.commons.collections4.SetUtils;
 
 import xyz.ottr.lutra.OTTR;
+import xyz.ottr.lutra.io.ReaderRegistry;
 import xyz.ottr.lutra.io.TemplateReader;
 import xyz.ottr.lutra.model.Instance;
 import xyz.ottr.lutra.model.Template;
@@ -38,6 +39,7 @@ import xyz.ottr.lutra.model.TemplateSignature;
 import xyz.ottr.lutra.result.Message;
 import xyz.ottr.lutra.result.MessageHandler;
 import xyz.ottr.lutra.result.Result;
+import xyz.ottr.lutra.result.ResultConsumer;
 import xyz.ottr.lutra.result.ResultStream;
 
 public interface TemplateStore extends Consumer<TemplateSignature> {
@@ -255,25 +257,18 @@ public interface TemplateStore extends Consumer<TemplateSignature> {
      * @param instance
      *     the template instance to expand
      *
-     * @param reader
-     *     the reader which should be used to fetch and read missing templates
-     *
      * @return
      *     a ResultStream of expanded template instances
      */
-    default ResultStream<Instance> expandInstance(Instance instance, TemplateReader reader) {
+    default ResultStream<Instance> expandInstanceFetch(Instance instance) {
 
         if (!containsTemplate(instance.getIRI())) {
             // Need to fetch missing template
-            MessageHandler messages = fetchMissingDependencies(reader,
-                new HashSet<>(Arrays.asList(instance.getIRI())));
-            List<Message> msgs = messages.getMessages();
-            if (!msgs.isEmpty()) {
-                // Got errors or warnings. Keep these in Result which will be parsedFrom the expanded instances
-                Result<String> resWithMsgs = Result.of("Fetch missing template: " + instance.getIRI());
-                resWithMsgs.addMessages(msgs);
-                return resWithMsgs.mapToStream(ignore -> expandInstance(instance));
-            }
+            MessageHandler messages = fetchMissingDependencies(Arrays.asList(instance.getIRI()));
+            Result<Instance> insWithMsgs = Result.of(instance);
+            messages.toSingleMessage("Fetch missing template: " + instance.getIRI())
+                .ifPresent(insWithMsgs::addMessage);
+            return insWithMsgs.mapToStream(this::expandInstance);
         }
 
         return expandInstance(instance);
@@ -287,49 +282,38 @@ public interface TemplateStore extends Consumer<TemplateSignature> {
 
     /**
      * Fetches all missing dependencies (according to #getMissingDependencies())
-     * recursively based on their IRI and adds them to this Store.
+     * iteratively based on their IRI and adds them to this Store.
      *
-     * @param reader
-     *    A TemplateReader to be used for fetching and parsing missing templates.
+     * @param missing
+     *    The IRIs of the missing template to fetch
      *
      * @return
      *    A MessageHandler containing all Messages obtained through fetching and
      *    parsing missing templates
      */
-    default MessageHandler fetchMissingDependencies(TemplateReader reader) {
-        return fetchMissingDependencies(reader, getMissingDependencies());
+    default MessageHandler fetchMissingDependencies() {
+        return fetchMissingDependencies(getMissingDependencies());
     }
+    
+    default MessageHandler fetchMissingDependencies(Collection<String> initMissing) {
 
-    /**
-     * Fetches all missing dependencies (according to #getMissingDependencies())
-     * recursively based on their IRI and adds them to this Store.
-     *
-     * @param reader
-     *    A TemplateReader to be used for fetching and parsing missing templates.
-     *
-     * @return
-     *    A MessageHandler containing all Messages obtained through fetching and
-     *    parsing missing templates
-     */
-    default MessageHandler fetchMissingDependencies(TemplateReader reader, Set<String> toFetch) {
-
-        Set<String> missing = toFetch;
-        MessageHandler messages = new MessageHandler();
-        Set<String> previous;
-
-        while (!missing.isEmpty()) {
-            messages.combine(reader.populateTemplateStore(this, missing));
-            previous = new HashSet<>(missing);
-            missing = getMissingDependencies();
-
-            // Give errors for IRIs we were unable to find def. for
-            for (String iri : SetUtils.intersection(previous, missing)) {
-                messages.add(Result.empty(Message.error(
-                    "Unable to find definition of template with IRI " + iri
-                    + " by dereferencing its IRI.")));
-            }
-            missing.removeAll(previous);
+        ResultConsumer<TemplateReader> messages = new ResultConsumer<>();
+        
+        ReaderRegistry readerRegistry = getReaderRegistry();
+        if (readerRegistry == null) {
+            messages.accept(Result.error(
+                    "Attempted fetching missing templates, but has no ReaderRegistry provided."));
+            return messages.getMessageHandler();
         }
-        return messages;
+
+        Set<String> missing = new HashSet<>(initMissing);
+        while (!missing.isEmpty()) {
+            String toFetch = missing.iterator().next();
+            messages.accept(readerRegistry.attemptAllReaders(reader -> reader.populateTemplateStore(this, toFetch)));
+            missing = getMissingDependencies(); // TODO: Make more efficient check for missing
+        }
+        return messages.getMessageHandler();
     }
+
+    ReaderRegistry getReaderRegistry();
 }

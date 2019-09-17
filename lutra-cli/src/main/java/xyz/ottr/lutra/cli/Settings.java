@@ -85,8 +85,8 @@ public class Settings {
 
     @Option(names = {"-I", "--inputFormat"}, completionCandidates = InsInputFormat.class,
         description = {"Input format of instances.%n"
-                       + "(legal values: ${COMPLETION-CANDIDATES}; "
-                       + "default: ${DEFAULT-VALUE})"})
+                       + "(legal values: ${COMPLETION-CANDIDATES}"
+                       + " default: ${DEFAULT-VALUE})"})
     public Format inputFormat = Format.wottr;
 
     @Option(names = {"-O", "--outputFormat"}, completionCandidates = OutputFormat.class,
@@ -97,9 +97,8 @@ public class Settings {
 
     @Option(names = {"-L", "--libraryFormat"}, completionCandidates = TplInputFormat.class,
         description = {"The input format of the library.%n"
-                       + "(legal values: ${COMPLETION-CANDIDATES}; "
-                       + "default: ${DEFAULT-VALUE})"})
-    public Format libraryFormat = Format.wottr;
+                       + "(legal values: ${COMPLETION-CANDIDATES})"})
+    public Format libraryFormat;
 
 
     @Option(names = {"-f", "--fetchMissing"},

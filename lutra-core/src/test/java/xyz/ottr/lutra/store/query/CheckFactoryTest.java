@@ -55,7 +55,7 @@ public class CheckFactoryTest {
 
     private DependencyGraph initStore() {
         
-        DependencyGraph store = new DependencyGraph();
+        DependencyGraph store = new DependencyGraph(null);
         store.addTemplateSignature(
             new TemplateSignature("base2",
                 new ParameterList(new ObjectTerm("x", true), new ObjectTerm("y", true))));
@@ -146,7 +146,7 @@ public class CheckFactoryTest {
     @Test
     public void nonNonBlankUsedAsNonBlankError() {
 
-        DependencyGraph store = new DependencyGraph();
+        DependencyGraph store = new DependencyGraph(null);
         store.addTemplateSignature(
             new TemplateSignature("base",
                 new ParameterList(
@@ -196,7 +196,7 @@ public class CheckFactoryTest {
 
     @Test
     public void correctConsistentTypeUsageTest() {
-        DependencyGraph store = new DependencyGraph();
+        DependencyGraph store = new DependencyGraph(null);
 
         Term varBase1 = new IRITerm("ex.com/var1");
         varBase1.setType(TypeFactory.getType(OTTR.TypeURI.IRI));
@@ -237,7 +237,7 @@ public class CheckFactoryTest {
     public void inconsistentTypeUsageTest() {
 
         // Using a constant as both Class and ObjectProperty
-        DependencyGraph store = new DependencyGraph();
+        DependencyGraph store = new DependencyGraph(null);
 
         Term classVar = new IRITerm("ex.com/classVar");
         classVar.setType(TypeFactory.getType(OWL.Class));
@@ -280,7 +280,7 @@ public class CheckFactoryTest {
     public void incorrectTypeUsage() {
 
         // Using a variable with type IRI to a parameter with type Class
-        DependencyGraph store = new DependencyGraph();
+        DependencyGraph store = new DependencyGraph(null);
 
         Term varBase1 = new IRITerm("ex.com/var1");
         varBase1.setType(TypeFactory.getType(OWL.Class));
@@ -318,7 +318,7 @@ public class CheckFactoryTest {
     public void correctListTypeUsage() {
 
         // Using a variable with type IRI to a parameter with type Class
-        DependencyGraph store = new DependencyGraph();
+        DependencyGraph store = new DependencyGraph(null);
 
         Term varBase = new BlankNodeTerm("_:classes");
         varBase.setType(new NEListType(TypeFactory.getType(OWL.Class)));
@@ -350,7 +350,7 @@ public class CheckFactoryTest {
 
         // Using a list of a variable of type Class and a an integer as argument
         // to a parameter of type NEList<Class>
-        DependencyGraph store = new DependencyGraph();
+        DependencyGraph store = new DependencyGraph(null);
 
         Term varBase = new BlankNodeTerm("_:classes");
         varBase.setType(new NEListType(TypeFactory.getType(OWL.Class)));
@@ -380,7 +380,7 @@ public class CheckFactoryTest {
     @Test
     public void incorrectDeepListTypeUsage() {
 
-        DependencyGraph store = new DependencyGraph();
+        DependencyGraph store = new DependencyGraph(null);
 
         Term varBase = new BlankNodeTerm("_:classeses");
         varBase.setType(new NEListType(new NEListType(TypeFactory.getType(OWL.Class))));

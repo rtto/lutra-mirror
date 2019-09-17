@@ -38,6 +38,7 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
+
 import xyz.ottr.lutra.io.InstanceParser;
 import xyz.ottr.lutra.model.Instance;
 import xyz.ottr.lutra.result.Message;
@@ -46,7 +47,7 @@ import xyz.ottr.lutra.result.ResultStream;
 import xyz.ottr.lutra.tabottr.model.Table;
 
 public class ExcelReader implements InstanceParser<String> {
-
+    
     private TableParser tableParser;
 
     public ExcelReader() {

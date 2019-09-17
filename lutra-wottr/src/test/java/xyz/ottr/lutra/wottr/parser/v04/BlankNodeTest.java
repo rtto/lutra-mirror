@@ -59,7 +59,7 @@ public class BlankNodeTest {
     @Test
     public void shouldBeIsomorphic() {
 
-        TemplateStore store = new DependencyGraph();
+        TemplateStore store = new DependencyGraph(null);
         store.addOTTRBaseTemplates();
 
         // Read templates
