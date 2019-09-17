@@ -38,6 +38,7 @@ public class MessageHandler {
     }
 
     private final Set<Trace> traces;
+    private static int count;
 
     public MessageHandler() {
         this.traces = new HashSet<>();
@@ -110,6 +111,7 @@ public class MessageHandler {
 
     private static String getLocation(Trace trace) {
         StringBuilder context = new StringBuilder();
+        count = 0;
         getLocationRecur(context, trace, "1", new HashMap<>());
         return context.toString();
     }
@@ -123,14 +125,14 @@ public class MessageHandler {
      * This enumeration is then used to reference already visited trace elements.
      */
     private static void getLocationRecur(StringBuilder context, Trace trace,
-            String curRef, Map<Trace, String> refs) {
+           String curRef, Map<Trace, String> refs) {
         
         if (refs.containsKey(trace)) {
             // Already printed subtrace, just reference to its enumeration and returns
             context.append(toReferenceString(curRef, refs.get(trace)));
             return;
         } 
-        refs.put(trace, curRef);
+        refs.put(trace, makeReference(curRef));
         if (trace.hasIdentifier()) {
             // Assign enumeration to trace element, and append to trace
             context.append(toLocationString(trace, refs.get(trace)));
@@ -142,13 +144,18 @@ public class MessageHandler {
             c++;
         }
     }
+
+    private static String makeReference(String ref) {
+        count++;
+        return "[" + count + ": " + ref + "]";
+    }
     
     private static String toReferenceString(String curRef, String eqRef) {
-        return " >>> at [" + curRef + "] = [" + eqRef + "]\n";
+        return " >>> at " + makeReference(curRef) + " = " + eqRef + "\n";
     }
     
     private static String toLocationString(Trace trace, String enumStr) {
-        return " >>> at [" + enumStr + "] " + trace.getIdentifier() + "\n";
+        return " >>> at " + enumStr + " " + trace.getIdentifier() + "\n";
     }
     
     public static void printLocation(Trace trace) {
