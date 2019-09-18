@@ -12,6 +12,7 @@
         <module>lutra-tabottr</module>
         <module>lutra-stottr</module>
         <module>lutra-cli</module>
+        <module>lutra-restapi</module>
     </modules>
 
     <issueManagement>
@@ -58,7 +59,6 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.8.1</version>
                 <configuration>
                     <source>1.8</source>
                     <target>1.8</target>
@@ -110,7 +110,6 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.22.2</version>
                 <!-- <configuration> <useSystemClassLoader>false</useSystemClassLoader>
                     </configuration> --> <!-- For Debian, see https://stackoverflow.com/questions/13170860/failed-to-execute-goal-org-apache-maven-pluginsmaven-surefire-plugin2-10test/41666587#41666587 -->
                 <!-- <configuration> <argLine>-Xms15512m -Xmx15512m</argLine> </configuration> --> <!-- To increase memory -->
@@ -284,6 +283,36 @@
         <pluginManagement>
             <plugins>
 
+                <plugin>
+                    <artifactId>maven-clean-plugin</artifactId>
+                    <version>3.1.0</version>
+                </plugin>
+                <!-- see http://maven.apache.org/ref/current/maven-core/default-bindings.html#Plugin_bindings_for_war_packaging -->
+                <plugin>
+                    <artifactId>maven-resources-plugin</artifactId>
+                    <version>3.0.2</version>
+                </plugin>
+                <plugin>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>3.8.0</version>
+                </plugin>
+                <plugin>
+                    <artifactId>maven-surefire-plugin</artifactId>
+                    <version>2.22.1</version>
+                </plugin>
+                <plugin>
+                    <artifactId>maven-war-plugin</artifactId>
+                    <version>3.2.2</version>
+                </plugin>
+                <plugin>
+                    <artifactId>maven-install-plugin</artifactId>
+                    <version>2.5.2</version>
+                </plugin>
+                <plugin>
+                    <artifactId>maven-deploy-plugin</artifactId>
+                    <version>2.8.2</version>
+                </plugin>
+                
                 <!-- https://github.com/maven-download-plugin/maven-download-plugin -->
                 <plugin>
                     <groupId>com.googlecode.maven-download-plugin</groupId>
@@ -327,9 +356,7 @@
             </plugin>
 
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-report-plugin</artifactId>
-                <version>2.22.2</version>
+                <artifactId>maven-surefire-plugin</artifactId>
             </plugin>
 
             <plugin>
@@ -389,6 +416,11 @@
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>lutra-stottr</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>lutra-cli</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
