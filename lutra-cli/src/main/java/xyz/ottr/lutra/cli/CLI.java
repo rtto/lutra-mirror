@@ -139,9 +139,15 @@ public class CLI {
             return readers.isEmpty() ? Result.empty() : Result.of(readers.iterator().next());
         }
         
-        Result<TemplateReader> successfull = store.getReaderRegistry().attemptAllReaders(reader ->
-            reader.loadTemplatesFromFolder(store, settings.library,
-                    settings.extensions, settings.ignoreExtensions));
+        Result<TemplateReader> successfull;
+        if (Files.isDirectory(Paths.get(settings.library))) {
+            successfull = store.getReaderRegistry().attemptAllReaders(reader ->
+                reader.loadTemplatesFromFolder(store, settings.library,
+                        settings.extensions, settings.ignoreExtensions));
+        } else {
+            successfull = store.getReaderRegistry().attemptAllReaders(reader ->
+                reader.loadTemplatesFromFile(store, settings.library));
+        }
         if (settings.fetchMissingDependencies) {
             MessageHandler msgs = store.fetchMissingDependencies();
             successfull.addMessages(msgs.getMessages());
