@@ -22,7 +22,8 @@ package xyz.ottr.lutra.cli;
  * #L%
  */
 
-import java.io.IOException; 
+import java.io.IOException;
+import java.io.PrintStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.Charset;
@@ -60,11 +61,26 @@ import xyz.ottr.lutra.wottr.writer.v04.WTemplateWriter;
 
 public class CLI {
 
-    private static Settings settings;
+    private final Settings settings;
+    private final PrintStream outStream;
+    //private final PrintStream errStream;
+
+    public CLI(PrintStream outStream) {
+        this.settings = new Settings();
+        this.outStream = outStream;
+        //this.errStream = errStream;
+    }
+
+    public CLI() {
+        this(System.out);
+    }
 
     public static void main(String[] args) {
+        new CLI().run(args);
+    }
 
-        settings = new Settings();
+    public void run(String[] args) {
+
         CommandLine cli = new CommandLine(settings);
         try {
             cli.parse(args);
@@ -77,9 +93,9 @@ public class CLI {
         MessageHandler.setQuiet(settings.quiet);
 
         if (cli.isUsageHelpRequested()) {
-            cli.usage(System.out);
+            cli.usage(outStream);
         } else if (cli.isVersionHelpRequested()) {
-            cli.printVersionHelp(System.out);
+            cli.printVersionHelp(outStream);
         } else if (checkOptions()) {
             execute();
         }
@@ -89,7 +105,7 @@ public class CLI {
      * Checks that the provided options form a meaningful execution,
      * otherwise prints an error message.
      */
-    private static boolean checkOptions() {
+    private boolean checkOptions() {
 
         if (settings.inputs.isEmpty()
             && (settings.mode == Settings.Mode.expand
@@ -116,7 +132,7 @@ public class CLI {
     ////////////////////////////////////////////////////////////
 
 
-    private static void execute() {
+    private void execute() {
 
         TemplateStore store = new DependencyGraph(ReaderRegistryImpl.getReaderRegistry());
         Result<TemplateReader> successfullReader = parseLibraryInto(store);
@@ -130,7 +146,7 @@ public class CLI {
     /**
      * Populated store with parsed templates, and returns true if error occurred, and false otherwise.
      */
-    private static Result<TemplateReader> parseLibraryInto(TemplateStore store) {
+    private Result<TemplateReader> parseLibraryInto(TemplateStore store) {
         
         store.addOTTRBaseTemplates();
 
@@ -156,7 +172,7 @@ public class CLI {
         return successfull;
     } 
     
-    private static void executeExpand(TemplateStore store, PrefixMapping usedPrefixes) {
+    private void executeExpand(TemplateStore store, PrefixMapping usedPrefixes) {
 
         ResultConsumer.use(makeInstanceReader(),
             reader -> {
@@ -176,7 +192,7 @@ public class CLI {
         );
     }
 
-    private static void executeExpandLibrary(TemplateStore store, PrefixMapping usedPrefixes) {
+    private void executeExpandLibrary(TemplateStore store, PrefixMapping usedPrefixes) {
         
         ResultConsumer.use(store.expandAll(),
             expandedStore -> {
@@ -191,7 +207,7 @@ public class CLI {
         );
     }
 
-    private static void executeFormatLibrary(TemplateStore store, PrefixMapping usedPrefixes) {
+    private void executeFormatLibrary(TemplateStore store, PrefixMapping usedPrefixes) {
         
         ResultConsumer.use(makeTemplateWriter(usedPrefixes),
             writer ->  {
@@ -201,7 +217,7 @@ public class CLI {
         );
     }
 
-    private static void executeFormat(PrefixMapping usedPrefixes) {
+    private void executeFormat(PrefixMapping usedPrefixes) {
         
         ResultConsumer.use(makeInstanceReader(),
             reader -> {
@@ -216,7 +232,7 @@ public class CLI {
         );
     }
 
-    private static void executeMode(TemplateStore store, PrefixMapping usedPrefixes) {
+    private void executeMode(TemplateStore store, PrefixMapping usedPrefixes) {
         
         int severity = Message.INFO; // Least severe
         if (!settings.quiet) {
@@ -243,7 +259,7 @@ public class CLI {
             case lint:
                 // Simply load templates and check for messages, as done before the switch
                 if (!settings.quiet && Message.moreSevere(Message.WARNING, severity)) {
-                    System.out.println("No errors found.");
+                    this.outStream.println("No errors found.");
                 }
                 break;
             default:
@@ -257,7 +273,7 @@ public class CLI {
     /// MAKER-METHODS, MAKING THINGS BASED ON FLAGS          ///
     ////////////////////////////////////////////////////////////
             
-    private static Result<InstanceReader> makeInstanceReader() {
+    private Result<InstanceReader> makeInstanceReader() {
         if (settings.inputs.isEmpty()) {
             return Result.empty(Message.error(
                     "No input file provided."));
@@ -265,7 +281,7 @@ public class CLI {
         return ReaderRegistryImpl.getReaderRegistry().getInstanceReader(settings.inputFormat.toString());
     }
 
-    private static Result<Function<Instance, ResultStream<Instance>>> makeExpander(TemplateStore store) {
+    private Result<Function<Instance, ResultStream<Instance>>> makeExpander(TemplateStore store) {
         if (settings.fetchMissingDependencies) {
             return Result.of(store::expandInstanceFetch);
         } else {
@@ -273,7 +289,7 @@ public class CLI {
         }
     }
 
-    private static Result<InstanceWriter> makeInstanceWriter(PrefixMapping usedPrefixes) {
+    private Result<InstanceWriter> makeInstanceWriter(PrefixMapping usedPrefixes) {
         switch (settings.outputFormat) {
             case wottr:
                 return Result.of(new WInstanceWriter(usedPrefixes));
@@ -286,7 +302,7 @@ public class CLI {
         }
     }
 
-    private static Result<TemplateWriter> makeTemplateWriter(PrefixMapping usedPrefixes) {
+    private Result<TemplateWriter> makeTemplateWriter(PrefixMapping usedPrefixes) {
         switch (settings.outputFormat) {
             case wottr:
                 return Result.of(new WTemplateWriter(usedPrefixes));
@@ -304,7 +320,7 @@ public class CLI {
     /// WRITER-METHODS, WRITING THINGS TO FILE               ///
     ////////////////////////////////////////////////////////////
 
-    private static void processInstances(Function<String, ResultStream<Instance>> processor,
+    private void processInstances(Function<String, ResultStream<Instance>> processor,
         InstanceWriter writer) {
 
         ResultConsumer<Instance> consumer = new ResultConsumer<>(writer);
@@ -317,21 +333,21 @@ public class CLI {
         }
     }
 
-    private static void formatInstances(InstanceReader reader, InstanceWriter writer) {
+    private void formatInstances(InstanceReader reader, InstanceWriter writer) {
         processInstances(reader, writer);
     }
 
-    private static void expandAndWriteInstanes(InstanceReader reader, InstanceWriter writer,
+    private void expandAndWriteInstanes(InstanceReader reader, InstanceWriter writer,
         Function<Instance, ResultStream<Instance>> expander) {
 
         processInstances(ResultStream.innerFlatMapCompose(reader, expander), writer);
     }
 
-    private static void writeInstances(String output) {
+    private void writeInstances(String output) {
 
         // If neither --stdout nor -o is set, default to --stdout
         if (shouldPrintOutput()) {
-            System.out.println(output);
+            this.outStream.println(output);
         }
 
         if (settings.out == null) {
@@ -348,7 +364,7 @@ public class CLI {
         }
     }
 
-    private static void writeTemplates(TemplateStore store, TemplateWriter writer) {
+    private void writeTemplates(TemplateStore store, TemplateWriter writer) {
         ResultConsumer<TemplateSignature> consumer = new ResultConsumer<>(writer);
         store.getAllTemplateObjects().forEach(consumer);
 
@@ -359,11 +375,11 @@ public class CLI {
         }
     }
 
-    private static void writeTemplate(String iri, String output) {
+    private void writeTemplate(String iri, String output) {
 
         // If neither --stdout nor -o is set, default to --stdout
         if (shouldPrintOutput()) {
-            System.out.println(output);
+            outStream.println(output);
         }
 
         if (settings.out == null) {
@@ -386,7 +402,7 @@ public class CLI {
     /// UTILS                                                ///
     ////////////////////////////////////////////////////////////
 
-    private static String getFileSuffix() {
+    private String getFileSuffix() {
 
         switch (settings.outputFormat) {
             case legacy:
@@ -400,7 +416,7 @@ public class CLI {
     }
         
 
-    private static boolean shouldPrintOutput() {
+    private boolean shouldPrintOutput() {
         return settings.stdout || settings.out == null;
     }
 
