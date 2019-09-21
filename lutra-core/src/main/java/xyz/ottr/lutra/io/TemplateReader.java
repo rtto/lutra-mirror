@@ -85,6 +85,12 @@ public class TemplateReader implements Function<String, ResultStream<TemplateSig
         return consumer.getMessageHandler();
     }
 
+    public MessageHandler loadTemplatesFromFile(TemplateStore store, String file) {
+        ResultConsumer<TemplateSignature> consumer = new ResultConsumer<TemplateSignature>(store);
+        templatePipeline.apply(file).forEach(consumer);
+        return consumer.getMessageHandler();
+    }
+
     /**
      * Loads a folder of templates to be parsed when the parse-method is called.
      *
