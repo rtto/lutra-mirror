@@ -38,10 +38,10 @@ public class Servlet extends HttpServlet {
         CLIWrapper cli = new CLIWrapper();
 
         cli.setInput(request.getParameter("input"));
-        cli.setInFormat(request.getParameter("inFormat"));
+        cli.setInputFormat(request.getParameter("inputFormat"));
         cli.setLibrary(request.getParameter("library"));
-        cli.setOutFormat(request.getParameter("outFormat"));
-        cli.setLibFormat(request.getParameter("libFormat"));
+        cli.setOutputFormat(request.getParameter("outputFormat"));
+        cli.setLibraryFormat(request.getParameter("libraryFormat"));
 
         String output = cli.run();
 

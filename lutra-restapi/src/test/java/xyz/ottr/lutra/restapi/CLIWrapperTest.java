@@ -46,8 +46,8 @@ public class CLIWrapperTest {
         CLIWrapper cliWrapper = new CLIWrapper();
 
         cliWrapper.setInput(instances);
-        cliWrapper.setInFormat(instanceFormat);
-        cliWrapper.setOutFormat(outputFormat);
+        cliWrapper.setInputFormat(instanceFormat);
+        cliWrapper.setOutputFormat(outputFormat);
 
         String out = cliWrapper.run();
 
@@ -59,13 +59,13 @@ public class CLIWrapperTest {
     public void pizzatest2() throws IOException {
 
         // Set template to user-input template
-        String instances = "@prefix o-pizza: <http://tpl.ottr.xyz/pizza/0.1-test/> .\n"
+        String instances = "@prefix test: <http://example.com/test/ns#> .\n"
             + "@prefix ex: <http://example.com/ns#> .\n"
-            + "o-pizza:NamedPizza(ex:Grandiosa, ex:Norge, (ex:Tomat, ex:Ost, ex:Paprika, ex:Kjøttdeig)) .";
+            + "test:NamedPizza(ex:Grandiosa, ex:Norge, (ex:Tomat, ex:Ost, ex:Paprika, ex:Kjøttdeig)) .";
 
 
         // Verbatim copy of NamedPizza template, except namespace to test user-input of library
-        String library = "@prefix o-pizza: <http://tpl.ottr.xyz/pizza/0.1-test/> .\n"
+        String library = "@prefix test: <http://example.com/test/ns#> .\n"
             + "@prefix pav:   <http://purl.org/pav/> .\n"
             + "@prefix owl:   <http://www.w3.org/2002/07/owl#> .\n"
             + "@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .\n"
@@ -76,7 +76,7 @@ public class CLIWrapperTest {
             + "@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .\n"
             + "@prefix o-owl-ax: <http://tpl.ottr.xyz/owl/axiom/0.1/> .\n"
             + "\n"
-            + "o-pizza:PizzaTopping  a  ottr:Template ;\n"
+            + "test:PizzaTopping  a  ottr:Template ;\n"
             + "        ottr:parameters  ( [ ottr:type      owl:Class ;\n"
             + "                             ottr:variable  _:b0\n"
             + "                           ]\n"
@@ -135,10 +135,10 @@ public class CLIWrapperTest {
         CLIWrapper cliWrapper = new CLIWrapper();
 
         cliWrapper.setInput(instances);
-        cliWrapper.setInFormat("stottr");
+        cliWrapper.setInputFormat("stottr");
         cliWrapper.setLibrary(library);
-        cliWrapper.setLibFormat("wottr");
-        cliWrapper.setOutFormat("wottr");
+        cliWrapper.setLibraryFormat("wottr");
+        cliWrapper.setOutputFormat("wottr");
 
         String out = cliWrapper.run();
 

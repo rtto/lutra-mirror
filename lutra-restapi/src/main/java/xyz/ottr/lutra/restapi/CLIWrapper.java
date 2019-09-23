@@ -41,9 +41,9 @@ import xyz.ottr.lutra.cli.CLI;
 public class CLIWrapper {
 
     private @NonNull String input;
-    private @NonNull String inFormat;
-    private @NonNull String outFormat;
-    private String libFormat;
+    private @NonNull String inputFormat;
+    private @NonNull String outputFormat;
+    private String libraryFormat;
     private String library;
 
     private static final String CHARSET = "UTF-8";
@@ -57,10 +57,10 @@ public class CLIWrapper {
             : null;
 
         String command = "--mode expand"
-            + " --inputFormat " + this.inFormat
-            + " --outputFormat " + this.outFormat
+            + " --inputFormat " + this.inputFormat
+            + " --outputFormat " + this.outputFormat
             + (libraryFile != null ? " --library " + libraryFile.getAbsolutePath() : "")
-            + (libraryFile != null && this.libFormat != null ? " --libraryFormat " + this.libFormat : "")
+            + (libraryFile != null && this.libraryFormat != null ? " --libraryFormat " + this.libraryFormat : "")
             + " --fetchMissing"
             + " --stdout "
             + inputFile.getAbsolutePath();
