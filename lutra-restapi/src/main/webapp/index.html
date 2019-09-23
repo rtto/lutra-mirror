@@ -1,58 +1,107 @@
 <!DOCTYPE html>
 <html>
-  <head>
+<head>
     <meta charset="UTF-8"/>
-    <title>Lutra webapp</title>
+    <title>Lutra</title>
+
+    <!--link rel="stylesheet" type="text/css" href="https://ottr.xyz/inc/style.css" /-->
+    
+    <style>
+.row {
+  display: flex;
+  height: 90vh;
+}
+
+.column {
+  flex: 50%;
+  padding: 10px;
+}
+
+textarea {
+  width: 100%;
+}
+
+.column.left textarea {
+  height: 35%;
+}
+
+.column.right textarea {
+  height: 82%;
+}
+
+</style>
 
     <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
     <script>
-$(function(){
-    $('#inputform').submit(function() { // catch the form's submit event
-        console.log($(this).serialize());
-        $.ajax({ // create an AJAX call...
-            data: $(this).serialize(), // get the form data
-            type: $(this).attr('method'), // GET or POST
-            url: $(this).attr('action'), // the file to call
-            success: function(response) { // on success..
-                console.log(response);
-                $('#output').text(response).html(); // update the DIV
-                contd = false;
-            }
-        });
-    return false; // cancel original event to prevent form submitting
+    $(function(){
+	$('#inputform').submit(function() { // catch the form's submit event
+            $("#btnSubmit").attr("disabled", true);
+            $('#txtOutput').text("Loading...");
+            $.ajax({ // create an AJAX call...
+		data: $(this).serialize(), // get the form data
+		type: $(this).attr('method'), // GET or POST
+		url: $(this).attr('action'), // the file to call
+		success: function(response) { // on success..
+                    $('#txtOutput').text(response).html(); // update the DIV
+		}
+            });
+            $("#btnSubmit").attr("disabled", false);
+	    return false; // cancel original event to prevent form submitting	   
+	});
     });
-});
     </script>
 
-  </head>
-  <body>
-    <h2>Lutra</h2>
-
+</head>
+<body>
+    <h1>Lutra</h1>
     <form id="inputform" action="./expand" method="post">
-      <textarea cols="90" rows="20" name="input">
+      <div class="row">
+	<div class="column left">
+
+	  <b>Instances</b>
+	  <select id="opnInFormat" name="inFormat">
+            <option value="stottr">stOTTR</option>
+            <option value="wottr">RDF (wOTTR)</option>
+	  </select>
+	  <p>
+	    Enter template instances on the specified format. Templates are fetched by their IRI or from below.
+	  </p>	  
+	  <textarea id="txtInput" cols="90" rows="1" name="input">
 @prefix o-pizza: <http://tpl.ottr.xyz/pizza/0.1/> .
 @prefix ex: <http://example.com/ns#> .
-	  
+
 o-pizza:NamedPizza(ex:Grandiosa, ex:Norge, (ex:Tomat, ex:Ost, ex:Paprika, ex:Kjøttdeig)) .
-      </textarea>
-      <br/>
-      <label for="inFormat">input format</label>
-      <select id="inFormat" name="inFormat">
-        <option value="wottr">wottr</option>
-        <option value="stottr">stottr</option>
-      </select>
-      <br/>
-      <label for="outFormat">output format</label>
-      <select id="outFormat" name="outFormat">
-        <option value="wottr">wottr</option>
-        <option value="stottr">stottr</option>
-      </select>
-      <br/>
-      <input type="submit" value="Send"/>
+          </textarea>
+
+	  <br/><br/>
+	  
+	  <b>Additional templates*</b>
+	  <select id="opnLibFormat" name="libFormat">
+            <option value="stottr">stOTTR</option>
+            <option value="wottr">RDF (wOTTR)</option>
+	  </select>
+	  <p>
+	    Enter additional template definitions on the specified format.
+	  </p>
+	  <textarea id="txtLibrary" cols="90" rows="3" name="library"></textarea>
+	  
+	</div>
+	<div class="column right">
+	  <b>Output</b>
+	  <select id="opnOutFormat" name="outFormat">
+            <option value="wottr">RDF (wOTTR)</option>
+            <option value="stottr">stOTTR</option>
+	  </select>
+	  
+	  <input id="btnSubmit" type="submit" value="Send"/>
+	  <p>Specify output format and send.
+	  </p>
+
+	  <textarea class="fill" id="txtOutput" cols="90" rows="10" readonly></textarea>
+	  
+	</div>
+      </div>
     </form>
-    
-    <textarea id="output" cols="90" rows="20" readonly></textarea>
-    
-  </body>
+</body>
 </html>
-    
+
