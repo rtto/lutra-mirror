@@ -24,33 +24,24 @@ package xyz.ottr.lutra.cli;
 
 import org.junit.Test;
 
-public class IssuesTest {
+public class Issues193Test {
 
-    private static final String ROOT = "src/test/resources/issues/";
+    private static final String ROOT = "src/test/resources/issues/193/";
 
     public void runCLI(String cmd) {
         CLI.main(cmd.split(" "));
     }
 
 
-    // ****
-    // ISSUE 156: Formal parameters of templates are not supported in list operators
-
-    // Verifying issue:
     @Test
-    public void issue156stottr() {
-        runCLI("-I stottr -f -F wottr -l "
-                + ROOT + "156/lib.stottr" + " -L stottr --stdout "
-                + ROOT + "156/instance.stottr/instance1.stottr");
+    public void test() {
+        runCLI(""
+            + " --library " + ROOT + "template.tmp"
+            + " --libraryFormat wottr"
+            + " -f"
+            + " --stdout"
+            + " --inputFormat stottr"
+            + " " + ROOT + "instance.tmp");
     }
-
-    // Assuming bug is due to error in stOTTR grammar; testing wOTTR equivalent:
-    @Test
-    public void issue156wottr() {
-        runCLI("-I wottr -f -F wottr -l "
-                + ROOT + "156/lib.wottr" + " -L wottr --stdout "
-                + ROOT + "156/instance.wottr/instance1.wottr");
-    }
-
 
 }
