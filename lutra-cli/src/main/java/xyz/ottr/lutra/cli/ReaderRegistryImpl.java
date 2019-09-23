@@ -22,7 +22,8 @@ package xyz.ottr.lutra.cli;
  * #L%
  */
 
-import java.util.HashMap;
+import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.function.Function;
 
@@ -48,51 +49,48 @@ public class ReaderRegistryImpl implements ReaderRegistry {
     private Map<String, InstanceReader> instanceReaders;
     
     private ReaderRegistryImpl() {
-        this.templateReaders = new HashMap<>();
-        this.instanceReaders = new HashMap<>();
+        this.templateReaders = new LinkedHashMap<>(); // use linked hash maps for predictable order
+        this.instanceReaders = new LinkedHashMap<>();
         
         // Add template readers
         
         // wottr
-        TemplateReader wottrTemplateReader = new TemplateReader(
-                new RDFFileReader(), new WTemplateParser(), Settings.Format.wottr.toString());
-        this.templateReaders.put(Settings.Format.wottr.toString(), wottrTemplateReader);
-
-        // legacy
-        TemplateReader legacyTemplateReader = new TemplateReader(
-                new RDFFileReader(),
-                new xyz.ottr.lutra.wottr.parser.v03.WTemplateParser(),
-                Settings.Format.legacy.toString());
-        this.templateReaders.put(Settings.Format.legacy.toString(), legacyTemplateReader);
+        registerTemplateReader(new TemplateReader(
+            new RDFFileReader(), new WTemplateParser(),
+            Settings.Format.wottr.toString()));
 
         // stottr
-        TemplateReader stottrTemplateReader = new TemplateReader(
-                new SFileReader(), new STemplateParser(),Settings.Format.stottr.toString());
-        this.templateReaders.put(Settings.Format.stottr.toString(), stottrTemplateReader);
-        
+        registerTemplateReader(new TemplateReader(
+            new SFileReader(), new STemplateParser(),
+            Settings.Format.stottr.toString()));
+
+        // legacy
+        registerTemplateReader(new TemplateReader(
+            new RDFFileReader(), new xyz.ottr.lutra.wottr.parser.v03.WTemplateParser(),
+            Settings.Format.legacy.toString()));
+
         // Add instance readers
         
         // wottr
-        InstanceReader wottrInstanceReader = new InstanceReader(
-                new RDFFileReader(), new WInstanceParser(), Settings.Format.wottr.toString());
-        this.instanceReaders.put(Settings.Format.wottr.toString(), wottrInstanceReader);
-        
-        // legacy
-        InstanceReader legacyInstanceReader = new InstanceReader(
-                new RDFFileReader(),
-                new xyz.ottr.lutra.wottr.parser.v03.WInstanceParser(),
-                Settings.Format.legacy.toString());
-        this.instanceReaders.put(Settings.Format.legacy.toString(), legacyInstanceReader);
-        
+        registerInstanceReader(new InstanceReader(
+            new RDFFileReader(), new WInstanceParser(),
+            Settings.Format.wottr.toString()));
+
         // stottr
-        InstanceReader stottrInstanceReader = new InstanceReader(
-                new SFileReader(), new SInstanceParser(), Settings.Format.stottr.toString());
-        this.instanceReaders.put(Settings.Format.stottr.toString(), stottrInstanceReader);
+        registerInstanceReader(new InstanceReader(
+            new SFileReader(), new SInstanceParser(),
+            Settings.Format.stottr.toString()));
         
         // tabottr
-        InstanceReader tabInstanceReader = new InstanceReader(
-                new ExcelReader(), Settings.Format.tabottr.toString());
-        this.instanceReaders.put(Settings.Format.tabottr.toString(), tabInstanceReader);
+        registerInstanceReader(new InstanceReader(
+            new ExcelReader(),
+            Settings.Format.tabottr.toString()));
+
+        // legacy
+        registerInstanceReader(new InstanceReader(
+            new RDFFileReader(), new xyz.ottr.lutra.wottr.parser.v03.WInstanceParser(),
+            Settings.Format.legacy.toString()));
+
     }
     
     public static ReaderRegistry getReaderRegistry() {
@@ -100,40 +98,41 @@ public class ReaderRegistryImpl implements ReaderRegistry {
     }
     
     @Override
-    public void registerTemplateReader(String format, TemplateReader reader) {
-        this.templateReaders.put(format, reader);
+    public void registerTemplateReader(TemplateReader reader) {
+        this.templateReaders.put(reader.getFormat(), reader);
     }
 
     @Override
-    public void registerInstanceReader(String format, InstanceReader reader) {
-        this.instanceReaders.put(format, reader);
+    public void registerInstanceReader(InstanceReader reader) {
+        this.instanceReaders.put(reader.getFormat(), reader);
     }
 
     @Override
     public Map<String, TemplateReader> getAllTemplateReaders() {
-        return this.templateReaders;
+        return Collections.unmodifiableMap(this.templateReaders);
     }
 
     public Map<String, InstanceReader> getAllInstanceReaders() {
-        return this.instanceReaders;
+        return Collections.unmodifiableMap(this.instanceReaders);
     }
     
-    public Result<TemplateReader> attemptAllReaders(Function<TemplateReader, MessageHandler> todo) {
+    public Result<TemplateReader> attemptAllReaders(Function<TemplateReader, MessageHandler> readerFunction) {
         
-        Result<TemplateReader> unsuccsessfull = Result.empty(); // Return in case of no succeed
+        Result<TemplateReader> unsuccessful = Result.empty(); // Return in case of no succeed
         for (Map.Entry<String, TemplateReader> reader : getAllTemplateReaders().entrySet()) {
-            MessageHandler msgs = todo.apply(reader.getValue());
+            MessageHandler msgs = readerFunction.apply(reader.getValue());
 
             if (Message.moreSevere(msgs.getMostSevere(), Message.ERROR)) {
-                msgs.toSingleMessage("Parsing templates as "
-                        + reader.getKey() + " failed with following errors:")
-                    .ifPresent(unsuccsessfull::addMessage);
+                msgs.toSingleMessage("Attempt of parsing templates as "
+                    + reader.getKey() + " format failed:")
+                    .ifPresent(unsuccessful::addMessage);
             } else {
                 Result<TemplateReader> readerRes = Result.of(reader.getValue());
-                msgs.toSingleMessage("").ifPresent(readerRes::addMessage);
+                msgs.toSingleMessage("")
+                    .ifPresent(readerRes::addMessage);
                 return readerRes;
             }
         }
-        return unsuccsessfull;
+        return unsuccessful;
     }
 }
