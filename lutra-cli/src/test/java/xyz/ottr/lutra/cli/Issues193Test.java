@@ -27,15 +27,11 @@ import org.junit.Test;
 public class Issues193Test {
 
     private static final String ROOT = "src/test/resources/issues/193/";
-
-    public void runCLI(String cmd) {
-        CLI.main(cmd.split(" "));
-    }
-
+    
     // Bug was caused by the string starting with a space.
     @Test
     public void test() {
-        runCLI(""
+        CLIRunner.run(" "
             + " --library " + ROOT + "template.tmp"
             + " --libraryFormat wottr"
             + " -f"

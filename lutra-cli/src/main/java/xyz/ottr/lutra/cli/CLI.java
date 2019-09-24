@@ -34,7 +34,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.function.Function;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.jena.shared.PrefixMapping;
 
 import picocli.CommandLine;
@@ -54,7 +53,6 @@ import xyz.ottr.lutra.result.ResultConsumer;
 import xyz.ottr.lutra.result.ResultStream;
 import xyz.ottr.lutra.store.DependencyGraph;
 import xyz.ottr.lutra.store.TemplateStore;
-
 import xyz.ottr.lutra.stottr.io.SInstanceWriter;
 import xyz.ottr.lutra.stottr.io.STemplateWriter;
 import xyz.ottr.lutra.wottr.writer.v04.WInstanceWriter;
@@ -156,9 +154,9 @@ public class CLI {
             return readers.isEmpty() ? Result.empty() : Result.of(readers.iterator().next());
         }
 
-        // check if library is folder or file
+        // check if library is folder or file, and get readerFunction accordingly:
         Function<TemplateReader, MessageHandler> readerFunction =
-            (Files.isDirectory(Paths.get(settings.library)))
+            Files.isDirectory(Paths.get(settings.library))
                 ? reader -> reader.loadTemplatesFromFolder(store, settings.library,
                     settings.extensions, settings.ignoreExtensions)
                 : reader -> reader.loadTemplatesFromFile(store, settings.library);
@@ -168,8 +166,10 @@ public class CLI {
         if (settings.libraryFormat != null) {
             reader = store.getReaderRegistry().getTemplateReaders(settings.libraryFormat.toString());
             reader.map(readerFunction)
-                .ifPresent(mgs -> mgs.toSingleMessage("Attempt of parsing templates as "
-                    + settings.libraryFormat + " format failed:").ifPresent(reader::addMessage));
+                .map(mgs -> mgs.toSingleMessage("Attempt of parsing templates as "
+                        + settings.libraryFormat + " format failed:"))
+                .ifPresent(mgs -> mgs.ifPresent(reader::addMessage));
+
         } else {
             reader = store.getReaderRegistry().attemptAllReaders(readerFunction);
         }
@@ -335,7 +335,6 @@ public class CLI {
 
         ResultConsumer<Instance> consumer = new ResultConsumer<>(writer);
         ResultStream.innerOf(settings.inputs)
-            .innerFilter(StringUtils::isNoneBlank)
             .innerFlatMap(processor)
             .forEach(consumer);
 

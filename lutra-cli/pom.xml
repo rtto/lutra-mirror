@@ -28,10 +28,6 @@
             <artifactId>lutra-stottr</artifactId>
         </dependency>
 
-        <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-lang3</artifactId>
-        </dependency>
 
         <!-- https://mvnrepository.com/artifact/info.picocli/picocli -->
         <dependency>
