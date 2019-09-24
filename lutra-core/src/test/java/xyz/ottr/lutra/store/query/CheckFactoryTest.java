@@ -33,6 +33,8 @@ import org.apache.jena.vocabulary.OWL;
 import org.apache.jena.vocabulary.XSD;
 import org.junit.Test;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import xyz.ottr.lutra.OTTR;
 import xyz.ottr.lutra.model.ArgumentList;
 import xyz.ottr.lutra.model.BlankNodeTerm;
@@ -48,10 +50,11 @@ import xyz.ottr.lutra.model.TermList;
 import xyz.ottr.lutra.model.types.NEListType;
 import xyz.ottr.lutra.model.types.TypeFactory;
 import xyz.ottr.lutra.result.Message;
-import xyz.ottr.lutra.result.MessageHandler;
 import xyz.ottr.lutra.store.DependencyGraph;
 
 public class CheckFactoryTest {
+
+    private final Logger log = LoggerFactory.getLogger(CheckFactoryTest.class);
 
     private DependencyGraph initStore() {
         
@@ -77,9 +80,7 @@ public class CheckFactoryTest {
             + severity + " but gave " + msgs.size();
 
         if (msgs.size() != numErrors) {
-            for (Message msg : msgs) {
-                MessageHandler.printMessage(msg);
-            }
+            msgs.forEach(m -> m.log(log));
         }
 
         assertTrue(assStr, msgs.size() == numErrors); 

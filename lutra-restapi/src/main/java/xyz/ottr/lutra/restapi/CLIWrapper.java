@@ -68,7 +68,7 @@ public class CLIWrapper {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         PrintStream ps = new PrintStream(outputStream, true, CHARSET);
 
-        new CLI(ps).run(command.split(" "));
+        new CLI(ps, ps).run(command.split(" "));
 
         // clean up
         delete(inputFile);

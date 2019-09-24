@@ -62,16 +62,18 @@ public class CLI {
 
     private final Settings settings;
     private final PrintStream outStream;
-    //private final PrintStream errStream;
+    private final PrintStream errStream;
+    private final MessageHandler messageHandler;
 
-    public CLI(PrintStream outStream) {
+    public CLI(PrintStream outStream, PrintStream errStream) {
         this.settings = new Settings();
         this.outStream = outStream;
-        //this.errStream = errStream;
+        this.errStream = errStream;
+        this.messageHandler = new MessageHandler(errStream);
     }
 
     public CLI() {
-        this(System.out);
+        this(System.out, System.err);
     }
 
     public static void main(String[] args) {
@@ -85,11 +87,11 @@ public class CLI {
             cli.parse(args);
         } catch (ParameterException ex) {
             Message err = Message.error(ex.getMessage());
-            MessageHandler.printMessage(err);
+            messageHandler.printMessage(err);
             return;
         }
 
-        MessageHandler.setQuiet(settings.quiet);
+        messageHandler.setQuiet(settings.quiet);
 
         if (cli.isUsageHelpRequested()) {
             cli.usage(outStream);
@@ -110,7 +112,7 @@ public class CLI {
             && (settings.mode == Settings.Mode.expand
                 || settings.mode == Settings.Mode.format)) {
 
-            MessageHandler.printMessage(Message.error("Please provide one or more input files to perform "
+            messageHandler.printMessage(Message.error("Please provide one or more input files to perform "
                     + settings.mode + " on. For help on usage, use the --help option."));
             return false;
         } else if (settings.library == null
@@ -118,8 +120,8 @@ public class CLI {
                 || settings.mode == Settings.Mode.formatLibrary
                 || settings.mode == Settings.Mode.lint)) {
 
-            MessageHandler.printMessage(Message.error("Please provide a library to perform "
-                    + settings.mode + " on. For help on usage, use the --help option."));
+            // TODO MessageHandler.printMessage(Message.error("Please provide a library to perform "
+            //        + settings.mode + " on. For help on usage, use the --help option."));
             return false;
         }
         return true;
@@ -274,7 +276,7 @@ public class CLI {
                 break;
             default:
                 Message err = Message.error("The mode " + settings.mode + " is not yet supported.");
-                MessageHandler.printMessage(err);
+                messageHandler.printMessage(err);
         } 
     }
 
@@ -369,7 +371,7 @@ public class CLI {
             if (!settings.quiet) {
                 Message err = Message.error(
                     "Error when writing output -- " + ex.getMessage());
-                MessageHandler.printMessage(err);
+                messageHandler.printMessage(err);
             }
         }
     }
@@ -403,7 +405,7 @@ public class CLI {
         } catch (IOException | URISyntaxException ex) {
             Message err = Message.error(
                 "Error when writing output -- " + ex.getMessage());
-            MessageHandler.printMessage(err);
+            messageHandler.printMessage(err);
         }
     }
 
@@ -439,9 +441,9 @@ public class CLI {
         return new URI(iriStr).getPath();
     }
 
-    private static int checkTemplates(TemplateStore store) {
+    private int checkTemplates(TemplateStore store) {
         List<Message> msgs = store.checkTemplates();
-        msgs.forEach(MessageHandler::printMessage);
+        msgs.forEach(msg -> this.messageHandler.printMessage(msg));
         int mostSevere = msgs.stream()
             .mapToInt(Message::getLevel)
             .min()

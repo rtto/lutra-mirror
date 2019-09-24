@@ -22,6 +22,7 @@ package xyz.ottr.lutra.result;
  * #L%
  */
 
+import java.io.PrintStream;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -33,17 +34,24 @@ import java.util.function.Consumer;
 
 public class MessageHandler {
 
-    private static boolean quiet = false;
-
-    public static void setQuiet(boolean shouldBeQuiet) {
-        quiet = shouldBeQuiet;
-    }
-
-    private final Set<Trace> traces;
     private static int count;
 
-    public MessageHandler() {
+    private final Set<Trace> traces;
+    private final PrintStream printStream;
+
+    private boolean quiet = false;
+
+    public MessageHandler(PrintStream printStream) {
+        this.printStream = printStream;
         this.traces = new HashSet<>();
+    }
+
+    public MessageHandler() {
+        this(System.err);
+    }
+
+    public void setQuiet(boolean isQuiet) {
+        this.quiet = isQuiet;
     }
 
     public void add(Trace trace) {
@@ -120,12 +128,13 @@ public class MessageHandler {
      * the level of the most severe Message.
      */
     public int printMessages() {
-        return visitMessagesAndTraces(MessageHandler::printMessage, MessageHandler::printLocation);
+        return visitMessagesAndTraces(this::printMessage, this::printLocation);
     }
 
-    public static void printMessage(Message msg) {
-        if (!quiet) {
-            System.err.println("\n" + msg);
+
+    public void printMessage(Message msg) {
+        if (!this.quiet) {
+            printStream.println("\n" + msg);
         }
     }
 
@@ -178,9 +187,9 @@ public class MessageHandler {
         return " >>> at " + enumStr + " " + trace.getIdentifier() + "\n";
     }
     
-    public static void printLocation(Trace trace) {
-        if (!quiet) {
-            System.err.print(getLocation(trace));
+    public void printLocation(Trace trace) {
+        if (!this.quiet) {
+            printStream.print(getLocation(trace));
         }
     }
     
