@@ -1,4 +1,4 @@
-package xyz.ottr.lutra.stottr.io;
+package xyz.ottr.lutra.stottr.parser;
 
 /*-
  * #%L
@@ -46,7 +46,7 @@ public class ErrorToMessageListener extends BaseErrorListener {
         this.messageHandler.add(Result.empty(Message.error(err)));
     }
 
-    public MessageHandler getMessages() {
+    public MessageHandler getMessageHandler() {
         return this.messageHandler;
     }
 }

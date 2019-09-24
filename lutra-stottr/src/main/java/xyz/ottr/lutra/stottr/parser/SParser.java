@@ -1,4 +1,4 @@
-package xyz.ottr.lutra.stottr.io;
+package xyz.ottr.lutra.stottr.parser;
 
 /*-
  * #%L
@@ -22,6 +22,7 @@ package xyz.ottr.lutra.stottr.io;
  * #L%
  */
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Stream;
@@ -40,7 +41,7 @@ public abstract class SParser<T> extends SBaseParserVisitor<T> {
     private STermParser termParser = new STermParser(this.prefixes);
 
     public Map<String, String> getPrefixes() {
-        return this.prefixes;
+        return Collections.unmodifiableMap(this.prefixes);
     }
 
     protected void setPrefixesAndVariables(Map<String, String> prefixes, Map<String, Term> variables) {
@@ -50,7 +51,7 @@ public abstract class SParser<T> extends SBaseParserVisitor<T> {
 
     /**
      * Should initialize subparsers that depend on
-     * the prefix definitoins and this.termParser
+     * the prefix definitions and this.termParser
      * (such as ParameterParsers)
      */
     protected abstract void initSubParsers();
@@ -88,16 +89,16 @@ public abstract class SParser<T> extends SBaseParserVisitor<T> {
         ResultStream<T> resultStream = prefixRes.mapToStream(_ignore -> {
 
             Stream<Result<T>> results = document
-                .statement() // List of statments
+                .statement() // List of statements
                 .stream()
-                .map(stmt -> visitStatement(stmt));
+                .map(this::visitStatement);
 
             return new ResultStream<>(results);
         });
 
         // TODO: Somehow put these messages on returned instances,
         //       see https://gitlab.com/ottr/lutra/lutra/issues/148
-        errListener.getMessages().printMessages();
+        errListener.getMessageHandler().printMessages();
         return resultStream;
     }
 }

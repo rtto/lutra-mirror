@@ -1,4 +1,4 @@
-package xyz.ottr.lutra.stottr.io;
+package xyz.ottr.lutra.stottr.parser;
 
 /*-
  * #%L
@@ -22,26 +22,15 @@ package xyz.ottr.lutra.stottr.io;
  * #L%
  */
 
-import java.io.IOException;
-import java.io.Writer;
-import java.util.Map;
+import org.antlr.v4.runtime.tree.RuleNode;
 
-import xyz.ottr.lutra.result.Message;
-import xyz.ottr.lutra.result.MessageHandler;
+import xyz.ottr.lutra.result.Result;
+import xyz.ottr.lutra.stottr.antlr.stOTTRBaseVisitor;
 
-public class SPrefixWriter {
+public abstract class SBaseParserVisitor<T> extends stOTTRBaseVisitor<Result<T>> {
 
-    public static void write(Map<String, String> prefixes, Writer writer) {
-
-        try {
-            for (Map.Entry<String, String> nsln : prefixes.entrySet()) {
-                writer.write("@prefix " + nsln.getKey() + ": <" + nsln.getValue() + "> .\n");
-            }
-            writer.write("\n");
-        } catch (IOException ex) {
-            MessageHandler.printMessage(Message.error(
-                "Error when writing prefixes "
-                + ": " + ex.toString()));
-        }
+    @Override
+    protected boolean shouldVisitNextChild(RuleNode node, Result<T> current) {
+        return current == null;
     }
 }

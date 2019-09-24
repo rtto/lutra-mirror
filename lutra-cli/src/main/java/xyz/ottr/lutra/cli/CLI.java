@@ -53,8 +53,8 @@ import xyz.ottr.lutra.result.ResultConsumer;
 import xyz.ottr.lutra.result.ResultStream;
 import xyz.ottr.lutra.store.DependencyGraph;
 import xyz.ottr.lutra.store.TemplateStore;
-import xyz.ottr.lutra.stottr.io.SInstanceWriter;
-import xyz.ottr.lutra.stottr.io.STemplateWriter;
+import xyz.ottr.lutra.stottr.writer.SInstanceWriter;
+import xyz.ottr.lutra.stottr.writer.STemplateWriter;
 import xyz.ottr.lutra.wottr.writer.v04.WInstanceWriter;
 import xyz.ottr.lutra.wottr.writer.v04.WTemplateWriter;
 
@@ -62,13 +62,13 @@ public class CLI {
 
     private final Settings settings;
     private final PrintStream outStream;
-    private final PrintStream errStream;
+    //private final PrintStream errStream;
     private final MessageHandler messageHandler;
 
     public CLI(PrintStream outStream, PrintStream errStream) {
         this.settings = new Settings();
         this.outStream = outStream;
-        this.errStream = errStream;
+        //this.errStream = errStream;
         this.messageHandler = new MessageHandler(errStream);
     }
 
@@ -112,16 +112,16 @@ public class CLI {
             && (settings.mode == Settings.Mode.expand
                 || settings.mode == Settings.Mode.format)) {
 
-            messageHandler.printMessage(Message.error("Please provide one or more input files to perform "
-                    + settings.mode + " on. For help on usage, use the --help option."));
+            messageHandler.printMessage(Message.error("Must provide one or more input files. "
+                + "For help on usage, use the --help option."));
             return false;
         } else if (settings.library == null
             && (settings.mode == Settings.Mode.expandLibrary
                 || settings.mode == Settings.Mode.formatLibrary
                 || settings.mode == Settings.Mode.lint)) {
 
-            // TODO MessageHandler.printMessage(Message.error("Please provide a library to perform "
-            //        + settings.mode + " on. For help on usage, use the --help option."));
+            messageHandler.printMessage(Message.error("Must provide a library. "
+                + "For help on usage, use the --help option."));
             return false;
         }
         return true;
@@ -287,8 +287,7 @@ public class CLI {
             
     private Result<InstanceReader> makeInstanceReader() {
         if (settings.inputs.isEmpty()) {
-            return Result.empty(Message.error(
-                    "No input file provided."));
+            return Result.error("No input file provided.");
         }
         return ReaderRegistryImpl.getReaderRegistry().getInstanceReader(settings.inputFormat.toString());
     }
@@ -306,11 +305,9 @@ public class CLI {
             case wottr:
                 return Result.of(new WInstanceWriter(usedPrefixes));
             case stottr:
-                return Result.of(SInstanceWriter.makeOuterInstanceWriter(usedPrefixes.getNsPrefixMap()));
+                return Result.of(new SInstanceWriter(usedPrefixes.getNsPrefixMap()));
             default:
-                return Result.empty(Message.error(
-                        "Output format " + settings.outputFormat.toString()
-                            + " not yet supported for instances."));
+                return Result.error("Output format " + settings.outputFormat + " not (yet?) supported for instances.");
         }
     }
 
@@ -321,9 +318,7 @@ public class CLI {
             case stottr:
                 return Result.of(new STemplateWriter(usedPrefixes.getNsPrefixMap()));
             default:
-                return Result.empty(Message.error(
-                        "Output format " + settings.outputFormat.toString()
-                            + " not yet supported for templates."));
+                return Result.error("Output format " + settings.outputFormat + " not (yet?) supported for templates.");
         }
     }
 
@@ -332,8 +327,7 @@ public class CLI {
     /// WRITER-METHODS, WRITING THINGS TO FILE               ///
     ////////////////////////////////////////////////////////////
 
-    private void processInstances(Function<String, ResultStream<Instance>> processor,
-        InstanceWriter writer) {
+    private void processInstances(Function<String, ResultStream<Instance>> processor, InstanceWriter writer) {
 
         ResultConsumer<Instance> consumer = new ResultConsumer<>(writer);
         ResultStream.innerOf(settings.inputs)
@@ -369,8 +363,7 @@ public class CLI {
             Files.write(Paths.get(settings.out), output.getBytes(Charset.forName("UTF-8")));
         } catch (IOException ex) {
             if (!settings.quiet) {
-                Message err = Message.error(
-                    "Error when writing output -- " + ex.getMessage());
+                Message err = Message.error("Error writing output: " + ex.getMessage());
                 messageHandler.printMessage(err);
             }
         }

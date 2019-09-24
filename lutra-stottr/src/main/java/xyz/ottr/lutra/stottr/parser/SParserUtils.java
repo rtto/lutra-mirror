@@ -1,4 +1,4 @@
-package xyz.ottr.lutra.stottr.io;
+package xyz.ottr.lutra.stottr.parser;
 
 /*-
  * #%L
@@ -30,7 +30,9 @@ import xyz.ottr.lutra.result.Result;
 import xyz.ottr.lutra.stottr.antlr.stOTTRLexer;
 import xyz.ottr.lutra.stottr.antlr.stOTTRParser;
 
-public class SParserUtils {
+public enum SParserUtils {
+
+    ; // util enum
     
     public static stOTTRLexer makeLexer(CharStream in, ErrorToMessageListener errListener) {
 
@@ -60,7 +62,8 @@ public class SParserUtils {
 
         Result<T> res = visitor.visit(document);
 
-        errListener.getMessages().printMessages();
+        // TODO Rather add messages to res?
+        errListener.getMessageHandler().printMessages();
         return res;
     }
     
