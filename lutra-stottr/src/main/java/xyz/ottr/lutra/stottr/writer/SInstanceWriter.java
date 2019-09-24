@@ -22,7 +22,6 @@ package xyz.ottr.lutra.stottr.writer;
  * #L%
  */
 
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -35,31 +34,16 @@ import xyz.ottr.lutra.stottr.STOTTR;
 
 public class SInstanceWriter implements InstanceWriter {
 
-    private static final Map<ArgumentList.Expander, String> expanders;
-
-    static {
-        expanders = new HashMap<>();
-        expanders.put(ArgumentList.Expander.CROSS, STOTTR.Expanders.cross);
-        expanders.put(ArgumentList.Expander.ZIPMIN, STOTTR.Expanders.zipMin);
-        expanders.put(ArgumentList.Expander.ZIPMAX, STOTTR.Expanders.zipMax);
-    }
-
-    private final List<Instance> instances;
+    protected final List<Instance> instances;
     private final STermWriter termWriter;
-    private final boolean inDefinition;
        
-    private SInstanceWriter(STermWriter termWriter, boolean inDefinition) {
+    protected SInstanceWriter(STermWriter termWriter) {
         this.instances = new LinkedList<>();
         this.termWriter = termWriter;
-        this.inDefinition = inDefinition;
     }
 
-    public static SInstanceWriter makeOuterInstanceWriter(Map<String, String> prefixes) {
-        return new SInstanceWriter(new STermWriter(prefixes), false);
-    }
-
-    public static SInstanceWriter makeBodyInstanceWriter(STermWriter termWriter) {
-        return new SInstanceWriter(termWriter, true);
+    public SInstanceWriter(Map<String, String> prefixes) {
+        this(new STermWriter(prefixes));
     }
 
     @Override
@@ -71,45 +55,25 @@ public class SInstanceWriter implements InstanceWriter {
     public String write() {
 
         StringBuilder builder = new StringBuilder();
-        boolean firstInstance = true;
+        builder.append(SPrefixWriter.write(this.termWriter.getPrefixes()));
 
-        for (Instance instance : this.instances) {
-
-            if (this.inDefinition) {
-
-                if (!firstInstance) {
-                    builder
-                        .append(STOTTR.Statements.bodyInsSep)
-                        .append("\n");
-                }
-                builder
-                    .append(STOTTR.Statements.indent)
-                    .append(writeInstance(instance));
-            } else {
-
-                if (firstInstance) {
-                    builder.append(SPrefixWriter.write(this.termWriter.getPrefixes()));
-                }
-                builder
-                    .append(writeInstance(instance))
-                    .append(STOTTR.Statements.statementEnd)
-                    .append("\n");
-
-            }
-            firstInstance = false;
-        }
+        this.instances.forEach(instance ->
+            builder
+                .append(writeInstance(instance))
+                .append(STOTTR.Statements.statementEnd)
+                .append("\n"));
 
         return builder.toString();
     }
 
-    private StringBuilder writeInstance(Instance instance) {
+    protected StringBuilder writeInstance(Instance instance) {
 
         StringBuilder builder = new StringBuilder();
 
         ArgumentList args = instance.getArguments();
         if (args.hasListExpander()) {
             builder
-                .append(expanders.get(args.getListExpander()))
+                .append(STOTTR.Expanders.map.inverseBidiMap().getKey(args.getListExpander()))
                 .append(" ")
                 .append(STOTTR.Expanders.expanderSep)
                 .append(" ");

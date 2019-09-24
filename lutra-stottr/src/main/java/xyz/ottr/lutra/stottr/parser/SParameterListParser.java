@@ -91,7 +91,7 @@ public class SParameterListParser extends SBaseParserVisitor<ParameterList> {
                 }
             );
             varRes.ifPresent(var -> parseParameterModes(ctx.ParameterMode(), var));
-            resParams.add(varRes);
+            this.resParams.add(varRes);
         }
 
         private void parseParameterModes(List<TerminalNode> modes, Term var) {

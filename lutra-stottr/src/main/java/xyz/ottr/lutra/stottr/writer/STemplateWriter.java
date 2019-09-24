@@ -180,7 +180,7 @@ public class STemplateWriter implements TemplateWriter {
     }
 
     private String writePattern(Template template, STermWriter termWriter) {
-        SInstanceWriter instanceWriter = SInstanceWriter.makeBodyInstanceWriter(termWriter);
+        SInstanceWriter instanceWriter = new SPatternInstanceWriter(termWriter);
         template.getBody().forEach(instanceWriter);
         return instanceWriter.write();
     }

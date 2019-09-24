@@ -30,7 +30,6 @@ import org.antlr.v4.runtime.tree.TerminalNode;
 
 import xyz.ottr.lutra.model.ArgumentList;
 import xyz.ottr.lutra.model.Term;
-import xyz.ottr.lutra.result.Message;
 import xyz.ottr.lutra.result.Result;
 import xyz.ottr.lutra.stottr.STOTTR;
 import xyz.ottr.lutra.stottr.antlr.stOTTRParser;
@@ -82,17 +81,9 @@ public class SArgumentListParser extends SBaseParserVisitor<ArgumentList> {
     }
 
     protected Result<ArgumentList.Expander> parseExpander(String expanderStr) {
-
-        switch (expanderStr) {
-            case STOTTR.Expanders.cross:
-                return Result.of(ArgumentList.Expander.CROSS);
-            case STOTTR.Expanders.zipMin:
-                return Result.of(ArgumentList.Expander.ZIPMIN);
-            case STOTTR.Expanders.zipMax:
-                return Result.of(ArgumentList.Expander.ZIPMAX);
-            default:
-                return Result.empty(Message.error("Unrecognized list expander: " + expanderStr));
-        }
+        return STOTTR.Expanders.map.containsKey(expanderStr)
+            ? Result.of(STOTTR.Expanders.map.get(expanderStr))
+            : Result.error("Unrecognized list expander: " + expanderStr);
     }
     
     private Result<List<Argument>> parseArguments(stOTTRParser.ArgumentListContext ctx) {

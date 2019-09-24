@@ -294,7 +294,7 @@ public class CLI {
             case wottr:
                 return Result.of(new WInstanceWriter(usedPrefixes));
             case stottr:
-                return Result.of(SInstanceWriter.makeOuterInstanceWriter(usedPrefixes.getNsPrefixMap()));
+                return Result.of(new SInstanceWriter(usedPrefixes.getNsPrefixMap()));
             default:
                 return Result.empty(Message.error(
                         "Output format " + settings.outputFormat.toString()

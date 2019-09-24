@@ -46,7 +46,7 @@ public class ErrorToMessageListener extends BaseErrorListener {
         this.messageHandler.add(Result.empty(Message.error(err)));
     }
 
-    public MessageHandler getMessages() {
+    public MessageHandler getMessageHandler() {
         return this.messageHandler;
     }
 }

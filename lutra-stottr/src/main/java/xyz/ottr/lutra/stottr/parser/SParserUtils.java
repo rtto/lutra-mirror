@@ -62,7 +62,8 @@ public enum SParserUtils {
 
         Result<T> res = visitor.visit(document);
 
-        errListener.getMessages().printMessages();
+        // TODO Rather add messages to res?
+        errListener.getMessageHandler().printMessages();
         return res;
     }
     

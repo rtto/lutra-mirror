@@ -51,7 +51,7 @@ public abstract class SParser<T> extends SBaseParserVisitor<T> {
 
     /**
      * Should initialize subparsers that depend on
-     * the prefix definitoins and this.termParser
+     * the prefix definitions and this.termParser
      * (such as ParameterParsers)
      */
     protected abstract void initSubParsers();
@@ -89,7 +89,7 @@ public abstract class SParser<T> extends SBaseParserVisitor<T> {
         ResultStream<T> resultStream = prefixRes.mapToStream(_ignore -> {
 
             Stream<Result<T>> results = document
-                .statement() // List of statments
+                .statement() // List of statements
                 .stream()
                 .map(this::visitStatement);
 
@@ -98,7 +98,7 @@ public abstract class SParser<T> extends SBaseParserVisitor<T> {
 
         // TODO: Somehow put these messages on returned instances,
         //       see https://gitlab.com/ottr/lutra/lutra/issues/148
-        errListener.getMessages().printMessages();
+        errListener.getMessageHandler().printMessages();
         return resultStream;
     }
 }
