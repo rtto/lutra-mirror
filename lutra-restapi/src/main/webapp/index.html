@@ -38,12 +38,15 @@ textarea {
             $("#btnSubmit").attr("disabled", true);
             $('#txtOutput').text("Loading...");
             $.ajax({ // create an AJAX call...
-		data: $(this).serialize(), // get the form data
-		type: $(this).attr('method'), // GET or POST
-		url: $(this).attr('action'), // the file to call
-		success: function(response) { // on success..
-                    $('#txtOutput').text(response).html(); // update the DIV
-		}
+				data: $(this).serialize(), // get the form data
+				type: $(this).attr('method'), // GET or POST
+				url: $(this).attr('action'), // the file to call
+				success: function(response) {
+                    $('#txtOutput').text(response).html();
+				},
+				error: function (xhr, ajaxOptions, thrownError) {
+					$('#txtOutput').text(xhr.status + '\n' + thrownError).html();
+      			}
             });
             $("#btnSubmit").attr("disabled", false);
 	    return false; // cancel original event to prevent form submitting	   
@@ -59,7 +62,7 @@ textarea {
 	<div class="column left">
 
 	  <b>Instances</b>
-	  <select id="opnInFormat" name="inFormat">
+	  <select id="opnInFormat" name="inputFormat">
             <option value="stottr">stOTTR</option>
             <option value="wottr">RDF (wOTTR)</option>
 	  </select>
@@ -76,7 +79,7 @@ o-pizza:NamedPizza(ex:Grandiosa, ex:Norge, (ex:Tomat, ex:Ost, ex:Paprika, ex:Kj√
 	  <br/><br/>
 	  
 	  <b>Additional templates*</b>
-	  <select id="opnLibFormat" name="libFormat">
+	  <select id="opnLibFormat" name="libraryFormat">
             <option value="stottr">stOTTR</option>
             <option value="wottr">RDF (wOTTR)</option>
 	  </select>
@@ -88,7 +91,7 @@ o-pizza:NamedPizza(ex:Grandiosa, ex:Norge, (ex:Tomat, ex:Ost, ex:Paprika, ex:Kj√
 	</div>
 	<div class="column right">
 	  <b>Output</b>
-	  <select id="opnOutFormat" name="outFormat">
+	  <select id="opnOutFormat" name="outputFormat">
             <option value="wottr">RDF (wOTTR)</option>
             <option value="stottr">stOTTR</option>
 	  </select>

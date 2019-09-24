@@ -52,7 +52,7 @@ public class CLIWrapperTest {
         String out = cliWrapper.run();
 
         assertThat(StringUtils.isNoneBlank(out), is(true));
-
+        //System.out.println(out);
     }
 
     @Test

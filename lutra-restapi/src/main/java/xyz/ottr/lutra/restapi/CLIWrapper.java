@@ -65,16 +65,19 @@ public class CLIWrapper {
             + " --stdout "
             + inputFile.getAbsolutePath();
 
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        PrintStream ps = new PrintStream(outputStream, true, CHARSET);
+        ByteArrayOutputStream outStream = new ByteArrayOutputStream();
+        PrintStream out = new PrintStream(outStream, true, CHARSET);
 
-        new CLI(ps, ps).run(command.split(" "));
+        ByteArrayOutputStream errStream = new ByteArrayOutputStream();
+        PrintStream err = new PrintStream(errStream, true, CHARSET);
+
+        new CLI(out, err).run(command.split(" "));
 
         // clean up
         delete(inputFile);
         delete(libraryFile);
 
-        return outputStream.toString(CHARSET);
+        return outStream.toString(CHARSET) + errStream.toString(CHARSET);
     }
 
     private static File writeTempFile(String contents) throws IOException {

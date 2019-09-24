@@ -28,6 +28,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
+
 public class Servlet extends HttpServlet {
 
     private static final long serialVersionUID = -7342968018534639139L;
@@ -43,7 +45,15 @@ public class Servlet extends HttpServlet {
         cli.setOutputFormat(request.getParameter("outputFormat"));
         cli.setLibraryFormat(request.getParameter("libraryFormat"));
 
-        String output = cli.run();
+        String output = "";
+        try {
+            output = cli.run();
+        } catch (Exception ex) {
+            output = "Error!\n\n"
+                + ex.getMessage()
+                + "\n\n"
+                + ExceptionUtils.getStackTrace(ex);
+        }
 
         writeResponse(response, output);
     }
