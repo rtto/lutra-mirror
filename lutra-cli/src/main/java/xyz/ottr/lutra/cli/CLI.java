@@ -34,6 +34,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.function.Function;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.jena.shared.PrefixMapping;
 
 import picocli.CommandLine;
@@ -135,8 +136,8 @@ public class CLI {
     private void execute() {
 
         TemplateStore store = new DependencyGraph(ReaderRegistryImpl.getReaderRegistry());
-        Result<TemplateReader> successfullReader = parseLibraryInto(store);
-        ResultConsumer.use(successfullReader, reader -> {
+        Result<TemplateReader> successfulReader = parseLibraryInto(store);
+        ResultConsumer.use(successfulReader, reader -> {
             PrefixMapping usedPrefixes = OTTR.getDefaultPrefixes();
             usedPrefixes.setNsPrefixes(reader.getPrefixes());
             executeMode(store, usedPrefixes);
@@ -154,22 +155,31 @@ public class CLI {
             Collection<TemplateReader> readers = store.getReaderRegistry().getAllTemplateReaders().values();
             return readers.isEmpty() ? Result.empty() : Result.of(readers.iterator().next());
         }
-        
-        Result<TemplateReader> successfull;
-        if (Files.isDirectory(Paths.get(settings.library))) {
-            successfull = store.getReaderRegistry().attemptAllReaders(reader ->
-                reader.loadTemplatesFromFolder(store, settings.library,
-                        settings.extensions, settings.ignoreExtensions));
+
+        // check if library is folder or file
+        Function<TemplateReader, MessageHandler> readerFunction =
+            (Files.isDirectory(Paths.get(settings.library)))
+                ? reader -> reader.loadTemplatesFromFolder(store, settings.library,
+                    settings.extensions, settings.ignoreExtensions)
+                : reader -> reader.loadTemplatesFromFile(store, settings.library);
+
+        // check if libraryFormat is set or not
+        Result<TemplateReader> reader;
+        if (settings.libraryFormat != null) {
+            reader = store.getReaderRegistry().getTemplateReaders(settings.libraryFormat.toString());
+            reader.map(readerFunction)
+                .ifPresent(mgs -> mgs.toSingleMessage("Attempt of parsing templates as "
+                    + settings.libraryFormat + " format failed:").ifPresent(reader::addMessage));
         } else {
-            successfull = store.getReaderRegistry().attemptAllReaders(reader ->
-                reader.loadTemplatesFromFile(store, settings.library));
+            reader = store.getReaderRegistry().attemptAllReaders(readerFunction);
         }
+
         if (settings.fetchMissingDependencies) {
             MessageHandler msgs = store.fetchMissingDependencies();
-            successfull.addMessages(msgs.getMessages());
+            reader.addMessages(msgs.getMessages());
         }
         
-        return successfull;
+        return reader;
     } 
     
     private void executeExpand(TemplateStore store, PrefixMapping usedPrefixes) {
@@ -325,6 +335,7 @@ public class CLI {
 
         ResultConsumer<Instance> consumer = new ResultConsumer<>(writer);
         ResultStream.innerOf(settings.inputs)
+            .innerFilter(StringUtils::isNoneBlank)
             .innerFlatMap(processor)
             .forEach(consumer);
 

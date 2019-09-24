@@ -32,7 +32,7 @@ public class Issues193Test {
         CLI.main(cmd.split(" "));
     }
 
-
+    // Bug was caused by the string starting with a space.
     @Test
     public void test() {
         runCLI(""
