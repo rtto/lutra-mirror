@@ -99,7 +99,7 @@ public class SArgumentListParser extends SBaseParserVisitor<ArgumentList> {
         
         List<Result<Argument>> termsResList = ctx.argument()
             .stream()
-            .map(argCtx -> parseArgument(argCtx))
+            .map(this::parseArgument)
             .collect(Collectors.toList());
 
         return Result.aggregate(termsResList);

@@ -41,8 +41,8 @@ import xyz.ottr.lutra.stottr.STOTTR;
 
 public class STemplateWriter implements TemplateWriter {
 
-    private Map<String, TemplateSignature> templates;
-    private Map<String, String> prefixes;
+    private final Map<String, TemplateSignature> templates;
+    private final Map<String, String> prefixes;
 
     public STemplateWriter(Map<String, String> prefixes) {
         this.templates = new HashMap<>();

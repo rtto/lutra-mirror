@@ -30,7 +30,9 @@ import xyz.ottr.lutra.result.Result;
 import xyz.ottr.lutra.stottr.antlr.stOTTRLexer;
 import xyz.ottr.lutra.stottr.antlr.stOTTRParser;
 
-public class SParserUtils {
+public enum SParserUtils {
+
+    ; // util enum
     
     public static stOTTRLexer makeLexer(CharStream in, ErrorToMessageListener errListener) {
 

@@ -22,6 +22,7 @@ package xyz.ottr.lutra.stottr.parser;
  * #L%
  */
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Stream;
@@ -40,7 +41,7 @@ public abstract class SParser<T> extends SBaseParserVisitor<T> {
     private STermParser termParser = new STermParser(this.prefixes);
 
     public Map<String, String> getPrefixes() {
-        return this.prefixes;
+        return Collections.unmodifiableMap(this.prefixes);
     }
 
     protected void setPrefixesAndVariables(Map<String, String> prefixes, Map<String, Term> variables) {
@@ -90,7 +91,7 @@ public abstract class SParser<T> extends SBaseParserVisitor<T> {
             Stream<Result<T>> results = document
                 .statement() // List of statments
                 .stream()
-                .map(stmt -> visitStatement(stmt));
+                .map(this::visitStatement);
 
             return new ResultStream<>(results);
         });

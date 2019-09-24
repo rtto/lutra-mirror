@@ -45,7 +45,7 @@ public class SPrefixParser extends SBaseParserVisitor<Map<String, String>> {
         SDirectiveParser dirParser = new SDirectiveParser();
 
         return ResultStream.innerOf(ctx.directive())
-            .innerMap(dir -> dirParser.visit(dir))
+            .innerMap(dirParser::visit)
             .aggregate()
             .flatMap(pfs -> {
                 Map<String, String> m = new HashMap<>();

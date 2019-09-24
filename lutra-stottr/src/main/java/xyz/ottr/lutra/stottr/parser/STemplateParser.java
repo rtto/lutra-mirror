@@ -100,7 +100,7 @@ public class STemplateParser extends SParser<TemplateSignature> implements Templ
         Set<Result<Instance>> resBody = ctx.patternList()
             .instance()
             .stream()
-            .map(insCtx -> instanceParser.visitInstance(insCtx))
+            .map(instanceParser::visitInstance)
             .collect(Collectors.toSet());
 
         Result<Set<Instance>> bodyRes = Result.aggregate(resBody);
