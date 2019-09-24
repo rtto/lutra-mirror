@@ -1,4 +1,4 @@
-package xyz.ottr.lutra.stottr.io;
+package xyz.ottr.lutra.stottr.writer;
 
 /*-
  * #%L
@@ -22,8 +22,8 @@ package xyz.ottr.lutra.stottr.io;
  * #L%
  */
 
+import java.util.Collections;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -54,11 +54,11 @@ public class STermWriter {
     }
 
     public Map<String, String> getPrefixes() {
-        return this.prefixes;
+        return Collections.unmodifiableMap(this.prefixes);
     }
 
     public Set<String> getUsedPrefixes() {
-        return this.usedPrefixes;
+        return Collections.unmodifiableSet(this.usedPrefixes);
     }
 
     public String write(Term term) {
@@ -110,19 +110,16 @@ public class STermWriter {
     
     public String writeBlank(BlankNodeTerm blank) {
         String label = blank.getLabel();
-        String prefix = this.variables.contains(blank) ? STOTTR.Terms.variablePrefix : "_:";
-        return  prefix + label;
+        String prefix = this.variables.contains(blank)
+            ? STOTTR.Terms.variablePrefix
+            : "_:";
+        return prefix + label;
     }
 
     public String writeList(TermList list) {
-
-        List<String> terms = list.asList()
+        return list.asList()
             .stream()
             .map(this::write)
-            .collect(Collectors.toList());
-
-        return STOTTR.Terms.listStart
-            + String.join(STOTTR.Terms.listSep, terms)
-            + STOTTR.Terms.listEnd;
+            .collect(Collectors.joining(STOTTR.Terms.listSep, STOTTR.Terms.listStart, STOTTR.Terms.listEnd));
     }
 }

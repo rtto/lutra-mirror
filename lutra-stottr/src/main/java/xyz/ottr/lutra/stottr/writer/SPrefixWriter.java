@@ -1,4 +1,4 @@
-package xyz.ottr.lutra.stottr.io;
+package xyz.ottr.lutra.stottr.writer;
 
 /*-
  * #%L
@@ -22,26 +22,16 @@ package xyz.ottr.lutra.stottr.io;
  * #L%
  */
 
-import java.io.IOException;
-import java.io.Writer;
 import java.util.Map;
+import java.util.stream.Collectors;
 
-import xyz.ottr.lutra.result.Message;
-import xyz.ottr.lutra.result.MessageHandler;
+public enum SPrefixWriter {
 
-public class SPrefixWriter {
+    ; // util enum
 
-    public static void write(Map<String, String> prefixes, Writer writer) {
-
-        try {
-            for (Map.Entry<String, String> nsln : prefixes.entrySet()) {
-                writer.write("@prefix " + nsln.getKey() + ": <" + nsln.getValue() + "> .\n");
-            }
-            writer.write("\n");
-        } catch (IOException ex) {
-            MessageHandler.printMessage(Message.error(
-                "Error when writing prefixes "
-                + ": " + ex.toString()));
-        }
+    public static String write(Map<String, String> prefixes) {
+        return prefixes.keySet().stream()
+            .map(key -> "@prefix " + key + ": <" + prefixes.get(key) + "> .")
+            .collect(Collectors.joining("\n"));
     }
 }
