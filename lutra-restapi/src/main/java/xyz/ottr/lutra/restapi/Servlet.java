@@ -49,8 +49,10 @@ public class Servlet extends HttpServlet {
         try {
             output = cli.run();
         } catch (Exception ex) {
-            output = "Error, exception thrown:\n\n"
-                + ExceptionUtils.getStackTrace(ex);
+            output = "Error!"
+                + "\n\nMessage: " + ex.getMessage()
+                + "\n\nRoot cause: " + ExceptionUtils.getRootCause(ex)
+                + "\n\nFull stack trace: " + ExceptionUtils.getStackTrace(ex);
         }
 
         writeResponse(response, output);
