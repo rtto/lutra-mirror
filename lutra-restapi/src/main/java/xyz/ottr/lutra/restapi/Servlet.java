@@ -49,9 +49,7 @@ public class Servlet extends HttpServlet {
         try {
             output = cli.run();
         } catch (Exception ex) {
-            output = "Error!\n\n"
-                + ex.getMessage()
-                + "\n\n"
+            output = "Error, exception thrown:\n\n"
                 + ExceptionUtils.getStackTrace(ex);
         }
 
@@ -63,7 +61,6 @@ public class Servlet extends HttpServlet {
         //response.setContentType("text/html");
         response.setCharacterEncoding("UTF-8");
         PrintWriter writer = response.getWriter();
-
         writer.append(content);
     }
 

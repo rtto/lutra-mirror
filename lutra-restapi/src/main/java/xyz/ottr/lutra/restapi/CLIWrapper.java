@@ -68,16 +68,13 @@ public class CLIWrapper {
         ByteArrayOutputStream outStream = new ByteArrayOutputStream();
         PrintStream out = new PrintStream(outStream, true, CHARSET);
 
-        ByteArrayOutputStream errStream = new ByteArrayOutputStream();
-        PrintStream err = new PrintStream(errStream, true, CHARSET);
-
-        new CLI(out, err).run(command.split(" "));
+        new CLI(out, out).run(command.split(" "));
 
         // clean up
         delete(inputFile);
         delete(libraryFile);
 
-        return outStream.toString(CHARSET) + errStream.toString(CHARSET);
+        return outStream.toString(CHARSET);
     }
 
     private static File writeTempFile(String contents) throws IOException {
