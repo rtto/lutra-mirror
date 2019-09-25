@@ -64,10 +64,21 @@ public class RDFFactory {
     }
 
     public Statement createTriple(Model model, Instance instance) {
-        Resource s = createRDFNode(model, instance.getArguments().get(0)).asResource();
-        Property p = createRDFNode(model, instance.getArguments().get(1)).as(Property.class);
+        RDFNode s = createRDFNode(model, instance.getArguments().get(0));
+        RDFNode p = createRDFNode(model, instance.getArguments().get(1));
         RDFNode o = createRDFNode(model, instance.getArguments().get(2));
-        return model.createStatement(s, p, o);
+
+        // TODO: these checks should be superfluous once instance type checking is in place.
+        if (!s.isResource()) {
+            throw new IllegalArgumentException("Error creating triple of instance " + instance
+                + ". Expected a resource on subject position, but found " + s);
+        }
+        if (!p.canAs(Property.class)) {
+            throw new IllegalArgumentException("Error creating triple of instance " + instance
+                + ". Expected a property on predicate position, but found " + p);
+        }
+
+        return model.createStatement(s.asResource(), p.as(Property.class), o);
     }
 
 
