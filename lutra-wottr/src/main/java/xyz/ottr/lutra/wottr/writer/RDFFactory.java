@@ -69,16 +69,34 @@ public class RDFFactory {
         RDFNode o = createRDFNode(model, instance.getArguments().get(2));
 
         // TODO: these checks should be superfluous once instance type checking is in place.
-        if (!s.isResource()) {
-            throw new IllegalArgumentException("Error creating triple of instance " + instance
-                + ". Expected a resource on subject position, but found " + s);
-        }
-        if (!p.canAs(Property.class)) {
-            throw new IllegalArgumentException("Error creating triple of instance " + instance
-                + ". Expected a property on predicate position, but found " + p);
-        }
+        checkSubject(s, instance);
+        checkPredicate(p, instance);
 
         return model.createStatement(s.asResource(), p.as(Property.class), o);
+    }
+
+    private void checkSubject(RDFNode subject, Instance instance) throws IllegalArgumentException {
+        if (!subject.isResource()) {
+            throw new IllegalArgumentException("Error creating triple of instance " + instance
+                + ". Expected a resource on subject position, but found "
+                + (subject.isLiteral() ? "a literal: " + subject.asLiteral() : subject));
+        }
+    }
+
+    private void checkPredicate(RDFNode predicate, Instance instance) throws IllegalArgumentException {
+        String error;
+        if (predicate.isLiteral()) {
+            error = "a literal: " + predicate.asLiteral();
+        } else if (predicate.isAnon()) {
+            error = "a blank node: " + predicate;
+        } else {
+            error = predicate.toString();
+        }
+
+        if (!predicate.canAs(Property.class)) {
+            throw new IllegalArgumentException("Error creating triple of instance " + instance
+                + ". Expected a property on predicate position, but found " + error);
+        }
     }
 
 
