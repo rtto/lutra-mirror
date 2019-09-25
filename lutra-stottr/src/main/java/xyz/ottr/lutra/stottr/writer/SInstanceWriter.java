@@ -55,7 +55,10 @@ public class SInstanceWriter implements InstanceWriter {
     public String write() {
 
         StringBuilder builder = new StringBuilder();
-        builder.append(SPrefixWriter.write(this.termWriter.getPrefixes()));
+
+        builder
+            .append(SPrefixWriter.write(this.termWriter.getPrefixes()))
+            .append("\n\n");
 
         this.instances.forEach(instance ->
             builder
