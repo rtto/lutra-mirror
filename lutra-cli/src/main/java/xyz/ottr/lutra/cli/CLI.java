@@ -137,7 +137,7 @@ public class CLI {
 
         TemplateStore store = new DependencyGraph(ReaderRegistryImpl.getReaderRegistry());
         Result<TemplateReader> successfulReader = parseLibraryInto(store);
-        ResultConsumer.use(successfulReader, reader -> {
+        this.messageHandler.use(successfulReader, reader -> {
             PrefixMapping usedPrefixes = OTTR.getDefaultPrefixes();
             usedPrefixes.setNsPrefixes(reader.getPrefixes());
             executeMode(store, usedPrefixes);
@@ -186,13 +186,13 @@ public class CLI {
     
     private void executeExpand(TemplateStore store, PrefixMapping usedPrefixes) {
 
-        ResultConsumer.use(makeInstanceReader(),
+        this.messageHandler.use(makeInstanceReader(),
             reader -> {
 
-                ResultConsumer.use(makeExpander(store),
+                this.messageHandler.use(makeExpander(store),
                     expander -> {
 
-                        ResultConsumer.use(makeInstanceWriter(usedPrefixes),
+                        this.messageHandler.use(makeInstanceWriter(usedPrefixes),
                             writer -> {
                                 
                                 expandAndWriteInstanes(reader, writer, expander);
@@ -206,10 +206,10 @@ public class CLI {
 
     private void executeExpandLibrary(TemplateStore store, PrefixMapping usedPrefixes) {
         
-        ResultConsumer.use(store.expandAll(),
+        this.messageHandler.use(store.expandAll(),
             expandedStore -> {
 
-                ResultConsumer.use(makeTemplateWriter(usedPrefixes),
+                this.messageHandler.use(makeTemplateWriter(usedPrefixes),
                     writer ->  {
 
                         writeTemplates(expandedStore, writer);
@@ -221,7 +221,7 @@ public class CLI {
 
     private void executeFormatLibrary(TemplateStore store, PrefixMapping usedPrefixes) {
         
-        ResultConsumer.use(makeTemplateWriter(usedPrefixes),
+        this.messageHandler.use(makeTemplateWriter(usedPrefixes),
             writer ->  {
 
                 writeTemplates(store, writer);
@@ -231,10 +231,10 @@ public class CLI {
 
     private void executeFormat(PrefixMapping usedPrefixes) {
         
-        ResultConsumer.use(makeInstanceReader(),
+        this.messageHandler.use(makeInstanceReader(),
             reader -> {
 
-                ResultConsumer.use(makeInstanceWriter(usedPrefixes),
+                this.messageHandler.use(makeInstanceWriter(usedPrefixes),
                     writer ->  {
 
                         formatInstances(reader, writer);

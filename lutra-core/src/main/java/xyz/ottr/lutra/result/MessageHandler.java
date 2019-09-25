@@ -76,6 +76,22 @@ public class MessageHandler {
     }
 
     /**
+     * Applies a fresh ResultConumer with the argument consumer to the argument 
+     * element, and prints messages using this' PrintStream. 
+     *
+     * @param element
+     *     Element to applied the consumer to
+     * @param consumer
+     *     Consumer which will consume value in element if present
+     */
+    public <T> void use(Result<T> element, Consumer<T> consumer) {
+        // TODO: This only depends on this.output and it not so natural,  perhaps move
+        ResultConsumer<T> resConsumer = new ResultConsumer<>(consumer, this.printStream);
+        resConsumer.accept(element);
+        resConsumer.getMessageHandler().printMessages();
+    }
+
+    /**
      * Returns a list of all Messages on any accepted Result,
      * and all Traces reachable via traces-pointers from
      * accepted Results. That is, it returns all Message-s
