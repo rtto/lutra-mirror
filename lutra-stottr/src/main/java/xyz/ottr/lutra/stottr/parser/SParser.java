@@ -25,6 +25,7 @@ package xyz.ottr.lutra.stottr.parser;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 import org.antlr.v4.runtime.CharStream;
@@ -98,13 +99,12 @@ public abstract class SParser<T> extends SBaseParserVisitor<T> {
             return new ResultStream<>(results);
         });
 
-        // TODO: Somehow put these messages on returned instances,
+        // TODO: Somehow put some of these messages more fine-grained on returned instances,
         //       see https://gitlab.com/ottr/lutra/lutra/issues/148
         MessageHandler messageHandler = errListener.getMessageHandler();
-        if (Message.moreSevere(messageHandler.getMostSevere(), Message.ERROR)) {
-            Message errorMessage = messageHandler.toSingleMessage("Error parsing stOTTR").get();
-            Result errorResult = Result.empty(errorMessage);
-            return ResultStream.of(errorResult);
+        Optional<Message> listenerMessage = messageHandler.toSingleMessage("Parsing stOTTR");
+        if (listenerMessage.isPresent()) {
+            resultStream = ResultStream.concat(ResultStream.of(Result.empty(listenerMessage.get())), resultStream);
         }
 
         return resultStream;
