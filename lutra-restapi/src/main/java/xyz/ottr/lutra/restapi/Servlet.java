@@ -45,7 +45,7 @@ public class Servlet extends HttpServlet {
         cli.setOutputFormat(request.getParameter("outputFormat"));
         cli.setLibraryFormat(request.getParameter("libraryFormat"));
 
-        String output = "";
+        String output;
         try {
             output = cli.run();
         } catch (Exception ex) {
@@ -58,12 +58,13 @@ public class Servlet extends HttpServlet {
         writeResponse(response, output);
     }
 
-    private void writeResponse(HttpServletResponse response, String content) throws IOException {
+    private static void writeResponse(HttpServletResponse response, String content) throws IOException {
         response.setContentType("text/plain");
         //response.setContentType("text/html");
         response.setCharacterEncoding("UTF-8");
-        PrintWriter writer = response.getWriter();
-        writer.append(content);
+        try (PrintWriter writer = response.getWriter()) {
+            writer.append(content);
+        }
     }
 
 }

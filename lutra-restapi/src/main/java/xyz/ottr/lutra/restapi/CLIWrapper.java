@@ -40,9 +40,9 @@ import xyz.ottr.lutra.cli.CLI;
 @NoArgsConstructor
 public class CLIWrapper {
 
-    private @NonNull String input;
-    private @NonNull String inputFormat;
-    private @NonNull String outputFormat;
+    @NonNull private String input;
+    @NonNull private String inputFormat;
+    @NonNull private String outputFormat;
     private String libraryFormat;
     private String library;
 
@@ -53,7 +53,7 @@ public class CLIWrapper {
         File inputFile = writeTempFile(this.input);
 
         File libraryFile = StringUtils.isNoneBlank(this.library)
-            ? libraryFile = writeTempFile(this.library)
+            ? writeTempFile(this.library)
             : null;
 
         String command = "--mode expand"
@@ -65,16 +65,18 @@ public class CLIWrapper {
             + " --stdout "
             + inputFile.getAbsolutePath();
 
-        ByteArrayOutputStream outStream = new ByteArrayOutputStream();
-        PrintStream out = new PrintStream(outStream, true, CHARSET);
-
-        new CLI(out, out).run(command.split(" "));
+        String output;
+        try (ByteArrayOutputStream outStream = new ByteArrayOutputStream();
+            PrintStream out = new PrintStream(outStream, true, CHARSET)) {
+            new CLI(out, out).run(command.split(" "));
+            output = outStream.toString(CHARSET);
+        }
 
         // clean up
         delete(inputFile);
         delete(libraryFile);
 
-        return outStream.toString(CHARSET);
+        return output;
     }
 
     private static File writeTempFile(String contents) throws IOException {
