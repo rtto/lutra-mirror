@@ -24,6 +24,12 @@ package xyz.ottr.lutra.restapi;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
+import java.util.Locale;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -34,36 +40,82 @@ public class Servlet extends HttpServlet {
 
     private static final long serialVersionUID = -7342968018534639139L;
 
+    private static final int MAX_SIZE = 50000;
+    private static final List<String> originWhitelist = Arrays.asList("http://weblutra.ottr.xyz");
+
+    private DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss.SSS", Locale.ENGLISH);
+
+    /*
+    @Override
+    protected void doOptions(HttpServletRequest request, HttpServletResponse response) {
+        String origin = request.getHeader("Origin");
+        setAccessControlHeaders(response, origin);
+        response.setStatus(HttpServletResponse.SC_OK);
+    }
+    */
+
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        doIt(request, response);
+    }
+
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        doIt(request, response);
+    }
+
+    private void doIt(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
         CLIWrapper cli = new CLIWrapper();
 
-        cli.setInput(request.getParameter("input"));
+        String input = request.getParameter("input");
+        String library = request.getParameter("library");
+
+        cli.setInput(input);
         cli.setInputFormat(request.getParameter("inputFormat"));
-        cli.setLibrary(request.getParameter("library"));
+        cli.setLibrary(library);
         cli.setOutputFormat(request.getParameter("outputFormat"));
         cli.setLibraryFormat(request.getParameter("libraryFormat"));
 
         String output;
-        try {
-            output = cli.run();
-        } catch (Exception ex) {
-            output = "Error!"
-                + "\n\nMessage: " + ex.getMessage()
-                + "\n\nRoot cause: " + ExceptionUtils.getRootCause(ex)
-                + "\n\nFull stack trace: " + ExceptionUtils.getStackTrace(ex);
+
+        if (input.length() > MAX_SIZE || library.length() > MAX_SIZE) {
+            output = "Error. Input exceeds max input size, please use desktop version of Lutra.";
+        } else {
+            try {
+                output = cli.run();
+            } catch (Exception ex) {
+                output = "Error."
+                    + "\n\nMessage: " + ex.getMessage()
+                    //+ "\n\nRoot cause: " + ExceptionUtils.getRootCause(ex)
+                    + "\n\nFull stack trace: " + ExceptionUtils.getStackTrace(ex);
+            }
         }
 
+        String origin = request.getHeader("Origin");
+        if (originWhitelist.contains(origin)) {
+            setAccessControlHeaders(response, origin);
+        }
         writeResponse(response, output);
     }
 
-    private static void writeResponse(HttpServletResponse response, String content) throws IOException {
+    private static void setAccessControlHeaders(HttpServletResponse response, String origin) {
+        response.setHeader("Access-Control-Allow-Origin", origin);
+        response.setHeader("Vary", "Origin");
+        //response.setHeader("Access-Control-Allow-Credentials", "true");
+        //response.setHeader("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE, HEAD");
+        //response.setHeader("Access-Control-Max-Age", "3600");
+        //response.setHeader("Access-Control-Allow-Headers", "Origin, Content-Type, Accept, X-Requested-With");
+    }
+
+    private void writeResponse(HttpServletResponse response, String content) throws IOException {
         response.setContentType("text/plain");
         //response.setContentType("text/html");
         response.setCharacterEncoding("UTF-8");
+
         try (PrintWriter writer = response.getWriter()) {
-            writer.append(content);
+            writer.println(content);
+            writer.println("### " +  dateFormat.format(new Date()));
         }
     }
 
