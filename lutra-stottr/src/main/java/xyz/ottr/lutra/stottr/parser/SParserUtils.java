@@ -62,8 +62,10 @@ public enum SParserUtils {
 
         Result<T> res = visitor.visit(document);
 
-        // TODO Rather add messages to res?
-        errListener.getMessageHandler().printMessages();
+        errListener.getMessageHandler()
+            .toSingleMessage("Parsing stOTTR string.")
+            .ifPresent(res::addMessage);
+
         return res;
     }
     

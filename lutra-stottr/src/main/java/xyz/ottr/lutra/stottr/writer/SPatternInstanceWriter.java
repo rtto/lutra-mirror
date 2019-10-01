@@ -22,7 +22,8 @@ package xyz.ottr.lutra.stottr.writer;
  * #L%
  */
 
-import xyz.ottr.lutra.model.Instance;
+import java.util.stream.Collectors;
+
 import xyz.ottr.lutra.stottr.STOTTR;
 
 // Only used by STemplateWriter, so visibility is package-private
@@ -34,25 +35,10 @@ class SPatternInstanceWriter extends SInstanceWriter {
 
     @Override
     public String write() {
-
-        StringBuilder builder = new StringBuilder();
-        boolean firstInstance = true;
-
-        for (Instance instance : super.instances) {
-
-            if (!firstInstance) {
-                builder
-                    .append(STOTTR.Statements.bodyInsSep)
-                    .append("\n");
-            }
-            builder
-                .append(STOTTR.Statements.indent)
-                .append(writeInstance(instance));
-
-            firstInstance = false;
-        }
-
-        return builder.toString();
+        return instances.stream()
+            .map(this::writeInstance)
+            .map(StringBuilder::toString)
+            .collect(Collectors.joining(STOTTR.Statements.bodyInsSep + "\n", STOTTR.Statements.indent, ""));
     }
 
 }
