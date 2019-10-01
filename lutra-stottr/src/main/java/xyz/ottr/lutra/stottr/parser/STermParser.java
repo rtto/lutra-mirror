@@ -1,4 +1,4 @@
-package xyz.ottr.lutra.stottr.io;
+package xyz.ottr.lutra.stottr.parser;
 
 /*-
  * #%L
@@ -122,7 +122,7 @@ public class STermParser extends SBaseParserVisitor<Term> {
 
         List<Result<Term>> termResLst = ctx.term()
             .stream()
-            .map(cnst -> visitTerm(cnst))
+            .map(this::visitTerm)
             .collect(Collectors.toList());
 
         Result<List<Term>> termLstRes = Result.aggregate(termResLst);

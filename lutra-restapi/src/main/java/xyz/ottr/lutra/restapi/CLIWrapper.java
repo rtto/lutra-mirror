@@ -23,44 +23,70 @@ package xyz.ottr.lutra.restapi;
  */
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.nio.file.Files;
 
+import lombok.NoArgsConstructor;
+import lombok.NonNull;
+import lombok.Setter;
+
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
 import xyz.ottr.lutra.cli.CLI;
 
-public enum CLIWrapper {
+@Setter
+@NoArgsConstructor
+public class CLIWrapper {
 
-    ; // util class
+    private @NonNull String input;
+    private @NonNull String inFormat;
+    private @NonNull String outFormat;
+    private String libFormat;
+    private String library;
 
     private static final String CHARSET = "UTF-8";
 
-    public static String run(String input, String inFormat, String outFormat) throws IOException {
+    public String run() throws IOException {
 
-        java.nio.file.Path tempInput = Files.createTempFile("input-", ".tmp");
+        File inputFile = writeTempFile(this.input);
 
-        FileUtils.write(tempInput.toFile(), input, CHARSET);
-        String tempInputPath = tempInput.toAbsolutePath().toString();
+        File libraryFile = StringUtils.isNoneBlank(this.library)
+            ? libraryFile = writeTempFile(this.library)
+            : null;
 
         String command = "--mode expand"
-            + " --inputFormat " + inFormat
-            + " --outputFormat " + outFormat
-            //+ " --library"
+            + " --inputFormat " + this.inFormat
+            + " --outputFormat " + this.outFormat
+            + (libraryFile != null ? " --library " + libraryFile.getAbsolutePath() : "")
+            + (libraryFile != null && this.libFormat != null ? " --libraryFormat " + this.libFormat : "")
             + " --fetchMissing"
             + " --stdout "
-            + tempInputPath;
+            + inputFile.getAbsolutePath();
 
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        PrintStream ps = new PrintStream(baos, true, CHARSET);
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        PrintStream ps = new PrintStream(outputStream, true, CHARSET);
 
         new CLI(ps).run(command.split(" "));
 
-        String output = baos.toString(CHARSET);
-
         // clean up
-        tempInput.toFile().deleteOnExit();
+        delete(inputFile);
+        delete(libraryFile);
 
-        return output;
+        return outputStream.toString(CHARSET);
     }
+
+    private static File writeTempFile(String contents) throws IOException {
+        File tempInput = Files.createTempFile("lutra-", ".tmp").toFile();
+        FileUtils.write(tempInput, contents, CHARSET);
+        return tempInput;
+    }
+
+    private static void delete(File file) throws IOException {
+        if (file != null) {
+            Files.deleteIfExists(file.toPath());
+        }
+    }
+
 }

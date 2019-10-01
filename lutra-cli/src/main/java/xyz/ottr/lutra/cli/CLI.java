@@ -54,8 +54,8 @@ import xyz.ottr.lutra.result.ResultStream;
 import xyz.ottr.lutra.store.DependencyGraph;
 import xyz.ottr.lutra.store.TemplateStore;
 
-import xyz.ottr.lutra.stottr.io.SInstanceWriter;
-import xyz.ottr.lutra.stottr.io.STemplateWriter;
+import xyz.ottr.lutra.stottr.writer.SInstanceWriter;
+import xyz.ottr.lutra.stottr.writer.STemplateWriter;
 import xyz.ottr.lutra.wottr.writer.v04.WInstanceWriter;
 import xyz.ottr.lutra.wottr.writer.v04.WTemplateWriter;
 
@@ -294,7 +294,7 @@ public class CLI {
             case wottr:
                 return Result.of(new WInstanceWriter(usedPrefixes));
             case stottr:
-                return Result.of(SInstanceWriter.makeOuterInstanceWriter(usedPrefixes.getNsPrefixMap()));
+                return Result.of(new SInstanceWriter(usedPrefixes.getNsPrefixMap()));
             default:
                 return Result.empty(Message.error(
                         "Output format " + settings.outputFormat.toString()

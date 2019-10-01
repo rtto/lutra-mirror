@@ -35,18 +35,26 @@ public class Servlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
-        String input = request.getParameter("input");
-        String inFormat = request.getParameter("inFormat");
-        String outFormat = request.getParameter("outFormat");
+        CLIWrapper cli = new CLIWrapper();
 
-        String output = CLIWrapper.run(input, inFormat, outFormat);
+        cli.setInput(request.getParameter("input"));
+        cli.setInFormat(request.getParameter("inFormat"));
+        cli.setLibrary(request.getParameter("library"));
+        cli.setOutFormat(request.getParameter("outFormat"));
+        cli.setLibFormat(request.getParameter("libFormat"));
 
+        String output = cli.run();
+
+        writeResponse(response, output);
+    }
+
+    private void writeResponse(HttpServletResponse response, String content) throws IOException {
         response.setContentType("text/plain");
         //response.setContentType("text/html");
         response.setCharacterEncoding("UTF-8");
         PrintWriter writer = response.getWriter();
 
-        writer.append(output);
+        writer.append(content);
     }
 
 }

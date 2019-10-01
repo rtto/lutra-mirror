@@ -1,4 +1,4 @@
-package xyz.ottr.lutra.stottr.io;
+package xyz.ottr.lutra.stottr.parser;
 
 /*-
  * #%L
@@ -41,8 +41,8 @@ import xyz.ottr.lutra.stottr.antlr.stOTTRParser;
 
 public class SParameterListParser extends SBaseParserVisitor<ParameterList> {
 
-    private STypeParser typeParser;
-    private STermParser termParser;
+    private final STypeParser typeParser;
+    private final STermParser termParser;
 
     public SParameterListParser(STermParser termParser) {
         this.termParser = termParser;
@@ -53,7 +53,7 @@ public class SParameterListParser extends SBaseParserVisitor<ParameterList> {
 
         // Need to make a fresh ParameterParser per parameter list to parse
         ParameterParser paramParser = new ParameterParser();
-        ctx.parameter().forEach(parCtx -> paramParser.parseParameter(parCtx));
+        ctx.parameter().forEach(paramParser::parseParameter);
         return paramParser.makeParameterList();
     }
 
@@ -91,7 +91,7 @@ public class SParameterListParser extends SBaseParserVisitor<ParameterList> {
                 }
             );
             varRes.ifPresent(var -> parseParameterModes(ctx.ParameterMode(), var));
-            resParams.add(varRes);
+            this.resParams.add(varRes);
         }
 
         private void parseParameterModes(List<TerminalNode> modes, Term var) {

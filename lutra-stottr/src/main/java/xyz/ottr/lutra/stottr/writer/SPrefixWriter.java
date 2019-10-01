@@ -1,4 +1,4 @@
-package xyz.ottr.lutra.stottr.io;
+package xyz.ottr.lutra.stottr.writer;
 
 /*-
  * #%L
@@ -22,15 +22,16 @@ package xyz.ottr.lutra.stottr.io;
  * #L%
  */
 
-import org.antlr.v4.runtime.tree.RuleNode;
+import java.util.Map;
+import java.util.stream.Collectors;
 
-import xyz.ottr.lutra.result.Result;
-import xyz.ottr.lutra.stottr.antlr.stOTTRBaseVisitor;
+public enum SPrefixWriter {
 
-public abstract class SBaseParserVisitor<T> extends stOTTRBaseVisitor<Result<T>> {
+    ; // util enum
 
-    @Override
-    protected boolean shouldVisitNextChild(RuleNode node, Result<T> current) {
-        return current == null;
+    public static String write(Map<String, String> prefixes) {
+        return prefixes.keySet().stream()
+            .map(key -> "@prefix " + key + ": <" + prefixes.get(key) + "> .")
+            .collect(Collectors.joining("\n"));
     }
 }
