@@ -22,6 +22,7 @@ package xyz.ottr.lutra.bottr.source;
  * #L%
  */
 
+import java.util.Collections;
 import java.util.List;
 import org.apache.jena.query.QueryExecution;
 import org.apache.jena.query.QueryExecutionFactory;
@@ -39,11 +40,11 @@ public class RDFSource extends AbstractSPARQLSource {
 
     public RDFSource(PrefixMapping prefixes, List<String> modelURIs) {
         super(prefixes);
-        this.modelURIs = modelURIs;
+        this.modelURIs = Collections.unmodifiableList(modelURIs);
     }
 
     public RDFSource(List<String> modelURIs) {
-        this.modelURIs = modelURIs;
+        this(PrefixMapping.Factory.create(), modelURIs);
     }
 
     private Result<Model> loadModels() {

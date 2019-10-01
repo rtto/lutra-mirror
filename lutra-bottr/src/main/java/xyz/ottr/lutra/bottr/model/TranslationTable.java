@@ -22,6 +22,7 @@ package xyz.ottr.lutra.bottr.model;
  * #L%
  */
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
@@ -35,7 +36,7 @@ public class TranslationTable implements Function<Term, Result<Term>> {
     private final Map<Term, Term> table;
 
     public TranslationTable(Map<Term, Term> table) {
-        this.table = table;
+        this.table = Collections.unmodifiableMap(table);
     }
 
     public TranslationTable() {

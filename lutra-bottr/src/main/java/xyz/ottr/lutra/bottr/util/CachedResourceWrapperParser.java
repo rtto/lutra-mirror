@@ -34,7 +34,7 @@ public abstract class CachedResourceWrapperParser<X> extends ResourceWrapperPars
 
     private static final Map<Map.Entry<Model, Resource>, Result> cache = new HashMap<>();
 
-    public CachedResourceWrapperParser(Resource resource) {
+    protected CachedResourceWrapperParser(Resource resource) {
         super(resource);
     }
 

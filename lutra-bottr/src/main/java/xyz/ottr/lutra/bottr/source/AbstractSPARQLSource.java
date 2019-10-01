@@ -108,10 +108,11 @@ public abstract class AbstractSPARQLSource implements Source<RDFNode> {
 
         final List<String> columns = resultSet.getResultVars();
         // TODO: does this work when a get returns null? will there be a hole in the list? Must test.
-        final Function<QuerySolution, Result<X>> rowCreator = (sol) -> Result.of(
+        final Function<QuerySolution, Result<X>> rowCreator = (sol) ->
+            Result.of(
                 columns.stream()
-                .map(sol::get)
-                .collect(Collectors.toList()))
+                    .map(sol::get)
+                    .collect(Collectors.toList()))
             .flatMap(translationFunction);
 
         return new ResultStream<>(StreamSupport.stream(

@@ -32,10 +32,10 @@ import java.util.stream.Collectors;
 
 import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.NodeIterator;
 import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
-import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.vocabulary.RDF;
 
 import xyz.ottr.lutra.bottr.BOTTR;
@@ -55,7 +55,7 @@ class BSourceParser implements Function<Resource, Result<Source<?>>> {
     private final Model model;
     private final String filePath; // @Nullable
 
-    public BSourceParser(Model model, String filePath) {
+    BSourceParser(Model model, String filePath) {
         this.model = model;
         this.filePath = filePath;
     }
@@ -71,8 +71,7 @@ class BSourceParser implements Function<Resource, Result<Source<?>>> {
 
         // We allow a source to have other types than just the source classes, therefore
         // cannot use ModelSelector.getRequiredResourceObject.
-        List<RDFNode> sourceTypes = this.model.listStatements(source, RDF.type, (RDFNode) null)
-            .mapWith(Statement::getObject)
+        List<RDFNode> sourceTypes = this.model.listObjectsOfProperty(source, RDF.type)
             .filterKeep(BOTTR.sources::contains)
             .toList();
 
@@ -93,7 +92,7 @@ class BSourceParser implements Function<Resource, Result<Source<?>>> {
             return getH2Source(source);
         }
         return Result.error("Error parsing source. Source type " + RDFNodes.toString(sourceType) + " is not a supported source: "
-         + RDFNodes.toString(BOTTR.sources));
+            + RDFNodes.toString(BOTTR.sources));
     }
 
     private Result<Source<?>> getSQLSource(Resource source) {
@@ -114,11 +113,9 @@ class BSourceParser implements Function<Resource, Result<Source<?>>> {
     private Result<Source<?>> getRDFSource(Resource source) {
 
         // RDFSource takes a *list* of sourceURLs, therefore a bit more work than for SPARQLEndpointSource.
-        List<RDFNode> urlNodes = this.model.listStatements(source, BOTTR.sourceURL, (RDFNode) null)
-            .mapWith(Statement::getObject)
-            .toList();
+        NodeIterator sourceNodes = this.model.listObjectsOfProperty(source, BOTTR.sourceURL);
 
-        List<Result<String>> urlStrings = ResultStream.innerOf(urlNodes)
+        List<Result<String>> urlStrings = ResultStream.innerOf(sourceNodes)
             .mapFlatMap(node -> RDFNodes.cast(node, Literal.class))
             .innerMap(Literal::getLexicalForm)
             .innerMap(this::getPath)

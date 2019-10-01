@@ -22,10 +22,10 @@ package xyz.ottr.lutra.bottr.source;
  * #L%
  */
 
-import java.util.Optional;
-
 import org.apache.jena.shared.PrefixMapping;
+
 import xyz.ottr.lutra.bottr.model.ArgumentMap;
+import xyz.ottr.lutra.bottr.util.TermFactory;
 import xyz.ottr.lutra.model.Term;
 import xyz.ottr.lutra.model.types.BasicType;
 import xyz.ottr.lutra.model.types.TermType;
@@ -46,9 +46,10 @@ public class StringArgumentMap extends ArgumentMap<String> {
 
     @Override
     protected Result<Term> getBasicTerm(String value, BasicType type) {
-        return Optional.ofNullable(this.literalLangTag)
-            .map(tag -> this.termFactory.createLangLiteral(toString(value), tag).map(t -> (Term)t))
-            .orElse(this.termFactory.createTermByType(toString(value), type));
+        return Result.ofNullable(this.literalLangTag)
+            .flatMapOrElse(
+                tag -> TermFactory.createLangLiteral(toString(value), tag).map(t -> (Term)t),
+                this.termFactory.createTermByType(toString(value), type));
     }
 
     @Override

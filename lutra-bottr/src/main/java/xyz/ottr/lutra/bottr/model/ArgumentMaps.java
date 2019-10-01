@@ -41,12 +41,12 @@ public class ArgumentMaps<V> implements Function<List<V>, Result<ArgumentList>> 
 
     public ArgumentMaps(PrefixMapping prefixMapping, Source<V> source, List<ArgumentMap<V>> argumentMaps) {
         this.prefixMapping = prefixMapping;
-        this.argumentMaps = argumentMaps;
+        this.argumentMaps = Collections.unmodifiableList(argumentMaps);
         this.source = source;
     }
 
     public ArgumentMaps(PrefixMapping prefixMapping, Source<V> source) {
-        this(prefixMapping, source, Collections.<ArgumentMap<V>>emptyList());
+        this(prefixMapping, source, Collections.emptyList());
     }
 
     @Override

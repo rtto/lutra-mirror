@@ -52,10 +52,10 @@ public class JDBCSourceTest {
     @Test
     public void prototypeTest() throws ClassNotFoundException, SQLException {
 
-        final String driver = "org.h2.Driver";
-        final String url = "jdbc:h2:" + this.testFolder.getRoot().getAbsolutePath() + "/db";
-        final String user = "user";
-        final String pass = "pass";
+        String driver = "org.h2.Driver";
+        String url = "jdbc:h2:" + this.testFolder.getRoot().getAbsolutePath() + "/db";
+        String user = "user";
+        String pass = "pass";
 
         Class.forName(driver);
         Connection conn = DriverManager.getConnection(url, user, pass);

@@ -45,6 +45,7 @@ public class BTranslationSettingsParser extends CachedResourceWrapperParser<Tran
         this.termFactory = new TermFactory(WOTTR.theInstance, this.model);
     }
 
+    @Override
     protected Result<TranslationSettings> getResult(Resource resource) {
 
         Result<TranslationSettings.TranslationSettingsBuilder> builder = Result.of(TranslationSettings.builder());

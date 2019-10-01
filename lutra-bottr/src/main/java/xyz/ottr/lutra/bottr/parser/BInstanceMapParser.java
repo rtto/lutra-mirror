@@ -48,11 +48,7 @@ public class BInstanceMapParser implements Function<Model, ResultStream<Instance
     @Override
     public ResultStream<InstanceMap> apply(Model model) {
         List<Resource> instanceMaps = ModelSelector.getInstancesOfClass(model, BOTTR.InstanceMap);
-        return parseInstanceMaps(model, instanceMaps);
-    }
-
-    private ResultStream<InstanceMap> parseInstanceMaps(Model model, List<Resource> instancesMaps) {
-        return ResultStream.innerOf(instancesMaps)
+        return ResultStream.innerOf(instanceMaps)
             .mapFlatMap(i -> parseInstanceMap(model, i));
     }
 

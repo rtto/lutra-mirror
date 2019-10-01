@@ -64,7 +64,7 @@ public class BTranslationTableParser extends CachedResourceWrapperParser<Transla
 
     class BTranslationEntryParserResource extends ResourceWrapperParser<Map.Entry<Term, Term>> {
 
-        public BTranslationEntryParserResource(Resource resource) {
+        BTranslationEntryParserResource(Resource resource) {
             super(resource);
         }
 

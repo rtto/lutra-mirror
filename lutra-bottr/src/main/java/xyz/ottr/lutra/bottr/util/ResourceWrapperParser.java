@@ -33,7 +33,7 @@ public abstract class ResourceWrapperParser<X> implements Supplier<Result<X>> {
     protected Model model;
     protected Resource resource;
 
-    public ResourceWrapperParser(Resource resource) {
+    protected ResourceWrapperParser(Resource resource) {
         this.model = resource.getModel();
         this.resource = resource;
     }

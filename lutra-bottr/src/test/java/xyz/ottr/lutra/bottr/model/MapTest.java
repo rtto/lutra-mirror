@@ -48,14 +48,14 @@ public class MapTest {
     @Test
     public void prototypeTest() {
 
-        final String ns = "http://example.com/ns#";
+        String ns = "http://example.com/ns#";
 
         // Input: Set up source with some data
         class StaticTestSource implements Source<String> {
 
             private final List<List<String>> rows;
 
-            public StaticTestSource() {
+            StaticTestSource() {
 
                 this.rows = new ArrayList<>();
                 this.rows.add(Arrays.asList(ns + "A1", ns + "B1", ns + "C1"));
