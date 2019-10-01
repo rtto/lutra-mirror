@@ -1,8 +1,8 @@
-package xyz.ottr.lutra.stottr.io;
+package xyz.ottr.lutra.cli;
 
 /*-
  * #%L
- * lutra-stottr
+ * lutra-cli
  * %%
  * Copyright (C) 2018 - 2019 University of Oslo
  * %%
@@ -22,23 +22,22 @@ package xyz.ottr.lutra.stottr.io;
  * #L%
  */
 
-import java.io.IOException;
+import org.junit.Test;
 
-import org.antlr.v4.runtime.CharStream;
-import org.antlr.v4.runtime.CharStreams;
+public class Issues193Test {
 
-import xyz.ottr.lutra.io.InputReader;
-import xyz.ottr.lutra.result.Result;
-import xyz.ottr.lutra.result.ResultStream;
-
-public class SFileReader implements InputReader<String, CharStream> {
-
-    public ResultStream<CharStream> apply(String filename) {
-
-        try {
-            return ResultStream.innerOf(CharStreams.fromFileName(filename));
-        } catch (IOException ex) {
-            return ResultStream.of(Result.error("Error reading stOTTR file: '" + filename + "': " + ex.getMessage()));
-        }
+    private static final String ROOT = "src/test/resources/issues/193/";
+    
+    // Bug was caused by the string starting with a space.
+    @Test
+    public void test() {
+        CLIRunner.run(" "
+            + " --library " + ROOT + "template.tmp"
+            + " --libraryFormat wottr"
+            + " -f"
+            + " --stdout"
+            + " --inputFormat stottr"
+            + " " + ROOT + "instance.tmp");
     }
+
 }

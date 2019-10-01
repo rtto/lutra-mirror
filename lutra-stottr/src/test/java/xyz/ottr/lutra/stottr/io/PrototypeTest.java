@@ -24,11 +24,15 @@ package xyz.ottr.lutra.stottr.io;
 
 import org.junit.Test;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import xyz.ottr.lutra.result.Message;
-import xyz.ottr.lutra.result.MessageHandler;
 import xyz.ottr.lutra.stottr.parser.SInstanceParser;
 
 public class PrototypeTest {
+
+    private static final Logger log = LoggerFactory.getLogger(PrototypeTest.class);
 
     @Test
     public void test() {
@@ -46,6 +50,6 @@ public class PrototypeTest {
                 + "ex:H4(1, 2.32, .45) .\n"
                 + "ex:H5(\"1\"^^xsd:int, \"hello\"@en) .\n"
                 + "ex:T6([], _:blank) .")
-            .forEach(res -> MessageHandler.printMessage(Message.info(("Parsed :" + res.toString()))));
+            .forEach(res -> Message.info("Parsed :" + res.toString()).log(log));
     }
 }

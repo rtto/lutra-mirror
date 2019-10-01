@@ -22,16 +22,12 @@ package xyz.ottr.lutra.cli;
  * #L%
  */
 
-import org.junit.Test;
+public enum CLIRunner {
 
-public class PrototypeCLITest {
-    
-    @Test
-    public void testHelp() {
-        runCLI("--help");
-    }
+    ; // util enum
 
-    public void runCLI(String cmd) {
-        CLI.main(cmd.split(" "));
+    public static void run(String args) {
+        CLI.main(args.trim().split("\\s+"));
     }
 }
+

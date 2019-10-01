@@ -75,7 +75,7 @@ public class LiteralTerm extends ResourceTerm {
         } else if (getDatatype() != null) {
             suffix = " : " + getDatatype();
         }
-        return this.value + suffix;
+        return "\"" + this.value + "\"" + suffix;
     }
 
     public String getPureValue() {

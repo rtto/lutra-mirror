@@ -41,9 +41,9 @@ import xyz.ottr.lutra.cli.CLI;
 public class CLIWrapper {
 
     private @NonNull String input;
-    private @NonNull String inFormat;
-    private @NonNull String outFormat;
-    private String libFormat;
+    private @NonNull String inputFormat;
+    private @NonNull String outputFormat;
+    private String libraryFormat;
     private String library;
 
     private static final String CHARSET = "UTF-8";
@@ -53,28 +53,30 @@ public class CLIWrapper {
         File inputFile = writeTempFile(this.input);
 
         File libraryFile = StringUtils.isNoneBlank(this.library)
-            ? libraryFile = writeTempFile(this.library)
+            ? writeTempFile(this.library)
             : null;
 
         String command = "--mode expand"
-            + " --inputFormat " + this.inFormat
-            + " --outputFormat " + this.outFormat
+            + " --inputFormat " + this.inputFormat
+            + " --outputFormat " + this.outputFormat
             + (libraryFile != null ? " --library " + libraryFile.getAbsolutePath() : "")
-            + (libraryFile != null && this.libFormat != null ? " --libraryFormat " + this.libFormat : "")
+            + (libraryFile != null && this.libraryFormat != null ? " --libraryFormat " + this.libraryFormat : "")
             + " --fetchMissing"
             + " --stdout "
             + inputFile.getAbsolutePath();
 
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        PrintStream ps = new PrintStream(outputStream, true, CHARSET);
-
-        new CLI(ps).run(command.split(" "));
+        String output;
+        try (ByteArrayOutputStream outStream = new ByteArrayOutputStream();
+            PrintStream out = new PrintStream(outStream, true, CHARSET)) {
+            new CLI(out, out).run(command.split(" "));
+            output = outStream.toString(CHARSET);
+        }
 
         // clean up
         delete(inputFile);
         delete(libraryFile);
 
-        return outputStream.toString(CHARSET);
+        return output;
     }
 
     private static File writeTempFile(String contents) throws IOException {

@@ -38,9 +38,9 @@ public interface ReaderRegistry {
         return Result.ofNullable(getAllInstanceReaders().get(format));
     }
 
-    void registerTemplateReader(String format, TemplateReader reader);
+    void registerTemplateReader(TemplateReader reader);
 
-    void registerInstanceReader(String format, InstanceReader reader);
+    void registerInstanceReader(InstanceReader reader);
 
     Map<String, TemplateReader> getAllTemplateReaders();
 

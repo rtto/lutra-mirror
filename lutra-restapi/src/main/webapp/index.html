@@ -4,12 +4,12 @@
     <meta charset="UTF-8"/>
     <title>Lutra</title>
 
-    <!--link rel="stylesheet" type="text/css" href="https://ottr.xyz/inc/style.css" /-->
+    <link rel="stylesheet" type="text/css" href="https://ottr.xyz/inc/fonts.css" />
     
     <style>
 .row {
   display: flex;
-  height: 90vh;
+  height: 85vh;
 }
 
 .column {
@@ -22,14 +22,14 @@ textarea {
 }
 
 .column.left textarea {
-  height: 35%;
+  height: 37%;
 }
 
 .column.right textarea {
-  height: 82%;
+  height: 87%;
 }
 
-</style>
+	</style>
 
     <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
     <script>
@@ -38,12 +38,15 @@ textarea {
             $("#btnSubmit").attr("disabled", true);
             $('#txtOutput').text("Loading...");
             $.ajax({ // create an AJAX call...
-		data: $(this).serialize(), // get the form data
-		type: $(this).attr('method'), // GET or POST
-		url: $(this).attr('action'), // the file to call
-		success: function(response) { // on success..
-                    $('#txtOutput').text(response).html(); // update the DIV
-		}
+				data: $(this).serialize(), // get the form data
+				type: $(this).attr('method'), // GET or POST
+				url: $(this).attr('action'), // the file to call
+				success: function(response) {
+                    $('#txtOutput').text(response).html();
+				},
+				error: function (xhr, ajaxOptions, thrownError) {
+					$('#txtOutput').text('Error: ' + xhr.status + '\n' + thrownError).html();
+      			}
             });
             $("#btnSubmit").attr("disabled", false);
 	    return false; // cancel original event to prevent form submitting	   
@@ -53,55 +56,76 @@ textarea {
 
 </head>
 <body>
-    <h1>Lutra</h1>
-    <form id="inputform" action="./expand" method="post">
-      <div class="row">
-	<div class="column left">
+<h1>Lutra</h1>
+<form id="inputform" action="./expand" method="post">
+	<div class="row">
+		<div class="column left">
 
-	  <b>Instances</b>
-	  <select id="opnInFormat" name="inFormat">
-            <option value="stottr">stOTTR</option>
-            <option value="wottr">RDF (wOTTR)</option>
-	  </select>
-	  <p>
-	    Enter template instances on the specified format. Templates are fetched by their IRI or from below.
-	  </p>	  
-	  <textarea id="txtInput" cols="90" rows="1" name="input">
+			<b>Instances</b>
+			<select id="opnInFormat" name="inputFormat">
+				<option value="stottr">stOTTR</option>
+				<option value="wottr">RDF (wOTTR)</option>
+			</select>
+			<p>
+				Enter template instances on the specified format. Templates are fetched by their IRI or from below.
+			</p>
+			<textarea id="txtInput" cols="90" rows="3" name="input">
+@prefix ottr: <http://ns.ottr.xyz/0.4/> .
 @prefix o-pizza: <http://tpl.ottr.xyz/pizza/0.1/> .
 @prefix ex: <http://example.com/ns#> .
 
-o-pizza:NamedPizza(ex:Grandiosa, ex:Norge, (ex:Tomat, ex:Ost, ex:Paprika, ex:Kjøttdeig)) .
-          </textarea>
+## The o-pizza:NamedPizza template represents the pattern used in the well-known Pizza Ontology tutorial.
+## Visit its URI to see its definition: http://tpl.ottr.xyz/pizza/0.1/NamedPizza.
+## The template takes three arguments:
+##   1. the Pizza IRI, 2. an optional Country IRI, 3. a list of topping IRIs.
 
-	  <br/><br/>
-	  
-	  <b>Additional templates*</b>
-	  <select id="opnLibFormat" name="libFormat">
-            <option value="stottr">stOTTR</option>
-            <option value="wottr">RDF (wOTTR)</option>
-	  </select>
-	  <p>
-	    Enter additional template definitions on the specified format.
-	  </p>
-	  <textarea id="txtLibrary" cols="90" rows="3" name="library"></textarea>
-	  
-	</div>
-	<div class="column right">
-	  <b>Output</b>
-	  <select id="opnOutFormat" name="outFormat">
-            <option value="wottr">RDF (wOTTR)</option>
-            <option value="stottr">stOTTR</option>
-	  </select>
-	  
-	  <input id="btnSubmit" type="submit" value="Send"/>
-	  <p>Specify output format and send.
-	  </p>
+## Below are four template instances:
 
-	  <textarea class="fill" id="txtOutput" cols="90" rows="10" readonly></textarea>
-	  
+o-pizza:NamedPizza(ex:Margerita, ex:Italy, (ex:Tomato, ex:Mozzarella)) .
+
+o-pizza:NamedPizza(ex:QuattroFormaggi, ex:Italy, (ex:Tomato, ex:Mozzarella, ex:Gorgonzola, ex:Parmesan, ex:Stracchino)) .
+
+o-pizza:NamedPizza(ex:Grandiosa, ex:Norway, (ex:Tomato, ex:Cheese, ex:BellPepper, ex:Ham)) .
+
+# Use ottr:none to represent "no value" for optional arguments:
+o-pizza:NamedPizza(ex:PepperoniPizza, ottr:none, (ex:Tomato, ex:Cheese, ex:Pepperoni)) .
+
+</textarea>
+
+			<br/><br/>
+
+			<b>Additional templates*</b>
+			<select id="opnLibFormat" name="libraryFormat">
+				<option value="stottr">stOTTR</option>
+				<option value="wottr">RDF (wOTTR)</option>
+			</select>
+			<p>
+				Enter additional template definitions on the specified format.
+			</p>
+			<textarea id="txtLibrary" cols="90" rows="3" name="library"></textarea>
+
+		</div>
+		<div class="column right">
+			<b>Output</b>
+			<select id="opnOutFormat" name="outputFormat">
+				<option value="wottr">RDF (wOTTR)</option>
+				<option value="stottr">stOTTR</option>
+			</select>
+
+			<input id="btnSubmit" type="submit" value="Send"/>
+			<p>
+				Specify output format and click send.
+			</p>
+
+			<textarea class="fill" id="txtOutput" cols="90" rows="3" readonly></textarea>
+
+		</div>
 	</div>
-      </div>
-    </form>
+</form>
+<p>
+	This is the web version of Lutra, the reference implementation for working with OTTR templates.
+	For more information, see <a href="http://ottr.xyz">ottr.xyz</a>.
+</p>
 </body>
 </html>
 

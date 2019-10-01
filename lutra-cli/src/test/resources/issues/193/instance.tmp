@@ -1,0 +1,4 @@
+@prefix test: <http://example.com/test/ns#> .
+@prefix ex: <http://example.com/ns#> .
+
+test:NamedPizza(ex:Grandiosa, ex:Norge, (ex:Tomat, ex:Ost, ex:Paprika, ex:Kjøttdeig)) .

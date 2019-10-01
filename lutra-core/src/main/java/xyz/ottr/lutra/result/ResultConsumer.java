@@ -22,6 +22,7 @@ package xyz.ottr.lutra.result;
  * #L%
  */
 
+import java.io.PrintStream;
 import java.util.function.Consumer;
 
 public class ResultConsumer<T> implements Consumer<Result<T>> {
@@ -29,28 +30,21 @@ public class ResultConsumer<T> implements Consumer<Result<T>> {
     private MessageHandler messageHandler;
     private Consumer<T> valueConsumer;
 
-    public ResultConsumer(Consumer<T> valueConsumer) {
+    public ResultConsumer(Consumer<T> valueConsumer, PrintStream output) {
         this.valueConsumer = valueConsumer;
-        this.messageHandler = new MessageHandler();
+        if (output == null) {
+            this.messageHandler = new MessageHandler();
+        } else {
+            this.messageHandler = new MessageHandler(output);
+        }
+    }
+
+    public ResultConsumer(Consumer<T> valueConsumer) {
+        this(valueConsumer, null);
     }
 
     public ResultConsumer() {
         this(null);
-    }
-
-    /**
-     * Applied a ResultConumer with the argument consumer to element, and prints
-     * messages.
-     *
-     * @param element
-     *     Element to applied the consumer to
-     * @param consumer
-     *     Consumer which will consume value in element if present
-     */
-    public static <T> void use(Result<T> element, Consumer<T> consumer) {
-        ResultConsumer<T> resConsumer = new ResultConsumer<>(consumer);
-        resConsumer.accept(element);
-        resConsumer.getMessageHandler().printMessages();
     }
 
     @Override
