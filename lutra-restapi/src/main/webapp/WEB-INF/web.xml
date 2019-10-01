@@ -8,7 +8,7 @@
   <display-name>Lutra</display-name>
   <servlet>
     <servlet-name>lutra</servlet-name>
-    <servlet-class>xyz.ottr.lutra.restapi.Servlet</servlet-class>
+    <servlet-class>xyz.ottr.lutra.restapi.WebLutraServlet</servlet-class>
     <load-on-startup>1</load-on-startup>
   </servlet>
 

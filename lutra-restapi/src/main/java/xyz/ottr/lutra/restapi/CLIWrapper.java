@@ -40,9 +40,9 @@ import xyz.ottr.lutra.cli.CLI;
 @NoArgsConstructor
 public class CLIWrapper {
 
-    @NonNull private String input;
-    @NonNull private String inputFormat;
-    @NonNull private String outputFormat;
+    private @NonNull String input;
+    private @NonNull String inputFormat;
+    private @NonNull String outputFormat;
     private String libraryFormat;
     private String library;
 

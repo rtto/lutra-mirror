@@ -24,26 +24,22 @@ package xyz.ottr.lutra.restapi;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
 
-public class Servlet extends HttpServlet {
+public class WebLutraServlet extends HttpServlet {
 
     private static final long serialVersionUID = -7342968018534639139L;
 
     private static final int MAX_SIZE = 50000;
     private static final List<String> originWhitelist = Arrays.asList("http://weblutra.ottr.xyz");
-
-    private DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss.SSS", Locale.ENGLISH);
 
     /*
     @Override
@@ -115,7 +111,7 @@ public class Servlet extends HttpServlet {
 
         try (PrintWriter writer = response.getWriter()) {
             writer.println(content);
-            writer.println("### " +  dateFormat.format(new Date()));
+            writer.println("### " + OffsetDateTime.now(ZoneOffset.UTC));
         }
     }
 
