@@ -1,8 +1,6 @@
-
 [![codebeat badge](https://codebeat.co/badges/6bafc41c-75e1-4bb3-8e6e-9cddbc36f297)](https://codebeat.co/projects/github-com-rtto-lutra-mirror-develop)[![CodeFactor](https://www.codefactor.io/repository/github/rtto/lutra-mirror/badge)](https://www.codefactor.io/repository/github/rtto/lutra-mirror)
 [![Total alerts](https://img.shields.io/lgtm/alerts/g/rtto/lutra-mirror.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/rtto/lutra-mirror/alerts/)
 [![Language grade: Java](https://img.shields.io/lgtm/grade/java/g/rtto/lutra-mirror.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/rtto/lutra-mirror/context:java)
-[![BCH compliance](https://bettercodehub.com/edge/badge/rtto/lutra-mirror?branch=develop-mirror)](https://bettercodehub.com/results/rtto/lutra-mirror)
 [![Known Vulnerabilities](https://snyk.io/test/github/rtto/lutra-mirror/develop/badge.svg)](https://snyk.io/test/github/rtto/lutra-mirror/develop) 
 
 # Lutra – Reasonable Ontology Template (OTTR) reference implementation
@@ -92,8 +90,8 @@ The project is supported by the [Department of Informatics][9] at University of 
 
 [1]:https://openjdk.java.net/install/index.html
 [2]:https://gitlab.com/ottr/lutra/lutra/releases
-[3]:https://gitlab.com/ottr/lutra/lutra/builds/artifacts/master/raw/lutra.jar?job=snapshot
-[4]:https://gitlab.com/ottr/lutra/lutra/builds/artifacts/develop/raw/lutra.jar?job=snapshot
+[3]:https://gitlab.com/ottr/lutra/lutra/-/jobs/artifacts/master/raw/lutra.jar?job=snapshot
+[4]:https://gitlab.com/ottr/lutra/lutra/-/jobs/artifacts/develop/raw/lutra.jar?job=snapshot
 [5]:https://docs.gitlab.com/ee/gitlab-basics/add-merge-request.html
 [6]:https://gitlab.com/ottr/lutra/lutra/tags
 [7]:https://gitlab.com/ottr/lutra/lutra/graphs/master
