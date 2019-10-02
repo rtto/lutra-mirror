@@ -158,9 +158,12 @@ public class WInstanceParser implements InstanceParser<Model> {
 
         List<Result<Term>> x = ResultStream
             .innerOf(lstRes.asJavaList())
-            .mapFlatMap(node -> illegalArgumentValue.test(node)
-                ? Result.error("Illegal argument, value " + RDFNodes.toString(node) + " is in the ottr namespace: " + OTTR.namespace)
-                : Result.of(node))
+            .peek(node -> {
+                if (node.isPresent() && illegalArgumentValue.test(node.get())) {
+                    node.addMessage(Message.warning("Illegal argument, value " + RDFNodes.toString(node.get())
+                        + " is in the ottr namespace: " + OTTR.namespace));
+                }
+            })
             .mapFlatMap(parser)
             .collect(Collectors.toList());
         return Result.aggregate(x);
