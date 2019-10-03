@@ -37,7 +37,6 @@ import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.shared.PrefixMapping;
 import org.apache.jena.vocabulary.XSD;
 
-import xyz.ottr.lutra.result.Message;
 import xyz.ottr.lutra.result.Result;
 import xyz.ottr.lutra.tabottr.TabOTTR;
 import xyz.ottr.lutra.wottr.vocabulary.v04.WOTTR;
@@ -55,7 +54,7 @@ public class RDFNodeFactory {
 
     public Result<RDFNode> toRDFNode(String value, String type) {
 
-        // if is a list, split in to values and parse into RDF nodes with a recursive call.
+        // if is a list, split into values and parse into RDF nodes with a recursive call.
         if (type.endsWith(TabOTTR.TYPE_LIST_POSTFIX)) {
             String singleType = type.substring(0, type.length() - 1).trim(); // remove list operator from type
             List<Result<RDFNode>> nodes = new ArrayList<>();
@@ -85,8 +84,7 @@ public class RDFNodeFactory {
             }
         } else { // literal
             if (!this.validator.isIRI(type)) {
-                Message msg = Message.error("Type " + type + " is not a recognised type.");
-                return Result.empty(msg);
+                return Result.error("Type " + type + " is not a recognised type.");
             }
             return Result.of(toTypedLiteral(value, type));
         }

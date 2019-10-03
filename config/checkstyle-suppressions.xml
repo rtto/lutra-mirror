@@ -7,6 +7,4 @@
 <suppressions>
   <suppress checks="AvoidStarImport"
             files="CheckFactory.java"/>
-  <suppress checks="AbbreviationAsWordInName"
-            files=".*OTTR.java"/>
 </suppressions>

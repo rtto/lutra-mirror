@@ -71,7 +71,7 @@ import xyz.ottr.lutra.result.Message;
     versionProvider = Settings.JarFileVersionProvider.class)
 public class Settings {
 
-    public enum Format { legacy, wottr, stottr, tabottr }
+    public enum Format { legacy, wottr, stottr, tabottr, bottr }
 
     @Option(names = {"--extension", "-e"}, split = ",",
         description = {"File extension of files to use as input to template library.%n"

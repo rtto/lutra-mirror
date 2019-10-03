@@ -22,15 +22,20 @@ package xyz.ottr.lutra.result;
  * #L%
  */
 
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Spliterator;
+import java.util.Spliterators;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 public class ResultStream<E> {
 
@@ -67,7 +72,36 @@ public class ResultStream<E> {
      * in argument Collection.
      */
     public static <R> ResultStream<R> innerOf(Collection<R> col) {
-        return new ResultStream<>(col.stream().map(e -> Result.of(e)));
+        return innerOf(col.stream());
+    }
+
+    /**
+     * Returns a ResultStream consisting of one Result per element
+     * in argument Stream.
+     */
+    public static <R> ResultStream<R> innerOf(Stream<R> stream) {
+        return new ResultStream<>(stream.map(e -> Result.of(e)));
+    }
+
+
+    /**
+     * Returns a ResultStream consisting of one Result per element
+     * in argument array.
+     */
+    public static <R> ResultStream<R> innerOf(Iterator<R> iterator) {
+        Stream<R> stream = StreamSupport.stream(
+            Spliterators.spliteratorUnknownSize(iterator, Spliterator.ORDERED),
+            false);
+        return innerOf(stream);
+    }
+
+
+    /**
+     * Returns a ResultStream consisting of one Result per element
+     * in argument array.
+     */
+    public static <R> ResultStream<R> innerOf(R[] array) {
+        return innerOf(Arrays.stream(array));
     }
 
     /**

@@ -55,11 +55,10 @@ public class TypeFactory {
         init();
     }
     
-    private static final BasicType topType = getType(RDFS.Resource);
-    private static final BasicType botType = getType(OTTR.TypeURI.Bot);
-    private static final BasicType iriType = getType(OTTR.TypeURI.IRI);
-    private static final BasicType literalType = getType(RDFS.Literal);
-
+    public static final BasicType TOP = getType(RDFS.Resource);
+    public static final BasicType BOT = getType(OTTR.TypeURI.Bot);
+    public static final BasicType IRI = getType(OTTR.TypeURI.IRI);
+    public static final BasicType LITERAL = getType(RDFS.Literal);
 
     private static void init() {
         InputStream filename = TypeFactory.class.getClassLoader().getResourceAsStream(OTTR.Files.StdTypes);
@@ -103,26 +102,26 @@ public class TypeFactory {
     public static TermType getConstantType(Term term) {
 
         if (term instanceof BlankNodeTerm) {
-            return new LUBType(topType);
+            return new LUBType(TOP);
         } else if (term instanceof IRITerm) {
-            return new LUBType(iriType);
+            return new LUBType(IRI);
         } else if (term instanceof LiteralTerm) {
 
             String datatypeStr = ((LiteralTerm) term).getDatatype();
             TermType datatype = datatypeStr != null ? TypeFactory.getType(datatypeStr) : null;
-            return datatype == null ? literalType : datatype;
+            return datatype == null ? LITERAL : datatype;
 
         } else if (term instanceof TermList) {
 
             List<Term> terms = ((TermList) term).asList();
             if (terms.isEmpty()) {
-                return new ListType(botType);
+                return new ListType(BOT);
             } else {
-                return new NEListType(new LUBType(topType));
+                return new NEListType(new LUBType(TOP));
             }
 
         } else {
-            return new LUBType(topType);
+            return new LUBType(TOP);
         }
     }
 
@@ -162,6 +161,7 @@ public class TypeFactory {
      * @param resource the Resource of the term type to get
      * @return the matching termtype, or null if no such termtype
      */
+    // TODO: rename to asType since getType could be taken to mean getting the type *of* the resource.
     public static BasicType getType(Resource resource)  {
         return getType(resource.getURI());
     }
@@ -180,7 +180,7 @@ public class TypeFactory {
      * of all other types.
      */
     public static BasicType getTopType() {
-        return topType;
+        return TOP;
     }
 
     /**
@@ -188,7 +188,7 @@ public class TypeFactory {
      * of all other types.
      */
     public static BasicType getBotType() {
-        return botType;
+        return BOT;
     }
 
 }

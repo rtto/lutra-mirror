@@ -1,19 +1,22 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>xyz.ottr.lutra</groupId>
-    <artifactId>lutra</artifactId>
-    <version>0.6.0-beta-3-SNAPSHOT</version>
-    <packaging>pom</packaging>
-    <modules>
-        <module>lutra-core</module>
-        <module>lutra-wottr</module>
-        <module>lutra-tabottr</module>
+	<groupId>xyz.ottr.lutra</groupId>
+	<artifactId>lutra</artifactId>
+	<version>0.6.0-beta-3-SNAPSHOT</version>
+	<packaging>pom</packaging>
+	<modules>
+		<module>lutra-core</module>
+		<module>lutra-wottr</module>
         <module>lutra-stottr</module>
-        <module>lutra-cli</module>
+		<module>lutra-tabottr</module>
+        <module>lutra-bottr</module>
+		<module>lutra-cli</module>
         <module>lutra-restapi</module>
-    </modules>
+	</modules>
+
 
     <issueManagement>
         <url>/issues</url>
@@ -32,7 +35,6 @@
         <url>https://gitlab.com/ottr/lutra/lutra</url>
         <connection>scm:git:https://gitlab.com/ottr/lutra/lutra.git</connection>
         <developerConnection>scm:git:https://gitlab.com/ottr/lutra/lutra.git</developerConnection>
-        <tag>v0.5.0-alpha-2</tag>
     </scm>
 
     <developers>
@@ -44,8 +46,8 @@
         </developer>
     </developers>
 
-    <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
         <maven.compiler.target>1.8</maven.compiler.target>
         <maven.javadoc.skip>true</maven.javadoc.skip>
@@ -399,6 +401,13 @@
             <artifactId>junit</artifactId>
             <scope>test</scope>
         </dependency>
+
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
     </dependencies>
 
 
@@ -418,12 +427,17 @@
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
+                <artifactId>lutra-stottr</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
                 <artifactId>lutra-tabottr</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>lutra-stottr</artifactId>
+                <artifactId>lutra-bottr</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
@@ -432,6 +446,12 @@
                 <version>${project.version}</version>
             </dependency>
 
+
+            <dependency>
+                <groupId>org.projectlombok</groupId>
+                <artifactId>lombok</artifactId>
+                <version>1.18.4</version>
+            </dependency>
 
             <!-- Apache commons -->
             <dependency>
@@ -448,6 +468,11 @@
                 <groupId>commons-io</groupId>
                 <artifactId>commons-io</artifactId>
                 <version>2.6</version>
+            </dependency>
+            <dependency>
+                <groupId>commons-validator</groupId>
+                <artifactId>commons-validator</artifactId>
+                <version>1.6</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.commons</groupId>
@@ -478,12 +503,6 @@
 
             <!-- TabOTTR -->
 
-            <dependency>
-                <groupId>commons-validator</groupId>
-                <artifactId>commons-validator</artifactId>
-                <version>1.6</version>
-            </dependency>
-
             <!-- apache poi -->
             <dependency>
                 <groupId>org.apache.poi</groupId>
@@ -497,6 +516,29 @@
                 <version>4.1.0</version>
             </dependency>
 
+
+			<!-- BOTTR -->
+			<!-- https://mvnrepository.com/artifact/commons-dbutils/commons-dbutils -->
+			<dependency>
+				<groupId>commons-dbutils</groupId>
+				<artifactId>commons-dbutils</artifactId>
+				<version>1.7</version>
+			</dependency>
+			<!-- https://mvnrepository.com/artifact/org.apache.commons/commons-dbcp2 -->
+			<dependency>
+				<groupId>org.apache.commons</groupId>
+				<artifactId>commons-dbcp2</artifactId>
+				<version>2.6.0</version>
+			</dependency>
+
+			<!-- https://mvnrepository.com/artifact/com.h2database/h2 -->
+			<dependency>
+				<groupId>com.h2database</groupId>
+				<artifactId>h2</artifactId>
+				<version>1.4.199</version>
+			</dependency>
+			
+
             <!-- CLI -->
             <!-- https://mvnrepository.com/artifact/info.picocli/picocli -->
             <dependency>
@@ -504,6 +546,9 @@
                 <artifactId>picocli</artifactId>
                 <version>3.9.6</version>
             </dependency>
+
+
+            <!-- Logging and testing -->
 
             <dependency>
                 <groupId>org.slf4j</groupId>

@@ -1,0 +1,7 @@
+@prefix ex:  <http://example.com/ns#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+
+ex:Ann  a foaf:Person .
+ex:Bob  a foaf:Person .
+ex:Carl a foaf:Person .

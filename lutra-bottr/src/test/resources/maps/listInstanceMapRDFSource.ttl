@@ -1,0 +1,32 @@
+@prefix : <http://ns.ottr.xyz/0.4/> .
+@prefix ex: <http://example.com/ns#> .
+@prefix tpl: <http://example.com/tpl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+
+@prefix foaf: <http://xmlns.com/foaf/0.1/> . ## note that this is used in the query.
+
+
+ex:MyMap a :InstanceMap ;
+  :template :Triple ;
+  :query """
+    SELECT
+      ?o ?p (group_concat(?s; separator=',') as ?people)
+    WHERE {
+      ?s a foaf:Person ;
+         ?p ?o
+    }
+    GROUP BY ?o ?p
+    """ ;
+  :argumentMaps (
+    [ :type :IRI ]
+    [ :type :IRI ]
+    [ :type (:NEList :IRI) ]
+    ) ;
+  :source
+    [ a :RDFSource ;
+      :sourceURL
+        "../sources/rdf/a.ttl" ,
+        "../sources/rdf/b.ttl" ] .
+
+

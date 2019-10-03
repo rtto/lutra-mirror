@@ -1,0 +1,13 @@
+@prefix : <http://ns.ottr.xyz/0.4/> .
+@prefix ex: <http://example.com/ns#> .
+@prefix tpl: <http://example.com/tpl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+
+
+ex:MyMap a :InstanceMap ;
+  :template :Triple ;
+  :query "SELECT ?s ?p ?o WHERE { ?s ?p ?o } LIMIT 13" ;
+  :source
+    [ a :SPARQLSource ;
+      :sourceURL "https://query.wikidata.org/bigdata/namespace/wdq/sparql" ] .

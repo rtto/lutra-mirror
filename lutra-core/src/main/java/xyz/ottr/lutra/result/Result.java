@@ -385,11 +385,28 @@ public class Result<E> {
     }
 
     /**
+     * Similar to Result#map(Function), but returns the Result of orElse if this' result is empty -- with a
+     * pointer to this.
+     */
+    public <R> Result<R> mapOrElse(Function<? super E, ? extends R> fun, R orElse) {
+        return this.isPresent()
+            ? this.map(fun)
+            : Result.of(orElse, this);
+    }
+
+    /**
      * Similar to Optional#flatMap(Function), but result's parsed from becomes this.
      */
     public <R> Result<R> flatMap(Function<? super E, ? extends Result<R>> fun) {
+        return flatMapOrElse(fun, Result.empty());
+    }
 
-        Result<R> newResult = result.isPresent() ? fun.apply(result.get()) : Result.empty();
+    /**
+     * Similar to Result#flatMap(Function), but result becomes orElse if this' result is empty.
+     */
+    public <R> Result<R> flatMapOrElse(Function<? super E, ? extends Result<R>> fun, Result<R> orElse) {
+
+        Result<R> newResult = result.isPresent() ? fun.apply(result.get()) : orElse;
         return newResult.addToTrace(this);
     }
 

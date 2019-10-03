@@ -27,6 +27,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.function.Function;
 
+import xyz.ottr.lutra.bottr.io.BInstanceReader;
 import xyz.ottr.lutra.io.InstanceReader;
 import xyz.ottr.lutra.io.ReaderRegistry;
 import xyz.ottr.lutra.io.TemplateReader;
@@ -80,6 +81,11 @@ public class ReaderRegistryImpl implements ReaderRegistry {
         registerInstanceReader(new InstanceReader(
             new SFileReader(), new SInstanceParser(),
             Settings.Format.stottr.toString()));
+
+        // bottr
+        registerInstanceReader(new InstanceReader(
+            new BInstanceReader(),
+            Settings.Format.bottr.toString()));
         
         // tabottr
         registerInstanceReader(new InstanceReader(

@@ -1,0 +1,64 @@
+@prefix : <http://ns.ottr.xyz/0.4/> .
+@prefix ex: <http://example.com/ns#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+
+##id,name,age,address,salary
+##1,Paulo,32,Niteroi,N/A
+
+ex:MyMap1 a :InstanceMap ;
+      :template :Triple ;
+      :query "SELECT CONCAT('ex:map1_id', ID), 'ex:hasSalary', SALARY FROM CSVREAD('src/test/resources/sources/csv/linux.csv') WHERE ID = '1';" ;
+       :argumentMaps(
+                [ :type :IRI ]
+                [ :type :IRI ]
+                [ :type rdfs:Resource ]
+                ) ;
+      :source [ a :H2Source ] .
+
+ex:MyMap2 a :InstanceMap ;
+      :template :Triple ;
+      :query "SELECT CONCAT('ex:map2_id', ID), 'ex:hasSalary', SALARY FROM CSVREAD('src/test/resources/sources/csv/linux.csv') WHERE ID = '1';" ;
+      :source [ a :H2Source ] ;
+      :argumentMaps(
+          [ :type :IRI ]
+          [ :type :IRI ]
+          [ :type xsd:float ]
+      ) .
+
+
+ex:MyMap3a a :InstanceMap ;
+      :template :Triple ;
+      :query "SELECT CONCAT('_:', ID), 'ex:hasSalary', SALARY FROM CSVREAD('src/test/resources/sources/csv/linux.csv') WHERE ID = '1';" ;
+      :source [ a :H2Source ] ;
+      :argumentMaps(
+          [ :type :IRI ]
+          [ :type :IRI ]
+          [ :type xsd:integer ]
+      ) .
+
+ex:MyMap4a a :InstanceMap ;
+    :template :Triple ;
+    :query "SELECT CONCAT('ex:map4_id', ID), 'ex:hasSalary', NULL FROM CSVREAD('src/test/resources/sources/csv/linux.csv') WHERE ID = '1';" ;
+    :argumentMaps(
+      [ :type :IRI ]
+      [ :type :IRI ]
+      [ :type rdfs:Resource ]
+     ) ;
+     :source
+     [ a :H2Source ] .
+
+ex:MyMap4b a :InstanceMap ;
+    :template :Triple ;
+    :query "SELECT CONCAT('ex:map4_id', ID), 'ex:hasSalary', NULL FROM CSVREAD('src/test/resources/sources/csv/linux.csv') WHERE ID = '1';" ;
+    :argumentMaps(
+    [ :type :IRI ]
+    [ :type :IRI ]
+    [ :type rdfs:Resource ; :translationSettings [ :nullValue "myNull" ] ]
+    ) ;
+    :source [ a :H2Source ] .
+
+
+## currently unsupported
+## ex:table
+##  :entry [ :inValue ex:test ; :outValue 9999999999999 ] .
