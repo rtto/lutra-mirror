@@ -45,7 +45,7 @@ public class WOTTR implements WOTTRVocabulary {
     public static final Resource Template = getResource(ns + "Template");
     public static final Resource TemplateSignature = getResource(ns + "Signature");
     public static final Resource BaseTemplate = getResource(ns + "BaseTemplate");
-    public static final Resource TemplateInstance = getResource(ns + "TemplateInstance");
+    public static final Resource Instance = getResource(ns + "Instance");
 
     // Individuals
     public static final Resource triple = getResource(OTTR.BaseURI.Triple);
