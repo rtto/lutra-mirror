@@ -160,7 +160,7 @@ public class WInstanceParser implements InstanceParser<Model> {
             .innerOf(lstRes.asJavaList())
             .peek(node -> {
                 if (node.isPresent() && illegalArgumentValue.test(node.get())) {
-                    node.addMessage(Message.warning("Illegal argument, value " + RDFNodes.toString(node.get())
+                    node.addMessage(Message.error("Illegal argument, value " + RDFNodes.toString(node.get())
                         + " is in the ottr namespace: " + OTTR.namespace));
                 }
             })
