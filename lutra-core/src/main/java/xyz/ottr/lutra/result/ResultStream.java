@@ -124,6 +124,13 @@ public class ResultStream<E> {
     }
 
     /**
+     * @see Stream#peek(Consumer)
+     */
+    public ResultStream<E> peek(Consumer<? super Result<E>> consumer) {
+        return new ResultStream<>(this.results.peek(consumer));
+    }
+
+    /**
      * @see Stream#map(Function)
      */
     public <R> ResultStream<R> map(Function<? super Result<E>, ? extends Result<R>> f) {
