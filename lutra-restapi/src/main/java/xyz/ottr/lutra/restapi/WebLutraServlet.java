@@ -32,8 +32,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.lang3.exception.ExceptionUtils;
-
 public class WebLutraServlet extends HttpServlet {
 
     private static final long serialVersionUID = -7342968018534639139L;
@@ -82,9 +80,7 @@ public class WebLutraServlet extends HttpServlet {
                 output = cli.run();
             } catch (Exception ex) {
                 output = "Error."
-                    + "\n\nMessage: " + ex.getMessage()
-                    //+ "\n\nRoot cause: " + ExceptionUtils.getRootCause(ex)
-                    + "\n\nFull stack trace: " + ExceptionUtils.getStackTrace(ex);
+                    + "\n\nMessage: " + ex.getMessage();
             }
         }
 
