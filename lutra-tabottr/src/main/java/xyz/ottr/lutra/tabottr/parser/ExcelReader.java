@@ -27,6 +27,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import org.apache.poi.EncryptedDocumentException;
 import org.apache.poi.openxml4j.exceptions.InvalidOperationException;
@@ -39,6 +40,7 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
 
+import org.apache.poi.util.LocaleUtil;
 import xyz.ottr.lutra.io.InstanceParser;
 import xyz.ottr.lutra.model.Instance;
 import xyz.ottr.lutra.result.Message;
@@ -48,7 +50,7 @@ import xyz.ottr.lutra.tabottr.model.Table;
 
 public class ExcelReader implements InstanceParser<String> {
     
-    private TableParser tableParser;
+    private final TableParser tableParser;
 
     public ExcelReader() {
         this.tableParser = new TableParser();
@@ -56,7 +58,13 @@ public class ExcelReader implements InstanceParser<String> {
 
     @Override
     public ResultStream<Instance> apply(String filename) {
-        return parseTables(filename).mapToStream(this.tableParser::processInstructions);
+
+        // Set locale to ENGLISH while parsing in order to get e.g., correct decimal indicators (dot, not comma).
+        Locale usersLocale = Locale.getDefault(); // safe-keep users locale
+        LocaleUtil.setUserLocale(Locale.ENGLISH);
+        ResultStream<Instance> instances = parseTables(filename).mapToStream(this.tableParser::processInstructions);
+        LocaleUtil.setUserLocale(usersLocale); // set locale back
+        return instances;
     }
     
     /**
