@@ -37,11 +37,11 @@ public class BlankNodeTerm extends ResourceTerm {
     }
 
     public BlankNodeTerm() {
-        this("blankNodeTerm" + getNewID());
+        this("_blank" + getNewID());
     }
 
     private static int getNewID() {
-        newID++;
+        newID += 1;
         return newID;
     }
 

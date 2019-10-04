@@ -22,6 +22,8 @@ package xyz.ottr.lutra.model.types;
  * #L%
  */
 
+import org.apache.jena.vocabulary.RDF;
+
 public class ListType implements ComplexType {
 
     private TermType inner;
@@ -32,6 +34,11 @@ public class ListType implements ComplexType {
 
     public TermType getInner() {
         return this.inner;
+    }
+
+    @Override
+    public String getOuterIRI() {
+        return RDF.List.getURI();
     }
 
     @Override

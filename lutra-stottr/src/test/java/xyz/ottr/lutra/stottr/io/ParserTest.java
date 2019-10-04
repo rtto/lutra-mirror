@@ -23,7 +23,6 @@ package xyz.ottr.lutra.stottr.io;
  */
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.util.HashMap;
@@ -36,20 +35,19 @@ import java.util.stream.Stream;
 
 import org.apache.jena.vocabulary.XSD;
 
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
-import xyz.ottr.lutra.io.TemplateReader;
 import xyz.ottr.lutra.model.ArgumentList;
 import xyz.ottr.lutra.model.IRITerm;
 import xyz.ottr.lutra.model.Instance;
 import xyz.ottr.lutra.model.LiteralTerm;
 import xyz.ottr.lutra.model.NoneTerm;
-import xyz.ottr.lutra.model.Template;
 import xyz.ottr.lutra.model.Term;
 import xyz.ottr.lutra.model.TermList;
 import xyz.ottr.lutra.result.Result;
+import xyz.ottr.lutra.stottr.parser.SInstanceParser;
+import xyz.ottr.lutra.stottr.parser.SParserUtils;
+import xyz.ottr.lutra.stottr.parser.SPrefixParser;
 
 public class ParserTest {
 

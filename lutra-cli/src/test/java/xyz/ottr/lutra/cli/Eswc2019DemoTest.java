@@ -30,15 +30,12 @@ public class Eswc2019DemoTest {
     
     @Test
     public void expandNamedPizzaInstances() {
-        runCLI("-I tabottr -f --stdout " + ROOT + "instances/NamedPizza-instances.xlsx");
+        CLIRunner.run("-I tabottr -f --stdout " + ROOT + "instances/NamedPizza-instances.xlsx");
     }
 
     @Test
     public void expandPizzaOntologyInstances() {
-        runCLI("-I tabottr -f --stdout " + ROOT + "instances/PizzaOntology-instances.xlsx");
+        CLIRunner.run("-I tabottr -f --stdout " + ROOT + "instances/PizzaOntology-instances.xlsx");
     }
 
-    public void runCLI(String cmd) {
-        CLI.main(cmd.split(" "));
-    }
 }

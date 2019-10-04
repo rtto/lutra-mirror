@@ -33,6 +33,8 @@ import org.apache.jena.vocabulary.OWL;
 import org.apache.jena.vocabulary.XSD;
 import org.junit.Test;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import xyz.ottr.lutra.OTTR;
 import xyz.ottr.lutra.model.ArgumentList;
 import xyz.ottr.lutra.model.BlankNodeTerm;
@@ -48,14 +50,15 @@ import xyz.ottr.lutra.model.TermList;
 import xyz.ottr.lutra.model.types.NEListType;
 import xyz.ottr.lutra.model.types.TypeFactory;
 import xyz.ottr.lutra.result.Message;
-import xyz.ottr.lutra.result.MessageHandler;
 import xyz.ottr.lutra.store.DependencyGraph;
 
 public class CheckFactoryTest {
 
+    private final Logger log = LoggerFactory.getLogger(CheckFactoryTest.class);
+
     private DependencyGraph initStore() {
         
-        DependencyGraph store = new DependencyGraph();
+        DependencyGraph store = new DependencyGraph(null);
         store.addTemplateSignature(
             new TemplateSignature("base2",
                 new ParameterList(new ObjectTerm("x", true), new ObjectTerm("y", true))));
@@ -77,9 +80,7 @@ public class CheckFactoryTest {
             + severity + " but gave " + msgs.size();
 
         if (msgs.size() != numErrors) {
-            for (Message msg : msgs) {
-                MessageHandler.printMessage(msg);
-            }
+            msgs.forEach(m -> m.log(log));
         }
 
         assertTrue(assStr, msgs.size() == numErrors); 
@@ -146,7 +147,7 @@ public class CheckFactoryTest {
     @Test
     public void nonNonBlankUsedAsNonBlankError() {
 
-        DependencyGraph store = new DependencyGraph();
+        DependencyGraph store = new DependencyGraph(null);
         store.addTemplateSignature(
             new TemplateSignature("base",
                 new ParameterList(
@@ -196,10 +197,10 @@ public class CheckFactoryTest {
 
     @Test
     public void correctConsistentTypeUsageTest() {
-        DependencyGraph store = new DependencyGraph();
+        DependencyGraph store = new DependencyGraph(null);
 
         Term varBase1 = new IRITerm("ex.com/var1");
-        varBase1.setType(TypeFactory.getType(OTTR.Types.IRI));
+        varBase1.setType(TypeFactory.getType(OTTR.TypeURI.IRI));
         Term varBase2 = new IRITerm("ex.com/var2");
         varBase2.setType(TypeFactory.getType(OWL.ObjectProperty));
         Term varBase3 = new LiteralTerm("7", TypeFactory.getType(XSD.integer).getIRI());
@@ -209,7 +210,7 @@ public class CheckFactoryTest {
                 new ParameterList(varBase1, varBase2, varBase3)));
 
         Term varC1 = new IRITerm("ex.com/iri");
-        varC1.setType(TypeFactory.getType(OTTR.Types.IRI));
+        varC1.setType(TypeFactory.getType(OTTR.TypeURI.IRI));
         Term varC2 = new LiteralTerm("1", TypeFactory.getType(XSD.integer).getIRI());
 
         Term varC1b = new IRITerm("ex.com/iri");
@@ -237,7 +238,7 @@ public class CheckFactoryTest {
     public void inconsistentTypeUsageTest() {
 
         // Using a constant as both Class and ObjectProperty
-        DependencyGraph store = new DependencyGraph();
+        DependencyGraph store = new DependencyGraph(null);
 
         Term classVar = new IRITerm("ex.com/classVar");
         classVar.setType(TypeFactory.getType(OWL.Class));
@@ -280,7 +281,7 @@ public class CheckFactoryTest {
     public void incorrectTypeUsage() {
 
         // Using a variable with type IRI to a parameter with type Class
-        DependencyGraph store = new DependencyGraph();
+        DependencyGraph store = new DependencyGraph(null);
 
         Term varBase1 = new IRITerm("ex.com/var1");
         varBase1.setType(TypeFactory.getType(OWL.Class));
@@ -293,7 +294,7 @@ public class CheckFactoryTest {
                 new ParameterList(varBase1, varBase2, varBase3)));
 
         Term var1 = new IRITerm("ex.com/iri");
-        var1.setType(TypeFactory.getType(OTTR.Types.IRI));
+        var1.setType(TypeFactory.getType(OTTR.TypeURI.IRI));
         Term var2 = new LiteralTerm("1", TypeFactory.getType(XSD.integer).getIRI());
 
         Term var1b = new IRITerm("ex.com/iri");
@@ -318,7 +319,7 @@ public class CheckFactoryTest {
     public void correctListTypeUsage() {
 
         // Using a variable with type IRI to a parameter with type Class
-        DependencyGraph store = new DependencyGraph();
+        DependencyGraph store = new DependencyGraph(null);
 
         Term varBase = new BlankNodeTerm("_:classes");
         varBase.setType(new NEListType(TypeFactory.getType(OWL.Class)));
@@ -350,7 +351,7 @@ public class CheckFactoryTest {
 
         // Using a list of a variable of type Class and a an integer as argument
         // to a parameter of type NEList<Class>
-        DependencyGraph store = new DependencyGraph();
+        DependencyGraph store = new DependencyGraph(null);
 
         Term varBase = new BlankNodeTerm("_:classes");
         varBase.setType(new NEListType(TypeFactory.getType(OWL.Class)));
@@ -380,7 +381,7 @@ public class CheckFactoryTest {
     @Test
     public void incorrectDeepListTypeUsage() {
 
-        DependencyGraph store = new DependencyGraph();
+        DependencyGraph store = new DependencyGraph(null);
 
         Term varBase = new BlankNodeTerm("_:classeses");
         varBase.setType(new NEListType(new NEListType(TypeFactory.getType(OWL.Class))));

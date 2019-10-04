@@ -1,7 +1,5 @@
 package xyz.ottr.lutra.wottr.util;
 
-import java.io.StringWriter;
-
 /*-
  * #%L
  * lutra-wottr
@@ -24,21 +22,19 @@ import java.io.StringWriter;
  * #L%
  */
 
-import java.util.List;
-import java.util.StringJoiner;
+import java.io.StringWriter;
 
-import org.apache.jena.graph.Node;
 import org.apache.jena.rdf.model.Model;
-import org.apache.jena.rdf.model.RDFList;
-import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.util.FileManager;
 import org.apache.jena.util.FileUtils;
 
-public abstract class ModelIO {
+public enum ModelIO {
 
-    private static Lang defaultLang = Lang.TURTLE;
+    ; // singleton enum
+
+    private static final Lang defaultLang = Lang.TURTLE;
 
     public static Model readModel(String file) {
         return readModel(file, FileUtils.guessLang(file, defaultLang.getLabel()));
@@ -50,34 +46,6 @@ public abstract class ModelIO {
 
     private static Model readModel(String file, String format) {
         return FileManager.get().loadModel(file, format);
-    }
-
-    public static String shortForm(Model model, List<? extends RDFNode> nodes) {
-        StringJoiner sj = new StringJoiner(", ", "[", "]");
-        for (RDFNode node : nodes) {
-            sj.add(shortForm(model, node));
-        }
-        return sj.toString();
-    }
-
-    public static String shortForm(Model model, Node node) {
-        if (node.isVariable()) {
-            return node.toString();
-        }
-        return model.shortForm(node.toString());
-    }
-
-    public static String shortForm(Model model, RDFNode node) {
-        if (node.canAs(RDFList.class)) {
-            return shortForm(model, node.as(RDFList.class).asJavaList());
-        } else {
-            return shortForm(model, node.asNode());
-        }
-    }
-
-    public static String shortForm(RDFNode node) {
-        Model model = node.getModel();
-        return model == null ? node.toString() : shortForm(model, node.asNode());
     }
 
     public static String writeModel(Model model) {
@@ -93,5 +61,4 @@ public abstract class ModelIO {
         RDFDataMgr.write(out, model, language);
         return out.toString();
     }
-
 }

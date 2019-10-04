@@ -25,4 +25,25 @@ package xyz.ottr.lutra.model.types;
 public interface ComplexType extends TermType {
 
     TermType getInner();
+
+    /**
+     * @return the IRI of the (outer) term.
+     */
+    String getOuterIRI();
+
+    /**
+     * Get the level of nesting of complex types. Example List List X has depth 2.
+     * @return
+     */
+    default int getDepth() {
+        return getInner() instanceof ComplexType
+            ? 1 + ((ComplexType) getInner()).getDepth()
+            : 1;
+    }
+
+    default BasicType getInnermost() {
+        return getInner() instanceof ComplexType
+            ? ((ComplexType)getInner()).getInnermost()
+            : (BasicType)getInner();
+    }
 }

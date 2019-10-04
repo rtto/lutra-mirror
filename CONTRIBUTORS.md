@@ -3,6 +3,7 @@
 
 Thanks to all contributors!
 
+
 ## @johanw
 
  - Numerous issues and feature requests
@@ -10,4 +11,9 @@ Thanks to all contributors!
 ## @mehmandarov
 
  - Project documentation
+
+## @vmgraciolli
+
+ - Initial bOTTR implementation
+
 

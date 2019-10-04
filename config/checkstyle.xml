@@ -169,7 +169,8 @@
 	<!-- Lutra: We allow longer abbreviations -->
         <module name="AbbreviationAsWordInName">
             <property name="ignoreFinal" value="false"/>
-            <property name="allowedAbbreviationLength" value="4"/>
+            <property name="allowedAbbreviations" value="OTTR,SPARQL"/>
+            <property name="allowedAbbreviationLength" value="5"/>
         </module>
         <module name="OverloadMethodsDeclarationOrder"/>
         <module name="VariableDeclarationUsageDistance"/>

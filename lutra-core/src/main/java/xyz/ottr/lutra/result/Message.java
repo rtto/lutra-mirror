@@ -24,6 +24,8 @@ package xyz.ottr.lutra.result;
 
 import java.util.Objects;
 
+import org.slf4j.Logger;
+
 public class Message {
 
     public static final int FATAL   = 0;
@@ -84,6 +86,19 @@ public class Message {
             && this.getClass() == o.getClass()
             && this.lvl == ((Message) o).lvl
             && Objects.equals(this.msg, ((Message) o).msg);
+    }
+
+    public void log(Logger log) {
+        switch (this.lvl) {
+            case WARNING:
+                log.warn(this.getMessage());
+                break;
+            case INFO:
+                log.trace(this.getMessage());
+                break;
+            default:
+                log.error(this.getMessage());
+        }
     }
 
     public static String toString(int level) {

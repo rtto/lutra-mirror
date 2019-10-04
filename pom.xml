@@ -2,17 +2,20 @@
 
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>xyz.ottr.lutra</groupId>
-    <artifactId>lutra</artifactId>
-    <version>0.6.0-beta-2</version>
-    <packaging>pom</packaging>
-    <modules>
-        <module>lutra-core</module>
-        <module>lutra-wottr</module>
-        <module>lutra-tab</module>
+	<groupId>xyz.ottr.lutra</groupId>
+	<artifactId>lutra</artifactId>
+	<version>0.6.0</version>
+	<packaging>pom</packaging>
+	<modules>
+		<module>lutra-core</module>
+		<module>lutra-wottr</module>
         <module>lutra-stottr</module>
-        <module>lutra-cli</module>
-    </modules>
+		<module>lutra-tabottr</module>
+        <module>lutra-bottr</module>
+		<module>lutra-cli</module>
+        <module>lutra-restapi</module>
+	</modules>
+
 
     <issueManagement>
         <url>/issues</url>
@@ -31,7 +34,6 @@
         <url>https://gitlab.com/ottr/lutra/lutra</url>
         <connection>scm:git:https://gitlab.com/ottr/lutra/lutra.git</connection>
         <developerConnection>scm:git:https://gitlab.com/ottr/lutra/lutra.git</developerConnection>
-        <tag>v0.5.0-alpha-2</tag>
     </scm>
 
     <developers>
@@ -43,8 +45,8 @@
         </developer>
     </developers>
 
-    <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
         <maven.compiler.target>1.8</maven.compiler.target>
         <maven.javadoc.skip>true</maven.javadoc.skip>
@@ -58,7 +60,6 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.8.1</version>
                 <configuration>
                     <source>1.8</source>
                     <target>1.8</target>
@@ -110,7 +111,6 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.22.2</version>
                 <!-- <configuration> <useSystemClassLoader>false</useSystemClassLoader>
                     </configuration> --> <!-- For Debian, see https://stackoverflow.com/questions/13170860/failed-to-execute-goal-org-apache-maven-pluginsmaven-surefire-plugin2-10test/41666587#41666587 -->
                 <!-- <configuration> <argLine>-Xms15512m -Xmx15512m</argLine> </configuration> --> <!-- To increase memory -->
@@ -284,6 +284,36 @@
         <pluginManagement>
             <plugins>
 
+                <plugin>
+                    <artifactId>maven-clean-plugin</artifactId>
+                    <version>3.1.0</version>
+                </plugin>
+                <!-- see http://maven.apache.org/ref/current/maven-core/default-bindings.html#Plugin_bindings_for_war_packaging -->
+                <plugin>
+                    <artifactId>maven-resources-plugin</artifactId>
+                    <version>3.0.2</version>
+                </plugin>
+                <plugin>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>3.8.0</version>
+                </plugin>
+                <plugin>
+                    <artifactId>maven-surefire-plugin</artifactId>
+                    <version>2.22.1</version>
+                </plugin>
+                <plugin>
+                    <artifactId>maven-war-plugin</artifactId>
+                    <version>3.2.2</version>
+                </plugin>
+                <plugin>
+                    <artifactId>maven-install-plugin</artifactId>
+                    <version>2.5.2</version>
+                </plugin>
+                <plugin>
+                    <artifactId>maven-deploy-plugin</artifactId>
+                    <version>2.8.2</version>
+                </plugin>
+                
                 <!-- https://github.com/maven-download-plugin/maven-download-plugin -->
                 <plugin>
                     <groupId>com.googlecode.maven-download-plugin</groupId>
@@ -327,9 +357,7 @@
             </plugin>
 
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-report-plugin</artifactId>
-                <version>2.22.2</version>
+                <artifactId>maven-surefire-plugin</artifactId>
             </plugin>
 
             <plugin>
@@ -359,11 +387,26 @@
 
 
     <dependencies>
+        <!-- https://mvnrepository.com/artifact/org.projectlombok/lombok -->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.18.10</version>
+            <scope>provided</scope>
+        </dependency>
+
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <scope>test</scope>
         </dependency>
+
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
     </dependencies>
 
 
@@ -383,15 +426,31 @@
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>lutra-tab</artifactId>
+                <artifactId>lutra-stottr</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>lutra-stottr</artifactId>
+                <artifactId>lutra-tabottr</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>lutra-bottr</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>lutra-cli</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
+
+            <dependency>
+                <groupId>org.projectlombok</groupId>
+                <artifactId>lombok</artifactId>
+                <version>1.18.4</version>
+            </dependency>
 
             <!-- Apache commons -->
             <dependency>
@@ -404,11 +463,20 @@
                 <artifactId>commons-math3</artifactId>
                 <version>3.6.1</version>
             </dependency>
-
             <dependency>
                 <groupId>commons-io</groupId>
                 <artifactId>commons-io</artifactId>
                 <version>2.6</version>
+            </dependency>
+            <dependency>
+                <groupId>commons-validator</groupId>
+                <artifactId>commons-validator</artifactId>
+                <version>1.6</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-lang3</artifactId>
+                <version>3.9</version>
             </dependency>
 
 
@@ -434,12 +502,6 @@
 
             <!-- TabOTTR -->
 
-            <dependency>
-                <groupId>commons-validator</groupId>
-                <artifactId>commons-validator</artifactId>
-                <version>1.6</version>
-            </dependency>
-
             <!-- apache poi -->
             <dependency>
                 <groupId>org.apache.poi</groupId>
@@ -453,6 +515,29 @@
                 <version>4.1.0</version>
             </dependency>
 
+
+			<!-- BOTTR -->
+			<!-- https://mvnrepository.com/artifact/commons-dbutils/commons-dbutils -->
+			<dependency>
+				<groupId>commons-dbutils</groupId>
+				<artifactId>commons-dbutils</artifactId>
+				<version>1.7</version>
+			</dependency>
+			<!-- https://mvnrepository.com/artifact/org.apache.commons/commons-dbcp2 -->
+			<dependency>
+				<groupId>org.apache.commons</groupId>
+				<artifactId>commons-dbcp2</artifactId>
+				<version>2.6.0</version>
+			</dependency>
+
+			<!-- https://mvnrepository.com/artifact/com.h2database/h2 -->
+			<dependency>
+				<groupId>com.h2database</groupId>
+				<artifactId>h2</artifactId>
+				<version>1.4.199</version>
+			</dependency>
+			
+
             <!-- CLI -->
             <!-- https://mvnrepository.com/artifact/info.picocli/picocli -->
             <dependency>
@@ -460,6 +545,9 @@
                 <artifactId>picocli</artifactId>
                 <version>3.9.6</version>
             </dependency>
+
+
+            <!-- Logging and testing -->
 
             <dependency>
                 <groupId>org.slf4j</groupId>

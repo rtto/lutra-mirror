@@ -1,5 +1,6 @@
 package xyz.ottr.lutra.result;
 
+
 /*-
  * #%L
  * lutra-core
@@ -22,14 +23,14 @@ package xyz.ottr.lutra.result;
  * #L%
  */
 
+import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
-//import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
+import java.util.function.BiPredicate;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -37,61 +38,27 @@ import java.util.stream.Collectors;
 
 public class Result<E> {
 
-    // Used to construct a printable context, which is stored within a Result
-    // object in the parsedFrom-pointer. This is used by a ResultConsumer
-    // to give a context to the Messages printed. The default is just the
-    // toString-representation of the original object, but one can override
-    // this to get a different context object.
-    private static Function<Object, ?> deriveContext = obj -> {
-        if (obj == null) {
-            return null;
-        }
-        String str = obj.toString();
-        String prefix = "(" + obj.getClass().getName() + ") ";
-        if (str.length() <= 60) {
-            return prefix + str;
-        } else {
-            return prefix + str.substring(0, 60) + "...";
-        }
-    };
-
-    /** 
-     * Sets the argument function to be the method to construct a printable context, which is
-     * stored within a Result object in the parsedFrom-pointer.
-     * This context is then used by a ResultConsumer to give a context to the Messages printed. 
-     * The default is just Object#toString()
-     */
-    public static void setDeriveContextFunction(Function<Object, ?> fun) {
-        deriveContext = fun;
-    }
-
-    private Result<?> parsedFrom;
-    private final List<Message> messages;
+    private Trace trace;
     private final Optional<E> result;
 
-    // Used to determine of this is a context Result (deriveContext has been applied)
-    private boolean isContext = false; 
-
-    private Result(Optional<E> result, List<Message> messages, Result<?> parsedFrom) {
-        this.result = result;
-        this.messages = messages;
-        addParsedFrom(parsedFrom);
-    }
-
     private Result(Optional<E> result) {
-        this(result, new LinkedList<>(), null);
+        this.result = result;
+        this.trace = new Trace(result);
     }
 
-    private Result(Optional<E> result, Message msg, Result<?> parsedFrom) {
-        this(result, new LinkedList<>(), parsedFrom);
-        this.messages.add(msg);
+    private Result(Optional<E> result, Collection<Message> messages) {
+        this(result);
+        this.trace.addMessages(messages);
     }
-
-    private Result(Result<E> other, Result<?> newParsedFrom) {
-        this(other == null ? Optional.empty() : other.result,
-            other == null ? new LinkedList<>() : other.messages,
-            other == null ? null : other.parsedFrom);
-        addParsedFrom(newParsedFrom);
+    
+    private Result(Optional<E> result, Trace trace) {
+        this(result);
+        this.trace.addTrace(trace);
+    }
+    
+    private Result(Optional<E> result, Collection<Message> messages, Trace trace) {
+        this(result, messages);
+        this.trace.addTrace(trace);
     }
 
     /**
@@ -105,7 +72,7 @@ public class Result<E> {
      * Same as #of, but sets parsedFrom to argument Result.
      */
     public static <R> Result<R> of(R val, Result<?> parsedFrom) {
-        return new Result<R>(Optional.of(val), new LinkedList<>(), parsedFrom);
+        return new Result<R>(Optional.of(val), parsedFrom.getTrace());
     }
 
     /**
@@ -119,7 +86,15 @@ public class Result<E> {
      * Same as #ofNullable, but sets parsedFrom to argument Result.
      */
     public static <R> Result<R> ofNullable(R val, Result<?> parsedFrom) {
-        return new Result<R>(Optional.ofNullable(val), new LinkedList<>(), parsedFrom);
+        return new Result<R>(Optional.ofNullable(val), parsedFrom.getTrace());
+    }
+    
+    public static <R> Set<Result<R>> lift(Set<R> rs) {
+        return ResultStream.innerOf(rs).collect(Collectors.toSet());
+    }
+
+    public static <R> List<Result<R>> lift(List<R> rs) {
+        return ResultStream.innerOf(rs).collect(Collectors.toList());
     }
 
     /**
@@ -140,7 +115,7 @@ public class Result<E> {
      *      An empty Result
      */
     public static <R> Result<R> empty(Result<?> parsedFrom) {
-        return new Result<R>(Optional.empty(), new LinkedList<>(), parsedFrom);
+        return new Result<R>(Optional.empty(), parsedFrom.getTrace());
     }
 
     /**
@@ -154,7 +129,7 @@ public class Result<E> {
      *      An empty Result
      */
     public static <R> Result<R> empty(Message msg) {
-        return new Result<R>(Optional.empty(), msg, null);
+        return new Result<R>(Optional.empty(), Arrays.asList(msg));
     }
 
     /**
@@ -171,7 +146,7 @@ public class Result<E> {
      *      An empty Result
      */
     public static <R> Result<R> empty(Message msg, Result<?> parsedFrom) {
-        return new Result<R>(Optional.empty(), msg, parsedFrom);
+        return new Result<R>(Optional.empty(), Arrays.asList(msg), parsedFrom.getTrace());
     }
 
     /**
@@ -185,33 +160,49 @@ public class Result<E> {
      *      An empty Result
      */
     public static <R> Result<R> empty(List<Message> msgs) {
-        return new Result<R>(Optional.empty(), msgs, null);
+        return new Result<R>(Optional.empty(), msgs);
     }
 
-    protected Result<?> deriveContext() {
-        if (!this.isContext) {
-            Result<?> context = this.map(deriveContext);
-            context.isContext = true;
-            return context;
-        } else {
-            return this;
-        }
+    public static <R> Result<R> fatal(String msg) {
+        return empty(Message.fatal(msg));
     }
 
-    private void addParsedFrom(Result<?> other) {
-        if (other == null) {
-            return;
+    public static <R> Result<R> error(String msg) {
+        return empty(Message.error(msg));
+    }
+
+    public static <R> Result<R> warning(String msg) {
+        return empty(Message.warning(msg));
+    }
+
+    public static <R> Result<R> info(String msg) {
+        return empty(Message.info(msg));
+    }
+    
+    public Result<E> addToTrace(Result<?> other) {
+        if (other != null) {
+            this.trace.addTrace(other.getTrace());
         }
-        Result<?> context = other.deriveContext();
-        Result<?> r = this;
-        Set<Result<?>> visited = new HashSet<>();
-        while (r.parsedFrom != null && !r.parsedFrom.equals(context) && !visited.contains(r)) {
-            r = r.parsedFrom;
-            visited.add(r);
+        return this;
+    }
+
+    public Result<E> addToTrace(Trace other) {
+        if (other != null) {
+            this.trace.addTrace(other);
         }
-        if (r.parsedFrom == null) {
-            r.parsedFrom = context;
+        return this;
+    }
+
+    /**
+     * Add a result to this result by bi-consuming this and the other result. Adds the other result to the
+     * context of this result.
+     * @see Result#addResult(Result, BiConsumer)
+     */
+    public <B> void addResult(Result<B> other, BiConsumer<? super E, ? super B> consumer) {
+        if (this.result.isPresent() && other.isPresent()) {
+            consumer.accept(this.result.get(), other.result.get());
         }
+        this.trace.addDirectTrace(other.getTrace());
     }
 
     /**
@@ -219,12 +210,7 @@ public class Result<E> {
      * returns empty Result if not, but keeps both argument Result's messages.
      */
     public static <A,B,R> Result<R> zip(Result<A> a, Result<B> b, BiFunction<A,B,R> f) {
-        // TODO: Implement using flatMap to get parsedFrom pointers instead of addMessage
-        R r = a.isPresent() && b.isPresent() ? f.apply(a.get(), b.get()) : null;
-        Result<R> res = Result.ofNullable(r);
-        res.addParsedFrom(a);
-        res.addParsedFrom(b);
-        return res;
+        return conditionalZip(a, b, (x,y) -> x.isPresent() && y.isPresent(), f);
     }
 
     /**
@@ -232,14 +218,51 @@ public class Result<E> {
      * and keeps both argument Result's messages.
      */
     public static <A,B,R> Result<R> zipNullables(Result<A> a, Result<B> b, BiFunction<A,B,R> f) {
-        // TODO: Implement using flatMap to get parsedFrom pointers instead of addMessage
-        A aval = a.isPresent() ? a.get() : null;
-        B bval = b.isPresent() ? b.get() : null;
-        R r = f.apply(aval, bval);
-        Result<R> res = Result.ofNullable(r);
-        res.addParsedFrom(a);
-        res.addParsedFrom(b);
+        return conditionalZip(a, b, (x,y) -> true, f);
+    }
+
+
+    /**
+     * Applies f to the values (possibly null) contained in argument results if the condition is met, and
+     * returns an empty Result if not, but keeps both argument Result's messages.
+     */
+    public static <A,B,R> Result<R> conditionalZip(Result<A> a, Result<B> b, BiPredicate<Result<A>, Result<B>> p, BiFunction<A, B, R> f) {
+        Result<R> res = p.test(a, b)
+            ? Result.ofNullable(f.apply(a.orElse(null), b.orElse(null)))
+            : Result.empty();
+        Trace fork = Trace.fork(a.getTrace(), b.getTrace());
+        res.addToTrace(fork);
         return res;
+    }
+
+
+    /**
+     * Applies f to the value contained in the argument result if it is present, and
+     * returns empty Result if not.
+     */
+    public static <A,B,R> Result<R> apply(Result<A> a, Function<A, Result<R>> f) {
+        return a.flatMap(f);
+    }
+
+    /**
+     * Applies f to the values contained in argument results if both are present, and
+     * returns empty Result if not.
+     */
+    public static <A,B,R> Result<R> apply(Result<A> a, Result<B> b, BiFunction<A, B, Result<R>> f) {
+        return flatten(zip(a, b, f));
+    }
+    
+    public static <R> Result<R> flatten(Result<Result<R>> r) {
+        return r.flatMap(x -> x);
+    }
+
+    /**
+     * Consumes the values contained in argument results if both are present.
+     */
+    public static <A,B> void consume(Result<A> a, Result<B> b, BiConsumer<A,B> f) {
+        if (a.isPresent() && b.isPresent()) {
+            f.accept(a.get(), b.get());
+        }
     }
 
     /**
@@ -310,14 +333,29 @@ public class Result<E> {
     public E get() {
         return this.result.get();
     }
+    
+    protected Optional<E> getOptional() {
+        return this.result;
+    }
+
+    /**
+     * @see Optional#orElse(E)
+     */
+    public E orElse(E other) {
+        return this.result.orElse(other);
+    }
+
+    protected Trace getTrace() {
+        return this.trace;
+    }
 
     /**
      * Returns the list of Message-s on this Result.
      * To retrieve all Message-s including Message-s on the Result-s
      * this is parsed from, use a ResultConsumer or Result#getAllMessages().
      */
-    public List<Message> getMessages() {
-        return this.messages;
+    protected List<Message> getMessages() {
+        return this.trace.getMessages();
     }
 
     /**
@@ -325,16 +363,9 @@ public class Result<E> {
      * To retrieve only Message-s on this Result, use Result#getMessages().
      */
     public List<Message> getAllMessages() {
-        ResultConsumer<E> msgs = new ResultConsumer<>();
-        msgs.accept(this);
-        return msgs.getMessageHandler().getMessages();
-    }
-
-    /**
-     * Returns the Result which this was derived from, via some form of computation.
-     */
-    public Result<?> getParsedFrom() {
-        return this.parsedFrom;
+        MessageHandler msgs = new MessageHandler();
+        msgs.add(this);
+        return msgs.getMessages();
     }
 
     /**
@@ -342,7 +373,7 @@ public class Result<E> {
      * to the parsed from Result.
      */
     public Result<E> filter(Predicate<E> pred) {
-        return new Result<>(this.result.filter(pred), this.messages, this.parsedFrom);
+        return new Result<>(this.result.filter(pred), this.trace);
     }
 
     /**
@@ -350,16 +381,33 @@ public class Result<E> {
      * to the parsed from Result.
      */
     public <R> Result<R> map(Function<? super E, ? extends R> fun) {
-        return new Result<R>(this.result.map(fun), this.messages, this.parsedFrom);
+        return new Result<R>(this.result.map(fun), this.trace);
+    }
+
+    /**
+     * Similar to Result#map(Function), but returns the Result of orElse if this' result is empty -- with a
+     * pointer to this.
+     */
+    public <R> Result<R> mapOrElse(Function<? super E, ? extends R> fun, R orElse) {
+        return this.isPresent()
+            ? this.map(fun)
+            : Result.of(orElse, this);
     }
 
     /**
      * Similar to Optional#flatMap(Function), but result's parsed from becomes this.
      */
     public <R> Result<R> flatMap(Function<? super E, ? extends Result<R>> fun) {
+        return flatMapOrElse(fun, Result.empty());
+    }
 
-        Result<R> newResult = result.isPresent() ? fun.apply(result.get()) : Result.empty();
-        return new Result<R>(newResult, this);
+    /**
+     * Similar to Result#flatMap(Function), but result becomes orElse if this' result is empty.
+     */
+    public <R> Result<R> flatMapOrElse(Function<? super E, ? extends Result<R>> fun, Result<R> orElse) {
+
+        Result<R> newResult = result.isPresent() ? fun.apply(result.get()) : orElse;
+        return newResult.addToTrace(this);
     }
 
     /**
@@ -372,7 +420,7 @@ public class Result<E> {
         if (mapped.isPresent()) {
             // Return a stream of results with parsedFrom pointers to this
             // TODO: Fix loss of messages if mapped contains an empty ResultStream
-            return mapped.get().map(r -> new Result<>(r, this));
+            return mapped.get().filter(r -> r != null).map(r -> r.addToTrace(this));
         } else {
             // Return a stream of an empty Result, containing parsedFrom pointer to this
             return ResultStream.of(Result.empty(this));
@@ -383,29 +431,21 @@ public class Result<E> {
      * Adds the argument Message to this' list of Message-s.
      */
     public void addMessage(Message newMsg) {
-        this.messages.add(newMsg);
+        this.trace.addMessage(newMsg);
     }
 
     /**
      * Adds the argument Message-s to this' list of Message-s.
      */
     public void addMessages(Collection<Message> moreMsgs) {
-        this.messages.addAll(moreMsgs);
+        this.trace.addMessages(moreMsgs);
     }
 
     @Override
     public String toString() {
         return (this.result.isPresent()
                 ? "Result(" + this.result.get().toString() + ")"
-                : "Empty") + this.messages.toString();
-    }
-
-    public String getContext() {
-        if (isContext) {
-            return get().toString();
-        } else {
-            return deriveContext.apply(get()).toString();
-        }
+                : "Empty") + this.trace.getMessages().toString();
     }
 
     /**

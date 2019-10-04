@@ -22,6 +22,11 @@ package xyz.ottr.lutra.stottr;
  * #L%
  */
 
+import org.apache.commons.collections4.BidiMap;
+import org.apache.commons.collections4.bidimap.DualHashBidiMap;
+import org.apache.commons.collections4.bidimap.UnmodifiableBidiMap;
+import xyz.ottr.lutra.model.ArgumentList;
+
 public class STOTTR {
 
     // Terms
@@ -61,6 +66,16 @@ public class STOTTR {
         public static final String zipMax = "zipMax";
         public static final String expanderSep = "|";
         public static final String expander = "++";
+
+        public static final BidiMap<String, ArgumentList.Expander> map;
+
+        static {
+            BidiMap<String, ArgumentList.Expander> tempMap = new DualHashBidiMap<>();
+            tempMap.put(cross, ArgumentList.Expander.CROSS);
+            tempMap.put(zipMin, ArgumentList.Expander.ZIPMIN);
+            tempMap.put(zipMax, ArgumentList.Expander.ZIPMAX);
+            map = UnmodifiableBidiMap.unmodifiableBidiMap(tempMap);
+        }
     }
 
     public static class Parameters {
@@ -71,4 +86,5 @@ public class STOTTR {
         public static final String nonBlank = "!";
         public static final String defaultValSep = "=";
     }
+
 }
