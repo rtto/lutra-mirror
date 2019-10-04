@@ -10,6 +10,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Support for stOTTR for both reading and writing, and both instances and templates
 - CLI-flag to set format for template library fetched online
+- Initial support for bOTTR
+- Bug fixes
 
 ### Changed
 - Switched the flags `-l` and `-L` for consistency
