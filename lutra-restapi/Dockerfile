@@ -1,7 +1,7 @@
 # Pull base image
 From tomcat:8-jre8
 
-MAINTAINER "Martin G. Skjæveland <m.g.skjaeveland@gmail.com>"
+LABEL maintainer="m.g.skjaeveland@gmail.com"
 
 ADD target/lutra.war /usr/local/tomcat/webapps/
 
