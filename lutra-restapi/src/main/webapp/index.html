@@ -5,52 +5,64 @@
     <title>Lutra</title>
 
     <link rel="stylesheet" type="text/css" href="https://ottr.xyz/inc/fonts.css" />
-    
     <style>
 .row {
-  display: flex;
-  height: 85vh;
+    display: flex;
+    height: 85vh;
 }
 
 .column {
-  flex: 50%;
-  padding: 10px;
+    flex: 50%;
+    padding: 10px;
 }
 
 textarea {
-  width: 100%;
+    width: 100%;
 }
 
 .column.left textarea {
-  height: 37%;
+    height: 37%;
 }
 
 .column.right textarea {
-  height: 87%;
+    height: 87%;
 }
 
-	</style>
+    </style>
 
     <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
     <script>
     $(function(){
-	$('#inputform').submit(function() { // catch the form's submit event
+        $('#inputform').submit(function() { // catch the form's submit event
+	    var waitValue = "Wait...";
             $("#btnSubmit").attr("disabled", true);
+            $("#btnSubmit").attr("value", waitValue);
             $('#txtOutput').text("Loading...");
-            $.ajax({ // create an AJAX call...
-				data: $(this).serialize(), // get the form data
-				type: $(this).attr('method'), // GET or POST
-				url: $(this).attr('action'), // the file to call
-				success: function(response) {
+            $.ajax({
+                data: $(this).serialize(), // get the form data
+                type: $(this).attr('method'), // GET or POST
+                url: $(this).attr('action'),
+                success: function(response) {
                     $('#txtOutput').text(response).html();
-				},
-				error: function (xhr, ajaxOptions, thrownError) {
-					$('#txtOutput').text('Error: ' + xhr.status + '\n' + thrownError).html();
-      			}
+                },
+                error: function (xhr, ajaxOptions, thrownError) {
+                    $('#txtOutput').text('Error: ' + xhr.status + '\n' + thrownError).html();
+                },
+                complete: function(xhr, textStatus) {           
+                    var counter = 4;
+                    var interval = setInterval(function() {
+                        counter--;
+                        $("#btnSubmit").attr("value", waitValue + " (" + counter + ")");
+                        if (counter == 0) {
+                            clearInterval(interval);
+                            $("#btnSubmit").attr("disabled", false);
+                            $("#btnSubmit").attr("value", "Send");
+                        }
+                    }, 1000);
+                }
             });
-            $("#btnSubmit").attr("disabled", false);
-	    return false; // cancel original event to prevent form submitting	   
-	});
+            return false; // cancel original event to prevent form submitting
+        });
     });
     </script>
 
@@ -58,18 +70,18 @@ textarea {
 <body>
 <h1>Lutra</h1>
 <form id="inputform" action="./expand" method="post">
-	<div class="row">
-		<div class="column left">
+    <div class="row">
+        <div class="column left">
 
-			<b>Instances</b>
-			<select id="opnInFormat" name="inputFormat">
-				<option value="stottr">stOTTR</option>
-				<option value="wottr">RDF (wOTTR)</option>
-			</select>
-			<p>
-				Enter template instances on the specified format. Templates are fetched by their IRI or from below.
-			</p>
-			<textarea id="txtInput" cols="90" rows="3" name="input">
+            <b>Instances</b>
+            <select id="opnInFormat" name="inputFormat">
+                <option value="stottr">stOTTR</option>
+                <option value="wottr">RDF (wOTTR)</option>
+            </select>
+            <p>
+                Enter template instances on the specified format. Templates are fetched by their IRI or from below.
+            </p>
+            <textarea id="txtInput" cols="90" rows="3" name="input">
 @prefix ottr: <http://ns.ottr.xyz/0.4/> .
 @prefix o-pizza: <http://tpl.ottr.xyz/pizza/0.1/> .
 @prefix ex: <http://example.com/ns#> .
@@ -92,39 +104,39 @@ o-pizza:NamedPizza(ex:PepperoniPizza, ottr:none, (ex:Tomato, ex:Cheese, ex:Peppe
 
 </textarea>
 
-			<br/><br/>
+            <br/><br/>
 
-			<b>Additional templates*</b>
-			<select id="opnLibFormat" name="libraryFormat">
-				<option value="stottr">stOTTR</option>
-				<option value="wottr">RDF (wOTTR)</option>
-			</select>
-			<p>
-				Enter additional template definitions on the specified format.
-			</p>
-			<textarea id="txtLibrary" cols="90" rows="3" name="library"></textarea>
+            <b>Additional templates*</b>
+            <select id="opnLibFormat" name="libraryFormat">
+                <option value="stottr">stOTTR</option>
+                <option value="wottr">RDF (wOTTR)</option>
+            </select>
+            <p>
+                Enter additional template definitions on the specified format.
+            </p>
+            <textarea id="txtLibrary" cols="90" rows="3" name="library"></textarea>
 
-		</div>
-		<div class="column right">
-			<b>Output</b>
-			<select id="opnOutFormat" name="outputFormat">
-				<option value="wottr">RDF (wOTTR)</option>
-				<option value="stottr">stOTTR</option>
-			</select>
+        </div>
+        <div class="column right">
+            <b>Output</b>
+            <select id="opnOutFormat" name="outputFormat">
+                <option value="wottr">RDF (wOTTR)</option>
+                <option value="stottr">stOTTR</option>
+            </select>
 
-			<input id="btnSubmit" type="submit" value="Send"/>
-			<p>
-				Specify output format and click send.
-			</p>
+            <input id="btnSubmit" type="submit" value="Send"/>
+            <p>
+                Specify output format and click send.
+            </p>
 
-			<textarea class="fill" id="txtOutput" cols="90" rows="3" readonly></textarea>
+            <textarea class="fill" id="txtOutput" cols="90" rows="3" readonly></textarea>
 
-		</div>
-	</div>
+        </div>
+    </div>
 </form>
 <p>
-	This is the web version of Lutra, the reference implementation for working with OTTR templates.
-	For more information, see <a href="http://ottr.xyz">ottr.xyz</a>.
+    This is the web version of Lutra, the reference implementation for working with OTTR templates.
+    For more information, see <a href="http://ottr.xyz">ottr.xyz</a>.
 </p>
 </body>
 </html>
