@@ -48,8 +48,8 @@ textarea {
                 error: function (xhr, ajaxOptions, thrownError) {
                     $('#txtOutput').text('Error: ' + xhr.status + '\n' + thrownError).html();
                 },
-                complete: function(xhr, textStatus) {           
-                    var counter = 4;
+                complete: function(xhr, textStatus) {
+                    var counter = 3;
                     var interval = setInterval(function() {
                         counter--;
                         $("#btnSubmit").attr("value", waitValue + " (" + counter + ")");
@@ -77,6 +77,7 @@ textarea {
             <select id="opnInFormat" name="inputFormat">
                 <option value="stottr">stOTTR</option>
                 <option value="wottr">RDF (wOTTR)</option>
+                <option value="bottr">bOTTR (experimental)</option>
             </select>
             <p>
                 Enter template instances on the specified format. Templates are fetched by their IRI or from below.
@@ -106,27 +107,46 @@ o-pizza:NamedPizza(ex:PepperoniPizza, ottr:none, (ex:Tomato, ex:Cheese, ex:Peppe
 
             <br/><br/>
 
+	    <b>Fetch templates by URI:</b>
+            <input type="checkbox" name="fetchMissing" value="true" checked="checked"/>
+	    <br/>	    
+
             <b>Additional templates*</b>
             <select id="opnLibFormat" name="libraryFormat">
                 <option value="stottr">stOTTR</option>
                 <option value="wottr">RDF (wOTTR)</option>
             </select>
             <p>
-                Enter additional template definitions on the specified format.
+                Select if templates should be fetched by their URI, and enter any additional
+                template definitions on the specified format.
             </p>
             <textarea id="txtLibrary" cols="90" rows="3" name="library"></textarea>
 
         </div>
         <div class="column right">
+
+            <b>Action</b>
+            <select id="opnMode" name="mode">
+                <optgroup label="instances">
+                    <option value="expand">expand</option>
+                    <option value="format">format</option>
+                </optgroup>
+                <optgroup label="library">
+                    <option value="lint">lint</option>
+                    <option value="expandLibrary">expand</option>
+                    <option value="formatLibrary">format</option>
+                </optgroup>
+            </select>
+	    
             <b>Output</b>
             <select id="opnOutFormat" name="outputFormat">
                 <option value="wottr">RDF (wOTTR)</option>
                 <option value="stottr">stOTTR</option>
             </select>
-
+	    
             <input id="btnSubmit" type="submit" value="Send"/>
             <p>
-                Specify output format and click send.
+                Specify action, output format and click send.
             </p>
 
             <textarea class="fill" id="txtOutput" cols="90" rows="3" readonly></textarea>
