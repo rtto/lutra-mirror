@@ -53,7 +53,6 @@ public class BOTTR extends WOTTR {
     public static final Property password = getProperty(ns + "password");
     public static final Property jdbcDriver = getProperty(ns + "jdbcDriver");
 
-
     public static final Property nullValue = getProperty(ns + "nullValue");
     public static final Property languageTag = getProperty(ns + "languageTag");
     public static final Property labelledBlankPrefix = getProperty(ns + "labelledBlankPrefix");

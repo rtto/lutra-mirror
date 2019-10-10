@@ -63,11 +63,16 @@ public class WebLutraServlet extends HttpServlet {
         CLIWrapper cli = new CLIWrapper();
 
         String input = request.getParameter("input");
-        String library = request.getParameter("library");
-
         cli.setInput(input);
-        cli.setInputFormat(request.getParameter("inputFormat"));
+
+        String library = request.getParameter("library");
         cli.setLibrary(library);
+
+        cli.setMode(request.getParameter("mode"));
+
+        cli.setFetchMissing("true".equalsIgnoreCase(request.getParameter("fetchMissing")));
+
+        cli.setInputFormat(request.getParameter("inputFormat"));
         cli.setOutputFormat(request.getParameter("outputFormat"));
         cli.setLibraryFormat(request.getParameter("libraryFormat"));
 

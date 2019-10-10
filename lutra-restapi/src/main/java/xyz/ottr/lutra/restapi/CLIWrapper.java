@@ -40,9 +40,11 @@ import xyz.ottr.lutra.cli.CLI;
 @NoArgsConstructor
 public class CLIWrapper {
 
+    private @NonNull String mode;
     private @NonNull String input;
     private @NonNull String inputFormat;
     private @NonNull String outputFormat;
+    private boolean fetchMissing;
     private String libraryFormat;
     private String library;
 
@@ -56,12 +58,13 @@ public class CLIWrapper {
             ? writeTempFile(this.library)
             : null;
 
-        String command = "--mode expand"
+        String command =
+            "--mode " + this.mode
             + " --inputFormat " + this.inputFormat
             + " --outputFormat " + this.outputFormat
             + (libraryFile != null ? " --library " + libraryFile.getAbsolutePath() : "")
             + (libraryFile != null && this.libraryFormat != null ? " --libraryFormat " + this.libraryFormat : "")
-            + " --fetchMissing"
+            + (this.fetchMissing ? " --fetchMissing" : "")
             + " --stdout "
             + inputFile.getAbsolutePath();
 
