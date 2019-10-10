@@ -84,9 +84,9 @@ class BSourceParser implements Function<Resource, Result<Source<?>>> {
  
         if (BOTTR.JDBCSource.equals(sourceType)) {
             return getSQLSource(source);
-        } else if (BOTTR.SPARQLSource.equals(sourceType)) {
+        } else if (BOTTR.SPARQLEndpointSource.equals(sourceType)) {
             return getSPARQLEndpointSource(source);
-        } else if (BOTTR.RDFSource.equals(sourceType)) {
+        } else if (BOTTR.RDFFileSource.equals(sourceType)) {
             return getRDFSource(source);
         } else if (BOTTR.H2Source.equals(sourceType)) {
             return getH2Source(source);
@@ -112,7 +112,7 @@ class BSourceParser implements Function<Resource, Result<Source<?>>> {
 
     private Result<Source<?>> getRDFSource(Resource source) {
 
-        // RDFSource takes a *list* of sourceURLs, therefore a bit more work than for SPARQLEndpointSource.
+        // RDFFileSource takes a *list* of sourceURLs, therefore a bit more work than for SPARQLEndpointSource.
         NodeIterator sourceNodes = this.model.listObjectsOfProperty(source, BOTTR.sourceURL);
 
         List<Result<String>> urlStrings = ResultStream.innerOf(sourceNodes)

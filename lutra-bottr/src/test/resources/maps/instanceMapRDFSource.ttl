@@ -16,7 +16,7 @@ ex:MyMap a :InstanceMap ;
     [ :type :IRI ]
     ) ;
   :source
-    [ a :RDFSource ;
+    [ a :RDFFileSource ;
       :sourceURL
         "../sources/rdf/a.ttl" ,
         "../sources/rdf/b.ttl" ] .

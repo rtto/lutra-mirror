@@ -24,7 +24,7 @@ ex:MyMap a :InstanceMap ;
     [ :type (:NEList :IRI) ]
     ) ;
   :source
-    [ a :RDFSource ;
+    [ a :RDFFileSource ;
       :sourceURL
         "../sources/rdf/a.ttl" ,
         "../sources/rdf/b.ttl" ] .

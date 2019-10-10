@@ -9,5 +9,5 @@ ex:MyMap a :InstanceMap ;
   :template :Triple ;
   :query "SELECT ?s ?p ?o WHERE { ?s ?p ?o } LIMIT 13" ;
   :source
-    [ a :SPARQLSource ;
+    [ a :SPARQLEndpointSource ;
       :sourceURL "https://query.wikidata.org/bigdata/namespace/wdq/sparql" ] .
