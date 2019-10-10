@@ -42,7 +42,7 @@ import xyz.ottr.lutra.bottr.BOTTR;
 import xyz.ottr.lutra.bottr.model.Source;
 import xyz.ottr.lutra.bottr.source.H2Source;
 import xyz.ottr.lutra.bottr.source.JDBCSource;
-import xyz.ottr.lutra.bottr.source.RDFSource;
+import xyz.ottr.lutra.bottr.source.RDFFileSource;
 import xyz.ottr.lutra.bottr.source.SPARQLEndpointSource;
 import xyz.ottr.lutra.bottr.util.DataParser;
 import xyz.ottr.lutra.result.Result;
@@ -122,7 +122,7 @@ class BSourceParser implements Function<Resource, Result<Source<?>>> {
             .collect(Collectors.toList());
 
         return Result.aggregate(urlStrings)
-            .map(url -> new RDFSource(this.model, url));
+            .map(url -> new RDFFileSource(this.model, url));
     }
 
     private Result<Source<?>> getH2Source(Resource source) {

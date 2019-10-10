@@ -34,16 +34,16 @@ import xyz.ottr.lutra.result.Result;
 import xyz.ottr.lutra.result.ResultStream;
 import xyz.ottr.lutra.wottr.io.RDFFileReader;
 
-public class RDFSource extends AbstractSPARQLSource {
+public class RDFFileSource extends AbstractSPARQLSource {
 
     private final List<String> modelURIs;
 
-    public RDFSource(PrefixMapping prefixes, List<String> modelURIs) {
+    public RDFFileSource(PrefixMapping prefixes, List<String> modelURIs) {
         super(prefixes);
         this.modelURIs = Collections.unmodifiableList(modelURIs);
     }
 
-    public RDFSource(List<String> modelURIs) {
+    public RDFFileSource(List<String> modelURIs) {
         this(PrefixMapping.Factory.create(), modelURIs);
     }
 
