@@ -35,11 +35,11 @@ public class BOTTR extends WOTTR {
     public static final Resource InstanceMap = getResource(ns + "InstanceMap");
 
     public static final Resource JDBCSource = getResource(ns + "JDBCSource");
-    public static final Resource SPARQLSource = getResource(ns + "SPARQLSource");
-    public static final Resource RDFSource = getResource(ns + "RDFSource");
+    public static final Resource SPARQLEndpointSource = getResource(ns + "SPARQLEndpointSource");
+    public static final Resource RDFFileSource = getResource(ns + "RDFFileSource");
     public static final Resource H2Source = getResource(ns + "H2Source");
 
-    public static final List<Resource> sources = getList(JDBCSource, SPARQLSource, RDFSource, H2Source);
+    public static final List<Resource> sources = getList(JDBCSource, SPARQLEndpointSource, RDFFileSource, H2Source);
     
     // Properties
     public static final Property template = getProperty(ns + "template");
@@ -60,6 +60,7 @@ public class BOTTR extends WOTTR {
     public static final Property listSep = getProperty(ns + "listSep");
     public static final Property listStart = getProperty(ns + "listStart");
     public static final Property listEnd = getProperty(ns + "listEnd");
+
     public static final Property translationSettings = getProperty(ns + "translationSettings");
     public static final Property translationTable = getProperty(ns + "translationTable");
     public static final Property inValue = getProperty(ns + "inValue");
