@@ -44,6 +44,7 @@ import xyz.ottr.lutra.cli.CLI;
 @Setter
 public class CLIWrapper {
 
+    private String prefixes;
     private @NonNull String mode;
     private Collection<File> inputFiles;
     private Collection<File> libraryFiles;
@@ -52,7 +53,6 @@ public class CLIWrapper {
     private @NonNull String outputFormat;
     private boolean fetchMissing;
     private String libraryFormat;
-    private String library;
 
     private Path inputDirectory;
     private Path libraryDirectory;
@@ -70,12 +70,18 @@ public class CLIWrapper {
         this.libraryDirectory = Files.createTempDirectory(tempPrefix + "library-");
     }
 
+    private String prependPrefixes(String content) {
+        return StringUtils.isNoneBlank(this.prefixes, content)
+            ? this.prefixes + " " + content
+            : content;
+    }
+
     void addInput(FileItem fileItem) throws Exception {
         addFileItem(fileItem, this.inputDirectory, this.inputFiles);
     }
 
     void addInput(String fileContent) throws IOException {
-        addFileContent(fileContent, this.inputDirectory, this.inputFiles);
+        addFileContent(prependPrefixes(fileContent), this.inputDirectory, this.inputFiles);
     }
 
     void addLibrary(FileItem fileItem) throws Exception {
@@ -83,7 +89,7 @@ public class CLIWrapper {
     }
 
     void addLibrary(String fileContent) throws IOException {
-        addFileContent(fileContent, this.libraryDirectory, this.libraryFiles);
+        addFileContent(prependPrefixes(fileContent), this.libraryDirectory, this.libraryFiles);
     }
 
     private void addFileItem(FileItem fileItem, Path path, Collection<File> files) throws Exception {
@@ -93,7 +99,7 @@ public class CLIWrapper {
     }
 
     private void addFileContent(String content, Path path, Collection<File> files) throws IOException {
-        if (StringUtils.isNoneBlank(content)) {
+        if (StringUtils.isNotBlank(content)) {
             File file = Files.createTempFile(path,"", ".txt").toFile();
             FileUtils.write(file, content, CHARSET);
             files.add(file);

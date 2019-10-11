@@ -87,6 +87,13 @@ public class WebLutraServlet extends HttpServlet {
         List<FileItem> fileItems = uploader.parseRequest(request);
 
         if (fileItems != null) {
+
+            // Must set prefixes first so prefixes are prepended to input and library.
+            fileItems.stream()
+                .filter(fi -> fi.getFieldName().equalsIgnoreCase("prefixes"))
+                .findFirst()
+                .ifPresent(fi -> cli.setPrefixes(fi.getString()));
+
             for (FileItem item : fileItems) {
                 switch (item.getFieldName()) {
 

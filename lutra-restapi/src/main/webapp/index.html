@@ -8,7 +8,7 @@
     <style>
 .row {
     display: flex;
-    height: 85vh;
+    height: 93vh;
 }
 
 .column {
@@ -21,11 +21,16 @@ textarea {
 }
 
 .column.left textarea {
-    height: 34.5%;
+    height: 32%;
 }
 
 .column.right textarea {
-    height: 87%;
+    height: 90%;
+}
+
+.footer {
+  margin-top: 50px;
+  margin-bottom: 30px;
 }
 
     </style>
@@ -76,14 +81,35 @@ textarea {
         });
     });
 
+    $(function(){
+        $('#txtPrefixes').hide();
+    });
+
     </script>
 
 </head>
 <body>
-<h1>WebLutra</h1>
+<h1 style="margin: 0; margin-bottom: -10px;">WebLutra</h1>
 <form id="inputform" action="./expand" method="post" enctype="multipart/form-data">
     <div class="row">
         <div class="column left">
+
+            <p style="cursor: pointer;" onclick="$('#txtPrefixes').toggle();"><b>Prefixes</b>
+                used by text input fields (not file uploads). Click to show/hide.
+            </p>
+            <textarea id="txtPrefixes" cols="90" rows="3" name="prefixes">
+@prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl:  <http://www.w3.org/2002/07/owl#> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+
+@prefix ottr: <http://ns.ottr.xyz/0.4/> .
+
+@prefix ax:   <http://tpl.ottr.xyz/owl/axiom/0.1/> .
+@prefix rstr: <http://tpl.ottr.xyz/owl/restriction/0.1/> .
+
+@prefix ex:   <http://example.com/ns#> .
+</textarea>
 
             <b>Instances</b>
             <select id="opnInFormat" name="inputFormat">
@@ -174,7 +200,7 @@ o-pizza:NamedPizza(ex:PepperoniPizza, ottr:none, (ex:Tomato, ex:Cheese, ex:Peppe
         </div>
     </div>
 </form>
-<p>
+<p class="footer">
     This is the web version of Lutra, the reference implementation for working with OTTR templates.
 
     It provides a feature limited version of the CLI version of Lutra. Releases of the CLI and the
