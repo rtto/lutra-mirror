@@ -123,7 +123,7 @@ public class CLIWrapperTest {
 
         cliWrapper.addInput(instances);
         cliWrapper.setInputFormat("stottr");
-        cliWrapper.setLibrary(library);
+        cliWrapper.addLibrary(library);
         cliWrapper.setLibraryFormat("wottr");
         cliWrapper.setOutputFormat("wottr");
 

@@ -66,8 +66,8 @@ public class CLIWrapper {
     CLIWrapper() throws IOException {
         this.inputFiles = new ArrayList<>();
         this.libraryFiles = new ArrayList<>();
-        this.inputDirectory = Files.createTempDirectory(tempPrefix + "input");
-        this.libraryDirectory = Files.createTempDirectory(tempPrefix + "library");
+        this.inputDirectory = Files.createTempDirectory(tempPrefix + "input-");
+        this.libraryDirectory = Files.createTempDirectory(tempPrefix + "library-");
     }
 
     void addInput(FileItem fileItem) throws Exception {

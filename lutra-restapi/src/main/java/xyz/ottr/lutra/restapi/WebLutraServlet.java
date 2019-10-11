@@ -94,7 +94,7 @@ public class WebLutraServlet extends HttpServlet {
                     case "fileInput" :
                         cli.addInput(item);
                         break;
-                    case "libraryInput" :
+                    case "fileLibrary" :
                         cli.addLibrary(item);
                         break;
 
@@ -103,7 +103,7 @@ public class WebLutraServlet extends HttpServlet {
                         cli.addInput(item.getString());
                         break;
                     case "library":
-                        cli.setLibrary(item.getString());
+                        cli.addLibrary(item.getString());
                         break;
                     case "mode":
                         cli.setMode(item.getString());
