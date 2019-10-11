@@ -68,6 +68,9 @@ public class BOTTR extends WOTTR {
     public static final Property outValue = getProperty(ns + "outValue");
     public static final Property entry = getProperty(ns + "entry");
 
+    // TOKENS
+    public static final String THIS_DIR = "@@THIS_DIR@@";
+
     public static class Settings {
         /**
          * Global setting for adding a LIMIT to SPARQL SELECT queries.

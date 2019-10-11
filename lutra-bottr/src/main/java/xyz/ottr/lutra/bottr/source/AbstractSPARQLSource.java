@@ -89,9 +89,10 @@ public abstract class AbstractSPARQLSource implements Source<RDFNode> {
     }
 
     private void addQueryLimit(Query query) {
-        int limit = BOTTR.Settings.getRDFSourceQueryLimit();
-        if (limit > 0) {
-            query.setLimit(limit);
+        int globalLimit = BOTTR.Settings.getRDFSourceQueryLimit();
+        long currentLimit = query.getLimit();
+        if (globalLimit > 0 && globalLimit < currentLimit) {
+            query.setLimit(globalLimit);
         }
     }
 

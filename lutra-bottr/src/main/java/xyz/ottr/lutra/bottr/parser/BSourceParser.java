@@ -129,7 +129,7 @@ class BSourceParser implements Function<Resource, Result<Source<?>>> {
         return ModelSelector.getOptionalLiteralObject(this.model, source, BOTTR.sourceURL)
             .map(Literal::getLexicalForm)
             .map(this::getPath)
-            .mapOrElse(H2Source::new, new H2Source());
+            .mapOrElse(dbPath -> new H2Source(this.filePath, dbPath), new H2Source(this.filePath));
     }
 
     /**

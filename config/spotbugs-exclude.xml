@@ -19,4 +19,12 @@
     <Class name="xyz.ottr.lutra.restapi.WebLutraServlet" />
     <Bug pattern="RCN_REDUNDANT_NULLCHECK_WOULD_HAVE_BEEN_A_NPE" />
   </Match>
+  <Match>
+    <!-- Complains about null, but there is a null test.
+         Related?: https://github.com/spotbugs/spotbugs/issues/651 -->
+    <Class name="xyz.ottr.lutra.bottr.source.H2Source" />
+    <Bug pattern="NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE" />
+  </Match>
+
+
 </FindBugsFilter>

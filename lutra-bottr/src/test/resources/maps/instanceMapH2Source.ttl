@@ -8,7 +8,7 @@
 
 ex:MyMap1 a :InstanceMap ;
       :template :Triple ;
-      :query "SELECT CONCAT('ex:map1_id', ID), 'ex:hasSalary', SALARY FROM CSVREAD('src/test/resources/sources/csv/linux.csv') WHERE ID = '1';" ;
+      :query "SELECT CONCAT('ex:map1_id', ID), 'ex:hasSalary', SALARY FROM CSVREAD('@@THIS_DIR@@/../sources/csv/linux.csv') WHERE ID = '1';" ;
        :argumentMaps(
                 [ :type :IRI ]
                 [ :type :IRI ]
