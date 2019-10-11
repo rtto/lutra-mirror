@@ -25,9 +25,11 @@ package xyz.ottr.lutra.restapi;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.PrintStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.stream.Collectors;
@@ -48,7 +50,7 @@ public class CLIWrapper {
     private @NonNull String mode;
     private Collection<File> inputFiles;
     private Collection<File> libraryFiles;
-    //private Collection<File> dataFiles;
+    private Collection<File> dataFiles;
     private @NonNull String inputFormat;
     private @NonNull String outputFormat;
     private boolean fetchMissing;
@@ -66,6 +68,7 @@ public class CLIWrapper {
     CLIWrapper() throws IOException {
         this.inputFiles = new ArrayList<>();
         this.libraryFiles = new ArrayList<>();
+        this.dataFiles = new ArrayList<>();
         this.inputDirectory = Files.createTempDirectory(tempPrefix + "input-");
         this.libraryDirectory = Files.createTempDirectory(tempPrefix + "library-");
     }
@@ -74,6 +77,10 @@ public class CLIWrapper {
         return StringUtils.isNoneBlank(this.prefixes, content)
             ? this.prefixes + " " + content
             : content;
+    }
+
+    void addData(FileItem fileItem) throws Exception {
+        addFileItem(fileItem, this.inputDirectory, this.dataFiles);
     }
 
     void addInput(FileItem fileItem) throws Exception {
@@ -92,11 +99,25 @@ public class CLIWrapper {
         addFileContent(prependPrefixes(fileContent), this.libraryDirectory, this.libraryFiles);
     }
 
+    /*
     private void addFileItem(FileItem fileItem, Path path, Collection<File> files) throws Exception {
         File outputFile = Files.createTempFile(path, "", "-" + fileItem.getName()).toFile();
         fileItem.write(outputFile);
         files.add(outputFile);
     }
+    */
+
+    private void addFileItem(FileItem fileItem, Path path, Collection<File> files) throws IOException {
+        if (fileItem.getSize() > 0) {
+            Path outputPath = path.resolve(fileItem.getName());
+            File outputFile = Files.createFile(outputPath).toFile();
+            InputStream inStream = fileItem.getInputStream();
+            Files.copy(inStream, outputPath, StandardCopyOption.REPLACE_EXISTING);
+            inStream.close();
+            files.add(outputFile);
+        }
+    }
+
 
     private void addFileContent(String content, Path path, Collection<File> files) throws IOException {
         if (StringUtils.isNotBlank(content)) {

@@ -126,16 +126,7 @@ textarea {
                 <input type="button" class="clear" data-for="txtInput" value="Clear textarea"/>
             </p>
             <textarea id="txtInput" cols="90" rows="3" name="input">
-@prefix ottr: <http://ns.ottr.xyz/0.4/> .
 @prefix o-pizza: <http://tpl.ottr.xyz/pizza/0.1/> .
-@prefix ex: <http://example.com/ns#> .
-
-## The o-pizza:NamedPizza template represents the pattern used in the well-known Pizza Ontology tutorial.
-## Visit its URI to see its definition: http://tpl.ottr.xyz/pizza/0.1/NamedPizza.
-## The template takes three arguments:
-##   1. the Pizza IRI, 2. an optional Country IRI, 3. a list of topping IRIs.
-
-## Below are four template instances:
 
 o-pizza:NamedPizza(ex:Margerita, ex:Italy, (ex:Tomato, ex:Mozzarella)) .
 
@@ -143,12 +134,20 @@ o-pizza:NamedPizza(ex:QuattroFormaggi, ex:Italy, (ex:Tomato, ex:Mozzarella, ex:G
 
 o-pizza:NamedPizza(ex:Grandiosa, ex:Norway, (ex:Tomato, ex:Cheese, ex:BellPepper, ex:Ham)) .
 
-# Use ottr:none to represent "no value" for optional arguments:
+  # Use ottr:none to represent "no value" for optional arguments:
 o-pizza:NamedPizza(ex:PepperoniPizza, ottr:none, (ex:Tomato, ex:Cheese, ex:Pepperoni)) .
+
+## The o-pizza:NamedPizza template represents the pattern used in the well-known Pizza Ontology tutorial.
+## Visit its URI to see its definition: http://tpl.ottr.xyz/pizza/0.1/NamedPizza.
+## The template takes three arguments:
+##   1. the Pizza IRI, 2. an optional Country IRI, 3. a list of topping IRIs.
 
 </textarea>
 
-            <br/><br/>
+            <p><b>Data files</b>
+                <input id="fileData" type="file" name="fileData" multiple>
+                <input type="button" class="clear" data-for="fileData" value="Clear files"/>
+            </p>
 
 	    <b>Fetch templates by URI:</b>
             <input type="checkbox" name="fetchMissing" value="true" checked="checked"/>

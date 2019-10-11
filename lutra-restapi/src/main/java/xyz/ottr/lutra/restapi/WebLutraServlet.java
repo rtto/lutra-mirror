@@ -53,7 +53,7 @@ public class WebLutraServlet extends HttpServlet {
 
 
     static {
-        BOTTR.Settings.setRDFSourceQueryLimit(10000);
+        BOTTR.Settings.setRDFSourceQueryLimit(200);
     }
 
     public ServletFileUpload initServletFileUpload() {
@@ -103,6 +103,9 @@ public class WebLutraServlet extends HttpServlet {
                         break;
                     case "fileLibrary" :
                         cli.addLibrary(item);
+                        break;
+                    case "fileData" :
+                        cli.addData(item);
                         break;
 
                     // form input
