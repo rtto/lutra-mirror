@@ -44,18 +44,23 @@ public class PrototypeTest {
     private static final Path ROOT = Paths.get("src", "test", "resources");
 
     @Test 
-    public void shouldParseToInstances1() {
-        InstanceParser<String> parser = new ExcelReader();
-        ResultStream<Instance> instances = parser.apply(ROOT.resolve("test1.xlsx").toString());
-        ResultConsumer<Instance> consumer = new ResultConsumer<>();
-        instances.forEach(consumer);
-        assertFalse(Message.moreSevere(consumer.getMessageHandler().printMessages(), Message.ERROR));
+    public void testAutoTyping() {
+        shouldParseToInstances("test1.xlsx");
     }
 
     @Test
-    public void shouldParseToInstances2() {
+    public void testNoPrefixInstruction() {
+        shouldParseToInstances("test-noPrefixes.xlsx");
+    }
+
+    @Test
+    public void testFormulaEvaluation() {
+        shouldParseToInstances("test-formulaEval.xlsx");
+    }
+
+    private void shouldParseToInstances(String filename) {
         InstanceParser<String> parser = new ExcelReader();
-        ResultStream<Instance> instances = parser.apply(ROOT.resolve("test-noPrefixes.xlsx").toString());
+        ResultStream<Instance> instances = parser.apply(ROOT.resolve(filename).toString());
         ResultConsumer<Instance> consumer = new ResultConsumer<>();
         instances.forEach(consumer);
         assertFalse(Message.moreSevere(consumer.getMessageHandler().printMessages(), Message.ERROR));
