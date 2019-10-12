@@ -27,6 +27,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.apache.commons.collections4.SetUtils;
@@ -91,6 +92,6 @@ public class PrefixInstructionParser {
                 // check for standard prefix conflicts:
                 .map(prefixes -> mergePrefixResults(Result.of(stdPrefixes), prefixes))
                 // check for conflicts when merging prefix instructions:
-                .reduce(Result.of(PrefixMapping.Factory.create()), PrefixInstructionParser::mergePrefixResults);
+                .reduce(Result.of(stdPrefixes), PrefixInstructionParser::mergePrefixResults);
     }
 }

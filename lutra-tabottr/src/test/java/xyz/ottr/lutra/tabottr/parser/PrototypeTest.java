@@ -44,9 +44,18 @@ public class PrototypeTest {
     private static final Path ROOT = Paths.get("src", "test", "resources");
 
     @Test 
-    public void shouldParseToInstances() {
+    public void shouldParseToInstances1() {
         InstanceParser<String> parser = new ExcelReader();
         ResultStream<Instance> instances = parser.apply(ROOT.resolve("test1.xlsx").toString());
+        ResultConsumer<Instance> consumer = new ResultConsumer<>();
+        instances.forEach(consumer);
+        assertFalse(Message.moreSevere(consumer.getMessageHandler().printMessages(), Message.ERROR));
+    }
+
+    @Test
+    public void shouldParseToInstances2() {
+        InstanceParser<String> parser = new ExcelReader();
+        ResultStream<Instance> instances = parser.apply(ROOT.resolve("test-noPrefixes.xlsx").toString());
         ResultConsumer<Instance> consumer = new ResultConsumer<>();
         instances.forEach(consumer);
         assertFalse(Message.moreSevere(consumer.getMessageHandler().printMessages(), Message.ERROR));
