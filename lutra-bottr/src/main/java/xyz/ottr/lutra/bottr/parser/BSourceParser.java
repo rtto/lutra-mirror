@@ -22,11 +22,12 @@ package xyz.ottr.lutra.bottr.parser;
  * #L%
  */
 
+import java.io.File;
 import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -42,7 +43,7 @@ import xyz.ottr.lutra.bottr.BOTTR;
 import xyz.ottr.lutra.bottr.model.Source;
 import xyz.ottr.lutra.bottr.source.H2Source;
 import xyz.ottr.lutra.bottr.source.JDBCSource;
-import xyz.ottr.lutra.bottr.source.RDFSource;
+import xyz.ottr.lutra.bottr.source.RDFFileSource;
 import xyz.ottr.lutra.bottr.source.SPARQLEndpointSource;
 import xyz.ottr.lutra.bottr.util.DataParser;
 import xyz.ottr.lutra.result.Result;
@@ -53,11 +54,14 @@ import xyz.ottr.lutra.wottr.util.RDFNodes;
 class BSourceParser implements Function<Resource, Result<Source<?>>> {
 
     private final Model model;
-    private final String filePath; // @Nullable
+    private final Optional<String> absoluteFilePath;
 
     BSourceParser(Model model, String filePath) {
         this.model = model;
-        this.filePath = filePath;
+        this.absoluteFilePath = Optional.ofNullable(filePath)
+            .map(File::new)
+            .map(File::getAbsoluteFile)
+            .map(File::getAbsolutePath);
     }
 
     private static final Map<Resource, Result<Source<?>>> sources = new HashMap<>();
@@ -122,14 +126,16 @@ class BSourceParser implements Function<Resource, Result<Source<?>>> {
             .collect(Collectors.toList());
 
         return Result.aggregate(urlStrings)
-            .map(url -> new RDFSource(this.model, url));
+            .map(url -> new RDFFileSource(this.model, url));
     }
 
     private Result<Source<?>> getH2Source(Resource source) {
         return ModelSelector.getOptionalLiteralObject(this.model, source, BOTTR.sourceURL)
             .map(Literal::getLexicalForm)
             .map(this::getPath)
-            .mapOrElse(H2Source::new, new H2Source());
+            .mapOrElse(
+                dbPath -> new H2Source(this.absoluteFilePath.orElse(null), dbPath),
+                new H2Source(this.absoluteFilePath.orElse(null)));
     }
 
     /**
@@ -138,10 +144,10 @@ class BSourceParser implements Function<Resource, Result<Source<?>>> {
      */
     private String getPath(String file) {
 
-        if (Objects.isNull(this.filePath) || DataParser.asURI(file).isPresent()) {
+        if (!this.absoluteFilePath.isPresent() || DataParser.asURI(file).isPresent()) {
             return file;
         } else {
-            return Paths.get(this.filePath).resolveSibling(file).toAbsolutePath().toString();
+            return Paths.get(this.absoluteFilePath.get()).resolveSibling(file).toAbsolutePath().toString();
         }
     }
 

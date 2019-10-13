@@ -24,6 +24,8 @@ package xyz.ottr.lutra.bottr;
 
 import java.util.List;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.Resource;
 
@@ -65,4 +67,14 @@ public class BOTTR extends WOTTR {
     public static final Property inValue = getProperty(ns + "inValue");
     public static final Property outValue = getProperty(ns + "outValue");
     public static final Property entry = getProperty(ns + "entry");
+
+    // TOKENS
+    public static final String THIS_DIR = "@@THIS_DIR@@";
+
+    public static class Settings {
+        /**
+         * Global setting for adding a LIMIT to SPARQL SELECT queries.
+         */
+        @Getter @Setter private static int RDFSourceQueryLimit = -1;
+    }
 }

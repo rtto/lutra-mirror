@@ -35,7 +35,7 @@ import org.junit.Test;
 import xyz.ottr.lutra.bottr.model.Source;
 import xyz.ottr.lutra.result.ResultStream;
 
-public class RDFSourceTest {
+public class RDFFileSourceTest {
 
     private final Path root = Paths.get("src", "test", "resources", "sources", "rdf");
 
@@ -48,7 +48,7 @@ public class RDFSourceTest {
 
         List<String> modelURIs = Arrays.asList(getResourceFile("a.ttl"), getResourceFile("b.ttl"));
 
-        Source<RDFNode> source = new RDFSource(modelURIs);
+        Source<RDFNode> source = new RDFFileSource(modelURIs);
 
         ResultStream<?> result = source.execute(
                 "PREFIX foaf: <http://xmlns.com/foaf/0.1/>  " 
