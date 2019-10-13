@@ -22,8 +22,10 @@ package xyz.ottr.lutra.bottr.source;
  * #L%
  */
 
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Optional;
 
 import org.apache.jena.ext.com.google.common.io.Files;
 import xyz.ottr.lutra.bottr.BOTTR;
@@ -33,14 +35,11 @@ import xyz.ottr.lutra.result.ResultStream;
 
 public class H2Source extends JDBCSource {
 
-    private final String mapFolder;
+    private final Optional<String> mapFolder;
 
     public H2Source(String mapPath, String path) {
         super("org.h2.Driver","jdbc:h2:" + path, "user", "pass");
-
-        this.mapFolder = (mapPath == null)
-            ? null
-            : getParentFolder(mapPath);
+        this.mapFolder = getParentFolder(mapPath);
     }
 
     public H2Source(String mapPath) {
@@ -61,13 +60,17 @@ public class H2Source extends JDBCSource {
         return super.execute(setPWD(query), argumentMaps);
     }
 
-    private String getParentFolder(String file) {
-        return Paths.get(file).getParent().toAbsolutePath().toString();
+    private Optional<String> getParentFolder(String file) {
+        return Optional.ofNullable(file)
+            .map(Paths::get)
+            .map(Path::getParent)
+            .map(Path::toAbsolutePath)
+            .map(Path::toString);
     }
 
     private String setPWD(String query) {
-        return (this.mapFolder == null)
-            ? query
-            : query.replaceAll(BOTTR.THIS_DIR, this.mapFolder);
+        return this.mapFolder
+            .map(f -> query.replaceAll(BOTTR.THIS_DIR, f))
+            .orElse(query);
     }
 }

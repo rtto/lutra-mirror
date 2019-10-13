@@ -22,11 +22,12 @@ package xyz.ottr.lutra.bottr.parser;
  * #L%
  */
 
+import java.io.File;
 import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -53,11 +54,14 @@ import xyz.ottr.lutra.wottr.util.RDFNodes;
 class BSourceParser implements Function<Resource, Result<Source<?>>> {
 
     private final Model model;
-    private final String filePath; // @Nullable
+    private final Optional<String> absoluteFilePath;
 
     BSourceParser(Model model, String filePath) {
         this.model = model;
-        this.filePath = filePath;
+        this.absoluteFilePath = Optional.ofNullable(filePath)
+            .map(File::new)
+            .map(File::getAbsoluteFile)
+            .map(File::getAbsolutePath);
     }
 
     private static final Map<Resource, Result<Source<?>>> sources = new HashMap<>();
@@ -129,7 +133,9 @@ class BSourceParser implements Function<Resource, Result<Source<?>>> {
         return ModelSelector.getOptionalLiteralObject(this.model, source, BOTTR.sourceURL)
             .map(Literal::getLexicalForm)
             .map(this::getPath)
-            .mapOrElse(dbPath -> new H2Source(this.filePath, dbPath), new H2Source(this.filePath));
+            .mapOrElse(
+                dbPath -> new H2Source(this.absoluteFilePath.orElse(null), dbPath),
+                new H2Source(this.absoluteFilePath.orElse(null)));
     }
 
     /**
@@ -138,10 +144,10 @@ class BSourceParser implements Function<Resource, Result<Source<?>>> {
      */
     private String getPath(String file) {
 
-        if (Objects.isNull(this.filePath) || DataParser.asURI(file).isPresent()) {
+        if (!this.absoluteFilePath.isPresent() || DataParser.asURI(file).isPresent()) {
             return file;
         } else {
-            return Paths.get(this.filePath).resolveSibling(file).toAbsolutePath().toString();
+            return Paths.get(this.absoluteFilePath.get()).resolveSibling(file).toAbsolutePath().toString();
         }
     }
 
