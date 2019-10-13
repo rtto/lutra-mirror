@@ -39,6 +39,7 @@ import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import xyz.ottr.lutra.bottr.BOTTR;
+import xyz.ottr.lutra.result.Message;
 
 public class WebLutraServlet extends HttpServlet {
 
@@ -140,8 +141,7 @@ public class WebLutraServlet extends HttpServlet {
         try {
             output = cli.run();
         } catch (Exception ex) {
-            output = "Error."
-                + "\n\nMessage: " + ex.getMessage();
+            output = Message.error(ex.getMessage()).toString();
         }
 
         String origin = request.getHeader("Origin");
