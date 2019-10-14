@@ -62,13 +62,13 @@ public class CLI {
 
     private final Settings settings;
     private final PrintStream outStream;
-    //private final PrintStream errStream;
+    private final PrintStream errStream;
     private final MessageHandler messageHandler;
 
     public CLI(PrintStream outStream, PrintStream errStream) {
         this.settings = new Settings();
         this.outStream = outStream;
-        //this.errStream = errStream;
+        this.errStream = errStream;
         this.messageHandler = new MessageHandler(errStream);
     }
 
@@ -329,7 +329,7 @@ public class CLI {
 
     private void processInstances(Function<String, ResultStream<Instance>> processor, InstanceWriter writer) {
 
-        ResultConsumer<Instance> consumer = new ResultConsumer<>(writer);
+        ResultConsumer<Instance> consumer = new ResultConsumer<>(writer, this.errStream);
         ResultStream.innerOf(settings.inputs)
             .innerFlatMap(processor)
             .forEach(consumer);
@@ -370,7 +370,7 @@ public class CLI {
     }
 
     private void writeTemplates(TemplateStore store, TemplateWriter writer) {
-        ResultConsumer<TemplateSignature> consumer = new ResultConsumer<>(writer);
+        ResultConsumer<TemplateSignature> consumer = new ResultConsumer<>(writer, this.errStream);
         store.getAllTemplateObjects().forEach(consumer);
 
         if (!Message.moreSevere(consumer.getMessageHandler().printMessages(), settings.haltOn)) {
