@@ -49,8 +49,8 @@ public class WebLutraServlet extends HttpServlet {
 
     private static final List<String> originWhitelist = Arrays.asList("http://weblutra.ottr.xyz");
 
-    private static final long MAX_REQUEST_SIZE = 600000;
-    private static final long MAX_FILE_SIZE = 100000;
+    private static final long MAX_FILE_SIZE = 100 * 1024;
+    private static final long MAX_REQUEST_SIZE = 5 * MAX_FILE_SIZE;
 
 
     static {
