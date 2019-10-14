@@ -39,6 +39,7 @@ import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.shared.JenaException;
 import org.apache.jena.shared.PrefixMapping;
 
+import xyz.ottr.lutra.bottr.BOTTR;
 import xyz.ottr.lutra.bottr.model.ArgumentMap;
 import xyz.ottr.lutra.bottr.model.ArgumentMaps;
 import xyz.ottr.lutra.bottr.model.Source;
@@ -87,11 +88,20 @@ public abstract class AbstractSPARQLSource implements Source<RDFNode> {
         return streamQuery(query, argumentMaps);
     }
 
+    private void addQueryLimit(Query query) {
+        int globalLimit = BOTTR.Settings.getRDFSourceQueryLimit();
+        long currentLimit = query.getLimit();
+        if (globalLimit > 0 && globalLimit < currentLimit) {
+            query.setLimit(globalLimit);
+        }
+    }
+
     private <X> ResultStream<X> streamQuery(String query, Function<List<RDFNode>, Result<X>> translationFunction) {
         return getQueryExecution(query)
                 .mapToStream(exec -> {
                     Query q = exec.getQuery();
                     if (q.isSelectType()) {
+                        addQueryLimit(q);
                         ResultSet resultSet = exec.execSelect();
                         return getResultSetStream(resultSet, translationFunction);
                     //} else if (q.isAskType()) {

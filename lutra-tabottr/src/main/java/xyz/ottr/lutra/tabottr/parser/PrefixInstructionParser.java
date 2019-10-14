@@ -91,6 +91,6 @@ public class PrefixInstructionParser {
                 // check for standard prefix conflicts:
                 .map(prefixes -> mergePrefixResults(Result.of(stdPrefixes), prefixes))
                 // check for conflicts when merging prefix instructions:
-                .reduce(Result.of(PrefixMapping.Factory.create()), PrefixInstructionParser::mergePrefixResults);
+                .reduce(Result.of(stdPrefixes), PrefixInstructionParser::mergePrefixResults);
     }
 }

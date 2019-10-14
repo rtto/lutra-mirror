@@ -284,9 +284,6 @@ public interface TemplateStore extends Consumer<TemplateSignature> {
      * Fetches all missing dependencies (according to #getMissingDependencies())
      * iteratively based on their IRI and adds them to this Store.
      *
-     * @param missing
-     *    The IRIs of the missing template to fetch
-     *
      * @return
      *    A MessageHandler containing all Messages obtained through fetching and
      *    parsing missing templates

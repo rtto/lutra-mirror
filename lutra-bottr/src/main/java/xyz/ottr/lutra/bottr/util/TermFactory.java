@@ -105,13 +105,14 @@ public class TermFactory {
     }
 
     public static Result<LiteralTerm> createLiteral(String value, String datatype, String language) {
-        if (StringUtils.isNotEmpty(datatype) && StringUtils.isNotEmpty(language)) {
-            return Result.error("Error creating literal: cannot have a "
-                + " datatype: " + datatype + " *and* a language tag :" + language);
-        } else if (StringUtils.isNotEmpty(datatype)) {
-            return createTypedLiteral(value, datatype);
+
+        if (StringUtils.isNotEmpty(language) && !RDF.langString.getURI().equals(datatype)) {
+            return Result.error("Error creating literal. Cannot have a language tag: " + language
+                + " and the datatype: " + datatype);
         } else if (StringUtils.isNotEmpty(language)) {
             return createLangLiteral(value, language);
+        } else if (StringUtils.isNotEmpty(datatype)) {
+            return createTypedLiteral(value, datatype);
         } else {
             return createPlainLiteral(value);
         }

@@ -1,7 +1,5 @@
 package xyz.ottr.lutra.tabottr.parser;
 
-import java.io.File;
-
 /*-
  * #%L
  * lutra-tab
@@ -24,6 +22,7 @@ import java.io.File;
  * #L%
  */
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -32,6 +31,8 @@ import java.util.Locale;
 import org.apache.poi.EncryptedDocumentException;
 import org.apache.poi.openxml4j.exceptions.InvalidOperationException;
 import org.apache.poi.openxml4j.exceptions.NotOfficeXmlFileException;
+import org.apache.poi.ss.formula.WorkbookEvaluator;
+import org.apache.poi.ss.formula.eval.NotImplementedException;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.DataFormatter;
 import org.apache.poi.ss.usermodel.FormulaEvaluator;
@@ -39,11 +40,10 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
-
 import org.apache.poi.util.LocaleUtil;
+
 import xyz.ottr.lutra.io.InstanceParser;
 import xyz.ottr.lutra.model.Instance;
-import xyz.ottr.lutra.result.Message;
 import xyz.ottr.lutra.result.Result;
 import xyz.ottr.lutra.result.ResultStream;
 import xyz.ottr.lutra.tabottr.model.Table;
@@ -88,8 +88,13 @@ public class ExcelReader implements InstanceParser<String> {
                 tables.add(parseTable(workbook.getSheetAt(index), index + 1));
             }
             return Result.of(tables);
+        } catch (NotImplementedException ex) {
+            String message = ex.getMessage()
+                + ". Unsupported function. Supported functions are: "
+                + String.join(", ", WorkbookEvaluator.getSupportedFunctionNames());
+            return Result.error(message);
         } catch (IOException | EncryptedDocumentException | NotOfficeXmlFileException | InvalidOperationException ex) {
-            return Result.empty(Message.error(ex.getMessage()));
+            return Result.error(ex.getMessage());
         }
     }
 

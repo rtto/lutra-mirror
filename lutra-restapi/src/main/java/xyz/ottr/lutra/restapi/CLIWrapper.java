@@ -25,45 +25,123 @@ package xyz.ottr.lutra.restapi;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.PrintStream;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.stream.Collectors;
 
-import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.Setter;
-
+import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import xyz.ottr.lutra.cli.CLI;
 
 @Setter
-@NoArgsConstructor
 public class CLIWrapper {
 
-    private @NonNull String input;
+    private String prefixes;
+    private @NonNull String mode;
+    private Collection<File> inputFiles;
+    private Collection<File> libraryFiles;
+    private Collection<File> dataFiles;
     private @NonNull String inputFormat;
     private @NonNull String outputFormat;
+    private boolean fetchMissing;
     private String libraryFormat;
-    private String library;
+
+    private Path inputDirectory;
+    private Path libraryDirectory;
+
+    private static final String tempPrefix = "weblutra-";
 
     private static final String CHARSET = "UTF-8";
+    
+    private static final Logger log = LoggerFactory.getLogger(CLIWrapper.class);
 
-    public String run() throws IOException {
+    CLIWrapper() throws IOException {
+        this.inputFiles = new ArrayList<>();
+        this.libraryFiles = new ArrayList<>();
+        this.dataFiles = new ArrayList<>();
+        this.inputDirectory = Files.createTempDirectory(tempPrefix + "input-");
+        this.libraryDirectory = Files.createTempDirectory(tempPrefix + "library-");
+    }
 
-        File inputFile = writeTempFile(this.input);
+    private String prependPrefixes(String content) {
+        return StringUtils.isNoneBlank(this.prefixes, content)
+            ? this.prefixes + " " + content
+            : content;
+    }
 
-        File libraryFile = StringUtils.isNoneBlank(this.library)
-            ? writeTempFile(this.library)
-            : null;
+    void addData(FileItem fileItem) throws Exception {
+        addFileItem(fileItem, this.inputDirectory, this.dataFiles);
+    }
 
-        String command = "--mode expand"
+    void addInput(FileItem fileItem) throws Exception {
+        addFileItem(fileItem, this.inputDirectory, this.inputFiles);
+    }
+
+    void addInput(String fileContent) throws IOException {
+        addFileContent(prependPrefixes(fileContent), this.inputDirectory, this.inputFiles);
+    }
+
+    void addLibrary(FileItem fileItem) throws Exception {
+        addFileItem(fileItem, this.libraryDirectory, this.libraryFiles);
+    }
+
+    void addLibrary(String fileContent) throws IOException {
+        addFileContent(prependPrefixes(fileContent), this.libraryDirectory, this.libraryFiles);
+    }
+
+    /*
+    private void addFileItem(FileItem fileItem, Path path, Collection<File> files) throws Exception {
+        File outputFile = Files.createTempFile(path, "", "-" + fileItem.getName()).toFile();
+        fileItem.write(outputFile);
+        files.add(outputFile);
+    }
+    */
+
+    private void addFileItem(FileItem fileItem, Path path, Collection<File> files) throws IOException {
+        if (fileItem.getSize() > 0) {
+            Path outputPath = path.resolve(fileItem.getName());
+            File outputFile = Files.createFile(outputPath).toFile();
+            InputStream inStream = fileItem.getInputStream();
+            Files.copy(inStream, outputPath, StandardCopyOption.REPLACE_EXISTING);
+            inStream.close();
+            files.add(outputFile);
+        }
+    }
+
+
+    private void addFileContent(String content, Path path, Collection<File> files) throws IOException {
+        if (StringUtils.isNotBlank(content)) {
+            File file = Files.createTempFile(path,"", ".txt").toFile();
+            FileUtils.write(file, content, CHARSET);
+            files.add(file);
+        }
+    }
+
+    String run() throws IOException {
+
+        String command =
+            "--mode " + this.mode
             + " --inputFormat " + this.inputFormat
             + " --outputFormat " + this.outputFormat
-            + (libraryFile != null ? " --library " + libraryFile.getAbsolutePath() : "")
-            + (libraryFile != null && this.libraryFormat != null ? " --libraryFormat " + this.libraryFormat : "")
-            + " --fetchMissing"
+            + (!this.libraryFiles.isEmpty() ? " --library " + this.libraryDirectory.toAbsolutePath() : "")
+            + (!this.libraryFiles.isEmpty() && this.libraryFormat != null ? " --libraryFormat " + this.libraryFormat : "")
+            + (this.fetchMissing ? " --fetchMissing" : "")
             + " --stdout "
-            + inputFile.getAbsolutePath();
+            + this.inputFiles.stream()
+                .map(File::getAbsolutePath)
+                .collect(Collectors.joining(" "));
+
+        log.info(command);
 
         String output;
         try (ByteArrayOutputStream outStream = new ByteArrayOutputStream();
@@ -73,22 +151,10 @@ public class CLIWrapper {
         }
 
         // clean up
-        delete(inputFile);
-        delete(libraryFile);
+        FileUtils.deleteDirectory(this.inputDirectory.toFile());
+        FileUtils.deleteDirectory(this.libraryDirectory.toFile());
 
         return output;
-    }
-
-    private static File writeTempFile(String contents) throws IOException {
-        File tempInput = Files.createTempFile("lutra-", ".tmp").toFile();
-        FileUtils.write(tempInput, contents, CHARSET);
-        return tempInput;
-    }
-
-    private static void delete(File file) throws IOException {
-        if (file != null) {
-            Files.deleteIfExists(file.toPath());
-        }
     }
 
 }
