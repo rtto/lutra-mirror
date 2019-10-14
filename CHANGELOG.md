@@ -5,12 +5,33 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 0.6.1
+
+### Added
+
+- WebLutra improvements
+  - support file upload
+  - support tabOTTR and bOTTR
+
+### Bugs fixes
+
+- bOTTR
+  - fix handling of language tagged literals
+  - fix getting parent directory of bOTTR map for resolving path to
+    relative sources
+
+- tabOTTR
+  - add default prefixes in the case of no prefix instruction
+  - handling unsupported spreadsheet functions better by
+    printing list of supported functions.
+
 ## 0.6.0
 
 ### Added
 - Support for stOTTR for both reading and writing, and both instances and templates
 - CLI-flag to set format for template library fetched online
 - Initial support for bOTTR
+- WebLutra, java servlet and HTML + JS frontend for testing and learning
 - Bug fixes
 
 ### Changed
