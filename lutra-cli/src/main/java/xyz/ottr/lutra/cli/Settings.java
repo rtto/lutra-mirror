@@ -113,7 +113,7 @@ public class Settings {
     public Format fetchFormat;
 
     @Option(names = {"-l", "--library"}, description = {"Folder containing templates to use as library."})
-    public String library;
+    public String[] library;
 
     @Parameters(description = {"Files of instances to which operations are to be applied."})
     public List<String> inputs = new LinkedList<>();
