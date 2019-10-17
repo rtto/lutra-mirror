@@ -25,6 +25,7 @@ package xyz.ottr.lutra.cli;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Function;
 
 import xyz.ottr.lutra.bottr.io.BInstanceReader;
@@ -139,6 +140,14 @@ public class ReaderRegistryImpl implements ReaderRegistry {
                 return readerRes;
             }
         }
-        return unsuccessful;
+
+        // Combine all errors in the failed attempts into one message
+        MessageHandler allMsgs = new MessageHandler();
+        allMsgs.add(unsuccessful);
+        Optional<Message> errors = allMsgs.toSingleMessage(
+            "Attempts of parsing library on all available formats " 
+            + getAllTemplateReaders().keySet().toString() + " failed with following errors:\n");
+
+        return errors.isPresent() ? Result.empty(errors.get()) : Result.empty();
     }
 }
