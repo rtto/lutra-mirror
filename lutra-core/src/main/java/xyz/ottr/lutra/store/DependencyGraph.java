@@ -375,7 +375,6 @@ public class DependencyGraph implements TemplateStore {
 
             // Check that we can and should expand
             final Result<Dependency> checkedEdge = edgeRes.flatMap(edge -> checkForExpansionErrors(edge));
-            // TODO: May loose messages on checkedEdge if present, but contains messages
             if (!checkedEdge.isPresent()) {
                 unexpanded.add(checkedEdge);
                 continue;
