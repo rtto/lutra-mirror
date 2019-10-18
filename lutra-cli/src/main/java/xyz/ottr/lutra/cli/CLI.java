@@ -30,8 +30,9 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 
 import org.apache.jena.shared.PrefixMapping;
@@ -136,10 +137,10 @@ public class CLI {
     private void execute() {
 
         TemplateStore store = new DependencyGraph(ReaderRegistryImpl.getReaderRegistry());
-        Result<TemplateReader> successfulReader = parseLibraryInto(store);
-        this.messageHandler.use(successfulReader, reader -> {
+        Result<Map<String, String>> prefixesRes = parseLibraryInto(store);
+        this.messageHandler.use(prefixesRes, prefixes -> {
             PrefixMapping usedPrefixes = OTTR.getDefaultPrefixes();
-            usedPrefixes.setNsPrefixes(reader.getPrefixes());
+            usedPrefixes.setNsPrefixes(prefixes);
             executeMode(store, usedPrefixes);
         });
     }
@@ -147,41 +148,47 @@ public class CLI {
     /**
      * Populated store with parsed templates, and returns true if error occurred, and false otherwise.
      */
-    private Result<TemplateReader> parseLibraryInto(TemplateStore store) {
+    private Result<Map<String, String>> parseLibraryInto(TemplateStore store) {
         
         store.addOTTRBaseTemplates();
 
-        if (settings.library == null) {
-            Collection<TemplateReader> readers = store.getReaderRegistry().getAllTemplateReaders().values();
-            return readers.isEmpty() ? Result.empty() : Result.of(readers.iterator().next());
+        if (settings.library == null || settings.library.length == 0) {
+            return Result.of(OTTR.getDefaultPrefixes().getNsPrefixMap());
         }
 
-        // check if library is folder or file, and get readerFunction accordingly:
-        Function<TemplateReader, MessageHandler> readerFunction =
-            Files.isDirectory(Paths.get(settings.library))
-                ? reader -> reader.loadTemplatesFromFolder(store, settings.library,
-                    settings.extensions, settings.ignoreExtensions)
-                : reader -> reader.loadTemplatesFromFile(store, settings.library);
+        Result<Map<String, String>> prefixes = Result.of(new HashMap<>());
 
-        // check if libraryFormat is set or not
-        Result<TemplateReader> reader;
-        if (settings.libraryFormat != null) {
-            reader = store.getReaderRegistry().getTemplateReaders(settings.libraryFormat.toString());
-            reader.map(readerFunction)
-                .map(mgs -> mgs.toSingleMessage("Attempt of parsing templates as "
-                        + settings.libraryFormat + " format failed:"))
-                .ifPresent(mgs -> mgs.ifPresent(reader::addMessage));
+        for (int i = 0; i < settings.library.length; i++) {
+            // check if library is folder or file, and get readerFunction accordingly:
+            final String lib = settings.library[i];
 
-        } else {
-            reader = store.getReaderRegistry().attemptAllReaders(readerFunction);
+            Function<TemplateReader, MessageHandler> readerFunction =
+                Files.isDirectory(Paths.get(settings.library[i]))
+                    ? reader -> reader.loadTemplatesFromFolder(store, lib,
+                        settings.extensions, settings.ignoreExtensions)
+                    : reader -> reader.loadTemplatesFromFile(store, lib);
+
+            Result<TemplateReader> reader;
+            // check if libraryFormat is set or not
+            if (settings.libraryFormat != null) {
+                reader = store.getReaderRegistry().getTemplateReaders(settings.libraryFormat.toString());
+                reader.map(readerFunction)
+                    .map(mgs -> mgs.toSingleMessage("Attempt of parsing templates as "
+                            + settings.libraryFormat + " format failed:"))
+                    .ifPresent(mgs -> mgs.ifPresent(reader::addMessage));
+                prefixes.addResult(reader, (m, r) -> m.putAll(r.getPrefixes()));
+            } else {
+                reader = store.getReaderRegistry().attemptAllReaders(readerFunction);
+            }
+            prefixes.addResult(reader, (m, r) -> m.putAll(r.getPrefixes()));
         }
 
         if (settings.fetchMissingDependencies) {
             MessageHandler msgs = store.fetchMissingDependencies();
-            reader.addMessages(msgs.getMessages());
+            prefixes.addMessages(msgs.getMessages());
         }
         
-        return reader;
+        return prefixes;
     } 
     
     private void executeExpand(TemplateStore store, PrefixMapping usedPrefixes) {
