@@ -178,23 +178,6 @@ public class Result<E> {
     public static <R> Result<R> info(String msg) {
         return empty(Message.info(msg));
     }
-
-    /**
-     * Returns an empty result with this result as trace and with the argument message.
-     * 
-     * @param msg
-     *      Message to attach to resulting empty Result
-     * @return 
-     *      Returns an empty Result with this as trace and argument Message
-     */
-    public Result<E> fail(Message msg) {
-        if (this.isPresent()) {
-            return this.flatMap(v -> Result.empty(msg));
-        } else {
-            this.addMessage(msg);
-            return this;
-        }
-    }
     
     public Result<E> addToTrace(Result<?> other) {
         if (other != null) {

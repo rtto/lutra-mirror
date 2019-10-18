@@ -374,33 +374,30 @@ public class DependencyGraph implements TemplateStore {
         for (Result<Dependency> edgeRes : toExpand) {
 
             // Check that we can and should expand
-            final Result<Dependency> checkedEdge = edgeRes.flatMap(edge -> checkForExpansionErrors(edge));
-            if (!checkedEdge.isPresent()) {
-                unexpanded.add(checkedEdge);
+            edgeRes = edgeRes.flatMap(edge -> checkForExpansionErrors(edge));
+            // TODO: May loose messages on edgeRes if present, but contains messages
+            if (!edgeRes.isPresent()) {
+                unexpanded.add(edgeRes);
                 continue;
-            } else if (!checkedEdge.filter(shouldExpand).isPresent()) {
-                unexpanded.add(checkedEdge);
+            } else if (!edgeRes.filter(shouldExpand).isPresent()) {
+                unexpanded.add(edgeRes);
                 continue; 
-            } else if (checkedEdge.filter(edge -> edge.shouldDiscard()).isPresent()) {
+            } else if (edgeRes.filter(edge -> edge.shouldDiscard()).isPresent()) {
                 continue;
             }
 
             // Then expand instance
-            Dependency edge = checkedEdge.get();
+            Dependency edge = edgeRes.get();
             if (edge.argumentList.hasListExpander()) {
                 if (edge.canExpandExpander()) {
-                    Set<Result<Dependency>> exp = edge.expandListExpander();
-                    exp.forEach(e -> e.addToTrace(checkedEdge));
-                    expandEdges(exp, expanded, unexpanded, shouldExpand); 
+                    expandEdges(edge.expandListExpander(), expanded, unexpanded, shouldExpand); 
                 } else {
-                    unexpanded.add(checkedEdge);
+                    unexpanded.add(Result.of(edge));
                 }
             } else if (edge.canExpand()) {
-                Set<Result<Dependency>> exp = expandEdgeWithChecks(edge);
-                exp.forEach(e -> e.addToTrace(checkedEdge));
-                expanded.addAll(exp);
+                expanded.addAll(expandEdgeWithChecks(edge));
             } else {
-                unexpanded.add(checkedEdge);
+                unexpanded.add(Result.of(edge));
             }
         }
     }
@@ -538,11 +535,6 @@ public class DependencyGraph implements TemplateStore {
 
         Set<Result<Dependency>> finalExpansion = new HashSet<>();
         Set<Result<Dependency>> toExpandRes = toResultDependencies(instances);
-        
-        // Check arguments (number of arguments and types)
-        toExpandRes = toExpandRes.stream()
-            .map(ins -> ins.flatMap(this::checkArguments))
-            .collect(Collectors.toSet());
 
         while (!toExpandRes.isEmpty()) {
 
@@ -554,44 +546,6 @@ public class DependencyGraph implements TemplateStore {
         ResultStream<Instance> expandedInstances = new ResultStream<>(finalExpansion)
             .innerMap(dep -> new Instance(dep.to.getIRI(), dep.argumentList));
         return expandedInstances;
-    }
-
-    private Result<Dependency> checkArguments(Dependency ins) {
-        
-        ArgumentList args = ins.argumentList;
-        ParameterList params = ins.to.getParameters();
-
-        // First check correct number of arguments
-        if (params == null) {
-            return Result.error("Missing definition of template with IRI " + ins.to.getIRI() + ".");
-        } else if (params.size() != args.size()) {
-            return Result.error("Instance of template with IRI " + ins.to.getIRI() 
-                + " with arguments " + args.toString() + " has " + args.size() 
-                + " arguments, but template expects " + params.size() + ".");
-        }
-
-        // Then check types and non-blanks
-
-        Result<Dependency> insRes = Result.of(ins);
-
-        for (int i = 0; i < args.size(); i++) {
-            Term arg = args.get(i);
-            Term param = params.get(i);
-
-            if (!arg.getType().isCompatibleWith(param.getType())) {
-                String err = "Argument " + arg.toString() + " with index " + i 
-                    + " to template with IRI " + ins.to.getIRI() + " has incompatible type: "
-                    + "Expected type compatible with " + param.getType().toString() + " but got " + arg.getType().toString() + ".";
-                insRes = insRes.fail(Message.error(err));
-            }
-            if (arg instanceof BlankNodeTerm && params.isNonBlank(i)) {
-                String err = "Argument " + arg.toString() + " with index " + i 
-                    + " to template with IRI " + ins.to.getIRI() + " is a blank node, but "
-                    + " corresponding parameter " + params.get(i).toString() + " is marked as non-blank.";
-                insRes = insRes.fail(Message.error(err));
-            }
-        }
-        return insRes;
     }
 
     @Override
