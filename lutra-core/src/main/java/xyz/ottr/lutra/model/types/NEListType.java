@@ -52,9 +52,13 @@ public class NEListType implements ComplexType {
 
     @Override
     public boolean isCompatibleWith(TermType other) {
-        return isSubTypeOf(other);
+        return other.equals(TypeFactory.getTopType())
+            || other instanceof NEListType
+                && getInner().isCompatibleWith(((NEListType) other).getInner())
+            || other instanceof ListType
+                && getInner().isCompatibleWith(((ListType) other).getInner());
     }
-    
+
     @Override
     public String toString() {
         return "NEList<" + getInner().toString() + ">";

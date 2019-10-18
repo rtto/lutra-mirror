@@ -45,12 +45,14 @@ public class ListType implements ComplexType {
     public boolean isSubTypeOf(TermType other) {
         return other.equals(TypeFactory.getTopType())
             || other instanceof ListType
-            && this.inner.isSubTypeOf(((ListType) other).getInner());
+                && this.inner.isSubTypeOf(((ListType) other).getInner());
     }
 
     @Override
     public boolean isCompatibleWith(TermType other) {
-        return isSubTypeOf(other);
+        return other.equals(TypeFactory.getTopType())
+            || other instanceof ListType
+            && this.inner.isCompatibleWith(((ListType) other).getInner());
     }
     
     @Override
