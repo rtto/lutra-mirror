@@ -45,7 +45,7 @@ public class CLIWrapperTest {
 
         CLIWrapper cliWrapper = new CLIWrapper();
 
-        cliWrapper.addInput(instances);
+        cliWrapper.addInputString(instances);
         cliWrapper.setInputFormat(instanceFormat);
         cliWrapper.setOutputFormat(outputFormat);
 
@@ -121,10 +121,10 @@ public class CLIWrapperTest {
 
         CLIWrapper cliWrapper = new CLIWrapper();
 
-        cliWrapper.addInput(instances);
+        cliWrapper.addInputString(instances);
         cliWrapper.setInputFormat("stottr");
-        cliWrapper.addLibrary(library);
-        cliWrapper.setLibraryFormat("wottr");
+        cliWrapper.addLibraryString(library);
+        //cliWrapper.setLibraryFormat("wottr");
         cliWrapper.setOutputFormat("wottr");
 
         String out = cliWrapper.run();
