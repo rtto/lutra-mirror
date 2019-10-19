@@ -90,7 +90,7 @@ The project is supported by the [Department of Informatics][9] at University of 
 
 [1]:https://openjdk.java.net/install/index.html
 [2]:https://gitlab.com/ottr/lutra/lutra/releases
-[3]:https://gitlab.com/ottr/lutra/lutra/-/jobs/artifacts/master/raw/lutra.jar?job=snapshot
+[3]:https://gitlab.com/ottr/lutra/lutra/-/jobs/artifacts/master/raw/lutra.jar?job=release
 [4]:https://gitlab.com/ottr/lutra/lutra/-/jobs/artifacts/develop/raw/lutra.jar?job=snapshot
 [5]:https://docs.gitlab.com/ee/gitlab-basics/add-merge-request.html
 [6]:https://gitlab.com/ottr/lutra/lutra/tags
