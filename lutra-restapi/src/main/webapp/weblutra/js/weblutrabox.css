@@ -1,0 +1,59 @@
+input, select, label {
+    display: inline-block;
+}
+
+div.weblutra {
+    border: 1px solid #999;
+    margin-top: 10px;
+    padding-left: 20px;
+    padding-bottom: 15px;
+    background-color: #eee;
+}
+
+select, div.menu, .popup ul.list li {
+    font-size: 9pt;
+    font-family: sans-serif;
+}
+
+span.toggle, span.lutra-send, div.popup {
+  cursor: pointer;
+}
+
+span.lutra-send {
+ margin-left: 1em;
+}
+
+div.weblutra textarea {
+    width: 100%;
+    max-width: 950px;
+}
+
+div.popup {
+  display: inline;
+  position: relative;
+}
+
+div.popup span {
+  border-bottom: 1px solid #ccc;
+}
+
+div.popup span::after {
+  content: " \25BD";
+}
+
+.popup ul.list { 
+    position: absolute;
+    display: none;
+    left: 40px; 
+    top: -10px; 
+    z-index: 999; 
+    list-style: none;
+    width:100px;
+    margin:0; padding:10px;
+    border: 1px solid #ccc;
+    background:#fff; color:#333;
+}
+
+.popup ul.list li:hover {
+ background: #eee;
+}
