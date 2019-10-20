@@ -54,11 +54,11 @@ public class CLIWrapper {
     private @NonNull String inputFormat;
     private @NonNull String outputFormat;
     private boolean fetchMissing;
+    private boolean loadTplLibrary;
     //private String libraryFormat;
 
     private Path inputDirectory;
     private Path libraryDirectory;
-
     private String tplLibrary;
 
     private static final String tempPrefix = "weblutra-";
@@ -127,7 +127,7 @@ public class CLIWrapper {
             "--mode " + this.mode
             + " --inputFormat " + this.inputFormat
             + " --outputFormat " + this.outputFormat
-            + (StringUtils.isNotBlank(this.tplLibrary) ? " --library " + this.tplLibrary : "")
+            + (this.loadTplLibrary && StringUtils.isNotBlank(this.tplLibrary) ? " --library " + this.tplLibrary : "")
             + (!this.libraryFiles.isEmpty() ? " --library " + this.libraryDirectory.toAbsolutePath() : "")
             + (this.fetchMissing ? " --fetchMissing" : "")
             + " --stdout "

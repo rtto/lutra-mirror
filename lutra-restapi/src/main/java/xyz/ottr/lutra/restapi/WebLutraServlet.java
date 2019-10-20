@@ -177,6 +177,9 @@ public class WebLutraServlet extends HttpServlet {
                     case "fetchMissing":
                         cli.setFetchMissing("true".equalsIgnoreCase(item.getString()));
                         break;
+                    case "loadStdLib":
+                        cli.setLoadTplLibrary("true".equalsIgnoreCase(item.getString()));
+                        break;
                     case "inputFormat":
                         cli.setInputFormat(item.getString());
                         break;
