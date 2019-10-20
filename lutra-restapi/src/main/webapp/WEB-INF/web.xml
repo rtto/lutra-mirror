@@ -17,4 +17,8 @@
     <url-pattern>/expand</url-pattern>
   </servlet-mapping>
 
+  <welcome-file-list>
+    <welcome-file>weblutra/index.html</welcome-file>
+  </welcome-file-list>
+
 </web-app>

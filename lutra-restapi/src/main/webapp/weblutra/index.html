@@ -21,7 +21,7 @@ textarea {
 }
 
 .column.left textarea {
-    height: 32%;
+    height: 25%;
 }
 
 .column.right textarea {
@@ -90,7 +90,7 @@ textarea {
 </head>
 <body>
 <h1 style="margin: 0; margin-bottom: -10px;">WebLutra</h1>
-<form id="inputform" action="./expand" method="post" enctype="multipart/form-data">
+<form id="inputform" action="http://sws.ifi.uio.no/lutra/expand" method="post" enctype="multipart/form-data">
     <div class="row">
         <div class="column left">
 
@@ -143,15 +143,18 @@ o-pizza:NamedPizza(ex:PepperoniPizza, ottr:none, (ex:Tomato, ex:Cheese, ex:Peppe
 ##   1. the Pizza IRI, 2. an optional Country IRI, 3. a list of topping IRIs.
 
 </textarea>
-
-            <p><b>Data files</b>
+            <p><b title="Upload additional files, e.g., CSV files for bOTTR processing">Data files</b>
                 <input id="fileData" type="file" name="fileData" multiple>
                 <input type="button" class="clear" data-for="fileData" value="Clear files"/>
             </p>
 
 	    <b>Fetch templates by URI:</b>
             <input type="checkbox" name="fetchMissing" value="true" checked="checked"/>
-	    <br/>
+            <br/>
+        <b>Include standard library: <code>tpl.ottr.xyz</code>:</b>
+            <input type="checkbox" name="loadStdLib" value="true" checked="checked"/><br/>
+            <br/>
+
 
             <b>Additional templates*</b>
             <select id="opnLibFormat" name="libraryFormat">

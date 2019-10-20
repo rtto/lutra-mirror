@@ -54,16 +54,19 @@ public class CLIWrapper {
     private @NonNull String inputFormat;
     private @NonNull String outputFormat;
     private boolean fetchMissing;
-    private String libraryFormat;
+    private boolean loadTplLibrary;
+    //private String libraryFormat;
 
     private Path inputDirectory;
     private Path libraryDirectory;
+    private String tplLibrary;
 
     private static final String tempPrefix = "weblutra-";
 
     private static final String CHARSET = "UTF-8";
     
     private static final Logger log = LoggerFactory.getLogger(CLIWrapper.class);
+
 
     CLIWrapper() throws IOException {
         this.inputFiles = new ArrayList<>();
@@ -79,33 +82,25 @@ public class CLIWrapper {
             : content;
     }
 
-    void addData(FileItem fileItem) throws Exception {
+    void addDataFile(FileItem fileItem) throws Exception {
         addFileItem(fileItem, this.inputDirectory, this.dataFiles);
     }
 
-    void addInput(FileItem fileItem) throws Exception {
+    void addInputFile(FileItem fileItem) throws Exception {
         addFileItem(fileItem, this.inputDirectory, this.inputFiles);
     }
 
-    void addInput(String fileContent) throws IOException {
+    void addInputString(String fileContent) throws IOException {
         addFileContent(prependPrefixes(fileContent), this.inputDirectory, this.inputFiles);
     }
 
-    void addLibrary(FileItem fileItem) throws Exception {
+    void addLibraryFile(FileItem fileItem) throws Exception {
         addFileItem(fileItem, this.libraryDirectory, this.libraryFiles);
     }
 
-    void addLibrary(String fileContent) throws IOException {
+    void addLibraryString(String fileContent) throws IOException {
         addFileContent(prependPrefixes(fileContent), this.libraryDirectory, this.libraryFiles);
     }
-
-    /*
-    private void addFileItem(FileItem fileItem, Path path, Collection<File> files) throws Exception {
-        File outputFile = Files.createTempFile(path, "", "-" + fileItem.getName()).toFile();
-        fileItem.write(outputFile);
-        files.add(outputFile);
-    }
-    */
 
     private void addFileItem(FileItem fileItem, Path path, Collection<File> files) throws IOException {
         if (fileItem.getSize() > 0) {
@@ -118,7 +113,6 @@ public class CLIWrapper {
         }
     }
 
-
     private void addFileContent(String content, Path path, Collection<File> files) throws IOException {
         if (StringUtils.isNotBlank(content)) {
             File file = Files.createTempFile(path,"", ".txt").toFile();
@@ -126,22 +120,20 @@ public class CLIWrapper {
             files.add(file);
         }
     }
-
+    
     String run() throws IOException {
 
         String command =
             "--mode " + this.mode
             + " --inputFormat " + this.inputFormat
             + " --outputFormat " + this.outputFormat
+            + (this.loadTplLibrary && StringUtils.isNotBlank(this.tplLibrary) ? " --library " + this.tplLibrary : "")
             + (!this.libraryFiles.isEmpty() ? " --library " + this.libraryDirectory.toAbsolutePath() : "")
-            + (!this.libraryFiles.isEmpty() && this.libraryFormat != null ? " --libraryFormat " + this.libraryFormat : "")
             + (this.fetchMissing ? " --fetchMissing" : "")
             + " --stdout "
             + this.inputFiles.stream()
                 .map(File::getAbsolutePath)
                 .collect(Collectors.joining(" "));
-
-        log.info(command);
 
         String output;
         try (ByteArrayOutputStream outStream = new ByteArrayOutputStream();
