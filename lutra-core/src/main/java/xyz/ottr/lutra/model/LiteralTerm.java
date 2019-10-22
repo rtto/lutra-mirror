@@ -24,6 +24,7 @@ package xyz.ottr.lutra.model;
 
 import java.util.Optional;
 
+import org.apache.jena.vocabulary.XSD;
 import xyz.ottr.lutra.model.types.TypeFactory;
 
 public class LiteralTerm extends ResourceTerm {
@@ -33,7 +34,7 @@ public class LiteralTerm extends ResourceTerm {
     private final String langtag;
 
     public LiteralTerm(String value) {
-        this(value, null, null);
+        this(value, XSD.xstring.toString(), null);
     }
 
     // TODO: Remove, and replace calls with this#typedLiteral
