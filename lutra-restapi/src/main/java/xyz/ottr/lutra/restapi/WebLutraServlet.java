@@ -65,7 +65,7 @@ public class WebLutraServlet extends HttpServlet {
     private static final String attrLibraryRepo = "libraryRepo";
     private static final String attrLastPullTime = "lastPullTime";
 
-    private final long pullInterval = 1 * 1000 * 60 * 60; // update repo every hour
+    private final long pullInterval = 1000 * 60 * 10; // update repo every 10 mins
 
     private static final long MAX_FILE_SIZE = 100 * 1024;
     private static final long MAX_REQUEST_SIZE = 5 * MAX_FILE_SIZE;
