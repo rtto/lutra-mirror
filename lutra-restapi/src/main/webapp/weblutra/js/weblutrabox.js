@@ -26,6 +26,10 @@ $(function() {
 
     var globalPrefixes = $("div#text-prefixes > pre.example").text();
 
+    if (globalPrefixes.length === 0) {
+        $("div#text-prefixes > div.org-src-container > pre.src").text();
+    }
+
     // helper functions
 
     var generateID = (function(){

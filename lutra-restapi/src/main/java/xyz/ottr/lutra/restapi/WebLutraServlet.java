@@ -57,7 +57,8 @@ public class WebLutraServlet extends HttpServlet {
         "http://weblutra.ottr.xyz",
         "http://ottr.xyz",
         "http://www.ottr.xyz",
-        "http://spec.ottr.xyz"
+        "http://spec.ottr.xyz",
+        "http://dev.spec.ottr.xyz"
     );
     
     private static final String repoLibrary = "https://gitlab.com/ottr/templates.git";
