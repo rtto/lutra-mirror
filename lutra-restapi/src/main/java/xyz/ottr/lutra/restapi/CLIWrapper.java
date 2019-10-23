@@ -125,7 +125,7 @@ public class CLIWrapper {
 
         String command =
             "--mode " + this.mode
-            + " --inputFormat " + this.inputFormat
+            + (StringUtils.isNotEmpty(this.inputFormat) ? " --inputFormat " + this.inputFormat : "")
             + " --outputFormat " + this.outputFormat
             + (this.loadTplLibrary && StringUtils.isNotBlank(this.tplLibrary) ? " --library " + this.tplLibrary : "")
             + (!this.libraryFiles.isEmpty() ? " --library " + this.libraryDirectory.toAbsolutePath() : "")
