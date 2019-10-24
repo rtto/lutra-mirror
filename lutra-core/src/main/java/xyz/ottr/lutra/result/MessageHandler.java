@@ -62,7 +62,7 @@ public class MessageHandler {
 
     public void add(Result<?> result) {
         if (result != null) {
-            add(result.getTrace());
+            this.traces.add(result.getTrace());
         }
     }
 

@@ -24,8 +24,14 @@
 
 $(function() {
 
-    var globalPrefixes = $("div#text-prefixes > pre.example").text();
+    var globalPrefixes;
 
+    if ($("div#text-prefixes > pre.example").length) {
+	globalPrefixes = $("div#text-prefixes > pre.example").text();
+    } else if ($("div#text-prefixes > div.org-src-container > pre.src").length) {
+        globalPrefixes = $("div#text-prefixes > div.org-src-container > pre.src").text();
+    }
+    
     // helper functions
 
     var generateID = (function(){
@@ -155,7 +161,7 @@ $(function() {
 		    "<div class='menu'>"
 			+ htmlToggleButton($(this).attr("id"), "Output")
 			+ popup("Format", "outputFormat", ["wottr", "stottr"])
-			+ popup("Action", "mode", ["expand", "format" /*, "expandLibrary", "formatLibrary" */ ])
+			+ popup("Action", "mode", ["expand", "format", "lint" /*, "expandLibrary", "formatLibrary" */ ])
 			+ popup("Fetch templates", "fetchMissing", ["true", "false"])
 		    	+ popup("Load tpl.ottr.xyz", "loadStdLib", ["true", "false"])
 			+ "<span class='lutra-send'> Run &#9654; </span>"

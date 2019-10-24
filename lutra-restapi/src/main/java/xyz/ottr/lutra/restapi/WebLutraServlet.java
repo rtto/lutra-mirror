@@ -57,7 +57,8 @@ public class WebLutraServlet extends HttpServlet {
         "http://weblutra.ottr.xyz",
         "http://ottr.xyz",
         "http://www.ottr.xyz",
-        "http://spec.ottr.xyz"
+        "http://spec.ottr.xyz",
+        "http://dev.spec.ottr.xyz"
     );
     
     private static final String repoLibrary = "https://gitlab.com/ottr/templates.git";
@@ -65,18 +66,13 @@ public class WebLutraServlet extends HttpServlet {
     private static final String attrLibraryRepo = "libraryRepo";
     private static final String attrLastPullTime = "lastPullTime";
 
-    private final long pullInterval = 1 * 1000 * 60 * 60; // update repo every hour
+    private final long pullInterval = 1000 * 60 * 10; // update repo every 10 mins
 
     private static final long MAX_FILE_SIZE = 100 * 1024;
     private static final long MAX_REQUEST_SIZE = 5 * MAX_FILE_SIZE;
 
     static {
         BOTTR.Settings.setRDFSourceQueryLimit(200);
-    }
-
-    public void destroy() {
-        File repo = (File) getServletContext().getAttribute(attrLibraryRepo);
-        repo.deleteOnExit();
     }
 
     private void updateLibrary() throws IOException, GitAPIException {

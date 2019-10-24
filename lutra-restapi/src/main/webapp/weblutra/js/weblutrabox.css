@@ -10,6 +10,10 @@ div.weblutra {
     background-color: #eee;
 }
 
+div.weblutra.error {
+    border: 1px solid red;
+}
+
 select, div.menu, .popup ul.list li {
     font-size: 9pt;
     font-family: sans-serif;

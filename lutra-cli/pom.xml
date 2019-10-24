@@ -2,7 +2,7 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>xyz.ottr.lutra</groupId>
-        <version>0.6.2</version>
+        <version>0.6.3</version>
         <artifactId>lutra</artifactId>
         <relativePath>../pom.xml</relativePath>
     </parent>
@@ -42,6 +42,32 @@
 
     <build>
         <plugins>
+
+            <plugin>
+                <groupId>com.googlecode.maven-download-plugin</groupId>
+                <artifactId>download-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>download-pottr</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>wget</goal>
+                        </goals>
+                        <configuration>
+                            <unpack>true</unpack>
+                            <!--url>https://gitlab.com/ottr/spec/pOTTR/-/jobs/artifacts/0.1/download?job=release</url-->
+                            <url>https://gitlab.com/ottr/spec/pOTTR/-/jobs/331316047/artifacts/download</url>
+                            <outputFileName>pOTTR.zip</outputFileName>
+                            <outputDirectory>${project.basedir}/src/test/resources/</outputDirectory>
+                            <!--md5>MD5 SUM HERE</md5 -->
+                            <skipCache>true</skipCache>
+                        </configuration>
+                    </execution>
+
+                </executions>
+            </plugin>
+
+
             <!-- Taken from https://github.com/apache/jena/blob/master/jena-fuseki2/jena-fuseki-server/pom.xml
                 See also http://jena.apache.org/documentation/notes/jena-repack.html -->
             <plugin>

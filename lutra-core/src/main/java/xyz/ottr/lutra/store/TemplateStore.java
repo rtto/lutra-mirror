@@ -114,7 +114,11 @@ public interface TemplateStore extends Consumer<TemplateSignature> {
 
     default Set<String> getTemplateSignatureIRIs() {
         return getIRIs(iri ->
-            containsSignature(iri) || containsBase(iri) && !iri.equals(OTTR.BaseURI.Triple));
+            containsSignature(iri)
+                || containsBase(iri)
+                && !iri.equals(OTTR.BaseURI.Triple)
+                && !iri.equals(OTTR.BaseURI.NullableTriple)
+        );
     }
 
     /**
