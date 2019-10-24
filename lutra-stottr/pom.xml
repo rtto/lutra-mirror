@@ -64,23 +64,6 @@
                             <skipCache>true</skipCache>
                         </configuration>
                     </execution>
-
-                    <execution>
-                        <id>download-pottr</id>
-                        <phase>generate-sources</phase>
-                        <goals>
-                            <goal>wget</goal>
-                        </goals>
-                        <configuration>
-                            <unpack>true</unpack>
-                            <url>https://gitlab.com/ottr/spec/pOTTR/-/jobs/artifacts/master/download?job=release</url>
-                            <outputDirectory>${project.basedir}/src/test/resources/</outputDirectory>
-                            <outputFileName>pOTTR.zip</outputFileName>
-                            <!--md5>MD5 SUM HERE</md5 -->
-                            <skipCache>true</skipCache>
-                        </configuration>
-                    </execution>
-
                 </executions>
             </plugin>
             <plugin>

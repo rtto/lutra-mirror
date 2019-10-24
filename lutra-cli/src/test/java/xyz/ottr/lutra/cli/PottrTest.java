@@ -1,8 +1,8 @@
-package xyz.ottr.lutra.stottr.io;
+package xyz.ottr.lutra.cli;
 
 /*-
  * #%L
- * lutra-stottr
+ * lutra-cli
  * %%
  * Copyright (C) 2018 - 2019 University of Oslo
  * %%
@@ -23,8 +23,6 @@ package xyz.ottr.lutra.stottr.io;
  */
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertThat;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -44,12 +42,13 @@ import xyz.ottr.lutra.result.ResultConsumer;
 import xyz.ottr.lutra.result.ResultStream;
 import xyz.ottr.lutra.store.DependencyGraph;
 import xyz.ottr.lutra.store.TemplateStore;
+import xyz.ottr.lutra.stottr.io.SFileReader;
 import xyz.ottr.lutra.stottr.parser.SInstanceParser;
 import xyz.ottr.lutra.stottr.parser.STemplateParser;
 import xyz.ottr.lutra.stottr.writer.SInstanceWriter;
 
 @RunWith(Parameterized.class)
-public class PottrStottrTest {
+public class PottrTest {
 
     private static final Path ROOT = Paths.get("src", "test", "resources", ".temp-deploy", "pOTTR", "0.1", "files");
 
@@ -57,7 +56,7 @@ public class PottrStottrTest {
     private String templatePath;
     private boolean expextedResults;
 
-    public PottrStottrTest(String instance, String template, boolean expextedResults) {
+    public PottrTest(String instance, String template, boolean expextedResults) {
         this.instancePath = instance;
         this.templatePath = template;
         this.expextedResults = expextedResults;
@@ -110,7 +109,7 @@ public class PottrStottrTest {
     }
 
     private TemplateStore getStore() {
-        TemplateStore store = new DependencyGraph(null);
+        TemplateStore store = new DependencyGraph(ReaderRegistryImpl.getReaderRegistry());
         store.addOTTRBaseTemplates();
         return store;
     }
@@ -140,9 +139,6 @@ public class PottrStottrTest {
         ResultConsumer<Instance> expansionErrors = new ResultConsumer<>(insWriter);
         expandedInInstances.forEach(expansionErrors);
 
-        System.out.println(insWriter.write());
-
         return !Message.moreSevere(expansionErrors.getMessageHandler().printMessages(), Message.ERROR);
-
     }
 }
