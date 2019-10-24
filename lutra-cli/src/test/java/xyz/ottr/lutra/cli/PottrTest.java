@@ -117,6 +117,7 @@ public class PottrTest {
     private boolean testTemplates(TemplateStore store, String path) {
         TemplateReader reader = new TemplateReader(new SFileReader(), new STemplateParser());
         reader.loadTemplatesFromFolder(store, resolve(path), new String[]{}, new String[]{});
+        store.fetchMissingDependencies();
 
         List<Message> tplMsg = store.checkTemplates();
 

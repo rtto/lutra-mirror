@@ -121,3 +121,5 @@ lutra-stottr/src/main/antlr4/stOTTR\.g4
 lutra-stottr/src/main/antlr4/imports/Turtle\.g4
 
 lutra-stottr/src/test/resources/.temp-deploy/
+
+lutra-cli/src/test/resources/.temp-deploy/
