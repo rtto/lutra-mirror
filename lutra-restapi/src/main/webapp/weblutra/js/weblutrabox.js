@@ -31,10 +31,7 @@ $(function() {
     } else if ($("div#text-prefixes > div.org-src-container > pre.src").length) {
         globalPrefixes = $("div#text-prefixes > div.org-src-container > pre.src").text();
     }
-  
-    console.log(globalPrefixes);
-  
-  
+    
     // helper functions
 
     var generateID = (function(){

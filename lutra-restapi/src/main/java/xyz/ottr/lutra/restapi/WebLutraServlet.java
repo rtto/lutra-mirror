@@ -75,11 +75,6 @@ public class WebLutraServlet extends HttpServlet {
         BOTTR.Settings.setRDFSourceQueryLimit(200);
     }
 
-    public void destroy() {
-        File repo = (File) getServletContext().getAttribute(attrLibraryRepo);
-        repo.deleteOnExit();
-    }
-
     private void updateLibrary() throws IOException, GitAPIException {
 
         ServletContext context = getServletContext();
