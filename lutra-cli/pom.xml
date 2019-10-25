@@ -56,7 +56,7 @@
                         <configuration>
                             <unpack>true</unpack>
                             <!--url>https://gitlab.com/ottr/spec/pOTTR/-/jobs/artifacts/0.1/download?job=release</url-->
-                            <url>https://gitlab.com/ottr/spec/pOTTR/-/jobs/331316047/artifacts/download</url>
+                            <url>https://gitlab.com/ottr/spec/pOTTR/-/jobs/332608553/artifacts/download</url>
                             <outputFileName>pOTTR.zip</outputFileName>
                             <outputDirectory>${project.basedir}/src/test/resources/</outputDirectory>
                             <!--md5>MD5 SUM HERE</md5 -->
