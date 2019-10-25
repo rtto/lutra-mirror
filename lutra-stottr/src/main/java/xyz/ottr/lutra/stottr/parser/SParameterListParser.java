@@ -35,6 +35,7 @@ import xyz.ottr.lutra.model.BlankNodeTerm;
 import xyz.ottr.lutra.model.ParameterList;
 import xyz.ottr.lutra.model.Term;
 import xyz.ottr.lutra.model.types.TermType;
+import xyz.ottr.lutra.model.types.TypeFactory;
 import xyz.ottr.lutra.result.Result;
 import xyz.ottr.lutra.stottr.STOTTR;
 import xyz.ottr.lutra.stottr.antlr.stOTTRParser;
@@ -83,6 +84,8 @@ public class SParameterListParser extends SBaseParserVisitor<ParameterList> {
                     var.setIsVariable(true);
                     if (type != null) {
                         var.setType(type);
+                    } else {
+                        var.setType(TypeFactory.getVariableType(var));
                     }
                     if (deflt != null) {
                         this.defaults.put(var, deflt);

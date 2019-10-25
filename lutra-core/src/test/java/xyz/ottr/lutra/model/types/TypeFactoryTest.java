@@ -68,7 +68,7 @@ public class TypeFactoryTest {
     public void simpleTypeSetting3() {
         assertEquals(
                 new LiteralTerm("test").getType(),
-                TypeFactory.getType(RDFS.Literal));
+                TypeFactory.getType(XSD.xstring));
     }
 
     @Test
