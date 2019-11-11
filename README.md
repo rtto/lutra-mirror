@@ -7,14 +7,14 @@
 
 Detailed documentation on the OTTR framework can be found on our web site: https://ottr.xyz/.
 
-Lutra is our open source reference implementation of the OTTR language available under an LGPL licence. Lutra can read and write OTTR templates and instances on different serialisation formats, and expand instances into regular RDF graphs or RDF/OWL ontologies. Lutra is written in Java 8 and is currently available for use as a command line interface.
+Lutra is our open source reference implementation of the OTTR language available under an LGPL licence. Lutra can read and write OTTR templates and instances on different serialisation formats, and expand instances into regular RDF graphs or RDF/OWL ontologies. Lutra is written in Java 11 and is currently available for use as a command line interface.
 
 
 ## Running and installation
 
 ### Prerequisites
 
-To run Lutra you will need to install Java 8, for instance [OpenJDK][1].
+To run Lutra you will need to install Java 11, for instance [OpenJDK][1].
 
 ### Downloads
 
@@ -44,7 +44,7 @@ Note that the default branch of the project is the `develop` branch.
 
 Requirements:
 
-* Java 8, for instance [OpenJDK][1]
+* Java 11, for instance [OpenJDK][1]
 * [Maven](https://maven.apache.org/) - Dependency Management
 
 The project depends on the following external libraries:

@@ -48,7 +48,7 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-        <maven.compiler.target>1.8</maven.compiler.target>
+        <maven.compiler.target>11</maven.compiler.target>
         <maven.javadoc.skip>true</maven.javadoc.skip>
 
         <jena.version>3.12.0</jena.version>
@@ -61,8 +61,8 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
-                    <source>1.8</source>
-                    <target>1.8</target>
+                    <source>11</source>
+                    <target>11</target>
                 </configuration>
             </plugin>
 
@@ -182,9 +182,7 @@
             </plugin>
 
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-pmd-plugin</artifactId>
-                <version>3.8</version>
                 <configuration>
                     <excludeRoots>
                         <excludeRoot>target/generated-sources/</excludeRoot> <!-- Skip checking generated sources -->
@@ -235,7 +233,7 @@
                         <configuration>
                             <rules>
                                 <requireJavaVersion>
-                                    <version>1.8</version>
+                                    <version>11</version>
                                 </requireJavaVersion>
                                 <requireMavenVersion>
                                     <version>3.0.1</version>
@@ -333,6 +331,12 @@
                     <version>3.2.1</version>
                 </plugin>
 
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-pmd-plugin</artifactId>
+                    <version>3.12.0</version>
+                </plugin>
+
             </plugins>
         </pluginManagement>
 
@@ -362,7 +366,6 @@
 
             <plugin>
                 <artifactId>maven-pmd-plugin</artifactId>
-                <version>3.8</version>
                 <reportSets>
                     <reportSet>
                         <reports>
