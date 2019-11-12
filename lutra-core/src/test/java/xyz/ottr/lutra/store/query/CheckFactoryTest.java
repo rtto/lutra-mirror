@@ -54,7 +54,7 @@ import xyz.ottr.lutra.store.DependencyGraph;
 
 public class CheckFactoryTest {
 
-    private final Logger log = LoggerFactory.getLogger(CheckFactoryTest.class);
+    private static final Logger log = LoggerFactory.getLogger(CheckFactoryTest.class);
 
     private DependencyGraph initStore() {
         
@@ -80,7 +80,7 @@ public class CheckFactoryTest {
             + severity + " but gave " + msgs.size();
 
         if (msgs.size() != numErrors) {
-            msgs.forEach(m -> m.log(log));
+            msgs.forEach(m -> m.log(this.log));
         }
 
         assertTrue(assStr, msgs.size() == numErrors); 

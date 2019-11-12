@@ -27,9 +27,9 @@ import org.apache.jena.shared.PrefixMapping;
 
 public class TemplateSignature {
 
-    private String iri;
-    private ParameterList params;
-    private boolean isBaseTemplate;
+    private final String iri;
+    private final ParameterList params;
+    private final boolean isBaseTemplate;
 
     public TemplateSignature(String iri, ParameterList params, boolean isBaseTemplate) {
         this.iri = iri;
@@ -57,11 +57,11 @@ public class TemplateSignature {
     }
 
     public String getIRI() {
-        return iri;
+        return this.iri;
     }
 
     public ParameterList getParameters() {
-        return params;
+        return this.params;
     }
 
     public boolean isBaseTemplate() {
@@ -74,16 +74,16 @@ public class TemplateSignature {
      * argument PrefixMapping.
      */
     public String toString(PrefixMapping prefixes) {
-        String qheadStr = prefixes.qnameFor(iri);
-        String headStr = (qheadStr == null) ? iri : qheadStr;
-        headStr += (params == null) ? "(...)" : params.toString(prefixes);
+        String qheadStr = prefixes.qnameFor(this.iri);
+        String headStr = (qheadStr == null) ? this.iri : qheadStr;
+        headStr += (this.params == null) ? "(...)" : this.params.toString(prefixes);
         return headStr;
     }
 
     @Override
     public String toString() {
-        String headStr = iri;
-        headStr += (params == null) ? "(...)" : params.toString();
+        String headStr = this.iri;
+        headStr += (this.params == null) ? "(...)" : this.params.toString();
         return headStr;
     }
 

@@ -32,7 +32,7 @@ import org.slf4j.LoggerFactory;
 
 public class DataValidatorTest {
     
-    private final Logger log = LoggerFactory.getLogger(DataValidatorTest.class);
+    private static final Logger log = LoggerFactory.getLogger(DataValidatorTest.class);
     
     private void accept(Predicate<String> func, String value) {
         boolean result = func.test(value);

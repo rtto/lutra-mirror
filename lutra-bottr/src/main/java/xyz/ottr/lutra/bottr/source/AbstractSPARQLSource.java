@@ -116,9 +116,9 @@ public abstract class AbstractSPARQLSource implements Source<RDFNode> {
 
     private <X> ResultStream<X> getResultSetStream(ResultSet resultSet, Function<List<RDFNode>, Result<X>> translationFunction) {
 
-        final List<String> columns = resultSet.getResultVars();
+        List<String> columns = resultSet.getResultVars();
         // TODO: does this work when a get returns null? will there be a hole in the list? Must test.
-        final Function<QuerySolution, Result<X>> rowCreator = (sol) ->
+        Function<QuerySolution, Result<X>> rowCreator = (sol) ->
             Result.of(
                 columns.stream()
                     .map(sol::get)
@@ -126,17 +126,18 @@ public abstract class AbstractSPARQLSource implements Source<RDFNode> {
             .flatMap(translationFunction);
 
         return new ResultStream<>(StreamSupport.stream(
-                new Spliterators.AbstractSpliterator<Result<X>>(Long.MAX_VALUE, Spliterator.ORDERED) {
-                    @Override
-                    public boolean tryAdvance(Consumer<? super Result<X>> action) {
-                        if (!resultSet.hasNext()) { 
-                            return false;
-                        } else { 
-                            action.accept(rowCreator.apply(resultSet.next()));
-                            return true;
-                        }
+            new Spliterators.AbstractSpliterator<>(Long.MAX_VALUE, Spliterator.ORDERED) {
+                @Override
+                public boolean tryAdvance(Consumer<? super Result<X>> action) {
+
+                    if (!resultSet.hasNext()) {
+                        return false;
+                    } else {
+                        action.accept(rowCreator.apply(resultSet.next()));
+                        return true;
                     }
-                }, false));
+                }
+            }, false));
     }
 
     @Override

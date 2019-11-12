@@ -71,7 +71,8 @@ public class BOTTR extends WOTTR {
     // TOKENS
     public static final String THIS_DIR = "@@THIS_DIR@@";
 
-    public static class Settings {
+    public enum Settings {
+        ;
         /**
          * Global setting for adding a LIMIT to SPARQL SELECT queries.
          */

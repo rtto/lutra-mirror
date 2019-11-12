@@ -22,7 +22,6 @@ package xyz.ottr.lutra.model;
  * #L%
  */
 
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -53,7 +52,7 @@ public class ArgumentList {
     }
     
     public ArgumentList(Term... elems) {
-        this(Arrays.asList(elems), null, null);
+        this(List.of(elems), null, null);
     }
 
     public Expander getListExpander() {
@@ -73,7 +72,7 @@ public class ArgumentList {
     }
 
     public boolean hasCrossExpander() {
-        return this.listExpander != null && this.listExpander.equals(Expander.CROSS);
+        return Expander.CROSS == this.listExpander;
     }
 
     public boolean hasZipExpander() {
@@ -81,11 +80,11 @@ public class ArgumentList {
     }
 
     public boolean hasZipMinExpander() {
-        return this.listExpander != null && this.listExpander.equals(Expander.ZIPMIN);
+        return Expander.ZIPMIN == this.listExpander;
     }
 
     public boolean hasZipMaxExpander() {
-        return this.listExpander != null && this.listExpander.equals(Expander.ZIPMAX);
+        return Expander.ZIPMAX == this.listExpander;
     }
 
     public Set<Term> getExpanderValues() {
@@ -135,7 +134,7 @@ public class ArgumentList {
         String s = "";
         String sep = "";
         for (Term e : asList()) {
-            s = s.concat(sep + e.toString(prefixes));
+            s = s + sep + e.toString(prefixes);
             //s = s.concat(this.expanderValues != null && this.expanderValues.contains(e) ? "--e" : "");
             sep = ", ";
         }
@@ -147,7 +146,7 @@ public class ArgumentList {
         String s = "";
         String sep = "";
         for (Term e : asList()) {
-            s = s.concat(sep + e.toString());
+            s = s + sep + e.toString();
             //s = s.concat(this.expanderValues != null && this.expanderValues.contains(e) ? "--e" : "");
             sep = ", ";
         }
@@ -208,7 +207,7 @@ public class ArgumentList {
     public List<ArgumentList> expandListExpander() {
         List<ArgumentList> expanded = new LinkedList<>();
         if (hasCrossExpander() && !this.expanderValues.isEmpty()) {
-            expandCrossExpander(expanded, new LinkedList<Term>(), 0);
+            expandCrossExpander(expanded, new LinkedList<>(), 0);
         } else if (hasZipExpander() && !this.expanderValues.isEmpty()) {
             expandZipExpander(expanded);
         } else {  

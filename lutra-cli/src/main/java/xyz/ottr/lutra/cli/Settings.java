@@ -23,7 +23,6 @@ package xyz.ottr.lutra.cli;
  */
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -158,7 +157,7 @@ public class Settings {
         static final long serialVersionUID = 0L; // Not correct!
 
         InsInputFormat() {
-            super(Arrays.asList(
+            super(List.of(
                     Format.legacy.toString(),
                     Format.wottr.toString(),
                     Format.stottr.toString(),
@@ -171,7 +170,7 @@ public class Settings {
         static final long serialVersionUID = 0L; // Not correct!
 
         TplInputFormat() {
-            super(Arrays.asList(
+            super(List.of(
                     Format.stottr.toString(),
                     Format.legacy.toString(),
                     Format.wottr.toString()));
@@ -183,7 +182,7 @@ public class Settings {
         static final long serialVersionUID = 0L; // Not correct!
 
         OutputFormat() {
-            super(Arrays.asList(
+            super(List.of(
                     Format.legacy.toString(),
                     Format.stottr.toString(),
                     Format.wottr.toString()));

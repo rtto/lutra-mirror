@@ -46,8 +46,8 @@ public class BaseInstanceExpansionTest {
         return data;
     }
 
-    private String input;
-    private String output;
+    private final String input;
+    private final String output;
 
     public BaseInstanceExpansionTest(String input, String output) {
         this.input = input;

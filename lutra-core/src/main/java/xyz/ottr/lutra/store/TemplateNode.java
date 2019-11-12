@@ -75,19 +75,19 @@ public class TemplateNode {
     }
 
     public boolean isBase() {
-        return this.type.equals(Type.BASE);
+        return this.type == Type.BASE;
     }
 
     public boolean isSignature() {
-        return this.type.equals(Type.SIGNATURE);
+        return this.type == Type.SIGNATURE;
     }
 
     public boolean isDefinition() {
-        return this.type.equals(Type.DEFINITION);
+        return this.type == Type.DEFINITION;
     }
 
     public boolean isUndefined() {
-        return this.type.equals(Type.UNDEFINED);
+        return this.type == Type.UNDEFINED;
     }
 
     public boolean isOptional(int index) {
@@ -100,6 +100,6 @@ public class TemplateNode {
 
     @Override
     public String toString() {
-        return getIRI() + Objects.toString(parameters, "(...)");
+        return getIRI() + Objects.toString(this.parameters, "(...)");
     }
 }
