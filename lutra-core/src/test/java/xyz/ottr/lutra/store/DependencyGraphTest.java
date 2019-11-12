@@ -72,7 +72,7 @@ public class DependencyGraphTest {
         ResultStream<Template> tempRes = graph.getAllTemplates();
 
         Set<Template> expanded = new HashSet<>();
-        ResultConsumer<Template> consumer = new ResultConsumer<Template>(tmpl -> expanded.add(tmpl));
+        ResultConsumer<Template> consumer = new ResultConsumer<>(expanded::add);
         tempRes.forEach(consumer);
         assertFalse(Message.moreSevere(consumer.getMessageHandler().printMessages(), Message.ERROR));
 
@@ -230,7 +230,7 @@ public class DependencyGraphTest {
         ResultStream<Instance> expandedInsRes = graph.expandInstance(ins);
 
         Set<Instance> expandedIns = new HashSet<>();
-        ResultConsumer<Instance> consumer = new ResultConsumer<Instance>(in -> expandedIns.add(in));
+        ResultConsumer<Instance> consumer = new ResultConsumer<>(expandedIns::add);
         expandedInsRes.forEach(consumer);
         assertFalse(Message.moreSevere(consumer.getMessageHandler().printMessages(), Message.ERROR));
 
@@ -243,7 +243,7 @@ public class DependencyGraphTest {
         ResultStream<Instance> expandedInsRes2 = graph.expandInstance(ins);
 
         Set<Instance> expandedIns2 = new HashSet<>();
-        ResultConsumer<Instance> consumer2 = new ResultConsumer<Instance>(in -> expandedIns2.add(in));
+        ResultConsumer<Instance> consumer2 = new ResultConsumer<>(expandedIns2::add);
         expandedInsRes2.forEach(consumer2);
         assertFalse(Message.moreSevere(consumer2.getMessageHandler().printMessages(), Message.ERROR));
 

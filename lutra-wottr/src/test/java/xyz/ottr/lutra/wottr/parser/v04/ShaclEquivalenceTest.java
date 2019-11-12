@@ -58,7 +58,7 @@ public class ShaclEquivalenceTest {
     private static final String correct = FilenameUtils.separatorsToSystem("src/test/resources/spec/tests/correct/");
     private static final String incorrect = FilenameUtils.separatorsToSystem("src/test/resources/spec/tests/incorrect/");
 
-    private static Set<String> unsupportedTests = Stream.of(
+    private static final Set<String> unsupportedTests = Stream.of(
             correct + "basetemplate03.ttl", // Annotations
             correct + "signature10.ttl", // Annotations
             correct + "signature11.ttl", // Annotations
@@ -75,7 +75,7 @@ public class ShaclEquivalenceTest {
             incorrect + "signature12.ttl" // Annotation
         ).collect(Collectors.toSet());
     
-    private static Set<String> instanceTests = Stream.of(
+    private static final Set<String> instanceTests = Stream.of(
             correct + "argument02.ttl", 
             correct + "argument03.ttl", 
             correct + "instance01.ttl", 
@@ -101,11 +101,11 @@ public class ShaclEquivalenceTest {
             incorrect + "instance12.ttl" 
         ).collect(Collectors.toSet());
     
-    private TemplateReader tempReader;
-    private InstanceReader insReader;
+    private final TemplateReader tempReader;
+    private final InstanceReader insReader;
     
-    private String filename;
-    private boolean isCorrect;
+    private final String filename;
+    private final boolean isCorrect;
     
     public ShaclEquivalenceTest(String filename, boolean isCorrect) {
         this.filename = filename;

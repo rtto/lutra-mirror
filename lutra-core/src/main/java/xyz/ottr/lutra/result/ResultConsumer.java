@@ -27,8 +27,8 @@ import java.util.function.Consumer;
 
 public class ResultConsumer<T> implements Consumer<Result<T>> {
 
-    private MessageHandler messageHandler;
-    private Consumer<T> valueConsumer;
+    private final MessageHandler messageHandler;
+    private final Consumer<T> valueConsumer;
 
     public ResultConsumer(Consumer<T> valueConsumer, PrintStream output) {
         this.valueConsumer = valueConsumer;
@@ -50,8 +50,8 @@ public class ResultConsumer<T> implements Consumer<Result<T>> {
     @Override
     public void accept(Result<T> result) {
 
-        if (valueConsumer != null && result != null) {
-            result.ifPresent(valueConsumer);
+        if (this.valueConsumer != null && result != null) {
+            result.ifPresent(this.valueConsumer);
         }
 
         this.messageHandler.add(result);

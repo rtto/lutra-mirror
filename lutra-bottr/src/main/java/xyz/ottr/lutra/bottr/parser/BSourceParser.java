@@ -144,7 +144,7 @@ class BSourceParser implements Function<Resource, Result<Source<?>>> {
      */
     private String getPath(String file) {
 
-        if (!this.absoluteFilePath.isPresent() || DataParser.asURI(file).isPresent()) {
+        if (this.absoluteFilePath.isEmpty() || DataParser.asURI(file).isPresent()) {
             return file;
         } else {
             return Paths.get(this.absoluteFilePath.get()).resolveSibling(file).toAbsolutePath().toString();

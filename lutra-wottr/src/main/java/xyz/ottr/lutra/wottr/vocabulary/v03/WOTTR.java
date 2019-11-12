@@ -23,8 +23,6 @@ package xyz.ottr.lutra.wottr.vocabulary.v03;
  */
 
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -73,27 +71,25 @@ public class WOTTR implements WOTTRVocabulary {
     public static final Property dataPropertyVariable = getProperty(ns + "dataPropertyVariable");
     public static final Property annotationPropertyVariable = getProperty(ns + "annotationPropertyVariable");
     
-    public static final List<Property> ALL_variable = Collections.unmodifiableList(Arrays.asList(
-        variable, 
+    public static final List<Property> ALL_variable = List.of(
+        variable,
         literalVariable,
-        nonLiteralVariable, 
-        classVariable, 
-        listVariable, 
-        individualVariable, 
-        datatypeVariable, 
+        nonLiteralVariable,
+        classVariable,
+        listVariable,
+        individualVariable,
+        datatypeVariable,
         propertyVariable,
-        objectPropertyVariable, 
-        dataPropertyVariable, 
-        annotationPropertyVariable
-        ));
+        objectPropertyVariable,
+        dataPropertyVariable,
+        annotationPropertyVariable);
 
     public static final Map<Property, List<Property>> listPropertiesMap;
    
     static {
-        Map<Property, List<Property>> tempMap = new HashMap<>();
-        tempMap.put(withVariables, Arrays.asList(hasParameter, variable));
-        tempMap.put(withValues, Arrays.asList(hasArgument, value));
-        listPropertiesMap = Collections.unmodifiableMap(tempMap);
+        listPropertiesMap = Map.of(
+            withVariables, Arrays.asList(hasParameter, variable),
+            withValues, Arrays.asList(hasArgument, value));
     }
     
     private static Resource getResource(String uri) {

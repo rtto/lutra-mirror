@@ -26,7 +26,7 @@ import org.apache.jena.vocabulary.RDF;
 
 public class ListType implements ComplexType {
 
-    private TermType inner;
+    private final TermType inner;
 
     public ListType(TermType inner) {
         this.inner = inner;
@@ -57,7 +57,7 @@ public class ListType implements ComplexType {
     
     @Override
     public String toString() {
-        return "List<" + inner.toString() + ">";
+        return "List<" + this.inner.toString() + ">";
     }
 
     @Override

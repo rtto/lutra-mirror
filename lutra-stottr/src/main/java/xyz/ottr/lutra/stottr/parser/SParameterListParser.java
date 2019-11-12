@@ -80,7 +80,7 @@ public class SParameterListParser extends SBaseParserVisitor<ParameterList> {
             Result<TermType> typeRes = parseType(ctx.type());
             Result<Term> varRes = Result.zipNullables(typeRes, defaultRes, (type, deflt) -> {
 
-                    Term var = new BlankNodeTerm(termParser.getVariableLabel(ctx.Variable()));
+                    Term var = new BlankNodeTerm(SParameterListParser.this.termParser.getVariableLabel(ctx.Variable()));
                     var.setIsVariable(true);
                     if (type != null) {
                         var.setType(type);
@@ -115,14 +115,14 @@ public class SParameterListParser extends SBaseParserVisitor<ParameterList> {
             if (ctx == null) {
                 return Result.empty();
             }
-            return termParser.visit(ctx.constant());
+            return SParameterListParser.this.termParser.visit(ctx.constant());
         }
 
         private Result<TermType> parseType(stOTTRParser.TypeContext ctx) {
             if (ctx == null) {
                 return Result.empty();
             }
-            return typeParser.visit(ctx);
+            return SParameterListParser.this.typeParser.visit(ctx);
         }
     }
 }

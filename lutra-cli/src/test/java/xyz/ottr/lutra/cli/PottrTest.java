@@ -52,9 +52,9 @@ public class PottrTest {
 
     private static final Path ROOT = Paths.get("src", "test", "resources", ".temp-deploy", "pOTTR", "0.1", "files");
 
-    private String instancePath;
-    private String templatePath;
-    private boolean expextedResults;
+    private final String instancePath;
+    private final String templatePath;
+    private final boolean expextedResults;
 
     public PottrTest(String instance, String template, boolean expextedResults) {
         this.instancePath = instance;

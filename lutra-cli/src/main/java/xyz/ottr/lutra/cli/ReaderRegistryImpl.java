@@ -47,8 +47,8 @@ public class ReaderRegistryImpl implements ReaderRegistry {
     
     private static final ReaderRegistry INSTANCE = new ReaderRegistryImpl();
     
-    private Map<String, TemplateReader> templateReaders;
-    private Map<String, InstanceReader> instanceReaders;
+    private final Map<String, TemplateReader> templateReaders;
+    private final Map<String, InstanceReader> instanceReaders;
     
     private ReaderRegistryImpl() {
         this.templateReaders = new LinkedHashMap<>(); // use linked hash maps for predictable order

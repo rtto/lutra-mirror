@@ -48,30 +48,31 @@ public class TermTypeTest {
 
     @Before
     public void setup() {
-        owlOProp = byIRI(OWL.ObjectProperty);
+
+        this.owlOProp = byIRI(OWL.ObjectProperty);
     }
 
     @Test
     public void shouldBeSubTypes() {
-        assertTrue(owlOProp.isSubTypeOf(byIRI(RDFS.Resource)));
-        assertTrue(owlOProp.isSubTypeOf(byIRI(OWL.ObjectProperty)));
+        assertTrue(this.owlOProp.isSubTypeOf(byIRI(RDFS.Resource)));
+        assertTrue(this.owlOProp.isSubTypeOf(byIRI(OWL.ObjectProperty)));
     }
 
     @Test
     public void shouldBeCompatible() {
-        assertTrue(owlOProp.isCompatibleWith(byIRI(OTTR.TypeURI.IRI)));
-        assertTrue(owlOProp.isCompatibleWith(byIRI(RDFS.Resource)));
-        assertTrue(owlOProp.isCompatibleWith(byIRI(OWL.ObjectProperty)));
+        assertTrue(this.owlOProp.isCompatibleWith(byIRI(OTTR.TypeURI.IRI)));
+        assertTrue(this.owlOProp.isCompatibleWith(byIRI(RDFS.Resource)));
+        assertTrue(this.owlOProp.isCompatibleWith(byIRI(OWL.ObjectProperty)));
     }
 
     @Test
     public void shouldBeIncompatible() {
-        assertTrue(owlOProp.isIncompatibleWith(byIRI(OWL.DatatypeProperty)));
-        assertTrue(owlOProp.isIncompatibleWith(byIRI(OWL.AnnotationProperty)));
-        assertTrue(owlOProp.isIncompatibleWith(byIRI(XSD.xstring)));
-        assertTrue(owlOProp.isIncompatibleWith(byIRI(RDFS.Literal)));
-        assertTrue(owlOProp.isIncompatibleWith(byIRI(XSD.xlong)));
-        assertTrue(owlOProp.isIncompatibleWith(byIRI(RDF.HTML)));
+        assertTrue(this.owlOProp.isIncompatibleWith(byIRI(OWL.DatatypeProperty)));
+        assertTrue(this.owlOProp.isIncompatibleWith(byIRI(OWL.AnnotationProperty)));
+        assertTrue(this.owlOProp.isIncompatibleWith(byIRI(XSD.xstring)));
+        assertTrue(this.owlOProp.isIncompatibleWith(byIRI(RDFS.Literal)));
+        assertTrue(this.owlOProp.isIncompatibleWith(byIRI(XSD.xlong)));
+        assertTrue(this.owlOProp.isIncompatibleWith(byIRI(RDF.HTML)));
     }
 
     /* For debugging

@@ -52,7 +52,7 @@ public class RDFtoOTTRtoRDFParserTest {
                 .collect(Collectors.toList());
     }
 
-    private String filename;
+    private final String filename;
 
     public RDFtoOTTRtoRDFParserTest(String filename) {
         this.filename = filename;

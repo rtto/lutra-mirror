@@ -156,7 +156,7 @@ public class Trace {
             visited.add(trace);
             trace.getTrace().stream()
                 .filter(t -> !visited.contains(t))
-                .forEach(t -> toVisit.add(t));
+                .forEach(toVisit::add);
         }
     }
 }

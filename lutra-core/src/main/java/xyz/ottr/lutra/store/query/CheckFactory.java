@@ -22,8 +22,6 @@ package xyz.ottr.lutra.store.query;
  * #L%
  */
 
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import org.apache.commons.collections4.ListUtils;
 
@@ -31,46 +29,45 @@ import xyz.ottr.lutra.model.types.ListType;
 import xyz.ottr.lutra.model.types.TypeFactory;
 import xyz.ottr.lutra.result.Message;
 
-public abstract class CheckFactory {
+public enum CheckFactory {
+    ;
 
+    /* Undefined template */
     /**
      * Checks that require information to be present, e.g.
      * check for missing dependencies.
      */
     public static final List<Check> failsOnMissingInformationChecks =
-        Collections.unmodifiableList(Arrays.asList(
-            /* Undefined template */
-            new Check(
-                Query.template("Temp")
-                    .and(Query.bodyInstance("Temp", "Ins"))
-                    .and(Query.instanceIRI("Ins", "Temp2"))
-                    .and(Query.isUndefined("Temp2")),
-                tup -> Message.error(
-                    "Template with IRI " + tup.get("Temp").toString()
+        List.of(new Check(
+            Query.template("Temp")
+                .and(Query.bodyInstance("Temp", "Ins"))
+                .and(Query.instanceIRI("Ins", "Temp2"))
+                .and(Query.isUndefined("Temp2")),
+            tup -> Message.error(
+                "Template with IRI " + tup.get("Temp").toString()
                     + " depends on undefined template "
                     + tup.get("Temp2").toString())
-            )
         ));
 
+    /* Length of argument list not equal to length of corresponding parameter list */
+    // not(A) and not(B) = not(A or B)
     /**
      * Checks that does not depend on having all definitions present.
      * Type and parameter checks are included here, but only fails if a concrete
      * error/inconsitency is found (thus does not fail on missing information).
      */
     public static final List<Check> failsOnErrorChecks =
-        Collections.unmodifiableList(Arrays.asList(
-            /* Length of argument list not equal to length of corresponding parameter list */
-            new Check(
-                Query.template("Temp")
-                    .and(Query.bodyInstance("Temp", "Ins"))
-                    .and(Query.instanceIRI("Ins", "Temp2"))
-                    .and(Query.arguments("Ins", "Args"))
-                    .and(Query.length("Args", "Len1"))
-                    .and(Query.parameters("Temp2", "Params"))
-                    .and(Query.length("Params", "Len2"))
-                    .and(Query.notEquals("Len1", "Len2")),
-                tup -> Message.error(
-                    "Argument list to template " + tup.get("Temp2").toString()
+        List.of(new Check(
+            Query.template("Temp")
+                .and(Query.bodyInstance("Temp", "Ins"))
+                .and(Query.instanceIRI("Ins", "Temp2"))
+                .and(Query.arguments("Ins", "Args"))
+                .and(Query.length("Args", "Len1"))
+                .and(Query.parameters("Temp2", "Params"))
+                .and(Query.length("Params", "Len2"))
+                .and(Query.notEquals("Len1", "Len2")),
+            tup -> Message.error(
+                "Argument list to template " + tup.get("Temp2").toString()
                     + " has length " + tup.get("Len1")
                     + " but corresponding parameter list has length " + tup.get("Len2")
                     + " in template " + tup.get("Temp").toString())
@@ -88,10 +85,10 @@ public abstract class CheckFactory {
                     .and(Query.isNonBlank("Params2", "Index2")),
                 tup -> Message.error(
                     "Parameter with name " + tup.get("Val").toString() + " is not marked as non-blank,"
-                    + " but is used as argument to non-blank parameter index "
-                    + tup.getAsEndUserIndex("Index2") + " in instance of template "
-                    + tup.get("Temp2").toString()
-                    + " in template " + tup.get("Temp1").toString())
+                        + " but is used as argument to non-blank parameter index "
+                        + tup.getAsEndUserIndex("Index2") + " in instance of template "
+                        + tup.get("Temp2").toString()
+                        + " in template " + tup.get("Temp1").toString())
             ),
             /* Any template depending on itself (cyclic dependencies) */
             new Check(
@@ -111,9 +108,9 @@ public abstract class CheckFactory {
                                 .and(Query.hasOccurenceAt("Arg", "Lvl", "Val")))),
                 tup -> Message.warning(
                     "Parameter with name " + tup.get("Val").toString()
-                    + " with index " + tup.getAsEndUserIndex("Index")
-                    + " does not occur in the body of template "
-                    + tup.get("Temp").toString())
+                        + " with index " + tup.getAsEndUserIndex("Index")
+                        + " does not occur in the body of template "
+                        + tup.get("Temp").toString())
             ),
             /* Same variabel occurs twice in parameter list */
             new Check(
@@ -124,7 +121,7 @@ public abstract class CheckFactory {
                     .and(Query.notEquals("Index1", "Index2"))
                     .and(Query.removeSymmetry("Index1", "Index2")),
                 tup -> Message.error(
-                        "Parameter with name " + tup.get("Val").toString()
+                    "Parameter with name " + tup.get("Val").toString()
                         + " occurs twice with indecies " + tup.getAsEndUserIndex("Index1")
                         + " and " + tup.getAsEndUserIndex("Index2") + " in template "
                         + tup.get("Temp").toString())
@@ -209,8 +206,7 @@ public abstract class CheckFactory {
                 tup -> Message.error(
                     "Template with IRI " + tup.get("Temp").toString() + " has instance "
                         + tup.get("InsOf").toString() + " with list expander on non-list argument.")
-            )
-        ));
+            ));
 
     public static final List<Check> allChecks = ListUtils.union(failsOnErrorChecks, failsOnMissingInformationChecks);
 }

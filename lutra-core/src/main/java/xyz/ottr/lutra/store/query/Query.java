@@ -64,11 +64,11 @@ public class Query {
     }
 
     public Stream<Tuple> eval(QueryEngine<? extends TemplateStore> engine) {
-        return rel.apply(engine, new Tuple());
+        return this.rel.apply(engine, new Tuple());
     }
 
     public Stream<Tuple> eval(QueryEngine<? extends TemplateStore> engine, Tuple constants) {
-        return rel.apply(engine, constants.copy());
+        return this.rel.apply(engine, constants.copy());
     }
 
     ////////////////////
@@ -86,7 +86,7 @@ public class Query {
     public static Query not(Query query) {
 
         BiPredicate<QueryEngine<? extends TemplateStore>, Tuple> shouldKeep = (qe, m) ->
-            !query.rel.apply(qe, m).findAny().isPresent();
+            query.rel.apply(qe, m).findAny().isEmpty();
 
         return new Query((qe, m) -> shouldKeep.test(qe, m) ? Stream.of(m) : Stream.empty());
     }

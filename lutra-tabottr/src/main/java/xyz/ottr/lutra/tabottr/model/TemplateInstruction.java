@@ -30,7 +30,7 @@ public class TemplateInstruction extends Instruction {
 
     //private static Logger log = LoggerFactory.getLogger(TemplateInstruction.class);
 
-    private int[] colIndices;
+    private final int[] colIndices;
 
     public TemplateInstruction(Table table, int rowStart, int rowEnd) {
         super(table, rowStart, rowEnd);

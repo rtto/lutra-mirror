@@ -48,7 +48,7 @@ public class ListExpanderTest {
         List<ArgumentList> expanded = args.expandListExpander();
         assertTrue(expanded.size() == 6);
 
-        Set<List<Term>> resultLists = expanded.stream().map(al -> al.asList()).collect(Collectors.toSet());
+        Set<List<Term>> resultLists = expanded.stream().map(ArgumentList::asList).collect(Collectors.toSet());
         
         Set<List<ObjectTerm>> shouldEqual = Stream.of(
                 Stream.of(new ObjectTerm(1), new ObjectTerm(4), new ObjectTerm(6)).collect(Collectors.toList()),
@@ -75,7 +75,7 @@ public class ListExpanderTest {
         List<ArgumentList> expanded = args.expandListExpander();
         assertTrue(expanded.size() == 2);
 
-        Set<List<Term>> resultLists = expanded.stream().map(al -> al.asList()).collect(Collectors.toSet());
+        Set<List<Term>> resultLists = expanded.stream().map(ArgumentList::asList).collect(Collectors.toSet());
         
         Set<List<ObjectTerm>> shouldEqual = Stream.of(
                 Stream.of(new ObjectTerm(1), new ObjectTerm(4), new ObjectTerm(6)).collect(Collectors.toList()),
@@ -98,7 +98,7 @@ public class ListExpanderTest {
         List<ArgumentList> expanded = args.expandListExpander();
         assertTrue(expanded.size() == 3);
 
-        Set<List<Term>> resultLists = expanded.stream().map(al -> al.asList()).collect(Collectors.toSet());
+        Set<List<Term>> resultLists = expanded.stream().map(ArgumentList::asList).collect(Collectors.toSet());
         
         Set<List<? extends Term>> shouldEqual = Stream.of(
                 Stream.of(new ObjectTerm(1), new ObjectTerm(4), new ObjectTerm(6)).collect(Collectors.toList()),

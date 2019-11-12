@@ -19,7 +19,6 @@ import org.junit.rules.TemporaryFolder;
 import xyz.ottr.lutra.bottr.model.ArgumentMaps;
 import xyz.ottr.lutra.model.ArgumentList;
 import xyz.ottr.lutra.model.LiteralTerm;
-import xyz.ottr.lutra.model.Term;
 import xyz.ottr.lutra.result.Result;
 import xyz.ottr.lutra.result.ResultStream;
 
