@@ -22,7 +22,6 @@ package xyz.ottr.lutra.model;
  * #L%
  */
 
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
@@ -51,7 +50,7 @@ public class TermList extends Term {
     }
 
     public TermList(Term... terms) {
-        this(Arrays.asList(terms));
+        this(List.of(terms));
     }
 
     /**

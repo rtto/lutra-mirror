@@ -1,6 +1,5 @@
 package xyz.ottr.lutra.result;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedList; 
@@ -83,7 +82,7 @@ public class Trace {
     }
     
     protected static Trace fork(Trace... fs) {
-        return fork(Arrays.asList(fs));
+        return fork(List.of(fs));
     }
     
     public boolean hasIdentifier() {

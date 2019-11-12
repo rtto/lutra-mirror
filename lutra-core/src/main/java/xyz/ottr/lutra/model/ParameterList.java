@@ -22,7 +22,6 @@ package xyz.ottr.lutra.model;
  * #L%
  */
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -57,7 +56,7 @@ public class ParameterList {
     }
     
     public ParameterList(Term... elems) {
-        this(Arrays.asList(elems), null, null, null);
+        this(List.of(elems), null, null, null);
     }
 
     public boolean isNonBlank(Term param) {

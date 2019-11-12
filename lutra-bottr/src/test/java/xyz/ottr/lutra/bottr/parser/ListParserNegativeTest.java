@@ -22,7 +22,6 @@ package xyz.ottr.lutra.bottr.parser;
  * #L%
  */
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
@@ -40,7 +39,7 @@ public class ListParserNegativeTest {
     @Parameterized.Parameters(name = "{index}: {0}")
     public static Collection<Object[]> data() {
 
-        return Arrays.asList(
+        return List.of(
             new Object[][]{
                 { "[" },
                 { "]" },

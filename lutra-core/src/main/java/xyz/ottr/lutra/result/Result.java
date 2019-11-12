@@ -23,7 +23,6 @@ package xyz.ottr.lutra.result;
  * #L%
  */
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
@@ -130,7 +129,7 @@ public class Result<E> {
      *      An empty Result
      */
     public static <R> Result<R> empty(Message msg) {
-        return new Result<>(Optional.empty(), Arrays.asList(msg));
+        return new Result<>(Optional.empty(), List.of(msg));
     }
 
     /**
@@ -147,7 +146,7 @@ public class Result<E> {
      *      An empty Result
      */
     public static <R> Result<R> empty(Message msg, Result<?> parsedFrom) {
-        return new Result<>(Optional.empty(), Arrays.asList(msg), parsedFrom.getTrace());
+        return new Result<>(Optional.empty(), List.of(msg), parsedFrom.getTrace());
     }
 
     /**

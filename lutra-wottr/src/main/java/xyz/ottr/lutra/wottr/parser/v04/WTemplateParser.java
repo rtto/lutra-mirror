@@ -22,7 +22,6 @@ package xyz.ottr.lutra.wottr.parser.v04;
  * #L%
  */
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -49,7 +48,7 @@ import xyz.ottr.lutra.wottr.vocabulary.v04.WOTTR;
 
 public class WTemplateParser implements TemplateParser<Model> {
 
-    private static final List<Resource> templateTypes = Arrays.asList(WOTTR.Template, WOTTR.TemplateSignature, WOTTR.BaseTemplate);
+    private static final List<Resource> templateTypes = List.of(WOTTR.Template, WOTTR.TemplateSignature, WOTTR.BaseTemplate);
 
     private final WInstanceParser instanceParser;
     private final PrefixMapping prefixes;

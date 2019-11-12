@@ -22,7 +22,6 @@ package xyz.ottr.lutra.store;
  * #L%
  */
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -268,7 +267,7 @@ public interface TemplateStore extends Consumer<TemplateSignature> {
 
         if (!containsTemplate(instance.getIRI())) {
             // Need to fetch missing template
-            MessageHandler messages = fetchMissingDependencies(Arrays.asList(instance.getIRI()));
+            MessageHandler messages = fetchMissingDependencies(List.of(instance.getIRI()));
             Result<Instance> insWithMsgs = Result.of(instance);
             messages.toSingleMessage("Fetch missing template: " + instance.getIRI())
                 .ifPresent(insWithMsgs::addMessage);

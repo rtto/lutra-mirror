@@ -26,7 +26,6 @@ import static org.junit.Assert.assertEquals;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
@@ -64,7 +63,7 @@ public class PottrTest {
 
     @Parameterized.Parameters(name = "{index}: instance: {0}, template: {1}")
     public static List<Object[]> data() {
-        return Arrays.asList(
+        return List.of(
             new Object[] { "01-basics/1/ins/Person1.stottr", "01-basics/1/tpl/", true },
             new Object[] { null, "01-basics/2/tpl/", true },
             new Object[] { "01-basics/3/tpl/cycle.stottr", "01-basics/3/tpl/", false },

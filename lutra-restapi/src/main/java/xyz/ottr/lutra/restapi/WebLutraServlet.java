@@ -28,7 +28,6 @@ import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
-import java.util.Arrays;
 import java.util.List;
 
 import javax.servlet.ServletContext;
@@ -53,7 +52,7 @@ public class WebLutraServlet extends HttpServlet {
 
     private static final long serialVersionUID = -7342968018534639139L;
 
-    private static final List<String> originWhitelist = Arrays.asList(
+    private static final List<String> originWhitelist = List.of(
         "http://weblutra.ottr.xyz",
         "http://ottr.xyz",
         "http://www.ottr.xyz",

@@ -22,7 +22,6 @@ package xyz.ottr.lutra.model;
  * #L%
  */
 
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -53,7 +52,7 @@ public class ArgumentList {
     }
     
     public ArgumentList(Term... elems) {
-        this(Arrays.asList(elems), null, null);
+        this(List.of(elems), null, null);
     }
 
     public Expander getListExpander() {
