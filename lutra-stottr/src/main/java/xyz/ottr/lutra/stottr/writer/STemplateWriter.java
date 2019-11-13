@@ -27,21 +27,21 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import xyz.ottr.lutra.io.TemplateWriter;
 import xyz.ottr.lutra.model.ParameterList;
+import xyz.ottr.lutra.model.Signature;
 import xyz.ottr.lutra.model.Template;
-import xyz.ottr.lutra.model.TemplateSignature;
-import xyz.ottr.lutra.model.Term;
+import xyz.ottr.lutra.model.terms.Term;
 import xyz.ottr.lutra.model.types.BasicType;
 import xyz.ottr.lutra.model.types.LUBType;
 import xyz.ottr.lutra.model.types.ListType;
 import xyz.ottr.lutra.model.types.NEListType;
 import xyz.ottr.lutra.model.types.TermType;
 import xyz.ottr.lutra.stottr.STOTTR;
+import xyz.ottr.lutra.writer.TemplateWriter;
 
 public class STemplateWriter implements TemplateWriter {
 
-    private final Map<String, TemplateSignature> templates;
+    private final Map<String, Signature> templates;
     private final Map<String, String> prefixes;
 
     public STemplateWriter(Map<String, String> prefixes) {
@@ -55,14 +55,14 @@ public class STemplateWriter implements TemplateWriter {
     }
 
     @Override
-    public void accept(TemplateSignature template) {
+    public void accept(Signature template) {
         this.templates.put(template.getIRI(), template);
     }
 
     public String write(String iri) {
 
         StringBuilder builder = new StringBuilder();
-        TemplateSignature template = this.templates.get(iri);
+        Signature template = this.templates.get(iri);
 
         if  (template == null) {
             return null;
@@ -101,7 +101,7 @@ public class STemplateWriter implements TemplateWriter {
         return SPrefixWriter.write(usedPrefixMap);
     }
 
-    private StringBuilder writeSignature(TemplateSignature template, STermWriter termWriter) {
+    private StringBuilder writeSignature(Signature template, STermWriter termWriter) {
 
         StringBuilder builder = new StringBuilder();
 

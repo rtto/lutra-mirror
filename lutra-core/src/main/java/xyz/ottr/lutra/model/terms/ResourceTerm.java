@@ -1,4 +1,4 @@
-package xyz.ottr.lutra.io;
+package xyz.ottr.lutra.model.terms;
 
 /*-
  * #%L
@@ -22,36 +22,26 @@ package xyz.ottr.lutra.io;
  * #L%
  */
 
-import java.util.Set;
-import java.util.function.Consumer;
+public abstract class ResourceTerm extends Term {
 
-import xyz.ottr.lutra.model.TemplateSignature;
-
-public interface TemplateWriter extends Consumer<TemplateSignature> {
-
-    /**
-     * Returns the set of IRIs which is added to this writer.
-     */
-    Set<String> getIRIs();
-
-    /**
-     * Adds a template definition to this writer.
-     *
-     * @param template
-     *          a template to add to this Writer
-     */
-    void accept(TemplateSignature template);
-
-    /**
-     * Adds a set of definitions to this writer.
-     *
-     * @param templates
-     *          a set of templates to add to this Writer
-     */
-    default void addTemplates(Set<TemplateSignature> templates) {
-        templates.stream().forEach(this);
+    public boolean isLiteral() {
+        return this instanceof LiteralTerm;
     }
-
-    String write(String iri);
     
+    public boolean isIRI() {
+        return this instanceof IRITerm;
+    }
+    
+    @Override
+    public boolean isBlank() {
+        return this instanceof BlankNodeTerm;
+    }
+    
+    public boolean isConcrete() {
+        return isIRI() || isLiteral();
+    }
+    
+    public boolean isNonLiteral() {
+        return !isLiteral();
+    }
 }

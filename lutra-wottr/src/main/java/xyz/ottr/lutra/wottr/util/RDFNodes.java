@@ -30,10 +30,9 @@ import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.RDFList;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
-
 import org.apache.jena.shared.PrefixMapping;
 import xyz.ottr.lutra.OTTR;
-import xyz.ottr.lutra.result.Result;
+import xyz.ottr.lutra.system.Result;
 
 public enum RDFNodes {
 

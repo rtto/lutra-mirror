@@ -29,6 +29,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.Property;
@@ -38,13 +39,12 @@ import org.apache.jena.reasoner.Reasoner;
 import org.apache.jena.reasoner.ReasonerRegistry;
 import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.RDFS;
-
 import xyz.ottr.lutra.OTTR;
-import xyz.ottr.lutra.model.BlankNodeTerm;
-import xyz.ottr.lutra.model.IRITerm;
-import xyz.ottr.lutra.model.LiteralTerm;
-import xyz.ottr.lutra.model.Term;
-import xyz.ottr.lutra.model.TermList;
+import xyz.ottr.lutra.model.terms.BlankNodeTerm;
+import xyz.ottr.lutra.model.terms.IRITerm;
+import xyz.ottr.lutra.model.terms.LiteralTerm;
+import xyz.ottr.lutra.model.terms.Term;
+import xyz.ottr.lutra.model.terms.TermList;
 
 public class TypeFactory {
 

@@ -6,7 +6,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NonNull;
 import xyz.ottr.lutra.model.Instance;
-import xyz.ottr.lutra.result.ResultStream;
+import xyz.ottr.lutra.system.ResultStream;
 
 /*-
  * #%L

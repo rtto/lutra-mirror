@@ -31,13 +31,12 @@ import java.util.stream.Stream;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Statement;
-
 import xyz.ottr.lutra.OTTR;
 import xyz.ottr.lutra.model.ArgumentList;
 import xyz.ottr.lutra.model.Instance;
-import xyz.ottr.lutra.model.Term;
-import xyz.ottr.lutra.result.Result;
-import xyz.ottr.lutra.result.ResultStream;
+import xyz.ottr.lutra.model.terms.Term;
+import xyz.ottr.lutra.system.Result;
+import xyz.ottr.lutra.system.ResultStream;
 import xyz.ottr.lutra.wottr.util.RDFNodes;
 import xyz.ottr.lutra.wottr.vocabulary.v04.WOTTR;
 

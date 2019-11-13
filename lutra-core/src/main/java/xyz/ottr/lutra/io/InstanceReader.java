@@ -29,11 +29,11 @@ import java.util.function.Function;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import xyz.ottr.lutra.model.Instance;
-import xyz.ottr.lutra.result.Message;
-import xyz.ottr.lutra.result.Result;
-import xyz.ottr.lutra.result.ResultStream;
+import xyz.ottr.lutra.parser.InstanceParser;
+import xyz.ottr.lutra.system.Message;
+import xyz.ottr.lutra.system.Result;
+import xyz.ottr.lutra.system.ResultStream;
 
 public class InstanceReader implements Function<String, ResultStream<Instance>> {
 
@@ -54,7 +54,7 @@ public class InstanceReader implements Function<String, ResultStream<Instance>> 
     }
 
     public <M> InstanceReader(InputReader<String, M> inputReader,
-            InstanceParser<M> instanceParser, String format) {
+                              InstanceParser<M> instanceParser, String format) {
         this(ResultStream.innerFlatMapCompose(inputReader, instanceParser), format);
     }
     

@@ -22,26 +22,36 @@ package xyz.ottr.lutra.model;
  * #L%
  */
 
-public abstract class ResourceTerm extends Term {
+import java.util.List;
 
-    public boolean isLiteral() {
-        return this instanceof LiteralTerm;
+import xyz.ottr.lutra.model.terms.Term;
+import xyz.ottr.lutra.model.terms.TermList;
+
+public abstract class AbstractTermList {
+
+    protected final TermList terms;
+
+    AbstractTermList(TermList terms) {
+        this.terms = terms;
     }
-    
-    public boolean isIRI() {
-        return this instanceof IRITerm;
+
+    public TermList getTermList() {
+        return this.terms;
     }
-    
-    @Override
-    public boolean isBlank() {
-        return this instanceof BlankNodeTerm;
+
+    public List<Term> asList() {
+        return this.terms.asList();
     }
-    
-    public boolean isConcrete() {
-        return isIRI() || isLiteral();
+
+    public int size() {
+        return this.terms.size();
     }
-    
-    public boolean isNonLiteral() {
-        return !isLiteral();
+
+    public boolean isEmpty() {
+        return this.terms.isEmpty();
+    }
+
+    public Term get(int i) {
+        return this.terms.get(i);
     }
 }

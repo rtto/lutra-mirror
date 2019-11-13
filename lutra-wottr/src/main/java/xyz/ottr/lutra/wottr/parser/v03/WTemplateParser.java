@@ -35,19 +35,18 @@ import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.shared.PrefixMapping;
-
-import xyz.ottr.lutra.io.TemplateParser;
 import xyz.ottr.lutra.model.ArgumentList;
-import xyz.ottr.lutra.model.BlankNodeTerm;
 import xyz.ottr.lutra.model.Instance;
 import xyz.ottr.lutra.model.ParameterList;
+import xyz.ottr.lutra.model.Signature;
 import xyz.ottr.lutra.model.Template;
-import xyz.ottr.lutra.model.TemplateSignature;
-import xyz.ottr.lutra.model.Term;
-import xyz.ottr.lutra.model.TermList;
-import xyz.ottr.lutra.result.Message;
-import xyz.ottr.lutra.result.Result;
-import xyz.ottr.lutra.result.ResultStream;
+import xyz.ottr.lutra.model.terms.BlankNodeTerm;
+import xyz.ottr.lutra.model.terms.Term;
+import xyz.ottr.lutra.model.terms.TermList;
+import xyz.ottr.lutra.parser.TemplateParser;
+import xyz.ottr.lutra.system.Message;
+import xyz.ottr.lutra.system.Result;
+import xyz.ottr.lutra.system.ResultStream;
 import xyz.ottr.lutra.wottr.parser.v03.util.ModelSelector;
 import xyz.ottr.lutra.wottr.parser.v03.util.ModelSelectorException;
 import xyz.ottr.lutra.wottr.vocabulary.v03.WOTTR;
@@ -68,7 +67,7 @@ public class WTemplateParser implements TemplateParser<Model> {
     }
 
     @Override
-    public ResultStream<TemplateSignature> apply(Model model) {
+    public ResultStream<Signature> apply(Model model) {
 
         Model canonModel = WParserUtils.getCanonicalModel(model);
         if (canonModel.listStatements((Resource) null, WOTTR.hasPattern, (RDFNode) null).hasNext()) {
@@ -80,11 +79,11 @@ public class WTemplateParser implements TemplateParser<Model> {
         }
     }
 
-    private Result<TemplateSignature> makeTemplateFromResults(String uri, Result<ParameterList> params, Result<Set<Instance>> ins) {
-        return Result.zip(params, ins, (ps, is) -> (TemplateSignature) new Template(uri, ps, is));
+    private Result<Signature> makeTemplateFromResults(String uri, Result<ParameterList> params, Result<Set<Instance>> ins) {
+        return Result.zip(params, ins, (ps, is) -> (Signature) new Template(uri, ps, is));
     }
 
-    public Result<TemplateSignature> parseTemplateWithImplicitBody(Model model) {
+    public Result<Signature> parseTemplateWithImplicitBody(Model model) {
         // Parse template's head
         Resource template;
         try {
@@ -119,9 +118,9 @@ public class WTemplateParser implements TemplateParser<Model> {
         return makeTemplateFromResults(templateURI, parsedParameters, instances);
     }
 
-    public ResultStream<TemplateSignature> parseTemplatesWithExplicitBody(Model model) {
+    public ResultStream<Signature> parseTemplatesWithExplicitBody(Model model) {
         
-        Stream.Builder<Result<TemplateSignature>> templates = Stream.builder();
+        Stream.Builder<Result<Signature>> templates = Stream.builder();
 
         for (Resource template : ModelSelector.listInstancesOfClass(model, WOTTR.Template)) {
 
@@ -140,7 +139,7 @@ public class WTemplateParser implements TemplateParser<Model> {
         return new ResultStream<>(templates.build());
     }
 
-    private TemplateSignature changeListVariablesToBlanks(TemplateSignature template) {
+    private Signature changeListVariablesToBlanks(Signature template) {
 
         ParameterList params = template.getParameters();
         Map<List<Term>, Term> listToBlanks = new HashMap<>();
@@ -175,7 +174,7 @@ public class WTemplateParser implements TemplateParser<Model> {
             }
             return new Template(template.getIRI(), newParamList, newInstances);
         } else {
-            return new TemplateSignature(template.getIRI(), newParamList, template.isBaseTemplate());
+            return new Signature(template.getIRI(), newParamList, template.isBaseTemplate());
         }
     }
 

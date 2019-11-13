@@ -1,4 +1,4 @@
-package xyz.ottr.lutra.model;
+package xyz.ottr.lutra.model.terms;
 
 /*-
  * #%L
@@ -29,7 +29,6 @@ import java.util.Optional;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.jena.shared.PrefixMapping;
-
 import xyz.ottr.lutra.model.types.TypeFactory;
 
 public class TermList extends Term {

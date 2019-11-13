@@ -25,8 +25,8 @@ package xyz.ottr.lutra.store.query;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
-import xyz.ottr.lutra.result.Message;
 import xyz.ottr.lutra.store.TemplateStore;
+import xyz.ottr.lutra.system.Message;
 
 public class Check {
 

@@ -30,15 +30,14 @@ import org.apache.jena.rdf.model.RDFList;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.shared.PrefixMapping;
-
-import xyz.ottr.lutra.io.InstanceWriter;
 import xyz.ottr.lutra.model.ArgumentList;
 import xyz.ottr.lutra.model.Instance;
-import xyz.ottr.lutra.model.Term;
+import xyz.ottr.lutra.model.terms.Term;
 import xyz.ottr.lutra.wottr.util.ModelIO;
 import xyz.ottr.lutra.wottr.util.PrefixMappings;
 import xyz.ottr.lutra.wottr.vocabulary.v04.WOTTR;
 import xyz.ottr.lutra.wottr.writer.RDFFactory;
+import xyz.ottr.lutra.writer.InstanceWriter;
 
 public class WInstanceWriter implements InstanceWriter {
 

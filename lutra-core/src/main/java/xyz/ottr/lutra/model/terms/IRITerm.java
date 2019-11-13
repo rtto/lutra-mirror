@@ -1,4 +1,4 @@
-package xyz.ottr.lutra.model;
+package xyz.ottr.lutra.model.terms;
 
 /*-
  * #%L

@@ -1,4 +1,4 @@
-package xyz.ottr.lutra.result;
+package xyz.ottr.lutra.system;
 
 /*-
  * #%L

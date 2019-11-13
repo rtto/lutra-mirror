@@ -29,18 +29,16 @@ import org.apache.jena.rdf.model.Model;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import xyz.ottr.lutra.io.InstanceReader;
 import xyz.ottr.lutra.io.TemplateReader;
 import xyz.ottr.lutra.model.Instance;
-import xyz.ottr.lutra.result.Message;
-import xyz.ottr.lutra.result.MessageHandler;
-import xyz.ottr.lutra.result.Result;
-import xyz.ottr.lutra.result.ResultConsumer;
-import xyz.ottr.lutra.result.ResultStream;
 import xyz.ottr.lutra.store.DependencyGraph;
 import xyz.ottr.lutra.store.TemplateStore;
-
+import xyz.ottr.lutra.system.Message;
+import xyz.ottr.lutra.system.MessageHandler;
+import xyz.ottr.lutra.system.Result;
+import xyz.ottr.lutra.system.ResultConsumer;
+import xyz.ottr.lutra.system.ResultStream;
 import xyz.ottr.lutra.wottr.io.RDFFileReader;
 import xyz.ottr.lutra.wottr.writer.v04.WInstanceWriter;
 

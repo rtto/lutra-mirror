@@ -25,11 +25,10 @@ package xyz.ottr.lutra.wottr.parser.v04;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
-
 import xyz.ottr.lutra.io.TemplateReader;
 import xyz.ottr.lutra.model.Template;
-import xyz.ottr.lutra.result.ResultConsumer;
 import xyz.ottr.lutra.store.DependencyGraph;
+import xyz.ottr.lutra.system.ResultConsumer;
 import xyz.ottr.lutra.wottr.io.RDFFileReader;
 import xyz.ottr.lutra.wottr.writer.v04.WTemplateWriter;
 

@@ -29,18 +29,16 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.math.NumberUtils;
-
 import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.RDFList;
 import org.apache.jena.rdf.model.Resource;
-
 import xyz.ottr.lutra.model.ArgumentList;
 import xyz.ottr.lutra.model.ParameterList;
-import xyz.ottr.lutra.model.Term;
+import xyz.ottr.lutra.model.terms.Term;
 import xyz.ottr.lutra.model.types.TypeFactory;
-import xyz.ottr.lutra.result.Message;
-import xyz.ottr.lutra.result.Result;
+import xyz.ottr.lutra.system.Message;
+import xyz.ottr.lutra.system.Result;
 import xyz.ottr.lutra.wottr.parser.TermFactory;
 import xyz.ottr.lutra.wottr.parser.v03.util.ModelSelector;
 import xyz.ottr.lutra.wottr.parser.v03.util.ModelSelectorException;

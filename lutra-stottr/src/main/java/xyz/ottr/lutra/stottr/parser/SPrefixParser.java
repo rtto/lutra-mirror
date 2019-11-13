@@ -27,11 +27,10 @@ import java.util.Map;
 import java.util.regex.Pattern;
 
 import org.antlr.v4.runtime.tree.TerminalNode;
-
-import xyz.ottr.lutra.result.Result;
-import xyz.ottr.lutra.result.ResultStream;
 import xyz.ottr.lutra.stottr.antlr.stOTTRBaseVisitor;
 import xyz.ottr.lutra.stottr.antlr.stOTTRParser;
+import xyz.ottr.lutra.system.Result;
+import xyz.ottr.lutra.system.ResultStream;
 
 public class SPrefixParser extends SBaseParserVisitor<Map<String, String>> {
 

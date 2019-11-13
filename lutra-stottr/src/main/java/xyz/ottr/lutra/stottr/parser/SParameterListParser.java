@@ -30,15 +30,14 @@ import java.util.Map;
 import java.util.Set;
 
 import org.antlr.v4.runtime.tree.TerminalNode;
-
-import xyz.ottr.lutra.model.BlankNodeTerm;
 import xyz.ottr.lutra.model.ParameterList;
-import xyz.ottr.lutra.model.Term;
+import xyz.ottr.lutra.model.terms.BlankNodeTerm;
+import xyz.ottr.lutra.model.terms.Term;
 import xyz.ottr.lutra.model.types.TermType;
 import xyz.ottr.lutra.model.types.TypeFactory;
-import xyz.ottr.lutra.result.Result;
 import xyz.ottr.lutra.stottr.STOTTR;
 import xyz.ottr.lutra.stottr.antlr.stOTTRParser;
+import xyz.ottr.lutra.system.Result;
 
 public class SParameterListParser extends SBaseParserVisitor<ParameterList> {
 

@@ -26,12 +26,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.apache.jena.shared.PrefixMapping;
 
+import org.apache.jena.shared.PrefixMapping;
+import xyz.ottr.lutra.model.terms.Term;
+import xyz.ottr.lutra.model.terms.TermList;
 import xyz.ottr.lutra.model.types.TermType;
 
 @SuppressWarnings("PMD.UselessOverridingMethod")
-public class Template extends TemplateSignature {
+public class Template extends Signature {
 
     //private Set<Instance> head;
     private Set<Instance> body;
@@ -42,7 +44,7 @@ public class Template extends TemplateSignature {
         setVariableFlagsAndTypes();
     }
 
-    public Template(TemplateSignature signature, Set<Instance> body) {
+    public Template(Signature signature, Set<Instance> body) {
         this(signature.getIRI(), signature.getParameters(), body);
     }
 

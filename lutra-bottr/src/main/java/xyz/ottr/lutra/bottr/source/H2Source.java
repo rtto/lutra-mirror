@@ -31,7 +31,7 @@ import org.apache.jena.ext.com.google.common.io.Files;
 import xyz.ottr.lutra.bottr.BOTTR;
 import xyz.ottr.lutra.bottr.model.ArgumentMaps;
 import xyz.ottr.lutra.model.ArgumentList;
-import xyz.ottr.lutra.result.ResultStream;
+import xyz.ottr.lutra.system.ResultStream;
 
 public class H2Source extends JDBCSource {
 

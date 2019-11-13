@@ -33,16 +33,15 @@ import org.apache.jena.rdf.model.RDFList;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.shared.PrefixMapping;
-
-import xyz.ottr.lutra.io.TemplateParser;
 import xyz.ottr.lutra.model.Instance;
 import xyz.ottr.lutra.model.ParameterList;
+import xyz.ottr.lutra.model.Signature;
 import xyz.ottr.lutra.model.Template;
-import xyz.ottr.lutra.model.TemplateSignature;
-import xyz.ottr.lutra.model.Term;
-import xyz.ottr.lutra.result.Message;
-import xyz.ottr.lutra.result.Result;
-import xyz.ottr.lutra.result.ResultStream;
+import xyz.ottr.lutra.model.terms.Term;
+import xyz.ottr.lutra.parser.TemplateParser;
+import xyz.ottr.lutra.system.Message;
+import xyz.ottr.lutra.system.Result;
+import xyz.ottr.lutra.system.ResultStream;
 import xyz.ottr.lutra.wottr.util.ModelSelector;
 import xyz.ottr.lutra.wottr.util.RDFNodes;
 import xyz.ottr.lutra.wottr.vocabulary.v04.WOTTR;
@@ -65,7 +64,7 @@ public class WTemplateParser implements TemplateParser<Model> {
     }
 
     @Override
-    public ResultStream<TemplateSignature> apply(Model model) {
+    public ResultStream<Signature> apply(Model model) {
 
         this.prefixes.setNsPrefixes(model);
 
@@ -75,7 +74,7 @@ public class WTemplateParser implements TemplateParser<Model> {
             .reduce(ResultStream.empty(), ResultStream::concat);
     }
 
-    private Result<TemplateSignature> parseSignature(Model model, Resource signatureResource, Resource type) {
+    private Result<Signature> parseSignature(Model model, Resource signatureResource, Resource type) {
 
         Result<String> signatureURI = RDFNodes.castURIResource(signatureResource)
             .map(Resource::getURI);
@@ -83,8 +82,8 @@ public class WTemplateParser implements TemplateParser<Model> {
         Result<ParameterList> parameterList = ModelSelector.getRequiredListObject(model, signatureResource, WOTTR.parameters)
             .flatMap(list -> parseParameters(model, list));
 
-        Result<TemplateSignature> signature = Result.zip(signatureURI, parameterList,
-            (sURI, pList) -> new TemplateSignature(sURI, pList, type.equals(WOTTR.BaseTemplate)));
+        Result<Signature> signature = Result.zip(signatureURI, parameterList,
+            (sURI, pList) -> new Signature(sURI, pList, type.equals(WOTTR.BaseTemplate)));
 
         // include pattern if template, or check that no pattern exists
         if (type.equals(WOTTR.Template)) {

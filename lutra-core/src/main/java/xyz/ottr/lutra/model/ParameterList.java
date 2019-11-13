@@ -29,11 +29,13 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import org.apache.jena.shared.PrefixMapping;
+import xyz.ottr.lutra.model.terms.Term;
+import xyz.ottr.lutra.model.terms.TermList;
 
-public class ParameterList {
+public class ParameterList extends AbstractTermList {
 
-    private final TermList terms;
     private final Set<Term> nonBlanks;
     private final Set<Term> optionals;
     private final Map<Term, Term> defaultValues;
@@ -41,7 +43,8 @@ public class ParameterList {
     public ParameterList(TermList parameters, Set<Term> nonBlanks, Set<Term> optionals,
         Map<Term, Term> defaultValues) {
 
-        this.terms = parameters;
+        super(parameters);
+
         this.nonBlanks = (nonBlanks == null) ? new HashSet<>() : nonBlanks;
         this.optionals = (optionals == null) ? new HashSet<>() : optionals;
         this.defaultValues = (defaultValues == null) ? new HashMap<>() : defaultValues;
@@ -102,26 +105,6 @@ public class ParameterList {
 
     public Set<Term> getOptional() {
         return this.optionals;
-    }
-
-    public TermList getTermList() {
-        return this.terms;
-    }
-
-    public List<Term> asList() {
-        return this.terms.asList();
-    }
-    
-    public int size() {
-        return this.terms.size();
-    }
-
-    public boolean isEmpty() {
-        return this.terms.isEmpty();
-    }
-
-    public Term get(int i) {
-        return this.terms.get(i);
     }
 
     public ParameterList shallowCloneTerms() {

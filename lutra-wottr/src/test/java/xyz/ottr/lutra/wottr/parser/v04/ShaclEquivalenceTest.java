@@ -32,23 +32,21 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.commons.io.FilenameUtils;
-
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
-
 import xyz.ottr.lutra.io.Files;
 import xyz.ottr.lutra.io.InstanceReader;
 import xyz.ottr.lutra.io.TemplateReader;
 import xyz.ottr.lutra.model.Instance;
-import xyz.ottr.lutra.model.TemplateSignature;
-import xyz.ottr.lutra.result.Message;
-import xyz.ottr.lutra.result.Result;
-import xyz.ottr.lutra.result.ResultConsumer;
-import xyz.ottr.lutra.result.ResultStream;
+import xyz.ottr.lutra.model.Signature;
 import xyz.ottr.lutra.store.DependencyGraph;
 import xyz.ottr.lutra.store.TemplateStore;
+import xyz.ottr.lutra.system.Message;
+import xyz.ottr.lutra.system.Result;
+import xyz.ottr.lutra.system.ResultConsumer;
+import xyz.ottr.lutra.system.ResultStream;
 import xyz.ottr.lutra.wottr.io.RDFFileReader;
 
 
@@ -150,10 +148,10 @@ public class ShaclEquivalenceTest {
 
     private void checkTemplate(String file, boolean correct) {
 
-        ResultStream<TemplateSignature> templates = this.tempReader.apply(file);
+        ResultStream<Signature> templates = this.tempReader.apply(file);
 
         TemplateStore store = new DependencyGraph(null);
-        ResultConsumer<TemplateSignature> tplErrorMessages = new ResultConsumer<>(store);
+        ResultConsumer<Signature> tplErrorMessages = new ResultConsumer<>(store);
         templates.forEach(tpl -> {
             if (correct) {
                 assertTrue("Should parse: " + file + ", but failed with errors:\n"

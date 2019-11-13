@@ -1,4 +1,4 @@
-package xyz.ottr.lutra.io;
+package xyz.ottr.lutra.writer;
 
 /*-
  * #%L

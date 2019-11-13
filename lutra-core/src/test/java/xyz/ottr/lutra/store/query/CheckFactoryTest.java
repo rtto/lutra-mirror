@@ -32,25 +32,24 @@ import java.util.stream.Stream;
 import org.apache.jena.vocabulary.OWL;
 import org.apache.jena.vocabulary.XSD;
 import org.junit.Test;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import xyz.ottr.lutra.OTTR;
 import xyz.ottr.lutra.model.ArgumentList;
-import xyz.ottr.lutra.model.BlankNodeTerm;
-import xyz.ottr.lutra.model.IRITerm;
 import xyz.ottr.lutra.model.Instance;
-import xyz.ottr.lutra.model.LiteralTerm;
-import xyz.ottr.lutra.model.ObjectTerm;
 import xyz.ottr.lutra.model.ParameterList;
+import xyz.ottr.lutra.model.Signature;
 import xyz.ottr.lutra.model.Template;
-import xyz.ottr.lutra.model.TemplateSignature;
-import xyz.ottr.lutra.model.Term;
-import xyz.ottr.lutra.model.TermList;
+import xyz.ottr.lutra.model.terms.BlankNodeTerm;
+import xyz.ottr.lutra.model.terms.IRITerm;
+import xyz.ottr.lutra.model.terms.LiteralTerm;
+import xyz.ottr.lutra.model.terms.ObjectTerm;
+import xyz.ottr.lutra.model.terms.Term;
+import xyz.ottr.lutra.model.terms.TermList;
 import xyz.ottr.lutra.model.types.NEListType;
 import xyz.ottr.lutra.model.types.TypeFactory;
-import xyz.ottr.lutra.result.Message;
 import xyz.ottr.lutra.store.DependencyGraph;
+import xyz.ottr.lutra.system.Message;
 
 public class CheckFactoryTest {
 
@@ -60,10 +59,10 @@ public class CheckFactoryTest {
         
         DependencyGraph store = new DependencyGraph(null);
         store.addTemplateSignature(
-            new TemplateSignature("base2",
+            new Signature("base2",
                 new ParameterList(new ObjectTerm("x", true), new ObjectTerm("y", true))));
         store.addTemplateSignature(
-            new TemplateSignature("base3",
+            new Signature("base3",
                 new ParameterList(new ObjectTerm("x", true), new ObjectTerm("y", true), new ObjectTerm("z", true))));
         return store;
     }
@@ -149,7 +148,7 @@ public class CheckFactoryTest {
 
         DependencyGraph store = new DependencyGraph(null);
         store.addTemplateSignature(
-            new TemplateSignature("base",
+            new Signature("base",
                 new ParameterList(
                     new TermList(new ObjectTerm("x", true), new ObjectTerm("y", true)),
                     Collections.singleton(new ObjectTerm("x", true)), null, null)));
@@ -206,7 +205,7 @@ public class CheckFactoryTest {
         Term varBase3 = new LiteralTerm("7", TypeFactory.getType(XSD.integer).getIRI());
 
         store.addTemplateSignature(
-            new TemplateSignature("hasInt",
+            new Signature("hasInt",
                 new ParameterList(varBase1, varBase2, varBase3)));
 
         Term varC1 = new IRITerm("ex.com/iri");
@@ -247,7 +246,7 @@ public class CheckFactoryTest {
         Term intVar = new LiteralTerm("7", TypeFactory.getType(XSD.integer).getIRI());
 
         store.addTemplateSignature(
-            new TemplateSignature("hasInt",
+            new Signature("hasInt",
                 new ParameterList(classVar, objpropVar, intVar)));
 
         Term classVar2 = new IRITerm("ex.com/class");
@@ -290,7 +289,7 @@ public class CheckFactoryTest {
         Term varBase3 = new LiteralTerm("7", TypeFactory.getType(XSD.integer).getIRI());
 
         store.addTemplateSignature(
-            new TemplateSignature("hasInt",
+            new Signature("hasInt",
                 new ParameterList(varBase1, varBase2, varBase3)));
 
         Term var1 = new IRITerm("ex.com/iri");
@@ -325,7 +324,7 @@ public class CheckFactoryTest {
         varBase.setType(new NEListType(TypeFactory.getType(OWL.Class)));
 
         store.addTemplateSignature(
-            new TemplateSignature("areClasses",
+            new Signature("areClasses",
                 new ParameterList(varBase)));
 
         Term var = new BlankNodeTerm("_:class");
@@ -357,7 +356,7 @@ public class CheckFactoryTest {
         varBase.setType(new NEListType(TypeFactory.getType(OWL.Class)));
 
         store.addTemplateSignature(
-            new TemplateSignature("areClasses",
+            new Signature("areClasses",
                 new ParameterList(varBase)));
 
         Term varClass = new BlankNodeTerm("_:class");
@@ -387,7 +386,7 @@ public class CheckFactoryTest {
         varBase.setType(new NEListType(new NEListType(TypeFactory.getType(OWL.Class))));
 
         store.addTemplateSignature(
-            new TemplateSignature("deepLists",
+            new Signature("deepLists",
                 new ParameterList(varBase)));
 
         Term varClass = new BlankNodeTerm("_:class");

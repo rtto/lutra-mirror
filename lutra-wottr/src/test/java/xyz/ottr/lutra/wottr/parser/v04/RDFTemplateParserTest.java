@@ -22,7 +22,6 @@ package xyz.ottr.lutra.wottr.parser.v04;
  * #L%
  */
 
-import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import org.apache.jena.rdf.model.Model;
@@ -33,9 +32,8 @@ import org.apache.jena.vocabulary.RDF;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
-
-import xyz.ottr.lutra.model.TemplateSignature;
-import xyz.ottr.lutra.result.ResultStream;
+import xyz.ottr.lutra.model.Signature;
+import xyz.ottr.lutra.system.ResultStream;
 import xyz.ottr.lutra.wottr.vocabulary.v04.WOTTR;
 
 public class RDFTemplateParserTest {
@@ -51,13 +49,13 @@ public class RDFTemplateParserTest {
     public void shouldNotParse() {
 
         Model model = ModelFactory.createDefaultModel();
-        ResultStream<TemplateSignature> empty = templateParser.apply(model);
+        ResultStream<Signature> empty = templateParser.apply(model);
         empty.innerForEach(none -> fail());
 
         Resource templateIRI = model.createResource("http://example.org/template");
         model.add(model.createStatement(templateIRI, RDF.type, WOTTR.Template));
 
-        ResultStream<TemplateSignature> onlyURI = templateParser.apply(model);
+        ResultStream<Signature> onlyURI = templateParser.apply(model);
         onlyURI.innerForEach(none -> fail());
 
         RDFList paramLst = model.createList();
@@ -65,7 +63,7 @@ public class RDFTemplateParserTest {
         paramLst = paramLst.cons(value);
         model.add(model.createStatement(templateIRI, WOTTR.parameters, paramLst));
 
-        ResultStream<TemplateSignature> noBody = templateParser.apply(model);
+        ResultStream<Signature> noBody = templateParser.apply(model);
         noBody.innerForEach(none -> fail());
     }
 

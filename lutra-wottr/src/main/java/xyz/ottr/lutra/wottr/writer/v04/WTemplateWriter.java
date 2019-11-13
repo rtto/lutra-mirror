@@ -34,18 +34,17 @@ import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.shared.PrefixMapping;
 import org.apache.jena.vocabulary.RDF;
-
-import xyz.ottr.lutra.io.TemplateWriter;
 import xyz.ottr.lutra.model.Instance;
 import xyz.ottr.lutra.model.ParameterList;
+import xyz.ottr.lutra.model.Signature;
 import xyz.ottr.lutra.model.Template;
-import xyz.ottr.lutra.model.TemplateSignature;
-import xyz.ottr.lutra.model.Term;
+import xyz.ottr.lutra.model.terms.Term;
 import xyz.ottr.lutra.wottr.util.ModelIO;
 import xyz.ottr.lutra.wottr.util.PrefixMappings;
 import xyz.ottr.lutra.wottr.vocabulary.v04.WOTTR;
 import xyz.ottr.lutra.wottr.writer.RDFFactory;
 import xyz.ottr.lutra.wottr.writer.TypeFactory;
+import xyz.ottr.lutra.writer.TemplateWriter;
 
 public class WTemplateWriter implements TemplateWriter {
 
@@ -75,7 +74,7 @@ public class WTemplateWriter implements TemplateWriter {
     }
 
     @Override
-    public void accept(TemplateSignature template) {
+    public void accept(Signature template) {
         Model model = ModelFactory.createDefaultModel();
         model.setNsPrefixes(this.prefixes);
         
@@ -96,7 +95,7 @@ public class WTemplateWriter implements TemplateWriter {
         return ModelIO.writeModel(this.models.get(iri));
     }
 
-    private Resource createSignature(Model model, TemplateSignature template) {
+    private Resource createSignature(Model model, Signature template) {
 
         Resource templateType;
         if (template instanceof Template) {

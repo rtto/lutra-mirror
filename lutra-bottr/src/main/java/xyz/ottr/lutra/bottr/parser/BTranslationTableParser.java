@@ -28,15 +28,14 @@ import java.util.Map;
 
 import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.Resource;
-
 import xyz.ottr.lutra.bottr.BOTTR;
 import xyz.ottr.lutra.bottr.model.TranslationTable;
 import xyz.ottr.lutra.bottr.util.CachedResourceWrapperParser;
 import xyz.ottr.lutra.bottr.util.ResourceWrapperParser;
 import xyz.ottr.lutra.bottr.util.TermFactory;
-import xyz.ottr.lutra.model.Term;
-import xyz.ottr.lutra.result.Result;
-import xyz.ottr.lutra.result.ResultStream;
+import xyz.ottr.lutra.model.terms.Term;
+import xyz.ottr.lutra.system.Result;
+import xyz.ottr.lutra.system.ResultStream;
 import xyz.ottr.lutra.wottr.util.ModelSelector;
 import xyz.ottr.lutra.wottr.vocabulary.v04.WOTTR;
 

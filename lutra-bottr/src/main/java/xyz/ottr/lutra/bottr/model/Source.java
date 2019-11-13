@@ -26,7 +26,7 @@ import java.util.List;
 
 import org.apache.jena.shared.PrefixMapping;
 import xyz.ottr.lutra.model.ArgumentList;
-import xyz.ottr.lutra.result.ResultStream;
+import xyz.ottr.lutra.system.ResultStream;
 
 public interface Source<V> {
 

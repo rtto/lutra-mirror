@@ -28,20 +28,19 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.antlr.v4.runtime.CharStream;
-
-import xyz.ottr.lutra.io.TemplateParser;
-import xyz.ottr.lutra.model.BlankNodeTerm;
-import xyz.ottr.lutra.model.IRITerm;
 import xyz.ottr.lutra.model.Instance;
 import xyz.ottr.lutra.model.ParameterList;
+import xyz.ottr.lutra.model.Signature;
 import xyz.ottr.lutra.model.Template;
-import xyz.ottr.lutra.model.TemplateSignature;
-import xyz.ottr.lutra.model.Term;
-import xyz.ottr.lutra.result.Result;
-import xyz.ottr.lutra.result.ResultStream;
+import xyz.ottr.lutra.model.terms.BlankNodeTerm;
+import xyz.ottr.lutra.model.terms.IRITerm;
+import xyz.ottr.lutra.model.terms.Term;
+import xyz.ottr.lutra.parser.TemplateParser;
 import xyz.ottr.lutra.stottr.antlr.stOTTRParser;
+import xyz.ottr.lutra.system.Result;
+import xyz.ottr.lutra.system.ResultStream;
 
-public class STemplateParser extends SParser<TemplateSignature> implements TemplateParser<CharStream> {
+public class STemplateParser extends SParser<Signature> implements TemplateParser<CharStream> {
     
     private SParameterListParser paramsParser;
 
@@ -56,12 +55,12 @@ public class STemplateParser extends SParser<TemplateSignature> implements Templ
     }
 
     @Override
-    public ResultStream<TemplateSignature> apply(CharStream in) {
+    public ResultStream<Signature> apply(CharStream in) {
         return parseDocument(in);
     }
 
     @Override
-    public Result<TemplateSignature> visitStatement(stOTTRParser.StatementContext ctx) {
+    public Result<Signature> visitStatement(stOTTRParser.StatementContext ctx) {
         return visitChildren(ctx);
     }
 
@@ -70,30 +69,30 @@ public class STemplateParser extends SParser<TemplateSignature> implements Templ
         return getTermParser().visit(ctx).flatMap(term -> Result.of(((IRITerm) term).getIRI()));
     }
 
-    private Result<TemplateSignature> makeSignature(stOTTRParser.TemplateNameContext nameCtx,
-        stOTTRParser.ParameterListContext paramsCtx, boolean isBase) {
+    private Result<Signature> makeSignature(stOTTRParser.TemplateNameContext nameCtx,
+                                            stOTTRParser.ParameterListContext paramsCtx, boolean isBase) {
         
         Result<String> iriRes = parseName(nameCtx);
         Result<ParameterList> paramsRes = this.paramsParser.visit(paramsCtx);
-        return Result.zip(iriRes, paramsRes, (iri, params) -> new TemplateSignature(iri, params, isBase));
+        return Result.zip(iriRes, paramsRes, (iri, params) -> new Signature(iri, params, isBase));
     }
 
     @Override
-    public Result<TemplateSignature> visitSignature(stOTTRParser.SignatureContext ctx) {
+    public Result<Signature> visitSignature(stOTTRParser.SignatureContext ctx) {
         return makeSignature(ctx.templateName(), ctx.parameterList(), false);
     }
     
     @Override
-    public Result<TemplateSignature> visitBaseTemplate(stOTTRParser.BaseTemplateContext ctx) {
+    public Result<Signature> visitBaseTemplate(stOTTRParser.BaseTemplateContext ctx) {
 
         stOTTRParser.SignatureContext sigCtx = ctx.signature();
         return makeSignature(sigCtx.templateName(), sigCtx.parameterList(), true);
     }
     
     @Override
-    public Result<TemplateSignature> visitTemplate(stOTTRParser.TemplateContext ctx) {
+    public Result<Signature> visitTemplate(stOTTRParser.TemplateContext ctx) {
 
-        Result<TemplateSignature> sigRes = visitSignature(ctx.signature());
+        Result<Signature> sigRes = visitSignature(ctx.signature());
         Map<String, Term> variables = makeVariablesMap(sigRes);
 
         SInstanceParser instanceParser = new SInstanceParser(getPrefixes(), variables);
@@ -108,7 +107,7 @@ public class STemplateParser extends SParser<TemplateSignature> implements Templ
         return Result.zip(sigRes, bodyRes, Template::new);
     }
 
-    private Map<String, Term> makeVariablesMap(Result<TemplateSignature> resSig) {
+    private Map<String, Term> makeVariablesMap(Result<Signature> resSig) {
 
         Map<String, Term> variables = new HashMap<>();
         if (!resSig.isPresent()) {

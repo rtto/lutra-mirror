@@ -29,19 +29,17 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.antlr.v4.runtime.tree.TerminalNode;
-
 import org.apache.jena.vocabulary.XSD;
-
-import xyz.ottr.lutra.model.BlankNodeTerm;
-import xyz.ottr.lutra.model.IRITerm;
-import xyz.ottr.lutra.model.LiteralTerm;
-import xyz.ottr.lutra.model.NoneTerm;
-import xyz.ottr.lutra.model.Term;
-import xyz.ottr.lutra.model.TermList;
-import xyz.ottr.lutra.result.Message;
-import xyz.ottr.lutra.result.Result;
+import xyz.ottr.lutra.model.terms.BlankNodeTerm;
+import xyz.ottr.lutra.model.terms.IRITerm;
+import xyz.ottr.lutra.model.terms.LiteralTerm;
+import xyz.ottr.lutra.model.terms.NoneTerm;
+import xyz.ottr.lutra.model.terms.Term;
+import xyz.ottr.lutra.model.terms.TermList;
 import xyz.ottr.lutra.stottr.STOTTR;
 import xyz.ottr.lutra.stottr.antlr.stOTTRParser;
+import xyz.ottr.lutra.system.Message;
+import xyz.ottr.lutra.system.Result;
 import xyz.ottr.lutra.wottr.vocabulary.v04.WOTTR;
 
 public class STermParser extends SBaseParserVisitor<Term> {

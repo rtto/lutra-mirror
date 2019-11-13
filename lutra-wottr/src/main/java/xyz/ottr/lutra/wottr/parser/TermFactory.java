@@ -35,14 +35,13 @@ import org.apache.jena.rdf.model.RDFList;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.vocabulary.RDF;
-
-import xyz.ottr.lutra.model.BlankNodeTerm;
-import xyz.ottr.lutra.model.IRITerm;
-import xyz.ottr.lutra.model.LiteralTerm;
-import xyz.ottr.lutra.model.NoneTerm;
-import xyz.ottr.lutra.model.Term;
-import xyz.ottr.lutra.model.TermList;
-import xyz.ottr.lutra.result.Result;
+import xyz.ottr.lutra.model.terms.BlankNodeTerm;
+import xyz.ottr.lutra.model.terms.IRITerm;
+import xyz.ottr.lutra.model.terms.LiteralTerm;
+import xyz.ottr.lutra.model.terms.NoneTerm;
+import xyz.ottr.lutra.model.terms.Term;
+import xyz.ottr.lutra.model.terms.TermList;
+import xyz.ottr.lutra.system.Result;
 import xyz.ottr.lutra.wottr.util.RDFNodes;
 import xyz.ottr.lutra.wottr.vocabulary.WOTTRVocabulary;
 

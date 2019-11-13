@@ -37,11 +37,11 @@ import org.junit.Test;
 import xyz.ottr.lutra.OTTR;
 import xyz.ottr.lutra.bottr.source.StringArgumentMap;
 import xyz.ottr.lutra.model.ArgumentList;
-import xyz.ottr.lutra.model.IRITerm;
 import xyz.ottr.lutra.model.Instance;
+import xyz.ottr.lutra.model.terms.IRITerm;
 import xyz.ottr.lutra.model.types.TypeFactory;
-import xyz.ottr.lutra.result.Result;
-import xyz.ottr.lutra.result.ResultStream;
+import xyz.ottr.lutra.system.Result;
+import xyz.ottr.lutra.system.ResultStream;
 
 public class MapTest {
 

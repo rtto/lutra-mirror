@@ -30,13 +30,12 @@ import java.util.stream.Stream;
 
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
-
-import xyz.ottr.lutra.model.Term;
-import xyz.ottr.lutra.result.Message;
-import xyz.ottr.lutra.result.MessageHandler;
-import xyz.ottr.lutra.result.Result;
-import xyz.ottr.lutra.result.ResultStream;
+import xyz.ottr.lutra.model.terms.Term;
 import xyz.ottr.lutra.stottr.antlr.stOTTRParser;
+import xyz.ottr.lutra.system.Message;
+import xyz.ottr.lutra.system.MessageHandler;
+import xyz.ottr.lutra.system.Result;
+import xyz.ottr.lutra.system.ResultStream;
 
 public abstract class SParser<T> extends SBaseParserVisitor<T> {
 

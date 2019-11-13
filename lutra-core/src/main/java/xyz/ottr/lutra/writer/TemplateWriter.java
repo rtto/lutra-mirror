@@ -1,4 +1,4 @@
-package xyz.ottr.lutra.io;
+package xyz.ottr.lutra.writer;
 
 /*-
  * #%L
@@ -22,11 +22,36 @@ package xyz.ottr.lutra.io;
  * #L%
  */
 
-import java.util.function.Function;
+import java.util.Set;
+import java.util.function.Consumer;
 
-import xyz.ottr.lutra.model.Instance;
-import xyz.ottr.lutra.result.ResultStream;
+import xyz.ottr.lutra.model.Signature;
 
-public interface InstanceParser<E> extends Function<E, ResultStream<Instance>> {
+public interface TemplateWriter extends Consumer<Signature> {
 
+    /**
+     * Returns the set of IRIs which is added to this writer.
+     */
+    Set<String> getIRIs();
+
+    /**
+     * Adds a template definition to this writer.
+     *
+     * @param template
+     *          a template to add to this Writer
+     */
+    void accept(Signature template);
+
+    /**
+     * Adds a set of definitions to this writer.
+     *
+     * @param templates
+     *          a set of templates to add to this Writer
+     */
+    default void addTemplates(Set<Signature> templates) {
+        templates.stream().forEach(this);
+    }
+
+    String write(String iri);
+    
 }

@@ -29,8 +29,8 @@ import java.util.stream.Stream;
 import org.apache.jena.rdf.model.Model;
 import org.junit.Test;
 import xyz.ottr.lutra.model.Instance;
-import xyz.ottr.lutra.result.Result;
-import xyz.ottr.lutra.result.ResultConsumer;
+import xyz.ottr.lutra.system.Result;
+import xyz.ottr.lutra.system.ResultConsumer;
 import xyz.ottr.lutra.wottr.util.ModelIO;
 import xyz.ottr.lutra.wottr.writer.v04.WInstanceWriter;
 

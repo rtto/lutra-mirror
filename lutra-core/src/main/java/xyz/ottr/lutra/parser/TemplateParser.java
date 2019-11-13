@@ -1,8 +1,8 @@
-package xyz.ottr.lutra.stottr.io;
+package xyz.ottr.lutra.parser;
 
 /*-
  * #%L
- * lutra-stottr
+ * lutra-core
  * %%
  * Copyright (C) 2018 - 2019 University of Oslo
  * %%
@@ -22,22 +22,13 @@ package xyz.ottr.lutra.stottr.io;
  * #L%
  */
 
-import java.io.IOException;
+import java.util.Map;
+import java.util.function.Function;
 
-import org.antlr.v4.runtime.CharStream;
-import org.antlr.v4.runtime.CharStreams;
-import xyz.ottr.lutra.io.InputReader;
-import xyz.ottr.lutra.system.Result;
+import xyz.ottr.lutra.model.Signature;
 import xyz.ottr.lutra.system.ResultStream;
 
-public class SFileReader implements InputReader<String, CharStream> {
+public interface TemplateParser<E> extends Function<E, ResultStream<Signature>> {
 
-    public ResultStream<CharStream> apply(String filename) {
-
-        try {
-            return ResultStream.innerOf(CharStreams.fromFileName(filename));
-        } catch (IOException ex) {
-            return ResultStream.of(Result.error("Error reading stOTTR file: '" + filename + "': " + ex.getMessage()));
-        }
-    }
+    Map<String, String> getPrefixes();
 }

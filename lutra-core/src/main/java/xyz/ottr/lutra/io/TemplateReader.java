@@ -33,16 +33,16 @@ import java.util.function.Function;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import xyz.ottr.lutra.model.TemplateSignature;
-import xyz.ottr.lutra.result.MessageHandler;
-import xyz.ottr.lutra.result.ResultConsumer;
-import xyz.ottr.lutra.result.ResultStream;
+import xyz.ottr.lutra.model.Signature;
+import xyz.ottr.lutra.parser.TemplateParser;
 import xyz.ottr.lutra.store.TemplateStore;
+import xyz.ottr.lutra.system.MessageHandler;
+import xyz.ottr.lutra.system.ResultConsumer;
+import xyz.ottr.lutra.system.ResultStream;
 
-public class TemplateReader implements Function<String, ResultStream<TemplateSignature>> {
+public class TemplateReader implements Function<String, ResultStream<Signature>> {
 
-    private final Function<String, ResultStream<TemplateSignature>> templatePipeline;
+    private final Function<String, ResultStream<Signature>> templatePipeline;
     private final TemplateParser<?> parser; // Needed for retrieving used prefixes
     private final Logger log = LoggerFactory.getLogger(TemplateReader.class);
     private final String format;
@@ -67,7 +67,7 @@ public class TemplateReader implements Function<String, ResultStream<TemplateSig
         return this.format;
     }
 
-    public ResultStream<TemplateSignature> apply(String file) {
+    public ResultStream<Signature> apply(String file) {
         return templatePipeline.apply(file);
     }
 
@@ -80,13 +80,13 @@ public class TemplateReader implements Function<String, ResultStream<TemplateSig
     }
 
     public MessageHandler populateTemplateStore(TemplateStore store, ResultStream<String> iris) {
-        ResultConsumer<TemplateSignature> consumer = new ResultConsumer<TemplateSignature>(store);
+        ResultConsumer<Signature> consumer = new ResultConsumer<Signature>(store);
         iris.innerFlatMap(templatePipeline).forEach(consumer);
         return consumer.getMessageHandler();
     }
 
     public MessageHandler loadTemplatesFromFile(TemplateStore store, String file) {
-        ResultConsumer<TemplateSignature> consumer = new ResultConsumer<TemplateSignature>(store);
+        ResultConsumer<Signature> consumer = new ResultConsumer<Signature>(store);
         templatePipeline.apply(file).forEach(consumer);
         return consumer.getMessageHandler();
     }
@@ -128,8 +128,8 @@ public class TemplateReader implements Function<String, ResultStream<TemplateSig
      * @return
      *       a ResultStream containing the parsed TemplateSignatures 
      */
-    public ResultStream<TemplateSignature> loadTemplatesFromFolder(String folder,
-            String[] includeExtensions, String[] excludeExtensions) {
+    public ResultStream<Signature> loadTemplatesFromFolder(String folder,
+                                                           String[] includeExtensions, String[] excludeExtensions) {
         log.info("Loading all templates from folder " + folder + " with suffix "
                 + Arrays.toString(includeExtensions) + " except " + Arrays.toString(excludeExtensions));
         return Files.loadFromFolder(folder, includeExtensions, excludeExtensions)

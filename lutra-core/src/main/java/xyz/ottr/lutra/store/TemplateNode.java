@@ -25,8 +25,9 @@ package xyz.ottr.lutra.store;
 import java.util.Objects;
 
 import xyz.ottr.lutra.model.ParameterList;
+import xyz.ottr.lutra.model.terms.Term;
+
 //import xyz.ottr.lutra.model.Substitution;
-import xyz.ottr.lutra.model.Term;
 
 public class TemplateNode {
 

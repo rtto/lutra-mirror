@@ -34,7 +34,7 @@ import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdf.model.StmtIterator;
 import org.apache.jena.vocabulary.RDF;
-import xyz.ottr.lutra.result.Result;
+import xyz.ottr.lutra.system.Result;
 
 public enum ModelSelector {
 

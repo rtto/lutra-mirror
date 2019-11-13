@@ -28,11 +28,10 @@ import java.util.stream.Stream;
 
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.shared.PrefixMapping;
-
 import xyz.ottr.lutra.model.ArgumentList;
 import xyz.ottr.lutra.model.Instance;
-import xyz.ottr.lutra.model.Term;
-import xyz.ottr.lutra.result.Result;
+import xyz.ottr.lutra.model.terms.Term;
+import xyz.ottr.lutra.system.Result;
 import xyz.ottr.lutra.tabottr.model.TemplateInstruction;
 import xyz.ottr.lutra.wottr.parser.TermFactory;
 import xyz.ottr.lutra.wottr.vocabulary.v04.WOTTR;

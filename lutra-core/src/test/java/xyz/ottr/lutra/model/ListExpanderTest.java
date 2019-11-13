@@ -32,6 +32,10 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.junit.Test;
+import xyz.ottr.lutra.model.terms.NoneTerm;
+import xyz.ottr.lutra.model.terms.ObjectTerm;
+import xyz.ottr.lutra.model.terms.Term;
+import xyz.ottr.lutra.model.terms.TermList;
 
 public class ListExpanderTest {
 

@@ -48,11 +48,11 @@ import xyz.ottr.lutra.bottr.source.StringArgumentMap;
 import xyz.ottr.lutra.io.TemplateReader;
 import xyz.ottr.lutra.model.Instance;
 import xyz.ottr.lutra.model.types.TypeFactory;
-import xyz.ottr.lutra.result.Message;
-import xyz.ottr.lutra.result.MessageHandler;
-import xyz.ottr.lutra.result.Result;
-import xyz.ottr.lutra.result.ResultConsumer;
-import xyz.ottr.lutra.result.ResultStream;
+import xyz.ottr.lutra.system.Message;
+import xyz.ottr.lutra.system.MessageHandler;
+import xyz.ottr.lutra.system.Result;
+import xyz.ottr.lutra.system.ResultConsumer;
+import xyz.ottr.lutra.system.ResultStream;
 import xyz.ottr.lutra.store.DependencyGraph;
 import xyz.ottr.lutra.store.TemplateStore;
 

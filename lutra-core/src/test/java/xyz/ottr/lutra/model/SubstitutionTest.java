@@ -28,9 +28,13 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.HashMap;
 import java.util.Map;
-import org.junit.Test;
 
-import xyz.ottr.lutra.result.Result;
+import org.junit.Test;
+import xyz.ottr.lutra.model.terms.NoneTerm;
+import xyz.ottr.lutra.model.terms.ObjectTerm;
+import xyz.ottr.lutra.model.terms.Term;
+import xyz.ottr.lutra.model.terms.TermList;
+import xyz.ottr.lutra.system.Result;
 
 public class SubstitutionTest {
 

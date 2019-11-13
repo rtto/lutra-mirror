@@ -34,20 +34,18 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.jena.vocabulary.XSD;
-
 import org.junit.Test;
-
 import xyz.ottr.lutra.model.ArgumentList;
-import xyz.ottr.lutra.model.IRITerm;
 import xyz.ottr.lutra.model.Instance;
-import xyz.ottr.lutra.model.LiteralTerm;
-import xyz.ottr.lutra.model.NoneTerm;
-import xyz.ottr.lutra.model.Term;
-import xyz.ottr.lutra.model.TermList;
-import xyz.ottr.lutra.result.Result;
+import xyz.ottr.lutra.model.terms.IRITerm;
+import xyz.ottr.lutra.model.terms.LiteralTerm;
+import xyz.ottr.lutra.model.terms.NoneTerm;
+import xyz.ottr.lutra.model.terms.Term;
+import xyz.ottr.lutra.model.terms.TermList;
 import xyz.ottr.lutra.stottr.parser.SInstanceParser;
 import xyz.ottr.lutra.stottr.parser.SParserUtils;
 import xyz.ottr.lutra.stottr.parser.SPrefixParser;
+import xyz.ottr.lutra.system.Result;
 
 public class ParserTest {
 

@@ -36,8 +36,7 @@ import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.shared.PrefixMapping;
 import org.apache.jena.vocabulary.XSD;
-
-import xyz.ottr.lutra.result.Result;
+import xyz.ottr.lutra.system.Result;
 import xyz.ottr.lutra.tabottr.TabOTTR;
 import xyz.ottr.lutra.wottr.vocabulary.v04.WOTTR;
 

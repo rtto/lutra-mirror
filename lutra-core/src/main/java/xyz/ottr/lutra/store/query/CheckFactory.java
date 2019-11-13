@@ -27,11 +27,11 @@ import static xyz.ottr.lutra.store.query.Query.*;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import org.apache.commons.collections4.ListUtils;
 
+import org.apache.commons.collections4.ListUtils;
 import xyz.ottr.lutra.model.types.ListType;
 import xyz.ottr.lutra.model.types.TypeFactory;
-import xyz.ottr.lutra.result.Message;
+import xyz.ottr.lutra.system.Message;
 
 public abstract class CheckFactory {
 

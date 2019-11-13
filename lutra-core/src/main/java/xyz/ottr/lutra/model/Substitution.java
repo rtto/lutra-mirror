@@ -31,8 +31,12 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import xyz.ottr.lutra.result.Message;
-import xyz.ottr.lutra.result.Result;
+import xyz.ottr.lutra.model.terms.BlankNodeTerm;
+import xyz.ottr.lutra.model.terms.NoneTerm;
+import xyz.ottr.lutra.model.terms.Term;
+import xyz.ottr.lutra.model.terms.TermList;
+import xyz.ottr.lutra.system.Message;
+import xyz.ottr.lutra.system.Result;
 
 public class Substitution {
 

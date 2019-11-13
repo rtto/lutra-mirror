@@ -28,18 +28,21 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.IntStream;
-import org.apache.jena.shared.PrefixMapping;
 
-public class ArgumentList {
+import org.apache.jena.shared.PrefixMapping;
+import xyz.ottr.lutra.model.terms.NoneTerm;
+import xyz.ottr.lutra.model.terms.Term;
+import xyz.ottr.lutra.model.terms.TermList;
+
+public class ArgumentList extends AbstractTermList {
 
     public enum Expander { CROSS, ZIPMIN, ZIPMAX }
 
     private final Set<Term> expanderValues;
     private final Expander listExpander;
-    private final TermList terms;
 
     public ArgumentList(TermList parameters, Set<Term> expanderValues, Expander listExpander) {
-        this.terms = parameters;
+        super(parameters);
         this.listExpander = listExpander;
         this.expanderValues = (expanderValues == null) ? new HashSet<>() : expanderValues;
     }
@@ -90,26 +93,6 @@ public class ArgumentList {
 
     public Set<Term> getExpanderValues() {
         return this.expanderValues;
-    }
-
-    public TermList getTermList() {
-        return this.terms;
-    }
-
-    public List<Term> asList() {
-        return this.terms.asList();
-    }
-    
-    public int size() {
-        return this.terms.size();
-    }
-
-    public boolean isEmpty() {
-        return this.terms.isEmpty();
-    }
-
-    public Term get(int i) {
-        return this.terms.get(i);
     }
 
     public ArgumentList shallowCloneTerms() {

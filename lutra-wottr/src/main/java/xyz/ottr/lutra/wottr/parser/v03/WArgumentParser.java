@@ -33,11 +33,10 @@ import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.Statement;
-
 import xyz.ottr.lutra.model.ArgumentList;
-import xyz.ottr.lutra.model.NoneTerm;
-import xyz.ottr.lutra.model.Term;
-import xyz.ottr.lutra.result.Result;
+import xyz.ottr.lutra.model.terms.NoneTerm;
+import xyz.ottr.lutra.model.terms.Term;
+import xyz.ottr.lutra.system.Result;
 import xyz.ottr.lutra.wottr.parser.TermFactory;
 import xyz.ottr.lutra.wottr.parser.v03.util.ModelSelector;
 import xyz.ottr.lutra.wottr.parser.v03.util.ModelSelectorException;

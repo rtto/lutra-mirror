@@ -27,12 +27,11 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.antlr.v4.runtime.tree.TerminalNode;
-
 import xyz.ottr.lutra.model.ArgumentList;
-import xyz.ottr.lutra.model.Term;
-import xyz.ottr.lutra.result.Result;
+import xyz.ottr.lutra.model.terms.Term;
 import xyz.ottr.lutra.stottr.STOTTR;
 import xyz.ottr.lutra.stottr.antlr.stOTTRParser;
+import xyz.ottr.lutra.system.Result;
 
 public class SArgumentListParser extends SBaseParserVisitor<ArgumentList> {
 

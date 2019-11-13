@@ -1,4 +1,4 @@
-package xyz.ottr.lutra.io;
+package xyz.ottr.lutra.parser;
 
 /*-
  * #%L
@@ -22,13 +22,11 @@ package xyz.ottr.lutra.io;
  * #L%
  */
 
-import java.util.Map;
 import java.util.function.Function;
 
-import xyz.ottr.lutra.model.TemplateSignature;
-import xyz.ottr.lutra.result.ResultStream;
+import xyz.ottr.lutra.model.Instance;
+import xyz.ottr.lutra.system.ResultStream;
 
-public interface TemplateParser<E> extends Function<E, ResultStream<TemplateSignature>> {
+public interface InstanceParser<E> extends Function<E, ResultStream<Instance>> {
 
-    Map<String, String> getPrefixes();
 }

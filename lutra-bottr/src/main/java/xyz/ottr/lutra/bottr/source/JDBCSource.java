@@ -16,13 +16,12 @@ import org.apache.commons.dbutils.handlers.ArrayListHandler;
 import org.apache.jena.shared.PrefixMapping;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import xyz.ottr.lutra.bottr.model.ArgumentMap;
 import xyz.ottr.lutra.bottr.model.ArgumentMaps;
 import xyz.ottr.lutra.bottr.model.Source;
 import xyz.ottr.lutra.model.ArgumentList;
-import xyz.ottr.lutra.result.Result;
-import xyz.ottr.lutra.result.ResultStream;
+import xyz.ottr.lutra.system.Result;
+import xyz.ottr.lutra.system.ResultStream;
 
 /*-
  * #%L

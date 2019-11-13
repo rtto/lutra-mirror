@@ -30,8 +30,8 @@ import java.util.stream.Collectors;
 
 import org.apache.jena.shared.PrefixMapping;
 import xyz.ottr.lutra.model.ArgumentList;
-import xyz.ottr.lutra.model.Term;
-import xyz.ottr.lutra.result.Result;
+import xyz.ottr.lutra.model.terms.Term;
+import xyz.ottr.lutra.system.Result;
 
 public class ArgumentMaps<V> implements Function<List<V>, Result<ArgumentList>> {
 

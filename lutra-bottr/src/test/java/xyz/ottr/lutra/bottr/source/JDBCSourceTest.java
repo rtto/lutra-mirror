@@ -15,13 +15,11 @@ import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
-
 import xyz.ottr.lutra.bottr.model.ArgumentMaps;
 import xyz.ottr.lutra.model.ArgumentList;
-import xyz.ottr.lutra.model.LiteralTerm;
-import xyz.ottr.lutra.model.Term;
-import xyz.ottr.lutra.result.Result;
-import xyz.ottr.lutra.result.ResultStream;
+import xyz.ottr.lutra.model.terms.LiteralTerm;
+import xyz.ottr.lutra.system.Result;
+import xyz.ottr.lutra.system.ResultStream;
 
 /*-
  * #%L
@@ -73,7 +71,7 @@ public class JDBCSourceTest {
         stmt.execute("INSERT into CUSTOMER values (6, 'Linhares', 42, 'Viamao', 2200);");
         stmt.execute("INSERT into CUSTOMER values (7, 'Lagreca', 28, 'Sao Paulo', 1000);");
 
-        //Create expected result
+        //Create expected system
         Set<List<String>> expected = new HashSet<>();
         expected.add(Arrays.asList("1", "Paulo", "2500"));
         expected.add(Arrays.asList("2", "Pedro", "2700"));
@@ -101,7 +99,7 @@ public class JDBCSourceTest {
                 .collect(Collectors.toList()))
             .collect(Collectors.toSet());
 
-        //Compare dbOutput to expected result
+        //Compare dbOutput to expected system
         Assert.assertEquals(expected, dbOutput);
 
         //Clean up

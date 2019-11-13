@@ -36,27 +36,26 @@ import java.util.stream.Stream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import xyz.ottr.lutra.OTTR;
 import xyz.ottr.lutra.io.ReaderRegistry;
 import xyz.ottr.lutra.model.ArgumentList;
-import xyz.ottr.lutra.model.BlankNodeTerm;
 import xyz.ottr.lutra.model.Instance;
-import xyz.ottr.lutra.model.NoneTerm;
 import xyz.ottr.lutra.model.ParameterList;
+import xyz.ottr.lutra.model.Signature;
 import xyz.ottr.lutra.model.Substitution;
 import xyz.ottr.lutra.model.Template;
-import xyz.ottr.lutra.model.TemplateSignature;
-import xyz.ottr.lutra.model.Term;
-import xyz.ottr.lutra.result.Message;
-import xyz.ottr.lutra.result.Result;
-import xyz.ottr.lutra.result.ResultStream;
+import xyz.ottr.lutra.model.terms.BlankNodeTerm;
+import xyz.ottr.lutra.model.terms.NoneTerm;
+import xyz.ottr.lutra.model.terms.Term;
 import xyz.ottr.lutra.store.query.Check;
 import xyz.ottr.lutra.store.query.CheckFactory;
 import xyz.ottr.lutra.store.query.DependencyGraphEngine;
 import xyz.ottr.lutra.store.query.Query;
 import xyz.ottr.lutra.store.query.QueryEngine;
 import xyz.ottr.lutra.store.query.Tuple;
+import xyz.ottr.lutra.system.Message;
+import xyz.ottr.lutra.system.Result;
+import xyz.ottr.lutra.system.ResultStream;
 
 public class DependencyGraph implements TemplateStore {
 
@@ -136,7 +135,7 @@ public class DependencyGraph implements TemplateStore {
     }
 
     @Override
-    public void accept(TemplateSignature template) {
+    public void accept(Signature template) {
         this.addTemplateObject(template);
     }
 
@@ -179,10 +178,10 @@ public class DependencyGraph implements TemplateStore {
     }
 
     @Override
-    public boolean addTemplateSignature(TemplateSignature templateSignature) {
-        addTemplateSignature(templateSignature.getIRI(), templateSignature.getParameters(),
-                templateSignature.isBaseTemplate());
-        log.info("Adding template signature " + templateSignature.getIRI());
+    public boolean addTemplateSignature(Signature signature) {
+        addTemplateSignature(signature.getIRI(), signature.getParameters(),
+                signature.isBaseTemplate());
+        log.info("Adding template signature " + signature.getIRI());
         return true;
     }
 
@@ -479,12 +478,12 @@ public class DependencyGraph implements TemplateStore {
     }
 
     @Override
-    public Result<TemplateSignature> getTemplateSignature(String iri) {
+    public Result<Signature> getTemplateSignature(String iri) {
 
         Result<TemplateNode> resTemplate = checkIsTemplate(iri);
 
         return resTemplate.map(template ->
-            new TemplateSignature(template.getIRI(), template.getParameters(), template.isBase()));
+            new Signature(template.getIRI(), template.getParameters(), template.isBase()));
     }
 
     @Override

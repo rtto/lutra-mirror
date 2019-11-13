@@ -30,11 +30,11 @@ import org.apache.jena.vocabulary.OWL;
 import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.RDFS;
 import org.apache.jena.vocabulary.XSD;
-import xyz.ottr.lutra.model.BlankNodeTerm;
 import xyz.ottr.lutra.model.ParameterList;
-import xyz.ottr.lutra.model.TemplateSignature;
-import xyz.ottr.lutra.model.Term;
-import xyz.ottr.lutra.model.TermList;
+import xyz.ottr.lutra.model.Signature;
+import xyz.ottr.lutra.model.terms.BlankNodeTerm;
+import xyz.ottr.lutra.model.terms.Term;
+import xyz.ottr.lutra.model.terms.TermList;
 import xyz.ottr.lutra.model.types.TypeFactory;
 
 public class OTTR  {
@@ -62,8 +62,8 @@ public class OTTR  {
     }
 
     public static class BaseTemplate {
-        public static final TemplateSignature Triple;
-        public static final TemplateSignature NullableTriple;
+        public static final Signature Triple;
+        public static final Signature NullableTriple;
 
         static {
             Term sub = new BlankNodeTerm("_:s");
@@ -75,7 +75,7 @@ public class OTTR  {
 
             Set<Term> nonBlanks = new HashSet<>();
             nonBlanks.add(pred);
-            Triple = new TemplateSignature(
+            Triple = new Signature(
                 OTTR.BaseURI.Triple,
                 new ParameterList(new TermList(sub, pred, obj), nonBlanks, null, null),
                 true);
@@ -84,7 +84,7 @@ public class OTTR  {
             optionals.add(sub);
             optionals.add(pred);
             optionals.add(obj);
-            NullableTriple = new TemplateSignature(
+            NullableTriple = new Signature(
                 OTTR.BaseURI.NullableTriple,
                 new ParameterList(new TermList(sub, pred, obj), nonBlanks, optionals, null),
                 true);

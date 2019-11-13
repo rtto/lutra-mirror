@@ -1,4 +1,4 @@
-package xyz.ottr.lutra.result;
+package xyz.ottr.lutra.system;
 
 
 /*-
@@ -180,7 +180,7 @@ public class Result<E> {
     }
 
     /**
-     * Returns an empty result with this result as trace and with the argument message.
+     * Returns an empty system with this system as trace and with the argument message.
      * 
      * @param msg
      *      Message to attach to resulting empty Result
@@ -211,8 +211,8 @@ public class Result<E> {
     }
 
     /**
-     * Add a result to this result by bi-consuming this and the other result. Adds the other result to the
-     * context of this result.
+     * Add a system to this system by bi-consuming this and the other system. Adds the other system to the
+     * context of this system.
      * @see Result#addResult(Result, BiConsumer)
      */
     public <B> void addResult(Result<B> other, BiConsumer<? super E, ? super B> consumer) {
@@ -254,7 +254,7 @@ public class Result<E> {
 
 
     /**
-     * Applies f to the value contained in the argument result if it is present, and
+     * Applies f to the value contained in the argument system if it is present, and
      * returns empty Result if not.
      */
     public static <A,B,R> Result<R> apply(Result<A> a, Function<A, Result<R>> f) {
@@ -386,7 +386,7 @@ public class Result<E> {
     }
 
     /**
-     * Similar to Optional#filter(Predicate), but result retains Message-s and the pointer
+     * Similar to Optional#filter(Predicate), but system retains Message-s and the pointer
      * to the parsed from Result.
      */
     public Result<E> filter(Predicate<E> pred) {
@@ -394,7 +394,7 @@ public class Result<E> {
     }
 
     /**
-     * Similar to Optional#map(Function), but result retains Message-s and the pointer
+     * Similar to Optional#map(Function), but system retains Message-s and the pointer
      * to the parsed from Result.
      */
     public <R> Result<R> map(Function<? super E, ? extends R> fun) {
@@ -402,7 +402,7 @@ public class Result<E> {
     }
 
     /**
-     * Similar to Result#map(Function), but returns the Result of orElse if this' result is empty -- with a
+     * Similar to Result#map(Function), but returns the Result of orElse if this' system is empty -- with a
      * pointer to this.
      */
     public <R> Result<R> mapOrElse(Function<? super E, ? extends R> fun, R orElse) {
@@ -412,14 +412,14 @@ public class Result<E> {
     }
 
     /**
-     * Similar to Optional#flatMap(Function), but result's parsed from becomes this.
+     * Similar to Optional#flatMap(Function), but system's parsed from becomes this.
      */
     public <R> Result<R> flatMap(Function<? super E, ? extends Result<R>> fun) {
         return flatMapOrElse(fun, Result.empty());
     }
 
     /**
-     * Similar to Result#flatMap(Function), but result becomes orElse if this' result is empty.
+     * Similar to Result#flatMap(Function), but system becomes orElse if this' system is empty.
      */
     public <R> Result<R> flatMapOrElse(Function<? super E, ? extends Result<R>> fun, Result<R> orElse) {
 
@@ -428,7 +428,7 @@ public class Result<E> {
     }
 
     /**
-     * If this is present, returns the result of mapping argument function over this with
+     * If this is present, returns the system of mapping argument function over this with
      * every Result in resulting stream having this as parsed from, otherwise
      * returns a ResultStream containing a single empty Result with this as parsed from.
      */
@@ -468,7 +468,7 @@ public class Result<E> {
     /**
      * Returns a new function that is the composition of the two argument functions, under
      * flatMap, that is, the function applies the first to the argument then flatMaps
-     * the second over the result.
+     * the second over the system.
      */
     public static <A,B,C> Function<A, Result<C>> flatMapCompose(Function<A, Result<B>> fun1,
             Function<? super B, Result<C>> fun2) {

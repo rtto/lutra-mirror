@@ -263,7 +263,7 @@
                     </bundledSignatures>
                     <excludes>
                         <!-- MessageHandler uses System.err: -->
-                        <exclude>**/xyz/ottr/lutra/result/MessageHandler.class</exclude>
+                        <exclude>**/xyz/ottr/lutra/system/MessageHandler.class</exclude>
 
                         <!-- CLI uses System.out: -->
                         <exclude>**/xyz/ottr/lutra/cli/CLI.class</exclude>

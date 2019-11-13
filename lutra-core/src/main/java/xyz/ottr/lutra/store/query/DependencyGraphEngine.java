@@ -35,13 +35,13 @@ import xyz.ottr.lutra.model.Instance;
 import xyz.ottr.lutra.model.ParameterList;
 import xyz.ottr.lutra.model.Substitution;
 import xyz.ottr.lutra.model.Template;
-import xyz.ottr.lutra.model.Term;
-import xyz.ottr.lutra.model.TermList;
+import xyz.ottr.lutra.model.terms.Term;
+import xyz.ottr.lutra.model.terms.TermList;
 import xyz.ottr.lutra.model.types.ComplexType;
 import xyz.ottr.lutra.model.types.TermType;
-import xyz.ottr.lutra.result.Result;
 import xyz.ottr.lutra.store.DependencyGraph;
 import xyz.ottr.lutra.store.TemplateNode;
+import xyz.ottr.lutra.system.Result;
 
 public class DependencyGraphEngine extends QueryEngine<DependencyGraph> {
 

@@ -31,7 +31,6 @@ import org.apache.jena.rdf.model.RDFList;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.vocabulary.RDF;
-
 import xyz.ottr.lutra.OTTR;
 import xyz.ottr.lutra.model.types.BasicType;
 import xyz.ottr.lutra.model.types.LUBType;
@@ -39,7 +38,7 @@ import xyz.ottr.lutra.model.types.ListType;
 import xyz.ottr.lutra.model.types.NEListType;
 import xyz.ottr.lutra.model.types.TermType;
 import xyz.ottr.lutra.model.types.TypeFactory;
-import xyz.ottr.lutra.result.Result;
+import xyz.ottr.lutra.system.Result;
 import xyz.ottr.lutra.wottr.util.RDFNodes;
 
 public class TermTypeFactory implements Function<RDFNode, Result<TermType>> {

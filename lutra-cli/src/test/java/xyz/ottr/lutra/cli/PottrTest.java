@@ -37,15 +37,15 @@ import org.junit.runners.Parameterized;
 import xyz.ottr.lutra.io.InstanceReader;
 import xyz.ottr.lutra.io.TemplateReader;
 import xyz.ottr.lutra.model.Instance;
-import xyz.ottr.lutra.result.Message;
-import xyz.ottr.lutra.result.ResultConsumer;
-import xyz.ottr.lutra.result.ResultStream;
 import xyz.ottr.lutra.store.DependencyGraph;
 import xyz.ottr.lutra.store.TemplateStore;
 import xyz.ottr.lutra.stottr.io.SFileReader;
 import xyz.ottr.lutra.stottr.parser.SInstanceParser;
 import xyz.ottr.lutra.stottr.parser.STemplateParser;
 import xyz.ottr.lutra.stottr.writer.SInstanceWriter;
+import xyz.ottr.lutra.system.Message;
+import xyz.ottr.lutra.system.ResultConsumer;
+import xyz.ottr.lutra.system.ResultStream;
 
 @RunWith(Parameterized.class)
 public class PottrTest {

@@ -32,17 +32,16 @@ import org.apache.jena.vocabulary.OWL;
 import org.apache.jena.vocabulary.RDFS;
 import org.apache.jena.vocabulary.XSD;
 import org.junit.Test;
-
 import xyz.ottr.lutra.OTTR;
 import xyz.ottr.lutra.model.ArgumentList;
-import xyz.ottr.lutra.model.BlankNodeTerm;
-import xyz.ottr.lutra.model.IRITerm;
 import xyz.ottr.lutra.model.Instance;
-import xyz.ottr.lutra.model.LiteralTerm;
 import xyz.ottr.lutra.model.ParameterList;
 import xyz.ottr.lutra.model.Template;
-import xyz.ottr.lutra.model.Term;
-import xyz.ottr.lutra.model.TermList;
+import xyz.ottr.lutra.model.terms.BlankNodeTerm;
+import xyz.ottr.lutra.model.terms.IRITerm;
+import xyz.ottr.lutra.model.terms.LiteralTerm;
+import xyz.ottr.lutra.model.terms.Term;
+import xyz.ottr.lutra.model.terms.TermList;
 
 public class TypeFactoryTest {
 

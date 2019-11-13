@@ -26,11 +26,11 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import xyz.ottr.lutra.io.InstanceWriter;
 import xyz.ottr.lutra.model.ArgumentList;
 import xyz.ottr.lutra.model.Instance;
-import xyz.ottr.lutra.model.Term;
+import xyz.ottr.lutra.model.terms.Term;
 import xyz.ottr.lutra.stottr.STOTTR;
+import xyz.ottr.lutra.writer.InstanceWriter;
 
 public class SInstanceWriter implements InstanceWriter {
 

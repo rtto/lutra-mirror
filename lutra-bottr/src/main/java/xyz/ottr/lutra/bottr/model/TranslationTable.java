@@ -28,8 +28,8 @@ import java.util.Map;
 import java.util.function.Function;
 
 import xyz.ottr.lutra.bottr.util.TermFactory;
-import xyz.ottr.lutra.model.Term;
-import xyz.ottr.lutra.result.Result;
+import xyz.ottr.lutra.model.terms.Term;
+import xyz.ottr.lutra.system.Result;
 
 public class TranslationTable implements Function<Term, Result<Term>> {
 

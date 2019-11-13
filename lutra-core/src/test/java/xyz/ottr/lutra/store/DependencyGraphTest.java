@@ -34,26 +34,25 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.junit.Test;
-
 import xyz.ottr.lutra.model.ArgumentList;
-import xyz.ottr.lutra.model.BlankNodeTerm;
 import xyz.ottr.lutra.model.Instance;
-import xyz.ottr.lutra.model.NoneTerm;
-import xyz.ottr.lutra.model.ObjectTerm;
 import xyz.ottr.lutra.model.ParameterList;
+import xyz.ottr.lutra.model.Signature;
 import xyz.ottr.lutra.model.Template;
-import xyz.ottr.lutra.model.TemplateSignature;
-import xyz.ottr.lutra.model.TermList;
-import xyz.ottr.lutra.result.Message;
-import xyz.ottr.lutra.result.Result;
-import xyz.ottr.lutra.result.ResultConsumer;
-import xyz.ottr.lutra.result.ResultStream;
+import xyz.ottr.lutra.model.terms.BlankNodeTerm;
+import xyz.ottr.lutra.model.terms.NoneTerm;
+import xyz.ottr.lutra.model.terms.ObjectTerm;
+import xyz.ottr.lutra.model.terms.TermList;
+import xyz.ottr.lutra.system.Message;
+import xyz.ottr.lutra.system.Result;
+import xyz.ottr.lutra.system.ResultConsumer;
+import xyz.ottr.lutra.system.ResultStream;
 
 public class DependencyGraphTest {
 
     private void expandAndCheckEquality(Set<Template> toExpand, Set<Template> shouldEqual) {
         
-        TemplateSignature base = new TemplateSignature(
+        Signature base = new Signature(
                 "base",
                 new ParameterList(new ObjectTerm("x", true), new ObjectTerm("y", true)),
                 true);
@@ -142,7 +141,7 @@ public class DependencyGraphTest {
         );
 
         graph.addTemplateSignature(
-            new TemplateSignature(
+            new Signature(
                 "base",
                 new ParameterList(new ObjectTerm("x", true), new ObjectTerm("y", true)),
                 true)
@@ -215,7 +214,7 @@ public class DependencyGraphTest {
     private void expandInstanceAndCheckEquality(Instance ins, Set<Instance> shouldEqual,
                                                 Set<Template> templates) {
         
-        TemplateSignature base = new TemplateSignature(
+        Signature base = new Signature(
                 "base",
                 new ParameterList(new ObjectTerm("x", true), new ObjectTerm("y", true)),
                 true);
@@ -293,7 +292,7 @@ public class DependencyGraphTest {
 
         DependencyGraph graph = new DependencyGraph(null);
         graph.addTemplateSignature(
-            new TemplateSignature(
+            new Signature(
                 "base",
                 new ParameterList(new ObjectTerm("x", true), new ObjectTerm("y", true)),
                 true)
@@ -313,7 +312,7 @@ public class DependencyGraphTest {
                 .collect(Collectors.toSet()))
         );
         graph.addTemplateSignature(
-            new TemplateSignature(
+            new Signature(
                 "signature",
                     new ParameterList(new ObjectTerm("v", true), new ObjectTerm("u", true)))
         );

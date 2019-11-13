@@ -1,10 +1,10 @@
-package xyz.ottr.lutra.result;
+package xyz.ottr.lutra.system;
 
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.LinkedList; 
-import java.util.List; 
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -43,13 +43,13 @@ public class Trace {
         if (obj == null) {
             return Optional.empty();
         }
-        String str = obj.toString();
+
+        int maxLength = 60;
         String prefix = "(" + obj.getClass().getName() + ") ";
-        if (str.length() <= 60) {
-            return Optional.of(prefix + str);
-        } else {
-            return Optional.of(prefix + str.substring(0, 60) + "...");
-        }
+        String content = obj.toString();
+        String id = prefix
+            + (content.length() <= maxLength ? content : content.substring(0, maxLength) + " ...");
+        return Optional.of(id);
     };
 
     /** 

@@ -31,8 +31,7 @@ import picocli.CommandLine.Command;
 import picocli.CommandLine.IVersionProvider;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;
-
-import xyz.ottr.lutra.result.Message;
+import xyz.ottr.lutra.system.Message;
 
 @Command(
     name = "lutra",
@@ -128,7 +127,7 @@ public class Settings {
     public String out;
 
     @Option(names = {"--stdout"},
-        description = {"Print result of operations to standard out.%n"
+        description = {"Print system of operations to standard out.%n"
                        + "(default: ${DEFAULT-VALUE})"})
     public boolean stdout = false;
 

@@ -23,26 +23,28 @@ package xyz.ottr.lutra.model;
  */
 
 import java.util.Objects;
-import org.apache.jena.shared.PrefixMapping;
 
-public class TemplateSignature {
+import org.apache.jena.shared.PrefixMapping;
+import xyz.ottr.lutra.model.terms.Term;
+
+public class Signature {
 
     private String iri;
     private ParameterList params;
     private boolean isBaseTemplate;
 
-    public TemplateSignature(String iri, ParameterList params, boolean isBaseTemplate) {
+    public Signature(String iri, ParameterList params, boolean isBaseTemplate) {
         this.iri = iri;
         this.params = params;
         this.isBaseTemplate = isBaseTemplate;
         setVariables();
     }
 
-    public TemplateSignature(String iri, ParameterList params) {
+    public Signature(String iri, ParameterList params) {
         this(iri, params, false);
     }
 
-    public TemplateSignature(String iri) {
+    public Signature(String iri) {
         this(iri, null);
     }
 

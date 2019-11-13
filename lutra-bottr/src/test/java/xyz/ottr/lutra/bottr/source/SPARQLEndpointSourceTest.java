@@ -26,9 +26,8 @@ import static org.junit.Assert.assertEquals;
 
 import org.apache.jena.rdf.model.RDFNode;
 import org.junit.Test;
-
 import xyz.ottr.lutra.bottr.model.Source;
-import xyz.ottr.lutra.result.ResultStream;
+import xyz.ottr.lutra.system.ResultStream;
 
 public class SPARQLEndpointSourceTest {
 

@@ -1,4 +1,4 @@
-package xyz.ottr.lutra.result;
+package xyz.ottr.lutra.system;
 
 /*-
  * #%L
@@ -114,7 +114,7 @@ public class ResultStream<E> {
 
     /**
      * Returns a ResultStream containing a single element
-     * which is the result of applying Result#ofNullable(R)
+     * which is the system of applying Result#ofNullable(R)
      * to argument.
      */
     public static <R> ResultStream<R> ofNullable(R val) {
@@ -284,7 +284,7 @@ public class ResultStream<E> {
     /**
      * Similar to Result#flatMapCompose(Function), that is, returns a new function
      * which applies the first function to the argument, and then innerFlatMap-s the
-     * second function over the result.
+     * second function over the system.
      */
     public static <A,B,C> Function<A, ResultStream<C>> innerFlatMapCompose(Function<A, ResultStream<B>> f,
             Function<? super B, ResultStream<C>> g) {

@@ -25,15 +25,14 @@ package xyz.ottr.lutra.stottr.parser;
 import java.util.Map;
 
 import org.antlr.v4.runtime.CharStream;
-
-import xyz.ottr.lutra.io.InstanceParser;
 import xyz.ottr.lutra.model.ArgumentList;
-import xyz.ottr.lutra.model.IRITerm;
 import xyz.ottr.lutra.model.Instance;
-import xyz.ottr.lutra.model.Term;
-import xyz.ottr.lutra.result.Result;
-import xyz.ottr.lutra.result.ResultStream;
+import xyz.ottr.lutra.model.terms.IRITerm;
+import xyz.ottr.lutra.model.terms.Term;
+import xyz.ottr.lutra.parser.InstanceParser;
 import xyz.ottr.lutra.stottr.antlr.stOTTRParser;
+import xyz.ottr.lutra.system.Result;
+import xyz.ottr.lutra.system.ResultStream;
 
 public class SInstanceParser extends SParser<Instance> implements InstanceParser<CharStream> {
     

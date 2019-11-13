@@ -34,15 +34,14 @@ import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.RDFList;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
-
 import xyz.ottr.lutra.OTTR;
-import xyz.ottr.lutra.io.InstanceParser;
 import xyz.ottr.lutra.model.ArgumentList;
 import xyz.ottr.lutra.model.Instance;
-import xyz.ottr.lutra.model.Term;
-import xyz.ottr.lutra.result.Message;
-import xyz.ottr.lutra.result.Result;
-import xyz.ottr.lutra.result.ResultStream;
+import xyz.ottr.lutra.model.terms.Term;
+import xyz.ottr.lutra.parser.InstanceParser;
+import xyz.ottr.lutra.system.Message;
+import xyz.ottr.lutra.system.Result;
+import xyz.ottr.lutra.system.ResultStream;
 import xyz.ottr.lutra.wottr.parser.TermFactory;
 import xyz.ottr.lutra.wottr.parser.TripleInstanceFactory;
 import xyz.ottr.lutra.wottr.util.ModelSelector;
@@ -119,7 +118,7 @@ public class WInstanceParser implements InstanceParser<Model> {
     }
 
     /**
-     * Note that the expander result may be null both when there is no
+     * Note that the expander system may be null both when there is no
      * expanders and when are errors.
      */
     private Result<ArgumentList.Expander> getExpander(Model model, Resource instance) {

@@ -1,4 +1,4 @@
-package xyz.ottr.lutra.model;
+package xyz.ottr.lutra.model.terms;
 
 /*-
  * #%L
@@ -24,8 +24,9 @@ package xyz.ottr.lutra.model;
 
 import java.util.Optional;
 
-//import xyz.ottr.lutra.ROTTR;
 import xyz.ottr.lutra.model.types.TypeFactory;
+
+//import xyz.ottr.lutra.ROTTR;
 
 public class NoneTerm extends Term {
 
