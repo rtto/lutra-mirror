@@ -24,33 +24,36 @@ package xyz.ottr.lutra.model;
 
 import java.util.Objects;
 
+import lombok.Getter;
 import org.apache.jena.shared.PrefixMapping;
+import xyz.ottr.lutra.OTTR;
 import xyz.ottr.lutra.model.terms.Term;
 
+@Getter
 public class Signature {
 
     private final String iri;
-    private final ParameterList params;
+    private final ParameterList parameters;
     private final boolean isBaseTemplate;
 
-    public Signature(String iri, ParameterList params, boolean isBaseTemplate) {
+    protected Signature(String iri, ParameterList parameters, boolean isBaseTemplate) {
         this.iri = iri;
-        this.params = params;
+        this.parameters = parameters;
         this.isBaseTemplate = isBaseTemplate;
         setVariables();
     }
 
-    public Signature(String iri, ParameterList params) {
-        this(iri, params, false);
+    protected Signature(String iri, ParameterList parameters) {
+        this(iri, parameters, false);
     }
 
-    public Signature(String iri) {
+    protected Signature(String iri) {
         this(iri, null);
     }
 
     private void setVariables() {
-        if (this.params != null) {
-            for (Term var : this.params.asList()) {
+        if (this.parameters != null) {
+            for (Term var : this.parameters.asList()) {
                 if (var != null) {
                     var.setIsVariable(true);
                 }
@@ -58,35 +61,14 @@ public class Signature {
         }
     }
 
-    public String getIRI() {
-        return this.iri;
-    }
-
-    public ParameterList getParameters() {
-        return this.params;
-    }
-
-    public boolean isBaseTemplate() {
-        return this.isBaseTemplate;
-    }
-
-    /**
-     * Returns a String similar to toString(), but
-     * IRIs are written as qnames according to the
-     * argument PrefixMapping.
-     */
     public String toString(PrefixMapping prefixes) {
-        String qheadStr = prefixes.qnameFor(this.iri);
-        String headStr = (qheadStr == null) ? this.iri : qheadStr;
-        headStr += (this.params == null) ? "(...)" : this.params.toString(prefixes);
-        return headStr;
+        return prefixes.shortForm(this.iri)
+            + (this.parameters == null ? "(...)" : this.parameters.toString(prefixes));
     }
 
     @Override
     public String toString() {
-        String headStr = this.iri;
-        headStr += (this.params == null) ? "(...)" : this.params.toString();
-        return headStr;
+        return toString(OTTR.getDefaultPrefixes());
     }
 
     @Override
@@ -99,6 +81,6 @@ public class Signature {
         return this == o 
                 || Objects.nonNull(o) 
                         && getClass() == o.getClass()
-                        && Objects.equals(this.getIRI(), ((Template) o).getIRI());
+                        && Objects.equals(this.getIri(), ((Template) o).getIri());
     }
 }

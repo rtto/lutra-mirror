@@ -166,7 +166,7 @@ public class STermParser extends SBaseParserVisitor<Term> {
         if (ctx.iri() != null) { // Explicit type present
             Result<Term> iriTermRes = visitIri(ctx.iri());
             return iriTermRes.flatMap(iri ->
-                Result.of(LiteralTerm.typedLiteral(val, ((IRITerm) iri).getIRI())));
+                Result.of(LiteralTerm.typedLiteral(val, ((IRITerm) iri).getIri())));
         }
 
         return Result.of(new LiteralTerm(val));

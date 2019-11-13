@@ -51,10 +51,6 @@ public class Substitution {
         this(new HashMap<>());
     }
 
-    private Map<Term, Term> getTermSubstition() {
-        return this.termSubstitution;
-    }
-
     public static Result<Substitution> makeSubstitution(TermList args, TermList parameters) {
         return makeSubstitution(new ArgumentList(args.asList()), new ParameterList(parameters.asList()));
     }
@@ -129,7 +125,7 @@ public class Substitution {
      * constructing new blank nodes for lists.
      */
     public Instance apply(Instance instance) {
-        return new Instance(instance.getIRI(), apply(instance.getArguments()));
+        return new Instance(instance.getIri(), apply(instance.getArguments()));
     }
 
     /**
@@ -147,7 +143,7 @@ public class Substitution {
     public Optional<Substitution> mergeWithUnification(Substitution other) {
 
         Map<Term, Term> newTermSubs = new HashMap<>(this.termSubstitution);
-        Map<Term, Term> otherSubs = other.getTermSubstition();
+        Map<Term, Term> otherSubs = new HashMap<>(other.termSubstitution);
         for (Map.Entry<Term, Term> e : otherSubs.entrySet()) {
             if (!newTermSubs.containsKey(e.getKey())) {
                 newTermSubs.put(e.getKey(), e.getValue());

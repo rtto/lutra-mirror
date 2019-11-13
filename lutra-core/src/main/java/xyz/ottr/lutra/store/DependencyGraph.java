@@ -70,7 +70,7 @@ public class DependencyGraph implements TemplateStore {
      *         in argument set
      */
     public static Predicate<Dependency> vocabularyExpansionPredicate(Set<String> iris) {
-        return (e) -> iris.contains(e.to.getIRI());
+        return (e) -> iris.contains(e.to.getIri());
     }
 
     private final Set<TemplateNode> roots;
@@ -127,10 +127,10 @@ public class DependencyGraph implements TemplateStore {
     }
 
     private void addNode(TemplateNode n) {
-        if (!this.nodes.containsKey(n.getIRI())) {
+        if (!this.nodes.containsKey(n.getIri())) {
             this.roots.add(n);
             this.dependencies.put(n, new HashSet<>());
-            this.nodes.put(n.getIRI(), n);
+            this.nodes.put(n.getIri(), n);
         }
     }
 
@@ -168,7 +168,7 @@ public class DependencyGraph implements TemplateStore {
      */
     private TemplateNode addTemplateSignature(String uri, ParameterList params, boolean isBaseTemplate) {
         TemplateNode node = addTemplateNode(uri);
-        node.addParameters(params);
+        node.setParameters(params);
         if (isBaseTemplate) {
             node.setType(TemplateNode.Type.BASE);
         } else {
@@ -179,27 +179,27 @@ public class DependencyGraph implements TemplateStore {
 
     @Override
     public boolean addTemplateSignature(Signature signature) {
-        addTemplateSignature(signature.getIRI(), signature.getParameters(),
+        addTemplateSignature(signature.getIri(), signature.getParameters(),
                 signature.isBaseTemplate());
-        log.info("Adding template signature " + signature.getIRI());
+        log.info("Adding template signature " + signature.getIri());
         return true;
     }
 
     @Override
     public boolean addTemplate(Template template) {
         addTemplateSignature(template);
-        Result<TemplateNode> tempNodeRes = checkIsTemplate(template.getIRI());
+        Result<TemplateNode> tempNodeRes = checkIsTemplate(template.getIri());
         if (!tempNodeRes.isPresent()) {
             return false;
         }
         TemplateNode tempNode = tempNodeRes.get();
-        if (template.getBody() != null) {
+        if (template.getPattern() != null) {
             if (!this.dependencies.get(tempNode).isEmpty()) {
                 return false;
             }
-            this.log.info("Adding body for template " + template.getIRI());
-            for (Instance i : template.getBody()) {
-                TemplateNode insNode = addTemplateNode(i.getIRI());
+            this.log.info("Adding body for template " + template.getIri());
+            for (Instance i : template.getPattern()) {
+                TemplateNode insNode = addTemplateNode(i.getIri());
                 addDependency(tempNode, i.getArguments(), insNode);
             }
             tempNode.setType(TemplateNode.Type.DEFINITION);
@@ -230,13 +230,13 @@ public class DependencyGraph implements TemplateStore {
     private void addDependency(Dependency edge) {
         this.dependencies.get(edge.from).add(edge);
         this.roots.remove(edge.to);
-        addInstanceToIndex(edge.to.getIRI(), edge.argumentList, edge.from.getIRI());
+        addInstanceToIndex(edge.to.getIri(), edge.argumentList, edge.from.getIri());
     }
 
     private void removeDependency(Dependency dependency) {
         this.dependencies.get(dependency.from).remove(dependency);
-        String instance = dependency.to.getIRI();
-        removeInstanceFromIndex(instance, dependency.argumentList, dependency.from.getIRI());
+        String instance = dependency.to.getIri();
+        removeInstanceFromIndex(instance, dependency.argumentList, dependency.from.getIri());
         if (!instance.equals(OTTR.BaseURI.Triple) && this.instanceIndex.get(instance).isEmpty()) {
             this.roots.add(dependency.to);
         }
@@ -413,16 +413,16 @@ public class DependencyGraph implements TemplateStore {
             && edge.isInstance()) {
 
             res = Result.empty(Message.error(
-                    "Cannot expand expander on instance of template " + edge.to.getIRI()
+                    "Cannot expand expander on instance of template " + edge.to.getIri()
                     + " with arguments " + edge.argumentList.toString()
                     + ": it contains blank nodes."), res);
         }
 
         if (edge.to.isUndefined() || edge.isInstance() && edge.to.isSignature()) {
             res = Result.empty(Message.error(
-                    "Cannot expand instance of template " + edge.to.getIRI()
+                    "Cannot expand instance of template " + edge.to.getIri()
                     + " with arguments " + edge.argumentList.toString()
-                    + (edge.from == null ? "" : " in body of " + edge.from.getIRI())
+                    + (edge.from == null ? "" : " in body of " + edge.from.getIri())
                     + ": missing definition."), res);
         }
 
@@ -470,11 +470,11 @@ public class DependencyGraph implements TemplateStore {
 
         resTemplate.ifPresent(template -> {
             for (Dependency d : this.dependencies.get(template)) {
-                body.add(new Instance(d.to.getIRI(), d.argumentList));
+                body.add(new Instance(d.to.getIri(), d.argumentList));
             }
         });
         return resTemplate.map(template ->
-                new Template(template.getIRI(), template.getParameters(), body));
+                Template.createTemplate(template.getIri(), template.getParameters(), body));
     }
 
     @Override
@@ -483,7 +483,9 @@ public class DependencyGraph implements TemplateStore {
         Result<TemplateNode> resTemplate = checkIsTemplate(iri);
 
         return resTemplate.map(template ->
-            new Signature(template.getIRI(), template.getParameters(), template.isBase()));
+            template.isBase()
+                ? Template.createBaseTemplate(template.getIri(), template.getParameters())
+                : Template.createSignature(template.getIri(), template.getParameters()));
     }
 
     @Override
@@ -501,8 +503,7 @@ public class DependencyGraph implements TemplateStore {
         Set<String> res = new HashSet<>();
         this.dependencies
             .get(this.nodes.get(template))
-            .stream()
-            .forEach(dep -> res.add(dep.to.getIRI()));
+            .forEach(dep -> res.add(dep.to.getIri()));
         return Result.of(res);
     }
 
@@ -522,7 +523,7 @@ public class DependencyGraph implements TemplateStore {
 
     private Set<Result<Dependency>> toResultDependencies(Set<Instance> instances) {
         return instances.stream()
-            .map(i -> checkIsTemplate(i.getIRI()).map(template ->
+            .map(i -> checkIsTemplate(i.getIri()).map(template ->
                         new Dependency(null, i.getArguments(), template)))
             .collect(Collectors.toSet());
     }
@@ -551,7 +552,7 @@ public class DependencyGraph implements TemplateStore {
         }
 
         ResultStream<Instance> expandedInstances = new ResultStream<>(finalExpansion)
-            .innerMap(dep -> new Instance(dep.to.getIRI(), dep.argumentList));
+            .innerMap(dep -> new Instance(dep.to.getIri(), dep.argumentList));
         return expandedInstances;
     }
 
@@ -562,9 +563,9 @@ public class DependencyGraph implements TemplateStore {
 
         // First check correct number of arguments
         if (params == null) {
-            return Result.error("Missing definition of template with IRI " + ins.to.getIRI() + ".");
+            return Result.error("Missing definition of template with IRI " + ins.to.getIri() + ".");
         } else if (params.size() != args.size()) {
-            return Result.error("Instance of template with IRI " + ins.to.getIRI() 
+            return Result.error("Instance of template with IRI " + ins.to.getIri()
                 + " with arguments " + args.toString() + " has " + args.size() 
                 + " arguments, but template expects " + params.size() + ".");
         }
@@ -579,13 +580,13 @@ public class DependencyGraph implements TemplateStore {
 
             if (!arg.getType().isCompatibleWith(param.getType())) {
                 String err = "Argument " + arg.toString() + " with index " + i 
-                    + " to template with IRI " + ins.to.getIRI() + " has incompatible type: "
+                    + " to template with IRI " + ins.to.getIri() + " has incompatible type: "
                     + "Expected type compatible with " + param.getType().toString() + " but got " + arg.getType().toString() + ".";
                 insRes = insRes.fail(Message.error(err));
             }
             if (arg instanceof BlankNodeTerm && params.isNonBlank(i)) {
                 String err = "Argument " + arg.toString() + " with index " + i 
-                    + " to template with IRI " + ins.to.getIRI() + " is a blank node, but "
+                    + " to template with IRI " + ins.to.getIri() + " is a blank node, but "
                     + " corresponding parameter " + params.get(i).toString() + " is marked as non-blank.";
                 insRes = insRes.fail(Message.error(err));
             }

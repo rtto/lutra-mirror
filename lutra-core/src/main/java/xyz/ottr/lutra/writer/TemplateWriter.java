@@ -49,7 +49,7 @@ public interface TemplateWriter extends Consumer<Signature> {
      *          a set of templates to add to this Writer
      */
     default void addTemplates(Set<Signature> templates) {
-        templates.stream().forEach(this);
+        templates.forEach(this);
     }
 
     String write(String iri);

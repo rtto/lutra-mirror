@@ -24,9 +24,11 @@ package xyz.ottr.lutra.model;
 
 import java.util.List;
 
+import lombok.EqualsAndHashCode;
 import xyz.ottr.lutra.model.terms.Term;
 import xyz.ottr.lutra.model.terms.TermList;
 
+@EqualsAndHashCode
 public abstract class AbstractTermList {
 
     protected final TermList terms;

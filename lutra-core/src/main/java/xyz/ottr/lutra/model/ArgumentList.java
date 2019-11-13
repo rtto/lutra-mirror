@@ -26,13 +26,17 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import lombok.Getter;
 import org.apache.jena.shared.PrefixMapping;
+import xyz.ottr.lutra.OTTR;
 import xyz.ottr.lutra.model.terms.NoneTerm;
 import xyz.ottr.lutra.model.terms.Term;
 import xyz.ottr.lutra.model.terms.TermList;
 
+@Getter
 public class ArgumentList extends AbstractTermList {
 
     public enum Expander { CROSS, ZIPMIN, ZIPMAX }
@@ -58,10 +62,6 @@ public class ArgumentList extends AbstractTermList {
         this(List.of(elems), null, null);
     }
 
-    public Expander getListExpander() {
-        return this.listExpander;
-    }
-
     public boolean hasListExpander() {
         return this.listExpander != null;
     }
@@ -78,7 +78,7 @@ public class ArgumentList extends AbstractTermList {
         return Expander.CROSS == this.listExpander;
     }
 
-    public boolean hasZipExpander() {
+    private boolean hasZipExpander() {
         return hasZipMinExpander() || hasZipMaxExpander();
     }
 
@@ -88,10 +88,6 @@ public class ArgumentList extends AbstractTermList {
 
     public boolean hasZipMaxExpander() {
         return Expander.ZIPMAX == this.listExpander;
-    }
-
-    public Set<Term> getExpanderValues() {
-        return this.expanderValues;
     }
 
     public ArgumentList shallowCloneTerms() {
@@ -108,32 +104,15 @@ public class ArgumentList extends AbstractTermList {
         return new ArgumentList(clonedTerms, clonedExpanderValues, this.listExpander);
     }
 
-    /**
-     * Returns a String similar to toString(), but
-     * IRIs are written as qnames according to the
-     * argument PrefixMapping.
-     */
     public String toString(PrefixMapping prefixes) {
-        String s = "";
-        String sep = "";
-        for (Term e : asList()) {
-            s = s + sep + e.toString(prefixes);
-            //s = s.concat(this.expanderValues != null && this.expanderValues.contains(e) ? "--e" : "");
-            sep = ", ";
-        }
-        return "(" + s + ")";
+        return asList().stream()
+            .map(t -> t.toString(prefixes))
+            .collect(Collectors.joining(", ", "(", ")"));
     }
 
     @Override
     public String toString() {
-        String s = "";
-        String sep = "";
-        for (Term e : asList()) {
-            s = s + sep + e.toString();
-            //s = s.concat(this.expanderValues != null && this.expanderValues.contains(e) ? "--e" : "");
-            sep = ", ";
-        }
-        return "(" + s + ")";
+        return toString(OTTR.getDefaultPrefixes());
     }
 
     private void expandCrossExpander(List<ArgumentList> expanded, List<Term> current, int i) {

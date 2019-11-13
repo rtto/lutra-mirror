@@ -32,7 +32,7 @@ public class BasicType implements TermType {
         this.iri = iri;
     }
 
-    public String getIRI() {
+    public String getIri() {
         return this.iri.toString();
     }
 
@@ -52,17 +52,17 @@ public class BasicType implements TermType {
 
     @Override
     public String toString() {
-        return getIRI();
+        return this.iri.toString();
     }
 
     @Override
     public boolean equals(Object other) {
         return other instanceof BasicType
-            && getIRI().equals(((BasicType) other).getIRI());
+            && getIri().equals(((BasicType) other).getIri());
     }
 
     @Override
     public int hashCode() {
-        return getIRI().hashCode();
+        return getIri().hashCode();
     }
 }

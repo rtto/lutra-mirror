@@ -83,7 +83,7 @@ public class TermTypeTest {
 
     @Test
     public void test1() throws Exception {
-        Resource op = ResourceFactory.createResource(owlOProp.getIRI());
+        Resource op = ResourceFactory.createResource(owlOProp.getIri());
 
         for (Property p : new Property[]{OWL.disjointWith, RDFS.subClassOf, OTTR.unifiableWith}) {
 

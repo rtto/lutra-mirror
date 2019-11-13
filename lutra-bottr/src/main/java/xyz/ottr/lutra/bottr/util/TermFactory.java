@@ -123,12 +123,12 @@ public class TermFactory {
         } else if (type.equals(TypeFactory.LITERAL)) {
             return createPlainLiteral(value).map(t -> (Term)t);
         } else if (type.isProperSubTypeOf(TypeFactory.LITERAL)) {
-            return createTypedLiteral(value, type.getIRI()).map(t -> (Term)t);
+            return createTypedLiteral(value, type.getIri()).map(t -> (Term)t);
         } else {
             Result<LiteralTerm> result = createPlainLiteral(value);
-            result.addMessage(Message.warning("Type " + RDFNodes.toString(type.getIRI())
+            result.addMessage(Message.warning("Type " + RDFNodes.toString(type.getIri())
                 + " too generic to materialise, defaulting to "
-                + RDFNodes.toString(TypeFactory.LITERAL.getIRI())));
+                + RDFNodes.toString(TypeFactory.LITERAL.getIri())));
             return result.map(t -> (Term)t);
         }
     }

@@ -265,11 +265,11 @@ public interface TemplateStore extends Consumer<Signature> {
      */
     default ResultStream<Instance> expandInstanceFetch(Instance instance) {
 
-        if (!containsTemplate(instance.getIRI())) {
+        if (!containsTemplate(instance.getIri())) {
             // Need to fetch missing template
-            MessageHandler messages = fetchMissingDependencies(List.of(instance.getIRI()));
+            MessageHandler messages = fetchMissingDependencies(List.of(instance.getIri()));
             Result<Instance> insWithMsgs = Result.of(instance);
-            messages.toSingleMessage("Fetch missing template: " + instance.getIRI())
+            messages.toSingleMessage("Fetch missing template: " + instance.getIri())
                 .ifPresent(insWithMsgs::addMessage);
             return insWithMsgs.mapToStream(this::expandInstance);
         }

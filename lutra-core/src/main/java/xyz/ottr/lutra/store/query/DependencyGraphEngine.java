@@ -316,8 +316,8 @@ public class DependencyGraphEngine extends QueryEngine<DependencyGraph> {
         if (!resBoundTemplate.isPresent()) {
             return Stream.empty(); //  argument is not a template
         }
-        Template boundTemplate = this.store.getTemplate(resBoundTemplate.get().getIRI()).get();
-        Set<Instance> deps = boundTemplate.getBody();
+        Template boundTemplate = this.store.getTemplate(resBoundTemplate.get().getIri()).get();
+        Set<Instance> deps = boundTemplate.getPattern();
 
         if (tuple.hasBound(body)) {
             return deps.equals(tuple.get(body)) ? Stream.of(tuple) : Stream.empty();
@@ -349,10 +349,10 @@ public class DependencyGraphEngine extends QueryEngine<DependencyGraph> {
         Instance boundInstance = tuple.getAs(Instance.class, instance);
 
         if (tuple.hasBound(iri)) {
-            return tuple.getAs(String.class, iri).equals(boundInstance.getIRI())
+            return tuple.getAs(String.class, iri).equals(boundInstance.getIri())
                 ? Stream.of(tuple) : Stream.empty();
         }
-        return Stream.of(tuple.bind(iri, boundInstance.getIRI()));
+        return Stream.of(tuple.bind(iri, boundInstance.getIri()));
     }
 
     @Override

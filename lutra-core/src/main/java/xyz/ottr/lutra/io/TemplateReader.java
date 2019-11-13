@@ -68,7 +68,7 @@ public class TemplateReader implements Function<String, ResultStream<Signature>>
     }
 
     public ResultStream<Signature> apply(String file) {
-        return templatePipeline.apply(file);
+        return this.templatePipeline.apply(file);
     }
 
     public MessageHandler populateTemplateStore(TemplateStore store, String iri) {
@@ -80,14 +80,14 @@ public class TemplateReader implements Function<String, ResultStream<Signature>>
     }
 
     public MessageHandler populateTemplateStore(TemplateStore store, ResultStream<String> iris) {
-        ResultConsumer<Signature> consumer = new ResultConsumer<Signature>(store);
-        iris.innerFlatMap(templatePipeline).forEach(consumer);
+        ResultConsumer<Signature> consumer = new ResultConsumer<>(store);
+        iris.innerFlatMap(this.templatePipeline).forEach(consumer);
         return consumer.getMessageHandler();
     }
 
     public MessageHandler loadTemplatesFromFile(TemplateStore store, String file) {
-        ResultConsumer<Signature> consumer = new ResultConsumer<Signature>(store);
-        templatePipeline.apply(file).forEach(consumer);
+        ResultConsumer<Signature> consumer = new ResultConsumer<>(store);
+        this.templatePipeline.apply(file).forEach(consumer);
         return consumer.getMessageHandler();
     }
 

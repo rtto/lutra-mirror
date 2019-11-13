@@ -27,29 +27,43 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import lombok.Getter;
 import org.apache.jena.shared.PrefixMapping;
+import xyz.ottr.lutra.OTTR;
 import xyz.ottr.lutra.model.terms.Term;
 import xyz.ottr.lutra.model.terms.TermList;
 import xyz.ottr.lutra.model.types.TermType;
 
 @SuppressWarnings("PMD.UselessOverridingMethod")
+@Getter
 public class Template extends Signature {
 
-    //private Set<Instance> head;
-    private final Set<Instance> body;
+    private final Set<Instance> pattern;
+
+    public static Template createTemplate(String iri, ParameterList parameters, Set<Instance> pattern) {
+        return new Template(iri, parameters, pattern);
+    }
+
+    public static Template createTemplate(Signature signature, Set<Instance> pattern) {
+        return new Template(signature.getIri(), signature.getParameters(), pattern);
+    }
+
+    public static Signature createBaseTemplate(String iri, ParameterList parameters) {
+        return new Signature(iri, parameters, true);
+    }
+
+    public static Signature createSignature(String iri, ParameterList parameters) {
+        return new Signature(iri, parameters, false);
+    }
+
+    public static Signature createSignature(String iri) {
+        return new Signature(iri, null);
+    }
     
-    public Template(String iri, ParameterList params, Set<Instance> body) {
-        super(iri, params);
-        this.body = body;
+    private Template(String iri, ParameterList parameters, Set<Instance> pattern) {
+        super(iri, parameters);
+        this.pattern = pattern;
         setVariableFlagsAndTypes();
-    }
-
-    public Template(Signature signature, Set<Instance> body) {
-        this(signature.getIRI(), signature.getParameters(), body);
-    }
-
-    public Set<Instance> getBody() {
-        return this.body;
     }
 
     private void setVariableFlagsAndTypes() {
@@ -63,15 +77,15 @@ public class Template extends Signature {
             idTypes.put(var.getIdentifier(), var.getType());
         }
 
-        if (this.body != null) {
-            this.body.stream()
+        if (this.pattern != null) {
+            this.pattern
                 .forEach(instance ->
                     setVariableFlagsAndTypes(instance.getArguments().asList(), idTypes));
         }
     }
 
     private void setVariableFlagsAndTypes(List<Term> terms, Map<Object, TermType> idTypes) {
-        terms.stream()
+        terms
             .forEach(term -> {
                 if (term instanceof TermList) {
                     TermList tl = (TermList) term;
@@ -90,7 +104,7 @@ public class Template extends Signature {
         String headStr = super.toString(prefixes);
         headStr += " ::\n";
         StringBuilder bodyStr = new StringBuilder();
-        for (Instance ins : getBody()) {
+        for (Instance ins : getPattern()) {
             bodyStr.append("    " + ins.toString(prefixes));
             bodyStr.append("\n");
         }
@@ -99,14 +113,7 @@ public class Template extends Signature {
 
     @Override
     public String toString() {
-        String headStr = super.toString();
-        headStr += " ::\n";
-        StringBuilder bodyStr = new StringBuilder();
-        for (Instance ins : getBody()) {
-            bodyStr.append("    " + ins.toString());
-            bodyStr.append("\n");
-        }
-        return headStr + bodyStr.toString();
+        return toString(OTTR.getDefaultPrefixes());
     }
 
     @Override

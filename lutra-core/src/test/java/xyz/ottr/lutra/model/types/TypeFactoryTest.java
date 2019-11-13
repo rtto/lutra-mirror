@@ -46,7 +46,7 @@ import xyz.ottr.lutra.model.terms.TermList;
 public class TypeFactoryTest {
 
     private LiteralTerm typedLiteral(String val, Resource type) {
-        return new LiteralTerm(val, TypeFactory.getType(type).getIRI());
+        return new LiteralTerm(val, TypeFactory.getType(type).getIri());
     }
 
     @Test
@@ -132,7 +132,7 @@ public class TypeFactoryTest {
                         new IRITerm("example.org/hasCommentList"),
                         var3b));
 
-        Template tmp = new Template(
+        Template tmp = Template.createTemplate(
                 "t1",
                 new ParameterList(var1, var2, var3),
                 Stream.of(i1, i2).collect(Collectors.toSet()));
@@ -181,7 +181,7 @@ public class TypeFactoryTest {
                         new IRITerm("example.org/hasCommentList"),
                         lst2));
 
-        Template tmp = new Template(
+        Template tmp = Template.createTemplate(
                 "t1",
                 new ParameterList(var1, var21, var22, var3),
                 Stream.of(i1, i2).collect(Collectors.toSet()));

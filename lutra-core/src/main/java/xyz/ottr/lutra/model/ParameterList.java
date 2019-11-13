@@ -27,30 +27,31 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 
+import lombok.Getter;
 import org.apache.jena.shared.PrefixMapping;
+import xyz.ottr.lutra.OTTR;
 import xyz.ottr.lutra.model.terms.Term;
 import xyz.ottr.lutra.model.terms.TermList;
 
+@Getter
 public class ParameterList extends AbstractTermList {
 
     private final Set<Term> nonBlanks;
     private final Set<Term> optionals;
     private final Map<Term, Term> defaultValues;
 
-    public ParameterList(TermList parameters, Set<Term> nonBlanks, Set<Term> optionals,
-        Map<Term, Term> defaultValues) {
-
+    public ParameterList(TermList parameters, Set<Term> nonBlanks, Set<Term> optionals, Map<Term, Term> defaultValues) {
         super(parameters);
-
-        this.nonBlanks = (nonBlanks == null) ? new HashSet<>() : nonBlanks;
-        this.optionals = (optionals == null) ? new HashSet<>() : optionals;
-        this.defaultValues = (defaultValues == null) ? new HashMap<>() : defaultValues;
+        this.nonBlanks = Objects.requireNonNullElse(nonBlanks, new HashSet<>());
+        this.optionals = Objects.requireNonNullElse(optionals, new HashSet<>());
+        this.defaultValues = Objects.requireNonNullElse(defaultValues, new HashMap<>());
     }
     
-    public ParameterList(List<Term> parameters, Set<Term> nonBlanks, Set<Term> optionals,
-        Map<Term, Term> defaultValues) {
+    public ParameterList(List<Term> parameters, Set<Term> nonBlanks, Set<Term> optionals, Map<Term, Term> defaultValues) {
         this(new TermList(parameters), nonBlanks, optionals, defaultValues);
     }
     
@@ -70,10 +71,6 @@ public class ParameterList extends AbstractTermList {
         return isNonBlank(this.terms.get(index));
     }
 
-    public Set<Term> getNonBlanks() {
-        return this.nonBlanks;
-    }
-
     public boolean hasDefaultValue(Term param) {
         return this.defaultValues.containsKey(param);
     }
@@ -90,20 +87,12 @@ public class ParameterList extends AbstractTermList {
         return getDefaultValue(get(index));
     }
 
-    public Map<Term, Term> getDefaultValues() {
-        return this.defaultValues;
-    }
-
     public boolean isOptional(int index) {
         return isOptional(get(index));
     }
 
     public boolean isOptional(Term e) {
         return this.optionals.contains(e);
-    }
-
-    public Set<Term> getOptional() {
-        return this.optionals;
     }
 
     public ParameterList shallowCloneTerms() {
@@ -134,28 +123,15 @@ public class ParameterList extends AbstractTermList {
      * argument PrefixMapping.
      */
     public String toString(PrefixMapping prefixes) {
-        String s = "";
-        String sep = "";
-        for (Term e : asList()) {
-            s = s + sep + e.toString(prefixes);
-            s += this.optionals.contains(e) ? " : ?" : "";
-            sep = ", ";
-        }
-        return "(" + s + ")";
+        return asList().stream()
+            .map(t -> (this.optionals.contains(t) ? "?" : "")
+                + t.toString(prefixes))
+            .collect(Collectors.joining(", ", "(", ")"));
     }
 
     @Override
     public String toString() {
-        String s = "";
-        String sep = "";
-        for (Term e : asList()) {
-            s = s + sep + e.toString();
-            s += this.optionals.contains(e) ? " : ?" : " : ";
-            String type = e.getType().toString();
-            s += type;
-            sep = ", ";
-        }
-        return "(" + s + ")";
+        return toString(OTTR.getDefaultPrefixes());
     }
 
     @Override

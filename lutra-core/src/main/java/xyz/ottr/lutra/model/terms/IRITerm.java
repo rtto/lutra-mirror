@@ -24,8 +24,10 @@ package xyz.ottr.lutra.model.terms;
 
 import java.util.Optional;
 
+import lombok.Getter;
 import xyz.ottr.lutra.model.types.TypeFactory;
 
+@Getter
 public class IRITerm extends ResourceTerm {
 
     private final String iri;
@@ -33,10 +35,6 @@ public class IRITerm extends ResourceTerm {
     public IRITerm(String iri) {
         this.iri = iri;
         super.type = TypeFactory.getConstantType(this);
-    }
-
-    public String getIRI() {
-        return this.iri;
     }
 
     @Override 
@@ -62,6 +60,6 @@ public class IRITerm extends ResourceTerm {
 
     @Override
     public String getIdentifier() {
-        return getIRI();
+        return getIri();
     }
 }

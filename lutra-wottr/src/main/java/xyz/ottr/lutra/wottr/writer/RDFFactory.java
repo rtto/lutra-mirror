@@ -57,7 +57,7 @@ public class RDFFactory {
     }
 
     public static boolean isTriple(Instance instance) {
-        String templateIRI = instance.getIRI();
+        String templateIRI = instance.getIri();
         return OTTR.BaseURI.Triple.equals(templateIRI)
             || OTTR.BaseURI.NullableTriple.equals(templateIRI);
     }
@@ -125,7 +125,7 @@ public class RDFFactory {
     }
 
     public Resource createURIResource(Model model, IRITerm term) {
-        return model.createResource(term.getIRI());
+        return model.createResource(term.getIri());
     }
 
     public Literal createLiteral(Model model, LiteralTerm term) {

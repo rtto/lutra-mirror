@@ -38,7 +38,7 @@ import java.util.stream.Collectors;
 
 public class Result<E> {
 
-    private Trace trace;
+    private final Trace trace;
     private final Optional<E> result;
 
     private Result(Optional<E> result) {
@@ -65,28 +65,28 @@ public class Result<E> {
      * @see Optional#of(R)
      */
     public static <R> Result<R> of(R val) {
-        return new Result<R>(Optional.of(val));
+        return new Result<>(Optional.of(val));
     }
 
     /**
      * Same as #of, but sets parsedFrom to argument Result.
      */
     public static <R> Result<R> of(R val, Result<?> parsedFrom) {
-        return new Result<R>(Optional.of(val), parsedFrom.getTrace());
+        return new Result<>(Optional.of(val), parsedFrom.getTrace());
     }
 
     /**
      * @see Optional#ofNullable(R)
      */
     public static <R> Result<R> ofNullable(R val) {
-        return new Result<R>(Optional.ofNullable(val));
+        return new Result<>(Optional.ofNullable(val));
     }
 
     /**
      * Same as #ofNullable, but sets parsedFrom to argument Result.
      */
     public static <R> Result<R> ofNullable(R val, Result<?> parsedFrom) {
-        return new Result<R>(Optional.ofNullable(val), parsedFrom.getTrace());
+        return new Result<>(Optional.ofNullable(val), parsedFrom.getTrace());
     }
     
     public static <R> Set<Result<R>> lift(Set<R> rs) {
@@ -101,7 +101,7 @@ public class Result<E> {
      * @see Optional#empty()
      */
     public static <R> Result<R> empty() {
-        return new Result<R>(Optional.empty());
+        return new Result<>(Optional.empty());
     }
 
     /**
@@ -115,7 +115,7 @@ public class Result<E> {
      *      An empty Result
      */
     public static <R> Result<R> empty(Result<?> parsedFrom) {
-        return new Result<R>(Optional.empty(), parsedFrom.getTrace());
+        return new Result<>(Optional.empty(), parsedFrom.getTrace());
     }
 
     /**
@@ -129,7 +129,7 @@ public class Result<E> {
      *      An empty Result
      */
     public static <R> Result<R> empty(Message msg) {
-        return new Result<R>(Optional.empty(), Arrays.asList(msg));
+        return new Result<>(Optional.empty(), Arrays.asList(msg));
     }
 
     /**
@@ -146,7 +146,7 @@ public class Result<E> {
      *      An empty Result
      */
     public static <R> Result<R> empty(Message msg, Result<?> parsedFrom) {
-        return new Result<R>(Optional.empty(), Arrays.asList(msg), parsedFrom.getTrace());
+        return new Result<>(Optional.empty(), Arrays.asList(msg), parsedFrom.getTrace());
     }
 
     /**
@@ -160,7 +160,7 @@ public class Result<E> {
      *      An empty Result
      */
     public static <R> Result<R> empty(List<Message> msgs) {
-        return new Result<R>(Optional.empty(), msgs);
+        return new Result<>(Optional.empty(), msgs);
     }
 
     public static <R> Result<R> fatal(String msg) {
@@ -341,7 +341,8 @@ public class Result<E> {
      * @see Optional#ifPresent(Consumer)
      */
     public void ifPresent(Consumer<? super E> consumer) {
-        result.ifPresent(consumer);
+
+        this.result.ifPresent(consumer);
     }
 
     /**
@@ -398,7 +399,7 @@ public class Result<E> {
      * to the parsed from Result.
      */
     public <R> Result<R> map(Function<? super E, ? extends R> fun) {
-        return new Result<R>(this.result.map(fun), this.trace);
+        return new Result<>(this.result.map(fun), this.trace);
     }
 
     /**
@@ -423,7 +424,7 @@ public class Result<E> {
      */
     public <R> Result<R> flatMapOrElse(Function<? super E, ? extends Result<R>> fun, Result<R> orElse) {
 
-        Result<R> newResult = result.isPresent() ? fun.apply(result.get()) : orElse;
+        Result<R> newResult = this.result.isPresent() ? fun.apply(this.result.get()) : orElse;
         return newResult.addToTrace(this);
     }
 

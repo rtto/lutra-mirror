@@ -51,10 +51,9 @@ public class DependencyGraphTest {
 
     private void expandAndCheckEquality(Set<Template> toExpand, Set<Template> shouldEqual) {
         
-        Signature base = new Signature(
+        Signature base = Template.createBaseTemplate(
                 "base",
-                new ParameterList(new ObjectTerm("x", true), new ObjectTerm("y", true)),
-                true);
+                new ParameterList(new ObjectTerm("x", true), new ObjectTerm("y", true)));
 
         DependencyGraph graph = new DependencyGraph(null);
         graph.addTemplateSignature(base);
@@ -81,7 +80,7 @@ public class DependencyGraphTest {
     public void simpleExpansion() {
 
         Set<Template> toExpand = Stream.of(
-            new Template(
+            Template.createTemplate(
                 "t1",
                 new ParameterList(new ObjectTerm("a", true), new ObjectTerm("b", true)),
                 Stream.of(new Instance("base",
@@ -89,7 +88,7 @@ public class DependencyGraphTest {
                           new Instance("base",
                                        new ArgumentList(new ObjectTerm(2), new ObjectTerm("b", true))))
                 .collect(Collectors.toSet())),
-            new Template(
+            Template.createTemplate(
                 "t2",
                 new ParameterList(new ObjectTerm("v", true), new ObjectTerm("u", true)),
                 Stream.of(new Instance("base",
@@ -100,7 +99,7 @@ public class DependencyGraphTest {
             .collect(Collectors.toSet());
 
         Set<Template> shouldEqual = Stream.of(
-            new Template(
+            Template.createTemplate(
                 "t1",
                 new ParameterList(new ObjectTerm("a", true), new ObjectTerm("b", true)),
                 Stream.of(new Instance("base",
@@ -108,7 +107,7 @@ public class DependencyGraphTest {
                           new Instance("base",
                                        new ArgumentList(new ObjectTerm(2), new ObjectTerm("b", true))))
                 .collect(Collectors.toSet())),
-            new Template(
+            Template.createTemplate(
                 "t2",
                 new ParameterList(new ObjectTerm("v", true), new ObjectTerm("u", true)),
                 Stream.of(new Instance("base",
@@ -129,7 +128,7 @@ public class DependencyGraphTest {
         DependencyGraph graph = new DependencyGraph(null);
 
         graph.addTemplate(
-            new Template(
+            Template.createTemplate(
                 "t1",
                 new ParameterList(new ObjectTerm("a", true), new ObjectTerm("b", true)),
                 Stream.of(new Instance("t2",
@@ -140,10 +139,9 @@ public class DependencyGraphTest {
         );
 
         graph.addTemplateSignature(
-            new Signature(
+            Template.createBaseTemplate(
                 "base",
-                new ParameterList(new ObjectTerm("x", true), new ObjectTerm("y", true)),
-                true)
+                new ParameterList(new ObjectTerm("x", true), new ObjectTerm("y", true)))
         );
 
         Result<DependencyGraph> graphRes = graph.expandAll();
@@ -156,7 +154,7 @@ public class DependencyGraphTest {
     public void optionalSafe() {
 
         Set<Template> toExpand = Stream.of(
-            new Template(
+            Template.createTemplate(
                 "t1",
                 new ParameterList(new ObjectTerm("a", true), new ObjectTerm("b", true)),
                 Stream.of(new Instance("base",
@@ -164,7 +162,7 @@ public class DependencyGraphTest {
                           new Instance("base",
                                        new ArgumentList(new ObjectTerm(2), new ObjectTerm("b", true))))
                 .collect(Collectors.toSet())),
-            new Template(
+            Template.createTemplate(
                 "t2",
                 new ParameterList(List.of(new ObjectTerm("v", true), new ObjectTerm("u", true)),
                                   null,
@@ -187,7 +185,7 @@ public class DependencyGraphTest {
                                                            new ObjectTerm("v2", true)),
                                              true);
         Set<Template> toExpand = Stream.of(
-            new Template(
+            Template.createTemplate(
                 "t1",
                 new ParameterList(new ObjectTerm("a", true), new ObjectTerm("b", true)),
                 Stream.of(new Instance("base",
@@ -195,7 +193,7 @@ public class DependencyGraphTest {
                           new Instance("base",
                                        new ArgumentList(new ObjectTerm(2), new ObjectTerm("b", true))))
                 .collect(Collectors.toSet())),
-            new Template(
+            Template.createTemplate(
                 "t2",
                 new ParameterList(toListExpand, new ObjectTerm("u", true)),
                 Stream.of(new Instance("t1",
@@ -210,13 +208,11 @@ public class DependencyGraphTest {
         expandAndCheckEquality(toExpand, new HashSet<>(toExpand));
     }
 
-    private void expandInstanceAndCheckEquality(Instance ins, Set<Instance> shouldEqual,
-                                                Set<Template> templates) {
+    private void expandInstanceAndCheckEquality(Instance ins, Set<Instance> shouldEqual, Set<Template> templates) {
         
-        Signature base = new Signature(
+        Signature base = Template.createBaseTemplate(
                 "base",
-                new ParameterList(new ObjectTerm("x", true), new ObjectTerm("y", true)),
-                true);
+                new ParameterList(new ObjectTerm("x", true), new ObjectTerm("y", true)));
 
         DependencyGraph graph = new DependencyGraph(null);
         graph.addTemplateSignature(base);
@@ -250,10 +246,10 @@ public class DependencyGraphTest {
 
 
     @Test
-    public void simpleInstanceExpandion() {
+    public void simpleInstanceExpansion() {
 
         Set<Template> templates = Stream.of(
-            new Template(
+            Template.createTemplate(
                 "t1",
                 new ParameterList(new ObjectTerm("a", true), new ObjectTerm("b", true)),
                 Stream.of(new Instance("base",
@@ -261,7 +257,7 @@ public class DependencyGraphTest {
                           new Instance("base",
                                        new ArgumentList(new ObjectTerm(2), new ObjectTerm("b", true))))
                 .collect(Collectors.toSet())),
-            new Template(
+            Template.createTemplate(
                 "t2",
                 new ParameterList(new ObjectTerm("v", true), new ObjectTerm("u", true)),
                 Stream.of(new Instance("base",
@@ -291,15 +287,14 @@ public class DependencyGraphTest {
 
         DependencyGraph graph = new DependencyGraph(null);
         graph.addTemplateSignature(
-            new Signature(
+            Template.createBaseTemplate(
                 "base",
-                new ParameterList(new ObjectTerm("x", true), new ObjectTerm("y", true)),
-                true)
+                new ParameterList(new ObjectTerm("x", true), new ObjectTerm("y", true)))
         );
 
         ObjectTerm toListExpand = new ObjectTerm("a", true);
         graph.addTemplate(
-            new Template(
+            Template.createTemplate(
                 "withCross",
                 new ParameterList(new ObjectTerm("a", true), new ObjectTerm("b", true)),
                 Stream.of(new Instance("base",
@@ -311,7 +306,7 @@ public class DependencyGraphTest {
                 .collect(Collectors.toSet()))
         );
         graph.addTemplateSignature(
-            new Signature(
+            Template.createSignature(
                 "signature",
                     new ParameterList(new ObjectTerm("v", true), new ObjectTerm("u", true)))
         );
@@ -334,7 +329,7 @@ public class DependencyGraphTest {
     public void optionalInstanceExpansion() {
 
         Set<Template> templates = Stream.of(
-            new Template(
+            Template.createTemplate(
                 "t1",
                 new ParameterList(List.of(new ObjectTerm("a", true), new ObjectTerm("b", true)),
                                   null,
@@ -345,7 +340,7 @@ public class DependencyGraphTest {
                           new Instance("base",
                                        new ArgumentList(new ObjectTerm(2), new ObjectTerm("b", true))))
                 .collect(Collectors.toSet())),
-            new Template(
+            Template.createTemplate(
                 "t2",
                 new ParameterList(List.of(new ObjectTerm("v", true), new ObjectTerm("u", true)),
                                   null,

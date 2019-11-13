@@ -82,12 +82,15 @@ public class WTemplateParser implements TemplateParser<Model> {
             .flatMap(list -> parseParameters(model, list));
 
         Result<Signature> signature = Result.zip(signatureURI, parameterList,
-            (sURI, pList) -> new Signature(sURI, pList, type.equals(WOTTR.BaseTemplate)));
+            (sURI, pList) ->
+                type.equals(WOTTR.BaseTemplate)
+                    ? Template.createBaseTemplate(sURI, pList)
+                    : Template.createSignature(sURI, pList));
 
         // include pattern if template, or check that no pattern exists
         if (type.equals(WOTTR.Template)) {
             Result<Set<Instance>> pattern = parsePattern(model, signatureResource);
-            signature = Result.zip(signature, pattern, Template::new);
+            signature = Result.zip(signature, pattern, Template::createTemplate);
         } else if (model.contains(signatureResource, WOTTR.pattern, (RDFNode) null)) {
             signature.addMessage(Message.error(
                 RDFNodes.toString(type) + " " + signatureURI.orElse("") + " cannot have a pattern."));

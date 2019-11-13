@@ -57,10 +57,10 @@ public class PrototypeTest {
         legacyReader.loadTemplatesFromFolder(graph, inFolder, new String []{"ttl"}, new String []{});
         //int f = 0;
         //for (Template t : graph.getAllTemplates().getStream().map(r -> r.get()).collect(Collectors.toSet())) {
-        //    if (t.getIRI().equals(newTemplate)) {
+        //    if (t.getIri().equals(newTemplate)) {
         //        continue;
         //    }
-        //    boolean fixed = graph.refactor(newTemplate, t.getIRI());
+        //    boolean fixed = graph.refactor(newTemplate, t.getIri());
         //    if (fixed) {
         //        f++;
         //    }

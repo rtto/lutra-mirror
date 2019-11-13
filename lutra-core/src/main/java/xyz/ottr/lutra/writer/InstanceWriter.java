@@ -36,7 +36,7 @@ public interface InstanceWriter extends Consumer<Instance> {
      *          a set of template instances to add to this Writer 
      */
     default void addInstances(Set<Instance> instances) {
-        instances.stream().forEach(this);
+        instances.forEach(this);
     }
 
     String write();

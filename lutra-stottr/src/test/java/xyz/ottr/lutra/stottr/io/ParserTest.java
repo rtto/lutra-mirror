@@ -141,7 +141,7 @@ public class ParserTest {
             // Thus, need to check structural equality:
             // TODO: Should be implemeted on objects in future
 
-            assertEquals(mins.getIRI(), pins.getIRI());
+            assertEquals(mins.getIri(), pins.getIri());
             List<Term> pterms = pins.getArguments().asList();
             List<Term> mterms = mins.getArguments().asList();
             assertEquals(mterms.size(), pterms.size());

@@ -24,11 +24,13 @@ package xyz.ottr.lutra.store;
 
 import java.util.Objects;
 
+import lombok.Getter;
+import lombok.Setter;
 import xyz.ottr.lutra.model.ParameterList;
 import xyz.ottr.lutra.model.terms.Term;
 
-//import xyz.ottr.lutra.model.Substitution;
-
+@Getter
+@Setter
 public class TemplateNode {
 
     /**
@@ -41,9 +43,9 @@ public class TemplateNode {
      */
     enum Type { UNDEFINED, BASE, SIGNATURE, DEFINITION }
 
+    private final String iri;
     private ParameterList parameters;
     private Type type;
-    private final String iri;
 
     public TemplateNode(String iri, Type type) {
         this.iri = iri;
@@ -53,26 +55,6 @@ public class TemplateNode {
     public TemplateNode(String iri, ParameterList parameters, Type type) {
         this(iri, type);
         this.parameters = parameters;
-    }
-
-    public String getIRI() {
-        return this.iri;
-    }
-
-    public Type getType() {
-        return this.type;
-    }
-
-    public void addParameters(ParameterList parameters) {
-        this.parameters = parameters;
-    }
-
-    public ParameterList getParameters() {
-        return this.parameters;
-    }
-
-    public void setType(Type type) {
-        this.type = type;
     }
 
     public boolean isBase() {
@@ -101,6 +83,6 @@ public class TemplateNode {
 
     @Override
     public String toString() {
-        return getIRI() + Objects.toString(this.parameters, "(...)");
+        return getIri() + Objects.toString(this.parameters, "(...)");
     }
 }

@@ -38,7 +38,6 @@ import xyz.ottr.lutra.OTTR;
 import xyz.ottr.lutra.model.ArgumentList;
 import xyz.ottr.lutra.model.Instance;
 import xyz.ottr.lutra.model.ParameterList;
-import xyz.ottr.lutra.model.Signature;
 import xyz.ottr.lutra.model.Template;
 import xyz.ottr.lutra.model.terms.BlankNodeTerm;
 import xyz.ottr.lutra.model.terms.IRITerm;
@@ -59,10 +58,10 @@ public class CheckFactoryTest {
         
         DependencyGraph store = new DependencyGraph(null);
         store.addTemplateSignature(
-            new Signature("base2",
+            Template.createSignature("base2",
                 new ParameterList(new ObjectTerm("x", true), new ObjectTerm("y", true))));
         store.addTemplateSignature(
-            new Signature("base3",
+            Template.createSignature("base3",
                 new ParameterList(new ObjectTerm("x", true), new ObjectTerm("y", true), new ObjectTerm("z", true))));
         return store;
     }
@@ -90,7 +89,7 @@ public class CheckFactoryTest {
 
         DependencyGraph store = initStore();
         store.addTemplate(
-            new Template("test",
+            Template.createTemplate("test",
                 new ParameterList(new ObjectTerm("a", true), new ObjectTerm("b", true)),
                 Collections.singleton(new Instance("base2",
                         new ArgumentList(new ObjectTerm("a", true), new ObjectTerm(1))))));
@@ -104,7 +103,7 @@ public class CheckFactoryTest {
 
         DependencyGraph store = initStore();
         store.addTemplate(
-            new Template("test",
+            Template.createTemplate("test",
                 new ParameterList(new ObjectTerm("a", true), new ObjectTerm("b", true)),
                 Collections.singleton(new Instance("base2",
                         new ArgumentList(new TermList(new ObjectTerm("a", true)),
@@ -120,7 +119,7 @@ public class CheckFactoryTest {
 
         DependencyGraph store = initStore();
         store.addTemplate(
-            new Template("test",
+            Template.createTemplate("test",
                 new ParameterList(new ObjectTerm("a", true), new ObjectTerm("a", true)),
                 Collections.singleton(new Instance("base2",
                         new ArgumentList(new ObjectTerm("a", true), new ObjectTerm(1))))));
@@ -134,7 +133,7 @@ public class CheckFactoryTest {
 
         DependencyGraph store = initStore();
         store.addTemplate(
-            new Template("test",
+            Template.createTemplate("test",
                 new ParameterList(new ObjectTerm("a", true), new ObjectTerm("b", true)),
                 Collections.singleton(new Instance("base3",
                         new ArgumentList(new ObjectTerm("a", true), new ObjectTerm("b", true))))));
@@ -148,12 +147,12 @@ public class CheckFactoryTest {
 
         DependencyGraph store = new DependencyGraph(null);
         store.addTemplateSignature(
-            new Signature("base",
+            Template.createSignature("base",
                 new ParameterList(
                     new TermList(new ObjectTerm("x", true), new ObjectTerm("y", true)),
                     Collections.singleton(new ObjectTerm("x", true)), null, null)));
         store.addTemplate(
-            new Template("test",
+            Template.createTemplate("test",
                 new ParameterList(new ObjectTerm("a", true), new ObjectTerm("b", true)),
                 Collections.singleton(new Instance("base",
                         new ArgumentList(new ObjectTerm("a", true), new ObjectTerm("b", true))))));
@@ -168,7 +167,7 @@ public class CheckFactoryTest {
         DependencyGraph store = initStore();
 
         store.addTemplate(
-            new Template("test1",
+            Template.createTemplate("test1",
                 new ParameterList(new ObjectTerm("a", true), new ObjectTerm("b", true)),
                 Stream.of(
                     new Instance("base2",
@@ -178,13 +177,13 @@ public class CheckFactoryTest {
                 .collect(Collectors.toSet())));
 
         store.addTemplate(
-            new Template("test2",
+            Template.createTemplate("test2",
                 new ParameterList(new ObjectTerm("a", true), new ObjectTerm("b", true)),
                 Collections.singleton(new Instance("test1",
                         new ArgumentList(new ObjectTerm("a", true), new ObjectTerm("b", true))))));
 
         store.addTemplate(
-            new Template("test3",
+            Template.createTemplate("test3",
                 new ParameterList(new ObjectTerm("a", true), new ObjectTerm("b", true)),
                 Collections.singleton(new Instance("test2",
                         new ArgumentList(new ObjectTerm("a", true), new ObjectTerm("b", true))))));
@@ -202,24 +201,24 @@ public class CheckFactoryTest {
         varBase1.setType(TypeFactory.getType(OTTR.TypeURI.IRI));
         Term varBase2 = new IRITerm("ex.com/var2");
         varBase2.setType(TypeFactory.getType(OWL.ObjectProperty));
-        Term varBase3 = new LiteralTerm("7", TypeFactory.getType(XSD.integer).getIRI());
+        Term varBase3 = new LiteralTerm("7", TypeFactory.getType(XSD.integer).getIri());
 
         store.addTemplateSignature(
-            new Signature("hasInt",
+            Template.createSignature("hasInt",
                 new ParameterList(varBase1, varBase2, varBase3)));
 
         Term varC1 = new IRITerm("ex.com/iri");
         varC1.setType(TypeFactory.getType(OTTR.TypeURI.IRI));
-        Term varC2 = new LiteralTerm("1", TypeFactory.getType(XSD.integer).getIRI());
+        Term varC2 = new LiteralTerm("1", TypeFactory.getType(XSD.integer).getIri());
 
         Term varC1b = new IRITerm("ex.com/iri");
-        Term varC2b = new LiteralTerm("1", TypeFactory.getType(XSD.integer).getIRI());
+        Term varC2b = new LiteralTerm("1", TypeFactory.getType(XSD.integer).getIri());
 
         Term constC1 = new IRITerm("ex.com/nicepropiri");
         Term constC2 = new IRITerm("ex.com/niceonlyprop");
 
         store.addTemplate(
-            new Template("testCorrect",
+            Template.createTemplate("testCorrect",
                 new ParameterList(varC1, varC2),
                 Stream.of(
                     new Instance("hasInt",
@@ -243,26 +242,26 @@ public class CheckFactoryTest {
         classVar.setType(TypeFactory.getType(OWL.Class));
         Term objpropVar = new IRITerm("ex.com/objpropVar");
         objpropVar.setType(TypeFactory.getType(OWL.ObjectProperty));
-        Term intVar = new LiteralTerm("7", TypeFactory.getType(XSD.integer).getIRI());
+        Term intVar = new LiteralTerm("7", TypeFactory.getType(XSD.integer).getIri());
 
         store.addTemplateSignature(
-            new Signature("hasInt",
+            Template.createSignature("hasInt",
                 new ParameterList(classVar, objpropVar, intVar)));
 
         Term classVar2 = new IRITerm("ex.com/class");
         classVar2.setType(TypeFactory.getType(OWL.Class));
-        Term intVar2 = new LiteralTerm("1", TypeFactory.getType(XSD.integer).getIRI());
+        Term intVar2 = new LiteralTerm("1", TypeFactory.getType(XSD.integer).getIri());
 
         Term classVar2b = new IRITerm("ex.com/class");
-        Term intVar21b = new LiteralTerm("1", TypeFactory.getType(XSD.integer).getIRI());
-        Term intVar22b = new LiteralTerm("1", TypeFactory.getType(XSD.integer).getIRI());
+        Term intVar21b = new LiteralTerm("1", TypeFactory.getType(XSD.integer).getIri());
+        Term intVar22b = new LiteralTerm("1", TypeFactory.getType(XSD.integer).getIri());
 
         Term propClass1 = new IRITerm("ex.com/nicepropclass");
         Term propClass2 = new IRITerm("ex.com/nicepropclass");
         Term prop = new IRITerm("ex.com/niceonlyprop");
 
         store.addTemplate(
-            new Template("testIncorrect",
+            Template.createTemplate("testIncorrect",
                 new ParameterList(classVar2, intVar2),
                 Stream.of(
                     new Instance("hasInt",
@@ -286,23 +285,23 @@ public class CheckFactoryTest {
         varBase1.setType(TypeFactory.getType(OWL.Class));
         Term varBase2 = new IRITerm("ex.com/var2");
         varBase2.setType(TypeFactory.getType(OWL.ObjectProperty));
-        Term varBase3 = new LiteralTerm("7", TypeFactory.getType(XSD.integer).getIRI());
+        Term varBase3 = new LiteralTerm("7", TypeFactory.getType(XSD.integer).getIri());
 
         store.addTemplateSignature(
-            new Signature("hasInt",
+            Template.createSignature("hasInt",
                 new ParameterList(varBase1, varBase2, varBase3)));
 
         Term var1 = new IRITerm("ex.com/iri");
         var1.setType(TypeFactory.getType(OTTR.TypeURI.IRI));
-        Term var2 = new LiteralTerm("1", TypeFactory.getType(XSD.integer).getIRI());
+        Term var2 = new LiteralTerm("1", TypeFactory.getType(XSD.integer).getIri());
 
         Term var1b = new IRITerm("ex.com/iri");
-        Term var2b = new LiteralTerm("1", TypeFactory.getType(XSD.integer).getIRI());
+        Term var2b = new LiteralTerm("1", TypeFactory.getType(XSD.integer).getIri());
 
         Term cons1 = new IRITerm("ex.com/prop1");
 
         store.addTemplate(
-            new Template("testIncorrect",
+            Template.createTemplate("testIncorrect",
                 new ParameterList(var1, var2),
                 Stream.of(
                     new Instance("hasInt",
@@ -324,7 +323,7 @@ public class CheckFactoryTest {
         varBase.setType(new NEListType(TypeFactory.getType(OWL.Class)));
 
         store.addTemplateSignature(
-            new Signature("areClasses",
+            Template.createSignature("areClasses",
                 new ParameterList(varBase)));
 
         Term var = new BlankNodeTerm("_:class");
@@ -333,7 +332,7 @@ public class CheckFactoryTest {
         Term cons = new BlankNodeTerm("_:b");
 
         store.addTemplate(
-            new Template("testCorrect1",
+            Template.createTemplate("testCorrect1",
                 new ParameterList(var),
                 Stream.of(
                     new Instance("areClasses",
@@ -356,16 +355,16 @@ public class CheckFactoryTest {
         varBase.setType(new NEListType(TypeFactory.getType(OWL.Class)));
 
         store.addTemplateSignature(
-            new Signature("areClasses",
+            Template.createSignature("areClasses",
                 new ParameterList(varBase)));
 
         Term varClass = new BlankNodeTerm("_:class");
         varClass.setType(TypeFactory.getType(OWL.Class));
 
-        Term one = new LiteralTerm("1", TypeFactory.getType(XSD.integer).getIRI());
+        Term one = new LiteralTerm("1", TypeFactory.getType(XSD.integer).getIri());
 
         store.addTemplate(
-            new Template("testCorrect1",
+            Template.createTemplate("testCorrect1",
                 new ParameterList(varClass),
                 Stream.of(
                     new Instance("areClasses",
@@ -386,16 +385,16 @@ public class CheckFactoryTest {
         varBase.setType(new NEListType(new NEListType(TypeFactory.getType(OWL.Class))));
 
         store.addTemplateSignature(
-            new Signature("deepLists",
+            Template.createSignature("deepLists",
                 new ParameterList(varBase)));
 
         Term varClass = new BlankNodeTerm("_:class");
         varClass.setType(TypeFactory.getType(OWL.Class));
 
-        Term one = new LiteralTerm("1", TypeFactory.getType(XSD.integer).getIRI());
+        Term one = new LiteralTerm("1", TypeFactory.getType(XSD.integer).getIri());
 
         store.addTemplate(
-            new Template("testCorrect1",
+            Template.createTemplate("testCorrect1",
                 new ParameterList(varClass),
                 Stream.of(
                     new Instance("areClasses",

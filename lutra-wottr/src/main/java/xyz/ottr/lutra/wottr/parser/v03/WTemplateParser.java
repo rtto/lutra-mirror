@@ -80,7 +80,7 @@ public class WTemplateParser implements TemplateParser<Model> {
     }
 
     private Result<Signature> makeTemplateFromResults(String uri, Result<ParameterList> params, Result<Set<Instance>> ins) {
-        return Result.zip(params, ins, (ps, is) -> (Signature) new Template(uri, ps, is));
+        return Result.zip(params, ins, (ps, is) -> (Signature) Template.createTemplate(uri, ps, is));
     }
 
     public Result<Signature> parseTemplateWithImplicitBody(Model model) {
@@ -148,8 +148,8 @@ public class WTemplateParser implements TemplateParser<Model> {
 
         if (template instanceof Template) {
             Set<Instance> newInstances = new HashSet<>();
-            for (Instance ins : ((Template) template).getBody()) {
-                String of = ins.getIRI();
+            for (Instance ins : ((Template) template).getPattern()) {
+                String of = ins.getIri();
                 ArgumentList arguments = ins.getArguments();
                 List<Term> newArgs = new LinkedList<>();
                 Set<Term> newExpanderValues = new HashSet<>();
@@ -172,9 +172,11 @@ public class WTemplateParser implements TemplateParser<Model> {
                     new TermList(newArgs), newExpanderValues, arguments.getListExpander());
                 newInstances.add(new Instance(of, newArguments));
             }
-            return new Template(template.getIRI(), newParamList, newInstances);
+            return Template.createTemplate(template.getIri(), newParamList, newInstances);
         } else {
-            return new Signature(template.getIRI(), newParamList, template.isBaseTemplate());
+            return template.isBaseTemplate()
+                ? Template.createBaseTemplate(template.getIri(), newParamList)
+                : Template.createSignature(template.getIri(), newParamList);
         }
     }
 

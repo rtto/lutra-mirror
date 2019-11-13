@@ -68,7 +68,7 @@ public class WInstanceWriter implements InstanceWriter {
 
     private void addInstance(Instance instance, Model model) {
 
-        Resource templateNode = model.createResource(instance.getIRI());
+        Resource templateNode = model.createResource(instance.getIri());
         Resource instanceNode = model.createResource();
 
         model.add(instanceNode, WOTTR.templateRef, templateNode);

@@ -22,55 +22,39 @@ package xyz.ottr.lutra.model;
  * #L%
  */
 
+import java.util.Locale;
 import java.util.Objects;
-import org.apache.jena.shared.PrefixMapping;
 
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import org.apache.jena.shared.PrefixMapping;
+import xyz.ottr.lutra.OTTR;
+
+@Getter
+@EqualsAndHashCode
 public class Instance {
 
     private final String iri;
-    private final ArgumentList args;
+    private final ArgumentList arguments;
 
-    public Instance(String iri, ArgumentList args) {
+    public Instance(String iri, ArgumentList arguments) {
         this.iri = iri;
-        this.args = args;
+        this.arguments = arguments;
     }
 
-    public String getIRI() {
-        return this.iri;
-    }
-
-    public ArgumentList getArguments() {
-        return this.args;
-    }
-
-    /**
-     * Returns a String similar to toString(), but
-     * IRIs are written as qnames according to the
-     * argument PrefixMapping.
-     */
     public String toString(PrefixMapping prefixes) {
-        String pre = this.args.hasCrossExpander() ? "x | " : this.args.hasZipExpander() ? "z | " : "";
-        String qname = prefixes.qnameFor(this.iri);
-        return pre + ((qname == null) ? this.iri : qname) + this.args.toString(prefixes);
+
+        String expander = Objects.toString(this.arguments.getListExpander(), "").toLowerCase(Locale.ENGLISH);
+        if (!expander.isEmpty()) {
+            expander += " | ";
+        }
+        return expander
+            + prefixes.shortForm(this.iri)
+            + this.arguments.toString(prefixes);
     }
 
     @Override
     public String toString() {
-        String pre = this.args.hasCrossExpander() ? "x | " : this.args.hasZipExpander() ? "z | " : "";
-        return pre + this.iri + this.args.toString();
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(this.iri, this.args);
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        return this == o 
-                || Objects.nonNull(o) 
-                        && getClass() == o.getClass()
-                        && Objects.equals(this.getIRI(), ((Instance) o).getIRI())
-                        && Objects.equals(this.getArguments(), ((Instance) o).getArguments());
+        return toString(OTTR.getDefaultPrefixes());
     }
 }

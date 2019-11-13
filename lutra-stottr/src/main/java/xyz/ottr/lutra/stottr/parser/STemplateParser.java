@@ -66,7 +66,7 @@ public class STemplateParser extends SParser<Signature> implements TemplateParse
 
     private Result<String> parseName(stOTTRParser.TemplateNameContext ctx) {
 
-        return getTermParser().visit(ctx).flatMap(term -> Result.of(((IRITerm) term).getIRI()));
+        return getTermParser().visit(ctx).flatMap(term -> Result.of(((IRITerm) term).getIri()));
     }
 
     private Result<Signature> makeSignature(stOTTRParser.TemplateNameContext nameCtx,
@@ -74,7 +74,10 @@ public class STemplateParser extends SParser<Signature> implements TemplateParse
         
         Result<String> iriRes = parseName(nameCtx);
         Result<ParameterList> paramsRes = this.paramsParser.visit(paramsCtx);
-        return Result.zip(iriRes, paramsRes, (iri, params) -> new Signature(iri, params, isBase));
+        return Result.zip(iriRes, paramsRes, (iri, params) ->
+            isBase
+                ? Template.createBaseTemplate(iri, params)
+                : Template.createSignature(iri, params));
     }
 
     @Override
@@ -104,7 +107,7 @@ public class STemplateParser extends SParser<Signature> implements TemplateParse
 
         Result<Set<Instance>> bodyRes = Result.aggregate(resBody);
 
-        return Result.zip(sigRes, bodyRes, Template::new);
+        return Result.zip(sigRes, bodyRes, Template::createTemplate);
     }
 
     private Map<String, Term> makeVariablesMap(Result<Signature> resSig) {

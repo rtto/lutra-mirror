@@ -56,7 +56,7 @@ public class STemplateWriter implements TemplateWriter {
 
     @Override
     public void accept(Signature template) {
-        this.templates.put(template.getIRI(), template);
+        this.templates.put(template.getIri(), template);
     }
 
     public String write(String iri) {
@@ -105,7 +105,7 @@ public class STemplateWriter implements TemplateWriter {
 
         StringBuilder builder = new StringBuilder();
 
-        builder.append(termWriter.writeIRI(template.getIRI()));
+        builder.append(termWriter.writeIRI(template.getIri()));
         builder.append(STOTTR.Parameters.sigParamsStart);
 
         ParameterList params = template.getParameters();
@@ -155,7 +155,7 @@ public class STemplateWriter implements TemplateWriter {
         StringBuilder builder = new StringBuilder();
 
         if (type instanceof BasicType) {
-            builder.append(termWriter.writeIRI(((BasicType) type).getIRI()));
+            builder.append(termWriter.writeIRI(((BasicType) type).getIri()));
         } else {
 
             String typeStr;
@@ -181,7 +181,7 @@ public class STemplateWriter implements TemplateWriter {
 
     private String writePattern(Template template, STermWriter termWriter) {
         SInstanceWriter instanceWriter = new SPatternInstanceWriter(termWriter);
-        template.getBody().forEach(instanceWriter);
+        template.getPattern().forEach(instanceWriter);
         return instanceWriter.write();
     }
 

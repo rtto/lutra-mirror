@@ -77,7 +77,7 @@ public enum TypeFactory {
                 .toSet().stream()
                 .map(RDFNode::asResource)
                 .map(BasicType::new)
-                .collect(Collectors.toMap(BasicType::getIRI, Function.identity()));
+                .collect(Collectors.toMap(BasicType::getIri, Function.identity()));
     }
 
     private static void initSuperTypes(Model model) {

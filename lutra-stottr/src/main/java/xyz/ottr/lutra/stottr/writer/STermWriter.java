@@ -66,7 +66,7 @@ public class STermWriter {
         if (term instanceof NoneTerm) {
             return STOTTR.Terms.none;
         } else if (term instanceof IRITerm) {
-            return writeIRI(((IRITerm) term).getIRI());
+            return writeIRI(((IRITerm) term).getIri());
         } else if (term instanceof LiteralTerm) {
             return writeLiteral((LiteralTerm) term);
         } else if (term instanceof BlankNodeTerm) {

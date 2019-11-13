@@ -82,7 +82,7 @@ public class SInstanceWriter implements InstanceWriter {
                 .append(" ");
         }
 
-        builder.append(this.termWriter.writeIRI(instance.getIRI()));
+        builder.append(this.termWriter.writeIRI(instance.getIri()));
         builder.append(STOTTR.Terms.insArgStart)
             .append(writeArguments(args))
             .append(STOTTR.Terms.insArgEnd);

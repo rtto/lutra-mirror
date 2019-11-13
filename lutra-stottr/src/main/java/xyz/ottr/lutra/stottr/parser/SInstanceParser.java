@@ -78,7 +78,7 @@ public class SInstanceParser extends SParser<Instance> implements InstanceParser
         // Parse template name
         Result<String> iriRes = getTermParser()
             .visitIri(ctx.templateName().iri())
-            .map(iri -> ((IRITerm) iri).getIRI());
+            .map(iri -> ((IRITerm) iri).getIri());
 
         // Parse arguments and possible list expander
         SArgumentListParser argumentListParser = new SArgumentListParser(getTermParser());

@@ -32,6 +32,7 @@ import org.apache.jena.vocabulary.RDFS;
 import org.apache.jena.vocabulary.XSD;
 import xyz.ottr.lutra.model.ParameterList;
 import xyz.ottr.lutra.model.Signature;
+import xyz.ottr.lutra.model.Template;
 import xyz.ottr.lutra.model.terms.BlankNodeTerm;
 import xyz.ottr.lutra.model.terms.Term;
 import xyz.ottr.lutra.model.terms.TermList;
@@ -79,19 +80,17 @@ public enum OTTR  {
 
             Set<Term> nonBlanks = new HashSet<>();
             nonBlanks.add(pred);
-            Triple = new Signature(
+            Triple = Template.createBaseTemplate(
                 OTTR.BaseURI.Triple,
-                new ParameterList(new TermList(sub, pred, obj), nonBlanks, null, null),
-                true);
+                new ParameterList(new TermList(sub, pred, obj), nonBlanks, null, null));
 
             Set<Term> optionals = new HashSet<>();
             optionals.add(sub);
             optionals.add(pred);
             optionals.add(obj);
-            NullableTriple = new Signature(
+            NullableTriple = Template.createBaseTemplate(
                 OTTR.BaseURI.NullableTriple,
-                new ParameterList(new TermList(sub, pred, obj), nonBlanks, optionals, null),
-                true);
+                new ParameterList(new TermList(sub, pred, obj), nonBlanks, optionals, null));
         }
     }
     

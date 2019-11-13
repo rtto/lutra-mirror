@@ -80,14 +80,14 @@ public class WTemplateWriter implements TemplateWriter {
         
         Resource signatureNode = createSignature(model, template);
         if (template instanceof Template) {
-            for (Instance instance : ((Template) template).getBody()) {
+            for (Instance instance : ((Template) template).getPattern()) {
                 Resource instanceNode = this.instanceWriter.createInstanceNode(model, instance);
                 model.add(signatureNode, WOTTR.pattern, instanceNode);
             }
         }
 
         PrefixMappings.trim(model);
-        this.models.put(template.getIRI(), model);
+        this.models.put(template.getIri(), model);
     }
     
     @Override
@@ -106,7 +106,7 @@ public class WTemplateWriter implements TemplateWriter {
             templateType = WOTTR.TemplateSignature;
         }
 
-        Resource templateIRI = model.createResource(template.getIRI());
+        Resource templateIRI = model.createResource(template.getIri());
         model.add(templateIRI, RDF.type, templateType);
         ParameterList parameters = template.getParameters();
         addParameters(parameters, templateIRI, model);
