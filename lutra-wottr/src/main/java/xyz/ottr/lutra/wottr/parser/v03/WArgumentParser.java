@@ -22,10 +22,10 @@ package xyz.ottr.lutra.wottr.parser.v03;
  * #L%
  */
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.function.Function;
 
@@ -62,7 +62,7 @@ public class WArgumentParser implements Function<Resource, Result<Term>> {
 
         try {
             // Must have a variable/value:
-            Collection<Property> valueProperties = Arrays.asList(WOTTR.value, WOTTR.eachValue);
+            Collection<Property> valueProperties = List.of(WOTTR.value, WOTTR.eachValue);
             Statement varAssignment = ModelSelector.getOptionalStatementWithProperties(this.model, p,
                     valueProperties);
 

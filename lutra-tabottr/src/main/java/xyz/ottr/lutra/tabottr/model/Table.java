@@ -31,9 +31,9 @@ import xyz.ottr.lutra.tabottr.TabOTTR;
 
 public class Table {
 
-    private String[][] data;
-    private int index;
-    private String rowNumberFormat;
+    private final String[][] data;
+    private final int index;
+    private final String rowNumberFormat;
 
     public Table(int index, int height, int width) {
         this.index = index;

@@ -38,8 +38,8 @@ import xyz.ottr.lutra.wottr.vocabulary.v04.WOTTR;
 
 public class TemplateInstructionParser {
 
-    private RDFNodeFactory dataFactory;
-    private TermFactory termFactory;
+    private final RDFNodeFactory dataFactory;
+    private final TermFactory termFactory;
     
     public TemplateInstructionParser(PrefixMapping prefixes) {
         this.dataFactory = new RDFNodeFactory(prefixes);

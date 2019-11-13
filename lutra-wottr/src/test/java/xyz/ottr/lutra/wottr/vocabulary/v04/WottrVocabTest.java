@@ -74,7 +74,7 @@ public class WottrVocabTest {
 
         // collect all constants in clazz
         List<Resource> clazzResources = getConstantsOfType(
-            clazz, Arrays.asList(Resource.class, Property.class), ResourceFactory.createResource());
+            clazz, List.of(Resource.class, Property.class), ResourceFactory.createResource());
 
         // we want all lutraResources to be contained in specResources, i.e. soundness, not completeness
         clazzResources.removeAll(specResources);

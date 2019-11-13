@@ -22,7 +22,6 @@ package xyz.ottr.lutra.model;
  * #L%
  */
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -60,7 +59,7 @@ public class ParameterList extends AbstractTermList {
     }
     
     public ParameterList(Term... elems) {
-        this(Arrays.asList(elems), null, null, null);
+        this(List.of(elems), null, null, null);
     }
 
     public boolean isNonBlank(Term param) {
@@ -113,7 +112,7 @@ public class ParameterList extends AbstractTermList {
         Set<Term> clonedOptionals = new HashSet<>();
         Map<Term, Term> clonedDefaults = new HashMap<>();
 
-        for (Term t : terms.asList()) {
+        for (Term t : this.terms.asList()) {
             Term nt = t.shallowClone();
             clonedTerms.add(nt);
             if (isNonBlank(t)) {
@@ -138,8 +137,8 @@ public class ParameterList extends AbstractTermList {
         String s = "";
         String sep = "";
         for (Term e : asList()) {
-            s = s.concat(sep + e.toString(prefixes));
-            s = s.concat(this.optionals.contains(e) ? " : ?" : "");
+            s = s + sep + e.toString(prefixes);
+            s += this.optionals.contains(e) ? " : ?" : "";
             sep = ", ";
         }
         return "(" + s + ")";
@@ -150,10 +149,10 @@ public class ParameterList extends AbstractTermList {
         String s = "";
         String sep = "";
         for (Term e : asList()) {
-            s = s.concat(sep + e.toString());
-            s = s.concat(this.optionals.contains(e) ? " : ?" : " : ");
+            s = s + sep + e.toString();
+            s += this.optionals.contains(e) ? " : ?" : " : ";
             String type = e.getType().toString();
-            s = s.concat(type);
+            s += type;
             sep = ", ";
         }
         return "(" + s + ")";

@@ -120,7 +120,7 @@ public class MessageHandler {
      */
     private int visitMessagesAndTraces(Consumer<Message> msgConsumer, Consumer<Trace> traceConsumer) {
 
-        int[] mostSevere = new int[] {Integer.MAX_VALUE}; 
+        int[] mostSevere = {Integer.MAX_VALUE};
 
         Trace.visitTraces(this.traces, trace -> {
             for (Message msg : trace.getMessages()) {
@@ -150,7 +150,7 @@ public class MessageHandler {
 
     public void printMessage(Message msg) {
         if (!this.quiet) {
-            printStream.println("\n" + msg);
+            this.printStream.println("\n" + msg);
         }
     }
 
@@ -205,7 +205,7 @@ public class MessageHandler {
     
     public void printLocation(Trace trace) {
         if (!this.quiet) {
-            printStream.print(getLocation(trace));
+            this.printStream.print(getLocation(trace));
         }
     }
     

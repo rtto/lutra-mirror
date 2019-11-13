@@ -111,17 +111,16 @@ public class WParameterParser implements Function<Resource, Result<Term>> {
     private static final Map<Property, TermType> PROPERTY_TERM_TYPE_MAP;
 
     static {
-        Map<Property, TermType> typeMap = new HashMap<>();
-        typeMap.put(WOTTR.literalVariable, TypeFactory.getType(RDFS.Literal));
-        typeMap.put(WOTTR.classVariable, TypeFactory.getType(OWL.Class));
-        typeMap.put(WOTTR.individualVariable, TypeFactory.getType(OWL.NS + "NamedIndividual"));
-        typeMap.put(WOTTR.propertyVariable, TypeFactory.getType(OTTR.TypeURI.IRI));
-        typeMap.put(WOTTR.dataPropertyVariable, TypeFactory.getType(OWL.DatatypeProperty));
-        typeMap.put(WOTTR.annotationPropertyVariable, TypeFactory.getType(OWL.AnnotationProperty));
-        typeMap.put(WOTTR.objectPropertyVariable, TypeFactory.getType(OWL.ObjectProperty));
-        typeMap.put(WOTTR.datatypeVariable, TypeFactory.getType(RDFS.Datatype));
-        typeMap.put(WOTTR.variable, TypeFactory.getTopType());
-        PROPERTY_TERM_TYPE_MAP = Collections.unmodifiableMap(typeMap);
+        PROPERTY_TERM_TYPE_MAP = Map.of(
+            WOTTR.literalVariable, TypeFactory.getType(RDFS.Literal),
+            WOTTR.classVariable, TypeFactory.getType(OWL.Class),
+            WOTTR.individualVariable, TypeFactory.getType(OWL.NS + "NamedIndividual"),
+            WOTTR.propertyVariable, TypeFactory.getType(OTTR.TypeURI.IRI),
+            WOTTR.dataPropertyVariable, TypeFactory.getType(OWL.DatatypeProperty),
+            WOTTR.annotationPropertyVariable, TypeFactory.getType(OWL.AnnotationProperty),
+            WOTTR.objectPropertyVariable, TypeFactory.getType(OWL.ObjectProperty),
+            WOTTR.datatypeVariable, TypeFactory.getType(RDFS.Datatype),
+            WOTTR.variable, TypeFactory.getTopType());
     }
 
     private void setType(Term term, Property property) {

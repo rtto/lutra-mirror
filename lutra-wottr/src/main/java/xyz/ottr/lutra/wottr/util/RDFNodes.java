@@ -61,7 +61,7 @@ public enum RDFNodes {
 
     public static String toString(Collection<? extends RDFNode> nodes) {
         return nodes.stream()
-            .map(node -> toString(node))
+            .map(RDFNodes::toString)
             .collect(Collectors.joining(", ", "[", "]"));
     }
 

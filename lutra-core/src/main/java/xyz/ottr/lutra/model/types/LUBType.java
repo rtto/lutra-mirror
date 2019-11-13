@@ -26,7 +26,7 @@ import xyz.ottr.lutra.OTTR;
 
 public class LUBType implements ComplexType {
 
-    private BasicType inner;
+    private final BasicType inner;
 
     public LUBType(BasicType inner) {
         this.inner = inner;
@@ -49,7 +49,7 @@ public class LUBType implements ComplexType {
             return this.inner.equals(((LUBType) other).getInner());
         } else {
             // LUB<P> subtype of P, and thus all subtypes of P
-            return inner.isSubTypeOf(other);
+            return this.inner.isSubTypeOf(other);
         }
     }
 
@@ -60,7 +60,7 @@ public class LUBType implements ComplexType {
     
     @Override
     public String toString() {
-        return "LUB<" + inner.toString() + ">";
+        return "LUB<" + this.inner.toString() + ">";
     }
 
     @Override

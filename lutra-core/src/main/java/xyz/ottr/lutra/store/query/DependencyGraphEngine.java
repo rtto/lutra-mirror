@@ -129,7 +129,7 @@ public class DependencyGraphEngine extends QueryEngine<DependencyGraph> {
         for (int boundIndex = 0; boundIndex < paramList.size(); boundIndex++) {
             if (paramList.get(boundIndex) != null
                     && (boundVal == null || paramList.get(boundIndex).equals(boundVal))) {
-                tuples.accept(tuple.bind(index, Integer.valueOf(boundIndex))
+                tuples.accept(tuple.bind(index, boundIndex)
                                    .bind(val, paramList.get(boundIndex)));
             }
         }
@@ -151,7 +151,7 @@ public class DependencyGraphEngine extends QueryEngine<DependencyGraph> {
         Stream.Builder<Tuple> tuples = Stream.builder();
         List<Term> paramList = terms.asList();
         for (int boundIndex = 0; boundIndex < paramList.size(); boundIndex++) {
-            tuples.accept(tuple.bind(index, Integer.valueOf(boundIndex)));
+            tuples.accept(tuple.bind(index, boundIndex));
         }
         return tuples.build();
     }
@@ -166,7 +166,7 @@ public class DependencyGraphEngine extends QueryEngine<DependencyGraph> {
     private Stream<Tuple> findOccurences(Tuple tuple, Term term, String inside, String level, int current) {
 
         if (tuple.hasBound(level)
-            && current > tuple.getAs(Integer.class, level).intValue()) {
+            && current > tuple.getAs(Integer.class, level)) {
 
             return Stream.empty(); // Level will never match
         }
@@ -181,7 +181,7 @@ public class DependencyGraphEngine extends QueryEngine<DependencyGraph> {
 
         // Has non-list term, just need to check for equality of level and term
         if (tuple.hasBound(level)
-            && current != tuple.getAs(Integer.class, level).intValue()) {
+            && current != tuple.getAs(Integer.class, level)) {
 
             return Stream.empty();
         }
@@ -214,7 +214,7 @@ public class DependencyGraphEngine extends QueryEngine<DependencyGraph> {
         TermType boundType = tuple.getAs(TermType.class, type);
 
         if (tuple.hasBound(level)) {
-            int boundLvl = tuple.getAs(Integer.class, level).intValue();
+            int boundLvl = tuple.getAs(Integer.class, level);
             return bindInnerTypeAt(tuple, boundType, boundLvl, inner);
         }
         return bindInnerTypes(tuple, boundType, level, inner, 0);
@@ -405,7 +405,7 @@ public class DependencyGraphEngine extends QueryEngine<DependencyGraph> {
 
         Optional<Term> unified = boundVal1.unify(boundVal2);
 
-        if (!unified.isPresent()) {
+        if (unified.isEmpty()) {
             return Stream.empty();
         }
 
@@ -455,7 +455,7 @@ public class DependencyGraphEngine extends QueryEngine<DependencyGraph> {
                 }
                 if (!visited.contains(ins)) {
                     tuples.add(tuple.bind(instanceIRI, ins));
-                    this.store.getDependencies(ins).ifPresent(iris -> nextNext.addAll(iris));
+                    this.store.getDependencies(ins).ifPresent(nextNext::addAll);
                 }
             }
             visited.addAll(next);

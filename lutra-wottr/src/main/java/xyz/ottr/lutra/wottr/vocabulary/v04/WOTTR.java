@@ -22,8 +22,6 @@ package xyz.ottr.lutra.wottr.vocabulary.v04;
  * #L%
  */
 
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 import org.apache.commons.collections4.BidiMap;
@@ -93,7 +91,7 @@ public class WOTTR implements WOTTRVocabulary {
     }
 
     protected static <X> List<X> getList(X... objects) {
-        return Collections.unmodifiableList(Arrays.asList(objects));
+        return List.of(objects);
     }
 
     public static final WOTTRVocabulary theInstance = new WOTTR();

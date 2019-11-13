@@ -24,7 +24,6 @@ package xyz.ottr.lutra.system;
 
 import static org.hamcrest.CoreMatchers.is;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -70,7 +69,7 @@ public class ResultTest {
     }
 
     private void testEqualMessages(Result r, Message... messages) {
-        Assert.assertThat(getSortedMessages(r.getAllMessages()), is(getSortedMessages(Arrays.asList(messages))));
+        Assert.assertThat(getSortedMessages(r.getAllMessages()), is(getSortedMessages(List.of(messages))));
     }
 
     private List<String> getSortedMessages(Collection<Message> messages) {

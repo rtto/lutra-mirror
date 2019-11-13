@@ -70,18 +70,16 @@ public class DependencyGraph implements TemplateStore {
      *         in argument set
      */
     public static Predicate<Dependency> vocabularyExpansionPredicate(Set<String> iris) {
-        return (e) -> {
-            return iris.contains(e.to.getIRI());
-        };
+        return (e) -> iris.contains(e.to.getIRI());
     }
 
-    private Set<TemplateNode> roots;
-    private Map<String, TemplateNode> nodes;
-    private Map<TemplateNode, Set<Dependency>> dependencies;
-    private Map<String, Set<String>> instanceIndex;
-    private ReaderRegistry readerRegistry;
+    private final Set<TemplateNode> roots;
+    private final Map<String, TemplateNode> nodes;
+    private final Map<TemplateNode, Set<Dependency>> dependencies;
+    private final Map<String, Set<String>> instanceIndex;
+    private final ReaderRegistry readerRegistry;
 
-    private final Logger log = LoggerFactory.getLogger(DependencyGraph.class);
+    private static final Logger log = LoggerFactory.getLogger(DependencyGraph.class);
 
     /**
      * Constructs a graph representing template definitions and instances.
@@ -102,8 +100,9 @@ public class DependencyGraph implements TemplateStore {
     }
 
     private void addInstanceToIndex(String instance, String template) {
-        instanceIndex.putIfAbsent(instance, new HashSet<>());
-        instanceIndex.get(instance).add(template);
+
+        this.instanceIndex.putIfAbsent(instance, new HashSet<>());
+        this.instanceIndex.get(instance).add(template);
     }
 
     private void addInstanceToIndex(String instance, ArgumentList args, String template) {
@@ -115,7 +114,8 @@ public class DependencyGraph implements TemplateStore {
     }
 
     private void removeInstanceFromIndex(String instance, String template) {
-        instanceIndex.get(instance).remove(template);
+
+        this.instanceIndex.get(instance).remove(template);
     }
 
     private void removeInstanceFromIndex(String instance, ArgumentList args, String template) {
@@ -127,9 +127,9 @@ public class DependencyGraph implements TemplateStore {
     }
 
     private void addNode(TemplateNode n) {
-        if (!nodes.containsKey(n.getIRI())) {
+        if (!this.nodes.containsKey(n.getIRI())) {
             this.roots.add(n);
-            this.dependencies.put(n, new HashSet<Dependency>());
+            this.dependencies.put(n, new HashSet<>());
             this.nodes.put(n.getIRI(), n);
         }
     }
@@ -197,7 +197,7 @@ public class DependencyGraph implements TemplateStore {
             if (!this.dependencies.get(tempNode).isEmpty()) {
                 return false;
             }
-            log.info("Adding body for template " + template.getIRI());
+            this.log.info("Adding body for template " + template.getIRI());
             for (Instance i : template.getBody()) {
                 TemplateNode insNode = addTemplateNode(i.getIRI());
                 addDependency(tempNode, i.getArguments(), insNode);
@@ -248,7 +248,7 @@ public class DependencyGraph implements TemplateStore {
      * returns empty Result.
      */
     public Result<TemplateNode> checkIsTemplate(String iri) {
-        TemplateNode node = nodes.get(iri);
+        TemplateNode node = this.nodes.get(iri);
         if (node == null) {
             return Result.empty(Message.error("IRI not found in TemplateStore: " + iri + "."));
         }
@@ -298,7 +298,7 @@ public class DependencyGraph implements TemplateStore {
         // Compute unifier
         Stream<Tuple> ans = unifiesBodyConstants(toUse, toChange);
         Optional<Tuple> optUnifier = ans.findAny();
-        if (!optUnifier.isPresent()) {
+        if (optUnifier.isEmpty()) {
             return false;
         }
         Substitution unifier = optUnifier.get().getAs(Substitution.class, "UB");
@@ -373,14 +373,14 @@ public class DependencyGraph implements TemplateStore {
         for (Result<Dependency> edgeRes : toExpand) {
 
             // Check that we can and should expand
-            final Result<Dependency> checkedEdge = edgeRes.flatMap(edge -> checkForExpansionErrors(edge));
+            Result<Dependency> checkedEdge = edgeRes.flatMap(this::checkForExpansionErrors);
             if (!checkedEdge.isPresent()) {
                 unexpanded.add(checkedEdge);
                 continue;
             } else if (!checkedEdge.filter(shouldExpand).isPresent()) {
                 unexpanded.add(checkedEdge);
                 continue; 
-            } else if (checkedEdge.filter(edge -> edge.shouldDiscard()).isPresent()) {
+            } else if (checkedEdge.filter(Dependency::shouldDiscard).isPresent()) {
                 continue;
             }
 
@@ -457,8 +457,8 @@ public class DependencyGraph implements TemplateStore {
 
     @Override
     public Set<String> getIRIs(Predicate<String> pred) {
-        return nodes.keySet().stream()
-            .filter(iri -> pred.test(iri))
+        return this.nodes.keySet().stream()
+            .filter(pred::test)
             .collect(Collectors.toSet());
     }
 
@@ -466,10 +466,10 @@ public class DependencyGraph implements TemplateStore {
     public Result<Template> getTemplate(String iri) {
 
         Result<TemplateNode> resTemplate = checkIsTemplate(iri);
-        Set<Instance> body = new HashSet<Instance>();
+        Set<Instance> body = new HashSet<>();
 
         resTemplate.ifPresent(template -> {
-            for (Dependency d : dependencies.get(template)) {
+            for (Dependency d : this.dependencies.get(template)) {
                 body.add(new Instance(d.to.getIRI(), d.argumentList));
             }
         });
@@ -606,7 +606,7 @@ public class DependencyGraph implements TemplateStore {
      */
     public Result<DependencyGraph> expandOnly(Predicate<Dependency> shouldExpand) {
 
-        log.info("Expanding definitions.");
+        this.log.info("Expanding definitions.");
         List<TemplateNode> sorted = topologicallySort();
 
         DependencyGraph ngraph = new DependencyGraph(this.readerRegistry);
@@ -666,7 +666,7 @@ public class DependencyGraph implements TemplateStore {
             str.append(node.toString() + ":" + "\n");
             Map<TemplateNode, Set<ArgumentList>> deps = new HashMap<>();
             for (Dependency e : ens.getValue()) {
-                deps.putIfAbsent(e.to, new HashSet<ArgumentList>());
+                deps.putIfAbsent(e.to, new HashSet<>());
                 deps.get(e.to).add(e.argumentList);
             }
             for (Map.Entry<TemplateNode, Set<ArgumentList>> dep : deps.entrySet()) {

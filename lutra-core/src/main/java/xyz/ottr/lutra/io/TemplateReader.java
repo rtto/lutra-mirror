@@ -44,7 +44,7 @@ public class TemplateReader implements Function<String, ResultStream<Signature>>
 
     private final Function<String, ResultStream<Signature>> templatePipeline;
     private final TemplateParser<?> parser; // Needed for retrieving used prefixes
-    private final Logger log = LoggerFactory.getLogger(TemplateReader.class);
+    private static final Logger log = LoggerFactory.getLogger(TemplateReader.class);
     private final String format;
 
     public <M> TemplateReader(InputReader<String, M> templateInputReader,
@@ -60,7 +60,7 @@ public class TemplateReader implements Function<String, ResultStream<Signature>>
     }
 
     public Map<String, String> getPrefixes() {
-        return parser.getPrefixes();
+        return this.parser.getPrefixes();
     }
     
     public String getFormat() {
@@ -107,7 +107,8 @@ public class TemplateReader implements Function<String, ResultStream<Signature>>
      */
     public MessageHandler loadTemplatesFromFolder(TemplateStore store, String folder,
             String[] includeExtensions, String[] excludeExtensions) {
-        log.info("Loading all templates from folder " + folder + " with suffix "
+
+        this.log.info("Loading all templates from folder " + folder + " with suffix "
                 + Arrays.toString(includeExtensions) + " except " + Arrays.toString(excludeExtensions));
 
         return populateTemplateStore(store,
@@ -138,6 +139,6 @@ public class TemplateReader implements Function<String, ResultStream<Signature>>
     
     @Override
     public String toString() {
-        return parser.toString();
+        return this.parser.toString();
     }
 }

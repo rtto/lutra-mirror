@@ -23,7 +23,6 @@ package xyz.ottr.lutra.wottr.parser.v04;
  */
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.function.Function;
@@ -75,7 +74,7 @@ public class WTripleSerialiser {
         triples.addAll(serialisePropertyList(template, WOTTR.parameters, this::serialiseParameter));
 
         // serialise instances in ottr:pattern and ottr:annotation
-        for (Property property : Arrays.asList(WOTTR.pattern, WOTTR.annotation)) {
+        for (Property property : List.of(WOTTR.pattern, WOTTR.annotation)) {
             listStatements(template, property).forEachRemaining(statement ->
                 triples.addAll(serialiseInstance(statement.getObject().asResource())));
         }
@@ -88,7 +87,7 @@ public class WTripleSerialiser {
         triples.addAll(listStatements(parameter));
 
         // type and default value may be list of lists:
-        for (Property property : Arrays.asList(WOTTR.type, WOTTR.defaultVal)) {
+        for (Property property : List.of(WOTTR.type, WOTTR.defaultVal)) {
             listStatements(parameter, property).forEachRemaining(statement -> {
                 if (statement.getObject().asResource().canAs(RDFList.class)) {
                     triples.addAll(serialiseList(statement.getObject().asResource(), true));

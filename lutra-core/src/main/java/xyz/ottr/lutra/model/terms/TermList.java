@@ -22,7 +22,6 @@ package xyz.ottr.lutra.model.terms;
  * #L%
  */
 
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
@@ -50,7 +49,7 @@ public class TermList extends Term {
     }
 
     public TermList(Term... terms) {
-        this(Arrays.asList(terms));
+        this(List.of(terms));
     }
 
     /**
@@ -62,7 +61,7 @@ public class TermList extends Term {
      */
     public void recomputeType() {
 
-        for (Term inner : terms) {
+        for (Term inner : this.terms) {
             if (inner instanceof TermList) {
                 ((TermList) inner).recomputeType();
             }
@@ -80,15 +79,15 @@ public class TermList extends Term {
     }
     
     public int size() {
-        return terms.size();
+        return this.terms.size();
     }
 
     public boolean isEmpty() {
-        return terms.isEmpty();
+        return this.terms.isEmpty();
     }
 
     public Term get(int i) {
-        return terms.get(i);
+        return this.terms.get(i);
     }
 
     public boolean equalContentAs(TermList o) {
@@ -128,7 +127,7 @@ public class TermList extends Term {
 
         for (int i = 0; i < this.terms.size(); i++) {
             Optional<Term> ot = this.terms.get(i).unify(othersList.get(i));
-            if (!ot.isPresent()) {
+            if (ot.isEmpty()) {
                 return Optional.empty();
             }
             result.add(ot.get());
@@ -138,7 +137,7 @@ public class TermList extends Term {
 
     @Override
     public Object getIdentifier() {
-        return listID;
+        return this.listID;
     }
     
     @Override
@@ -149,11 +148,11 @@ public class TermList extends Term {
             s.append(sep + e.toString(prefixes));
             sep = ",";
         }
-        return "<" + s.toString() + ">" + ">(" + listID + ")";
+        return "<" + s.toString() + ">" + ">(" + this.listID + ")";
     }
 
     @Override
     public String toString() {
-        return "<" + StringUtils.join(this.terms, ", ") + ">(" + listID + ")";
+        return "<" + StringUtils.join(this.terms, ", ") + ">(" + this.listID + ")";
     }
 }

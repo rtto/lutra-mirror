@@ -47,7 +47,7 @@ import xyz.ottr.lutra.system.ResultStream;
 
 public class JDBCSource implements Source<String> {
 
-    private final Logger log = LoggerFactory.getLogger(JDBCSource.class);
+    private static final Logger log = LoggerFactory.getLogger(JDBCSource.class);
 
     private final BasicDataSource dataSource;
 

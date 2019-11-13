@@ -36,7 +36,7 @@ import xyz.ottr.lutra.model.types.TermType;
 public class Template extends Signature {
 
     //private Set<Instance> head;
-    private Set<Instance> body;
+    private final Set<Instance> body;
     
     public Template(String iri, ParameterList params, Set<Instance> body) {
         super(iri, params);
@@ -49,7 +49,7 @@ public class Template extends Signature {
     }
 
     public Set<Instance> getBody() {
-        return body;
+        return this.body;
     }
 
     private void setVariableFlagsAndTypes() {
@@ -63,8 +63,8 @@ public class Template extends Signature {
             idTypes.put(var.getIdentifier(), var.getType());
         }
 
-        if (body != null) {
-            body.stream()
+        if (this.body != null) {
+            this.body.stream()
                 .forEach(instance ->
                     setVariableFlagsAndTypes(instance.getArguments().asList(), idTypes));
         }

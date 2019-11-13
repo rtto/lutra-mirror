@@ -23,7 +23,6 @@ package xyz.ottr.lutra.store.query;
  */
 
 import java.io.Serializable;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -672,12 +671,12 @@ public abstract class QueryEngine<S extends TemplateStore> {
             return Stream.empty();
         } else {
             biggestBody = b2Ins;
-            Collections.sort(biggestBody, comp);
+            biggestBody.sort(comp);
             smallestBody = b1Ins;
-            Collections.sort(smallestBody, comp);
+            smallestBody.sort(comp);
         }
 
-        if (smallestBody.size() == 0) {
+        if (smallestBody.isEmpty()) {
             return Stream.empty();
         }
 
@@ -753,7 +752,7 @@ public abstract class QueryEngine<S extends TemplateStore> {
 
         Optional<Substitution> newUni = mu1.mergeWithUnification(mu2);
 
-        return newUni.isPresent() ? Stream.of(tuple.bind(u, newUni.get())) : Stream.empty();
+        return newUni.stream().map(substitution -> tuple.bind(u, substitution));
     }
 
     public Stream<Tuple> applyUnifier(Tuple tuple, String elem, String u, String unified) {

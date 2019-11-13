@@ -53,18 +53,18 @@ public class ResultStream<E> {
      * @see Stream#empty()
      */
     public static <R> ResultStream<R> empty() {
-        return new ResultStream<R>(Stream.empty());
+        return new ResultStream<>(Stream.empty());
     }
 
     /**
      * @see Stream#of(R)
      */
     public static <R> ResultStream<R> of(Result<R> r) {
-        return new ResultStream<R>(Stream.of(r));
+        return new ResultStream<>(Stream.of(r));
     }
 
     public static <R> ResultStream<R> of(Collection<Result<R>> results) {
-        return new ResultStream<R>(results);
+        return new ResultStream<>(results);
     }
 
     /**
@@ -80,7 +80,7 @@ public class ResultStream<E> {
      * in argument Stream.
      */
     public static <R> ResultStream<R> innerOf(Stream<R> stream) {
-        return new ResultStream<>(stream.map(e -> Result.of(e)));
+        return new ResultStream<>(stream.map(Result::of));
     }
 
 
@@ -125,21 +125,21 @@ public class ResultStream<E> {
      * Returns the underlying stream of Results.
      */
     public Stream<Result<E>> getStream() {
-        return results;
+        return this.results;
     }
 
     /**
      * @see Stream#parallel()
      */
     public ResultStream<E> parallel() {
-        return new ResultStream<>(results.parallel());
+        return new ResultStream<>(this.results.parallel());
     }
 
     /**
      * @see Stream#sequential()
      */
     public ResultStream<E> sequential() {
-        return new ResultStream<>(results.sequential());
+        return new ResultStream<>(this.results.sequential());
     }
 
     /**
@@ -191,14 +191,15 @@ public class ResultStream<E> {
      * @see Stream#collect(Collector)
      */
     public <R, A> R collect(Collector<Result<E>, A, R> collector) {
-        return results.collect(collector);
+        return this.results.collect(collector);
     }
 
     /**
      * @see Stream#forEach(Consumer)
      */
     public void forEach(Consumer<? super Result<E>> consumer) {
-        results.forEach(consumer);
+
+        this.results.forEach(consumer);
     }
 
     /**
@@ -206,7 +207,8 @@ public class ResultStream<E> {
      * of each present Result in this stream.
      */
     public void innerForEach(Consumer<? super E> consumer) {
-        results.forEach(r -> r.ifPresent(consumer));
+
+        this.results.forEach(r -> r.ifPresent(consumer));
     }
 
     /**
@@ -276,7 +278,7 @@ public class ResultStream<E> {
             }
         }
 
-        Result<Stream<E>> res = Result.ofNullable(unpacked).map(unp -> unp.stream());
+        Result<Stream<E>> res = Result.ofNullable(unpacked).map(Collection::stream);
         res.addToTrace(Trace.fork(traces));
         return res;
     }

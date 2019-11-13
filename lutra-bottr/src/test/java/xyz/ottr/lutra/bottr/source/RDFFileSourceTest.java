@@ -26,7 +26,6 @@ import static org.junit.Assert.assertEquals;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Arrays;
 import java.util.List;
 
 import org.apache.jena.rdf.model.RDFNode;
@@ -45,7 +44,7 @@ public class RDFFileSourceTest {
     @Test
     public void prototypeTest() {
 
-        List<String> modelURIs = Arrays.asList(getResourceFile("a.ttl"), getResourceFile("b.ttl"));
+        List<String> modelURIs = List.of(getResourceFile("a.ttl"), getResourceFile("b.ttl"));
 
         Source<RDFNode> source = new RDFFileSource(modelURIs);
 

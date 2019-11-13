@@ -46,7 +46,8 @@ import xyz.ottr.lutra.model.terms.LiteralTerm;
 import xyz.ottr.lutra.model.terms.Term;
 import xyz.ottr.lutra.model.terms.TermList;
 
-public class TypeFactory {
+public enum TypeFactory {
+    ;
 
     private static Map<String, BasicType> iris;
     private static Map<BasicType, Set<BasicType>> superTypes;
@@ -83,7 +84,7 @@ public class TypeFactory {
 
         // prepare the map of types -> set of supertypes
         superTypes = iris.values().stream().collect(
-                Collectors.toMap(Function.identity(), _x -> new HashSet<BasicType>()));
+                Collectors.toMap(Function.identity(), _x -> new HashSet<>()));
         
         Property subTypeOf = model.createProperty(OTTR.TypeURI.subTypeOf);
         model.listStatements((Resource) null, subTypeOf, (RDFNode) null)

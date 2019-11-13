@@ -29,9 +29,9 @@ import xyz.ottr.lutra.model.terms.Term;
 
 public class Signature {
 
-    private String iri;
-    private ParameterList params;
-    private boolean isBaseTemplate;
+    private final String iri;
+    private final ParameterList params;
+    private final boolean isBaseTemplate;
 
     public Signature(String iri, ParameterList params, boolean isBaseTemplate) {
         this.iri = iri;
@@ -59,11 +59,11 @@ public class Signature {
     }
 
     public String getIRI() {
-        return iri;
+        return this.iri;
     }
 
     public ParameterList getParameters() {
-        return params;
+        return this.params;
     }
 
     public boolean isBaseTemplate() {
@@ -76,16 +76,16 @@ public class Signature {
      * argument PrefixMapping.
      */
     public String toString(PrefixMapping prefixes) {
-        String qheadStr = prefixes.qnameFor(iri);
-        String headStr = (qheadStr == null) ? iri : qheadStr;
-        headStr += (params == null) ? "(...)" : params.toString(prefixes);
+        String qheadStr = prefixes.qnameFor(this.iri);
+        String headStr = (qheadStr == null) ? this.iri : qheadStr;
+        headStr += (this.params == null) ? "(...)" : this.params.toString(prefixes);
         return headStr;
     }
 
     @Override
     public String toString() {
-        String headStr = iri;
-        headStr += (params == null) ? "(...)" : params.toString();
+        String headStr = this.iri;
+        headStr += (this.params == null) ? "(...)" : this.params.toString();
         return headStr;
     }
 
