@@ -39,6 +39,6 @@ public class Check {
     }
 
     public Stream<Message> check(QueryEngine<? extends TemplateStore> engine) {
-        return query.eval(engine).map(toMessage).distinct();
+        return this.query.eval(engine).map(this.toMessage).distinct();
     }
 }

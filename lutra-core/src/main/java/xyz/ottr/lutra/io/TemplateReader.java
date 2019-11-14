@@ -44,7 +44,7 @@ public class TemplateReader implements Function<String, ResultStream<TemplateSig
 
     private final Function<String, ResultStream<TemplateSignature>> templatePipeline;
     private final TemplateParser<?> parser; // Needed for retrieving used prefixes
-    private final Logger log = LoggerFactory.getLogger(TemplateReader.class);
+    private static final Logger log = LoggerFactory.getLogger(TemplateReader.class);
     private final String format;
 
     public <M> TemplateReader(InputReader<String, M> templateInputReader,
@@ -60,7 +60,7 @@ public class TemplateReader implements Function<String, ResultStream<TemplateSig
     }
 
     public Map<String, String> getPrefixes() {
-        return parser.getPrefixes();
+        return this.parser.getPrefixes();
     }
     
     public String getFormat() {
@@ -68,7 +68,7 @@ public class TemplateReader implements Function<String, ResultStream<TemplateSig
     }
 
     public ResultStream<TemplateSignature> apply(String file) {
-        return templatePipeline.apply(file);
+        return this.templatePipeline.apply(file);
     }
 
     public MessageHandler populateTemplateStore(TemplateStore store, String iri) {
@@ -80,14 +80,14 @@ public class TemplateReader implements Function<String, ResultStream<TemplateSig
     }
 
     public MessageHandler populateTemplateStore(TemplateStore store, ResultStream<String> iris) {
-        ResultConsumer<TemplateSignature> consumer = new ResultConsumer<TemplateSignature>(store);
-        iris.innerFlatMap(templatePipeline).forEach(consumer);
+        ResultConsumer<TemplateSignature> consumer = new ResultConsumer<>(store);
+        iris.innerFlatMap(this.templatePipeline).forEach(consumer);
         return consumer.getMessageHandler();
     }
 
     public MessageHandler loadTemplatesFromFile(TemplateStore store, String file) {
-        ResultConsumer<TemplateSignature> consumer = new ResultConsumer<TemplateSignature>(store);
-        templatePipeline.apply(file).forEach(consumer);
+        ResultConsumer<TemplateSignature> consumer = new ResultConsumer<>(store);
+        this.templatePipeline.apply(file).forEach(consumer);
         return consumer.getMessageHandler();
     }
 
@@ -107,7 +107,8 @@ public class TemplateReader implements Function<String, ResultStream<TemplateSig
      */
     public MessageHandler loadTemplatesFromFolder(TemplateStore store, String folder,
             String[] includeExtensions, String[] excludeExtensions) {
-        log.info("Loading all templates from folder " + folder + " with suffix "
+
+        this.log.info("Loading all templates from folder " + folder + " with suffix "
                 + Arrays.toString(includeExtensions) + " except " + Arrays.toString(excludeExtensions));
 
         return populateTemplateStore(store,
@@ -130,7 +131,8 @@ public class TemplateReader implements Function<String, ResultStream<TemplateSig
      */
     public ResultStream<TemplateSignature> loadTemplatesFromFolder(String folder,
             String[] includeExtensions, String[] excludeExtensions) {
-        log.info("Loading all templates from folder " + folder + " with suffix "
+
+        this.log.info("Loading all templates from folder " + folder + " with suffix "
                 + Arrays.toString(includeExtensions) + " except " + Arrays.toString(excludeExtensions));
         return Files.loadFromFolder(folder, includeExtensions, excludeExtensions)
             .innerFlatMap(this.templatePipeline);
@@ -138,6 +140,6 @@ public class TemplateReader implements Function<String, ResultStream<TemplateSig
     
     @Override
     public String toString() {
-        return parser.toString();
+        return this.parser.toString();
     }
 }

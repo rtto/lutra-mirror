@@ -26,7 +26,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -72,7 +71,7 @@ public class DependencyGraphTest {
         ResultStream<Template> tempRes = graph.getAllTemplates();
 
         Set<Template> expanded = new HashSet<>();
-        ResultConsumer<Template> consumer = new ResultConsumer<Template>(tmpl -> expanded.add(tmpl));
+        ResultConsumer<Template> consumer = new ResultConsumer<>(expanded::add);
         tempRes.forEach(consumer);
         assertFalse(Message.moreSevere(consumer.getMessageHandler().printMessages(), Message.ERROR));
 
@@ -168,9 +167,9 @@ public class DependencyGraphTest {
                 .collect(Collectors.toSet())),
             new Template(
                 "t2",
-                new ParameterList(Arrays.asList(new ObjectTerm("v", true), new ObjectTerm("u", true)),
+                new ParameterList(List.of(new ObjectTerm("v", true), new ObjectTerm("u", true)),
                                   null,
-                                  new HashSet<>(Arrays.asList(new ObjectTerm("u", true))),
+                                  Set.of(new ObjectTerm("u", true)),
                                   null),
                 Stream.of(new Instance("base",
                                        new ArgumentList(new ObjectTerm("v", true), new ObjectTerm(3))),
@@ -185,7 +184,7 @@ public class DependencyGraphTest {
     @Test
     public void expanderSafe() {
 
-        TermList toListExpand = new TermList(Arrays.asList(new ObjectTerm("v1", true),
+        TermList toListExpand = new TermList(List.of(new ObjectTerm("v1", true),
                                                            new ObjectTerm("v2", true)),
                                              true);
         Set<Template> toExpand = Stream.of(
@@ -201,8 +200,8 @@ public class DependencyGraphTest {
                 "t2",
                 new ParameterList(toListExpand, new ObjectTerm("u", true)),
                 Stream.of(new Instance("t1",
-                                       new ArgumentList(Arrays.asList(toListExpand, new ObjectTerm(3)),
-                                                        new HashSet<>(Arrays.asList(toListExpand)),
+                                       new ArgumentList(List.of(toListExpand, new ObjectTerm(3)),
+                                                        Set.of(toListExpand),
                                                         ArgumentList.Expander.CROSS)),
                           new Instance("base",
                                        new ArgumentList(new ObjectTerm(4), new ObjectTerm("u", true))))
@@ -230,7 +229,7 @@ public class DependencyGraphTest {
         ResultStream<Instance> expandedInsRes = graph.expandInstance(ins);
 
         Set<Instance> expandedIns = new HashSet<>();
-        ResultConsumer<Instance> consumer = new ResultConsumer<Instance>(in -> expandedIns.add(in));
+        ResultConsumer<Instance> consumer = new ResultConsumer<>(expandedIns::add);
         expandedInsRes.forEach(consumer);
         assertFalse(Message.moreSevere(consumer.getMessageHandler().printMessages(), Message.ERROR));
 
@@ -243,7 +242,7 @@ public class DependencyGraphTest {
         ResultStream<Instance> expandedInsRes2 = graph.expandInstance(ins);
 
         Set<Instance> expandedIns2 = new HashSet<>();
-        ResultConsumer<Instance> consumer2 = new ResultConsumer<Instance>(in -> expandedIns2.add(in));
+        ResultConsumer<Instance> consumer2 = new ResultConsumer<>(expandedIns2::add);
         expandedInsRes2.forEach(consumer2);
         assertFalse(Message.moreSevere(consumer2.getMessageHandler().printMessages(), Message.ERROR));
 
@@ -276,15 +275,15 @@ public class DependencyGraphTest {
         Instance ins = new Instance("t2", new ArgumentList(new ObjectTerm(1), new ObjectTerm(2)));
 
         Set<Instance> expandedIns =
-            new HashSet<>(Arrays.asList(new Instance("base",
-                                                     new ArgumentList(new ObjectTerm(1),
-                                                                      new ObjectTerm(3))),
-                                        new Instance("base",
-                                                     new ArgumentList(new ObjectTerm(4),
-                                                                      new ObjectTerm(1))),
-                                        new Instance("base",
-                                                     new ArgumentList(new ObjectTerm(2),
-                                                                      new ObjectTerm(2)))));
+            Set.of(new Instance("base",
+                    new ArgumentList(new ObjectTerm(1),
+                        new ObjectTerm(3))),
+                new Instance("base",
+                    new ArgumentList(new ObjectTerm(4),
+                        new ObjectTerm(1))),
+                new Instance("base",
+                    new ArgumentList(new ObjectTerm(2),
+                        new ObjectTerm(2))));
         expandInstanceAndCheckEquality(ins, expandedIns, templates);
     }
 
@@ -305,8 +304,8 @@ public class DependencyGraphTest {
                 "withCross",
                 new ParameterList(new ObjectTerm("a", true), new ObjectTerm("b", true)),
                 Stream.of(new Instance("base",
-                                       new ArgumentList(Arrays.asList(toListExpand, new ObjectTerm(1)),
-                                                        new HashSet<>(Arrays.asList(toListExpand)),
+                                       new ArgumentList(List.of(toListExpand, new ObjectTerm(1)),
+                                                        Set.of(toListExpand),
                                                         ArgumentList.Expander.CROSS)),
                           new Instance("base",
                                        new ArgumentList(new ObjectTerm(2), new ObjectTerm("b", true))))
@@ -318,7 +317,7 @@ public class DependencyGraphTest {
                     new ParameterList(new ObjectTerm("v", true), new ObjectTerm("u", true)))
         );
         
-        List<Instance> inss = Arrays.asList(
+        List<Instance> inss = List.of(
             new Instance("withCross", new ArgumentList(new BlankNodeTerm(), new ObjectTerm(2))),
             new Instance("signature", new ArgumentList(new ObjectTerm(1), new ObjectTerm(2))),
             new Instance("undefined", new ArgumentList(new ObjectTerm(1), new ObjectTerm(2)))
@@ -338,9 +337,9 @@ public class DependencyGraphTest {
         Set<Template> templates = Stream.of(
             new Template(
                 "t1",
-                new ParameterList(Arrays.asList(new ObjectTerm("a", true), new ObjectTerm("b", true)),
+                new ParameterList(List.of(new ObjectTerm("a", true), new ObjectTerm("b", true)),
                                   null,
-                                  new HashSet<>(Arrays.asList(new ObjectTerm("b", true))),
+                                  Set.of(new ObjectTerm("b", true)),
                                   null),
                 Stream.of(new Instance("base",
                                        new ArgumentList(new ObjectTerm("a", true), new ObjectTerm(1))),
@@ -349,9 +348,9 @@ public class DependencyGraphTest {
                 .collect(Collectors.toSet())),
             new Template(
                 "t2",
-                new ParameterList(Arrays.asList(new ObjectTerm("v", true), new ObjectTerm("u", true)),
+                new ParameterList(List.of(new ObjectTerm("v", true), new ObjectTerm("u", true)),
                                   null,
-                                  new HashSet<>(Arrays.asList(new ObjectTerm("u", true))),
+                                  Set.of(new ObjectTerm("u", true)),
                                   null),
                 Stream.of(new Instance("base",
                                        new ArgumentList(new ObjectTerm("v", true), new ObjectTerm(3))),
@@ -363,12 +362,12 @@ public class DependencyGraphTest {
         Instance ins = new Instance("t2", new ArgumentList(new ObjectTerm(1), new NoneTerm()));
 
         Set<Instance> expandedIns =
-            new HashSet<>(Arrays.asList(new Instance("base",
-                                                     new ArgumentList(new ObjectTerm(1),
-                                                                      new ObjectTerm(3))),
-                                        new Instance("base",
-                                                     new ArgumentList(new ObjectTerm(4),
-                                                                      new ObjectTerm(1)))));
+            Set.of(new Instance("base",
+                    new ArgumentList(new ObjectTerm(1),
+                        new ObjectTerm(3))),
+                new Instance("base",
+                    new ArgumentList(new ObjectTerm(4),
+                        new ObjectTerm(1))));
         expandInstanceAndCheckEquality(ins, expandedIns, templates);
     }
 }

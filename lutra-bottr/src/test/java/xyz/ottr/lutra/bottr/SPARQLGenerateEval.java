@@ -93,7 +93,7 @@ public class SPARQLGenerateEval {
         Path csvFile = this.testRoot.resolve(inFile);
 
         // Set up map to translate source to triple instances
-        ArgumentMaps<String> valMap = new ArgumentMaps<>(prefixes, h2, Arrays.asList(
+        ArgumentMaps<String> valMap = new ArgumentMaps<>(prefixes, h2, List.of(
             new StringArgumentMap(prefixes, TypeFactory.IRI),
             new StringArgumentMap(prefixes),
             new StringArgumentMap(prefixes, TypeFactory.IRI),

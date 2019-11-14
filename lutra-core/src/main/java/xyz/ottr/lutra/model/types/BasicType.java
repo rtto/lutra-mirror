@@ -26,14 +26,14 @@ import org.apache.jena.rdf.model.Resource;
 
 public class BasicType implements TermType {
 
-    private Resource iri;
+    private final Resource iri;
 
     protected BasicType(Resource iri) {
         this.iri = iri;
     }
 
     public String getIRI() {
-        return iri.toString();
+        return this.iri.toString();
     }
 
     @Override

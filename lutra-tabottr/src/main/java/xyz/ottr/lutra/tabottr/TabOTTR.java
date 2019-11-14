@@ -22,8 +22,9 @@ package xyz.ottr.lutra.tabottr;
  * #L%
  */
 
-public abstract class TabOTTR {
-    
+public enum TabOTTR {
+    ;
+
     public static final String TOKEN = "#OTTR";
     
     public static final String INSTRUCTION_TEMPLATE = "template";
