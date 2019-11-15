@@ -40,6 +40,7 @@ import xyz.ottr.lutra.model.terms.TermList;
 @Getter
 public class ParameterList extends AbstractTermList {
 
+    // TODO: Bug, must be based on indicies
     private final Set<Term> nonBlanks;
     private final Set<Term> optionals;
     private final Map<Term, Term> defaultValues;
@@ -68,7 +69,7 @@ public class ParameterList extends AbstractTermList {
     }
 
     public boolean isNonBlank(int index) {
-        return isNonBlank(this.terms.get(index));
+        return isNonBlank(this.termList.get(index));
     }
 
     public boolean hasDefaultValue(Term param) {
@@ -101,7 +102,7 @@ public class ParameterList extends AbstractTermList {
         Set<Term> clonedOptionals = new HashSet<>();
         Map<Term, Term> clonedDefaults = new HashMap<>();
 
-        for (Term t : this.terms.asList()) {
+        for (Term t : this.termList.asList()) {
             Term nt = t.shallowClone();
             clonedTerms.add(nt);
             if (isNonBlank(t)) {
@@ -138,13 +139,13 @@ public class ParameterList extends AbstractTermList {
     public boolean equals(Object o) {
         return this == o
             || this.getClass() == o.getClass()
-            && this.terms.asList().equals(((ParameterList) o).terms.asList())
+            && this.termList.asList().equals(((ParameterList) o).termList.asList())
             && this.defaultValues.equals(((ParameterList) o).defaultValues)
             && this.optionals.equals(((ParameterList) o).optionals);
     }
 
     @Override
     public int hashCode() {
-        return this.terms.asList().hashCode() + 3 * this.defaultValues.hashCode() + 5 * this.optionals.hashCode();
+        return this.termList.asList().hashCode() + 3 * this.defaultValues.hashCode() + 5 * this.optionals.hashCode();
     }
 }

@@ -25,23 +25,33 @@ package xyz.ottr.lutra.model.terms;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.jena.shared.PrefixMapping;
-import xyz.ottr.lutra.model.types.TypeFactory;
 
-public class TermList extends Term {
+import xyz.ottr.lutra.model.types.LUBType;
+import xyz.ottr.lutra.model.types.ListType;
+import xyz.ottr.lutra.model.types.NEListType;
+import xyz.ottr.lutra.model.types.TermType;
+import xyz.ottr.lutra.model.types.TypeRegistry;
 
-    private static int newID = 0;
+public class TermList extends Term implements SimpleList<Term> {
+
+    private static long newID = 0L;
 
     private final List<Term> terms;
-    private final int listID; // Used to distinguish diferent lists but with same elements
+    private final long listID; // Used to distinguish different lists but with same elements
 
     public TermList(List<Term> terms, boolean isVariable) {
+        super(getTermType(terms), isVariable);
         this.terms = terms;
-        this.listID = getNewID();
-        super.setIsVariable(isVariable);
-        super.type = TypeFactory.getConstantType(this);
+        this.listID = generateNewID();
+    }
+
+    private static TermType getTermType(List<Term> terms) {
+        return terms.isEmpty()
+            ? new ListType(TypeRegistry.BOT)
+            : new NEListType(new LUBType(TypeRegistry.TOP));
     }
 
     public TermList(List<Term> terms) {
@@ -66,28 +76,16 @@ public class TermList extends Term {
                 ((TermList) inner).recomputeType();
             }
         }
-        this.type = TypeFactory.getConstantType(this);
+        setType(getTermType(this.terms));
     }
 
-    private static int getNewID() {
-        newID++;
+    private static long generateNewID() {
+        newID += 1;
         return newID;
     }
 
     public List<Term> asList() {
         return this.terms;
-    }
-    
-    public int size() {
-        return this.terms.size();
-    }
-
-    public boolean isEmpty() {
-        return this.terms.isEmpty();
-    }
-
-    public Term get(int i) {
-        return this.terms.get(i);
     }
 
     public boolean equalContentAs(TermList o) {
@@ -101,9 +99,7 @@ public class TermList extends Term {
 
     @Override
     public TermList shallowClone() {
-        TermList t = new TermList(this.terms, this.isVariable);
-        t.setIsVariable(super.isVariable());
-        return t;
+        return new TermList(this.terms, isVariable());
     }
 
     @Override
@@ -142,17 +138,10 @@ public class TermList extends Term {
     
     @Override
     public String toString(PrefixMapping prefixes) {
-        StringBuilder s = new StringBuilder();
-        String sep = "";
-        for (Term e : this.terms) {
-            s.append(sep + e.toString(prefixes));
-            sep = ",";
-        }
-        return "<" + s.toString() + ">" + ">(" + this.listID + ")";
+        return this.terms.stream()
+            .map(t -> t.toString(prefixes))
+            .collect(Collectors.joining(", ", "<", ">"))
+            + "(id: " + this.listID + ")";
     }
 
-    @Override
-    public String toString() {
-        return "<" + StringUtils.join(this.terms, ", ") + ">(" + this.listID + ")";
-    }
 }

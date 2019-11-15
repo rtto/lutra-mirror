@@ -35,7 +35,6 @@ import xyz.ottr.lutra.model.terms.BlankNodeTerm;
 import xyz.ottr.lutra.model.terms.NoneTerm;
 import xyz.ottr.lutra.model.terms.Term;
 import xyz.ottr.lutra.model.terms.TermList;
-import xyz.ottr.lutra.system.Message;
 import xyz.ottr.lutra.system.Result;
 
 public class Substitution {
@@ -58,25 +57,22 @@ public class Substitution {
     public static Result<Substitution> makeSubstitution(ArgumentList args, ParameterList parameters) {
 
         if (args.asList().size() != parameters.asList().size()) {
-            return Result.empty(Message.error(
-                        "Cannot make substitution out of two term lists"
-                        + " with different lengths: " + args.toString()
-                        + " and " + parameters.toString()));
+            return Result.error("Cannot make substitution out of two term lists with different lengths: "
+                + args.toString() + " and " + parameters.toString());
         }
-                        
 
         Map<Term, Term> termSubstitution = new HashMap<>();
         for (int i = 0; i < args.size(); i++) {
-            if (args.get(i) instanceof NoneTerm && parameters.hasDefaultValue(i)) {
-                Term dflt = parameters.getDefaultValue(i);
-                if (dflt instanceof BlankNodeTerm) { // Blank node default results in fresh blank node
-                    termSubstitution.put(parameters.get(i), new BlankNodeTerm());
+            Term argument = args.get(i);
+            if (argument instanceof NoneTerm && parameters.hasDefaultValue(i)) {
+                Term defaultValue = parameters.getDefaultValue(i);
+                if (defaultValue instanceof BlankNodeTerm) { // Blank node default results in fresh blank node
+                    argument = new BlankNodeTerm();
                 } else {
-                    termSubstitution.put(parameters.get(i), dflt);
+                    argument = defaultValue;
                 }
-            } else {
-                termSubstitution.put(parameters.get(i), args.get(i));
             }
+            termSubstitution.put(parameters.get(i), argument);
         }
         return Result.of(new Substitution(termSubstitution));
     }
@@ -149,7 +145,7 @@ public class Substitution {
                 newTermSubs.put(e.getKey(), e.getValue());
             } else {
                 // TODO: Should not(?) unifiy the two values, only succeed if equal
-                //Optional<Term> unified = newTermSubs.get(e.getKey()).unify(e.getValue()); 
+                //Optional<Term> unified = newTermSubs.get(e.getKey()).unify(e.getLiteral());
                 //if (!unified.isPresent()) {
                 //    return Optional.empty();
                 //}

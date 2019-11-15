@@ -22,26 +22,22 @@ package xyz.ottr.lutra.model.terms;
  * #L%
  */
 
-public abstract class ResourceTerm extends Term {
+import java.util.List;
 
-    public boolean isLiteral() {
-        return this instanceof LiteralTerm;
+// TODO Rename to something else?
+public interface SimpleList<X> {
+
+    List<X> asList();
+
+    default int size() {
+        return asList().size();
     }
-    
-    public boolean isIRI() {
-        return this instanceof IRITerm;
+
+    default boolean isEmpty() {
+        return asList().isEmpty();
     }
-    
-    @Override
-    public boolean isBlank() {
-        return this instanceof BlankNodeTerm;
-    }
-    
-    public boolean isConcrete() {
-        return isIRI() || isLiteral();
-    }
-    
-    public boolean isNonLiteral() {
-        return !isLiteral();
+
+    default X get(int i) {
+        return asList().get(i);
     }
 }

@@ -40,7 +40,7 @@ import org.apache.jena.vocabulary.RDFS;
 import xyz.ottr.lutra.OTTR;
 import xyz.ottr.lutra.model.terms.Term;
 import xyz.ottr.lutra.model.types.TermType;
-import xyz.ottr.lutra.model.types.TypeFactory;
+import xyz.ottr.lutra.model.types.TypeRegistry;
 import xyz.ottr.lutra.system.Result;
 import xyz.ottr.lutra.wottr.parser.TermFactory;
 import xyz.ottr.lutra.wottr.parser.v03.util.ModelSelector;
@@ -54,8 +54,6 @@ public class WParameterParser implements Function<Resource, Result<Term>> {
     private final TermFactory rdfTermFactory;
     private final Set<Term> optionals;
     private final Map<Term, Term> defaultValues;
-
-
 
     public WParameterParser(Model model) {
         this.model = model;
@@ -112,18 +110,18 @@ public class WParameterParser implements Function<Resource, Result<Term>> {
 
     static {
         PROPERTY_TERM_TYPE_MAP = Map.of(
-            WOTTR.literalVariable, TypeFactory.getType(RDFS.Literal),
-            WOTTR.classVariable, TypeFactory.getType(OWL.Class),
-            WOTTR.individualVariable, TypeFactory.getType(OWL.NS + "NamedIndividual"),
-            WOTTR.propertyVariable, TypeFactory.getType(OTTR.TypeURI.IRI),
-            WOTTR.dataPropertyVariable, TypeFactory.getType(OWL.DatatypeProperty),
-            WOTTR.annotationPropertyVariable, TypeFactory.getType(OWL.AnnotationProperty),
-            WOTTR.objectPropertyVariable, TypeFactory.getType(OWL.ObjectProperty),
-            WOTTR.datatypeVariable, TypeFactory.getType(RDFS.Datatype),
-            WOTTR.variable, TypeFactory.getTopType());
+            WOTTR.literalVariable, TypeRegistry.getType(RDFS.Literal),
+            WOTTR.classVariable, TypeRegistry.getType(OWL.Class),
+            WOTTR.individualVariable, TypeRegistry.getType(OWL.NS + "NamedIndividual"),
+            WOTTR.propertyVariable, TypeRegistry.getType(OTTR.TypeURI.IRI),
+            WOTTR.dataPropertyVariable, TypeRegistry.getType(OWL.DatatypeProperty),
+            WOTTR.annotationPropertyVariable, TypeRegistry.getType(OWL.AnnotationProperty),
+            WOTTR.objectPropertyVariable, TypeRegistry.getType(OWL.ObjectProperty),
+            WOTTR.datatypeVariable, TypeRegistry.getType(RDFS.Datatype),
+            WOTTR.variable, TypeRegistry.TOP);
     }
 
     private void setType(Term term, Property property) {
-        term.setType(PROPERTY_TERM_TYPE_MAP.getOrDefault(property, TypeFactory.getVariableType(term)));
+        term.setType(PROPERTY_TERM_TYPE_MAP.getOrDefault(property, term.getVariableType()));
     }
 }

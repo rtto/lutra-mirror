@@ -22,65 +22,55 @@ package xyz.ottr.lutra.model.terms;
  * #L%
  */
 
+import java.util.Objects;
 import java.util.Optional;
 
+import lombok.Getter;
+import lombok.NonNull;
+import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.XSD;
-import xyz.ottr.lutra.model.types.TypeFactory;
+import xyz.ottr.lutra.model.types.TermType;
+import xyz.ottr.lutra.model.types.TypeRegistry;
 
-public class LiteralTerm extends ResourceTerm {
+@Getter
+public class LiteralTerm extends Term {
 
-    private final String value;
-    private final String datatype; // Might be an undefined TermType, thus not used for type-checking
-    private final String langtag;
+    public static final String LANG_STRING_DATATYPE = RDF.dtLangString.getURI();
+    public static final String PLAIN_STRING_DATATYPE = XSD.xstring.toString();
 
-    public LiteralTerm(String value) {
-        this(value, XSD.xstring.toString(), null);
-    }
+    @NonNull private final String value;
+    @NonNull private final String datatype;
+    private final String languageTag;
 
-    // TODO: Remove, and replace calls with this#typedLiteral
-    public LiteralTerm(String value, String datatype) {
+    private LiteralTerm(String value, String datatype, String languageTag) {
+        super(getTermType(datatype), false);
         this.value = value;
         this.datatype = datatype;
-        this.langtag = null;
-        super.type = TypeFactory.getConstantType(this);
+        this.languageTag = languageTag;
     }
 
-    private LiteralTerm(String value, String datatype, String langtag) {
-        this.value = value;
-        this.datatype = datatype;
-        this.langtag = langtag;
-        super.type = TypeFactory.getConstantType(this);
+    private static TermType getTermType(String datatype) {
+        return Objects.requireNonNullElse(TypeRegistry.getType(datatype), TypeRegistry.LITERAL);
     }
 
-    public static LiteralTerm taggedLiteral(String value, String langtag) {
-        return new LiteralTerm(value, null, langtag);
+    public static LiteralTerm createLanguageTagLiteral(String value, @NonNull String languageTag) {
+        return new LiteralTerm(value, LANG_STRING_DATATYPE, languageTag);
     }
 
-    public static LiteralTerm typedLiteral(String value, String datatype) {
+    public static LiteralTerm createTypedLiteral(String value, String datatype) {
         return new LiteralTerm(value, datatype, null);
     }
 
-    public String getDatatype() {
-        return this.datatype;
+    public static LiteralTerm createPlainLiteral(String value) {
+        return new LiteralTerm(value, PLAIN_STRING_DATATYPE, null);
     }
 
-    public String getLangTag() {
-        return this.langtag;
+    public boolean isLanguageTagged() {
+        return Objects.nonNull(languageTag);
     }
 
-    public String getValue() {
-
-        String suffix = "";
-        if (getLangTag() != null) {
-            suffix = "@" + getLangTag();
-        } else if (getDatatype() != null) {
-            suffix = " : " + getDatatype();
-        }
-        return "\"" + this.value + "\"" + suffix;
-    }
-
-    public String getPureValue() {
-        return this.value;
+    public boolean isPlainLiteral() {
+        return PLAIN_STRING_DATATYPE.equals(datatype);
     }
 
     @Override
@@ -90,9 +80,9 @@ public class LiteralTerm extends ResourceTerm {
 
     @Override
     public LiteralTerm shallowClone() {
-        LiteralTerm trm = new LiteralTerm(this.value, getDatatype(), getLangTag());
-        trm.setIsVariable(super.isVariable());
-        return trm;
+        LiteralTerm term = new LiteralTerm(this.value, this.datatype, this.languageTag);
+        term.setVariable(isVariable());
+        return term;
     }
 
     @Override
@@ -111,6 +101,9 @@ public class LiteralTerm extends ResourceTerm {
 
     @Override
     public String getIdentifier() {
-        return getValue();
+        return "\"" + this.value + "\""
+            + (Objects.nonNull(this.languageTag)
+            ? "@" + this.languageTag
+            : "^^" + this.datatype);
     }
 }

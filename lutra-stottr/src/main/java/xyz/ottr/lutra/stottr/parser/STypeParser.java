@@ -28,7 +28,7 @@ import xyz.ottr.lutra.model.types.LUBType;
 import xyz.ottr.lutra.model.types.ListType;
 import xyz.ottr.lutra.model.types.NEListType;
 import xyz.ottr.lutra.model.types.TermType;
-import xyz.ottr.lutra.model.types.TypeFactory;
+import xyz.ottr.lutra.model.types.TypeRegistry;
 import xyz.ottr.lutra.stottr.antlr.stOTTRParser;
 import xyz.ottr.lutra.system.Result;
 
@@ -66,6 +66,6 @@ public class STypeParser extends SBaseParserVisitor<TermType> {
     @Override
     public Result<TermType> visitBasicType(stOTTRParser.BasicTypeContext ctx) {
         Result<String> iriRes = this.termParser.visit(ctx).map(term -> ((IRITerm) term).getIri());
-        return iriRes.map(TypeFactory::getType);
+        return iriRes.map(TypeRegistry::getType);
     }
 }

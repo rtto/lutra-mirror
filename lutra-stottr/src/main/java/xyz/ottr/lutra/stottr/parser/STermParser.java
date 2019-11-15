@@ -110,7 +110,7 @@ public class STermParser extends SBaseParserVisitor<Term> {
 
         if (ctx.BooleanLiteral() != null) {
             String litVal = ctx.BooleanLiteral().getSymbol().getText();
-            return Result.of(new LiteralTerm(litVal, XSD.xboolean.getURI()));
+            return Result.of(LiteralTerm.createTypedLiteral(litVal, XSD.xboolean.getURI()));
         }
         return visitChildren(ctx);
     }
@@ -145,7 +145,7 @@ public class STermParser extends SBaseParserVisitor<Term> {
         }
 
         String val = valNode.getSymbol().getText();
-        return Result.of(new LiteralTerm(val, type));
+        return Result.of(LiteralTerm.createTypedLiteral(val, type));
     }
     
     @Override
@@ -160,16 +160,16 @@ public class STermParser extends SBaseParserVisitor<Term> {
         if (ctx.LANGTAG() != null) { // Language tag present
             String tag = ctx.LANGTAG().getSymbol().getText();
             tag = atPat.matcher(tag).replaceFirst(""); // Remove the @-prefix
-            return Result.of(LiteralTerm.taggedLiteral(val, tag));
+            return Result.of(LiteralTerm.createLanguageTagLiteral(val, tag));
         }
 
         if (ctx.iri() != null) { // Explicit type present
             Result<Term> iriTermRes = visitIri(ctx.iri());
             return iriTermRes.flatMap(iri ->
-                Result.of(LiteralTerm.typedLiteral(val, ((IRITerm) iri).getIri())));
+                Result.of(LiteralTerm.createTypedLiteral(val, ((IRITerm) iri).getIri())));
         }
 
-        return Result.of(new LiteralTerm(val));
+        return Result.of(LiteralTerm.createPlainLiteral(val));
     }
     
     @Override

@@ -38,7 +38,7 @@ import xyz.ottr.lutra.bottr.source.StringArgumentMap;
 import xyz.ottr.lutra.model.ArgumentList;
 import xyz.ottr.lutra.model.Instance;
 import xyz.ottr.lutra.model.terms.IRITerm;
-import xyz.ottr.lutra.model.types.TypeFactory;
+import xyz.ottr.lutra.model.types.TypeRegistry;
 import xyz.ottr.lutra.system.Result;
 import xyz.ottr.lutra.system.ResultStream;
 
@@ -81,7 +81,7 @@ public class MapTest {
 
         Source<String> source = new StaticTestSource();
         PrefixMapping prefixes = OTTR.getDefaultPrefixes();
-        StringArgumentMap iriMap = new StringArgumentMap(prefixes, TypeFactory.IRI);
+        StringArgumentMap iriMap = new StringArgumentMap(prefixes, TypeRegistry.IRI);
 
         // Set up map to translate source to triple instances
         ArgumentMaps<String> valMap = new ArgumentMaps<>(PrefixMapping.Standard, source,

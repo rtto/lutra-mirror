@@ -47,7 +47,7 @@ import xyz.ottr.lutra.bottr.source.H2Source;
 import xyz.ottr.lutra.bottr.source.StringArgumentMap;
 import xyz.ottr.lutra.io.TemplateReader;
 import xyz.ottr.lutra.model.Instance;
-import xyz.ottr.lutra.model.types.TypeFactory;
+import xyz.ottr.lutra.model.types.TypeRegistry;
 import xyz.ottr.lutra.system.Message;
 import xyz.ottr.lutra.system.MessageHandler;
 import xyz.ottr.lutra.system.Result;
@@ -94,13 +94,13 @@ public class SPARQLGenerateEval {
 
         // Set up map to translate source to triple instances
         ArgumentMaps<String> valMap = new ArgumentMaps<>(prefixes, h2, List.of(
-            new StringArgumentMap(prefixes, TypeFactory.IRI),
+            new StringArgumentMap(prefixes, TypeRegistry.IRI),
             new StringArgumentMap(prefixes),
-            new StringArgumentMap(prefixes, TypeFactory.IRI),
-            new StringArgumentMap(prefixes, TypeFactory.IRI),
-            new StringArgumentMap(prefixes, TypeFactory.getType(XSD.dateTime.toString())),
-            new StringArgumentMap(prefixes, TypeFactory.getType(XSD.decimal.toString())),
-            new StringArgumentMap(prefixes, TypeFactory.getType(XSD.decimal.toString()))
+            new StringArgumentMap(prefixes, TypeRegistry.IRI),
+            new StringArgumentMap(prefixes, TypeRegistry.IRI),
+            new StringArgumentMap(prefixes, TypeRegistry.getType(XSD.dateTime.toString())),
+            new StringArgumentMap(prefixes, TypeRegistry.getType(XSD.decimal.toString())),
+            new StringArgumentMap(prefixes, TypeRegistry.getType(XSD.decimal.toString()))
         ));
 
         // map data to triples

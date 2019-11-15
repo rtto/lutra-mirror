@@ -24,42 +24,47 @@ package xyz.ottr.lutra.model.terms;
 
 import java.util.Optional;
 
-import xyz.ottr.lutra.model.types.TypeFactory;
+import lombok.Getter;
+import lombok.NonNull;
+import xyz.ottr.lutra.model.types.LUBType;
+import xyz.ottr.lutra.model.types.TypeRegistry;
 
-public class BlankNodeTerm extends ResourceTerm {
+@Getter
+public class BlankNodeTerm extends Term {
 
-    private static int newID = 0;
-    private final String label;
+    private static long newID = 0L;
+    @NonNull private final String label;
 
     public BlankNodeTerm(String label) {
+        super(new LUBType(TypeRegistry.TOP), false);
         this.label = label;
-        super.type = TypeFactory.getConstantType(this);
     }
 
     public BlankNodeTerm() {
-        this("_blank" + getNewID());
+        this("_blank" + generateNewID());
     }
 
-    private static int getNewID() {
+    private static long generateNewID() {
         newID += 1;
         return newID;
-    }
-
-    public String getLabel() {
-        return this.label;
     }
 
     @Override
     public BlankNodeTerm shallowClone() {
         BlankNodeTerm t = new BlankNodeTerm(this.label);
-        t.setIsVariable(super.isVariable());
+        t.setVariable(isVariable());
         return t;
     }
 
     @Override
     public Optional<Term> unify(Term other) {
         return Optional.of(other); // TODO: Correct if other is a variable?
-    } 
+    }
+
+    @Override
+    public boolean isBlank() {
+        return true;
+    }
 
     @Override
     public String getIdentifier() {

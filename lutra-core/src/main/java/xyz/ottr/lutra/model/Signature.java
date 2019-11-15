@@ -47,6 +47,7 @@ public class Signature {
         this(iri, parameters, false);
     }
 
+    // TODO: remove this? or is it a signature without parameters, in which case we could replace null with empty list?
     protected Signature(String iri) {
         this(iri, null);
     }
@@ -55,7 +56,7 @@ public class Signature {
         if (this.parameters != null) {
             for (Term var : this.parameters.asList()) {
                 if (var != null) {
-                    var.setIsVariable(true);
+                    var.setVariable(true);
                 }
             }
         }

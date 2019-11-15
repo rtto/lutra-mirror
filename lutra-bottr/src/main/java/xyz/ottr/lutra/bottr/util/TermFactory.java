@@ -42,7 +42,7 @@ import xyz.ottr.lutra.model.terms.NoneTerm;
 import xyz.ottr.lutra.model.terms.Term;
 import xyz.ottr.lutra.model.terms.TermList;
 import xyz.ottr.lutra.model.types.BasicType;
-import xyz.ottr.lutra.model.types.TypeFactory;
+import xyz.ottr.lutra.model.types.TypeRegistry;
 import xyz.ottr.lutra.system.Message;
 import xyz.ottr.lutra.system.Result;
 import xyz.ottr.lutra.system.ResultStream;
@@ -91,16 +91,16 @@ public class TermFactory {
     public static Result<LiteralTerm> createTypedLiteral(String value, String datatype) {
         return DataParser.asURI(datatype)
             .map(URI::toString)
-            .map(iri -> LiteralTerm.typedLiteral(value, iri));
+            .map(iri -> LiteralTerm.createTypedLiteral(value, iri));
     }
 
     public static Result<LiteralTerm> createLangLiteral(String value, String languageTag) {
         return DataParser.asLanguageTagString(languageTag)
-            .map(tag -> LiteralTerm.taggedLiteral(value, tag));
+            .map(tag -> LiteralTerm.createLanguageTagLiteral(value, tag));
     }
 
     public static Result<LiteralTerm> createPlainLiteral(String value) {
-        return Result.of(new LiteralTerm(value));
+        return Result.of(LiteralTerm.createPlainLiteral(value));
     }
 
     public static Result<LiteralTerm> createLiteral(String value, String datatype, String language) {
@@ -118,17 +118,17 @@ public class TermFactory {
     }
 
     public Result<Term> createTermByType(String value, BasicType type) {
-        if (type.isSubTypeOf(TypeFactory.IRI)) {
+        if (type.isSubTypeOf(TypeRegistry.IRI)) {
             return createIRI(value).map(t -> (Term)t);
-        } else if (type.equals(TypeFactory.LITERAL)) {
+        } else if (type.equals(TypeRegistry.LITERAL)) {
             return createPlainLiteral(value).map(t -> (Term)t);
-        } else if (type.isProperSubTypeOf(TypeFactory.LITERAL)) {
+        } else if (type.isProperSubTypeOf(TypeRegistry.LITERAL)) {
             return createTypedLiteral(value, type.getIri()).map(t -> (Term)t);
         } else {
             Result<LiteralTerm> result = createPlainLiteral(value);
             result.addMessage(Message.warning("Type " + RDFNodes.toString(type.getIri())
                 + " too generic to materialise, defaulting to "
-                + RDFNodes.toString(TypeFactory.LITERAL.getIri())));
+                + RDFNodes.toString(TypeRegistry.LITERAL.getIri())));
             return result.map(t -> (Term)t);
         }
     }

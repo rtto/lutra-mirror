@@ -28,12 +28,12 @@ import xyz.ottr.lutra.bottr.util.TermFactory;
 import xyz.ottr.lutra.model.terms.Term;
 import xyz.ottr.lutra.model.types.BasicType;
 import xyz.ottr.lutra.model.types.TermType;
-import xyz.ottr.lutra.model.types.TypeFactory;
+import xyz.ottr.lutra.model.types.TypeRegistry;
 import xyz.ottr.lutra.system.Result;
 
 public class StringArgumentMap extends ArgumentMap<String> {
 
-    private static final TermType DEFAULT_TYPE = TypeFactory.LITERAL;
+    private static final TermType DEFAULT_TYPE = TypeRegistry.LITERAL;
 
     public StringArgumentMap(PrefixMapping prefixes, TermType type) {
         super(prefixes, type);

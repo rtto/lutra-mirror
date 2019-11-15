@@ -25,35 +25,23 @@ package xyz.ottr.lutra.model;
 import java.util.List;
 
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import xyz.ottr.lutra.model.terms.SimpleList;
 import xyz.ottr.lutra.model.terms.Term;
 import xyz.ottr.lutra.model.terms.TermList;
 
+@Getter
 @EqualsAndHashCode
-public abstract class AbstractTermList {
+public abstract class AbstractTermList implements SimpleList<Term> {
 
-    protected final TermList terms;
+    protected final TermList termList; // TODO is it more correct to have it as a SimpleList<Term>?
 
-    AbstractTermList(TermList terms) {
-        this.terms = terms;
-    }
-
-    public TermList getTermList() {
-        return this.terms;
+    AbstractTermList(TermList termList) {
+        this.termList = termList;
     }
 
     public List<Term> asList() {
-        return this.terms.asList();
+        return this.termList.asList();
     }
 
-    public int size() {
-        return this.terms.size();
-    }
-
-    public boolean isEmpty() {
-        return this.terms.isEmpty();
-    }
-
-    public Term get(int i) {
-        return this.terms.get(i);
-    }
 }

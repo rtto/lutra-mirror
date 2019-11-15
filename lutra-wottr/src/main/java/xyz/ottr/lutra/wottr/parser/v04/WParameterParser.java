@@ -36,7 +36,6 @@ import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 import xyz.ottr.lutra.model.terms.Term;
 import xyz.ottr.lutra.model.types.TermType;
-import xyz.ottr.lutra.model.types.TypeFactory;
 import xyz.ottr.lutra.system.Result;
 import xyz.ottr.lutra.system.ResultStream;
 import xyz.ottr.lutra.wottr.parser.TermFactory;
@@ -92,7 +91,7 @@ public class WParameterParser implements Function<RDFNode, Result<Term>> {
     private Result<TermType> getParameterType(Resource parameter, Term term) {
         Result<TermType> type = ModelSelector.getOptionalResourceObject(this.model, parameter, WOTTR.type)
             .flatMap(this.typeFactory);
-        return Result.of(type.orElse(TypeFactory.getVariableType(term)), type);
+        return Result.of(type.orElse(term.getVariableType()), type);
     }
 
     private Result<List<Resource>> getModifiers(Resource parameter) {

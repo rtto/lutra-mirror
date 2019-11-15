@@ -102,26 +102,29 @@ public class ParserTest {
 
     private List<Instance> makeInstances() {
 
-        TermList lst = new TermList(new LiteralTerm("one"), new LiteralTerm("two"), new LiteralTerm("three"));
+        TermList lst = new TermList(
+            LiteralTerm.createPlainLiteral("one"),
+            LiteralTerm.createPlainLiteral("two"),
+            LiteralTerm.createPlainLiteral("three"));
         Set<Term> toExpand = new HashSet<>();
         toExpand.add(lst);
 
         return Stream.of(
             new Instance("http://base.org/T1",
                 new ArgumentList(
-                    LiteralTerm.typedLiteral("true", XSD.xboolean.getURI()),
+                    LiteralTerm.createTypedLiteral("true", XSD.xboolean.getURI()),
                     new NoneTerm(),
                     new IRITerm("http://www.w3.org/1999/02/22-rdf-syntax-ns#type"),
                     new IRITerm("http://some.uri/with#part"))),
             new Instance("http://example.org/T2",
                 new ArgumentList(
-                    new TermList(LiteralTerm.taggedLiteral("hello", "no"), lst),
+                    new TermList(LiteralTerm.createLanguageTagLiteral("hello", "no"), lst),
                     toExpand, ArgumentList.Expander.CROSS)),
             new Instance("http://base.org/T3",
                 new ArgumentList(
-                    LiteralTerm.typedLiteral("42", XSD.integer.getURI()),
-                    LiteralTerm.typedLiteral("42.01", XSD.decimal.getURI()),
-                    LiteralTerm.typedLiteral("42.02", XSD.decimal.getURI())))
+                    LiteralTerm.createTypedLiteral("42", XSD.integer.getURI()),
+                    LiteralTerm.createTypedLiteral("42.01", XSD.decimal.getURI()),
+                    LiteralTerm.createTypedLiteral("42.02", XSD.decimal.getURI())))
         ).collect(Collectors.toList());
     }
 
@@ -139,7 +142,7 @@ public class ParserTest {
 
             //assertEquals(mins, pins); // Fails for lists
             // Thus, need to check structural equality:
-            // TODO: Should be implemeted on objects in future
+            // TODO: Should be implemented on objects in future
 
             assertEquals(mins.getIri(), pins.getIri());
             List<Term> pterms = pins.getArguments().asList();

@@ -22,18 +22,15 @@ package xyz.ottr.lutra.model.types;
  * #L%
  */
 
+import lombok.EqualsAndHashCode;
 import xyz.ottr.lutra.OTTR;
 
-public class LUBType implements ComplexType {
+@EqualsAndHashCode(callSuper = true)
+public class LUBType extends ComplexType {
 
-    private final BasicType inner;
 
     public LUBType(BasicType inner) {
-        this.inner = inner;
-    }
-
-    public BasicType getInner() {
-        return this.inner;
+        super(inner);
     }
 
     @Override
@@ -57,20 +54,15 @@ public class LUBType implements ComplexType {
     public boolean isCompatibleWith(TermType other) {
         return isSubTypeOf(other) || other.isSubTypeOf(this.inner);
     }
-    
+
+    @Override
+    public TermType removeLUB() {
+        return getInner();
+    }
+
     @Override
     public String toString() {
         return "LUB<" + this.inner.toString() + ">";
     }
 
-    @Override
-    public boolean equals(Object other) {
-        return other instanceof LUBType
-            && this.inner.equals(((LUBType) other).getInner());
-    }
-
-    @Override
-    public int hashCode() {
-        return 3 * this.inner.hashCode();
-    }
 }

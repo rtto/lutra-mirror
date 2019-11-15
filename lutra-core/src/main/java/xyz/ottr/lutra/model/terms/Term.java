@@ -25,43 +25,46 @@ package xyz.ottr.lutra.model.terms;
 import java.util.Objects;
 import java.util.Optional;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NonNull;
+import lombok.Setter;
 import org.apache.jena.shared.PrefixMapping;
+import xyz.ottr.lutra.OTTR;
 import xyz.ottr.lutra.model.types.TermType;
 
+@Getter
+@Setter
+@AllArgsConstructor
 public abstract class Term {
 
-    protected boolean isVariable;
-    protected TermType type;
+    @NonNull private TermType type;
+    private boolean isVariable;
 
     public abstract Object getIdentifier();
-
-    public TermType getType() {
-        return this.type;
-    }
-
-    public void setType(TermType type) {
-        this.type = type;
-    }
-
-    public boolean isVariable() {
-        return this.isVariable;
-    }
-
-    public void setIsVariable(boolean isVariable) {
-        this.isVariable = isVariable;
-    }
 
     public abstract Optional<Term> unify(Term other);
 
     public static Optional<Term> unify(Term t1, Term t2) {
-
-        Optional<Term> u1 = t1.unify(t2);
-        return u1.isPresent() ? u1 : t2.unify(t1);
+        return t1.unify(t2).or(() -> t2.unify(t1));
     }
 
     // TODO: only needed in Clustering, perhaps find better way of
-    //       handling RDF-specifics in lurta-core 
+    //       handling RDF-specifics in lutra-core
     public abstract boolean isBlank();
+
+    /**
+     * Returns the TermType that the variable Term
+     * has as default if no type is given, and is only based on the Term itself,
+     * and therefore not usage.
+     */
+    public TermType getVariableType() {
+        // The default type of a variable is the same as
+        // for a constant term, except that we remove
+        // any surrounding LUB. E.g. an IRI variable
+        // has default type IRI.
+        return getType().removeLUB();
+    }
 
     /**
      * Returns a shallow clone of this Term.
@@ -83,18 +86,12 @@ public abstract class Term {
         return getIdentifier().hashCode(); // Variable may change, so not part of hash TODO: Fix?
     }
 
-    /**
-     * Returns a String similar to toString(), but
-     * IRIs are written as qnames according to the
-     * argument PrefixMapping.
-     */
     public String toString(PrefixMapping prefixes) {
-        String qname = prefixes.qnameFor(getIdentifier().toString());
-        return (qname == null) ? toString() : qname;
+        return prefixes.shortForm(getIdentifier().toString());
     }
 
     @Override
     public String toString() {
-        return getIdentifier().toString();
+        return toString(OTTR.getDefaultPrefixes());
     }
 }

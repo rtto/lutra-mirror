@@ -94,7 +94,7 @@ public class JDBCSourceTest {
             .map(ArgumentList::asList)
             .map(list -> list.stream()
                 .map(t -> (LiteralTerm)t)
-                .map(LiteralTerm::getPureValue)
+                .map(LiteralTerm::getValue)
                 .collect(Collectors.toList()))
             .collect(Collectors.toSet());
 

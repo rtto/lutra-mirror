@@ -129,15 +129,15 @@ public class RDFFactory {
     }
 
     public Literal createLiteral(Model model, LiteralTerm term) {
-        String val = term.getPureValue();
+        String val = term.getValue();
         // TODO: Check correctness of typing below
-        if (term.getDatatype() != null) { // Typed literal
+        if (term.getLanguageTag() != null) { // Literal with language tag
+            String tag = term.getLanguageTag();
+            return model.createLiteral(val, tag);
+        } else if (term.getDatatype() != null) { // Typed literal
             String type = term.getDatatype();
             TypeMapper tm = TypeMapper.getInstance();
             return model.createTypedLiteral(val, tm.getSafeTypeByName(type));
-        } else if (term.getLangTag() != null) { // Literal with language tag
-            String tag = term.getLangTag();
-            return model.createLiteral(val, tag);
         } else { // Untyped literal (just a string)
             return model.createLiteral(val);
         }

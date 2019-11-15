@@ -22,27 +22,26 @@ package xyz.ottr.lutra.model.types;
  * #L%
  */
 
-import org.apache.jena.rdf.model.Resource;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
 
+@Getter
+@EqualsAndHashCode
 public class BasicType implements TermType {
 
-    private final Resource iri;
+    private final String iri;
 
-    protected BasicType(Resource iri) {
+    protected BasicType(String iri) {
         this.iri = iri;
-    }
-
-    public String getIri() {
-        return this.iri.toString();
     }
 
     @Override
     public boolean isSubTypeOf(TermType supertype) {
-        if (this.equals(TypeFactory.getBotType())) {
+        if (this.equals(TypeRegistry.BOT)) {
             return true;
         }
         return supertype instanceof BasicType
-            && TypeFactory.isSubTypeOf(this, (BasicType) supertype);
+            && TypeRegistry.isSubTypeOf(this, (BasicType) supertype);
     }
 
     @Override
@@ -51,18 +50,13 @@ public class BasicType implements TermType {
     }
 
     @Override
+    public TermType removeLUB() {
+        return this;
+    }
+
+    @Override
     public String toString() {
-        return this.iri.toString();
+        return this.iri;
     }
 
-    @Override
-    public boolean equals(Object other) {
-        return other instanceof BasicType
-            && getIri().equals(((BasicType) other).getIri());
-    }
-
-    @Override
-    public int hashCode() {
-        return getIri().hashCode();
-    }
 }

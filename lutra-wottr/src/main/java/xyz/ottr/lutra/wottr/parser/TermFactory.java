@@ -121,11 +121,11 @@ public class TermFactory implements Function<RDFNode, Result<Term>> {
         LiteralTerm literalTerm;
         // determine type of literal based on available "components"
         if (StringUtils.isNotEmpty(language)) {
-            literalTerm = LiteralTerm.taggedLiteral(value, language);
+            literalTerm = LiteralTerm.createLanguageTagLiteral(value, language);
         } else if (StringUtils.isNotEmpty(datatype)) {
-            literalTerm = LiteralTerm.typedLiteral(value, datatype);
+            literalTerm = LiteralTerm.createTypedLiteral(value, datatype);
         } else {
-            literalTerm = new LiteralTerm(value);
+            literalTerm = LiteralTerm.createPlainLiteral(value);
         }
         return Result.of(literalTerm);
     }

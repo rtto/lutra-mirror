@@ -29,11 +29,12 @@ import xyz.ottr.lutra.bottr.util.TypeFactory;
 import xyz.ottr.lutra.model.terms.Term;
 import xyz.ottr.lutra.model.types.BasicType;
 import xyz.ottr.lutra.model.types.TermType;
+import xyz.ottr.lutra.model.types.TypeRegistry;
 import xyz.ottr.lutra.system.Result;
 
 public class RDFNodeArgumentMap extends ArgumentMap<RDFNode> {
 
-    private static final TermType DEFAULT_TYPE = xyz.ottr.lutra.model.types.TypeFactory.TOP;
+    private static final TermType DEFAULT_TYPE = TypeRegistry.TOP;
 
     public RDFNodeArgumentMap(PrefixMapping prefixes, TermType type) {
         super(prefixes, type);

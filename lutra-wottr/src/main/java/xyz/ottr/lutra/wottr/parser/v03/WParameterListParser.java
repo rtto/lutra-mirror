@@ -36,7 +36,6 @@ import org.apache.jena.rdf.model.Resource;
 import xyz.ottr.lutra.model.ArgumentList;
 import xyz.ottr.lutra.model.ParameterList;
 import xyz.ottr.lutra.model.terms.Term;
-import xyz.ottr.lutra.model.types.TypeFactory;
 import xyz.ottr.lutra.system.Message;
 import xyz.ottr.lutra.system.Result;
 import xyz.ottr.lutra.wottr.parser.TermFactory;
@@ -100,14 +99,14 @@ public class WParameterListParser {
     }
 
     public Result<ArgumentList> parseValues(Resource argsList) {
-        return parseTermList(argsList, false).map(ArgumentList::new);
+        return parseTermList(argsList).map(ArgumentList::new);
     }
 
     public Result<ParameterList> parseVariables(Resource varsList) {
-        return parseTermList(varsList, true).map(ParameterList::new);
+        return parseTermList(varsList).map(ParameterList::new);
     }
 
-    private Result<List<Term>> parseTermList(Resource argsList, boolean isVariables) {
+    private Result<List<Term>> parseTermList(Resource argsList) {
         if (!argsList.canAs(RDFList.class)) {
             return Result.error("Expected " + RDFNodes.toString(WOTTR.withValues) + " element to be an RDF-list, "
                     + "but found " + RDFNodes.toString(argsList));
@@ -118,12 +117,16 @@ public class WParameterListParser {
             .asJavaList()
             .stream()
             .map(termFactory)
-            .map(trmRes -> trmRes.map(trm -> { 
+            /*
+            TODO: NB! check that removing this is correct.
+            .map(trmRes -> trmRes.map(trm -> {
                 if (isVariables) {
-                    trm.setType(TypeFactory.getConstantType(trm)); // Set variable type for variables
+                    trm.setType(TypeRegistry.getConstantType(trm)); // Set variable type for variables
                 }                                                  // as the constant type, as no type is
                 return trm;                                        // given (this will give it a weak type),
-            })).collect(Collectors.toList());                      // (e.g. an IRI will get type LUB<IRI>)
+            }))                                                    // (e.g. an IRI will get type LUB<IRI>)
+            */
+            .collect(Collectors.toList());
         return Result.aggregate(arguments);
     }
 

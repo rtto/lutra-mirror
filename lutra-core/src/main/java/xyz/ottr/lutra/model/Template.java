@@ -26,6 +26,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import lombok.Getter;
 import org.apache.jena.shared.PrefixMapping;
@@ -38,7 +39,7 @@ import xyz.ottr.lutra.model.types.TermType;
 @Getter
 public class Template extends Signature {
 
-    private final Set<Instance> pattern;
+    private final Set<Instance> pattern; // TODO? Set as NonNull?
 
     public static Template createTemplate(String iri, ParameterList parameters, Set<Instance> pattern) {
         return new Template(iri, parameters, pattern);
@@ -73,7 +74,7 @@ public class Template extends Signature {
 
         Map<Object, TermType> idTypes = new HashMap<>();
         for (Term var : getParameters().asList()) {
-            var.setIsVariable(true);
+            var.setVariable(true);
             idTypes.put(var.getIdentifier(), var.getType());
         }
 
@@ -92,23 +93,21 @@ public class Template extends Signature {
                     setVariableFlagsAndTypes(tl.asList(), idTypes);
                     tl.recomputeType();
                 } else if (idTypes.containsKey(term.getIdentifier())) {
-                    term.setIsVariable(true);
+                    term.setVariable(true);
                     term.setType(idTypes.get(term.getIdentifier()));
                 }
             });
     }
-        
 
     @Override
     public String toString(PrefixMapping prefixes) {
-        String headStr = super.toString(prefixes);
-        headStr += " ::\n";
-        StringBuilder bodyStr = new StringBuilder();
-        for (Instance ins : getPattern()) {
-            bodyStr.append("    " + ins.toString(prefixes));
-            bodyStr.append("\n");
-        }
-        return headStr + bodyStr.toString();
+        String signature = super.toString(prefixes);
+
+        String pattern = getPattern().stream()
+            .map(ins -> "\t" + ins.toString(prefixes))
+            .collect(Collectors.joining(",\n", "{", "}"));
+
+        return signature + " ::\n" + pattern + " .";
     }
 
     @Override

@@ -25,11 +25,11 @@ package xyz.ottr.lutra.model.types;
 /**
  * Represents the type a term can have. Term types are crucial when type checking 
  * template arguments against template parameters, and for unifying templates.
- * A basic term type can be identified by its IRI *and its localname while ignoring casing*. 
+ * A basic term type can be identified by its IRI.
  * There are also the type-constructors NEList, List and LUB which can be nested.
  * A term type may be subtype or compatible with other term types; 
  * Basic term types are declared in a external vocabulary and may therefore not be constructed, 
- * but may be gotten from the TypeFactory. 
+ * but may be gotten from the TypeRegistry.
  * @author martige leifhka
  */
 public interface TermType {
@@ -49,6 +49,8 @@ public interface TermType {
     default boolean isIncompatibleWith(TermType other) {
         return !isCompatibleWith(other);
     }
+
+    TermType removeLUB();
     
     String toString();
 }

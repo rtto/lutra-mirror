@@ -36,7 +36,7 @@ import xyz.ottr.lutra.model.Template;
 import xyz.ottr.lutra.model.terms.BlankNodeTerm;
 import xyz.ottr.lutra.model.terms.Term;
 import xyz.ottr.lutra.model.terms.TermList;
-import xyz.ottr.lutra.model.types.TypeFactory;
+import xyz.ottr.lutra.model.types.TypeRegistry;
 
 public enum OTTR  {
     ;
@@ -72,11 +72,11 @@ public enum OTTR  {
 
         static {
             Term sub = new BlankNodeTerm("_:s");
-            sub.setType(TypeFactory.getType(OTTR.TypeURI.IRI));
+            sub.setType(TypeRegistry.getType(OTTR.TypeURI.IRI));
             Term pred = new BlankNodeTerm("_:p");
-            pred.setType(TypeFactory.getType(OTTR.TypeURI.IRI));
+            pred.setType(TypeRegistry.getType(OTTR.TypeURI.IRI));
             Term obj = new BlankNodeTerm("_:o");
-            obj.setType(TypeFactory.getVariableType(obj));
+            obj.setType(obj.getVariableType());
 
             Set<Term> nonBlanks = new HashSet<>();
             nonBlanks.add(pred);

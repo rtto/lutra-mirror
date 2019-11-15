@@ -22,18 +22,14 @@ package xyz.ottr.lutra.model.types;
  * #L%
  */
 
+import lombok.EqualsAndHashCode;
 import org.apache.jena.vocabulary.RDF;
 
-public class ListType implements ComplexType {
-
-    private final TermType inner;
+@EqualsAndHashCode(callSuper = true)
+public class ListType extends ComplexType {
 
     public ListType(TermType inner) {
-        this.inner = inner;
-    }
-
-    public TermType getInner() {
-        return this.inner;
+        super(inner);
     }
 
     @Override
@@ -43,16 +39,21 @@ public class ListType implements ComplexType {
 
     @Override
     public boolean isSubTypeOf(TermType other) {
-        return other.equals(TypeFactory.getTopType())
+        return other.equals(TypeRegistry.TOP)
             || other instanceof ListType
                 && this.inner.isSubTypeOf(((ListType) other).getInner());
     }
 
     @Override
     public boolean isCompatibleWith(TermType other) {
-        return other.equals(TypeFactory.getTopType())
+        return other.equals(TypeRegistry.TOP)
             || other instanceof ListType
             && this.inner.isCompatibleWith(((ListType) other).getInner());
+    }
+
+    @Override
+    public TermType removeLUB() {
+        return new ListType(getInner().removeLUB());
     }
     
     @Override
@@ -60,14 +61,4 @@ public class ListType implements ComplexType {
         return "List<" + this.inner.toString() + ">";
     }
 
-    @Override
-    public boolean equals(Object other) {
-        return other instanceof ListType
-            && this.inner.equals(((ListType) other).getInner());
-    }
-
-    @Override
-    public int hashCode() {
-        return 5 * this.inner.hashCode();
-    }
 }

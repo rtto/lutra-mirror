@@ -24,20 +24,17 @@ package xyz.ottr.lutra.model.terms;
 
 import java.util.Optional;
 
-import xyz.ottr.lutra.model.types.TypeFactory;
+import xyz.ottr.lutra.model.types.LUBType;
+import xyz.ottr.lutra.model.types.TypeRegistry;
 
+// TODO: remove ObjectTerm, but figure out how to best replace it.
 public class ObjectTerm extends Term {
 
     private final Object identifier;
 
     public ObjectTerm(Object identifier, boolean isVariable) {
-        super.isVariable = isVariable;
+        super(isVariable ? TypeRegistry.TOP : new LUBType(TypeRegistry.TOP), isVariable);
         this.identifier = identifier;
-        if (isVariable) {
-            super.type = TypeFactory.getVariableType(this);
-        } else {
-            super.type = TypeFactory.getConstantType(this);
-        }
     }
 
     public ObjectTerm(Object identifier) {

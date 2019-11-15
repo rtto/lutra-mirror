@@ -26,7 +26,7 @@ import java.util.List;
 
 import org.apache.commons.collections4.ListUtils;
 import xyz.ottr.lutra.model.types.ListType;
-import xyz.ottr.lutra.model.types.TypeFactory;
+import xyz.ottr.lutra.model.types.TypeRegistry;
 import xyz.ottr.lutra.system.Message;
 
 public enum CheckFactory {
@@ -201,7 +201,7 @@ public enum CheckFactory {
                     .and(Query.index("Args", "Index", "Val"))
                     .and(Query.hasListExpander("Args", "Index"))
                     .and(Query.type("Val", "Type"))
-                    .and(Query.bind("ListType", new ListType(TypeFactory.getTopType())))
+                    .and(Query.bind("ListType", new ListType(TypeRegistry.TOP)))
                     .and(Query.not(Query.isSubTypeOf("Type", "ListType"))),
                 tup -> Message.error(
                     "Template with IRI " + tup.get("Temp").toString() + " has instance "

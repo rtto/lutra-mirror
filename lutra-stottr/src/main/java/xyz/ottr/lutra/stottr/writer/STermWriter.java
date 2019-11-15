@@ -99,11 +99,11 @@ public class STermWriter {
 
     public String writeLiteral(LiteralTerm literal) {
 
-        String val = "\"" + literal.getPureValue() + "\"";
+        String val = "\"" + literal.getValue() + "\"";
         if (literal.getDatatype() != null) {
             val += "^^" + writeIRI(literal.getDatatype());
-        } else if (literal.getLangTag() != null) {
-            val += "@" + literal.getLangTag();
+        } else if (literal.getLanguageTag() != null) {
+            val += "@" + literal.getLanguageTag();
         }
         return val;
     }

@@ -41,7 +41,7 @@ public class ArgumentList extends AbstractTermList {
 
     public enum Expander { CROSS, ZIPMIN, ZIPMAX }
 
-    private final Set<Term> expanderValues;
+    private final Set<Term> expanderValues; // TODO: Bug, must be based on indicies
     private final Expander listExpander;
 
     public ArgumentList(TermList parameters, Set<Term> expanderValues, Expander listExpander) {
@@ -61,6 +61,8 @@ public class ArgumentList extends AbstractTermList {
     public ArgumentList(Term... elems) {
         this(List.of(elems), null, null);
     }
+
+    // TODO: replace all expander tests with a single Optional<Expander> getExpander?
 
     public boolean hasListExpander() {
         return this.listExpander != null;
@@ -94,7 +96,7 @@ public class ArgumentList extends AbstractTermList {
         List<Term> clonedTerms = new LinkedList<>();
         Set<Term> clonedExpanderValues = new HashSet<>();
 
-        for (Term t : this.terms.asList()) {
+        for (Term t : this.termList.asList()) {
             Term nt = t.shallowClone();
             clonedTerms.add(nt);
             if (this.expanderValues.contains(t)) {
@@ -151,7 +153,7 @@ public class ArgumentList extends AbstractTermList {
     private ArgumentList zipExpandAtIndex(int i) {
 
         List<Term> picked = new LinkedList<>();
-        for (Term arg : this.terms.asList()) {
+        for (Term arg : this.termList.asList()) {
             if (hasListExpander(arg)) {
                 TermList lst = (TermList) arg;
                 if (lst.size() <= i) { // ZipMax and shorter than longest list
@@ -182,12 +184,12 @@ public class ArgumentList extends AbstractTermList {
     public boolean equals(Object o) {
         return this == o
             || this.getClass() == o.getClass()
-            && this.terms.asList().equals(((ArgumentList) o).terms.asList())
+            && this.termList.asList().equals(((ArgumentList) o).termList.asList())
             && this.expanderValues.equals(((ArgumentList) o).expanderValues);
     }
 
     @Override
     public int hashCode() {
-        return this.terms.asList().hashCode() + 3 * this.expanderValues.hashCode();
+        return this.termList.asList().hashCode() + 3 * this.expanderValues.hashCode();
     }
 }

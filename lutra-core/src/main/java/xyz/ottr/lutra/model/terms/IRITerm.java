@@ -25,23 +25,25 @@ package xyz.ottr.lutra.model.terms;
 import java.util.Optional;
 
 import lombok.Getter;
-import xyz.ottr.lutra.model.types.TypeFactory;
+import lombok.NonNull;
+import xyz.ottr.lutra.model.types.LUBType;
+import xyz.ottr.lutra.model.types.TypeRegistry;
 
 @Getter
-public class IRITerm extends ResourceTerm {
+public class IRITerm extends Term {
 
-    private final String iri;
+    @NonNull private final String iri;
 
     public IRITerm(String iri) {
+        super(new LUBType(TypeRegistry.IRI), false);
         this.iri = iri;
-        super.type = TypeFactory.getConstantType(this);
     }
 
     @Override 
     public IRITerm shallowClone() {
-        IRITerm t = new IRITerm(this.iri);
-        t.setIsVariable(super.isVariable());
-        return t;
+        IRITerm term = new IRITerm(this.iri);
+        term.setVariable(isVariable());
+        return term;
     }
 
     @Override
@@ -56,7 +58,12 @@ public class IRITerm extends ResourceTerm {
         }
 
         return Optional.empty();
-    } 
+    }
+
+    @Override
+    public boolean isBlank() {
+        return false;
+    }
 
     @Override
     public String getIdentifier() {

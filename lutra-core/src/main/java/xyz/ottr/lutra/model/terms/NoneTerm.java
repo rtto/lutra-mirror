@@ -24,28 +24,26 @@ package xyz.ottr.lutra.model.terms;
 
 import java.util.Optional;
 
-import xyz.ottr.lutra.model.types.TypeFactory;
-
-//import xyz.ottr.lutra.ROTTR;
+import xyz.ottr.lutra.model.types.TypeRegistry;
 
 public class NoneTerm extends Term {
 
     public NoneTerm() {
-        super();
-        super.isVariable = false;
-        super.type = TypeFactory.getBotType();
+        super(TypeRegistry.BOT, false);
     }
 
     public Object getIdentifier() {
         return "none";
     }
 
-    public void setIsVariable(boolean isVariable) {
+    @Override
+    public void setVariable(boolean isVariable) {
         if (isVariable) {
-            throw new UnsupportedOperationException("Cannot set a NoneTerm to a varible.");
+            throw new UnsupportedOperationException("Cannot set a NoneTerm to a variable.");
         }
     }
 
+    @Override
     public Optional<Term> unify(Term other) {
         if (equals(other)) {
             return Optional.of(this);
@@ -54,10 +52,12 @@ public class NoneTerm extends Term {
         }
     }
 
+    @Override
     public boolean isBlank() {
         return false;
     }
 
+    @Override
     public Term shallowClone() {
         return new NoneTerm();
     }

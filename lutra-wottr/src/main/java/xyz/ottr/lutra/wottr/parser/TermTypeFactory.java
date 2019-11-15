@@ -37,7 +37,7 @@ import xyz.ottr.lutra.model.types.LUBType;
 import xyz.ottr.lutra.model.types.ListType;
 import xyz.ottr.lutra.model.types.NEListType;
 import xyz.ottr.lutra.model.types.TermType;
-import xyz.ottr.lutra.model.types.TypeFactory;
+import xyz.ottr.lutra.model.types.TypeRegistry;
 import xyz.ottr.lutra.system.Result;
 import xyz.ottr.lutra.wottr.util.RDFNodes;
 
@@ -56,7 +56,7 @@ public class TermTypeFactory implements Function<RDFNode, Result<TermType>> {
 
     private Result<TermType> parseSimpleType(Resource node) {
 
-        TermType type = TypeFactory.getType(node.getURI()); 
+        TermType type = TypeRegistry.getType(node.getURI());
 
         if (type == null) {
             return Result.error("Expected a resource denoting a simple type, but no simple type "
