@@ -26,17 +26,22 @@ import java.util.Optional;
 
 import lombok.Getter;
 import lombok.NonNull;
-import xyz.ottr.lutra.model.types.LUBType;
+import xyz.ottr.lutra.model.types.TermType;
 import xyz.ottr.lutra.model.types.TypeRegistry;
 
 @Getter
-public class IRITerm extends Term {
+public class IRITerm extends AbstractTerm {
 
-    @NonNull private final String iri;
+    private final @NonNull String iri;
 
     public IRITerm(String iri) {
-        super(new LUBType(TypeRegistry.IRI), false);
         this.iri = iri;
+        setType(getIntrinsicType());
+    }
+
+    @Override
+    public TermType getIntrinsicType() {
+        return TypeRegistry.LUB_IRI;
     }
 
     @Override 

@@ -24,6 +24,7 @@ package xyz.ottr.lutra.model.types;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import xyz.ottr.lutra.OTTR;
 
 @Getter
 @EqualsAndHashCode
@@ -56,7 +57,7 @@ public class BasicType implements TermType {
 
     @Override
     public String toString() {
-        return this.iri;
+        return OTTR.getDefaultPrefixes().shortForm(this.iri);
     }
 
 }

@@ -22,76 +22,49 @@ package xyz.ottr.lutra.model.terms;
  * #L%
  */
 
-import java.util.Objects;
 import java.util.Optional;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NonNull;
-import lombok.Setter;
 import org.apache.jena.shared.PrefixMapping;
-import xyz.ottr.lutra.OTTR;
 import xyz.ottr.lutra.model.types.TermType;
+import xyz.ottr.lutra.model.types.TypeRegistry;
 
-@Getter
-@Setter
-@AllArgsConstructor
-public abstract class Term {
+public interface Term {
 
-    @NonNull private TermType type;
-    private boolean isVariable;
+    Object getIdentifier();
 
-    public abstract Object getIdentifier();
+    void setType(TermType term);
 
-    public abstract Optional<Term> unify(Term other);
+    TermType getType();
 
-    public static Optional<Term> unify(Term t1, Term t2) {
-        return t1.unify(t2).or(() -> t2.unify(t1));
+    default TermType getIntrinsicType() {
+        return TypeRegistry.LUB_TOP;
     }
 
-    // TODO: only needed in Clustering, perhaps find better way of
-    //       handling RDF-specifics in lutra-core
-    public abstract boolean isBlank();
-
     /**
-     * Returns the TermType that the variable Term
-     * has as default if no type is given, and is only based on the Term itself,
-     * and therefore not usage.
+     * Returns the TermType that the variable Term has as default if no type is given, and is only based on the
+     * Term itself, and therefore not usage.
      */
-    public TermType getVariableType() {
-        // The default type of a variable is the same as
-        // for a constant term, except that we remove
-        // any surrounding LUB. E.g. an IRI variable
-        // has default type IRI.
+    default TermType getVariableType() {
+        // The default type of a variable is the same as for a constant term, except that we remove
+        // any surrounding LUB. E.g. an IRI variable has default type IRI.
         return getType().removeLUB();
     }
 
-    /**
-     * Returns a shallow clone of this Term.
-     */
-    public abstract Term shallowClone();
+    boolean isVariable();
 
-    @Override
-    public boolean equals(Object o) {
-        return this == o 
-                || Objects.nonNull(o) 
-                        && getClass() == o.getClass()
-                        && this.isVariable() == ((Term) o).isVariable()
-                        && Objects.equals(this.getIdentifier(), ((Term) o).getIdentifier());
+    void setVariable(boolean variable);
+
+    // TODO: only needed in Clustering, perhaps find better way of handling RDF-specifics in lutra-core.
+    boolean isBlank();
+
+    Optional<Term> unify(Term other);
+
+    static Optional<Term> unify(Term t1, Term t2) {
+        return t1.unify(t2).or(() -> t2.unify(t1));
     }
 
-    @Override
-    public int hashCode() {
-        //return Objects.hash(getIdentifier(), isVariable);
-        return getIdentifier().hashCode(); // Variable may change, so not part of hash TODO: Fix?
-    }
+    Term shallowClone();
 
-    public String toString(PrefixMapping prefixes) {
-        return prefixes.shortForm(getIdentifier().toString());
-    }
+    String toString(PrefixMapping prefixes);
 
-    @Override
-    public String toString() {
-        return toString(OTTR.getDefaultPrefixes());
-    }
 }

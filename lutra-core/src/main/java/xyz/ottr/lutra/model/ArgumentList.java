@@ -41,7 +41,7 @@ public class ArgumentList extends AbstractTermList {
 
     public enum Expander { CROSS, ZIPMIN, ZIPMAX }
 
-    private final Set<Term> expanderValues; // TODO: Bug, must be based on indicies
+    private final Set<Term> expanderValues; // TODO: Bug, must be based on indices
     private final Expander listExpander;
 
     public ArgumentList(TermList parameters, Set<Term> expanderValues, Expander listExpander) {

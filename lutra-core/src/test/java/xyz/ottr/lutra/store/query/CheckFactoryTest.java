@@ -381,7 +381,7 @@ public class CheckFactoryTest {
 
         DependencyGraph store = new DependencyGraph(null);
 
-        Term varBase = new BlankNodeTerm("_:classeses");
+        Term varBase = new BlankNodeTerm("_:classes");
         varBase.setType(new NEListType(new NEListType(TypeRegistry.getType(OWL.Class))));
 
         store.addTemplateSignature(

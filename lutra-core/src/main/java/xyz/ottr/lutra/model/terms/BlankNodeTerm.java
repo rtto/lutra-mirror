@@ -26,18 +26,16 @@ import java.util.Optional;
 
 import lombok.Getter;
 import lombok.NonNull;
-import xyz.ottr.lutra.model.types.LUBType;
-import xyz.ottr.lutra.model.types.TypeRegistry;
 
 @Getter
-public class BlankNodeTerm extends Term {
+public class BlankNodeTerm extends AbstractTerm {
 
     private static long newID = 0L;
-    @NonNull private final String label;
+    private final @NonNull String label;
 
     public BlankNodeTerm(String label) {
-        super(new LUBType(TypeRegistry.TOP), false);
         this.label = label;
+        setType(getIntrinsicType());
     }
 
     public BlankNodeTerm() {
@@ -51,9 +49,9 @@ public class BlankNodeTerm extends Term {
 
     @Override
     public BlankNodeTerm shallowClone() {
-        BlankNodeTerm t = new BlankNodeTerm(this.label);
-        t.setVariable(isVariable());
-        return t;
+        BlankNodeTerm term = new BlankNodeTerm(this.label);
+        term.setVariable(isVariable());
+        return term;
     }
 
     @Override

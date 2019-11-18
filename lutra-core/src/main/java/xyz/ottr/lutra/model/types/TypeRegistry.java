@@ -55,6 +55,8 @@ public enum TypeRegistry {
     public static final BasicType BOT = getType(OTTR.TypeURI.Bot);
     public static final BasicType IRI = getType(OTTR.TypeURI.IRI);
     public static final BasicType LITERAL = getType(RDFS.Literal);
+    public static final ComplexType LUB_TOP = new LUBType(TOP);
+    public static final ComplexType LUB_IRI = new LUBType(IRI);
 
 
     // TODO change to method that takes file or model as input, and rather set the StdTypes in init()

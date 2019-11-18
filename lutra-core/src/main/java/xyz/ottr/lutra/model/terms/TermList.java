@@ -35,23 +35,19 @@ import xyz.ottr.lutra.model.types.NEListType;
 import xyz.ottr.lutra.model.types.TermType;
 import xyz.ottr.lutra.model.types.TypeRegistry;
 
-public class TermList extends Term implements SimpleList<Term> {
+public class TermList extends AbstractTerm implements SimpleList<Term> {
 
     private static long newID = 0L;
 
     private final List<Term> terms;
     private final long listID; // Used to distinguish different lists but with same elements
 
-    public TermList(List<Term> terms, boolean isVariable) {
-        super(getTermType(terms), isVariable);
+
+    public TermList(List<Term> terms, boolean variable) {
         this.terms = terms;
         this.listID = generateNewID();
-    }
-
-    private static TermType getTermType(List<Term> terms) {
-        return terms.isEmpty()
-            ? new ListType(TypeRegistry.BOT)
-            : new NEListType(new LUBType(TypeRegistry.TOP));
+        setType(getIntrinsicType());
+        setVariable(variable);
     }
 
     public TermList(List<Term> terms) {
@@ -61,6 +57,14 @@ public class TermList extends Term implements SimpleList<Term> {
     public TermList(Term... terms) {
         this(List.of(terms));
     }
+
+    @Override
+    public TermType getIntrinsicType() {
+        return this.terms.isEmpty()
+            ? new ListType(TypeRegistry.BOT)
+            : new NEListType(new LUBType(TypeRegistry.TOP));
+    }
+
 
     /**
      * As variables have a type depending on its declaration in the head
@@ -76,7 +80,7 @@ public class TermList extends Term implements SimpleList<Term> {
                 ((TermList) inner).recomputeType();
             }
         }
-        setType(getTermType(this.terms));
+        setType(getIntrinsicType());
     }
 
     private static long generateNewID() {
@@ -99,7 +103,7 @@ public class TermList extends Term implements SimpleList<Term> {
 
     @Override
     public TermList shallowClone() {
-        return new TermList(this.terms, isVariable());
+        return new TermList(this.terms, this.variable);
     }
 
     @Override
@@ -131,11 +135,12 @@ public class TermList extends Term implements SimpleList<Term> {
         return Optional.of(new TermList(result, false));
     }
 
+    // TODO since this is used in hashcode, should we include the list in the identifier?
     @Override
     public Object getIdentifier() {
         return this.listID;
     }
-    
+
     @Override
     public String toString(PrefixMapping prefixes) {
         return this.terms.stream()

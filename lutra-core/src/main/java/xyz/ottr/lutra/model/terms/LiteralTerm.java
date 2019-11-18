@@ -33,24 +33,26 @@ import xyz.ottr.lutra.model.types.TermType;
 import xyz.ottr.lutra.model.types.TypeRegistry;
 
 @Getter
-public class LiteralTerm extends Term {
+public class LiteralTerm extends AbstractTerm {
 
-    public static final String LANG_STRING_DATATYPE = RDF.dtLangString.getURI();
+    public static final String LANG_STRING_DATATYPE = RDF.dtLangString.getURI(); // TODO add this type to the type hierarchy
     public static final String PLAIN_STRING_DATATYPE = XSD.xstring.toString();
 
-    @NonNull private final String value;
-    @NonNull private final String datatype;
+    private final @NonNull String value;
+    private final @NonNull String datatype;
     private final String languageTag;
 
     private LiteralTerm(String value, String datatype, String languageTag) {
-        super(getTermType(datatype), false);
         this.value = value;
         this.datatype = datatype;
         this.languageTag = languageTag;
+        setType(getIntrinsicType());
+
     }
 
-    private static TermType getTermType(String datatype) {
-        return Objects.requireNonNullElse(TypeRegistry.getType(datatype), TypeRegistry.LITERAL);
+    @Override
+    public TermType getIntrinsicType() {
+        return Objects.requireNonNullElse(TypeRegistry.getType(this.datatype), TypeRegistry.LITERAL);
     }
 
     public static LiteralTerm createLanguageTagLiteral(String value, @NonNull String languageTag) {
