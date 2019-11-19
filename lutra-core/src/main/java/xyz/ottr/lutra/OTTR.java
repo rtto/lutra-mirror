@@ -58,9 +58,11 @@ public enum OTTR  {
         public static final String subTypeOf = ns + "subTypeOf";
         
         public static final String NEList = ns + "NEList";
+        public static final String List = RDF.List.getURI();
         public static final String LUB = ns + "LUB";
-        
 
+        public static final String Top = RDFS.Resource.getURI();
+        public static final String Literal = RDFS.Literal.getURI();
         public static final String IRI = ns + "IRI";
         public static final String Bot = ns + "Bot";
     }

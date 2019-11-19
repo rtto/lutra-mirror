@@ -117,7 +117,7 @@ public class Query {
     }
 
     public static Query hasOccurenceAt(String term, String level, String inside) {
-        return new Query((qe, m) -> qe.hasOccurenceAt(m, term, inside, level));
+        return new Query((qe, m) -> qe.hasOccurrenceAt(m, term, inside, level));
     }
 
     public static Query type(String term, String type) {

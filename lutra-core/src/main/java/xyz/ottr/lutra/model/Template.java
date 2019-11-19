@@ -22,13 +22,13 @@ package xyz.ottr.lutra.model;
  * #L%
  */
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import lombok.Getter;
+import lombok.NonNull;
 import org.apache.jena.shared.PrefixMapping;
 import xyz.ottr.lutra.OTTR;
 import xyz.ottr.lutra.model.terms.Term;
@@ -39,7 +39,7 @@ import xyz.ottr.lutra.model.types.TermType;
 @Getter
 public class Template extends Signature {
 
-    private final Set<Instance> pattern; // TODO? Set as NonNull?
+    private final @NonNull Set<Instance> pattern;
 
     public static Template createTemplate(String iri, ParameterList parameters, Set<Instance> pattern) {
         return new Template(iri, parameters, pattern);
@@ -57,10 +57,6 @@ public class Template extends Signature {
         return new Signature(iri, parameters, false);
     }
 
-    public static Signature createSignature(String iri) {
-        return new Signature(iri, null);
-    }
-    
     private Template(String iri, ParameterList parameters, Set<Instance> pattern) {
         super(iri, parameters);
         this.pattern = pattern;
@@ -68,35 +64,27 @@ public class Template extends Signature {
     }
 
     private void setVariableFlagsAndTypes() {
-        if (getParameters() == null) {
-            return;
-        }
+        super.setVariables();
 
-        Map<Object, TermType> idTypes = new HashMap<>();
-        for (Term var : getParameters().asList()) {
-            var.setVariable(true);
-            idTypes.put(var.getIdentifier(), var.getType());
-        }
+        // Collect parameter types
+        Map<Object, TermType> parameterTypes = getParameters().asList().stream()
+            .collect(Collectors.toMap(Term::getIdentifier, Term::getType, (t1, t2) -> t1));
 
-        if (this.pattern != null) {
-            this.pattern
-                .forEach(instance ->
-                    setVariableFlagsAndTypes(instance.getArguments().asList(), idTypes));
-        }
+        this.pattern.forEach(instance ->
+            setVariableFlagsAndTypes(instance.getArguments().asList(), parameterTypes));
     }
 
-    private void setVariableFlagsAndTypes(List<Term> terms, Map<Object, TermType> idTypes) {
-        terms
-            .forEach(term -> {
-                if (term instanceof TermList) {
-                    TermList tl = (TermList) term;
-                    setVariableFlagsAndTypes(tl.asList(), idTypes);
-                    tl.recomputeType();
-                } else if (idTypes.containsKey(term.getIdentifier())) {
-                    term.setVariable(true);
-                    term.setType(idTypes.get(term.getIdentifier()));
-                }
-            });
+    private void setVariableFlagsAndTypes(List<Term> terms, Map<Object, TermType> parameterTypes) {
+        terms.forEach(term -> {
+            if (term instanceof TermList) {
+                TermList tl = (TermList) term;
+                setVariableFlagsAndTypes(tl.asList(), parameterTypes);
+                tl.recomputeType();
+            } else if (parameterTypes.containsKey(term.getIdentifier())) {
+                term.setVariable(true);
+                term.setType(parameterTypes.get(term.getIdentifier()));
+            }
+        });
     }
 
     @Override

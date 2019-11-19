@@ -40,16 +40,6 @@ public abstract class ComplexType implements TermType {
      */
     public abstract String getOuterIRI();
 
-    /**
-     * Get the level of nesting of complex types. Example List List X has depth 2.
-     * @return
-     */
-    public int getDepth() {
-        return getInner() instanceof ComplexType
-            ? 1 + ((ComplexType) getInner()).getDepth()
-            : 1;
-    }
-
     public BasicType getInnermost() {
         return getInner() instanceof ComplexType
             ? ((ComplexType)getInner()).getInnermost()

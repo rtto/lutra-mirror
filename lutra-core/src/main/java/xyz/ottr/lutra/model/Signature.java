@@ -25,15 +25,15 @@ package xyz.ottr.lutra.model;
 import java.util.Objects;
 
 import lombok.Getter;
+import lombok.NonNull;
 import org.apache.jena.shared.PrefixMapping;
 import xyz.ottr.lutra.OTTR;
-import xyz.ottr.lutra.model.terms.Term;
 
 @Getter
 public class Signature {
 
-    private final String iri;
-    private final ParameterList parameters;
+    private final @NonNull String iri;
+    private final @NonNull ParameterList parameters;
     private final boolean isBaseTemplate;
 
     protected Signature(String iri, ParameterList parameters, boolean isBaseTemplate) {
@@ -47,24 +47,12 @@ public class Signature {
         this(iri, parameters, false);
     }
 
-    // TODO: remove this? or is it a signature without parameters, in which case we could replace null with empty list?
-    protected Signature(String iri) {
-        this(iri, null);
-    }
-
-    private void setVariables() {
-        if (this.parameters != null) {
-            for (Term var : this.parameters.asList()) {
-                if (var != null) {
-                    var.setVariable(true);
-                }
-            }
-        }
+    final void setVariables() {
+        this.parameters.asList().forEach(p -> p.setVariable(true));
     }
 
     public String toString(PrefixMapping prefixes) {
-        return prefixes.shortForm(this.iri)
-            + (this.parameters == null ? "(...)" : this.parameters.toString(prefixes));
+        return prefixes.shortForm(this.iri) + this.parameters.toString(prefixes);
     }
 
     @Override

@@ -23,7 +23,7 @@ package xyz.ottr.lutra.model.types;
  */
 
 import lombok.EqualsAndHashCode;
-import org.apache.jena.vocabulary.RDF;
+import xyz.ottr.lutra.OTTR;
 
 @EqualsAndHashCode(callSuper = true)
 public class ListType extends ComplexType {
@@ -34,7 +34,7 @@ public class ListType extends ComplexType {
 
     @Override
     public String getOuterIRI() {
-        return RDF.List.getURI();
+        return OTTR.TypeURI.List;
     }
 
     @Override

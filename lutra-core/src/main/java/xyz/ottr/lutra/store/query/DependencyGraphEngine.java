@@ -28,8 +28,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.BiPredicate;
+import java.util.function.Predicate;
 import java.util.stream.Stream;
 
+import xyz.ottr.lutra.model.AbstractTermList;
 import xyz.ottr.lutra.model.ArgumentList;
 import xyz.ottr.lutra.model.Instance;
 import xyz.ottr.lutra.model.ParameterList;
@@ -41,6 +44,7 @@ import xyz.ottr.lutra.model.types.ComplexType;
 import xyz.ottr.lutra.model.types.TermType;
 import xyz.ottr.lutra.store.DependencyGraph;
 import xyz.ottr.lutra.store.TemplateNode;
+import xyz.ottr.lutra.store.TemplateStore;
 import xyz.ottr.lutra.system.Result;
 
 public class DependencyGraphEngine extends QueryEngine<DependencyGraph> {
@@ -136,7 +140,7 @@ public class DependencyGraphEngine extends QueryEngine<DependencyGraph> {
         return tuples.build();
     }
 
-    private Stream<Tuple> bindIndecies(Tuple tuple, TermList terms, String index) {
+    private Stream<Tuple> bindIndices(Tuple tuple, TermList terms, String index) {
 
         if (tuple.hasBound(index)) {
             Integer boundIndex = tuple.getAs(Integer.class, index);
@@ -157,7 +161,7 @@ public class DependencyGraphEngine extends QueryEngine<DependencyGraph> {
     }
 
     @Override
-    public Stream<Tuple> hasOccurenceAt(Tuple tuple, String term, String inside, String level) {
+    public Stream<Tuple> hasOccurrenceAt(Tuple tuple, String term, String inside, String level) {
 
         Term boundTerm = tuple.getAs(Term.class, term);
         return findOccurences(tuple, boundTerm, inside, level, 0);
@@ -257,54 +261,49 @@ public class DependencyGraphEngine extends QueryEngine<DependencyGraph> {
     }
 
     @Override
-    public Stream<Tuple> isOptional(Tuple tuple, String params, String index) {
-        ParameterList boundParams = tuple.getAs(ParameterList.class, params);
-        return bindIndecies(tuple, boundParams.getTermList(), index)
-            .filter(tup -> boundParams.isOptional(tup.getAs(Integer.class, index)));
+    public Stream<Tuple> isOptional(Tuple tuple, String args, String index) {
+        return hasBoundTermListIndex(tuple, tuple.getAs(ParameterList.class, args), index, ParameterList::isOptional);
     }
 
     @Override
-    public Stream<Tuple> isNonBlank(Tuple tuple, String params, String index) {
-        ParameterList boundParams = tuple.getAs(ParameterList.class, params);
-        return bindIndecies(tuple, boundParams.getTermList(), index)
-            .filter(tup -> boundParams.isNonBlank(tup.getAs(Integer.class, index)));
+    public Stream<Tuple> isNonBlank(Tuple tuple, String args, String index) {
+        return hasBoundTermListIndex(tuple, tuple.getAs(ParameterList.class, args), index, ParameterList::isNonBlank);
     }
 
     @Override
     public Stream<Tuple> hasListExpander(Tuple tuple, String args, String index) {
-        ArgumentList boundArgs = tuple.getAs(ArgumentList.class, args);
-        return bindIndecies(tuple, boundArgs.getTermList(), index)
-            .filter(tup -> boundArgs.hasListExpander(tup.getAs(Integer.class, index)));
+        return hasBoundTermListIndex(tuple, tuple.getAs(ArgumentList.class, args), index, ArgumentList::hasListExpander);
     }
 
-    @Override
-    public Stream<Tuple> hasCrossModifier(Tuple tuple, String instance) {
-        Instance boundIns = tuple.getAs(Instance.class, instance);
-        return boundIns.getArguments().hasCrossExpander()
-            ? Stream.of(tuple)
-            : Stream.empty();
-    }
-
-    @Override
-    public Stream<Tuple> hasZipMinModifier(Tuple tuple, String instance) {
-        Instance boundIns = tuple.getAs(Instance.class, instance);
-        return boundIns.getArguments().hasZipMinExpander()
-            ? Stream.of(tuple)
-            : Stream.empty();
-    }
-
-    @Override
-    public Stream<Tuple> hasZipMaxModifier(Tuple tuple, String instance) {
-        Instance boundIns = tuple.getAs(Instance.class, instance);
-        return boundIns.getArguments().hasZipMaxExpander()
-            ? Stream.of(tuple)
-            : Stream.empty();
+    private <X extends AbstractTermList> Stream<Tuple> hasBoundTermListIndex(Tuple tuple, X list, String index,
+        BiPredicate<X, Integer> predicate) {
+        return bindIndices(tuple, list.getTermList(), index)
+            .filter(tup -> predicate.test(list, tup.getAs(Integer.class, index)));
     }
 
     @Override
     public Stream<Tuple> hasExpansionModifier(Tuple tuple, String instance) {
+        return hasArgumentsFlag(tuple, instance, ArgumentList::hasListExpander);
+    }
+
+    @Override
+    public Stream<Tuple> hasCrossModifier(Tuple tuple, String instance) {
+        return hasArgumentsFlag(tuple, instance, ArgumentList::hasCrossExpander);
+    }
+
+    @Override
+    public Stream<Tuple> hasZipMinModifier(Tuple tuple, String instance) {
+        return hasArgumentsFlag(tuple, instance, ArgumentList::hasZipMinExpander);
+    }
+
+    @Override
+    public Stream<Tuple> hasZipMaxModifier(Tuple tuple, String instance) {
+        return hasArgumentsFlag(tuple, instance, ArgumentList::hasZipMaxExpander);
+    }
+
+    private Stream<Tuple> hasArgumentsFlag(Tuple tuple, String instance, Predicate<ArgumentList> predicate) {
         Instance boundIns = tuple.getAs(Instance.class, instance);
-        return boundIns.getArguments().hasListExpander()
+        return predicate.test(boundIns.getArguments())
             ? Stream.of(tuple)
             : Stream.empty();
     }
@@ -369,26 +368,25 @@ public class DependencyGraphEngine extends QueryEngine<DependencyGraph> {
 
     @Override
     public Stream<Tuple> isUndefined(Tuple tuple, String template) {
-        String iri = tuple.getAs(String.class, template);
-        return !this.store.containsTemplate(iri)
-            ? Stream.of(tuple)
-            : Stream.empty();
+        return storeContains(tuple, template, (store, iri) -> !store.containsTemplate(iri));
     }
 
     @Override
     public Stream<Tuple> isSignature(Tuple tuple, String template) {
-        String iri = tuple.getAs(String.class, template);
-        return this.store.containsSignature(iri)
-            ? Stream.of(tuple)
-            : Stream.empty();
+        return storeContains(tuple, template, TemplateStore::containsSignature);
     }
 
     @Override
     public Stream<Tuple> isBase(Tuple tuple, String template) {
+        return storeContains(tuple, template, TemplateStore::containsBase);
+    }
+
+    private Stream<Tuple> storeContains(Tuple tuple, String template, BiPredicate<TemplateStore, String> containsTest) {
         String iri = tuple.getAs(String.class, template);
-        return this.store.containsBase(iri)
+        return containsTest.test(this.store, iri)
             ? Stream.of(tuple)
             : Stream.empty();
+
     }
 
     @Override

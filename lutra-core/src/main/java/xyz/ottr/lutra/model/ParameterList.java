@@ -40,7 +40,7 @@ import xyz.ottr.lutra.model.terms.TermList;
 @Getter
 public class ParameterList extends AbstractTermList {
 
-    // TODO: Bug, must be based on indicies
+    // TODO: Bug, must be based on indices
     private final Set<Term> nonBlanks;
     private final Set<Term> optionals;
     private final Map<Term, Term> defaultValues;

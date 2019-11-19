@@ -164,7 +164,7 @@ public abstract class QueryEngine<S extends TemplateStore> {
      *      a Stream of tuples binding inside to a term that occurs at a depth denoted by
      *      the variable level in the term denoted by the variable term.
      */
-    public abstract Stream<Tuple> hasOccurenceAt(Tuple tuple, String term, String inside, String level);
+    public abstract Stream<Tuple> hasOccurrenceAt(Tuple tuple, String term, String inside, String level);
 
     /**
      * Constructs a stream of maps (representing tuples) mapping the

@@ -25,6 +25,7 @@ package xyz.ottr.lutra.model;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -60,6 +61,10 @@ public class ArgumentList extends AbstractTermList {
     
     public ArgumentList(Term... elems) {
         this(List.of(elems), null, null);
+    }
+
+    public Optional<Expander> getListExpander() {
+        return Optional.ofNullable(this.listExpander);
     }
 
     // TODO: replace all expander tests with a single Optional<Expander> getExpander?

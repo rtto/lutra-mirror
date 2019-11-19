@@ -66,7 +66,9 @@ public class Substitution {
             Term argument = args.get(i);
             if (argument instanceof NoneTerm && parameters.hasDefaultValue(i)) {
                 Term defaultValue = parameters.getDefaultValue(i);
-                if (defaultValue instanceof BlankNodeTerm) { // Blank node default results in fresh blank node
+                // reassign argument with default value
+                if (defaultValue instanceof BlankNodeTerm) {
+                    // Blank node default results in fresh blank node
                     argument = new BlankNodeTerm();
                 } else {
                     argument = defaultValue;
@@ -113,7 +115,7 @@ public class Substitution {
                 .map(t -> this.termSubstitution.getOrDefault(t, t))
                 .collect(Collectors.toCollection(HashSet::new));
         }
-        return new ArgumentList(substituted, newExpanderValues, args.getListExpander());
+        return new ArgumentList(substituted, newExpanderValues, args.getListExpander().orElse(null));
     }
 
     /**

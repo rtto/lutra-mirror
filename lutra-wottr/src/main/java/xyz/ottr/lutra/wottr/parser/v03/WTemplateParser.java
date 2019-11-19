@@ -169,7 +169,7 @@ public class WTemplateParser implements TemplateParser<Model> {
                     }
                 }
                 ArgumentList newArguments = new ArgumentList(
-                    new TermList(newArgs), newExpanderValues, arguments.getListExpander());
+                    new TermList(newArgs), newExpanderValues, arguments.getListExpander().orElse(null));
                 newInstances.add(new Instance(of, newArguments));
             }
             return Template.createTemplate(template.getIri(), newParamList, newInstances);

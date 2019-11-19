@@ -36,8 +36,8 @@ import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.reasoner.Reasoner;
 import org.apache.jena.reasoner.ReasonerRegistry;
+import org.apache.jena.util.FileUtils;
 import org.apache.jena.vocabulary.RDF;
-import org.apache.jena.vocabulary.RDFS;
 import xyz.ottr.lutra.OTTR;
 
 public enum TypeRegistry {
@@ -47,23 +47,23 @@ public enum TypeRegistry {
     private static Map<BasicType, Set<BasicType>> superTypes;
     
     static {
-        init();
+        init(OTTR.Files.StdTypes);
     }
 
     // TODO: Move these elsewhere. and add other common types too, like LUB<TOP>
-    public static final BasicType TOP = getType(RDFS.Resource);
+    public static final BasicType TOP = getType(OTTR.TypeURI.Top);
     public static final BasicType BOT = getType(OTTR.TypeURI.Bot);
     public static final BasicType IRI = getType(OTTR.TypeURI.IRI);
-    public static final BasicType LITERAL = getType(RDFS.Literal);
+    public static final BasicType LITERAL = getType(OTTR.TypeURI.Literal);
+
     public static final ComplexType LUB_TOP = new LUBType(TOP);
     public static final ComplexType LUB_IRI = new LUBType(IRI);
 
 
-    // TODO change to method that takes file or model as input, and rather set the StdTypes in init()
-    private static void init() {
-        InputStream filename = TypeRegistry.class.getClassLoader().getResourceAsStream(OTTR.Files.StdTypes);
+    private static void init(String modelFile) {
+        InputStream filename = TypeRegistry.class.getClassLoader().getResourceAsStream(modelFile);
         Model types = ModelFactory.createDefaultModel();
-        types.read(filename, null, "TTL");
+        types.read(filename, null, FileUtils.guessLang(modelFile, "TTL"));
         Reasoner owlMicro = ReasonerRegistry.getOWLMicroReasoner();
         Model model = ModelFactory.createInfModel(owlMicro, types);
 

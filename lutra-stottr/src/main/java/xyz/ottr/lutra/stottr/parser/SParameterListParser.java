@@ -79,11 +79,11 @@ public class SParameterListParser extends SBaseParserVisitor<ParameterList> {
             Result<Term> varRes = Result.zipNullables(typeRes, defaultRes, (type, deflt) -> {
 
                     Term var = new BlankNodeTerm(SParameterListParser.this.termParser.getVariableLabel(ctx.Variable()));
-                    var.setVariable(true);
+                    var.setVariable(true); // TODO: Remove? Is is not already covered by Signature.setVariables()?
                     if (type != null) {
                         var.setType(type);
                     } else {
-                        var.setType(var.getVariableType());
+                        var.setType(var.getVariableType()); // TODO: Remove? Should be covered by core?
                     }
                     if (deflt != null) {
                         this.defaults.put(var, deflt);
