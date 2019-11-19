@@ -24,17 +24,15 @@ package xyz.ottr.lutra.model.terms;
 
 import java.util.Optional;
 
+import xyz.ottr.lutra.OTTR;
 import xyz.ottr.lutra.model.types.TermType;
 import xyz.ottr.lutra.model.types.TypeRegistry;
 
-public class NoneTerm extends AbstractTerm {
+public class NoneTerm extends AbstractTerm<String> {
 
     public NoneTerm() {
+        super(OTTR.prefix + ":none");
         setType(getIntrinsicType());
-    }
-
-    public Object getIdentifier() {
-        return "ottr:none";
     }
 
     @Override
@@ -54,11 +52,6 @@ public class NoneTerm extends AbstractTerm {
         return equals(other)
             ? Optional.of(this)
             : Optional.empty();
-    }
-
-    @Override
-    public boolean isBlank() {
-        return false;
     }
 
     @Override

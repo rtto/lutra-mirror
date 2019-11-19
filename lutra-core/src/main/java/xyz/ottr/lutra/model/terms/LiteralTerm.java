@@ -33,7 +33,7 @@ import xyz.ottr.lutra.model.types.TermType;
 import xyz.ottr.lutra.model.types.TypeRegistry;
 
 @Getter
-public class LiteralTerm extends AbstractTerm {
+public class LiteralTerm extends AbstractTerm<String> {
 
     public static final String LANG_STRING_DATATYPE = RDF.dtLangString.getURI(); // TODO add this type to the type hierarchy
     public static final String PLAIN_STRING_DATATYPE = XSD.xstring.toString();
@@ -43,11 +43,18 @@ public class LiteralTerm extends AbstractTerm {
     private final String languageTag;
 
     private LiteralTerm(String value, String datatype, String languageTag) {
+        super(getIdentifier(value, datatype, languageTag));
         this.value = value;
         this.datatype = datatype;
         this.languageTag = languageTag;
         setType(getIntrinsicType());
+    }
 
+    private static String getIdentifier(String value, String datatype, String languageTag) {
+        return "\"" + value + "\""
+            + (Objects.nonNull(languageTag)
+            ? "@" + languageTag
+            : "^^" + datatype);
     }
 
     @Override
@@ -76,11 +83,6 @@ public class LiteralTerm extends AbstractTerm {
     }
 
     @Override
-    public boolean isBlank() {
-        return false;
-    }
-
-    @Override
     public LiteralTerm shallowClone() {
         LiteralTerm term = new LiteralTerm(this.value, this.datatype, this.languageTag);
         term.setVariable(isVariable());
@@ -93,19 +95,10 @@ public class LiteralTerm extends AbstractTerm {
         if (!(other instanceof LiteralTerm)) {
             return Optional.empty();
         }
-
         if (isVariable() || !other.isVariable() && equals(other)) {
             return Optional.of(other);
         }
-
         return Optional.empty();
     }
-
-    @Override
-    public String getIdentifier() {
-        return "\"" + this.value + "\""
-            + (Objects.nonNull(this.languageTag)
-            ? "@" + this.languageTag
-            : "^^" + this.datatype);
-    }
+    
 }

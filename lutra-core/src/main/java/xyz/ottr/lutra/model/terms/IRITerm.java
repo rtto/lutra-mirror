@@ -24,19 +24,18 @@ package xyz.ottr.lutra.model.terms;
 
 import java.util.Optional;
 
-import lombok.Getter;
-import lombok.NonNull;
 import xyz.ottr.lutra.model.types.TermType;
 import xyz.ottr.lutra.model.types.TypeRegistry;
 
-@Getter
-public class IRITerm extends AbstractTerm {
-
-    private final @NonNull String iri;
+public class IRITerm extends AbstractTerm<String> {
 
     public IRITerm(String iri) {
-        this.iri = iri;
+        super(iri);
         setType(getIntrinsicType());
+    }
+
+    public String getIri() {
+        return getIdentifier();
     }
 
     @Override
@@ -46,7 +45,7 @@ public class IRITerm extends AbstractTerm {
 
     @Override 
     public IRITerm shallowClone() {
-        IRITerm term = new IRITerm(this.iri);
+        IRITerm term = new IRITerm(this.getIdentifier());
         term.setVariable(isVariable());
         return term;
     }
@@ -63,15 +62,5 @@ public class IRITerm extends AbstractTerm {
         }
 
         return Optional.empty();
-    }
-
-    @Override
-    public boolean isBlank() {
-        return false;
-    }
-
-    @Override
-    public String getIdentifier() {
-        return getIri();
     }
 }

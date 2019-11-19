@@ -29,18 +29,30 @@ import lombok.NonNull;
 import lombok.Setter;
 import org.apache.jena.shared.PrefixMapping;
 import xyz.ottr.lutra.OTTR;
+import xyz.ottr.lutra.model.types.LUBType;
 import xyz.ottr.lutra.model.types.TermType;
+import xyz.ottr.lutra.model.types.TypeRegistry;
 
 @Getter
 @Setter
-public abstract class AbstractTerm implements Term {
+public abstract class AbstractTerm<T> implements Term<T> {
 
+    private final T identifier;
     protected @NonNull TermType type;
     protected boolean variable;
 
+    protected AbstractTerm(T identifier) {
+        this.identifier = identifier;
+    }
+
+    @Override
+    public TermType getIntrinsicType() {
+        return this.variable ? TypeRegistry.TOP : new LUBType(TypeRegistry.TOP);
+    }
+
     @Override
     public int hashCode() {
-        return getIdentifier().hashCode();
+        return this.identifier.hashCode();
     }
 
     @Override

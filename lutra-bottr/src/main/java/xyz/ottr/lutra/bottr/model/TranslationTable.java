@@ -28,6 +28,7 @@ import java.util.Map;
 import java.util.function.Function;
 
 import xyz.ottr.lutra.bottr.util.TermFactory;
+import xyz.ottr.lutra.model.terms.BlankNodeTerm;
 import xyz.ottr.lutra.model.terms.Term;
 import xyz.ottr.lutra.system.Result;
 
@@ -49,7 +50,9 @@ public class TranslationTable implements Function<Term, Result<Term>> {
 
     public Result<Term> apply(Term value) {
         Term translation = this.table.getOrDefault(value, value);
-        return translation.isBlank() ? TermFactory.createBlankNode().map(t -> (Term) t) : Result.of(translation);
+        return translation instanceof BlankNodeTerm
+            ? TermFactory.createBlankNode().map(t -> (Term) t)
+            : Result.of(translation);
     }
 
 }

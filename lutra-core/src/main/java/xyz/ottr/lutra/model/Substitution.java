@@ -90,7 +90,7 @@ public class Substitution {
             if (p instanceof TermList) {
                 TermList tl = (TermList) p;
                 substituted.add(apply(tl));
-            } else if (p.isBlank() && !this.termSubstitution.containsKey(p)) {
+            } else if (p instanceof BlankNodeTerm && !this.termSubstitution.containsKey(p)) {
                 BlankNodeTerm blank = new BlankNodeTerm();
                 this.termSubstitution.put(p, blank);
                 substituted.add(blank);

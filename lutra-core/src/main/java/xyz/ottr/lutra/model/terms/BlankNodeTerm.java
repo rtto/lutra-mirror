@@ -24,17 +24,12 @@ package xyz.ottr.lutra.model.terms;
 
 import java.util.Optional;
 
-import lombok.Getter;
-import lombok.NonNull;
-
-@Getter
-public class BlankNodeTerm extends AbstractTerm {
+public class BlankNodeTerm extends AbstractTerm<String> {
 
     private static long newID = 0L;
-    private final @NonNull String label;
 
     public BlankNodeTerm(String label) {
-        this.label = label;
+        super(label);
         setType(getIntrinsicType());
     }
 
@@ -47,9 +42,13 @@ public class BlankNodeTerm extends AbstractTerm {
         return newID;
     }
 
+    public String getLabel() {
+        return getIdentifier();
+    }
+
     @Override
     public BlankNodeTerm shallowClone() {
-        BlankNodeTerm term = new BlankNodeTerm(this.label);
+        BlankNodeTerm term = new BlankNodeTerm(this.getIdentifier());
         term.setVariable(isVariable());
         return term;
     }
@@ -59,13 +58,4 @@ public class BlankNodeTerm extends AbstractTerm {
         return Optional.of(other); // TODO: Correct if other is a variable?
     }
 
-    @Override
-    public boolean isBlank() {
-        return true;
-    }
-
-    @Override
-    public String getIdentifier() {
-        return getLabel();
-    }
 }

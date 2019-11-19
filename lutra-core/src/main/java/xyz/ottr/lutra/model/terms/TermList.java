@@ -35,7 +35,7 @@ import xyz.ottr.lutra.model.types.NEListType;
 import xyz.ottr.lutra.model.types.TermType;
 import xyz.ottr.lutra.model.types.TypeRegistry;
 
-public class TermList extends AbstractTerm implements SimpleList<Term> {
+public class TermList extends AbstractTerm<Long> implements SimpleList<Term> {
 
     private static long newID = 0L;
 
@@ -44,6 +44,7 @@ public class TermList extends AbstractTerm implements SimpleList<Term> {
 
 
     public TermList(List<Term> terms, boolean variable) {
+        super(generateNewID()); // TODO change this?
         this.terms = terms;
         this.listID = generateNewID();
         setType(getIntrinsicType());
@@ -64,7 +65,6 @@ public class TermList extends AbstractTerm implements SimpleList<Term> {
             ? new ListType(TypeRegistry.BOT)
             : new NEListType(new LUBType(TypeRegistry.TOP));
     }
-
 
     /**
      * As variables have a type depending on its declaration in the head
@@ -94,11 +94,6 @@ public class TermList extends AbstractTerm implements SimpleList<Term> {
 
     public boolean equalContentAs(TermList o) {
         return this.asList().equals(o.asList());
-    }
-
-    @Override
-    public boolean isBlank() {
-        return false;
     }
 
     @Override
@@ -133,12 +128,6 @@ public class TermList extends AbstractTerm implements SimpleList<Term> {
             result.add(ot.get());
         }
         return Optional.of(new TermList(result, false));
-    }
-
-    // TODO since this is used in hashcode, should we include the list in the identifier?
-    @Override
-    public Object getIdentifier() {
-        return this.listID;
     }
 
     @Override

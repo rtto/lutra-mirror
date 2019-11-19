@@ -28,9 +28,9 @@ import org.apache.jena.shared.PrefixMapping;
 import xyz.ottr.lutra.model.types.TermType;
 import xyz.ottr.lutra.model.types.TypeRegistry;
 
-public interface Term {
+public interface Term<I> {
 
-    Object getIdentifier();
+    I getIdentifier();
 
     void setType(TermType term);
 
@@ -53,9 +53,6 @@ public interface Term {
     boolean isVariable();
 
     void setVariable(boolean variable);
-
-    // TODO: only needed in Clustering, perhaps find better way of handling RDF-specifics in lutra-core.
-    boolean isBlank();
 
     Optional<Term> unify(Term other);
 

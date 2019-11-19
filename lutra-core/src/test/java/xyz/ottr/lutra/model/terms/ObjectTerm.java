@@ -24,33 +24,16 @@ package xyz.ottr.lutra.model.terms;
 
 import java.util.Optional;
 
-import xyz.ottr.lutra.model.types.LUBType;
-import xyz.ottr.lutra.model.types.TermType;
-import xyz.ottr.lutra.model.types.TypeRegistry;
-
-// TODO: remove ObjectTerm, but figure out how to best replace it.
-public class ObjectTerm extends AbstractTerm {
-
-    private final Object identifier;
+public class ObjectTerm extends AbstractTerm<Object> {
 
     public ObjectTerm(Object identifier, boolean variable) {
-        this.identifier = identifier;
+        super(identifier);
         setVariable(variable);
         setType(getIntrinsicType());
     }
 
     public ObjectTerm(Object identifier) {
         this(identifier, false);
-    }
-
-    @Override
-    public TermType getIntrinsicType() {
-        return super.variable ? TypeRegistry.TOP : new LUBType(TypeRegistry.TOP);
-    }
-
-    @Override
-    public Object getIdentifier() {
-        return this.identifier;
     }
 
     @Override
@@ -68,8 +51,4 @@ public class ObjectTerm extends AbstractTerm {
         return new ObjectTerm(getIdentifier());
     }
 
-    @Override
-    public boolean isBlank() {
-        return false;
-    }
 }
