@@ -209,7 +209,7 @@ $(function() {
 	$.ajax({
 	    data: formData,
 	    type: "post",
-	    url: "http://sws.ifi.uio.no/lutra/expand",
+	    url: "https://sws.ifi.uio.no/lutra/expand",
 	    processData: false,
 	    contentType: false,
 	    success: function(response) {
