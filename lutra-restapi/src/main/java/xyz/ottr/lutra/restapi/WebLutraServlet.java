@@ -53,11 +53,11 @@ public class WebLutraServlet extends HttpServlet {
     private static final long serialVersionUID = -7342968018534639139L;
 
     private static final List<String> originWhitelist = List.of(
-        "http://weblutra.ottr.xyz",
-        "http://ottr.xyz",
-        "http://www.ottr.xyz",
-        "http://spec.ottr.xyz",
-        "http://dev.spec.ottr.xyz"
+        "https://weblutra.ottr.xyz",
+        "https://ottr.xyz",
+        "https://www.ottr.xyz",
+        "https://spec.ottr.xyz",
+        "https://dev.spec.ottr.xyz"
     );
     
     private static final String repoLibrary = "https://gitlab.com/ottr/templates.git";
