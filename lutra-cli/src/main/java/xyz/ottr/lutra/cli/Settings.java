@@ -111,6 +111,11 @@ public class Settings {
                        + "(default: ${DEFAULT-VALUE})"})
     public boolean fetchMissingDependencies = false;
 
+    @Option(names = {"-p", "--prefixes"},
+        description = "Path to RDF file containing prefix declarations to be used when rendering output. "
+            + "   Any other data in the file is read, but ignored.")
+    public String prefixes;
+
     @Option(names = {"-F", "--fetchFormat"},
         description = {"The input format of the templates fetched via the -f flag."})
     public Format fetchFormat;

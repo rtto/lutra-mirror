@@ -31,12 +31,12 @@ public class BottrTest {
     
     @Ignore("Relative source paths inside query don't work.")
     public void expandH2Source() {
-        runCLI("-I bottr -f --stdout " + ROOT + "instanceMapH2Source.ttl");
+        runCLI("-I bottr -f --stdout -p " + ROOT + "instanceMapH2Source.ttl");
     }
 
     @Test
     public void expandRDFSource() {
-        runCLI("-I bottr -f --stdout " + ROOT + "instanceMapRDFSource.ttl");
+        runCLI("-I bottr -f --stdout -p " + ROOT + "instanceMapRDFSource.ttl " + ROOT + "instanceMapRDFSource.ttl");
     }
 
     @Test
