@@ -122,12 +122,23 @@ public enum PrefixMappings {
     }
 
     public static void trim(Model model) {
-        Set<String> namespaces = model.listNameSpaces().toSet();
+
+        Set<String> namespaces = getAllURIsNamespaces(model);
         for (String prefixNamespace : model.getNsPrefixMap().values()) {
             if (!namespaces.contains(prefixNamespace)) {
                 model.removeNsPrefix(model.getNsURIPrefix(prefixNamespace));
             }
         }
+    }
+
+    private static Set<String> getAllURIsNamespaces(Model model) {
+        return model.listObjects()
+            .andThen(model.listSubjects())
+            .andThen(model.listStatements().mapWith(s -> s.getPredicate()))
+            .filterKeep(t -> t.isURIResource())
+            .mapWith(o -> o.asResource())
+            .mapWith(o -> o.getNameSpace())
+            .toSet();
     }
     
     public static String toStringTurtleFormat(PrefixMapping mapping) {
