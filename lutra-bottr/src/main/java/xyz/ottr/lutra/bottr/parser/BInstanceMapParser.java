@@ -54,16 +54,16 @@ public class BInstanceMapParser implements Function<Model, ResultStream<Instance
 
     private Result<InstanceMap> parseInstanceMap(Model model, Resource instanceMap) {
 
-        Result<InstanceMap.InstanceMapBuilder> builder = Result.of(InstanceMap.builder());
-        builder.addResult(getTemplate(model, instanceMap), InstanceMap.InstanceMapBuilder::templateIRI);
-        builder.addResult(getQuery(model, instanceMap), InstanceMap.InstanceMapBuilder::query);
+        Result<InstanceMap.Builder> builder = Result.of(InstanceMap.builder());
+        builder.addResult(getTemplate(model, instanceMap), InstanceMap.Builder::templateIRI);
+        builder.addResult(getQuery(model, instanceMap), InstanceMap.Builder::query);
 
         Result<Source<?>> source = getSource(model, instanceMap);
-        builder.addResult(source, InstanceMap.InstanceMapBuilder::source);
+        builder.addResult(source, InstanceMap.Builder::source);
 
         Result<ArgumentMaps> tupleMap = source.flatMap(s -> getArgumentMaps(model, instanceMap, s));
-        builder.addResult(tupleMap, InstanceMap.InstanceMapBuilder::argumentMaps);
-        return builder.map(InstanceMap.InstanceMapBuilder::build);
+        builder.addResult(tupleMap, InstanceMap.Builder::argumentMaps);
+        return builder.map(InstanceMap.Builder::build);
     }
 
     private Result<String> getTemplate(Model model, Resource instanceMap) {

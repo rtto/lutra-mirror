@@ -31,7 +31,7 @@ import xyz.ottr.lutra.result.ResultStream;
  */
 
 @Getter
-@Builder
+@Builder(builderClassName = "Builder")
 public class InstanceMap<V> implements Supplier<ResultStream<Instance>> {
 
     private final @NonNull Source<V> source;

@@ -22,13 +22,14 @@ package xyz.ottr.lutra.bottr.source;
  * #L%
  */
 
-import static org.junit.Assert.assertEquals;
+import static org.hamcrest.CoreMatchers.is;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 
 import org.apache.jena.rdf.model.RDFNode;
+import org.junit.Assert;
 import org.junit.Test;
 
 import xyz.ottr.lutra.bottr.model.Source;
@@ -52,6 +53,6 @@ public class RDFFileSourceTest {
         ResultStream<?> result = source.execute(
                 "PREFIX foaf: <http://xmlns.com/foaf/0.1/>  " 
                         + "SELECT ?s WHERE { ?s a foaf:Person }");
-        assertEquals(6, result.getStream().count());
+        Assert.assertThat(result.getStream().count(), is(6L));
     }
 }

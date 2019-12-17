@@ -22,6 +22,8 @@ package xyz.ottr.lutra.bottr.source;
  * #L%
  */
 
+import org.apache.jena.rdf.model.RDFNode;
+import org.apache.jena.rdf.model.ResourceFactory;
 import org.apache.jena.shared.PrefixMapping;
 
 import xyz.ottr.lutra.bottr.model.ArgumentMap;
@@ -38,6 +40,11 @@ public class StringArgumentMap extends ArgumentMap<String> {
 
     public StringArgumentMap(PrefixMapping prefixes, TermType type) {
         super(prefixes, type);
+    }
+
+    @Override
+    protected RDFNode toRDFNode(String value) {
+        return ResourceFactory.createPlainLiteral(value);
     }
 
     public StringArgumentMap(PrefixMapping prefixes) {

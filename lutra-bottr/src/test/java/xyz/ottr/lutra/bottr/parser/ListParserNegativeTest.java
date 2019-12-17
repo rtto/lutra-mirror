@@ -22,6 +22,8 @@ package xyz.ottr.lutra.bottr.parser;
  * #L%
  */
 
+import static org.hamcrest.CoreMatchers.is;
+
 import java.util.Collection;
 import java.util.List;
 
@@ -72,7 +74,7 @@ public class ListParserNegativeTest {
 
     public void test(String value) {
         List list = this.parser.toList(value);
-        Assert.assertEquals(value, list.toString());
+        Assert.assertThat(list.toString(), is(value));
     }
 
 }

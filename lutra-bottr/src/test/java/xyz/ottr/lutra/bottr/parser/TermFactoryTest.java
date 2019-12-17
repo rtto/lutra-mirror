@@ -22,14 +22,14 @@ package xyz.ottr.lutra.bottr.parser;
  * #L%
  */
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.hamcrest.CoreMatchers.is;
 
 import org.apache.jena.graph.Node;
 import org.apache.jena.riot.system.PrefixMap;
 import org.apache.jena.riot.system.PrefixMapFactory;
 import org.apache.jena.shared.PrefixMapping;
 import org.apache.jena.sparql.util.NodeFactoryExtra;
+import org.junit.Assert;
 import org.junit.Test;
 
 public class TermFactoryTest {
@@ -61,26 +61,26 @@ public class TermFactoryTest {
 
     private void isURI(String value) {
         Node node = getNode(value);
-        assertTrue(node.isURI());
-        assertFalse(node.isLiteral());
-        assertFalse(node.isBlank());
-        assertFalse(node.isVariable());
+        Assert.assertThat(node.isURI(), is(true));
+        Assert.assertThat(node.isLiteral(), is(false));
+        Assert.assertThat(node.isBlank(), is(false));
+        Assert.assertThat(node.isVariable(), is(false));
     }
 
     private void isLiteral(String value) {
         Node node = getNode(value);
-        assertFalse(node.isURI());
-        assertTrue(node.isLiteral());
-        assertFalse(node.isBlank());
-        assertFalse(node.isVariable());
+        Assert.assertThat(node.isURI(), is(false));
+        Assert.assertThat(node.isLiteral(), is(true));
+        Assert.assertThat(node.isBlank(), is(false));
+        Assert.assertThat(node.isVariable(), is(false));
     }
 
     private void isBlank(String value) {
         Node node = getNode(value);
-        assertFalse(node.isURI());
-        assertFalse(node.isLiteral());
-        assertTrue(node.isBlank());
-        assertFalse(node.isVariable());
+        Assert.assertThat(node.isURI(), is(false));
+        Assert.assertThat(node.isLiteral(), is(false));
+        Assert.assertThat(node.isBlank(), is(true));
+        Assert.assertThat(node.isVariable(), is(false));
     }
 
     private Node getNode(String value) {

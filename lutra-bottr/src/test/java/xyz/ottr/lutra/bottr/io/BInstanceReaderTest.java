@@ -22,11 +22,12 @@ package xyz.ottr.lutra.bottr.io;
  * #L%
  */
 
-import static org.junit.Assert.assertEquals;
+import static org.hamcrest.CoreMatchers.is;
 
 import java.util.stream.Stream;
 
 import org.apache.jena.rdf.model.Model;
+import org.junit.Assert;
 import org.junit.Test;
 import xyz.ottr.lutra.model.Instance;
 import xyz.ottr.lutra.result.Result;
@@ -39,13 +40,13 @@ public class BInstanceReaderTest {
 
     private static final String ROOT = "src/test/resources/";
 
-    private void testNumberOfInstances(String map, int size) {
+    private void testNumberOfInstances(String map, long size) {
         Stream<Result<Instance>> instances = Result.of(map)
             .mapToStream(new BInstanceReader())
             .getStream()
             .filter(Result::isPresent);
 
-        assertEquals(size, instances.count());
+        Assert.assertThat(instances.count(), is(size));
     }
 
     private Model getRDFModel(String mapFile) {
@@ -71,14 +72,14 @@ public class BInstanceReaderTest {
     @Test
     public void testSPARQLMap() {
         String file = ROOT + "maps/instanceMapSPARQL.ttl";
-        testNumberOfInstances(file, 13);
+        testNumberOfInstances(file, 13L);
         printRDFOutput(file);
     }
 
     @Test
     public void testRDFSourceMap() {
         String file = ROOT + "maps/instanceMapRDFSource.ttl";
-        testNumberOfInstances(file,6);
+        testNumberOfInstances(file,6L);
         printRDFOutput(file);
     }
 
@@ -86,21 +87,21 @@ public class BInstanceReaderTest {
     public void testCSVSourceMap() {
         String file = ROOT + "maps/instanceMapH2Source.ttl";
         printRDFOutput(file);
-        testNumberOfInstances(file, 5);
+        testNumberOfInstances(file, 5L);
     }
 
     @Test
     public void testCSVSourceMapLists() {
         String file = ROOT + "maps/listInstanceMapH2Source.ttl";
         printRDFOutput(file);
-        testNumberOfInstances(file, 1);
+        testNumberOfInstances(file, 1L);
     }
 
     @Test
     public void testRDFSourceMapLists() {
         String file = ROOT + "maps/listInstanceMapRDFSource.ttl";
         printRDFOutput(file);
-        testNumberOfInstances(file, 1);
+        testNumberOfInstances(file, 1L);
     }
 
 
