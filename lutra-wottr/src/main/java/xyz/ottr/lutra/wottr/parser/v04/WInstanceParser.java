@@ -34,8 +34,8 @@ import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.RDFList;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
+
 import xyz.ottr.lutra.OTTR;
-import xyz.ottr.lutra.model.ArgumentList;
 import xyz.ottr.lutra.model.Instance;
 import xyz.ottr.lutra.model.terms.Term;
 import xyz.ottr.lutra.parser.InstanceParser;
@@ -110,7 +110,7 @@ public class WInstanceParser implements InstanceParser<Model> {
         argumentList.ifPresent(list -> {
             if (list.hasListExpander() == list.getExpanderValues().isEmpty()) { // xor = not equal
                 argumentList.addMessage(Message.error(
-                    "An instance must have a list expander if and only if it has one or more expander values."));
+                    "An instance must have a listExpander if and only if it has one or more listExpander values."));
             }
         });
 
@@ -118,14 +118,14 @@ public class WInstanceParser implements InstanceParser<Model> {
     }
 
     /**
-     * Note that the expander system may be null both when there is no
+     * Note that the listExpander system may be null both when there is no
      * expanders and when are errors.
      */
     private Result<ArgumentList.Expander> getExpander(Model model, Resource instance) {
         return ModelSelector.getOptionalResourceObject(model, instance, WOTTR.modifier)
             .flatMap(r -> WOTTR.listExpanders.keySet().contains(r)
                 ? Result.ofNullable(WOTTR.listExpanders.get(r))
-                : Result.error("Unknown expander " + RDFNodes.toString(r) + " in instance " + RDFNodes.toString(instance) + "."));
+                : Result.error("Unknown listExpander " + RDFNodes.toString(r) + " in instance " + RDFNodes.toString(instance) + "."));
     }
 
     private Result<ArgumentList> getArguments(Model model, RDFList arguments, Result<ArgumentList.Expander> expander) {

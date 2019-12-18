@@ -39,10 +39,10 @@ import xyz.ottr.lutra.OTTR;
 import xyz.ottr.lutra.model.Instance;
 import xyz.ottr.lutra.model.terms.BlankNodeTerm;
 import xyz.ottr.lutra.model.terms.IRITerm;
+import xyz.ottr.lutra.model.terms.ListTerm;
 import xyz.ottr.lutra.model.terms.LiteralTerm;
 import xyz.ottr.lutra.model.terms.NoneTerm;
 import xyz.ottr.lutra.model.terms.Term;
-import xyz.ottr.lutra.model.terms.TermList;
 import xyz.ottr.lutra.wottr.vocabulary.WOTTRVocabulary;
 
 public class RDFFactory {
@@ -101,8 +101,8 @@ public class RDFFactory {
 
     public RDFNode createRDFNode(Model model, Term term) {
 
-        if (term instanceof TermList) {
-            return createRDFList(model, (TermList) term);
+        if (term instanceof ListTerm) {
+            return createRDFList(model, (ListTerm) term);
         } else if (term instanceof IRITerm) {
             return createURIResource(model, (IRITerm) term);
         } else if (term instanceof LiteralTerm) {
@@ -117,7 +117,7 @@ public class RDFFactory {
         }
     }
 
-    public RDFList createRDFList(Model model, TermList term) {
+    public RDFList createRDFList(Model model, ListTerm term) {
         Iterator<RDFNode> iterator = term.asList().stream()
             .map(t -> createRDFNode(model, t))
             .iterator();

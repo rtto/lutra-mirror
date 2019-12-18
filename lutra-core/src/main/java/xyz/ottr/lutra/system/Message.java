@@ -91,13 +91,13 @@ public class Message {
     public void log(Logger log) {
         switch (this.lvl) {
             case WARNING:
-                log.warn(this.getMessage());
+                log.warn(this.msg);
                 break;
             case INFO:
-                log.trace(this.getMessage());
+                log.trace(this.msg);
                 break;
             default:
-                log.error(this.getMessage());
+                log.error(this.msg);
         }
     }
 

@@ -30,7 +30,7 @@ import org.apache.jena.riot.Lang;
 import org.junit.Assert;
 import xyz.ottr.lutra.io.InstanceReader;
 import xyz.ottr.lutra.model.Instance;
-import xyz.ottr.lutra.store.DependencyGraph;
+import xyz.ottr.lutra.store.graph.DependencyGraph;
 import xyz.ottr.lutra.store.TemplateStore;
 import xyz.ottr.lutra.system.Message;
 import xyz.ottr.lutra.system.ResultConsumer;

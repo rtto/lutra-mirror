@@ -2,7 +2,7 @@
 <FindBugsFilter>
   <Match>
     <!-- Template inherits equals and hashCode from KnowledgeBase -->
-    <Class name="xyz.ottr.lutra.store.TemplateNode" />
+    <Class name="xyz.ottr.lutra.store.graph.TemplateNode" />
     <Bug pattern="EQ_DOESNT_OVERRIDE_EQUALS" />
   </Match>
   <Match>

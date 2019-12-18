@@ -1,4 +1,4 @@
-package xyz.ottr.lutra.store.query;
+package xyz.ottr.lutra.model;
 
 /*-
  * #%L
@@ -22,23 +22,8 @@ package xyz.ottr.lutra.store.query;
  * #L%
  */
 
-import java.util.function.Function;
-import java.util.stream.Stream;
+public interface TermSubstitutable<E> {
 
-import xyz.ottr.lutra.store.TemplateStore;
-import xyz.ottr.lutra.system.Message;
+    E apply(Substitution substitution);
 
-public class Check {
-
-    private final Query query;
-    private final Function<Tuple, Message> toMessage;
-
-    public Check(Query query, Function<Tuple, Message> toMessage) {
-        this.query = query;
-        this.toMessage = toMessage;
-    }
-
-    public Stream<Message> check(QueryEngine<? extends TemplateStore> engine) {
-        return this.query.eval(engine).map(this.toMessage).distinct();
-    }
 }

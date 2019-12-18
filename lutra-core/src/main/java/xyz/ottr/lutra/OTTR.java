@@ -22,20 +22,17 @@ package xyz.ottr.lutra;
  * #L%
  */
 
-import java.util.HashSet;
-import java.util.Set;
-
 import org.apache.jena.shared.PrefixMapping;
 import org.apache.jena.vocabulary.OWL;
 import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.RDFS;
 import org.apache.jena.vocabulary.XSD;
-import xyz.ottr.lutra.model.ParameterList;
+
+import xyz.ottr.lutra.model.Parameter;
 import xyz.ottr.lutra.model.Signature;
 import xyz.ottr.lutra.model.Template;
 import xyz.ottr.lutra.model.terms.BlankNodeTerm;
 import xyz.ottr.lutra.model.terms.Term;
-import xyz.ottr.lutra.model.terms.TermList;
 import xyz.ottr.lutra.model.types.TypeRegistry;
 
 public enum OTTR  {
@@ -80,19 +77,19 @@ public enum OTTR  {
             Term obj = new BlankNodeTerm("_:o");
             obj.setType(obj.getVariableType());
 
-            Set<Term> nonBlanks = new HashSet<>();
-            nonBlanks.add(pred);
-            Triple = Template.createBaseTemplate(
-                OTTR.BaseURI.Triple,
-                new ParameterList(new TermList(sub, pred, obj), nonBlanks, null, null));
+            Triple = Template.builder()
+                .iri(OTTR.BaseURI.Triple)
+                .parameter(Parameter.builder().term(sub).build())
+                .parameter(Parameter.builder().term(pred).nonBlank(true).build())
+                .parameter(Parameter.builder().term(obj).build())
+                .build();
 
-            Set<Term> optionals = new HashSet<>();
-            optionals.add(sub);
-            optionals.add(pred);
-            optionals.add(obj);
-            NullableTriple = Template.createBaseTemplate(
-                OTTR.BaseURI.NullableTriple,
-                new ParameterList(new TermList(sub, pred, obj), nonBlanks, optionals, null));
+            NullableTriple = Template.builder()
+                .iri(OTTR.BaseURI.Triple)
+                .parameter(Parameter.builder().term(sub).optional(true).build())
+                .parameter(Parameter.builder().term(pred).optional(true).nonBlank(true).build())
+                .parameter(Parameter.builder().term(obj).optional(true).build())
+                .build();
         }
     }
     

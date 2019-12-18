@@ -62,7 +62,7 @@ public class NEListType extends ComplexType {
 
     @Override
     public String toString() {
-        return "NEList<" + getInner().toString() + ">";
+        return "NEList<" + getInner() + ">";
     }
 
 }

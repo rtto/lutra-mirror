@@ -1,4 +1,4 @@
-package xyz.ottr.lutra.model.terms;
+package xyz.ottr.lutra.model;
 
 /*-
  * #%L
@@ -22,22 +22,9 @@ package xyz.ottr.lutra.model.terms;
  * #L%
  */
 
-import java.util.List;
+import xyz.ottr.lutra.model.terms.Term;
 
-// TODO Rename to something else?
-public interface SimpleList<X> {
+public interface TermWrapper {
 
-    List<X> asList();
-
-    default int size() {
-        return asList().size();
-    }
-
-    default boolean isEmpty() {
-        return asList().isEmpty();
-    }
-
-    default X get(int i) {
-        return asList().get(i);
-    }
+    Term getTerm();
 }

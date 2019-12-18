@@ -212,7 +212,7 @@ public class MessageHandler {
     public Optional<Message> toSingleMessage(String initialMessage) {
         StringBuilder str = new StringBuilder();
         int severity = visitMessagesAndTraces(
-            msg -> str.append(msg.toString() + "\n"), 
+            msg -> str.append(msg + "\n"),
             trace -> str.append(getLocation(trace)));
 
         if (str.length() == 0) { // No messages added

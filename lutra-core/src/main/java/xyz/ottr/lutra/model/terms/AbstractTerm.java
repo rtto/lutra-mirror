@@ -29,19 +29,20 @@ import lombok.NonNull;
 import lombok.Setter;
 import org.apache.jena.shared.PrefixMapping;
 import xyz.ottr.lutra.OTTR;
+import xyz.ottr.lutra.model.Substitution;
 import xyz.ottr.lutra.model.types.LUBType;
 import xyz.ottr.lutra.model.types.TermType;
 import xyz.ottr.lutra.model.types.TypeRegistry;
 
 @Getter
 @Setter
-public abstract class AbstractTerm<T> implements Term<T> {
+public abstract class AbstractTerm<T> implements Term {
 
     private final T identifier;
     protected @NonNull TermType type;
     protected boolean variable;
 
-    protected AbstractTerm(T identifier) {
+    AbstractTerm(T identifier) {
         this.identifier = identifier;
     }
 
@@ -60,15 +61,19 @@ public abstract class AbstractTerm<T> implements Term<T> {
         return this == o
             || Objects.nonNull(o)
             && getClass() == o.getClass()
-            && this.isVariable() == ((Term) o).isVariable()
-            && Objects.equals(this.getIdentifier(), ((Term) o).getIdentifier());
+            && this.variable == ((Term) o).isVariable()
+            && Objects.equals(this.identifier, ((AbstractTerm) o).identifier);
     }
 
+    @Override
+    public Term apply(Substitution substitution) {
+        return Objects.requireNonNullElse(substitution.get(this), this);
+    }
 
     public String toString(PrefixMapping prefixes) {
         return this.variable ? "?" : ""
-            + prefixes.shortForm(getIdentifier().toString())
-            + " : " + prefixes.shortForm(getType().toString());
+            + prefixes.shortForm(identifier.toString())
+            + " : " + prefixes.shortForm(type.toString());
     }
 
     public String toString() {

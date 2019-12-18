@@ -29,55 +29,44 @@ import java.util.stream.Collectors;
 
 import lombok.Getter;
 import lombok.NonNull;
+import lombok.Singular;
+import lombok.experimental.SuperBuilder;
 import org.apache.jena.shared.PrefixMapping;
 import xyz.ottr.lutra.OTTR;
+import xyz.ottr.lutra.model.terms.ListTerm;
 import xyz.ottr.lutra.model.terms.Term;
-import xyz.ottr.lutra.model.terms.TermList;
 import xyz.ottr.lutra.model.types.TermType;
 
 @SuppressWarnings("PMD.UselessOverridingMethod")
 @Getter
+@SuperBuilder
 public class Template extends Signature {
 
-    private final @NonNull Set<Instance> pattern;
+    @Singular private final @NonNull Set<Instance> instances;
 
-    public static Template createTemplate(String iri, ParameterList parameters, Set<Instance> pattern) {
-        return new Template(iri, parameters, pattern);
-    }
-
-    public static Template createTemplate(Signature signature, Set<Instance> pattern) {
-        return new Template(signature.getIri(), signature.getParameters(), pattern);
-    }
-
-    public static Signature createBaseTemplate(String iri, ParameterList parameters) {
-        return new Signature(iri, parameters, true);
-    }
-
-    public static Signature createSignature(String iri, ParameterList parameters) {
-        return new Signature(iri, parameters, false);
-    }
-
-    private Template(String iri, ParameterList parameters, Set<Instance> pattern) {
+    public Template(String iri, List<Parameter> parameters, Set<Instance> instances) {
         super(iri, parameters);
-        this.pattern = pattern;
+        this.instances = instances;
         setVariableFlagsAndTypes();
     }
 
     private void setVariableFlagsAndTypes() {
-        super.setVariables();
-
         // Collect parameter types
-        Map<Object, TermType> parameterTypes = getParameters().asList().stream()
+        Map<Object, TermType> parameterTypes = getParameters().stream()
+            .map(Parameter::getTerm)
             .collect(Collectors.toMap(Term::getIdentifier, Term::getType, (t1, t2) -> t1));
 
-        this.pattern.forEach(instance ->
-            setVariableFlagsAndTypes(instance.getArguments().asList(), parameterTypes));
+        this.instances.forEach(instance ->
+            setVariableFlagsAndTypes(
+                instance.getArguments().stream()
+                    .map(Argument::getTerm)
+                    .collect(Collectors.toList()), parameterTypes));
     }
 
     private void setVariableFlagsAndTypes(List<Term> terms, Map<Object, TermType> parameterTypes) {
         terms.forEach(term -> {
-            if (term instanceof TermList) {
-                TermList tl = (TermList) term;
+            if (term instanceof ListTerm) {
+                ListTerm tl = (ListTerm) term;
                 setVariableFlagsAndTypes(tl.asList(), parameterTypes);
                 tl.recomputeType();
             } else if (parameterTypes.containsKey(term.getIdentifier())) {
@@ -88,19 +77,17 @@ public class Template extends Signature {
     }
 
     @Override
-    public String toString(PrefixMapping prefixes) {
-        String signature = super.toString(prefixes);
-
-        String pattern = getPattern().stream()
-            .map(ins -> "\t" + ins.toString(prefixes))
-            .collect(Collectors.joining(",\n", "{", "}"));
-
-        return signature + " ::\n" + pattern + " .";
-    }
-
-    @Override
     public String toString() {
         return toString(OTTR.getDefaultPrefixes());
+    }
+
+    public String toString(PrefixMapping prefixes) {
+        return super.toString(prefixes)
+            + " ::\n"
+            + this.instances.stream()
+                .map(ins -> "\t" + ins.toString(prefixes))
+                .collect(Collectors.joining(",\n", "{", "}"))
+            + " .";
     }
 
     @Override

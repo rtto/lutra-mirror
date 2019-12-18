@@ -1,4 +1,4 @@
-package xyz.ottr.lutra.store.query;
+package xyz.ottr.lutra.store;
 
 /*-
  * #%L
@@ -26,8 +26,6 @@ import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
 import java.util.stream.Stream;
 
-import xyz.ottr.lutra.store.TemplateStore;
-
 public class Query {
 
     //public static final Query UNIFIES2 = Query.template("T1")
@@ -42,19 +40,19 @@ public class Query {
     //    .and(Query.unifiesBody("B1U", "B2U", "UB"));
 
     // Query for finding all pairs of templates witch unifies
-    public static final Query UNIFIES = Query.template("T1")
-        .and(Query.template("T2"))
-        .and(Query.body("T1", "B1"))
-        .and(Query.body("T2", "B2"))
-        .and(Query.unifiesBody("B1", "B2", "UB"));
+    public static final Query UNIFIES = template("T1")
+        .and(template("T2"))
+        .and(body("T1", "B1"))
+        .and(body("T2", "B2"))
+        .and(unifiesBody("B1", "B2", "UB"));
 
     // Query for finding all pairs of templates witch are equal
-    public static final Query EQUAL = Query.template("T1")
-        .and(Query.template("T2"))
-        .and(Query.body("T1", "B1"))
-        .and(Query.body("T2", "B2"))
-        .and(Query.unifiesBody("B1", "B2", "UB1"))
-        .and(Query.unifiesBody("B2", "B1", "UB2"));
+    public static final Query EQUAL = template("T1")
+        .and(template("T2"))
+        .and(body("T1", "B1"))
+        .and(body("T2", "B2"))
+        .and(unifiesBody("B1", "B2", "UB1"))
+        .and(unifiesBody("B2", "B1", "UB2"));
 
     // rel : (QueryEngine<? extends TemplateStore>, Tuple) -> Stream<Tuple>
     private final BiFunction<QueryEngine<? extends TemplateStore>, Tuple, Stream<Tuple>> rel;
@@ -265,10 +263,10 @@ public class Query {
      */
     public static Query usedAsType(String instance, String index, String level, String type) {
 
-        String temp =  Tuple.freshVar();
-        String para =  Tuple.freshVar();
-        String parType =  Tuple.freshVar();
-        String args =  Tuple.freshVar();
+        String temp = Tuple.freshVar();
+        String para = Tuple.freshVar();
+        String parType = Tuple.freshVar();
+        String args = Tuple.freshVar();
         String outer = Tuple.freshVar();
 
         return instanceIRI(instance, temp)

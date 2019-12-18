@@ -33,6 +33,7 @@ import java.util.function.Function;
 
 public class Trace {
 
+    private static final int MAX_CONTENT_LENGTH = 60;
     // Used to construct a printable identifier, which is stored within the Trace
     // object to provide in the trace. This is used by a MessageHandler
     // to give a location to the Messages printed. The default is just a slightly modified
@@ -43,7 +44,7 @@ public class Trace {
             return Optional.empty();
         }
 
-        int maxLength = 60;
+        int maxLength = MAX_CONTENT_LENGTH;
         String prefix = "(" + obj.getClass().getName() + ") ";
         String content = obj.toString();
         String id = prefix
@@ -153,7 +154,7 @@ public class Trace {
             Trace trace = toVisit.poll();
             traceConsumer.accept(trace);
             visited.add(trace);
-            trace.getTrace().stream()
+            trace.trace.stream()
                 .filter(t -> !visited.contains(t))
                 .forEach(toVisit::add);
         }

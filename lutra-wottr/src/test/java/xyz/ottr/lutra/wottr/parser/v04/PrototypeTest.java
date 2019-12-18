@@ -27,7 +27,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import xyz.ottr.lutra.io.TemplateReader;
 import xyz.ottr.lutra.model.Template;
-import xyz.ottr.lutra.store.DependencyGraph;
+import xyz.ottr.lutra.store.graph.DependencyGraph;
 import xyz.ottr.lutra.system.ResultConsumer;
 import xyz.ottr.lutra.wottr.io.RDFFileReader;
 import xyz.ottr.lutra.wottr.writer.v04.WTemplateWriter;
@@ -89,7 +89,7 @@ public class PrototypeTest {
         //for (int i = 0; i < nrIns; i++) {
         //    Instance ins = new Instance("http://draft.ottr.xyz/pizza/NamedPizza",
         //        new ArgumentList(new IRITerm(ns + "pizza" + i),
-        //            new TermList(new IRITerm(ns + "topping1" + i),
+        //            new ListTerm(new IRITerm(ns + "topping1" + i),
         //                new IRITerm(ns + "topping2" + i),
         //                new IRITerm(ns + "topping2" + i))));
         //    instances.add(ins);

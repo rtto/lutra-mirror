@@ -53,7 +53,7 @@ public class IRITerm extends AbstractTerm<String> {
     @Override
     public Optional<Term> unify(Term other) {
 
-        if ((other instanceof TermList 
+        if ((other instanceof ListTerm
              || other instanceof IRITerm
              || other instanceof BlankNodeTerm
              || other instanceof NoneTerm)

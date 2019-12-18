@@ -26,13 +26,21 @@ import java.util.Optional;
 
 public class ObjectTerm extends AbstractTerm<Object> {
 
-    public ObjectTerm(Object identifier, boolean variable) {
+    public static ObjectTerm var(Object identifier) {
+        return new ObjectTerm(identifier, true);
+    }
+
+    public static ObjectTerm cons(Object identifier) {
+        return new ObjectTerm(identifier, false);
+    }
+
+    private ObjectTerm(Object identifier, boolean variable) {
         super(identifier);
         setVariable(variable);
         setType(getIntrinsicType());
     }
 
-    public ObjectTerm(Object identifier) {
+    private ObjectTerm(Object identifier) {
         this(identifier, false);
     }
 
@@ -48,7 +56,7 @@ public class ObjectTerm extends AbstractTerm<Object> {
 
     @Override
     public Term shallowClone() {
-        return new ObjectTerm(getIdentifier());
+        return ObjectTerm.cons(getIdentifier());
     }
 
 }

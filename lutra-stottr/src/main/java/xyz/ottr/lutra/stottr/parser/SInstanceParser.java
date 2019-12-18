@@ -80,7 +80,7 @@ public class SInstanceParser extends SParser<Instance> implements InstanceParser
             .visitIri(ctx.templateName().iri())
             .map(iri -> ((IRITerm) iri).getIri());
 
-        // Parse arguments and possible list expander
+        // Parse arguments and possible listExpander
         SArgumentListParser argumentListParser = new SArgumentListParser(getTermParser());
         Result<ArgumentList> argsRes = argumentListParser.visitInstance(ctx);
 

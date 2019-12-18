@@ -242,7 +242,7 @@ public interface TemplateStore extends Consumer<Signature> {
      *          results in empty Result-objects
      */ 
     default ResultStream<Signature> getTemplateSignatures(Set<String> iris) {
-        return new ResultStream<>(iris.stream().map(iri -> getTemplateSignature(iri)));
+        return new ResultStream<>(iris.stream().map(this::getTemplateSignature));
     }
 
     /**

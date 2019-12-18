@@ -27,23 +27,26 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import lombok.Builder;
+import lombok.Singular;
 import org.apache.jena.shared.PrefixMapping;
 
+import xyz.ottr.lutra.model.Substitution;
 import xyz.ottr.lutra.model.types.LUBType;
 import xyz.ottr.lutra.model.types.ListType;
 import xyz.ottr.lutra.model.types.NEListType;
 import xyz.ottr.lutra.model.types.TermType;
 import xyz.ottr.lutra.model.types.TypeRegistry;
 
-public class TermList extends AbstractTerm<Long> implements SimpleList<Term> {
+public class ListTerm extends AbstractTerm<Long> {
 
     private static long newID = 0L;
 
     private final List<Term> terms;
     private final long listID; // Used to distinguish different lists but with same elements
 
-
-    public TermList(List<Term> terms, boolean variable) {
+    @Builder(toBuilder = true)
+    public ListTerm(@Singular List<Term> terms, boolean variable) {
         super(generateNewID()); // TODO change this?
         this.terms = terms;
         this.listID = generateNewID();
@@ -51,11 +54,11 @@ public class TermList extends AbstractTerm<Long> implements SimpleList<Term> {
         setVariable(variable);
     }
 
-    public TermList(List<Term> terms) {
+    public ListTerm(List<Term> terms) {
         this(terms, false);
     }
 
-    public TermList(Term... terms) {
+    public ListTerm(Term... terms) {
         this(List.of(terms));
     }
 
@@ -69,15 +72,15 @@ public class TermList extends AbstractTerm<Long> implements SimpleList<Term> {
     /**
      * As variables have a type depending on its declaration in the head
      * of a template, they might not have the proper type set on construction.
-     * Thus, the type computed at construction of this TermList might also be
+     * Thus, the type computed at construction of this ListTerm might also be
      * incorrect. This method simply recomputes its type, and is called
      * after proper typing of variables in Template.
      */
     public void recomputeType() {
 
         for (Term inner : this.terms) {
-            if (inner instanceof TermList) {
-                ((TermList) inner).recomputeType();
+            if (inner instanceof ListTerm) {
+                ((ListTerm) inner).recomputeType();
             }
         }
         setType(getIntrinsicType());
@@ -92,19 +95,27 @@ public class TermList extends AbstractTerm<Long> implements SimpleList<Term> {
         return this.terms;
     }
 
-    public boolean equalContentAs(TermList o) {
+    public boolean equalContentAs(ListTerm o) {
         return this.asList().equals(o.asList());
     }
 
     @Override
-    public TermList shallowClone() {
-        return new TermList(this.terms, this.variable);
+    public ListTerm shallowClone() {
+        return this.toBuilder().build();
+    }
+
+    @Override
+    public Term apply(Substitution substitution) {
+        // TODO is it correct to create a new list?
+        return this.toBuilder()
+            .terms(substitution.apply(this.terms))
+            .build();
     }
 
     @Override
     public Optional<Term> unify(Term other) {
 
-        if (!(other instanceof TermList)) {
+        if (!(other instanceof ListTerm)) {
             return Optional.empty();
         }
 
@@ -112,7 +123,7 @@ public class TermList extends AbstractTerm<Long> implements SimpleList<Term> {
             return Optional.of(other);
         }
 
-        List<Term> othersList = ((TermList) other).asList();
+        List<Term> othersList = ((ListTerm) other).asList();
         if (this.terms.size() != othersList.size()
             || other.isVariable()) {
             return Optional.empty();
@@ -127,7 +138,7 @@ public class TermList extends AbstractTerm<Long> implements SimpleList<Term> {
             }
             result.add(ot.get());
         }
-        return Optional.of(new TermList(result, false));
+        return Optional.of(new ListTerm(result, false));
     }
 
     @Override

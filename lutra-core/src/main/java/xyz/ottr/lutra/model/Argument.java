@@ -22,28 +22,28 @@ package xyz.ottr.lutra.model;
  * #L%
  */
 
+import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NonNull;
-import lombok.Singular;
-import lombok.experimental.SuperBuilder;
 import org.apache.jena.shared.PrefixMapping;
 import xyz.ottr.lutra.OTTR;
+import xyz.ottr.lutra.model.terms.Term;
 
 @Getter
-@SuperBuilder
-public class Signature {
+@Builder(toBuilder = true)
+public class Argument implements TermWrapper, TermSubstitutable<Argument> {
 
-    private final @NonNull String iri;
-    @Singular private final @NonNull List<Parameter> parameters; // TODO enforce no duplicates in list
+    private final @NonNull Term term;
+    private final boolean listExpander;
 
-    protected Signature(String iri, List<Parameter> parameters) {
-        this.iri = iri;
-        this.parameters = parameters;
-        this.parameters.forEach(p -> p.getTerm().setVariable(true));
+    public static List<Argument> of(Term... terms) {
+        return Arrays.stream(terms)
+            .map(t -> builder().term(t).build())
+            .collect(Collectors.toList());
     }
 
     @Override
@@ -51,23 +51,21 @@ public class Signature {
         return toString(OTTR.getDefaultPrefixes());
     }
 
-    public String toString(PrefixMapping prefixes) {
-        return prefixes.shortForm(iri)
-            + this.parameters.stream()
-                .map(t -> t.toString(prefixes))
-                .collect(Collectors.joining(", ", "[ ", " ]"));
+    public String toString(PrefixMapping prefixMapping) {
+        StringBuilder str = new StringBuilder();
+
+        if (this.listExpander) {
+            str.append("++");
+        }
+        str.append(this.term.toString(prefixMapping));
+
+        return str.toString();
     }
 
     @Override
-    public int hashCode() {
-        return this.iri.hashCode();
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        return this == o 
-                || Objects.nonNull(o) 
-                        && getClass() == o.getClass()
-                        && Objects.equals(this.iri, ((Signature) o).iri);
+    public Argument apply(Substitution substitution) {
+        return this.toBuilder()
+            .term(this.term.apply(substitution))
+            .build();
     }
 }

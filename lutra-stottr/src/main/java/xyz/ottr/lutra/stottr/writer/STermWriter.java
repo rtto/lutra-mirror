@@ -30,10 +30,10 @@ import java.util.stream.Collectors;
 
 import xyz.ottr.lutra.model.terms.BlankNodeTerm;
 import xyz.ottr.lutra.model.terms.IRITerm;
+import xyz.ottr.lutra.model.terms.ListTerm;
 import xyz.ottr.lutra.model.terms.LiteralTerm;
 import xyz.ottr.lutra.model.terms.NoneTerm;
 import xyz.ottr.lutra.model.terms.Term;
-import xyz.ottr.lutra.model.terms.TermList;
 import xyz.ottr.lutra.stottr.STOTTR;
 import xyz.ottr.lutra.wottr.vocabulary.v04.WOTTR;
 
@@ -71,8 +71,8 @@ public class STermWriter {
             return writeLiteral((LiteralTerm) term);
         } else if (term instanceof BlankNodeTerm) {
             return writeBlank((BlankNodeTerm) term);
-        } else if (term instanceof TermList) {
-            return writeList((TermList) term);
+        } else if (term instanceof ListTerm) {
+            return writeList((ListTerm) term);
         } else {
             return null; // TODO: Maybe use Result?
         }
@@ -116,7 +116,7 @@ public class STermWriter {
         return prefix + label;
     }
 
-    public String writeList(TermList list) {
+    public String writeList(ListTerm list) {
         return list.asList()
             .stream()
             .map(this::write)

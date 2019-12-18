@@ -37,10 +37,10 @@ import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.vocabulary.RDF;
 import xyz.ottr.lutra.model.terms.BlankNodeTerm;
 import xyz.ottr.lutra.model.terms.IRITerm;
+import xyz.ottr.lutra.model.terms.ListTerm;
 import xyz.ottr.lutra.model.terms.LiteralTerm;
 import xyz.ottr.lutra.model.terms.NoneTerm;
 import xyz.ottr.lutra.model.terms.Term;
-import xyz.ottr.lutra.model.terms.TermList;
 import xyz.ottr.lutra.system.Result;
 import xyz.ottr.lutra.wottr.util.RDFNodes;
 import xyz.ottr.lutra.wottr.vocabulary.WOTTRVocabulary;
@@ -48,7 +48,7 @@ import xyz.ottr.lutra.wottr.vocabulary.WOTTRVocabulary;
 public class TermFactory implements Function<RDFNode, Result<Term>> {
 
     // TODO: Verify that this is correct. This only gives correct results if blank nodes across Jena models are unique.
-    private static final Map<RDFList, Result<TermList>> createdLists = new HashMap<>();
+    private static final Map<RDFList, Result<ListTerm>> createdLists = new HashMap<>();
     private static final Map<String, BlankNodeTerm> createdBlanks = new HashMap<>();
 
     private final WOTTRVocabulary vocabulary;
@@ -90,13 +90,13 @@ public class TermFactory implements Function<RDFNode, Result<Term>> {
         if (uri.equals(this.vocabulary.getNoneResource().getURI())) {
             return Result.of(new NoneTerm());
         } else if (uri.equals(RDF.nil.getURI())) {
-            return Result.of(new TermList());
+            return Result.of(new ListTerm());
         } else {
             return Result.of(new IRITerm(uri));
         }
     }
 
-    public Result<TermList> createTermList(RDFList list) {
+    public Result<ListTerm> createTermList(RDFList list) {
 
         if (createdLists.containsKey(list)) {
             return createdLists.get(list);
@@ -105,7 +105,7 @@ public class TermFactory implements Function<RDFNode, Result<Term>> {
                 .map(this)
                 .collect(Collectors.toList());
             Result<List<Term>> aggTerms = Result.aggregate(terms);
-            Result<TermList> resTermList = aggTerms.map(TermList::new);
+            Result<ListTerm> resTermList = aggTerms.map(ListTerm::new);
             createdLists.put(list, resTermList);
             return resTermList;
         }

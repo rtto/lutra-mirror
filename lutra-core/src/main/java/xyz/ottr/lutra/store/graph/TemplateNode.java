@@ -1,4 +1,4 @@
-package xyz.ottr.lutra.store;
+package xyz.ottr.lutra.store.graph;
 
 /*-
  * #%L
@@ -22,11 +22,12 @@ package xyz.ottr.lutra.store;
  * #L%
  */
 
+import java.util.List;
 import java.util.Objects;
 
 import lombok.Getter;
 import lombok.Setter;
-import xyz.ottr.lutra.model.ParameterList;
+import xyz.ottr.lutra.model.Parameter;
 import xyz.ottr.lutra.model.terms.Term;
 
 @Getter
@@ -44,45 +45,44 @@ public class TemplateNode {
     enum Type { UNDEFINED, BASE, SIGNATURE, DEFINITION }
 
     private final String iri;
-    private ParameterList parameters;
+    private List<Parameter> parameters;
     private Type type;
 
-    public TemplateNode(String iri, Type type) {
+    TemplateNode(String iri, Type type) {
         this.iri = iri;
         this.type = type;
     }
 
-    public TemplateNode(String iri, ParameterList parameters, Type type) {
-        this(iri, type);
-        this.parameters = parameters;
-    }
-
-    public boolean isBase() {
+    boolean isBase() {
         return this.type == Type.BASE;
     }
 
-    public boolean isSignature() {
+    boolean isSignature() {
         return this.type == Type.SIGNATURE;
     }
 
-    public boolean isDefinition() {
+    boolean isDefinition() {
         return this.type == Type.DEFINITION;
     }
 
-    public boolean isUndefined() {
+    boolean isUndefined() {
         return this.type == Type.UNDEFINED;
     }
 
-    public boolean isOptional(int index) {
-        return getParameters().isOptional(getParameters().get(index));
+    boolean isOptional(int index) {
+        return this.parameters.get(index).isOptional();
     }
 
-    public boolean isOptional(Term e) {
-        return getParameters().isOptional(e);
+    boolean isOptional(Term parameterTerm) {
+        return this.parameters.stream()
+            .filter(p -> p.getTerm().equals(parameterTerm))
+            .findFirst()
+            .get()
+            .isOptional();
     }
 
     @Override
     public String toString() {
-        return getIri() + Objects.toString(this.parameters, "(...)");
+        return this.iri + Objects.toString(this.parameters, "(...)");
     }
 }

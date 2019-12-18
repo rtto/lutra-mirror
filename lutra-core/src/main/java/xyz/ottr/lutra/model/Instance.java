@@ -22,39 +22,52 @@ package xyz.ottr.lutra.model;
  * #L%
  */
 
-import java.util.Locale;
+import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
+import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.NonNull;
+import lombok.Singular;
 import org.apache.jena.shared.PrefixMapping;
 import xyz.ottr.lutra.OTTR;
 
 @Getter
 @EqualsAndHashCode
-public class Instance {
+@Builder(toBuilder = true)
+public class Instance implements TermSubstitutable<Instance> {
 
-    private final String iri;
-    private final ArgumentList arguments;
+    private final @NonNull String iri;
+    @Singular private final @NonNull List<Argument> arguments;
+    private final ListExpander listExpander;
 
-    public Instance(String iri, ArgumentList arguments) {
-        this.iri = iri;
-        this.arguments = arguments;
+    public boolean hasListExpander() {
+        return this.listExpander != null;
     }
 
-    public String toString(PrefixMapping prefixes) {
-
-        String expander = Objects.toString(this.arguments.getListExpander(), "").toLowerCase(Locale.ENGLISH);
-        if (!expander.isEmpty()) {
-            expander += " | ";
-        }
-        return expander
-            + prefixes.shortForm(this.iri)
-            + this.arguments.toString(prefixes);
+    public boolean hasListExpander(int index) {
+        return this.arguments.get(index).isListExpander();
     }
 
     @Override
     public String toString() {
         return toString(OTTR.getDefaultPrefixes());
+    }
+
+    public String toString(PrefixMapping prefixes) {
+        return Objects.isNull(this.listExpander) ? "" : this.listExpander + " | "
+            + prefixes.shortForm(this.iri)
+            + this.arguments.stream()
+                .map(t -> t.toString(prefixes))
+                .collect(Collectors.joining(", ", "(", ")"));
+    }
+
+    @Override
+    public Instance apply(Substitution substitution) {
+        return this.toBuilder()
+            .arguments(substitution.apply(this.arguments))
+            .build();
     }
 }

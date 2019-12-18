@@ -24,6 +24,8 @@ package xyz.ottr.lutra.model.terms;
 
 import java.util.Optional;
 
+import xyz.ottr.lutra.model.Substitution;
+
 public class BlankNodeTerm extends AbstractTerm<String> {
 
     private static long newID = 0L;
@@ -51,6 +53,11 @@ public class BlankNodeTerm extends AbstractTerm<String> {
         BlankNodeTerm term = new BlankNodeTerm(this.getIdentifier());
         term.setVariable(isVariable());
         return term;
+    }
+
+    @Override
+    public Term apply(Substitution substitution) {
+        return substitution.getOrCompute(this, _ignore -> new BlankNodeTerm());
     }
 
     @Override
