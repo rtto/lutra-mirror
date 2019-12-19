@@ -71,7 +71,7 @@ public abstract class AbstractTerm<T> implements Term {
     }
 
     public String toString(PrefixMapping prefixes) {
-        return this.variable ? "?" : ""
+        return (this.variable ? "?" : "")
             + prefixes.shortForm(identifier.toString())
             + " : " + prefixes.shortForm(type.toString());
     }
