@@ -22,9 +22,10 @@ package xyz.ottr.lutra.bottr.source;
  * #L%
  */
 
-import static org.junit.Assert.assertEquals;
+import static org.hamcrest.CoreMatchers.is;
 
 import org.apache.jena.rdf.model.RDFNode;
+import org.junit.Assert;
 import org.junit.Test;
 
 import xyz.ottr.lutra.bottr.model.Source;
@@ -38,6 +39,6 @@ public class SPARQLEndpointSourceTest {
         Source<RDFNode> source = new SPARQLEndpointSource(endpoint);
         
         ResultStream<?> result = source.execute("SELECT ?s ?p ?o WHERE { ?s ?p ?o } LIMIT 13");
-        assertEquals(13, result.getStream().count());
+        Assert.assertThat(result.getStream().count(), is(13L));
     }
 }

@@ -95,8 +95,8 @@ class BSourceParser implements Function<Resource, Result<Source<?>>> {
         } else if (BOTTR.H2Source.equals(sourceType)) {
             return getH2Source(source);
         }
-        return Result.error("Error parsing source. Source type " + RDFNodes.toString(sourceType) + " is not a supported source: "
-            + RDFNodes.toString(BOTTR.sources));
+        return Result.error("Error parsing source. Source type " + RDFNodes.toString(sourceType)
+            + " is not a supported source: " + RDFNodes.toString(BOTTR.sources));
     }
 
     private Result<Source<?>> getSQLSource(Resource source) {

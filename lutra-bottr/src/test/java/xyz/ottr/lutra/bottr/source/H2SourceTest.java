@@ -22,7 +22,7 @@ package xyz.ottr.lutra.bottr.source;
  * #L%
  */
 
-import static org.junit.Assert.assertEquals;
+import static org.hamcrest.CoreMatchers.is;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -35,6 +35,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.apache.jena.shared.PrefixMapping;
+import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -84,7 +85,7 @@ public class H2SourceTest {
             .build();
 
         // there should be three triples
-        assertEquals(3, map.get().getStream().filter(Result::isPresent).count());
+        Assert.assertThat(map.get().getStream().filter(Result::isPresent).count(), is(3L));
     }
 
     private Set<List<String>> getExpectedResult() {
@@ -131,7 +132,7 @@ public class H2SourceTest {
             .filter(Result::isPresent)
             .map(Result::get)
             .collect(Collectors.toSet());
-        assertEquals(getExpectedResult(), dbOutput);
+        Assert.assertThat(dbOutput, is(getExpectedResult()));
     }
 
 }

@@ -34,7 +34,7 @@ ex:MyMap3a a :InstanceMap ;
       :argumentMaps(
           [ :type :IRI ]
           [ :type :IRI ]
-          [ :type xsd:integer ]
+          [ :type xsd:integer; :translationTable ex:table ]
       ) .
 
 ex:MyMap4a a :InstanceMap ;
@@ -42,8 +42,8 @@ ex:MyMap4a a :InstanceMap ;
     :query "SELECT CONCAT('ex:map4_id', ID), 'ex:hasSalary', NULL FROM CSVREAD('src/test/resources/sources/csv/linux.csv') WHERE ID = '1';" ;
     :argumentMaps(
       [ :type :IRI ]
-      [ :type :IRI ]
-      [ :type rdfs:Resource ]
+      [ :type :IRI; :translationTable ex:table ]
+      [ :type rdfs:Resource; :translationTable ex:table  ]
      ) ;
      :source
      [ a :H2Source ] .
@@ -53,12 +53,12 @@ ex:MyMap4b a :InstanceMap ;
     :query "SELECT CONCAT('ex:map4_id', ID), 'ex:hasSalary', NULL FROM CSVREAD('src/test/resources/sources/csv/linux.csv') WHERE ID = '1';" ;
     :argumentMaps(
     [ :type :IRI ]
-    [ :type :IRI ]
+    [ :type :IRI]
     [ :type rdfs:Resource ; :translationSettings [ :nullValue "myNull" ] ]
     ) ;
     :source [ a :H2Source ] .
 
 
-## currently unsupported
-## ex:table
-##  :entry [ :inValue ex:test ; :outValue 9999999999999 ] .
+ex:table
+:entry [ :inValue "2500" ; :outValue 99999 ] ;
+:entry [ :inValue "ex:hasSalary" ; :outValue ex:hasIncome ] .

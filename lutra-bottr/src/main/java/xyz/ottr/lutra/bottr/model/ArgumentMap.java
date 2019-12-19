@@ -29,6 +29,7 @@ import java.util.stream.Collectors;
 
 import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.shared.PrefixMapping;
 import xyz.ottr.lutra.bottr.util.ListParser;
 import xyz.ottr.lutra.bottr.util.TermFactory;
@@ -48,17 +49,15 @@ public abstract class ArgumentMap<V> implements Function<V, Result<Term>> {
     protected TermType type;
     protected String literalLangTag;
 
-    //private TranslationTable translationTable;
+    private TranslationTable translationTable;
     private TranslationSettings translationSettings;
 
     protected final TermFactory termFactory;
-    //protected final PrefixMapping prefixMapping;
 
     protected ArgumentMap(PrefixMapping prefixMapping) {
-        //this.prefixMapping = prefixMapping;
         this.termFactory = new TermFactory(WOTTR.theInstance, prefixMapping);
         this.translationSettings = TranslationSettings.builder().build();
-        //this.translationTable = new TranslationTable();
+        this.translationTable = new TranslationTable();
     }
 
     protected ArgumentMap(PrefixMapping prefixMapping, TermType type) {
@@ -74,6 +73,8 @@ public abstract class ArgumentMap<V> implements Function<V, Result<Term>> {
         return Objects.toString(value);
     }
 
+    protected abstract RDFNode toRDFNode(V value);
+
     private String getBlankNodeLabel(V value) {
         String prefix = this.translationSettings.getLabelledBlankPrefix();
         String stringValue = toString(value);
@@ -85,21 +86,20 @@ public abstract class ArgumentMap<V> implements Function<V, Result<Term>> {
 
     private Result<Term> getTerm(V value, TermType type) {
 
-        String blankNodeLabel = getBlankNodeLabel(value);
-
-        Result<Term> term;
-
         if (Objects.isNull(value)) {
             return Result.of(this.translationSettings.getNullValue());
-        } else if (StringUtils.isNotEmpty(blankNodeLabel)) {
-            term = this.termFactory.createBlankNode(blankNodeLabel).map(t -> (Term)t);
+        } else if (StringUtils.isNotEmpty(getBlankNodeLabel(value))) {
+            return this.termFactory.createBlankNode(getBlankNodeLabel(value)).map(t -> (Term) t);
+        } else if (this.translationTable.containsKey(toRDFNode(value))) {
+            var translatedRDF = this.translationTable.get(toRDFNode(value));
+            return translatedRDF.isAnon()
+                    ? TermFactory.createBlankNode().map(t -> (Term) t)
+                    : this.termFactory.createTerm(translatedRDF);
         } else if (type.isListType()) {
-            term = getListTerm(toString(value), (ComplexType)type);
+            return getListTerm(toString(value), (ComplexType)type);
         } else {
-            term = getBasicTerm(value, (BasicType)type);
+            return getBasicTerm(value, (BasicType)type);
         }
-
-        return term;//.flatMap(this.translationTable);
     }
 
     protected abstract Result<Term> getBasicTerm(V value, BasicType type);
