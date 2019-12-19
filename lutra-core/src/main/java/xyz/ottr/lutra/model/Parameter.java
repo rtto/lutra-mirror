@@ -22,33 +22,35 @@ package xyz.ottr.lutra.model;
  * #L%
  */
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
 import lombok.Builder;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
-import lombok.Singular;
 import org.apache.jena.shared.PrefixMapping;
 import xyz.ottr.lutra.OTTR;
+import xyz.ottr.lutra.model.terms.Term;
 
 @Getter
-@EqualsAndHashCode
-@Builder(toBuilder = true)
-public class Instance implements TermSubstitutable<Instance> {
+@Builder
+public class Parameter implements TermWrapper {
 
-    private final @NonNull String iri;
-    @Singular private final @NonNull List<Argument> arguments;
-    private final ListExpander listExpander;
+    private final @NonNull Term term;
+    private final boolean nonBlank;
+    private final boolean optional;
+    private final Term defaultValue;
 
-    public boolean hasListExpander() {
-        return this.listExpander != null;
+    public boolean hasDefaultValue() {
+        return Objects.nonNull(this.defaultValue);
     }
 
-    public boolean hasListExpander(int index) {
-        return this.arguments.get(index).isListExpander();
+    public static List<Parameter> of(Term... terms) {
+        return Arrays.stream(terms)
+            .map(t -> builder().term(t).build())
+            .collect(Collectors.toList());
     }
 
     @Override
@@ -56,18 +58,24 @@ public class Instance implements TermSubstitutable<Instance> {
         return toString(OTTR.getDefaultPrefixes());
     }
 
-    public String toString(PrefixMapping prefixes) {
-        return (Objects.isNull(this.listExpander) ? "" : this.listExpander + " | ")
-            + prefixes.shortForm(this.iri)
-            + this.arguments.stream()
-                .map(t -> t.toString(prefixes))
-                .collect(Collectors.joining(", ", "(", ")"));
+    public String toString(PrefixMapping prefixMapping) {
+
+        StringBuilder str = new StringBuilder();
+        if (this.optional) {
+            str.append("?");
+        }
+        if (this.nonBlank) {
+            str.append("!");
+        }
+
+        str.append(this.term.toString(prefixMapping));
+
+        if (hasDefaultValue()) {
+            str.append(" = ");
+            str.append(this.defaultValue.toString(prefixMapping));
+        }
+
+        return str.toString();
     }
 
-    @Override
-    public Instance apply(Substitution substitution) {
-        return this.toBuilder()
-            .arguments(substitution.apply(this.arguments))
-            .build();
-    }
 }

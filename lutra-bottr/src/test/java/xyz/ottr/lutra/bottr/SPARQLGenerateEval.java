@@ -53,7 +53,7 @@ import xyz.ottr.lutra.system.MessageHandler;
 import xyz.ottr.lutra.system.Result;
 import xyz.ottr.lutra.system.ResultConsumer;
 import xyz.ottr.lutra.system.ResultStream;
-import xyz.ottr.lutra.store.DependencyGraph;
+import xyz.ottr.lutra.store.graph.DependencyGraph;
 import xyz.ottr.lutra.store.TemplateStore;
 
 import xyz.ottr.lutra.wottr.io.RDFFileReader;

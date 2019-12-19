@@ -41,8 +41,8 @@ import xyz.ottr.lutra.model.ParameterList;
 import xyz.ottr.lutra.model.Signature;
 import xyz.ottr.lutra.model.Template;
 import xyz.ottr.lutra.model.terms.BlankNodeTerm;
+import xyz.ottr.lutra.model.terms.ListTerm;
 import xyz.ottr.lutra.model.terms.Term;
-import xyz.ottr.lutra.model.terms.TermList;
 import xyz.ottr.lutra.parser.TemplateParser;
 import xyz.ottr.lutra.system.Message;
 import xyz.ottr.lutra.system.Result;
@@ -148,7 +148,7 @@ public class WTemplateParser implements TemplateParser<Model> {
 
         if (template instanceof Template) {
             Set<Instance> newInstances = new HashSet<>();
-            for (Instance ins : ((Template) template).getPattern()) {
+            for (Instance ins : ((Template) template).getInstances()) {
                 String of = ins.getIri();
                 ArgumentList arguments = ins.getArguments();
                 List<Term> newArgs = new LinkedList<>();
@@ -156,10 +156,10 @@ public class WTemplateParser implements TemplateParser<Model> {
 
                 for (Term arg : arguments.asList()) {
                     Term newArg;
-                    if (arg instanceof TermList
-                        && listToBlanks.containsKey(((TermList) arg).asList())) {
+                    if (arg instanceof ListTerm
+                        && listToBlanks.containsKey(((ListTerm) arg).asList())) {
 
-                        newArg = listToBlanks.get(((TermList) arg).asList());
+                        newArg = listToBlanks.get(((ListTerm) arg).asList());
                     } else {
                         newArg = arg;
                     }
@@ -169,7 +169,7 @@ public class WTemplateParser implements TemplateParser<Model> {
                     }
                 }
                 ArgumentList newArguments = new ArgumentList(
-                    new TermList(newArgs), newExpanderValues, arguments.getListExpander().orElse(null));
+                    new ListTerm(newArgs), newExpanderValues, arguments.getListExpander().orElse(null));
                 newInstances.add(new Instance(of, newArguments));
             }
             return Template.createTemplate(template.getIri(), newParamList, newInstances);
@@ -192,11 +192,11 @@ public class WTemplateParser implements TemplateParser<Model> {
         
         for (Term param : params.asList()) {
             Term newParam;
-            if (param instanceof TermList) {
+            if (param instanceof ListTerm) {
                 Term blank = new BlankNodeTerm("listVariable" + i);
                 blank.setType(param.getType());
                 i++;
-                listToBlanks.put(((TermList) param).asList(), blank);
+                listToBlanks.put(((ListTerm) param).asList(), blank);
                 newParam = blank;
             } else {
                 newParam = param;
@@ -214,6 +214,6 @@ public class WTemplateParser implements TemplateParser<Model> {
         }
 
         return new ParameterList(
-            new TermList(newParams), newNonBlanks, newOptionals, newDefaultValues);
+            new ListTerm(newParams), newNonBlanks, newOptionals, newDefaultValues);
     }
 }

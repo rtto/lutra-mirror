@@ -22,21 +22,21 @@ package xyz.ottr.lutra.model;
  * #L%
  */
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import lombok.ToString;
 import xyz.ottr.lutra.model.terms.BlankNodeTerm;
 import xyz.ottr.lutra.model.terms.NoneTerm;
 import xyz.ottr.lutra.model.terms.Term;
-import xyz.ottr.lutra.model.terms.TermList;
 import xyz.ottr.lutra.system.Result;
 
+@ToString
 public class Substitution {
 
     private final Map<Term, Term> termSubstitution; // Represents substitution of simple terms
@@ -44,28 +44,25 @@ public class Substitution {
     public Substitution(Map<Term, Term> termSubstitution) {
         this.termSubstitution = new HashMap<>();
         this.termSubstitution.putAll(termSubstitution);
+        // TODO why not just: this.termSubstitution = new HashMap<>(termSubstitution);
     }
 
     public Substitution() {
-        this(new HashMap<>());
+        this(new HashMap<>()); // TODO why not: this.termSubstitution = new HashMap<>();
     }
 
-    public static Result<Substitution> makeSubstitution(TermList args, TermList parameters) {
-        return makeSubstitution(new ArgumentList(args.asList()), new ParameterList(parameters.asList()));
-    }
+    public static Result<Substitution> resultOf(List<Argument> args, List<Parameter> parameters) {
 
-    public static Result<Substitution> makeSubstitution(ArgumentList args, ParameterList parameters) {
-
-        if (args.asList().size() != parameters.asList().size()) {
-            return Result.error("Cannot make substitution out of two term lists with different lengths: "
-                + args.toString() + " and " + parameters.toString());
+        if (args.size() != parameters.size()) {
+            return Result.error("Cannot create substitution out of two term lists with different lengths: "
+                + args + " and " + parameters);
         }
 
         Map<Term, Term> termSubstitution = new HashMap<>();
         for (int i = 0; i < args.size(); i++) {
-            Term argument = args.get(i);
-            if (argument instanceof NoneTerm && parameters.hasDefaultValue(i)) {
-                Term defaultValue = parameters.getDefaultValue(i);
+            Term argument = args.get(i).getTerm();
+            if (argument instanceof NoneTerm && parameters.get(i).hasDefaultValue()) {
+                Term defaultValue = parameters.get(i).getDefaultValue();
                 // reassign argument with default value
                 if (defaultValue instanceof BlankNodeTerm) {
                     // Blank node default results in fresh blank node
@@ -74,66 +71,23 @@ public class Substitution {
                     argument = defaultValue;
                 }
             }
-            termSubstitution.put(parameters.get(i), argument);
+            termSubstitution.put(parameters.get(i).getTerm(), argument);
         }
         return Result.of(new Substitution(termSubstitution));
     }
 
-    /**
-     * Applies this substitution to the argument TermList, and
-     * constructs fresh blank nodes for lists if argument keepListIDs
-     * is false, and keeps the original blank nodes if it is true.
-     */
-    public TermList apply(TermList args) {
-        List<Term> substituted = new ArrayList<>();
-        for (Term p : args.asList()) {
-            if (p instanceof TermList) {
-                TermList tl = (TermList) p;
-                substituted.add(apply(tl));
-            } else if (p instanceof BlankNodeTerm && !this.termSubstitution.containsKey(p)) {
-                BlankNodeTerm blank = new BlankNodeTerm();
-                this.termSubstitution.put(p, blank);
-                substituted.add(blank);
-            } else {
-                substituted.add(this.termSubstitution.getOrDefault(p, p));
-            }
-        }
-        return new TermList(substituted, args.isVariable());
+    public <E> List<E> apply(List<? extends TermSubstitutable<E>> list) {
+        return list.stream()
+            .map(element -> element.apply(this))
+            .collect(Collectors.toList());
     }
 
-    /**
-     * Applies this substitution to the argument ParameterList, and
-     * constructs fresh blank nodes for lists if argument keepListIDs
-     * is false, and keeps the original blank nodes if it is true.
-     */
-    public ArgumentList apply(ArgumentList args) {
-        TermList substituted = apply(args.getTermList());
-
-        Set<Term> newExpanderValues = null;
-        if (args.getExpanderValues() != null) {
-            newExpanderValues = args.getExpanderValues().stream()
-                .map(t -> this.termSubstitution.getOrDefault(t, t))
-                .collect(Collectors.toCollection(HashSet::new));
-        }
-        return new ArgumentList(substituted, newExpanderValues, args.getListExpander().orElse(null));
+    public <E> Set<E> apply(Set<? extends TermSubstitutable<E>> list) {
+        return list.stream()
+            .map(element -> element.apply(this))
+            .collect(Collectors.toSet());
     }
 
-    /**
-     * Applies this substitution to the argument Instance,
-     * constructing new blank nodes for lists.
-     */
-    public Instance apply(Instance instance) {
-        return new Instance(instance.getIri(), apply(instance.getArguments()));
-    }
-
-    /**
-     * Applies this substitution to the argument template body,
-     * constructing new blank nodes for lists.
-     */
-    public Set<Instance> apply(Set<Instance> body) {
-        return body.stream().map(this::apply).collect(Collectors.toSet());
-    }
-    
     /**
      * Creates a new Substitution which represents the merge of this with argument
      * if a merge is possible, and returns empty if not.
@@ -161,12 +115,12 @@ public class Substitution {
         return Optional.of(new Substitution(newTermSubs));
     }
 
-    public Term get(Term from) {
-        return this.termSubstitution.get(from);
+    public Term get(Term term) {
+        return this.termSubstitution.get(term);
     }
 
-    @Override
-    public String toString() {
-        return "<Term substitution: " + this.termSubstitution.toString() + ">";
+    public Term getOrCompute(Term term, Function<Term, Term> function) {
+        return this.termSubstitution.computeIfAbsent(term, function);
     }
+
 }

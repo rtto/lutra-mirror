@@ -24,24 +24,23 @@ package xyz.ottr.lutra.model.types;
 
 import static org.junit.Assert.assertEquals;
 
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.vocabulary.OWL;
 import org.apache.jena.vocabulary.RDFS;
 import org.apache.jena.vocabulary.XSD;
+
 import org.junit.Test;
+
 import xyz.ottr.lutra.OTTR;
-import xyz.ottr.lutra.model.ArgumentList;
+import xyz.ottr.lutra.model.Argument;
 import xyz.ottr.lutra.model.Instance;
-import xyz.ottr.lutra.model.ParameterList;
+import xyz.ottr.lutra.model.Parameter;
 import xyz.ottr.lutra.model.Template;
 import xyz.ottr.lutra.model.terms.BlankNodeTerm;
 import xyz.ottr.lutra.model.terms.IRITerm;
+import xyz.ottr.lutra.model.terms.ListTerm;
 import xyz.ottr.lutra.model.terms.LiteralTerm;
 import xyz.ottr.lutra.model.terms.Term;
-import xyz.ottr.lutra.model.terms.TermList;
 
 public class TypeRegistryTest {
 
@@ -87,21 +86,21 @@ public class TypeRegistryTest {
     @Test
     public void listTypeSetting1() {
         assertEquals(
-                new TermList(new IRITerm("example.com/v1"), new IRITerm("example.com/v2")).getType(),
-                new NEListType(new LUBType(TypeRegistry.TOP)));
+            new ListTerm(new IRITerm("example.com/v1"), new IRITerm("example.com/v2")).getType(),
+            new NEListType(new LUBType(TypeRegistry.TOP)));
     }
     
     @Test
     public void listTypeSetting2() {
         assertEquals(
-                new TermList(new IRITerm("example.com/v1"), new BlankNodeTerm()).getType(),
+                new ListTerm(new IRITerm("example.com/v1"), new BlankNodeTerm()).getType(),
                 new NEListType(new LUBType(TypeRegistry.TOP)));
     }
     
     @Test
     public void listTypeSetting3() {
         assertEquals(
-                new TermList(new IRITerm("example.com/v1"), LiteralTerm.createPlainLiteral("v2")).getType(),
+                new ListTerm(new IRITerm("example.com/v1"), LiteralTerm.createPlainLiteral("v2")).getType(),
                 new NEListType(new LUBType(TypeRegistry.TOP)));
     }
 
@@ -119,23 +118,28 @@ public class TypeRegistryTest {
         Term var2b = typedLiteral("1", XSD.integer);
         Term var3b = new BlankNodeTerm("_:b");
 
-        Instance i1 = new Instance(
-                "triple",
-                new ArgumentList(
-                        var1b1,
-                        new IRITerm("example.org/hasValue"),
-                        var2b));
-        Instance i2 = new Instance(
-                "triple",
-                new ArgumentList(
-                        var1b2,
-                        new IRITerm("example.org/hasCommentList"),
-                        var3b));
+        Instance i1 = Instance.builder()
+            .iri("triple")
+            .argument(Argument.builder().term(var1b1).build())
+            .argument(Argument.builder().term(new IRITerm("example.org/hasValue")).build())
+            .argument(Argument.builder().term(var2b).build())
+            .build();
 
-        Template tmp = Template.createTemplate(
-                "t1",
-                new ParameterList(var1, var2, var3),
-                Stream.of(i1, i2).collect(Collectors.toSet()));
+        Instance i2 = Instance.builder()
+            .iri("triple")
+            .argument(Argument.builder().term(var1b2).build())
+            .argument(Argument.builder().term(new IRITerm("example.org/hasCommentList")).build())
+            .argument(Argument.builder().term(var3b).build())
+            .build();
+
+        Template tpl = Template.superbuilder()
+            .iri("t1")
+            .parameter(Parameter.builder().term(var1).build())
+            .parameter(Parameter.builder().term(var2).build())
+            .parameter(Parameter.builder().term(var3).build())
+            .instance(i1)
+            .instance(i2)
+            .build();
 
         assertEquals(var1.getType(), var1b1.getType());
         assertEquals(var1.getType(), var1b2.getType());
@@ -164,27 +168,33 @@ public class TypeRegistryTest {
         Term var22b = new IRITerm("example.org/var22");
         Term var3b = new BlankNodeTerm("_:b");
 
-        Term lst1 = new TermList(var21b, var22b);
-        Term lst2 = new TermList(new TermList(
-                var3b, new TermList(typedLiteral("val1", XSD.xstring))));
+        Term lst1 = new ListTerm(var21b, var22b);
+        Term lst2 = new ListTerm(new ListTerm(
+                var3b, new ListTerm(typedLiteral("val1", XSD.xstring))));
 
-        Instance i1 = new Instance(
-                "triple",
-                new ArgumentList(
-                        var1b1,
-                        new IRITerm("example.org/hasValue"),
-                        lst1));
-        Instance i2 = new Instance(
-                "triple",
-                new ArgumentList(
-                        var1b2,
-                        new IRITerm("example.org/hasCommentList"),
-                        lst2));
+        Instance i1 = Instance.builder()
+            .iri("triple")
+            .argument(Argument.builder().term(var1b1).build())
+            .argument(Argument.builder().term(new IRITerm("example.org/hasValue")).build())
+            .argument(Argument.builder().term(lst1).build())
+            .build();
 
-        Template tmp = Template.createTemplate(
-                "t1",
-                new ParameterList(var1, var21, var22, var3),
-                Stream.of(i1, i2).collect(Collectors.toSet()));
+        Instance i2 = Instance.builder()
+            .iri("triple")
+            .argument(Argument.builder().term(var1b2).build())
+            .argument(Argument.builder().term(new IRITerm("example.org/hasCommentList")).build())
+            .argument(Argument.builder().term(lst2).build())
+            .build();
+
+        Template tpl = Template.superbuilder()
+            .iri("t1")
+            .parameter(Parameter.builder().term(var1).build())
+            .parameter(Parameter.builder().term(var21).build())
+            .parameter(Parameter.builder().term(var22).build())
+            .parameter(Parameter.builder().term(var3).build())
+            .instance(i1)
+            .instance(i2)
+            .build();
 
         assertEquals(var1.getType(), var1b1.getType());
         assertEquals(var1.getType(), var1b2.getType());

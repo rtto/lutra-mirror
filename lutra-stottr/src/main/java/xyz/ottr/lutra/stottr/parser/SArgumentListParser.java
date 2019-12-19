@@ -48,7 +48,7 @@ public class SArgumentListParser extends SBaseParserVisitor<ArgumentList> {
 
     /**
      * Entry-point of parsing set to InstanceContext as we need to have
-     * the expander, which is set on instance and not on argument list itself.
+     * the listExpander, which is set on instance and not on argument list itself.
      */
     @Override
     public Result<ArgumentList> visitInstance(stOTTRParser.InstanceContext ctx) {
@@ -61,13 +61,13 @@ public class SArgumentListParser extends SBaseParserVisitor<ArgumentList> {
                     .map(arg -> arg.term)
                     .collect(Collectors.toList());
 
-                // Find terms with list expander
+                // Find terms with listExpander
                 Set<Term> expanderValues = argLst.stream()
                     .filter(arg -> arg.expander)
                     .map(arg -> arg.term)
                     .collect(Collectors.toSet());
 
-                // Parse potential expander
+                // Parse potential listExpander
                 TerminalNode expanderNode = ctx.ListExpander();
                 if (expanderNode != null) {
                     Result<ArgumentList.Expander> expRes = parseExpander(expanderNode.getSymbol().getText());
@@ -82,7 +82,7 @@ public class SArgumentListParser extends SBaseParserVisitor<ArgumentList> {
     protected Result<ArgumentList.Expander> parseExpander(String expanderStr) {
         return STOTTR.Expanders.map.containsKey(expanderStr)
             ? Result.of(STOTTR.Expanders.map.get(expanderStr))
-            : Result.error("Unrecognized list expander: " + expanderStr);
+            : Result.error("Unrecognized listExpander: " + expanderStr);
     }
     
     private Result<List<Argument>> parseArguments(stOTTRParser.ArgumentListContext ctx) {

@@ -1,4 +1,4 @@
-package xyz.ottr.lutra.store.query;
+package xyz.ottr.lutra.store.checks;
 
 /*-
  * #%L
@@ -24,10 +24,8 @@ package xyz.ottr.lutra.store.query;
 
 import static org.junit.Assert.assertTrue;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import org.apache.jena.vocabulary.OWL;
 import org.apache.jena.vocabulary.XSD;
@@ -35,40 +33,53 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import xyz.ottr.lutra.OTTR;
-import xyz.ottr.lutra.model.ArgumentList;
+import xyz.ottr.lutra.model.Argument;
 import xyz.ottr.lutra.model.Instance;
-import xyz.ottr.lutra.model.ParameterList;
+import xyz.ottr.lutra.model.Parameter;
+import xyz.ottr.lutra.model.Signature;
 import xyz.ottr.lutra.model.Template;
 import xyz.ottr.lutra.model.terms.BlankNodeTerm;
 import xyz.ottr.lutra.model.terms.IRITerm;
+import xyz.ottr.lutra.model.terms.ListTerm;
 import xyz.ottr.lutra.model.terms.LiteralTerm;
 import xyz.ottr.lutra.model.terms.ObjectTerm;
 import xyz.ottr.lutra.model.terms.Term;
-import xyz.ottr.lutra.model.terms.TermList;
 import xyz.ottr.lutra.model.types.NEListType;
 import xyz.ottr.lutra.model.types.TypeRegistry;
-import xyz.ottr.lutra.store.DependencyGraph;
+import xyz.ottr.lutra.store.QueryEngine;
+import xyz.ottr.lutra.store.graph.DependencyGraph;
+import xyz.ottr.lutra.store.graph.DependencyGraphEngine;
 import xyz.ottr.lutra.system.Message;
 
-public class CheckFactoryTest {
+public class CheckLibraryTest {
 
-    private static final Logger log = LoggerFactory.getLogger(CheckFactoryTest.class);
+    private static final Logger log = LoggerFactory.getLogger(CheckLibraryTest.class);
 
     private DependencyGraph initStore() {
         
         DependencyGraph store = new DependencyGraph(null);
         store.addTemplateSignature(
-            Template.createSignature("base2",
-                new ParameterList(new ObjectTerm("x", true), new ObjectTerm("y", true))));
+            Signature.builder()
+                .iri("base2")
+                .parameters(Parameter.of(
+                    ObjectTerm.var("x"),
+                    ObjectTerm.var("y")))
+                .build());
+
         store.addTemplateSignature(
-            Template.createSignature("base3",
-                new ParameterList(new ObjectTerm("x", true), new ObjectTerm("y", true), new ObjectTerm("z", true))));
+            Signature.builder()
+                .iri("base3")
+                .parameters(Parameter.of(
+                    ObjectTerm.var("x"),
+                    ObjectTerm.var("y"),
+                    ObjectTerm.var("z")))
+                .build());
         return store;
     }
 
     private void check(QueryEngine<DependencyGraph> engine, int numErrors, int severity) {
 
-        List<Message> msgs = CheckFactory.allChecks
+        List<Message> msgs = CheckLibrary.allChecks
             .stream()
             .flatMap(c -> c.check(engine))
             .filter(msg -> Message.moreSevere(msg.getLevel(), severity))
@@ -89,10 +100,19 @@ public class CheckFactoryTest {
 
         DependencyGraph store = initStore();
         store.addTemplate(
-            Template.createTemplate("test",
-                new ParameterList(new ObjectTerm("a", true), new ObjectTerm("b", true)),
-                Collections.singleton(new Instance("base2",
-                        new ArgumentList(new ObjectTerm("a", true), new ObjectTerm(1))))));
+            Template.superbuilder()
+                .iri("test")
+                .parameters(Parameter.of(
+                    ObjectTerm.var("a"),
+                    ObjectTerm.var("b")))
+                .instance(Instance.builder()
+                    .iri("base2")
+                    .arguments(Argument.of(
+                            ObjectTerm.var("a"),
+                            ObjectTerm.cons(1)))
+                    .build())
+            .build());
+
         QueryEngine<DependencyGraph> engine = new DependencyGraphEngine(store);
 
         check(engine, 1, Message.WARNING);
@@ -103,12 +123,18 @@ public class CheckFactoryTest {
 
         DependencyGraph store = initStore();
         store.addTemplate(
-            Template.createTemplate("test",
-                new ParameterList(new ObjectTerm("a", true), new ObjectTerm("b", true)),
-                Collections.singleton(new Instance("base2",
-                        new ArgumentList(new TermList(new ObjectTerm("a", true)),
-                                         new TermList(new ObjectTerm(1),
-                                                      new TermList(new ObjectTerm("b", true))))))));
+            Template.superbuilder().iri("test")
+                .parameters(Parameter.of(
+                    ObjectTerm.var("a"),
+                    ObjectTerm.var("b")))
+                .instance(Instance.builder().iri("base2")
+                        .arguments(Argument.of(
+                            new ListTerm(ObjectTerm.var("a")),
+                                new ListTerm(ObjectTerm.cons(1),
+                                    new ListTerm(ObjectTerm.var("b")))))
+                    .build())
+            .build());
+
         QueryEngine<DependencyGraph> engine = new DependencyGraphEngine(store);
 
         check(engine, 0, Message.WARNING);
@@ -119,10 +145,19 @@ public class CheckFactoryTest {
 
         DependencyGraph store = initStore();
         store.addTemplate(
-            Template.createTemplate("test",
-                new ParameterList(new ObjectTerm("a", true), new ObjectTerm("a", true)),
-                Collections.singleton(new Instance("base2",
-                        new ArgumentList(new ObjectTerm("a", true), new ObjectTerm(1))))));
+            Template.superbuilder()
+                .iri("test")
+                .parameters(Parameter.of(
+                    ObjectTerm.var("a"),
+                    ObjectTerm.var("a")))
+                .instance(Instance.builder()
+                    .iri("base2")
+                    .arguments(Argument.of(
+                        ObjectTerm.var("a"),
+                        ObjectTerm.cons(1)))
+                    .build())
+            .build());
+
         QueryEngine<DependencyGraph> engine = new DependencyGraphEngine(store);
 
         check(engine, 1, Message.ERROR);
@@ -133,10 +168,18 @@ public class CheckFactoryTest {
 
         DependencyGraph store = initStore();
         store.addTemplate(
-            Template.createTemplate("test",
-                new ParameterList(new ObjectTerm("a", true), new ObjectTerm("b", true)),
-                Collections.singleton(new Instance("base3",
-                        new ArgumentList(new ObjectTerm("a", true), new ObjectTerm("b", true))))));
+            Template.superbuilder().iri("test")
+                .parameters(Parameter.of(
+                    ObjectTerm.var("a"),
+                    ObjectTerm.var("b")))
+                .instance(Instance.builder()
+                    .iri("base3")
+                    .arguments(Argument.of(
+                        ObjectTerm.var("a"),
+                        ObjectTerm.var("b")))
+                    .build())
+            .build());
+
         QueryEngine<DependencyGraph> engine = new DependencyGraphEngine(store);
 
         check(engine, 1, Message.ERROR);
@@ -147,15 +190,26 @@ public class CheckFactoryTest {
 
         DependencyGraph store = new DependencyGraph(null);
         store.addTemplateSignature(
-            Template.createSignature("base",
-                new ParameterList(
-                    new TermList(new ObjectTerm("x", true), new ObjectTerm("y", true)),
-                    Collections.singleton(new ObjectTerm("x", true)), null, null)));
+            Template.superbuilder()
+                .iri("base")
+                .parameter(Parameter.builder().term(ObjectTerm.var("x")).nonBlank(true).build())
+                .parameter(Parameter.builder().term(ObjectTerm.var("y")).build())
+                .build());
+
         store.addTemplate(
-            Template.createTemplate("test",
-                new ParameterList(new ObjectTerm("a", true), new ObjectTerm("b", true)),
-                Collections.singleton(new Instance("base",
-                        new ArgumentList(new ObjectTerm("a", true), new ObjectTerm("b", true))))));
+            Template.superbuilder()
+                .iri("test")
+                .parameters(Parameter.of(
+                    ObjectTerm.var("a"),
+                    ObjectTerm.var("b")))
+                .instance(Instance.builder()
+                    .iri("base")
+                    .arguments(Argument.of(
+                        ObjectTerm.var("a"),
+                        ObjectTerm.var("b")))
+                    .build())
+                .build());
+
         QueryEngine<DependencyGraph> engine = new DependencyGraphEngine(store);
 
         check(engine, 1, Message.ERROR);
@@ -167,26 +221,51 @@ public class CheckFactoryTest {
         DependencyGraph store = initStore();
 
         store.addTemplate(
-            Template.createTemplate("test1",
-                new ParameterList(new ObjectTerm("a", true), new ObjectTerm("b", true)),
-                Stream.of(
-                    new Instance("base2",
-                        new ArgumentList(new ObjectTerm("a", true), new ObjectTerm("b", true))),
-                    new Instance("test3",
-                        new ArgumentList(new ObjectTerm("b", true), new ObjectTerm("a", true))))
-                .collect(Collectors.toSet())));
+            Template.superbuilder()
+                .iri("test1")
+                .parameters(Parameter.of(
+                    ObjectTerm.var("a"),
+                    ObjectTerm.var("b")))
+                .instance(Instance.builder()
+                    .iri("base2")
+                    .arguments(Argument.of(
+                        ObjectTerm.var("a"),
+                        ObjectTerm.var("b")))
+                    .build())
+                .instance(Instance.builder()
+                    .iri("test3")
+                    .arguments(Argument.of(
+                        ObjectTerm.var("b"),
+                        ObjectTerm.var("a")))
+                    .build())
+                .build());
 
         store.addTemplate(
-            Template.createTemplate("test2",
-                new ParameterList(new ObjectTerm("a", true), new ObjectTerm("b", true)),
-                Collections.singleton(new Instance("test1",
-                        new ArgumentList(new ObjectTerm("a", true), new ObjectTerm("b", true))))));
+            Template.superbuilder().iri("test2")
+                .parameters(Parameter.of(
+                    ObjectTerm.var("a"),
+                    ObjectTerm.var("b")))
+                .instance(Instance.builder()
+                    .iri("test1")
+                    .arguments(Argument.of(
+                        ObjectTerm.var("a"),
+                        ObjectTerm.var("b")))
+                    .build())
+                .build());
 
         store.addTemplate(
-            Template.createTemplate("test3",
-                new ParameterList(new ObjectTerm("a", true), new ObjectTerm("b", true)),
-                Collections.singleton(new Instance("test2",
-                        new ArgumentList(new ObjectTerm("a", true), new ObjectTerm("b", true))))));
+            Template.superbuilder()
+                .iri("test3")
+                .parameters(Parameter.of(
+                    ObjectTerm.var("a"),
+                    ObjectTerm.var("b")))
+                .instance(Instance.builder()
+                    .iri("test2")
+                    .arguments(Argument.of(
+                        ObjectTerm.var("a"),
+                        ObjectTerm.var("b")))
+                    .build())
+                .build());
 
         QueryEngine<DependencyGraph> engine = new DependencyGraphEngine(store);
 
@@ -204,8 +283,10 @@ public class CheckFactoryTest {
         Term varBase3 = LiteralTerm.createTypedLiteral("7", TypeRegistry.getType(XSD.integer).getIri());
 
         store.addTemplateSignature(
-            Template.createSignature("hasInt",
-                new ParameterList(varBase1, varBase2, varBase3)));
+            Signature.builder()
+                .iri("hasInt")
+                .parameters(Parameter.of(varBase1, varBase2, varBase3))
+                .build());
 
         Term varC1 = new IRITerm("ex.com/iri");
         varC1.setType(TypeRegistry.getType(OTTR.TypeURI.IRI));
@@ -218,14 +299,18 @@ public class CheckFactoryTest {
         Term constC2 = new IRITerm("ex.com/niceonlyprop");
 
         store.addTemplate(
-            Template.createTemplate("testCorrect",
-                new ParameterList(varC1, varC2),
-                Stream.of(
-                    new Instance("hasInt",
-                        new ArgumentList(varC1b, constC1, varC2b)),
-                    new Instance("hasInt",
-                        new ArgumentList(constC1, constC2, varC2b)))
-                .collect(Collectors.toSet())));
+            Template.superbuilder()
+                .iri("testCorrect")
+                .parameters(Parameter.of(varC1, varC2))
+                .instance(Instance.builder()
+                    .iri("hasInt")
+                    .arguments(Argument.of(varC1b, constC1, varC2b))
+                    .build())
+                .instance(Instance.builder()
+                    .iri("hasInt")
+                    .arguments(Argument.of(constC1, constC2, varC2b))
+                    .build()
+                ).build());
 
         QueryEngine<DependencyGraph> engine = new DependencyGraphEngine(store);
 
@@ -245,8 +330,10 @@ public class CheckFactoryTest {
         Term intVar = LiteralTerm.createTypedLiteral("7", TypeRegistry.getType(XSD.integer).getIri());
 
         store.addTemplateSignature(
-            Template.createSignature("hasInt",
-                new ParameterList(classVar, objpropVar, intVar)));
+            Signature.builder()
+                .iri("hasInt")
+                .parameters(Parameter.of(classVar, objpropVar, intVar))
+                .build());
 
         Term classVar2 = new IRITerm("ex.com/class");
         classVar2.setType(TypeRegistry.getType(OWL.Class));
@@ -261,14 +348,18 @@ public class CheckFactoryTest {
         Term prop = new IRITerm("ex.com/niceonlyprop");
 
         store.addTemplate(
-            Template.createTemplate("testIncorrect",
-                new ParameterList(classVar2, intVar2),
-                Stream.of(
-                    new Instance("hasInt",
-                        new ArgumentList(classVar2b, propClass1, intVar21b)),
-                    new Instance("hasInt",
-                        new ArgumentList(propClass2, prop, intVar22b)))
-                .collect(Collectors.toSet())));
+            Template.superbuilder()
+                .iri("testIncorrect")
+                .parameters(Parameter.of(classVar2, intVar2))
+                .instance(Instance.builder()
+                        .iri("hasInt")
+                        .arguments(Argument.of(classVar2b, propClass1, intVar21b))
+                        .build())
+                .instance(Instance.builder()
+                    .iri("hasInt")
+                    .arguments(Argument.of(propClass2, prop, intVar22b))
+                    .build())
+            .build());
 
         QueryEngine<DependencyGraph> engine = new DependencyGraphEngine(store);
 
@@ -288,8 +379,10 @@ public class CheckFactoryTest {
         Term varBase3 = LiteralTerm.createTypedLiteral("7", TypeRegistry.getType(XSD.integer).getIri());
 
         store.addTemplateSignature(
-            Template.createSignature("hasInt",
-                new ParameterList(varBase1, varBase2, varBase3)));
+            Signature.builder()
+                .iri("hasInt")
+                .parameters(Parameter.of(varBase1, varBase2, varBase3))
+                .build());
 
         Term var1 = new IRITerm("ex.com/iri");
         var1.setType(TypeRegistry.getType(OTTR.TypeURI.IRI));
@@ -301,12 +394,14 @@ public class CheckFactoryTest {
         Term cons1 = new IRITerm("ex.com/prop1");
 
         store.addTemplate(
-            Template.createTemplate("testIncorrect",
-                new ParameterList(var1, var2),
-                Stream.of(
-                    new Instance("hasInt",
-                        new ArgumentList(var1b, cons1, var2b)))
-                .collect(Collectors.toSet())));
+            Template.superbuilder()
+                .iri("testIncorrect")
+                .parameters(Parameter.of(var1, var2))
+                .instance(Instance.builder()
+                    .iri("hasInt")
+                    .arguments(Argument.of(var1b, cons1, var2b))
+                    .build())
+                .build());
 
         QueryEngine<DependencyGraph> engine = new DependencyGraphEngine(store);
 
@@ -323,8 +418,10 @@ public class CheckFactoryTest {
         varBase.setType(new NEListType(TypeRegistry.getType(OWL.Class)));
 
         store.addTemplateSignature(
-            Template.createSignature("areClasses",
-                new ParameterList(varBase)));
+            Signature.builder()
+                .iri("areClasses")
+                .parameters(Parameter.of(varBase))
+                .build());
 
         Term var = new BlankNodeTerm("_:class");
         var.setType(TypeRegistry.getType(OWL.Class));
@@ -332,12 +429,14 @@ public class CheckFactoryTest {
         Term cons = new BlankNodeTerm("_:b");
 
         store.addTemplate(
-            Template.createTemplate("testCorrect1",
-                new ParameterList(var),
-                Stream.of(
-                    new Instance("areClasses",
-                        new ArgumentList(new TermList(cons, var))))
-                .collect(Collectors.toSet())));
+            Template.superbuilder()
+                .iri("testCorrect1")
+                .parameters(Parameter.of(var))
+                .instance(Instance.builder()
+                    .iri("areClasses")
+                    .arguments(Argument.of(new ListTerm(cons, var)))
+                    .build())
+                .build());
 
         QueryEngine<DependencyGraph> engine = new DependencyGraphEngine(store);
 
@@ -355,8 +454,10 @@ public class CheckFactoryTest {
         varBase.setType(new NEListType(TypeRegistry.getType(OWL.Class)));
 
         store.addTemplateSignature(
-            Template.createSignature("areClasses",
-                new ParameterList(varBase)));
+            Signature.builder()
+                .iri("areClasses")
+                .parameters(Parameter.of(varBase))
+                .build());
 
         Term varClass = new BlankNodeTerm("_:class");
         varClass.setType(TypeRegistry.getType(OWL.Class));
@@ -364,12 +465,13 @@ public class CheckFactoryTest {
         Term one = LiteralTerm.createTypedLiteral("1", TypeRegistry.getType(XSD.integer).getIri());
 
         store.addTemplate(
-            Template.createTemplate("testCorrect1",
-                new ParameterList(varClass),
-                Stream.of(
-                    new Instance("areClasses",
-                        new ArgumentList(new TermList(one, varClass))))
-                .collect(Collectors.toSet())));
+            Template.superbuilder().iri("testCorrect1")
+                .parameters(Parameter.of(varClass))
+                .instance(Instance.builder()
+                    .iri("areClasses")
+                    .arguments(Argument.of(new ListTerm(one, varClass)))
+                    .build())
+                .build());
 
         QueryEngine<DependencyGraph> engine = new DependencyGraphEngine(store);
 
@@ -385,8 +487,10 @@ public class CheckFactoryTest {
         varBase.setType(new NEListType(new NEListType(TypeRegistry.getType(OWL.Class))));
 
         store.addTemplateSignature(
-            Template.createSignature("deepLists",
-                new ParameterList(varBase)));
+            Signature.builder()
+                .iri("deepLists")
+                .parameters(Parameter.of(varBase))
+                .build());
 
         Term varClass = new BlankNodeTerm("_:class");
         varClass.setType(TypeRegistry.getType(OWL.Class));
@@ -394,14 +498,15 @@ public class CheckFactoryTest {
         Term one = LiteralTerm.createTypedLiteral("1", TypeRegistry.getType(XSD.integer).getIri());
 
         store.addTemplate(
-            Template.createTemplate("testCorrect1",
-                new ParameterList(varClass),
-                Stream.of(
-                    new Instance("areClasses",
-                        new ArgumentList(new TermList(
-                                new TermList(new BlankNodeTerm(), varClass), // (_:a ?var) OK
-                                new TermList(one, varClass)))))              // (1 ?var)   ERR
-                .collect(Collectors.toSet())));
+            Template.superbuilder().iri("testCorrect1")
+                .parameters(Parameter.of(varClass))
+                .instance(Instance.builder()
+                    .iri("areClasses")
+                    .arguments(Argument.of(new ListTerm(
+                                new ListTerm(new BlankNodeTerm(), varClass), // (_:a ?var) OK
+                                new ListTerm(one, varClass))))              // (1 ?var)   ERR
+                    .build())
+                .build());
 
         QueryEngine<DependencyGraph> engine = new DependencyGraphEngine(store);
 

@@ -1,4 +1,4 @@
-package xyz.ottr.lutra.store.query;
+package xyz.ottr.lutra.store.graph;
 
 /*-
  * #%L
@@ -26,25 +26,28 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.BiPredicate;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import xyz.ottr.lutra.model.AbstractTermList;
-import xyz.ottr.lutra.model.ArgumentList;
+import xyz.ottr.lutra.model.Argument;
 import xyz.ottr.lutra.model.Instance;
-import xyz.ottr.lutra.model.ParameterList;
+import xyz.ottr.lutra.model.ListExpander;
+import xyz.ottr.lutra.model.Parameter;
 import xyz.ottr.lutra.model.Substitution;
 import xyz.ottr.lutra.model.Template;
+import xyz.ottr.lutra.model.TermWrapper;
+import xyz.ottr.lutra.model.terms.ListTerm;
 import xyz.ottr.lutra.model.terms.Term;
-import xyz.ottr.lutra.model.terms.TermList;
 import xyz.ottr.lutra.model.types.ComplexType;
 import xyz.ottr.lutra.model.types.TermType;
-import xyz.ottr.lutra.store.DependencyGraph;
-import xyz.ottr.lutra.store.TemplateNode;
+import xyz.ottr.lutra.store.QueryEngine;
 import xyz.ottr.lutra.store.TemplateStore;
+import xyz.ottr.lutra.store.Tuple;
 import xyz.ottr.lutra.system.Result;
 
 public class DependencyGraphEngine extends QueryEngine<DependencyGraph> {
@@ -74,28 +77,18 @@ public class DependencyGraphEngine extends QueryEngine<DependencyGraph> {
         }
         TemplateNode boundTemplate = resBoundTemplate.get();
         if (tuple.hasBound(params)) {
-            ParameterList boundParams = tuple.getAs(ParameterList.class, params);
+            List<Parameter> boundParams = tuple.getAs(List.class, params);
             return boundTemplate.getParameters().equals(boundParams) ? Stream.of(tuple) : Stream.empty();
         } 
         return boundTemplate.getParameters() == null
             ? Stream.empty() : Stream.of(tuple.bind(params, boundTemplate.getParameters()));
     }
 
-    private TermList getUnderlyingList(Tuple tuple, String params) {
-        
-        if (tuple.get(params) instanceof ParameterList) {
-            ParameterList boundParams = tuple.getAs(ParameterList.class, params);
-            return boundParams.getTermList();
-        }
-
-        ArgumentList boundArgs = tuple.getAs(ArgumentList.class, params);
-        return boundArgs.getTermList();
-    }
 
     @Override
     public Stream<Tuple> length(Tuple tuple, String params, String length) {
 
-        TermList terms = getUnderlyingList(tuple, params);
+        List<?> terms = tuple.getAs(List.class, params);
         Integer actualLength = terms.size();
 
         if (tuple.hasBound(length)) {
@@ -110,10 +103,11 @@ public class DependencyGraphEngine extends QueryEngine<DependencyGraph> {
 
         // TODO: Make index(t, ps, i, v) be false for none in place of v
 
-        TermList terms = getUnderlyingList(tuple, params);
+        List<TermWrapper> terms = tuple.getAs(List.class, params);
+
         if (tuple.hasBound(index)) {
             Integer boundIndex = tuple.getAs(Integer.class, index);
-            if (boundIndex < 0 || terms.asList().size() <= boundIndex
+            if (boundIndex < 0 || terms.size() <= boundIndex
                     || terms.get(boundIndex) == null) {
                 // i not an index in params
                 return Stream.empty();
@@ -121,15 +115,15 @@ public class DependencyGraphEngine extends QueryEngine<DependencyGraph> {
             if (tuple.hasBound(val)) {
                 // boundIndex is an index in params and val is bound, check if boundVal is at boundIndex
                 Term boundVal = tuple.getAs(Term.class, val);
-                return terms.get(boundIndex).equals(boundVal) ? Stream.of(tuple) : Stream.empty();
+                return terms.get(boundIndex).getTerm().equals(boundVal) ? Stream.of(tuple) : Stream.empty();
             }
             // bind val to boundIndex'th element
-            return Stream.of(tuple.bind(val, terms.get(boundIndex)));
+            return Stream.of(tuple.bind(val, terms.get(boundIndex).getTerm()));
         } 
         // bind i, but only at v terms, if v is bound
         Term boundVal = tuple.hasBound(val) ? tuple.getAs(Term.class, val) : null;
         Stream.Builder<Tuple> tuples = Stream.builder();
-        List<Term> paramList = terms.asList();
+        List<Term> paramList = terms.stream().map(TermWrapper::getTerm).collect(Collectors.toList());
         for (int boundIndex = 0; boundIndex < paramList.size(); boundIndex++) {
             if (paramList.get(boundIndex) != null
                     && (boundVal == null || paramList.get(boundIndex).equals(boundVal))) {
@@ -140,7 +134,7 @@ public class DependencyGraphEngine extends QueryEngine<DependencyGraph> {
         return tuples.build();
     }
 
-    private Stream<Tuple> bindIndices(Tuple tuple, TermList terms, String index) {
+    private Stream<Tuple> bindIndices(Tuple tuple, List<?> terms, String index) {
 
         if (tuple.hasBound(index)) {
             Integer boundIndex = tuple.getAs(Integer.class, index);
@@ -153,8 +147,7 @@ public class DependencyGraphEngine extends QueryEngine<DependencyGraph> {
         }
 
         Stream.Builder<Tuple> tuples = Stream.builder();
-        List<Term> paramList = terms.asList();
-        for (int boundIndex = 0; boundIndex < paramList.size(); boundIndex++) {
+        for (int boundIndex = 0; boundIndex < terms.size(); boundIndex++) {
             tuples.accept(tuple.bind(index, boundIndex));
         }
         return tuples.build();
@@ -175,9 +168,9 @@ public class DependencyGraphEngine extends QueryEngine<DependencyGraph> {
             return Stream.empty(); // Level will never match
         }
 
-        if (term instanceof TermList) { // Match recursively on inner terms with current level +1
+        if (term instanceof ListTerm) { // Match recursively on inner terms with current level +1
             Stream.Builder<Tuple> stream = Stream.builder();
-            for (Term inner : ((TermList) term).asList()) {
+            for (Term inner : ((ListTerm) term).asList()) {
                 findOccurences(tuple, inner, inside, level, current + 1).forEach(stream);
             }
             return stream.build();
@@ -262,50 +255,49 @@ public class DependencyGraphEngine extends QueryEngine<DependencyGraph> {
 
     @Override
     public Stream<Tuple> isOptional(Tuple tuple, String args, String index) {
-        return hasBoundTermListIndex(tuple, tuple.getAs(ParameterList.class, args), index, ParameterList::isOptional);
+        return hasBoundTermListIndex(tuple, tuple.getAs(List.class, args), index, Parameter::isOptional);
     }
 
     @Override
     public Stream<Tuple> isNonBlank(Tuple tuple, String args, String index) {
-        return hasBoundTermListIndex(tuple, tuple.getAs(ParameterList.class, args), index, ParameterList::isNonBlank);
+        return hasBoundTermListIndex(tuple, tuple.getAs(List.class, args), index, Parameter::isNonBlank);
     }
 
     @Override
     public Stream<Tuple> hasListExpander(Tuple tuple, String args, String index) {
-        return hasBoundTermListIndex(tuple, tuple.getAs(ArgumentList.class, args), index, ArgumentList::hasListExpander);
+        return hasBoundTermListIndex(tuple, (List<Argument>) tuple.getAs(List.class, args), index, Argument::isListExpander);
     }
 
-    private <X extends AbstractTermList> Stream<Tuple> hasBoundTermListIndex(Tuple tuple, X list, String index,
-        BiPredicate<X, Integer> predicate) {
-        return bindIndices(tuple, list.getTermList(), index)
-            .filter(tup -> predicate.test(list, tup.getAs(Integer.class, index)));
+    private <X> Stream<Tuple> hasBoundTermListIndex(Tuple tuple, List<X> list, String index, Predicate<X> predicate) {
+        return bindIndices(tuple, list, index)
+            .filter(tup -> predicate.test(list.get(tup.getAs(Integer.class, index))));
     }
 
     @Override
     public Stream<Tuple> hasExpansionModifier(Tuple tuple, String instance) {
-        return hasArgumentsFlag(tuple, instance, ArgumentList::hasListExpander);
+        return hasExpansionModifier(tuple, instance, Objects::nonNull);
+    }
+
+    private Stream<Tuple> hasExpansionModifier(Tuple tuple, String instance, Predicate<ListExpander> test) {
+        Instance boundIns = tuple.getAs(Instance.class, instance);
+        return test.test(boundIns.getListExpander())
+            ? Stream.of(tuple)
+            : Stream.empty();
     }
 
     @Override
     public Stream<Tuple> hasCrossModifier(Tuple tuple, String instance) {
-        return hasArgumentsFlag(tuple, instance, ArgumentList::hasCrossExpander);
+        return hasExpansionModifier(tuple, instance, e -> e == ListExpander.cross);
     }
 
     @Override
     public Stream<Tuple> hasZipMinModifier(Tuple tuple, String instance) {
-        return hasArgumentsFlag(tuple, instance, ArgumentList::hasZipMinExpander);
+        return hasExpansionModifier(tuple, instance, e -> e == ListExpander.zipMin);
     }
 
     @Override
     public Stream<Tuple> hasZipMaxModifier(Tuple tuple, String instance) {
-        return hasArgumentsFlag(tuple, instance, ArgumentList::hasZipMaxExpander);
-    }
-
-    private Stream<Tuple> hasArgumentsFlag(Tuple tuple, String instance, Predicate<ArgumentList> predicate) {
-        Instance boundIns = tuple.getAs(Instance.class, instance);
-        return predicate.test(boundIns.getArguments())
-            ? Stream.of(tuple)
-            : Stream.empty();
+        return hasExpansionModifier(tuple, instance, e -> e == ListExpander.zipMax);
     }
 
     @Override
@@ -316,7 +308,7 @@ public class DependencyGraphEngine extends QueryEngine<DependencyGraph> {
             return Stream.empty(); //  argument is not a template
         }
         Template boundTemplate = this.store.getTemplate(resBoundTemplate.get().getIri()).get();
-        Set<Instance> deps = boundTemplate.getPattern();
+        Set<Instance> deps = boundTemplate.getInstances();
 
         if (tuple.hasBound(body)) {
             return deps.equals(tuple.get(body)) ? Stream.of(tuple) : Stream.empty();
@@ -328,7 +320,7 @@ public class DependencyGraphEngine extends QueryEngine<DependencyGraph> {
     @Override
     public Stream<Tuple> instance(Tuple tuple, String body, String instance) {
         
-        Set<Instance> boundBody = tuple.getAs(HashSet.class, body);
+        Set<Instance> boundBody = tuple.getAs(Set.class, body);
 
         if (tuple.hasBound(instance)) {
 
@@ -360,7 +352,7 @@ public class DependencyGraphEngine extends QueryEngine<DependencyGraph> {
         Instance boundInstance = tuple.getAs(Instance.class, instance);
 
         if (tuple.hasBound(args)) {
-            return tuple.getAs(ArgumentList.class, args).equals(boundInstance.getArguments())
+            return tuple.getAs(List.class, args).equals(boundInstance.getArguments())
                 ? Stream.of(tuple) : Stream.empty();
         }
         return Stream.of(tuple.bind(args, boundInstance.getArguments()));

@@ -1,4 +1,4 @@
-package xyz.ottr.lutra.store.query;
+package xyz.ottr.lutra.store;
 
 /*-
  * #%L
@@ -29,22 +29,18 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.commons.collections4.iterators.PermutationIterator;
 import org.apache.commons.math3.util.CombinatoricsUtils;
-
-import xyz.ottr.lutra.model.ArgumentList;
-import xyz.ottr.lutra.model.Instance;
 import xyz.ottr.lutra.model.Substitution;
+import xyz.ottr.lutra.model.TermSubstitutable;
 import xyz.ottr.lutra.model.types.TermType;
-import xyz.ottr.lutra.store.TemplateStore;
 
 public abstract class QueryEngine<S extends TemplateStore> {
 
-    S store; // Variable containing the store queries are to be evaluated over
+    protected S store; // Variable containing the store queries are to be evaluated over
 
     /**
      * Utility method for removing symmetries, such that not both (var1, var2)
@@ -312,7 +308,7 @@ public abstract class QueryEngine<S extends TemplateStore> {
      *      a variable name denoting a parameter index 
      * @return
      *      a Stream of tuples binding ps to a list of parameters,
-     *      with i boud to an index of a list expander parameter
+     *      with i boud to an index of a listExpander parameter
      *      in the corresponding parameter list.
      */
     public abstract Stream<Tuple> hasListExpander(Tuple tuple, String arguments, String index);
@@ -326,7 +322,7 @@ public abstract class QueryEngine<S extends TemplateStore> {
      * @param instance
      *      a variable name denoting an instance
      * @return
-     *      a Stream of tuples binding instance to an instance with a Cross expander.
+     *      a Stream of tuples binding instance to an instance with a Cross listExpander.
      */
     public abstract Stream<Tuple> hasCrossModifier(Tuple tuple, String instance);
 
@@ -339,7 +335,7 @@ public abstract class QueryEngine<S extends TemplateStore> {
      * @param instance
      *      a variable name denoting an instance
      * @return
-     *      a Stream of tuples binding instance to an instance with a ZipMin expander.
+     *      a Stream of tuples binding instance to an instance with a ZipMin listExpander.
      */
     public abstract Stream<Tuple> hasZipMinModifier(Tuple tuple, String instance);
 
@@ -352,7 +348,7 @@ public abstract class QueryEngine<S extends TemplateStore> {
      * @param instance
      *      a variable name denoting an instance
      * @return
-     *      a Stream of tuples binding instance to an instance with a ZipMax expander.
+     *      a Stream of tuples binding instance to an instance with a ZipMax listExpander.
      */
     public abstract Stream<Tuple> hasZipMaxModifier(Tuple tuple, String instance);
 
@@ -365,7 +361,7 @@ public abstract class QueryEngine<S extends TemplateStore> {
      * @param instance
      *      a variable name denoting an instance
      * @return
-     *      a Stream of tuples binding instance to an instance with an expander.
+     *      a Stream of tuples binding instance to an instance with an listExpander.
      */
     public abstract Stream<Tuple> hasExpansionModifier(Tuple tuple, String instance);
 
@@ -722,8 +718,8 @@ public abstract class QueryEngine<S extends TemplateStore> {
 
     private List<Tuple> makeSelection(List<Tuple> body, int[] selection) {
         List<Tuple> selected = new LinkedList<>();
-        for (int i = 0; i < selection.length; i++) {
-            selected.add(body.get(selection[i]));
+        for (int value : selection) {
+            selected.add(body.get(value));
         }
         return selected;
     }
@@ -761,15 +757,8 @@ public abstract class QueryEngine<S extends TemplateStore> {
         Object boundElem = tuple.get(elem);
         Object boundUnified;
 
-        if (boundElem instanceof ArgumentList) {
-            ArgumentList boundArgs = (ArgumentList) boundElem;
-            boundUnified = boundSubs.apply(boundArgs);
-        } else if (boundElem instanceof Instance) {
-            Instance boundInstance = (Instance) boundElem;
-            boundUnified = boundSubs.apply(boundInstance);
-        } else  if (boundElem instanceof Set) {
-            Set<Instance> boundBody = (Set<Instance>) boundElem;
-            boundUnified = boundSubs.apply(boundBody);
+        if (boundElem instanceof TermSubstitutable) {
+            boundUnified = ((TermSubstitutable)boundElem).apply(boundSubs);
         } else {
             throw new VariableNotBoundException("Variable " + elem
                     + " not bound to type a unifier can be applied to.");

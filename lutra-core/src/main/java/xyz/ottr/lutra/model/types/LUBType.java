@@ -62,7 +62,7 @@ public class LUBType extends ComplexType {
 
     @Override
     public String toString() {
-        return "LUB<" + this.inner.toString() + ">";
+        return "LUB<" + this.inner + ">";
     }
 
 }

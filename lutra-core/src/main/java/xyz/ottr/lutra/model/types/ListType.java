@@ -58,7 +58,7 @@ public class ListType extends ComplexType {
     
     @Override
     public String toString() {
-        return "List<" + this.inner.toString() + ">";
+        return "List<" + this.inner + ">";
     }
 
 }

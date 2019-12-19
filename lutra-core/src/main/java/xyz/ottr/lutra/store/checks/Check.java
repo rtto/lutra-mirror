@@ -1,4 +1,4 @@
-package xyz.ottr.lutra.model;
+package xyz.ottr.lutra.store.checks;
 
 /*-
  * #%L
@@ -22,26 +22,24 @@ package xyz.ottr.lutra.model;
  * #L%
  */
 
-import java.util.List;
+import java.util.function.Function;
+import java.util.stream.Stream;
 
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import xyz.ottr.lutra.model.terms.SimpleList;
-import xyz.ottr.lutra.model.terms.Term;
-import xyz.ottr.lutra.model.terms.TermList;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import xyz.ottr.lutra.store.Query;
+import xyz.ottr.lutra.store.QueryEngine;
+import xyz.ottr.lutra.store.TemplateStore;
+import xyz.ottr.lutra.store.Tuple;
+import xyz.ottr.lutra.system.Message;
 
-@Getter
-@EqualsAndHashCode
-public abstract class AbstractTermList implements SimpleList<Term> {
+@AllArgsConstructor(access = AccessLevel.PACKAGE)
+public class Check {
 
-    protected final TermList termList; // TODO is it more correct to have it as a SimpleList<Term>?
+    private final Query query;
+    private final Function<Tuple, Message> toMessage;
 
-    AbstractTermList(TermList termList) {
-        this.termList = termList;
+    public Stream<Message> check(QueryEngine<? extends TemplateStore> engine) {
+        return this.query.eval(engine).map(this.toMessage).distinct();
     }
-
-    public List<Term> asList() {
-        return this.termList.asList();
-    }
-
 }

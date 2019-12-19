@@ -1,4 +1,4 @@
-package xyz.ottr.lutra.store.query;
+package xyz.ottr.lutra.store.checks;
 
 /*-
  * #%L
@@ -27,9 +27,10 @@ import java.util.List;
 import org.apache.commons.collections4.ListUtils;
 import xyz.ottr.lutra.model.types.ListType;
 import xyz.ottr.lutra.model.types.TypeRegistry;
+import xyz.ottr.lutra.store.Query;
 import xyz.ottr.lutra.system.Message;
 
-public enum CheckFactory {
+public enum CheckLibrary {
     ;
 
     /* Undefined template */
@@ -44,9 +45,9 @@ public enum CheckFactory {
                 .and(Query.instanceIRI("Ins", "Temp2"))
                 .and(Query.isUndefined("Temp2")),
             tup -> Message.error(
-                "Template with IRI " + tup.get("Temp").toString()
+                "Template with IRI " + tup.get("Temp")
                     + " depends on undefined template "
-                    + tup.get("Temp2").toString())
+                    + tup.get("Temp2"))
         ));
 
     /* Length of argument list not equal to length of corresponding parameter list */
@@ -54,7 +55,7 @@ public enum CheckFactory {
     /**
      * Checks that does not depend on having all definitions present.
      * Type and parameter checks are included here, but only fails if a concrete
-     * error/inconsitency is found (thus does not fail on missing information).
+     * error/inconsistency is found (thus does not fail on missing information).
      */
     public static final List<Check> failsOnErrorChecks =
         List.of(new Check(
@@ -67,10 +68,10 @@ public enum CheckFactory {
                 .and(Query.length("Params", "Len2"))
                 .and(Query.notEquals("Len1", "Len2")),
             tup -> Message.error(
-                "Argument list to template " + tup.get("Temp2").toString()
+                "Argument list to template " + tup.get("Temp2")
                     + " has length " + tup.get("Len1")
                     + " but corresponding parameter list has length " + tup.get("Len2")
-                    + " in template " + tup.get("Temp").toString())
+                    + " in template " + tup.get("Temp"))
             ),
             /* Any parameter used as an argument to a non-blank is set to non-blank*/
             new Check(
@@ -84,11 +85,11 @@ public enum CheckFactory {
                     .and(Query.parameters("Temp2", "Params2"))
                     .and(Query.isNonBlank("Params2", "Index2")),
                 tup -> Message.error(
-                    "Parameter with name " + tup.get("Val").toString() + " is not marked as non-blank,"
+                    "Parameter with name " + tup.get("Val") + " is not marked as non-blank,"
                         + " but is used as argument to non-blank parameter index "
                         + tup.getAsEndUserIndex("Index2") + " in instance of template "
-                        + tup.get("Temp2").toString()
-                        + " in template " + tup.get("Temp1").toString())
+                        + tup.get("Temp2")
+                        + " in template " + tup.get("Temp1"))
             ),
             /* Any template depending on itself (cyclic dependencies) */
             new Check(
@@ -107,12 +108,12 @@ public enum CheckFactory {
                                 .and(Query.argumentIndex("Ins", "Index2", "Arg"))
                                 .and(Query.hasOccurenceAt("Arg", "Lvl", "Val")))),
                 tup -> Message.warning(
-                    "Parameter with name " + tup.get("Val").toString()
+                    "Parameter with name " + tup.get("Val")
                         + " with index " + tup.getAsEndUserIndex("Index")
                         + " does not occur in the body of template "
-                        + tup.get("Temp").toString())
+                        + tup.get("Temp"))
             ),
-            /* Same variabel occurs twice in parameter list */
+            /* Same variable occurs twice in parameter list */
             new Check(
                 Query.template("Temp")
                     .and(Query.parameters("Temp", "Params"))
@@ -121,13 +122,13 @@ public enum CheckFactory {
                     .and(Query.notEquals("Index1", "Index2"))
                     .and(Query.removeSymmetry("Index1", "Index2")),
                 tup -> Message.error(
-                    "Parameter with name " + tup.get("Val").toString()
-                        + " occurs twice with indecies " + tup.getAsEndUserIndex("Index1")
+                    "Parameter with name " + tup.get("Val")
+                        + " occurs twice with indices " + tup.getAsEndUserIndex("Index1")
                         + " and " + tup.getAsEndUserIndex("Index2") + " in template "
-                        + tup.get("Temp").toString())
+                        + tup.get("Temp"))
             ),
             /* Type checking: consistent use of terms */
-            // As our type hiearachy is tree shaped, if any pair of types a term is used as
+            // As our type hierarchy is tree shaped, if any pair of types a term is used as
             // is compatible (one subtype of the other) there must exist a least type subtype
             // of all the others
             new Check(
@@ -145,9 +146,9 @@ public enum CheckFactory {
                         .and(Query.not(Query.isSubTypeOf("Type2", "Type1")))),
                 tup -> Message.error(
                     "Template with IRI " + tup.get("Temp") + " has incompatible use of term "
-                        + tup.get("Val").toString() + " in instances " + tup.get("Ins1").toString()
+                        + tup.get("Val") + " in instances " + tup.get("Ins1")
                         + " and " + tup.get("Ins2") + ", with corresponding parameters typed as "
-                        + tup.get("Type1").toString() + " and " + tup.get("Type2") + " respectively.")
+                        + tup.get("Type1") + " and " + tup.get("Type2") + " respectively.")
             ),
             /* Type checking: intrinsic and inferred types incompatible */
             new Check(
@@ -160,9 +161,9 @@ public enum CheckFactory {
                     .and(Query.not(Query.isCompatibleWith("Intrinsic", "UsedAs"))),
                 tup -> Message.error(
                     "Template with IRI " + tup.get("Temp") + " has incompatible use of term "
-                        + tup.get("Val").toString() + " with intrinsic type " + tup.get("Intrinsic")
+                        + tup.get("Val") + " with intrinsic type " + tup.get("Intrinsic")
                         + " is used as argument to parameter with type " + tup.get("UsedAs")
-                        + " in instance " + tup.get("Ins").toString())
+                        + " in instance " + tup.get("Ins"))
             ),
             /* Has expansion modifier but no arguments with list expanders set.*/
             new Check(
@@ -175,8 +176,8 @@ public enum CheckFactory {
                             .and(Query.index("Args", "Index", "Val"))
                             .and(Query.hasListExpander("Args", "Index")))),
                 tup -> Message.error(
-                    "Template with IRI " + tup.get("Temp").toString() + " has instance "
-                        + tup.get("InsOf").toString() + " with a list expander but no arguments to expand.")
+                    "Template with IRI " + tup.get("Temp") + " has instance "
+                        + tup.get("InsOf") + " with a listExpander but no arguments to expand.")
             ),
             /* Has no expansion modifier but arguments with list expanders set.*/
             new Check(
@@ -188,8 +189,8 @@ public enum CheckFactory {
                     .and(Query.index("Args", "Index", "Val"))
                     .and(Query.hasListExpander("Args", "Index")),
                 tup -> Message.error(
-                    "Template with IRI " + tup.get("Temp").toString() + " has instance "
-                        + tup.get("InsOf").toString() + " with no list expander but arguments to expand.")
+                    "Template with IRI " + tup.get("Temp") + " has instance "
+                        + tup.get("InsOf") + " with no listExpander but arguments to expand.")
             ),
             /* Has non-list argument with list expanders set.*/
             new Check(
@@ -204,8 +205,8 @@ public enum CheckFactory {
                     .and(Query.bind("ListType", new ListType(TypeRegistry.TOP)))
                     .and(Query.not(Query.isSubTypeOf("Type", "ListType"))),
                 tup -> Message.error(
-                    "Template with IRI " + tup.get("Temp").toString() + " has instance "
-                        + tup.get("InsOf").toString() + " with list expander on non-list argument.")
+                    "Template with IRI " + tup.get("Temp") + " has instance "
+                        + tup.get("InsOf") + " with listExpander on non-list argument.")
             ));
 
     public static final List<Check> allChecks = ListUtils.union(failsOnErrorChecks, failsOnMissingInformationChecks);

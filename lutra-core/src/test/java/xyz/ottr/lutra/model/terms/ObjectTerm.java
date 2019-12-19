@@ -24,15 +24,30 @@ package xyz.ottr.lutra.model.terms;
 
 import java.util.Optional;
 
+import xyz.ottr.lutra.model.types.LUBType;
+import xyz.ottr.lutra.model.types.TermType;
+import xyz.ottr.lutra.model.types.TypeRegistry;
+
 public class ObjectTerm extends AbstractTerm<Object> {
 
-    public ObjectTerm(Object identifier, boolean variable) {
-        super(identifier);
-        setVariable(variable);
-        setType(getIntrinsicType());
+    public static ObjectTerm var(Object identifier) {
+        return new ObjectTerm(identifier, true);
     }
 
-    public ObjectTerm(Object identifier) {
+    public static ObjectTerm cons(Object identifier) {
+        return new ObjectTerm(identifier, false);
+    }
+
+    private ObjectTerm(Object identifier, boolean variable) {
+        super(identifier, getIntrinsicType(variable));
+        this.variable = variable;
+    }
+
+    private static TermType getIntrinsicType(boolean variable) {
+        return variable ? TypeRegistry.TOP : new LUBType(TypeRegistry.TOP);
+    }
+
+    private ObjectTerm(Object identifier) {
         this(identifier, false);
     }
 
@@ -48,7 +63,7 @@ public class ObjectTerm extends AbstractTerm<Object> {
 
     @Override
     public Term shallowClone() {
-        return new ObjectTerm(getIdentifier());
+        return ObjectTerm.cons(getIdentifier());
     }
 
 }

@@ -22,18 +22,10 @@ package xyz.ottr.lutra.store;
  * #L%
  */
 
-import org.apache.commons.lang3.StringUtils;
+public class VariableBoundToMultipleTypesException extends RuntimeException {
 
-public class IRILookupException extends RuntimeException {
-
-    private static final long serialVersionUID = -4884053332711307784L;
-
-    public IRILookupException(String message) {
-        super(message);
+    public VariableBoundToMultipleTypesException(String varName, Class a, Class b) {
+        super("Variable " + varName + " bound to both a " + a + " and a " + b);
     }
-
-    public IRILookupException(Object... message) {
-        this(StringUtils.join(message));
-    }
-
 }
+

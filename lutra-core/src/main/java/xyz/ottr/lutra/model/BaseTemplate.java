@@ -1,4 +1,4 @@
-package xyz.ottr.lutra.store.query;
+package xyz.ottr.lutra.model;
 
 /*-
  * #%L
@@ -22,10 +22,16 @@ package xyz.ottr.lutra.store.query;
  * #L%
  */
 
-public class VariableBoundToMultipleTypesException extends RuntimeException {
+import java.util.List;
 
-    public VariableBoundToMultipleTypesException(String varName, Class a, Class b) {
-        super("Variable " + varName + " bound to both a " + a.toString() + " and a " + b.toString());
+import lombok.Builder;
+import lombok.Singular;
+
+public class BaseTemplate extends Signature {
+
+    @Builder(builderMethodName = "superbuilder")
+    public BaseTemplate(String iri, @Singular List<Parameter> parameters) {
+        super(iri, parameters);
     }
-}
 
+}

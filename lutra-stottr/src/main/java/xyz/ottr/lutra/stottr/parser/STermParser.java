@@ -32,10 +32,10 @@ import org.antlr.v4.runtime.tree.TerminalNode;
 import org.apache.jena.vocabulary.XSD;
 import xyz.ottr.lutra.model.terms.BlankNodeTerm;
 import xyz.ottr.lutra.model.terms.IRITerm;
+import xyz.ottr.lutra.model.terms.ListTerm;
 import xyz.ottr.lutra.model.terms.LiteralTerm;
 import xyz.ottr.lutra.model.terms.NoneTerm;
 import xyz.ottr.lutra.model.terms.Term;
-import xyz.ottr.lutra.model.terms.TermList;
 import xyz.ottr.lutra.stottr.STOTTR;
 import xyz.ottr.lutra.stottr.antlr.stOTTRParser;
 import xyz.ottr.lutra.system.Message;
@@ -124,7 +124,7 @@ public class STermParser extends SBaseParserVisitor<Term> {
             .collect(Collectors.toList());
 
         Result<List<Term>> termLstRes = Result.aggregate(termResLst);
-        return termLstRes.map(TermList::new);
+        return termLstRes.map(ListTerm::new);
     }
     
     @Override

@@ -1,4 +1,4 @@
-package xyz.ottr.lutra.store;
+package xyz.ottr.lutra.store.graph;
 
 /*-
  * #%L
@@ -27,7 +27,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
@@ -38,21 +37,22 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import xyz.ottr.lutra.OTTR;
 import xyz.ottr.lutra.io.ReaderRegistry;
-import xyz.ottr.lutra.model.ArgumentList;
+import xyz.ottr.lutra.model.Argument;
+import xyz.ottr.lutra.model.BaseTemplate;
 import xyz.ottr.lutra.model.Instance;
-import xyz.ottr.lutra.model.ParameterList;
+import xyz.ottr.lutra.model.ListExpander;
+import xyz.ottr.lutra.model.Parameter;
 import xyz.ottr.lutra.model.Signature;
 import xyz.ottr.lutra.model.Substitution;
 import xyz.ottr.lutra.model.Template;
 import xyz.ottr.lutra.model.terms.BlankNodeTerm;
-import xyz.ottr.lutra.model.terms.NoneTerm;
 import xyz.ottr.lutra.model.terms.Term;
-import xyz.ottr.lutra.store.query.Check;
-import xyz.ottr.lutra.store.query.CheckFactory;
-import xyz.ottr.lutra.store.query.DependencyGraphEngine;
-import xyz.ottr.lutra.store.query.Query;
-import xyz.ottr.lutra.store.query.QueryEngine;
-import xyz.ottr.lutra.store.query.Tuple;
+import xyz.ottr.lutra.store.Query;
+import xyz.ottr.lutra.store.QueryEngine;
+import xyz.ottr.lutra.store.TemplateStore;
+import xyz.ottr.lutra.store.Tuple;
+import xyz.ottr.lutra.store.checks.Check;
+import xyz.ottr.lutra.store.checks.CheckLibrary;
 import xyz.ottr.lutra.system.Message;
 import xyz.ottr.lutra.system.Result;
 import xyz.ottr.lutra.system.ResultStream;
@@ -69,13 +69,13 @@ public class DependencyGraph implements TemplateStore {
      * @return a predicate returning true on edges pointing to a template with IRI
      *         in argument set
      */
-    public static Predicate<Dependency> vocabularyExpansionPredicate(Set<String> iris) {
+    public static Predicate<DependencyEdge> vocabularyExpansionPredicate(Set<String> iris) {
         return (e) -> iris.contains(e.to.getIri());
     }
 
     private final Set<TemplateNode> roots;
     private final Map<String, TemplateNode> nodes;
-    private final Map<TemplateNode, Set<Dependency>> dependencies;
+    private final Map<TemplateNode, Set<DependencyEdge>> dependencies;
     private final Map<String, Set<String>> instanceIndex;
     private final ReaderRegistry readerRegistry;
 
@@ -105,7 +105,7 @@ public class DependencyGraph implements TemplateStore {
         this.instanceIndex.get(instance).add(template);
     }
 
-    private void addInstanceToIndex(String instance, ArgumentList args, String template) {
+    private void addInstanceToIndex(String instance, List<Argument> args, String template) {
         if (instance.equals(OTTR.BaseURI.Triple)) {
             addInstanceToIndex(args.get(1).toString(), template);
         } else {
@@ -118,7 +118,7 @@ public class DependencyGraph implements TemplateStore {
         this.instanceIndex.get(instance).remove(template);
     }
 
-    private void removeInstanceFromIndex(String instance, ArgumentList args, String template) {
+    private void removeInstanceFromIndex(String instance, List<Argument> args, String template) {
         if (instance.equals(OTTR.BaseURI.Triple)) {
             removeInstanceFromIndex(args.get(1).toString(), template);
         } else {
@@ -156,33 +156,23 @@ public class DependencyGraph implements TemplateStore {
         return node;
     }
 
-    /**
-     * Adds a template as a node to the graph.
-     *
-     * @param uri
-     *            the URI of the template to add
-     * @param params
-     *            the parameters in the head of the template to add
-     * @param isBaseTemplate
-     *            true if the node to create represets a base template, false otherwise
-     */
-    private TemplateNode addTemplateSignature(String uri, ParameterList params, boolean isBaseTemplate) {
-        TemplateNode node = addTemplateNode(uri);
-        node.setParameters(params);
-        if (isBaseTemplate) {
-            node.setType(TemplateNode.Type.BASE);
-        } else {
-            node.setType(TemplateNode.Type.SIGNATURE);
-        }
-        return node;
-    }
-
     @Override
     public boolean addTemplateSignature(Signature signature) {
-        addTemplateSignature(signature.getIri(), signature.getParameters(),
-                signature.isBaseTemplate());
         log.info("Adding template signature " + signature.getIri());
+        TemplateNode node = addTemplateNode(signature.getIri());
+        node.setParameters(signature.getParameters());
+        node.setType(getTemplateNodeType(signature));
         return true;
+    }
+
+    private TemplateNode.Type getTemplateNodeType(Signature signature) {
+        if (signature instanceof Template) {
+            return TemplateNode.Type.DEFINITION;
+        } else if (signature instanceof BaseTemplate) {
+            return TemplateNode.Type.BASE;
+        } else {
+            return TemplateNode.Type.SIGNATURE;
+        }
     }
 
     @Override
@@ -193,14 +183,14 @@ public class DependencyGraph implements TemplateStore {
             return false;
         }
         TemplateNode tempNode = tempNodeRes.get();
-        if (template.getPattern() != null) {
+        if (template.getInstances() != null) {
             if (!this.dependencies.get(tempNode).isEmpty()) {
                 return false;
             }
-            this.log.info("Adding body for template " + template.getIri());
-            for (Instance i : template.getPattern()) {
+            log.info("Adding pattern for template " + template.getIri());
+            for (Instance i : template.getInstances()) {
                 TemplateNode insNode = addTemplateNode(i.getIri());
-                addDependency(tempNode, i.getArguments(), insNode);
+                addDependency(tempNode, i.getArguments(), i.getListExpander(), insNode);
             }
             tempNode.setType(TemplateNode.Type.DEFINITION);
         }
@@ -217,23 +207,23 @@ public class DependencyGraph implements TemplateStore {
      * @param instance
      *            the URI of the template called
      */
-    public void addInstance(String knowledgeBase, ArgumentList pl, String instance) {
+    public void addInstance(String knowledgeBase, List<Argument> pl, ListExpander expander, String instance) {
         TemplateNode kbNode = addTemplateNode(knowledgeBase);
         TemplateNode tempNode = addTemplateNode(instance);
-        addDependency(kbNode, pl, tempNode);
+        addDependency(kbNode, pl, expander, tempNode);
     }
 
-    private void addDependency(TemplateNode fromNode, ArgumentList pl, TemplateNode toNode) {
-        addDependency(new Dependency(fromNode, pl, toNode));
+    private void addDependency(TemplateNode fromNode, List<Argument> pl, ListExpander expander, TemplateNode toNode) {
+        addDependency(new DependencyEdge(fromNode, pl, expander, toNode));
     }
 
-    private void addDependency(Dependency edge) {
+    private void addDependency(DependencyEdge edge) {
         this.dependencies.get(edge.from).add(edge);
         this.roots.remove(edge.to);
         addInstanceToIndex(edge.to.getIri(), edge.argumentList, edge.from.getIri());
     }
 
-    private void removeDependency(Dependency dependency) {
+    private void removeDependency(DependencyEdge dependency) {
         this.dependencies.get(dependency.from).remove(dependency);
         String instance = dependency.to.getIri();
         removeInstanceFromIndex(instance, dependency.argumentList, dependency.from.getIri());
@@ -312,22 +302,27 @@ public class DependencyGraph implements TemplateStore {
         TemplateNode changeNode = changeNodeR.get();
         TemplateNode useNode = useNodeR.get();
 
-        for (Dependency toRemove : new HashSet<>(this.dependencies.get(useNode))) {
-            Dependency toRemoveUnifd = new Dependency(changeNode,
-                    unifier.apply(toRemove.argumentList), toRemove.to);
+        for (DependencyEdge toRemove : new HashSet<>(this.dependencies.get(useNode))) {
+            DependencyEdge toRemoveUnifd = new DependencyEdge(changeNode,
+                    unifier.apply(toRemove.argumentList), toRemove.listExpander, toRemove.to);
             removeDependency(toRemoveUnifd);
         }
          
         // Add dependency of toUse
-        ArgumentList newArgs = new ArgumentList(unifier.apply(useNode.getParameters().getTermList()));
-        addDependency(changeNode, newArgs, useNode);
+        List<Argument> newArgs = useNode.getParameters().stream()
+            .map(Parameter::getTerm)
+            .map(term -> term.apply(unifier))
+            .map(term -> Argument.builder().term(term).build())
+            .collect(Collectors.toList());
+
+        addDependency(changeNode, newArgs, null, useNode); // TODO: is it correct to pass null as expander here?
         return true;
     }
 
     private Map<TemplateNode, Integer> getIndegrees() {
         Map<TemplateNode, Integer> indegrees = new HashMap<>(this.dependencies.keySet().size());
-        for (Map.Entry<TemplateNode, Set<Dependency>> es : this.dependencies.entrySet()) {
-            for (Dependency e : es.getValue()) {
+        for (Map.Entry<TemplateNode, Set<DependencyEdge>> es : this.dependencies.entrySet()) {
+            for (DependencyEdge e : es.getValue()) {
                 indegrees.put(e.to, indegrees.getOrDefault(e.to, 0) + 1);
             }
         }
@@ -350,7 +345,7 @@ public class DependencyGraph implements TemplateStore {
                     continue;
                 }
 
-                for (Dependency e : this.dependencies.get(from)) {
+                for (DependencyEdge e : this.dependencies.get(from)) {
                     indegrees.put(e.to, indegrees.get(e.to) - 1);
                     if (indegrees.get(e.to) == 0) {
                         nextNext.add(e.to);
@@ -367,35 +362,35 @@ public class DependencyGraph implements TemplateStore {
      * according to argument predicate and adds all expanded dependencies into expanded
      * set and all unexpanded into the unexpanded set.
      */
-    private void expandEdges(Set<Result<Dependency>> toExpand, Set<Result<Dependency>> expanded,
-            Set<Result<Dependency>> unexpanded, Predicate<Dependency> shouldExpand) {
+    private void expandEdges(Set<Result<DependencyEdge>> toExpand, Set<Result<DependencyEdge>> expanded,
+            Set<Result<DependencyEdge>> unexpanded, Predicate<DependencyEdge> shouldExpand) {
 
-        for (Result<Dependency> edgeRes : toExpand) {
+        for (Result<DependencyEdge> edgeRes : toExpand) {
 
             // Check that we can and should expand
-            Result<Dependency> checkedEdge = edgeRes.flatMap(this::checkForExpansionErrors);
+            Result<DependencyEdge> checkedEdge = edgeRes.flatMap(this::checkForExpansionErrors);
             if (!checkedEdge.isPresent()) {
                 unexpanded.add(checkedEdge);
                 continue;
             } else if (!checkedEdge.filter(shouldExpand).isPresent()) {
                 unexpanded.add(checkedEdge);
                 continue; 
-            } else if (checkedEdge.filter(Dependency::shouldDiscard).isPresent()) {
+            } else if (checkedEdge.filter(DependencyEdge::shouldDiscard).isPresent()) {
                 continue;
             }
 
             // Then expand instance
-            Dependency edge = checkedEdge.get();
-            if (edge.argumentList.hasListExpander()) {
+            DependencyEdge edge = checkedEdge.get();
+            if (edge.hasListExpander()) {
                 if (edge.canExpandExpander()) {
-                    Set<Result<Dependency>> exp = edge.expandListExpander();
+                    Set<Result<DependencyEdge>> exp = edge.expandListExpander();
                     exp.forEach(e -> e.addToTrace(checkedEdge));
                     expandEdges(exp, expanded, unexpanded, shouldExpand); 
                 } else {
                     unexpanded.add(checkedEdge);
                 }
             } else if (edge.canExpand()) {
-                Set<Result<Dependency>> exp = expandEdgeWithChecks(edge);
+                Set<Result<DependencyEdge>> exp = expandEdgeWithChecks(edge);
                 exp.forEach(e -> e.addToTrace(checkedEdge));
                 expanded.addAll(exp);
             } else {
@@ -404,24 +399,24 @@ public class DependencyGraph implements TemplateStore {
         }
     }
 
-    private Result<Dependency> checkForExpansionErrors(Dependency edge) {
+    private Result<DependencyEdge> checkForExpansionErrors(DependencyEdge edge) {
 
-        Result<Dependency> res = Result.of(edge);
+        Result<DependencyEdge> res = Result.of(edge);
 
-        if (edge.argumentList.hasListExpander()
+        if (edge.hasListExpander()
             && !edge.canExpandExpander()
             && edge.isInstance()) {
 
             res = Result.empty(Message.error(
-                    "Cannot expand expander on instance of template " + edge.to.getIri()
-                    + " with arguments " + edge.argumentList.toString()
+                    "Cannot expand listExpander on instance of template " + edge.to.getIri()
+                    + " with arguments " + edge.argumentList
                     + ": it contains blank nodes."), res);
         }
 
         if (edge.to.isUndefined() || edge.isInstance() && edge.to.isSignature()) {
             res = Result.empty(Message.error(
                     "Cannot expand instance of template " + edge.to.getIri()
-                    + " with arguments " + edge.argumentList.toString()
+                    + " with arguments " + edge.argumentList
                     + (edge.from == null ? "" : " in body of " + edge.from.getIri())
                     + ": missing definition."), res);
         }
@@ -433,9 +428,9 @@ public class DependencyGraph implements TemplateStore {
      * Used for expanding instances: Expands edges if template used correctly, and gives
      * empty Result with error message othewise.
      */
-    private Set<Result<Dependency>> expandEdgeWithChecks(Dependency edge) {
+    private Set<Result<DependencyEdge>> expandEdgeWithChecks(DependencyEdge edge) {
 
-        Set<Result<Dependency>> expanded = new HashSet<>();
+        Set<Result<DependencyEdge>> expanded = new HashSet<>();
 
         Result<Substitution> resSubs = checkAndMakeSubstitution(edge.argumentList, edge.to.getParameters());
         if (!resSubs.isPresent()) {
@@ -443,16 +438,17 @@ public class DependencyGraph implements TemplateStore {
             return expanded;
         }
         
-        for (Dependency edgeEdge : this.dependencies.get(edge.to)) {
-            Dependency newDep = new Dependency(edge.from, resSubs.get().apply(edgeEdge.argumentList), edgeEdge.to);
+        for (DependencyEdge edgeEdge : this.dependencies.get(edge.to)) {
+            DependencyEdge newDep = new DependencyEdge(
+                edge.from, resSubs.get().apply(edgeEdge.argumentList), edgeEdge.listExpander, edgeEdge.to);
             expanded.add(Result.of(newDep, resSubs));
         }
         return expanded;
     }
 
-    private Result<Substitution> checkAndMakeSubstitution(ArgumentList args, ParameterList params) {
+    private Result<Substitution> checkAndMakeSubstitution(List<Argument> args, List<Parameter> params) {
         // TODO: Check types
-        return Substitution.makeSubstitution(args, params);
+        return Substitution.resultOf(args, params);
     }
 
     @Override
@@ -466,15 +462,23 @@ public class DependencyGraph implements TemplateStore {
     public Result<Template> getTemplate(String iri) {
 
         Result<TemplateNode> resTemplate = checkIsTemplate(iri);
-        Set<Instance> body = new HashSet<>();
+        Set<Instance> instances = new HashSet<>();
 
         resTemplate.ifPresent(template -> {
-            for (Dependency d : this.dependencies.get(template)) {
-                body.add(new Instance(d.to.getIri(), d.argumentList));
+            for (DependencyEdge d : this.dependencies.get(template)) {
+                instances.add(Instance.builder()
+                    .iri(d.to.getIri())
+                    .arguments(d.argumentList)
+                    .listExpander(d.listExpander)
+                    .build());
             }
         });
         return resTemplate.map(template ->
-                Template.createTemplate(template.getIri(), template.getParameters(), body));
+            Template.superbuilder()
+                .iri(template.getIri())
+                .parameters(template.getParameters())
+                .instances(instances)
+                .build());
     }
 
     @Override
@@ -484,8 +488,14 @@ public class DependencyGraph implements TemplateStore {
 
         return resTemplate.map(template ->
             template.isBase()
-                ? Template.createBaseTemplate(template.getIri(), template.getParameters())
-                : Template.createSignature(template.getIri(), template.getParameters()));
+                ? BaseTemplate.superbuilder()
+                    .iri(template.getIri())
+                    .parameters(template.getParameters())
+                    .build()
+                : Signature.builder()
+                    .iri(template.getIri())
+                    .parameters(template.getParameters())
+                    .build());
     }
 
     @Override
@@ -521,10 +531,10 @@ public class DependencyGraph implements TemplateStore {
         return missing;
     }
 
-    private Set<Result<Dependency>> toResultDependencies(Set<Instance> instances) {
+    private Set<Result<DependencyEdge>> toResultDependencies(Set<Instance> instances) {
         return instances.stream()
             .map(i -> checkIsTemplate(i.getIri()).map(template ->
-                        new Dependency(null, i.getArguments(), template)))
+                        new DependencyEdge(null, i.getArguments(), i.getListExpander(), template)))
             .collect(Collectors.toSet());
     }
 
@@ -534,10 +544,10 @@ public class DependencyGraph implements TemplateStore {
      * writer.
      */
     private ResultStream<Instance> expandInstances(Set<Instance> instances,
-            Predicate<Dependency> shouldExpand) {
+            Predicate<DependencyEdge> shouldExpand) {
 
-        Set<Result<Dependency>> finalExpansion = new HashSet<>();
-        Set<Result<Dependency>> toExpandRes = toResultDependencies(instances);
+        Set<Result<DependencyEdge>> finalExpansion = new HashSet<>();
+        Set<Result<DependencyEdge>> toExpandRes = toResultDependencies(instances);
         
         // Check arguments (number of arguments and types)
         toExpandRes = toExpandRes.stream()
@@ -546,48 +556,52 @@ public class DependencyGraph implements TemplateStore {
 
         while (!toExpandRes.isEmpty()) {
 
-            Set<Result<Dependency>> expanded = new HashSet<>();
+            Set<Result<DependencyEdge>> expanded = new HashSet<>();
             expandEdges(toExpandRes, expanded, finalExpansion, shouldExpand);
             toExpandRes = expanded;
         }
 
         ResultStream<Instance> expandedInstances = new ResultStream<>(finalExpansion)
-            .innerMap(dep -> new Instance(dep.to.getIri(), dep.argumentList));
+            .innerMap(dep -> Instance.builder()
+                .iri(dep.to.getIri())
+                .arguments(dep.argumentList)
+                .listExpander(dep.listExpander)
+                .build());
         return expandedInstances;
     }
 
-    private Result<Dependency> checkArguments(Dependency ins) {
+    private Result<DependencyEdge> checkArguments(DependencyEdge ins) {
         
-        ArgumentList args = ins.argumentList;
-        ParameterList params = ins.to.getParameters();
+        List<Argument> args = ins.argumentList;
+        List<Parameter> params = ins.to.getParameters();
 
         // First check correct number of arguments
         if (params == null) {
             return Result.error("Missing definition of template with IRI " + ins.to.getIri() + ".");
         } else if (params.size() != args.size()) {
             return Result.error("Instance of template with IRI " + ins.to.getIri()
-                + " with arguments " + args.toString() + " has " + args.size() 
+                + " with arguments " + args + " has " + args.size()
                 + " arguments, but template expects " + params.size() + ".");
         }
 
         // Then check types and non-blanks
 
-        Result<Dependency> insRes = Result.of(ins);
+        Result<DependencyEdge> insRes = Result.of(ins);
 
         for (int i = 0; i < args.size(); i++) {
-            Term arg = args.get(i);
-            Term param = params.get(i);
+            Term arg = args.get(i).getTerm();
+            Term param = params.get(i).getTerm();
 
             if (!arg.getType().isCompatibleWith(param.getType())) {
-                String err = "Argument " + arg.toString() + " with index " + i 
+                String err = "Argument " + arg + " with index " + i
                     + " to template with IRI " + ins.to.getIri() + " has incompatible type: "
-                    + "Expected type compatible with " + param.getType().toString() + " but got " + arg.getType().toString() + ".";
+                    + "Expected type compatible with " + param.getType() + " but got " + arg.getType() + ".";
                 insRes = insRes.fail(Message.error(err));
             }
-            if (arg instanceof BlankNodeTerm && params.isNonBlank(i)) {
-                String err = "Argument " + arg.toString() + " with index " + i 
+            if (arg instanceof BlankNodeTerm && params.get(i).isNonBlank()) {
+                String err = "Argument " + arg + " with index " + i
                     + " to template with IRI " + ins.to.getIri() + " is a blank node, but "
-                    + " corresponding parameter " + params.get(i).toString() + " is marked as non-blank.";
+                    + " corresponding parameter " + params.get(i) + " is marked as non-blank.";
                 insRes = insRes.fail(Message.error(err));
             }
         }
@@ -605,9 +619,9 @@ public class DependencyGraph implements TemplateStore {
      * Expands all nodes except where argument predicate holds, where arguments to
      * predicate is one of its outgoing edges.
      */
-    public Result<DependencyGraph> expandOnly(Predicate<Dependency> shouldExpand) {
+    public Result<DependencyGraph> expandOnly(Predicate<DependencyEdge> shouldExpand) {
 
-        this.log.info("Expanding definitions.");
+        log.info("Expanding definitions.");
         List<TemplateNode> sorted = topologicallySort();
 
         DependencyGraph ngraph = new DependencyGraph(this.readerRegistry);
@@ -617,9 +631,9 @@ public class DependencyGraph implements TemplateStore {
 
             ngraph.addNode(n);
             if (!isLeafNode(n)) {
-                Set<Result<Dependency>> expanded = new HashSet<>(); // Used for both expanded and unexpanded
+                Set<Result<DependencyEdge>> expanded = new HashSet<>(); // Used for both expanded and unexpanded
                 ngraph.expandEdges(Result.lift(this.dependencies.get(n)), expanded, expanded, shouldExpand);
-                Result<Set<Dependency>> resExpanded = Result.aggregate(expanded);
+                Result<Set<DependencyEdge>> resExpanded = Result.aggregate(expanded);
 
                 graphRes.addToTrace(resExpanded);
                 resExpanded.ifPresent(deps -> deps.forEach(ngraph::addDependency));
@@ -649,12 +663,12 @@ public class DependencyGraph implements TemplateStore {
 
     @Override
     public List<Message> checkTemplates() {
-        return checkTemplatesFor(CheckFactory.allChecks);
+        return checkTemplatesFor(CheckLibrary.allChecks);
     }
 
     @Override
     public List<Message> checkTemplatesForErrorsOnly() {
-        return checkTemplatesFor(CheckFactory.failsOnErrorChecks);
+        return checkTemplatesFor(CheckLibrary.failsOnErrorChecks);
     }
 
     @Override
@@ -662,18 +676,18 @@ public class DependencyGraph implements TemplateStore {
         
         StringBuilder str = new StringBuilder();
 
-        for (Map.Entry<TemplateNode, Set<Dependency>> ens : this.dependencies.entrySet()) {
+        for (Map.Entry<TemplateNode, Set<DependencyEdge>> ens : this.dependencies.entrySet()) {
             TemplateNode node = ens.getKey();
-            str.append(node.toString() + ":" + "\n");
-            Map<TemplateNode, Set<ArgumentList>> deps = new HashMap<>();
-            for (Dependency e : ens.getValue()) {
+            str.append(node + ":" + "\n");
+            Map<TemplateNode, Set<List<Argument>>> deps = new HashMap<>();
+            for (DependencyEdge e : ens.getValue()) {
                 deps.putIfAbsent(e.to, new HashSet<>());
                 deps.get(e.to).add(e.argumentList);
             }
-            for (Map.Entry<TemplateNode, Set<ArgumentList>> dep : deps.entrySet()) {
-                str.append("  " + dep.getKey().toString() + "\n");
-                for (ArgumentList args : dep.getValue()) {
-                    str.append("    => " + args.toString() + "\n");
+            for (Map.Entry<TemplateNode, Set<List<Argument>>> dep : deps.entrySet()) {
+                str.append("  " + dep.getKey() + "\n");
+                for (List<Argument> args : dep.getValue()) {
+                    str.append("    => " + args + "\n");
                 }
             }
             str.append("\n\n");
@@ -686,99 +700,5 @@ public class DependencyGraph implements TemplateStore {
         return this.readerRegistry;
     }
 
-    static class Dependency {
-        public final TemplateNode from;
-        public final ArgumentList argumentList;
-        public final TemplateNode to;
 
-        public Dependency(TemplateNode from, ArgumentList argumentList, TemplateNode to) {
-            this.from = from;
-            this.argumentList = argumentList;
-            this.to = to;
-        }
-
-        public boolean shouldDiscard() {
-
-            // Should discard this instance if it contains none at a non-optional position
-            for (int i = 0; i < this.argumentList.size(); i++) {
-                if (this.argumentList.get(i) instanceof NoneTerm
-                    && !this.to.isOptional(i)
-                    && !this.to.getParameters().hasDefaultValue(i)) { 
-                    return true;
-                }
-            }
-            return false;
-        }
-
-        public boolean isInstance() {
-            return this.from == null;
-        }
-
-        /**
-         * Checks if this edge can be expanded (i.e. not base and no optional variables),
-         * but does not check for missing definitions.
-         */
-        public boolean canExpand() {
-            if (this.to.isBase()) {
-                return false;
-            }
-            if (this.isInstance()) {
-                return true;
-            }
-            for (int i = 0; i < this.argumentList.size(); i++) {
-                Term arg = this.argumentList.get(i);
-                if (arg.isVariable() && this.from.isOptional(arg) && !this.to.isOptional(i)) { 
-                    return false;
-                }
-            }
-            return true;
-        }
-
-        /**
-         * Checks if this edge's expander can be expanded (i.e. no variable or blank marked for expansion),
-         * but does not check for missing definitions.
-         */
-        public boolean canExpandExpander() {
-            for (int i = 0; i < this.argumentList.size(); i++) {
-                Term arg = this.argumentList.get(i);
-                if (this.argumentList.hasListExpander(arg)
-                    && (arg.isVariable() || arg instanceof BlankNodeTerm)) { 
-                    return false;
-                }
-            }
-            return true;
-        }
-
-        public Set<Result<Dependency>> expandListExpander() {
-            Set<Result<Dependency>> expanded = new HashSet<>();
-            for (ArgumentList args : this.argumentList.expandListExpander()) {
-                expanded.add(Result.of(new Dependency(this.from, args, this.to)));
-            }
-            return expanded;
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(this.from, this.argumentList, this.to);
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            return this == o
-                || o != null
-                    && this.getClass().equals(o.getClass())
-                    && Objects.equals(this.from, ((Dependency) o).from)
-                    && Objects.equals(this.argumentList, ((Dependency) o).argumentList)
-                    && Objects.equals(this.to, ((Dependency) o).to);
-        }
-
-        @Override
-        public String toString() {
-            String fromStr = this.from == null ? "" : this.from.toString();
-            String argsStr = this.argumentList == null ? "" : this.argumentList.toString();
-            String toStr = this.to == null ? "" : this.to.toString();
-            return fromStr + "--" + argsStr + "--> " + toStr;
-        }
-
-    }
 }

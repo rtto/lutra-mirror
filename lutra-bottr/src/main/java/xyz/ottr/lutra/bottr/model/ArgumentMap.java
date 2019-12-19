@@ -32,8 +32,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.jena.shared.PrefixMapping;
 import xyz.ottr.lutra.bottr.util.ListParser;
 import xyz.ottr.lutra.bottr.util.TermFactory;
+import xyz.ottr.lutra.model.terms.ListTerm;
 import xyz.ottr.lutra.model.terms.Term;
-import xyz.ottr.lutra.model.terms.TermList;
 import xyz.ottr.lutra.model.types.BasicType;
 import xyz.ottr.lutra.model.types.ComplexType;
 import xyz.ottr.lutra.model.types.TermType;
@@ -133,6 +133,6 @@ public abstract class ArgumentMap<V> implements Function<V, Result<Term>> {
             })
             .aggregate()
             .map(stream -> stream.collect(Collectors.toList()))
-            .map(TermList::new);
+            .map(ListTerm::new);
     }
 }

@@ -1,4 +1,4 @@
-package xyz.ottr.lutra.store.query;
+package xyz.ottr.lutra.store;
 
 /*-
  * #%L
@@ -25,11 +25,14 @@ package xyz.ottr.lutra.store.query;
 import java.util.HashMap;
 import java.util.Map;
 
+import lombok.EqualsAndHashCode;
+
+@EqualsAndHashCode
 public class Tuple {
 
     private static int newId = 0;
 
-    protected static String freshVar() {
+    public static String freshVar() {
         newId++;
         return "_var" + newId;
     }
@@ -52,8 +55,8 @@ public class Tuple {
 
     public Tuple unbind(String... vars) {
         Map<String, Object> nmap = new HashMap<>(this.map);
-        for (int i = 0; i < vars.length; i++) {
-            nmap.remove(vars[i]);
+        for (String var : vars) {
+            nmap.remove(var);
         }
         return new Tuple(nmap);
     }
@@ -68,18 +71,6 @@ public class Tuple {
 
     public Object get(String name) {
         return this.map.get(name);
-    }
-
-    @Override
-    public boolean equals(Object other) {
-        return this == other
-            || other instanceof Tuple
-            && this.map.equals(((Tuple) other).map);
-    }
-
-    @Override
-    public int hashCode() {
-        return this.map.hashCode();
     }
 
     @Override

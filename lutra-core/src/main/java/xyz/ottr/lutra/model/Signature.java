@@ -22,10 +22,14 @@ package xyz.ottr.lutra.model;
  * #L%
  */
 
+import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NonNull;
+import lombok.Singular;
 import org.apache.jena.shared.PrefixMapping;
 import xyz.ottr.lutra.OTTR;
 
@@ -33,31 +37,25 @@ import xyz.ottr.lutra.OTTR;
 public class Signature {
 
     private final @NonNull String iri;
-    private final @NonNull ParameterList parameters;
-    private final boolean isBaseTemplate;
+    private final @NonNull List<Parameter> parameters; // TODO enforce no duplicates in list
 
-    protected Signature(String iri, ParameterList parameters, boolean isBaseTemplate) {
+    @Builder // Cannot use @SuperBuilder as we need to run our own constructor.
+    protected Signature(String iri, @Singular List<Parameter> parameters) {
         this.iri = iri;
         this.parameters = parameters;
-        this.isBaseTemplate = isBaseTemplate;
-        setVariables();
-    }
-
-    protected Signature(String iri, ParameterList parameters) {
-        this(iri, parameters, false);
-    }
-
-    final void setVariables() {
-        this.parameters.asList().forEach(p -> p.setVariable(true));
-    }
-
-    public String toString(PrefixMapping prefixes) {
-        return prefixes.shortForm(this.iri) + this.parameters.toString(prefixes);
+        this.parameters.forEach(p -> p.getTerm().setVariable(true));
     }
 
     @Override
     public String toString() {
         return toString(OTTR.getDefaultPrefixes());
+    }
+
+    public String toString(PrefixMapping prefixes) {
+        return prefixes.shortForm(iri)
+            + this.parameters.stream()
+                .map(t -> t.toString(prefixes))
+                .collect(Collectors.joining(", ", "[ ", " ]"));
     }
 
     @Override
@@ -70,6 +68,6 @@ public class Signature {
         return this == o 
                 || Objects.nonNull(o) 
                         && getClass() == o.getClass()
-                        && Objects.equals(this.getIri(), ((Template) o).getIri());
+                        && Objects.equals(this.iri, ((Signature) o).iri);
     }
 }

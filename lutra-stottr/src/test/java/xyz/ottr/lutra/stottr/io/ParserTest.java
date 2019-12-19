@@ -41,7 +41,7 @@ import xyz.ottr.lutra.model.terms.IRITerm;
 import xyz.ottr.lutra.model.terms.LiteralTerm;
 import xyz.ottr.lutra.model.terms.NoneTerm;
 import xyz.ottr.lutra.model.terms.Term;
-import xyz.ottr.lutra.model.terms.TermList;
+import xyz.ottr.lutra.model.terms.ListTerm;
 import xyz.ottr.lutra.stottr.parser.SInstanceParser;
 import xyz.ottr.lutra.stottr.parser.SParserUtils;
 import xyz.ottr.lutra.stottr.parser.SPrefixParser;
@@ -102,7 +102,7 @@ public class ParserTest {
 
     private List<Instance> makeInstances() {
 
-        TermList lst = new TermList(
+        ListTerm lst = new ListTerm(
             LiteralTerm.createPlainLiteral("one"),
             LiteralTerm.createPlainLiteral("two"),
             LiteralTerm.createPlainLiteral("three"));
@@ -118,7 +118,7 @@ public class ParserTest {
                     new IRITerm("http://some.uri/with#part"))),
             new Instance("http://example.org/T2",
                 new ArgumentList(
-                    new TermList(LiteralTerm.createLanguageTagLiteral("hello", "no"), lst),
+                    new ListTerm(LiteralTerm.createLanguageTagLiteral("hello", "no"), lst),
                     toExpand, ArgumentList.Expander.CROSS)),
             new Instance("http://base.org/T3",
                 new ArgumentList(

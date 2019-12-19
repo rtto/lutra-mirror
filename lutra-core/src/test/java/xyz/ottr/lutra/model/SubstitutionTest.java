@@ -26,66 +26,65 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
 
 import org.junit.Test;
+import xyz.ottr.lutra.model.terms.ListTerm;
 import xyz.ottr.lutra.model.terms.NoneTerm;
 import xyz.ottr.lutra.model.terms.ObjectTerm;
 import xyz.ottr.lutra.model.terms.Term;
-import xyz.ottr.lutra.model.terms.TermList;
 import xyz.ottr.lutra.system.Result;
 
 public class SubstitutionTest {
 
     @Test
     public void simpleSubstitution() {
-        TermList params = new TermList(
-                new ObjectTerm("a", true),
-                new ObjectTerm("b", true),
-                new ObjectTerm("c", true));
+        List<Parameter> params = Parameter.of(
+                ObjectTerm.var("a"),
+                ObjectTerm.var("b"),
+                ObjectTerm.var("c"));
 
-        TermList args = new TermList(
-                new ObjectTerm(1),
-                new ObjectTerm(2),
-                new ObjectTerm(3));
+        List<Argument> args = Argument.of(
+                ObjectTerm.cons(1),
+                ObjectTerm.cons(2),
+                ObjectTerm.cons(3));
 
-        Result<Substitution> subsRes = Substitution.makeSubstitution(args, params);
+        Result<Substitution> subsRes = Substitution.resultOf(args, params);
         assertTrue(subsRes.isPresent());
         Substitution subs = subsRes.get();
 
-        TermList bodyIns = new TermList(
-                new ObjectTerm("c", true),
-                new ObjectTerm(4),
-                new ObjectTerm("b", true));
+        List<Term> bodyIns = List.of(
+                ObjectTerm.var("c"),
+                ObjectTerm.cons(4),
+                ObjectTerm.var("b"));
 
-        TermList shouldEqual = new TermList(
-                new ObjectTerm(3),
-                new ObjectTerm(4),
-                new ObjectTerm(2));
+        List<Term> shouldEqual = List.of(
+                ObjectTerm.cons(3),
+                ObjectTerm.cons(4),
+                ObjectTerm.cons(2));
 
-        assertEquals(subs.apply(bodyIns).asList(), shouldEqual.asList());
+        assertEquals(subs.apply(bodyIns), shouldEqual);
     }
 
     @Test
     public void listSubstitution() {
 
-        TermList params = new TermList(
-            new ObjectTerm("a", true),
-            new ObjectTerm("b", true),
-            new ObjectTerm("c", true));
+        List<Parameter> params = Parameter.of(
+            ObjectTerm.var("a"),
+            ObjectTerm.var("b"),
+            ObjectTerm.var("c"));
 
-        TermList arg02 = new TermList(new ObjectTerm(1));
-        TermList args = new TermList(arg02, new ObjectTerm(2), arg02);
+        ListTerm arg02 = new ListTerm(ObjectTerm.cons(1));
+        List<Argument> args = Argument.of(arg02, ObjectTerm.cons(2), arg02);
 
-        Result<Substitution> subsRes = Substitution.makeSubstitution(args, params);
+        Result<Substitution> subsRes = Substitution.resultOf(args, params);
         assertTrue(subsRes.isPresent());
         Substitution subs = subsRes.get();
 
-        Term bodyArg01 = new ObjectTerm("a", true);
-        TermList bodyIns = new TermList(bodyArg01, bodyArg01, new ObjectTerm("c", true));
+        Term bodyArg01 = ObjectTerm.var("a");
+        List<Term> bodyIns = List.of(bodyArg01, bodyArg01, ObjectTerm.var("c"));
 
-        TermList exp = subs.apply(bodyIns);
+        List<Term> exp = subs.apply(bodyIns);
 
         assertEquals(exp.get(0), exp.get(1)); 
         assertEquals(exp.get(1), exp.get(2));
@@ -94,67 +93,65 @@ public class SubstitutionTest {
     @Test
     public void defaultValue() {
 
-        Term p1 = new ObjectTerm("a", true);
-        Term p1Default = new ObjectTerm(0);
-        TermList paramVars = new TermList(
-                p1,
-                new ObjectTerm("b", true),
-                new ObjectTerm("c", true));
-        
-        Map<Term, Term> defaultVals = new HashMap<>();
-        defaultVals.put(p1, p1Default);
-        ParameterList params = new ParameterList(paramVars, null, null, defaultVals);
+        List<Parameter> params = List.of(
+            Parameter.builder()
+                .term(ObjectTerm.var("a"))
+                .defaultValue(ObjectTerm.cons(0))
+                .build(),
+            Parameter.builder().term(ObjectTerm.var("b")).build(),
+            Parameter.builder().term(ObjectTerm.var("c")).build()
+        );
 
-        ArgumentList argsWithoutNone = new ArgumentList(
-                new ObjectTerm(1),
-                new ObjectTerm(2),
-                new ObjectTerm(3));
+        List<Argument> argsWithoutNone = Argument.of(
+                ObjectTerm.cons(1),
+                ObjectTerm.cons(2),
+                ObjectTerm.cons(3));
 
-        ArgumentList argsWithNone = new ArgumentList(
+        List<Argument> argsWithNone = Argument.of(
                 new NoneTerm(),
-                new ObjectTerm(2),
-                new ObjectTerm(3));
+                ObjectTerm.cons(2),
+                ObjectTerm.cons(3));
 
-        Result<Substitution> subsWithNoneRes = Substitution.makeSubstitution(argsWithNone, params);
+        Result<Substitution> subsWithNoneRes = Substitution.resultOf(argsWithNone, params);
         assertTrue(subsWithNoneRes.isPresent());
         Substitution subsWithNone = subsWithNoneRes.get();
 
-        Result<Substitution> subsWithoutNoneRes = Substitution.makeSubstitution(argsWithoutNone, params);
+        Result<Substitution> subsWithoutNoneRes = Substitution.resultOf(argsWithoutNone, params);
         assertTrue(subsWithoutNoneRes.isPresent());
         Substitution subsWithoutNone = subsWithoutNoneRes.get();
 
-        TermList bodyIns = new TermList(
-                new ObjectTerm("a", true),
-                new ObjectTerm("b", true),
-                new ObjectTerm("c", true));
+        List<Term> bodyIns = List.of(
+                ObjectTerm.var("a"),
+                ObjectTerm.var("b"),
+                ObjectTerm.var("c"));
 
-        TermList withNoneshouldEqual = new TermList(
-                new ObjectTerm(0),
-                new ObjectTerm(2),
-                new ObjectTerm(3));
+        List<Term> withNoneshouldEqual = List.of(
+                ObjectTerm.cons(0),
+                ObjectTerm.cons(2),
+                ObjectTerm.cons(3));
 
-        TermList withoutNoneshouldEqual = new TermList(
-                new ObjectTerm(1),
-                new ObjectTerm(2),
-                new ObjectTerm(3));
+        List<Term> withoutNoneshouldEqual = List.of(
+                ObjectTerm.cons(1),
+                ObjectTerm.cons(2),
+                ObjectTerm.cons(3));
 
-        assertEquals(subsWithNone.apply(bodyIns).asList(), withNoneshouldEqual.asList());
-        assertEquals(subsWithoutNone.apply(bodyIns).asList(), withoutNoneshouldEqual.asList());
+        assertEquals(subsWithNone.apply(bodyIns), withNoneshouldEqual);
+        assertEquals(subsWithoutNone.apply(bodyIns), withoutNoneshouldEqual);
     }
 
     @Test
     public void wrongConstruction() {
 
-        TermList params = new TermList(
-                new ObjectTerm("a", true),
-                new ObjectTerm("b", true),
-                new ObjectTerm("c", true));
+        List<Parameter> params = Parameter.of(
+                ObjectTerm.var("a"),
+                ObjectTerm.var("b"),
+                ObjectTerm.var("c"));
 
-        TermList args = new TermList(
-                new ObjectTerm(1),
-                new ObjectTerm(2));
+        List<Argument> args = Argument.of(
+                ObjectTerm.cons(1),
+                ObjectTerm.cons(2));
 
-        Result<Substitution> subs = Substitution.makeSubstitution(args, params);
+        Result<Substitution> subs = Substitution.resultOf(args, params);
         assertFalse(subs.isPresent());
     }
 }

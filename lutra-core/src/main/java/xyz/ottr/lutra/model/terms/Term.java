@@ -25,20 +25,20 @@ package xyz.ottr.lutra.model.terms;
 import java.util.Optional;
 
 import org.apache.jena.shared.PrefixMapping;
+import xyz.ottr.lutra.model.TermSubstitutable;
 import xyz.ottr.lutra.model.types.TermType;
-import xyz.ottr.lutra.model.types.TypeRegistry;
 
-public interface Term<I> {
+public interface Term extends TermSubstitutable<Term> {
 
-    I getIdentifier();
+    Object getIdentifier();
+
+    void setVariable(boolean variable);
+
+    boolean isVariable();
 
     void setType(TermType term);
 
     TermType getType();
-
-    default TermType getIntrinsicType() {
-        return TypeRegistry.LUB_TOP;
-    }
 
     /**
      * Returns the TermType that the variable Term has as default if no type is given, and is only based on the
@@ -50,10 +50,6 @@ public interface Term<I> {
         return getType().removeLUB();
     }
 
-    boolean isVariable();
-
-    void setVariable(boolean variable);
-
     Optional<Term> unify(Term other);
 
     static Optional<Term> unify(Term t1, Term t2) {
@@ -62,6 +58,6 @@ public interface Term<I> {
 
     Term shallowClone();
 
-    String toString(PrefixMapping prefixes);
+    String toString(PrefixMapping prefixMapping);
 
 }
