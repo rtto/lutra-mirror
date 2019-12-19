@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import lombok.Builder;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
 import org.apache.jena.shared.PrefixMapping;
@@ -34,6 +35,7 @@ import xyz.ottr.lutra.OTTR;
 import xyz.ottr.lutra.model.terms.Term;
 
 @Getter
+@EqualsAndHashCode
 @Builder(toBuilder = true)
 public class Argument implements TermWrapper, TermSubstitutable<Argument> {
 
