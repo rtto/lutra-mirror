@@ -57,7 +57,7 @@ public class Instance implements TermSubstitutable<Instance> {
     }
 
     public String toString(PrefixMapping prefixes) {
-        return Objects.isNull(this.listExpander) ? "" : this.listExpander + " | "
+        return (Objects.isNull(this.listExpander) ? "" : this.listExpander + " | ")
             + prefixes.shortForm(this.iri)
             + this.arguments.stream()
                 .map(t -> t.toString(prefixes))
