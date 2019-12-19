@@ -86,7 +86,7 @@ public class DependencyGraphTest {
     public void simpleExpansion() {
 
         Set<Template> toExpand = Set.of(
-            Template.builder()
+            Template.superbuilder()
                 .iri("t1")
                 .parameter(Parameter.builder().term(var("a")).build())
                 .parameter(Parameter.builder().term(var("b")).build())
@@ -101,7 +101,7 @@ public class DependencyGraphTest {
                     .argument(Argument.builder().term(var("b")).build())
                     .build())
                 .build(),
-            Template.builder()
+            Template.superbuilder()
                 .iri("t2")
                 .parameters(Parameter.of(var("v"), var("u")))
                 .instance(Instance.builder()
@@ -115,7 +115,7 @@ public class DependencyGraphTest {
                 .build());
 
         Set<Template> shouldEqual = Set.of(
-            Template.builder()
+            Template.superbuilder()
                 .iri("t1")
                 .parameters(Parameter.of(var("a"), var("b")))
                 .instance(Instance.builder()
@@ -127,7 +127,7 @@ public class DependencyGraphTest {
                     .arguments(Argument.of(cons(2), var("b")))
                     .build())
                 .build(),
-            Template.builder()
+            Template.superbuilder()
                 .iri("t2")
                 .parameters(Parameter.of(var("v"), var("u")))
                 .instance(Instance.builder()
@@ -153,7 +153,7 @@ public class DependencyGraphTest {
         DependencyGraph graph = new DependencyGraph(null);
 
         graph.addTemplate(
-            Template.builder()
+            Template.superbuilder()
                 .iri("t1")
                 .parameters(Parameter.of(var("a"), var("b")))
                 .instance(Instance.builder()
@@ -167,7 +167,7 @@ public class DependencyGraphTest {
                 .build());
 
         graph.addTemplateSignature(
-            BaseTemplate.builder()
+            BaseTemplate.superbuilder()
                 .iri("base")
                 .parameters(Parameter.of(var("x"), var("y")))
                 .build()
@@ -183,7 +183,7 @@ public class DependencyGraphTest {
     public void optionalSafe() {
 
         Set<Template> toExpand = Set.of(
-            Template.builder()
+            Template.superbuilder()
                 .iri("t1")
                 .parameters(Parameter.of(var("a"), var("b")))
                 .instance(Instance.builder()
@@ -195,7 +195,7 @@ public class DependencyGraphTest {
                     .arguments(Argument.of(cons(2), var("b")))
                     .build())
                 .build(),
-            Template.builder()
+            Template.superbuilder()
                 .iri("t2")
                 .parameter(Parameter.builder().term(var("v")).build())
                 .parameter(Parameter.builder().term(var("u")).optional(true).build())
@@ -218,7 +218,7 @@ public class DependencyGraphTest {
         ListTerm toListExpand = new ListTerm(List.of(var("v1"), var("v2")), true);
 
         Set<Template> toExpand = Set.of(
-            Template.builder()
+            Template.superbuilder()
                 .iri("t1")
                 .parameters(Parameter.of(var("a"), var("b")))
                 .instance(Instance.builder()
@@ -230,7 +230,7 @@ public class DependencyGraphTest {
                     .arguments(Argument.of(cons(2), var("b")))
                     .build())
                 .build(),
-            Template.builder()
+            Template.superbuilder()
                 .iri("t2")
                 .parameters(Parameter.of(toListExpand, var("u")))
                 .instance(Instance.builder()
@@ -250,7 +250,7 @@ public class DependencyGraphTest {
 
     private void expandInstanceAndCheckEquality(Instance ins, Set<Instance> shouldEqual, Set<Template> templates) {
         
-        BaseTemplate base = BaseTemplate.builder()
+        BaseTemplate base = BaseTemplate.superbuilder()
             .iri("base")
             .parameters(Parameter.of(var("x"), var("y")))
             .build();
@@ -290,7 +290,7 @@ public class DependencyGraphTest {
     public void simpleInstanceExpansion() {
 
         Set<Template> templates = Set.of(
-            Template.builder()
+            Template.superbuilder()
                 .iri("t1")
                 .parameters(Parameter.of(var("a"), var("b")))
                 .instance(Instance.builder()
@@ -302,7 +302,7 @@ public class DependencyGraphTest {
                     .arguments(Argument.of(cons(2), var("b")))
                     .build())
                 .build(),
-            Template.builder()
+            Template.superbuilder()
                 .iri("t2")
                 .parameters(Parameter.of(var("v"), var("u")))
                 .instance(Instance.builder()
@@ -339,7 +339,7 @@ public class DependencyGraphTest {
 
         DependencyGraph graph = new DependencyGraph(null);
         graph.addTemplateSignature(
-            BaseTemplate.builder()
+            BaseTemplate.superbuilder()
                 .iri("base")
                 .parameters(Parameter.of(var("x"), var("y")))
                 .build()
@@ -347,7 +347,7 @@ public class DependencyGraphTest {
 
         ObjectTerm toListExpand = var("a");
         graph.addTemplate(
-            Template.builder()
+            Template.superbuilder()
                 .iri("withCross")
                 .parameters(Parameter.of(var("a"), var("b")))
                 .instance(Instance.builder()
@@ -385,7 +385,7 @@ public class DependencyGraphTest {
     public void optionalInstanceExpansion() {
 
         Set<Template> templates = Set.of(
-            Template.builder()
+            Template.superbuilder()
                 .iri("t1")
                 .parameter(Parameter.builder().term(var("a")).build())
                 .parameter(Parameter.builder().term(var("b")).optional(true).build())
@@ -398,7 +398,7 @@ public class DependencyGraphTest {
                     .arguments(Argument.of(cons(2), var("b")))
                     .build())
                 .build(),
-            Template.builder()
+            Template.superbuilder()
                 .iri("t2")
                 .parameter(Parameter.builder().term(var("v")).build())
                 .parameter(Parameter.builder().term(var("u")).optional(true).build())

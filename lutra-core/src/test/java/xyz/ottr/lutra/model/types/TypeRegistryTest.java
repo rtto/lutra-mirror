@@ -132,7 +132,7 @@ public class TypeRegistryTest {
             .argument(Argument.builder().term(var3b).build())
             .build();
 
-        Template tpl = Template.builder()
+        Template tpl = Template.superbuilder()
             .iri("t1")
             .parameter(Parameter.builder().term(var1).build())
             .parameter(Parameter.builder().term(var2).build())
@@ -186,7 +186,7 @@ public class TypeRegistryTest {
             .argument(Argument.builder().term(lst2).build())
             .build();
 
-        Template tpl = Template.builder()
+        Template tpl = Template.superbuilder()
             .iri("t1")
             .parameter(Parameter.builder().term(var1).build())
             .parameter(Parameter.builder().term(var21).build())

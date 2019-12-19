@@ -77,14 +77,14 @@ public enum OTTR  {
             Term obj = new BlankNodeTerm("_:o");
             obj.setType(obj.getVariableType());
 
-            Triple = Template.builder()
+            Triple = Template.superbuilder()
                 .iri(OTTR.BaseURI.Triple)
                 .parameter(Parameter.builder().term(sub).build())
                 .parameter(Parameter.builder().term(pred).nonBlank(true).build())
                 .parameter(Parameter.builder().term(obj).build())
                 .build();
 
-            NullableTriple = Template.builder()
+            NullableTriple = Template.superbuilder()
                 .iri(OTTR.BaseURI.Triple)
                 .parameter(Parameter.builder().term(sub).optional(true).build())
                 .parameter(Parameter.builder().term(pred).optional(true).nonBlank(true).build())

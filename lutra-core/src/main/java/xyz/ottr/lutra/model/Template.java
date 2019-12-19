@@ -27,11 +27,13 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Singular;
-import lombok.experimental.SuperBuilder;
+
 import org.apache.jena.shared.PrefixMapping;
+
 import xyz.ottr.lutra.OTTR;
 import xyz.ottr.lutra.model.terms.ListTerm;
 import xyz.ottr.lutra.model.terms.Term;
@@ -39,12 +41,12 @@ import xyz.ottr.lutra.model.types.TermType;
 
 @SuppressWarnings("PMD.UselessOverridingMethod")
 @Getter
-@SuperBuilder
 public class Template extends Signature {
 
     @Singular private final @NonNull Set<Instance> instances;
 
-    public Template(String iri, List<Parameter> parameters, Set<Instance> instances) {
+    @Builder(builderMethodName = "superbuilder") // Cannot use @SuperBuilder as we need to run our own constructor.
+    public Template(String iri, @Singular List<Parameter> parameters, @Singular Set<Instance> instances) {
         super(iri, parameters);
         this.instances = instances;
         setVariableFlagsAndTypes();

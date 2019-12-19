@@ -474,7 +474,7 @@ public class DependencyGraph implements TemplateStore {
             }
         });
         return resTemplate.map(template ->
-            Template.builder()
+            Template.superbuilder()
                 .iri(template.getIri())
                 .parameters(template.getParameters())
                 .instances(instances)
@@ -487,10 +487,15 @@ public class DependencyGraph implements TemplateStore {
         Result<TemplateNode> resTemplate = checkIsTemplate(iri);
 
         return resTemplate.map(template ->
-            (template.isBase() ? BaseTemplate.builder() : Signature.builder()) // get correct builder
-                .iri(template.getIri())
-                .parameters(template.getParameters())
-                .build());
+            template.isBase()
+                ? BaseTemplate.superbuilder()
+                    .iri(template.getIri())
+                    .parameters(template.getParameters())
+                    .build()
+                : Signature.builder()
+                    .iri(template.getIri())
+                    .parameters(template.getParameters())
+                    .build());
     }
 
     @Override

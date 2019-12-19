@@ -100,7 +100,7 @@ public class CheckLibraryTest {
 
         DependencyGraph store = initStore();
         store.addTemplate(
-            Template.builder()
+            Template.superbuilder()
                 .iri("test")
                 .parameters(Parameter.of(
                     ObjectTerm.var("a"),
@@ -123,7 +123,7 @@ public class CheckLibraryTest {
 
         DependencyGraph store = initStore();
         store.addTemplate(
-            Template.builder().iri("test")
+            Template.superbuilder().iri("test")
                 .parameters(Parameter.of(
                     ObjectTerm.var("a"),
                     ObjectTerm.var("b")))
@@ -145,7 +145,7 @@ public class CheckLibraryTest {
 
         DependencyGraph store = initStore();
         store.addTemplate(
-            Template.builder()
+            Template.superbuilder()
                 .iri("test")
                 .parameters(Parameter.of(
                     ObjectTerm.var("a"),
@@ -168,7 +168,7 @@ public class CheckLibraryTest {
 
         DependencyGraph store = initStore();
         store.addTemplate(
-            Template.builder().iri("test")
+            Template.superbuilder().iri("test")
                 .parameters(Parameter.of(
                     ObjectTerm.var("a"),
                     ObjectTerm.var("b")))
@@ -190,14 +190,14 @@ public class CheckLibraryTest {
 
         DependencyGraph store = new DependencyGraph(null);
         store.addTemplateSignature(
-            Template.builder()
+            Template.superbuilder()
                 .iri("base")
                 .parameter(Parameter.builder().term(ObjectTerm.var("x")).nonBlank(true).build())
                 .parameter(Parameter.builder().term(ObjectTerm.var("y")).build())
                 .build());
 
         store.addTemplate(
-            Template.builder()
+            Template.superbuilder()
                 .iri("test")
                 .parameters(Parameter.of(
                     ObjectTerm.var("a"),
@@ -221,7 +221,7 @@ public class CheckLibraryTest {
         DependencyGraph store = initStore();
 
         store.addTemplate(
-            Template.builder()
+            Template.superbuilder()
                 .iri("test1")
                 .parameters(Parameter.of(
                     ObjectTerm.var("a"),
@@ -241,7 +241,7 @@ public class CheckLibraryTest {
                 .build());
 
         store.addTemplate(
-            Template.builder().iri("test2")
+            Template.superbuilder().iri("test2")
                 .parameters(Parameter.of(
                     ObjectTerm.var("a"),
                     ObjectTerm.var("b")))
@@ -254,7 +254,7 @@ public class CheckLibraryTest {
                 .build());
 
         store.addTemplate(
-            Template.builder()
+            Template.superbuilder()
                 .iri("test3")
                 .parameters(Parameter.of(
                     ObjectTerm.var("a"),
@@ -299,7 +299,7 @@ public class CheckLibraryTest {
         Term constC2 = new IRITerm("ex.com/niceonlyprop");
 
         store.addTemplate(
-            Template.builder()
+            Template.superbuilder()
                 .iri("testCorrect")
                 .parameters(Parameter.of(varC1, varC2))
                 .instance(Instance.builder()
@@ -348,7 +348,7 @@ public class CheckLibraryTest {
         Term prop = new IRITerm("ex.com/niceonlyprop");
 
         store.addTemplate(
-            Template.builder()
+            Template.superbuilder()
                 .iri("testIncorrect")
                 .parameters(Parameter.of(classVar2, intVar2))
                 .instance(Instance.builder()
@@ -394,7 +394,7 @@ public class CheckLibraryTest {
         Term cons1 = new IRITerm("ex.com/prop1");
 
         store.addTemplate(
-            Template.builder()
+            Template.superbuilder()
                 .iri("testIncorrect")
                 .parameters(Parameter.of(var1, var2))
                 .instance(Instance.builder()
@@ -429,7 +429,7 @@ public class CheckLibraryTest {
         Term cons = new BlankNodeTerm("_:b");
 
         store.addTemplate(
-            Template.builder()
+            Template.superbuilder()
                 .iri("testCorrect1")
                 .parameters(Parameter.of(var))
                 .instance(Instance.builder()
@@ -465,7 +465,7 @@ public class CheckLibraryTest {
         Term one = LiteralTerm.createTypedLiteral("1", TypeRegistry.getType(XSD.integer).getIri());
 
         store.addTemplate(
-            Template.builder().iri("testCorrect1")
+            Template.superbuilder().iri("testCorrect1")
                 .parameters(Parameter.of(varClass))
                 .instance(Instance.builder()
                     .iri("areClasses")
@@ -498,7 +498,7 @@ public class CheckLibraryTest {
         Term one = LiteralTerm.createTypedLiteral("1", TypeRegistry.getType(XSD.integer).getIri());
 
         store.addTemplate(
-            Template.builder().iri("testCorrect1")
+            Template.superbuilder().iri("testCorrect1")
                 .parameters(Parameter.of(varClass))
                 .instance(Instance.builder()
                     .iri("areClasses")
