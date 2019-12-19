@@ -76,11 +76,11 @@ public class DependencyEdge {
      */
     public boolean canExpand() {
 
-        if (this.isInstance()) {
-            return true;
-        }
         if (this.to.isBase()) {
             return false;
+        }
+        if (this.isInstance()) {
+            return true;
         }
         for (int i = 0; i < this.argumentList.size(); i++) {
             Term arg = this.argumentList.get(i).getTerm();
