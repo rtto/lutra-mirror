@@ -24,5 +24,12 @@
     <!-- https://github.com/spotbugs/spotbugs/issues/811 ? -->
     <Class name="xyz.ottr.lutra.bottr.model.TranslationSettings" />
     <Bug pattern="UPM_UNCALLED_PRIVATE_METHOD" />
-</Match>
+  </Match>
+
+  <Match>
+    <!-- https://github.com/spotbugs/spotbugs/issues/811 ? -->
+    <Class name="xyz.ottr.lutra.model.ListExpander" />
+    <Bug pattern="UPM_UNCALLED_PRIVATE_METHOD" />
+  </Match>
+
 </FindBugsFilter>

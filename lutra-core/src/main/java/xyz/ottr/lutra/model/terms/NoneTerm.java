@@ -25,19 +25,12 @@ package xyz.ottr.lutra.model.terms;
 import java.util.Optional;
 
 import xyz.ottr.lutra.OTTR;
-import xyz.ottr.lutra.model.types.TermType;
 import xyz.ottr.lutra.model.types.TypeRegistry;
 
 public class NoneTerm extends AbstractTerm<String> {
 
     public NoneTerm() {
-        super(OTTR.prefix + ":none");
-        setType(getIntrinsicType());
-    }
-
-    @Override
-    public TermType getIntrinsicType() {
-        return TypeRegistry.BOT;
+        super(OTTR.prefix + ":none", TypeRegistry.BOT);
     }
 
     @Override

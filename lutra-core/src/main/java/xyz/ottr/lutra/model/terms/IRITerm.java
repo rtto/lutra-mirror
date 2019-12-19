@@ -24,23 +24,16 @@ package xyz.ottr.lutra.model.terms;
 
 import java.util.Optional;
 
-import xyz.ottr.lutra.model.types.TermType;
 import xyz.ottr.lutra.model.types.TypeRegistry;
 
 public class IRITerm extends AbstractTerm<String> {
 
     public IRITerm(String iri) {
-        super(iri);
-        setType(getIntrinsicType());
+        super(iri, TypeRegistry.LUB_IRI);
     }
 
     public String getIri() {
         return getIdentifier();
-    }
-
-    @Override
-    public TermType getIntrinsicType() {
-        return TypeRegistry.LUB_IRI;
     }
 
     @Override 

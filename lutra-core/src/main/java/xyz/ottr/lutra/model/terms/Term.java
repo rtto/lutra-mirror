@@ -27,7 +27,6 @@ import java.util.Optional;
 import org.apache.jena.shared.PrefixMapping;
 import xyz.ottr.lutra.model.TermSubstitutable;
 import xyz.ottr.lutra.model.types.TermType;
-import xyz.ottr.lutra.model.types.TypeRegistry;
 
 public interface Term extends TermSubstitutable<Term> {
 
@@ -40,10 +39,6 @@ public interface Term extends TermSubstitutable<Term> {
     void setType(TermType term);
 
     TermType getType();
-
-    default TermType getIntrinsicType() {
-        return TypeRegistry.LUB_TOP;
-    }
 
     /**
      * Returns the TermType that the variable Term has as default if no type is given, and is only based on the

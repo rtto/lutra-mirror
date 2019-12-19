@@ -43,11 +43,10 @@ public class LiteralTerm extends AbstractTerm<String> {
     private final String languageTag;
 
     private LiteralTerm(String value, String datatype, String languageTag) {
-        super(getIdentifier(value, datatype, languageTag));
+        super(getIdentifier(value, datatype, languageTag), getIntrinsicType(datatype));
         this.value = value;
         this.datatype = datatype;
         this.languageTag = languageTag;
-        setType(getIntrinsicType());
     }
 
     private static String getIdentifier(String value, String datatype, String languageTag) {
@@ -57,9 +56,8 @@ public class LiteralTerm extends AbstractTerm<String> {
             : "^^" + datatype);
     }
 
-    @Override
-    public TermType getIntrinsicType() {
-        return Objects.requireNonNullElse(TypeRegistry.getType(this.datatype), TypeRegistry.LITERAL);
+    private static TermType getIntrinsicType(String datatype) {
+        return Objects.requireNonNullElse(TypeRegistry.getType(datatype), TypeRegistry.LITERAL);
     }
 
     public static LiteralTerm createLanguageTagLiteral(String value, @NonNull String languageTag) {

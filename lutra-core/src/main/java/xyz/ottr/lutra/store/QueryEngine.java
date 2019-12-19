@@ -758,7 +758,7 @@ public abstract class QueryEngine<S extends TemplateStore> {
         Object boundUnified;
 
         if (boundElem instanceof TermSubstitutable) {
-            boundUnified = ((TermSubstitutable)boundSubs).apply(boundSubs);
+            boundUnified = ((TermSubstitutable)boundElem).apply(boundSubs);
         } else {
             throw new VariableNotBoundException("Variable " + elem
                     + " not bound to type a unifier can be applied to.");

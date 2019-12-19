@@ -30,7 +30,6 @@ import java.util.stream.Collectors;
 import lombok.Builder;
 import lombok.Singular;
 import org.apache.jena.shared.PrefixMapping;
-
 import xyz.ottr.lutra.model.Substitution;
 import xyz.ottr.lutra.model.types.LUBType;
 import xyz.ottr.lutra.model.types.ListType;
@@ -47,11 +46,10 @@ public class ListTerm extends AbstractTerm<Long> {
 
     @Builder(toBuilder = true)
     public ListTerm(@Singular List<Term> terms, boolean variable) {
-        super(generateNewID()); // TODO change this?
+        super(generateNewID(), getIntrinsicType(terms)); // TODO change this?
         this.terms = terms;
         this.listID = generateNewID();
-        setType(getIntrinsicType());
-        setVariable(variable);
+        this.variable = variable;
     }
 
     public ListTerm(List<Term> terms) {
@@ -62,9 +60,8 @@ public class ListTerm extends AbstractTerm<Long> {
         this(List.of(terms));
     }
 
-    @Override
-    public TermType getIntrinsicType() {
-        return this.terms.isEmpty()
+    private static TermType getIntrinsicType(List<Term> terms) {
+        return terms.isEmpty()
             ? new ListType(TypeRegistry.BOT)
             : new NEListType(new LUBType(TypeRegistry.TOP));
     }
@@ -77,13 +74,12 @@ public class ListTerm extends AbstractTerm<Long> {
      * after proper typing of variables in Template.
      */
     public void recomputeType() {
-
         for (Term inner : this.terms) {
             if (inner instanceof ListTerm) {
                 ((ListTerm) inner).recomputeType();
             }
         }
-        setType(getIntrinsicType());
+        setType(getIntrinsicType(this.terms));
     }
 
     private static long generateNewID() {

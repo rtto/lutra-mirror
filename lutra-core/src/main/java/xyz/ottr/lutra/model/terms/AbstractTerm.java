@@ -30,9 +30,7 @@ import lombok.Setter;
 import org.apache.jena.shared.PrefixMapping;
 import xyz.ottr.lutra.OTTR;
 import xyz.ottr.lutra.model.Substitution;
-import xyz.ottr.lutra.model.types.LUBType;
 import xyz.ottr.lutra.model.types.TermType;
-import xyz.ottr.lutra.model.types.TypeRegistry;
 
 @Getter
 @Setter
@@ -42,13 +40,9 @@ public abstract class AbstractTerm<T> implements Term {
     protected @NonNull TermType type;
     protected boolean variable;
 
-    AbstractTerm(T identifier) {
+    AbstractTerm(T identifier, TermType type) {
         this.identifier = identifier;
-    }
-
-    @Override
-    public TermType getIntrinsicType() {
-        return this.variable ? TypeRegistry.TOP : new LUBType(TypeRegistry.TOP);
+        this.type = type;
     }
 
     @Override
@@ -71,9 +65,20 @@ public abstract class AbstractTerm<T> implements Term {
     }
 
     public String toString(PrefixMapping prefixes) {
-        return (this.variable ? "?" : "")
-            + prefixes.shortForm(identifier.toString())
-            + " : " + prefixes.shortForm(type.toString());
+
+        StringBuilder strBuilder = new StringBuilder();
+
+        if (this.variable) {
+            strBuilder.append("?");
+        }
+
+        strBuilder.append(prefixes.shortForm(this.identifier.toString()));
+
+        if (Objects.nonNull(this.type)) {
+            strBuilder.append(" : ").append(prefixes.shortForm(this.type.toString()));
+        }
+
+        return strBuilder.toString();
     }
 
     public String toString() {

@@ -51,6 +51,7 @@ public class TemplateNode {
     TemplateNode(String iri, Type type) {
         this.iri = iri;
         this.type = type;
+        this.parameters = null;
     }
 
     boolean isBase() {
@@ -70,15 +71,17 @@ public class TemplateNode {
     }
 
     boolean isOptional(int index) {
-        return this.parameters.get(index).isOptional();
+        return Objects.nonNull(this.parameters)
+            && this.parameters.get(index).isOptional();
     }
 
     boolean isOptional(Term parameterTerm) {
-        return this.parameters.stream()
-            .filter(p -> p.getTerm().equals(parameterTerm))
-            .findFirst()
-            .get()
-            .isOptional();
+        return Objects.nonNull(this.parameters)
+            && this.parameters.stream()
+                .filter(p -> p.getTerm().equals(parameterTerm))
+                .findFirst()
+                .get()
+                .isOptional();
     }
 
     @Override

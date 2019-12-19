@@ -26,7 +26,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.IntStream;
 
-import lombok.val;
 import xyz.ottr.lutra.model.terms.ListTerm;
 import xyz.ottr.lutra.model.terms.NoneTerm;
 import xyz.ottr.lutra.model.terms.Term;
@@ -100,10 +99,10 @@ public enum ListExpander {
 
         var expanded = new LinkedList<List<Argument>>();
         for (int pick = 0; pick < zipLength; pick += 1) {
-            val zipStep = new LinkedList<Argument>();
+            List<Argument> zipStep = new LinkedList<>();
             for (Argument arg : arguments) {
                 if (arg.isListExpander()) {
-                    val argTerms = ((ListTerm)arg.getTerm()).asList();
+                    List<Term> argTerms = ((ListTerm) arg.getTerm()).asList();
                     // Use None if the list is not long enough, only applies for zipMax.
                     Term newTerm = argTerms.size() <= pick
                         ? new NoneTerm()
