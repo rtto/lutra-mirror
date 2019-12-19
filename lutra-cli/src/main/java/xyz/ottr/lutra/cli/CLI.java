@@ -30,11 +30,11 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.function.Function;
 
+import org.apache.commons.lang3.StringUtils;
+import org.apache.jena.rdf.model.Model;
 import org.apache.jena.shared.PrefixMapping;
 
 import picocli.CommandLine;
@@ -56,6 +56,7 @@ import xyz.ottr.lutra.store.DependencyGraph;
 import xyz.ottr.lutra.store.TemplateStore;
 import xyz.ottr.lutra.stottr.writer.SInstanceWriter;
 import xyz.ottr.lutra.stottr.writer.STemplateWriter;
+import xyz.ottr.lutra.wottr.io.RDFFileReader;
 import xyz.ottr.lutra.wottr.writer.v04.WInstanceWriter;
 import xyz.ottr.lutra.wottr.writer.v04.WTemplateWriter;
 
@@ -137,26 +138,28 @@ public class CLI {
     private void execute() {
 
         TemplateStore store = new DependencyGraph(ReaderRegistryImpl.getReaderRegistry());
-        Result<Map<String, String>> prefixesRes = parseLibraryInto(store);
-        this.messageHandler.use(prefixesRes, prefixes -> {
-            PrefixMapping usedPrefixes = OTTR.getDefaultPrefixes();
-            usedPrefixes.setNsPrefixes(prefixes);
-            executeMode(store, usedPrefixes);
-        });
+        Result<PrefixMapping> prefixes = parseLibraryInto(store);
+
+        if (StringUtils.isNotBlank(this.settings.prefixes)) {
+            Result<Model> userPrefixes = new RDFFileReader().parse(this.settings.prefixes);
+            prefixes.addResult(userPrefixes, (a, b) -> a.withDefaultMappings(b));
+        }
+
+        this.messageHandler.use(prefixes, p -> executeMode(store, p));
     }
 
     /**
      * Populated store with parsed templates, and returns true if error occurred, and false otherwise.
      */
-    private Result<Map<String, String>> parseLibraryInto(TemplateStore store) {
+    private Result<PrefixMapping> parseLibraryInto(TemplateStore store) {
         
         store.addOTTRBaseTemplates();
 
-        if (this.settings.library == null || this.settings.library.length == 0) {
-            return Result.of(OTTR.getDefaultPrefixes().getNsPrefixMap());
-        }
+        Result<PrefixMapping> prefixes = Result.of(OTTR.getDefaultPrefixes());
 
-        Result<Map<String, String>> prefixes = Result.of(new HashMap<>());
+        if (this.settings.library == null || this.settings.library.length == 0) {
+            return prefixes;
+        }
 
         for (int i = 0; i < this.settings.library.length; i++) {
             // check if library is folder or file, and get readerFunction accordingly:
@@ -176,11 +179,11 @@ public class CLI {
                     .map(mgs -> mgs.toSingleMessage("Attempt of parsing templates as "
                             + this.settings.libraryFormat + " format failed:"))
                     .ifPresent(mgs -> mgs.ifPresent(reader::addMessage));
-                prefixes.addResult(reader, (m, r) -> m.putAll(r.getPrefixes()));
+                prefixes.addResult(reader, (m, r) -> m.setNsPrefixes(r.getPrefixes()));
             } else {
                 reader = store.getReaderRegistry().attemptAllReaders(readerFunction);
             }
-            prefixes.addResult(reader, (m, r) -> m.putAll(r.getPrefixes()));
+            prefixes.addResult(reader, (m, r) -> m.setNsPrefixes(r.getPrefixes()));
         }
 
         if (this.settings.fetchMissingDependencies) {
