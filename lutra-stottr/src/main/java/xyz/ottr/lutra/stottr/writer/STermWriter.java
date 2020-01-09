@@ -84,17 +84,15 @@ public class STermWriter {
             return STOTTR.Terms.none;
         }
 
-        String out = iri;
         // Shorten to qname if possible
         for (Map.Entry<String, String> nsln : this.prefixes.entrySet()) {
-            if (out.startsWith(nsln.getValue())) {
-                String suffix = out.substring(nsln.getValue().length());
-                out = nsln.getKey() + ":" + suffix;
+            if (iri.startsWith(nsln.getValue())) {
+                String suffix = iri.substring(nsln.getValue().length());
                 this.usedPrefixes.add(nsln.getKey());
-                break;
+                return nsln.getKey() + ":" + suffix;
             }
         }
-        return out;
+        return "<" + iri + ">";
     }
 
     public String writeLiteral(LiteralTerm literal) {
