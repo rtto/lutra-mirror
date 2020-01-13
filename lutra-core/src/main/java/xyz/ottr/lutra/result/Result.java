@@ -371,7 +371,7 @@ public class Result<E> {
      * To retrieve all Message-s including Message-s on the Result-s
      * this is parsed from, use a ResultConsumer or Result#getAllMessages().
      */
-    protected List<Message> getMessages() {
+    protected Collection<Message> getMessages() {
         return this.trace.getMessages();
     }
 

@@ -155,6 +155,12 @@ public class Settings {
                        + "(legal values: ${COMPLETION-CANDIDATES}; "
                        + "default: ${DEFAULT-VALUE})"})
     public Mode mode = Mode.expand;
+
+    @Option(names = {"--deepTrace"},
+        description = {"This enables tracing such that printed messages get a stack trace "
+                       + "giving more information on the location of the concerned objects.%n"
+                       + "default: ${DEFAULT-VALUE})"})
+    public boolean deepTrace = false;
     
     /* The following classes restrict the selections of Format to supported formats. */
     private static class InsInputFormat extends ArrayList<String> {

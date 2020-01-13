@@ -61,14 +61,23 @@ public class Trace {
         toIdentifier = fun;
     }
 
+    public static void setDeepTrace(boolean on) {
+        deepTrace = on;
+    }
+
     private final Optional<String> identifier;
     private final Set<Trace> trace;
-    private final List<Message> messages;
+    private final Collection<Message> messages;
+    private static boolean deepTrace = false;
    
     protected Trace(Optional<?> value) {
         this.identifier = value.map(o -> (Object) o).flatMap(toIdentifier);
         this.trace = new HashSet<>();
-        this.messages = new LinkedList<>();
+        if (deepTrace) {
+            this.messages = new LinkedList<>();
+        } else {
+            this.messages = new HashSet<>();
+        }
     }
     
     protected Trace() {
@@ -77,7 +86,11 @@ public class Trace {
     
     protected static Trace fork(Collection<Trace> fs) {
         Trace fork = new Trace();
-        fork.trace.addAll(fs);
+        if (fork.deepTrace) {
+            fork.trace.addAll(fs);
+        } else {
+            fs.stream().forEach(f -> fork.addMessages(f.getMessages()));
+        }
         return fork;
     }
     
@@ -97,7 +110,7 @@ public class Trace {
         return this.trace;
     }
 
-    public List<Message> getMessages() {
+    public Collection<Message> getMessages() {
         return this.messages;
     }
     
@@ -107,11 +120,15 @@ public class Trace {
      *      Trace element to add to this' trace
      */
     protected void addTrace(Trace elem) {
-        Set<Trace> visited = new HashSet<>();
-        addTrace(elem, visited);
+        if (deepTrace) {
+            Set<Trace> visited = new HashSet<>();
+            addTrace(elem, visited);
+        } else {
+            this.addMessages(elem.getMessages());
+        }
     }
     
-    protected void addTrace(Trace elem, Set<Trace> visited) {
+    private void addTrace(Trace elem, Set<Trace> visited) {
         
         if (visited.contains(this)) {
             addDirectTrace(elem);
@@ -133,7 +150,11 @@ public class Trace {
      */
     protected void addDirectTrace(Trace elem) {
         if (!this.equals(elem)) {
-            this.trace.add(elem);
+            if (deepTrace) {
+                this.trace.add(elem);
+            } else {
+                this.addMessages(elem.getMessages());
+            }
         }
     }
 

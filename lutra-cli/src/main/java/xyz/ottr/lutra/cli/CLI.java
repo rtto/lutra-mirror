@@ -52,6 +52,7 @@ import xyz.ottr.lutra.result.MessageHandler;
 import xyz.ottr.lutra.result.Result;
 import xyz.ottr.lutra.result.ResultConsumer;
 import xyz.ottr.lutra.result.ResultStream;
+import xyz.ottr.lutra.result.Trace;
 import xyz.ottr.lutra.store.DependencyGraph;
 import xyz.ottr.lutra.store.TemplateStore;
 import xyz.ottr.lutra.stottr.writer.SInstanceWriter;
@@ -94,6 +95,7 @@ public class CLI {
         }
 
         this.messageHandler.setQuiet(this.settings.quiet);
+        Trace.setDeepTrace(this.settings.deepTrace);
 
         if (cli.isUsageHelpRequested()) {
             cli.usage(this.outStream);
