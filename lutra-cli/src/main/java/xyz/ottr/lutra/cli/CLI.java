@@ -95,7 +95,7 @@ public class CLI {
         }
 
         this.messageHandler.setQuiet(this.settings.quiet);
-        Trace.setDeepTrace(settings.deepTrace);
+        Trace.setDeepTrace(this.settings.deepTrace);
 
         if (cli.isUsageHelpRequested()) {
             cli.usage(this.outStream);

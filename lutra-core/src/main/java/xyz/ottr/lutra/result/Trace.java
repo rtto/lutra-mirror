@@ -67,13 +67,17 @@ public class Trace {
 
     private final Optional<String> identifier;
     private final Set<Trace> trace;
-    private final List<Message> messages;
+    private final Collection<Message> messages;
     private static boolean deepTrace = false;
    
     protected Trace(Optional<?> value) {
         this.identifier = value.map(o -> (Object) o).flatMap(toIdentifier);
         this.trace = new HashSet<>();
-        this.messages = new LinkedList<>();
+        if (deepTrace) {
+            this.messages = new LinkedList<>();
+        } else {
+            this.messages = new HashSet<>();
+        }
     }
     
     protected Trace() {
@@ -106,7 +110,7 @@ public class Trace {
         return this.trace;
     }
 
-    public List<Message> getMessages() {
+    public Collection<Message> getMessages() {
         return this.messages;
     }
     
