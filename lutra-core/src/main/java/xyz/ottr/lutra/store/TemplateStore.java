@@ -306,11 +306,18 @@ public interface TemplateStore extends Consumer<TemplateSignature> {
             return messages.getMessageHandler();
         }
 
+        Set<String> failed = new HashSet<>(); // Stores IRIs that failed fetching
         Set<String> missing = new HashSet<>(initMissing);
+
         while (!missing.isEmpty()) {
-            String toFetch = missing.iterator().next();
-            messages.accept(readerRegistry.attemptAllReaders(reader -> reader.populateTemplateStore(this, toFetch)));
-            missing = getMissingDependencies(); // TODO: Make more efficient check for missing
+            for (String toFetch : missing) {
+                messages.accept(readerRegistry.attemptAllReaders(reader -> reader.populateTemplateStore(this, toFetch)));
+                if (!getTemplate(toFetch).isPresent()) { // Check if fetched and added to store
+                    failed.add(toFetch);
+                }
+            }
+            missing = getMissingDependencies();
+            missing.removeAll(failed); // Do not attempt to fetch IRIs that previously failed
         }
         return messages.getMessageHandler();
     }
