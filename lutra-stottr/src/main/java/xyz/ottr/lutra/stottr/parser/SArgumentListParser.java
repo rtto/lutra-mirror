@@ -98,6 +98,9 @@ public class SArgumentListParser extends SBaseParserVisitor<ArgumentList> {
 
     private Result<Argument> parseArgument(stOTTRParser.ArgumentContext ctx) {
 
+        if (ctx.term() == null) {
+            return Result.error("Expected term but found " + ctx.getText());
+        }
         Result<Term> termRes = this.termParser.visitTerm(ctx.term());
         boolean expander = ctx.ListExpand() != null;
         
