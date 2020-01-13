@@ -307,6 +307,9 @@ public interface TemplateStore extends Consumer<TemplateSignature> {
         }
 
         Set<String> failed = new HashSet<>(); // Stores IRIs that failed fetching
+        // TODO: Perhaps make failed a class-variable, rather than local
+        // such that we do not attempt to fetch templates that failed previously
+        // in the same run?
         Set<String> missing = new HashSet<>(initMissing);
 
         while (!missing.isEmpty()) {
