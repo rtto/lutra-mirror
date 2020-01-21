@@ -181,12 +181,13 @@ public class DependencyGraphEngine extends QueryEngine<DependencyGraph> {
 
         // Has non-list term, just need to check for equality of level and term
         if (tuple.hasBound(level)
-            && current != tuple.getAs(Integer.class, level)) {
+            && current != tuple.getAs(Integer.class, level).intValue()) {
 
             return Stream.empty();
         }
 
-        Tuple tupleWLvl = tuple.bind(level, current);
+        // Either level is unbound or equal current
+        Tuple tupleWLvl = tuple.bind(level, current); 
 
         if (tupleWLvl.hasBound(inside)) {
             return term.equals(tupleWLvl.getAs(Term.class, inside))
