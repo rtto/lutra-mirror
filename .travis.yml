@@ -2,3 +2,6 @@
 ## repo at github: https://github.com/mgskjaeveland/lutra-mirror
 
 language: java
+
+jdk:
+  - openjdk11
