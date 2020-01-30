@@ -51,7 +51,7 @@
         <maven.compiler.target>11</maven.compiler.target>
         <maven.javadoc.skip>true</maven.javadoc.skip>
 
-        <jena.version>3.13.0</jena.version>
+        <jena.version>3.14.0</jena.version>
     </properties>
 
     <build>
@@ -552,7 +552,7 @@
             <dependency>
                 <groupId>info.picocli</groupId>
                 <artifactId>picocli</artifactId>
-                <version>4.0.4</version>
+                <version>4.1.4</version>
             </dependency>
 
 
@@ -561,7 +561,7 @@
             <dependency>
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-log4j12</artifactId>
-                <version>1.7.29</version>
+                <version>1.7.30</version>
             </dependency>
 
             <dependency>
