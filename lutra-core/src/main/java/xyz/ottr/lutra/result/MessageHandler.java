@@ -38,12 +38,14 @@ public class MessageHandler {
 
     private final Set<Trace> traces;
     private final PrintStream printStream;
+    private final Set<String> printedMsgs;
 
     private boolean quiet = false;
 
     public MessageHandler(PrintStream printStream) {
         this.printStream = printStream;
         this.traces = new HashSet<>();
+        this.printedMsgs = new HashSet<>();
     }
 
     public MessageHandler() {
@@ -120,7 +122,7 @@ public class MessageHandler {
      */
     private int visitMessagesAndTraces(Consumer<Message> msgConsumer, Consumer<Trace> traceConsumer) {
 
-        int[] mostSevere = new int[] {Integer.MAX_VALUE}; 
+        int[] mostSevere = {Integer.MAX_VALUE};
 
         Trace.visitTraces(this.traces, trace -> {
             for (Message msg : trace.getMessages()) {
@@ -144,13 +146,16 @@ public class MessageHandler {
      * the level of the most severe Message.
      */
     public int printMessages() {
-        return visitMessagesAndTraces(this::printMessage, this::printLocation);
+        int code = visitMessagesAndTraces(this::printMessage, this::printLocation);
+        this.printedMsgs.clear();
+        return code;
     }
 
 
     public void printMessage(Message msg) {
-        if (!this.quiet) {
-            printStream.println("\n" + msg);
+        if (!this.quiet || this.printedMsgs.contains(msg.toString())) {
+            this.printStream.println("\n" + msg);
+            this.printedMsgs.add(msg.toString());
         }
     }
 
@@ -205,7 +210,7 @@ public class MessageHandler {
     
     public void printLocation(Trace trace) {
         if (!this.quiet) {
-            printStream.print(getLocation(trace));
+            this.printStream.print(getLocation(trace));
         }
     }
     

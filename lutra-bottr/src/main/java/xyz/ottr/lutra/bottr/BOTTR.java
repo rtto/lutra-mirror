@@ -41,7 +41,7 @@ public class BOTTR extends WOTTR {
     public static final Resource RDFFileSource = getResource(ns + "RDFFileSource");
     public static final Resource H2Source = getResource(ns + "H2Source");
 
-    public static final List<Resource> sources = getList(JDBCSource, SPARQLEndpointSource, RDFFileSource, H2Source);
+    public static final List<Resource> sources = List.of(JDBCSource, SPARQLEndpointSource, RDFFileSource, H2Source);
     
     // Properties
     public static final Property template = getProperty(ns + "template");
@@ -64,14 +64,15 @@ public class BOTTR extends WOTTR {
 
     public static final Property translationSettings = getProperty(ns + "translationSettings");
     public static final Property translationTable = getProperty(ns + "translationTable");
+    public static final Property entry = getProperty(ns + "entry");
     public static final Property inValue = getProperty(ns + "inValue");
     public static final Property outValue = getProperty(ns + "outValue");
-    public static final Property entry = getProperty(ns + "entry");
 
     // TOKENS
     public static final String THIS_DIR = "@@THIS_DIR@@";
 
-    public static class Settings {
+    public enum Settings {
+        ;
         /**
          * Global setting for adding a LIMIT to SPARQL SELECT queries.
          */

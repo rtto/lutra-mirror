@@ -40,11 +40,12 @@ import xyz.ottr.lutra.result.Message;
 import xyz.ottr.lutra.result.Result;
 import xyz.ottr.lutra.result.ResultStream;
 
-public abstract class Files {
+public enum Files {
+    ;
 
-    private static IOFileFilter hiddenFiles = new NotFileFilter(
+    private static final IOFileFilter hiddenFiles = new NotFileFilter(
             FileFilterUtils.or(new PrefixFileFilter("."), new PrefixFileFilter("#")));
-    private static Function<String, IOFileFilter> extFilter = string -> FileFilterUtils.suffixFileFilter(string,
+    private static final Function<String, IOFileFilter> extFilter = string -> FileFilterUtils.suffixFileFilter(string,
             IOCase.INSENSITIVE);
 
     public static Message checkFolderReadable(String folder) throws SecurityException {

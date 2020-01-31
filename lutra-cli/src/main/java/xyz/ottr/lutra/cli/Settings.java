@@ -23,7 +23,6 @@ package xyz.ottr.lutra.cli;
  */
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -112,6 +111,11 @@ public class Settings {
                        + "(default: ${DEFAULT-VALUE})"})
     public boolean fetchMissingDependencies = false;
 
+    @Option(names = {"-p", "--prefixes"},
+        description = "Path to RDF file containing prefix declarations to be used when rendering output. "
+            + "   Any other data in the file is read, but ignored.")
+    public String prefixes;
+
     @Option(names = {"-F", "--fetchFormat"},
         description = {"The input format of the templates fetched via the -f flag."})
     public Format fetchFormat;
@@ -151,6 +155,12 @@ public class Settings {
                        + "(legal values: ${COMPLETION-CANDIDATES}; "
                        + "default: ${DEFAULT-VALUE})"})
     public Mode mode = Mode.expand;
+
+    @Option(names = {"--deepTrace"},
+        description = {"This enables tracing such that printed messages get a stack trace "
+                       + "giving more information on the location of the concerned objects.%n"
+                       + "default: ${DEFAULT-VALUE})"})
+    public boolean deepTrace = false;
     
     /* The following classes restrict the selections of Format to supported formats. */
     private static class InsInputFormat extends ArrayList<String> {
@@ -158,7 +168,7 @@ public class Settings {
         static final long serialVersionUID = 0L; // Not correct!
 
         InsInputFormat() {
-            super(Arrays.asList(
+            super(List.of(
                     Format.legacy.toString(),
                     Format.wottr.toString(),
                     Format.stottr.toString(),
@@ -171,7 +181,7 @@ public class Settings {
         static final long serialVersionUID = 0L; // Not correct!
 
         TplInputFormat() {
-            super(Arrays.asList(
+            super(List.of(
                     Format.stottr.toString(),
                     Format.legacy.toString(),
                     Format.wottr.toString()));
@@ -183,7 +193,7 @@ public class Settings {
         static final long serialVersionUID = 0L; // Not correct!
 
         OutputFormat() {
-            super(Arrays.asList(
+            super(List.of(
                     Format.legacy.toString(),
                     Format.stottr.toString(),
                     Format.wottr.toString()));

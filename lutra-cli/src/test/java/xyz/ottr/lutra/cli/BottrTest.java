@@ -36,7 +36,7 @@ public class BottrTest {
 
     @Test
     public void expandRDFSource() {
-        runCLI("-I bottr -f --stdout " + ROOT + "instanceMapRDFSource.ttl");
+        runCLI("-I bottr -f --stdout -p " + ROOT + "instanceMapRDFSource.ttl " + ROOT + "instanceMapRDFSource.ttl");
     }
 
     @Test

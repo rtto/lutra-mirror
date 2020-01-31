@@ -23,62 +23,38 @@ package xyz.ottr.lutra.bottr.parser;
  */
 
 import java.util.AbstractMap;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.stream.Collectors;
 
-import org.apache.jena.rdf.model.Property;
+import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
-
 import xyz.ottr.lutra.bottr.BOTTR;
 import xyz.ottr.lutra.bottr.model.TranslationTable;
 import xyz.ottr.lutra.bottr.util.CachedResourceWrapperParser;
-import xyz.ottr.lutra.bottr.util.ResourceWrapperParser;
-import xyz.ottr.lutra.bottr.util.TermFactory;
-import xyz.ottr.lutra.model.Term;
 import xyz.ottr.lutra.result.Result;
 import xyz.ottr.lutra.result.ResultStream;
 import xyz.ottr.lutra.wottr.util.ModelSelector;
-import xyz.ottr.lutra.wottr.vocabulary.v04.WOTTR;
 
 public class BTranslationTableParser extends CachedResourceWrapperParser<TranslationTable> {
 
-    protected final TermFactory termFactory;
-
     public BTranslationTableParser(Resource resource) {
         super(resource);
-        this.termFactory = new TermFactory(WOTTR.theInstance, this.model);
     }
 
     @Override
     protected Result<TranslationTable> getResult(Resource resource) {
-
-        Result<Map<Term, Term>> table = Result.of(new HashMap<>());
-
-        ResultStream.of(ModelSelector.getResourceObjects(this.model, this.resource, BOTTR.entry))
-            .innerMap(BTranslationEntryParserResource::new)
-            .innerMap(BTranslationEntryParserResource::get)
-            .innerForEach(pair -> table.addResult(pair, (t,p) -> t.put(p.getKey(), p.getValue())));
-
-        return table.map(TranslationTable::new);
+        return ResultStream.of(ModelSelector.getResourceObjects(this.model, this.resource, BOTTR.entry))
+            .mapFlatMap(r -> Result.zip(getInValue(r), getOutValue(r), AbstractMap.SimpleEntry::new))
+            .aggregate()
+            .map(stream -> stream.collect(Collectors.toMap(AbstractMap.SimpleEntry::getKey, AbstractMap.SimpleEntry::getValue)))
+            .map(TranslationTable::new);
     }
 
-    class BTranslationEntryParserResource extends ResourceWrapperParser<Map.Entry<Term, Term>> {
-
-        BTranslationEntryParserResource(Resource resource) {
-            super(resource);
-        }
-
-        @Override
-        protected Result<Map.Entry<Term, Term>> getResult(Resource resource) {
-            return Result.zip(
-                getTermObject(BOTTR.inValue),
-                getTermObject(BOTTR.outValue),
-                AbstractMap.SimpleImmutableEntry::new);
-        }
-
-        private Result<Term> getTermObject(Property property) {
-            return ModelSelector.getRequiredObject(this.model, this.resource, property)
-                .flatMap(BTranslationTableParser.this.termFactory::createTerm);
-        }
+    private Result<RDFNode> getInValue(Resource entry) {
+        return ModelSelector.getRequiredObject(this.model, entry, BOTTR.inValue);
     }
+
+    private Result<RDFNode> getOutValue(Resource entry) {
+        return ModelSelector.getRequiredObject(this.model, entry, BOTTR.outValue);
+    }
+
 }

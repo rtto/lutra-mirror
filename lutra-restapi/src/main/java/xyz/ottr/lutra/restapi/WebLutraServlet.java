@@ -28,7 +28,6 @@ import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
-import java.util.Arrays;
 import java.util.List;
 
 import javax.servlet.ServletContext;
@@ -53,12 +52,18 @@ public class WebLutraServlet extends HttpServlet {
 
     private static final long serialVersionUID = -7342968018534639139L;
 
-    private static final List<String> originWhitelist = Arrays.asList(
+    private static final List<String> originWhitelist = List.of(
         "https://weblutra.ottr.xyz",
         "https://ottr.xyz",
         "https://www.ottr.xyz",
         "https://spec.ottr.xyz",
-        "https://dev.spec.ottr.xyz"
+        "https://dev.spec.ottr.xyz",
+        // http too:
+        "http://weblutra.ottr.xyz",
+        "http://ottr.xyz",
+        "http://www.ottr.xyz",
+        "http://spec.ottr.xyz",
+        "http://dev.spec.ottr.xyz"
     );
     
     private static final String repoLibrary = "https://gitlab.com/ottr/templates.git";
@@ -66,7 +71,7 @@ public class WebLutraServlet extends HttpServlet {
     private static final String attrLibraryRepo = "libraryRepo";
     private static final String attrLastPullTime = "lastPullTime";
 
-    private final long pullInterval = 1000 * 60 * 10; // update repo every 10 mins
+    private static final long pullInterval = 1000 * 60 * 10; // update repo every 10 mins
 
     private static final long MAX_FILE_SIZE = 100 * 1024;
     private static final long MAX_REQUEST_SIZE = 5 * MAX_FILE_SIZE;

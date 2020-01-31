@@ -95,8 +95,8 @@ class BSourceParser implements Function<Resource, Result<Source<?>>> {
         } else if (BOTTR.H2Source.equals(sourceType)) {
             return getH2Source(source);
         }
-        return Result.error("Error parsing source. Source type " + RDFNodes.toString(sourceType) + " is not a supported source: "
-            + RDFNodes.toString(BOTTR.sources));
+        return Result.error("Error parsing source. Source type " + RDFNodes.toString(sourceType)
+            + " is not a supported source: " + RDFNodes.toString(BOTTR.sources));
     }
 
     private Result<Source<?>> getSQLSource(Resource source) {
@@ -144,7 +144,7 @@ class BSourceParser implements Function<Resource, Result<Source<?>>> {
      */
     private String getPath(String file) {
 
-        if (!this.absoluteFilePath.isPresent() || DataParser.asURI(file).isPresent()) {
+        if (this.absoluteFilePath.isEmpty() || DataParser.asURI(file).isPresent()) {
             return file;
         } else {
             return Paths.get(this.absoluteFilePath.get()).resolveSibling(file).toAbsolutePath().toString();

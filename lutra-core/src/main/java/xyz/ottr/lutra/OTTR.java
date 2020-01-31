@@ -37,19 +37,22 @@ import xyz.ottr.lutra.model.Term;
 import xyz.ottr.lutra.model.TermList;
 import xyz.ottr.lutra.model.types.TypeFactory;
 
-public class OTTR  {
+public enum OTTR  {
+    ;
 
     private static final String ns = "http://ns.ottr.xyz/0.4/";
     
     public static final String prefix = "ottr";
     public static final String namespace = ns;
     
-    public static class BaseURI {
+    public enum BaseURI {
+        ;
         public static final String Triple = ns + "Triple";
         public static final String NullableTriple = ns + "NullableTriple";
     }
 
-    public static class TypeURI {
+    public enum TypeURI {
+        ;
         public static final String Type = ns + "Type";
         public static final String subTypeOf = ns + "subTypeOf";
         
@@ -61,7 +64,8 @@ public class OTTR  {
         public static final String Bot = ns + "Bot";
     }
 
-    public static class BaseTemplate {
+    public enum BaseTemplate {
+        ;
         public static final TemplateSignature Triple;
         public static final TemplateSignature NullableTriple;
 
@@ -91,7 +95,8 @@ public class OTTR  {
         }
     }
     
-    public static class Files {
+    public enum Files {
+        ;
         public static final String StdTypes = "types.owl.ttl";
     }
 

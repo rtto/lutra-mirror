@@ -36,7 +36,7 @@ import xyz.ottr.lutra.result.Result;
 
 public class Substitution {
 
-    private Map<Term, Term> termSubstitution; // Represents substitution of simple terms
+    private final Map<Term, Term> termSubstitution; // Represents substitution of simple terms
     
     public Substitution(Map<Term, Term> termSubstitution) {
         this.termSubstitution = new HashMap<>();
@@ -44,7 +44,7 @@ public class Substitution {
     }
 
     public Substitution() {
-        this(new HashMap<Term, Term>());
+        this(new HashMap<>());
     }
 
     private Map<Term, Term> getTermSubstition() {
@@ -65,7 +65,7 @@ public class Substitution {
         }
                         
 
-        Map<Term, Term> termSubstitution = new HashMap<Term, Term>();
+        Map<Term, Term> termSubstitution = new HashMap<>();
         for (int i = 0; i < args.size(); i++) {
             if (args.get(i) instanceof NoneTerm && parameters.hasDefaultValue(i)) {
                 Term dflt = parameters.getDefaultValue(i);
@@ -87,7 +87,7 @@ public class Substitution {
      * is false, and keeps the original blank nodes if it is true.
      */
     public TermList apply(TermList args) {
-        List<Term> substituted = new ArrayList<Term>();
+        List<Term> substituted = new ArrayList<>();
         for (Term p : args.asList()) {
             if (p instanceof TermList) {
                 TermList tl = (TermList) p;
@@ -133,7 +133,7 @@ public class Substitution {
      * constructing new blank nodes for lists.
      */
     public Set<Instance> apply(Set<Instance> body) {
-        return body.stream().map(ins -> apply(ins)).collect(Collectors.toSet());
+        return body.stream().map(this::apply).collect(Collectors.toSet());
     }
     
     /**
@@ -142,7 +142,7 @@ public class Substitution {
      */
     public Optional<Substitution> mergeWithUnification(Substitution other) {
 
-        Map<Term, Term> newTermSubs = new HashMap<>(termSubstitution);
+        Map<Term, Term> newTermSubs = new HashMap<>(this.termSubstitution);
         Map<Term, Term> otherSubs = other.getTermSubstition();
         for (Map.Entry<Term, Term> e : otherSubs.entrySet()) {
             if (!newTermSubs.containsKey(e.getKey())) {
@@ -169,6 +169,6 @@ public class Substitution {
 
     @Override
     public String toString() {
-        return "<Term substitution: " + termSubstitution.toString() + ">";
+        return "<Term substitution: " + this.termSubstitution.toString() + ">";
     }
 }

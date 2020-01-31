@@ -70,8 +70,7 @@ public class WInstanceWriter implements InstanceWriter {
 
     @Override
     public String write() {
-        PrefixMappings.trim(this.model);
-        return ModelIO.writeModel(this.model);
+        return ModelIO.writeModel(writeToModel());
     }
 
     public Model writeToModel() {

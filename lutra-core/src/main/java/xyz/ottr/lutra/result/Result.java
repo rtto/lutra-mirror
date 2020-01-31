@@ -23,9 +23,9 @@ package xyz.ottr.lutra.result;
  * #L%
  */
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.BiConsumer;
@@ -38,7 +38,7 @@ import java.util.stream.Collectors;
 
 public class Result<E> {
 
-    private Trace trace;
+    private final Trace trace;
     private final Optional<E> result;
 
     private Result(Optional<E> result) {
@@ -65,28 +65,28 @@ public class Result<E> {
      * @see Optional#of(R)
      */
     public static <R> Result<R> of(R val) {
-        return new Result<R>(Optional.of(val));
+        return new Result<>(Optional.of(val));
     }
 
     /**
      * Same as #of, but sets parsedFrom to argument Result.
      */
     public static <R> Result<R> of(R val, Result<?> parsedFrom) {
-        return new Result<R>(Optional.of(val), parsedFrom.getTrace());
+        return new Result<>(Optional.of(val), parsedFrom.getTrace());
     }
 
     /**
      * @see Optional#ofNullable(R)
      */
     public static <R> Result<R> ofNullable(R val) {
-        return new Result<R>(Optional.ofNullable(val));
+        return new Result<>(Optional.ofNullable(val));
     }
 
     /**
      * Same as #ofNullable, but sets parsedFrom to argument Result.
      */
     public static <R> Result<R> ofNullable(R val, Result<?> parsedFrom) {
-        return new Result<R>(Optional.ofNullable(val), parsedFrom.getTrace());
+        return new Result<>(Optional.ofNullable(val), parsedFrom.getTrace());
     }
     
     public static <R> Set<Result<R>> lift(Set<R> rs) {
@@ -101,7 +101,7 @@ public class Result<E> {
      * @see Optional#empty()
      */
     public static <R> Result<R> empty() {
-        return new Result<R>(Optional.empty());
+        return new Result<>(Optional.empty());
     }
 
     /**
@@ -115,7 +115,7 @@ public class Result<E> {
      *      An empty Result
      */
     public static <R> Result<R> empty(Result<?> parsedFrom) {
-        return new Result<R>(Optional.empty(), parsedFrom.getTrace());
+        return new Result<>(Optional.empty(), parsedFrom.getTrace());
     }
 
     /**
@@ -129,7 +129,7 @@ public class Result<E> {
      *      An empty Result
      */
     public static <R> Result<R> empty(Message msg) {
-        return new Result<R>(Optional.empty(), Arrays.asList(msg));
+        return new Result<>(Optional.empty(), List.of(msg));
     }
 
     /**
@@ -146,7 +146,7 @@ public class Result<E> {
      *      An empty Result
      */
     public static <R> Result<R> empty(Message msg, Result<?> parsedFrom) {
-        return new Result<R>(Optional.empty(), Arrays.asList(msg), parsedFrom.getTrace());
+        return new Result<>(Optional.empty(), List.of(msg), parsedFrom.getTrace());
     }
 
     /**
@@ -160,7 +160,7 @@ public class Result<E> {
      *      An empty Result
      */
     public static <R> Result<R> empty(List<Message> msgs) {
-        return new Result<R>(Optional.empty(), msgs);
+        return new Result<>(Optional.empty(), msgs);
     }
 
     public static <R> Result<R> fatal(String msg) {
@@ -213,7 +213,6 @@ public class Result<E> {
     /**
      * Add a result to this result by bi-consuming this and the other result. Adds the other result to the
      * context of this result.
-     * @see Result#addResult(Result, BiConsumer)
      */
     public <B> void addResult(Result<B> other, BiConsumer<? super E, ? super B> consumer) {
         if (this.result.isPresent() && other.isPresent()) {
@@ -341,7 +340,8 @@ public class Result<E> {
      * @see Optional#ifPresent(Consumer)
      */
     public void ifPresent(Consumer<? super E> consumer) {
-        result.ifPresent(consumer);
+
+        this.result.ifPresent(consumer);
     }
 
     /**
@@ -371,7 +371,7 @@ public class Result<E> {
      * To retrieve all Message-s including Message-s on the Result-s
      * this is parsed from, use a ResultConsumer or Result#getAllMessages().
      */
-    protected List<Message> getMessages() {
+    protected Collection<Message> getMessages() {
         return this.trace.getMessages();
     }
 
@@ -398,7 +398,7 @@ public class Result<E> {
      * to the parsed from Result.
      */
     public <R> Result<R> map(Function<? super E, ? extends R> fun) {
-        return new Result<R>(this.result.map(fun), this.trace);
+        return new Result<>(this.result.map(fun), this.trace);
     }
 
     /**
@@ -423,7 +423,7 @@ public class Result<E> {
      */
     public <R> Result<R> flatMapOrElse(Function<? super E, ? extends Result<R>> fun, Result<R> orElse) {
 
-        Result<R> newResult = result.isPresent() ? fun.apply(result.get()) : orElse;
+        Result<R> newResult = this.result.isPresent() ? fun.apply(this.result.get()) : orElse;
         return newResult.addToTrace(this);
     }
 
@@ -437,7 +437,7 @@ public class Result<E> {
         if (mapped.isPresent()) {
             // Return a stream of results with parsedFrom pointers to this
             // TODO: Fix loss of messages if mapped contains an empty ResultStream
-            return mapped.get().filter(r -> r != null).map(r -> r.addToTrace(this));
+            return mapped.get().filter(Objects::nonNull).map(r -> r.addToTrace(this));
         } else {
             // Return a stream of an empty Result, containing parsedFrom pointer to this
             return ResultStream.of(Result.empty(this));
@@ -460,9 +460,8 @@ public class Result<E> {
 
     @Override
     public String toString() {
-        return (this.result.isPresent()
-                ? "Result(" + this.result.get().toString() + ")"
-                : "Empty") + this.trace.getMessages().toString();
+        return this.result.map(e -> "Result(" + e.toString() + ")").orElse("Empty")
+            + this.trace.getMessages().toString();
     }
 
     /**

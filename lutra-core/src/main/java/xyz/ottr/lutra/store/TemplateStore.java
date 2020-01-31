@@ -22,7 +22,6 @@ package xyz.ottr.lutra.store;
  * #L%
  */
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -229,7 +228,7 @@ public interface TemplateStore extends Consumer<TemplateSignature> {
      *          results in empty Result-objects
      */ 
     default ResultStream<Template> getTemplates(Set<String> iris) {
-        return new ResultStream<>(iris.stream().map(iri -> getTemplate(iri)));
+        return new ResultStream<>(iris.stream().map(this::getTemplate));
     }
 
     /**
@@ -243,7 +242,7 @@ public interface TemplateStore extends Consumer<TemplateSignature> {
      *          results in empty Result-objects
      */ 
     default ResultStream<TemplateSignature> getTemplateSignatures(Set<String> iris) {
-        return new ResultStream<>(iris.stream().map(iri -> getTemplateSignature(iri)));
+        return new ResultStream<>(iris.stream().map(this::getTemplateSignature));
     }
 
     /**
@@ -268,7 +267,7 @@ public interface TemplateStore extends Consumer<TemplateSignature> {
 
         if (!containsTemplate(instance.getIRI())) {
             // Need to fetch missing template
-            MessageHandler messages = fetchMissingDependencies(Arrays.asList(instance.getIRI()));
+            MessageHandler messages = fetchMissingDependencies(List.of(instance.getIRI()));
             Result<Instance> insWithMsgs = Result.of(instance);
             messages.toSingleMessage("Fetch missing template: " + instance.getIRI())
                 .ifPresent(insWithMsgs::addMessage);
@@ -307,11 +306,21 @@ public interface TemplateStore extends Consumer<TemplateSignature> {
             return messages.getMessageHandler();
         }
 
+        Set<String> failed = new HashSet<>(); // Stores IRIs that failed fetching
+        // TODO: Perhaps make failed a class-variable, rather than local
+        // such that we do not attempt to fetch templates that failed previously
+        // in the same run?
         Set<String> missing = new HashSet<>(initMissing);
+
         while (!missing.isEmpty()) {
-            String toFetch = missing.iterator().next();
-            messages.accept(readerRegistry.attemptAllReaders(reader -> reader.populateTemplateStore(this, toFetch)));
-            missing = getMissingDependencies(); // TODO: Make more efficient check for missing
+            for (String toFetch : missing) {
+                messages.accept(readerRegistry.attemptAllReaders(reader -> reader.populateTemplateStore(this, toFetch)));
+                if (!getTemplate(toFetch).isPresent()) { // Check if fetched and added to store
+                    failed.add(toFetch);
+                }
+            }
+            missing = getMissingDependencies();
+            missing.removeAll(failed); // Do not attempt to fetch IRIs that previously failed
         }
         return messages.getMessageHandler();
     }

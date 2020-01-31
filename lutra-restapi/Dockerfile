@@ -1,5 +1,5 @@
 # Pull base image
-From tomcat:8-jre8
+From tomcat:9-jdk11-openjdk-slim
 
 LABEL maintainer="m.g.skjaeveland@gmail.com"
 

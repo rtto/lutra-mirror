@@ -22,7 +22,6 @@ package xyz.ottr.lutra.wottr.parser.v04;
  * #L%
  */
 
-import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import org.apache.jena.rdf.model.Model;

@@ -52,6 +52,11 @@ public class RDFNodeArgumentMap extends ArgumentMap<RDFNode> {
     }
 
     @Override
+    protected RDFNode toRDFNode(RDFNode value) {
+        return value;
+    }
+
+    @Override
     protected Result<Term> getBasicTerm(RDFNode value, BasicType type) {
 
         if (this.literalLangTag != null) {

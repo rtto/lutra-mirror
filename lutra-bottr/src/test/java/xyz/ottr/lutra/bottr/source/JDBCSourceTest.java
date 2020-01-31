@@ -1,28 +1,5 @@
 package xyz.ottr.lutra.bottr.source;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
-
-import org.apache.jena.shared.PrefixMapping;
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
-
-import xyz.ottr.lutra.bottr.model.ArgumentMaps;
-import xyz.ottr.lutra.model.ArgumentList;
-import xyz.ottr.lutra.model.LiteralTerm;
-import xyz.ottr.lutra.model.Term;
-import xyz.ottr.lutra.result.Result;
-import xyz.ottr.lutra.result.ResultStream;
-
 /*-
  * #%L
  * lutra-bottr
@@ -44,6 +21,29 @@ import xyz.ottr.lutra.result.ResultStream;
  * <http://www.gnu.org/licenses/lgpl-2.1.html>.
  * #L%
  */
+
+import static org.hamcrest.CoreMatchers.is;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import org.apache.jena.shared.PrefixMapping;
+import org.junit.Assert;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
+
+import xyz.ottr.lutra.bottr.model.ArgumentMaps;
+import xyz.ottr.lutra.model.ArgumentList;
+import xyz.ottr.lutra.model.LiteralTerm;
+import xyz.ottr.lutra.result.Result;
+import xyz.ottr.lutra.result.ResultStream;
 
 public class JDBCSourceTest {
   
@@ -75,13 +75,13 @@ public class JDBCSourceTest {
 
         //Create expected result
         Set<List<String>> expected = new HashSet<>();
-        expected.add(Arrays.asList("1", "Paulo", "2500"));
-        expected.add(Arrays.asList("2", "Pedro", "2700"));
-        expected.add(Arrays.asList("3", "Joao", "2800"));
-        expected.add(Arrays.asList("4", "Maria", "2000"));
-        expected.add(Arrays.asList("5", "Joselito", "1500"));
-        expected.add(Arrays.asList("6", "Linhares", "2200"));
-        expected.add(Arrays.asList("7", "Lagreca", "1000"));
+        expected.add(List.of("1", "Paulo", "2500"));
+        expected.add(List.of("2", "Pedro", "2700"));
+        expected.add(List.of("3", "Joao", "2800"));
+        expected.add(List.of("4", "Maria", "2000"));
+        expected.add(List.of("5", "Joselito", "1500"));
+        expected.add(List.of("6", "Linhares", "2200"));
+        expected.add(List.of("7", "Lagreca", "1000"));
 
         // Run the source
         JDBCSource jdbcTest = new JDBCSource(driver, url, user, pass);
@@ -102,7 +102,7 @@ public class JDBCSourceTest {
             .collect(Collectors.toSet());
 
         //Compare dbOutput to expected result
-        Assert.assertEquals(expected, dbOutput);
+        Assert.assertThat(dbOutput, is(expected));
 
         //Clean up
         stmt.close();

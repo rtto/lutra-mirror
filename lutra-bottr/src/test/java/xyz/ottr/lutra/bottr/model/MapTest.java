@@ -25,7 +25,6 @@ package xyz.ottr.lutra.bottr.model;
 import static org.hamcrest.CoreMatchers.is;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -58,8 +57,8 @@ public class MapTest {
             StaticTestSource() {
 
                 this.rows = new ArrayList<>();
-                this.rows.add(Arrays.asList(ns + "A1", ns + "B1", ns + "C1"));
-                this.rows.add(Arrays.asList(ns + "A2", ns + "B2", ns + "C2"));
+                this.rows.add(List.of(ns + "A1", ns + "B1", ns + "C1"));
+                this.rows.add(List.of(ns + "A2", ns + "B2", ns + "C2"));
             }
 
             // NB! Returns same rows regardless of query
@@ -86,7 +85,7 @@ public class MapTest {
 
         // Set up map to translate source to triple instances
         ArgumentMaps<String> valMap = new ArgumentMaps<>(PrefixMapping.Standard, source,
-            Arrays.asList(iriMap, iriMap, iriMap)
+            List.of(iriMap, iriMap, iriMap)
         );
 
         InstanceMap<String> myMap = new InstanceMap<>(

@@ -26,6 +26,8 @@ import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
 import java.util.stream.Stream;
 
+import xyz.ottr.lutra.model.types.ListType;
+import xyz.ottr.lutra.model.types.TermType;
 import xyz.ottr.lutra.store.TemplateStore;
 
 public class Query {
@@ -64,11 +66,11 @@ public class Query {
     }
 
     public Stream<Tuple> eval(QueryEngine<? extends TemplateStore> engine) {
-        return rel.apply(engine, new Tuple());
+        return this.rel.apply(engine, new Tuple());
     }
 
     public Stream<Tuple> eval(QueryEngine<? extends TemplateStore> engine, Tuple constants) {
-        return rel.apply(engine, constants.copy());
+        return this.rel.apply(engine, constants.copy());
     }
 
     ////////////////////
@@ -86,7 +88,7 @@ public class Query {
     public static Query not(Query query) {
 
         BiPredicate<QueryEngine<? extends TemplateStore>, Tuple> shouldKeep = (qe, m) ->
-            !query.rel.apply(qe, m).findAny().isPresent();
+            query.rel.apply(qe, m).findAny().isEmpty();
 
         return new Query((qe, m) -> shouldKeep.test(qe, m) ? Stream.of(m) : Stream.empty());
     }
@@ -268,18 +270,29 @@ public class Query {
         String temp =  Tuple.freshVar();
         String para =  Tuple.freshVar();
         String parType =  Tuple.freshVar();
+        String listParType =  Tuple.freshVar();
         String args =  Tuple.freshVar();
-        String outer = Tuple.freshVar();
 
         return instanceIRI(instance, temp)
             .and(parameterIndex(temp, index, para))
             .and(arguments(instance, args))
             .and(type(para, parType))
             .and(hasListExpander(args, index)
-                .and(innerTypeAt(parType, level, outer))
-                .and(innerType(outer, type))
+                .and(wrapInListType(parType, listParType)) // Wrap parType in List
+                .and(innerTypeAt(listParType, level, type))
                 .or(not(hasListExpander(args, index))
                     .and(innerTypeAt(parType, level, type))));
+    }
+
+    /**
+     * Simply wraps TermType T bound to first argument-variable into List of T and binds that to
+     * second variable-argument.
+     */
+    private static Query wrapInListType(String type, String listWrapped) {
+        return new Query((ts, tuple) -> {
+            TermType t = tuple.getAs(TermType.class, type);
+            return Stream.of(tuple.bind(listWrapped, new ListType(t)));
+        });
     }
 
     ////////////////////

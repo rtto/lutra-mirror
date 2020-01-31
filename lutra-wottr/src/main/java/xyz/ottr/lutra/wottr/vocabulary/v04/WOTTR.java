@@ -22,8 +22,6 @@ package xyz.ottr.lutra.wottr.vocabulary.v04;
  * #L%
  */
 
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 import org.apache.commons.collections4.BidiMap;
@@ -81,7 +79,7 @@ public class WOTTR implements WOTTRVocabulary {
         listExpanders = UnmodifiableBidiMap.unmodifiableBidiMap(map);
     }
 
-    public static final List<Resource> argumentModifiers = getList(optional, nonBlank);
+    public static final List<Resource> argumentModifiers = List.of(optional, nonBlank);
 
     // Utility methods
     protected static Resource getResource(String uri) {
@@ -90,10 +88,6 @@ public class WOTTR implements WOTTRVocabulary {
 
     protected static Property getProperty(String uri) {
         return ResourceFactory.createProperty(uri);
-    }
-
-    protected static <X> List<X> getList(X... objects) {
-        return Collections.unmodifiableList(Arrays.asList(objects));
     }
 
     public static final WOTTRVocabulary theInstance = new WOTTR();

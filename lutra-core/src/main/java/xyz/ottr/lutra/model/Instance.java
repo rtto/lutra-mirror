@@ -27,8 +27,8 @@ import org.apache.jena.shared.PrefixMapping;
 
 public class Instance {
 
-    private String iri; 
-    private ArgumentList args;
+    private final String iri;
+    private final ArgumentList args;
 
     public Instance(String iri, ArgumentList args) {
         this.iri = iri;
@@ -36,11 +36,11 @@ public class Instance {
     }
 
     public String getIRI() {
-        return iri;
+        return this.iri;
     }
 
     public ArgumentList getArguments() {
-        return args;
+        return this.args;
     }
 
     /**
@@ -49,15 +49,15 @@ public class Instance {
      * argument PrefixMapping.
      */
     public String toString(PrefixMapping prefixes) {
-        String pre = args.hasCrossExpander() ? "x | " : args.hasZipExpander() ? "z | " : "";
-        String qname = prefixes.qnameFor(iri); 
-        return pre + ((qname == null) ? iri : qname) + args.toString(prefixes);
+        String pre = this.args.hasCrossExpander() ? "x | " : this.args.hasZipExpander() ? "z | " : "";
+        String qname = prefixes.qnameFor(this.iri);
+        return pre + ((qname == null) ? this.iri : qname) + this.args.toString(prefixes);
     }
 
     @Override
     public String toString() {
-        String pre = args.hasCrossExpander() ? "x | " : args.hasZipExpander() ? "z | " : "";
-        return pre + iri + args.toString();
+        String pre = this.args.hasCrossExpander() ? "x | " : this.args.hasZipExpander() ? "z | " : "";
+        return pre + this.iri + this.args.toString();
     }
 
     @Override

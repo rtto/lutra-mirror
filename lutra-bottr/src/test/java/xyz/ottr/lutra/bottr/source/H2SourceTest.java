@@ -22,20 +22,20 @@ package xyz.ottr.lutra.bottr.source;
  * #L%
  */
 
-import static org.junit.Assert.assertEquals;
+import static org.hamcrest.CoreMatchers.is;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.apache.jena.shared.PrefixMapping;
+import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -85,19 +85,19 @@ public class H2SourceTest {
             .build();
 
         // there should be three triples
-        assertEquals(3, map.get().getStream().filter(Result::isPresent).count());
+        Assert.assertThat(map.get().getStream().filter(Result::isPresent).count(), is(3L));
     }
 
     private Set<List<String>> getExpectedResult() {
         //Create expected result
         Set<List<String>> expected = new HashSet<>();
-        expected.add(Arrays.asList("1", "Paulo", "2500"));
-        expected.add(Arrays.asList("2", "Pedro", "2700"));
-        expected.add(Arrays.asList("3", "Joao", "2800"));
-        expected.add(Arrays.asList("4", "Maria", "2000"));
-        expected.add(Arrays.asList("5", "Joselito", "1500"));
-        expected.add(Arrays.asList("6", "Linhares", "2200"));
-        expected.add(Arrays.asList("7", "Lagreca", "1000"));
+        expected.add(List.of("1", "Paulo", "2500"));
+        expected.add(List.of("2", "Pedro", "2700"));
+        expected.add(List.of("3", "Joao", "2800"));
+        expected.add(List.of("4", "Maria", "2000"));
+        expected.add(List.of("5", "Joselito", "1500"));
+        expected.add(List.of("6", "Linhares", "2200"));
+        expected.add(List.of("7", "Lagreca", "1000"));
         return expected;
     }
 
@@ -132,7 +132,7 @@ public class H2SourceTest {
             .filter(Result::isPresent)
             .map(Result::get)
             .collect(Collectors.toSet());
-        assertEquals(getExpectedResult(), dbOutput);
+        Assert.assertThat(dbOutput, is(getExpectedResult()));
     }
 
 }

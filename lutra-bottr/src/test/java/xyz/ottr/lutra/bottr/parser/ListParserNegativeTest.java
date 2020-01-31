@@ -22,7 +22,8 @@ package xyz.ottr.lutra.bottr.parser;
  * #L%
  */
 
-import java.util.Arrays;
+import static org.hamcrest.CoreMatchers.is;
+
 import java.util.Collection;
 import java.util.List;
 
@@ -40,7 +41,7 @@ public class ListParserNegativeTest {
     @Parameterized.Parameters(name = "{index}: {0}")
     public static Collection<Object[]> data() {
 
-        return Arrays.asList(
+        return List.of(
             new Object[][]{
                 { "[" },
                 { "]" },
@@ -73,7 +74,7 @@ public class ListParserNegativeTest {
 
     public void test(String value) {
         List list = this.parser.toList(value);
-        Assert.assertEquals(value, list.toString());
+        Assert.assertThat(list.toString(), is(value));
     }
 
 }

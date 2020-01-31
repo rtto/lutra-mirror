@@ -37,8 +37,8 @@ import xyz.ottr.lutra.result.ResultStream;
 
 public class InstanceReader implements Function<String, ResultStream<Instance>> {
 
-    private Function<String, ResultStream<Instance>> instancePipeline;
-    private final Logger log = LoggerFactory.getLogger(InstanceReader.class);
+    private final Function<String, ResultStream<Instance>> instancePipeline;
+    private static final Logger log = LoggerFactory.getLogger(InstanceReader.class);
 
     private final String[] includeExtensions = new String[0]; // TODO: Set via arguments
     private final String[] excludeExtensions = new String[0]; // TODO: Set via arguments
@@ -76,7 +76,7 @@ public class InstanceReader implements Function<String, ResultStream<Instance>> 
             if (Paths.get(filename).toFile().isDirectory()) {
                 return loadInstancesFromFolder(filename);
             } else {
-                return instancePipeline.apply(filename);
+                return this.instancePipeline.apply(filename);
             }
         } catch (IOException ex) {
             return ResultStream.of(Result.empty(Message.error(
@@ -92,8 +92,9 @@ public class InstanceReader implements Function<String, ResultStream<Instance>> 
      *            the folder containing templates to load
      */
     public ResultStream<Instance> loadInstancesFromFolder(String folder) throws IOException {
-        log.info("Loading all template instaces from folder " + folder + " with suffix "
-                + Arrays.toString(includeExtensions) + " except " + Arrays.toString(excludeExtensions));
+
+        this.log.info("Loading all template instaces from folder " + folder + " with suffix "
+                + Arrays.toString(this.includeExtensions) + " except " + Arrays.toString(this.excludeExtensions));
         return readInstances(Files.loadFromFolder(folder, this.includeExtensions, this.excludeExtensions));
     }
 }

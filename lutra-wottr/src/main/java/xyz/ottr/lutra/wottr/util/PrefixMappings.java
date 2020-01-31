@@ -27,6 +27,9 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.RDFNode;
+import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.shared.PrefixMapping;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -122,12 +125,25 @@ public enum PrefixMappings {
     }
 
     public static void trim(Model model) {
-        Set<String> namespaces = model.listNameSpaces().toSet();
+
+        Set<String> namespaces = getAllURIsNamespaces(model);
         for (String prefixNamespace : model.getNsPrefixMap().values()) {
             if (!namespaces.contains(prefixNamespace)) {
                 model.removeNsPrefix(model.getNsURIPrefix(prefixNamespace));
             }
         }
+    }
+
+    // TODO This might be too heavy for big data, should be possible to disable.
+    private static Set<String> getAllURIsNamespaces(Model model) {
+        return model.listObjects()
+            .andThen(model.listSubjects())
+            .andThen(model.listStatements()
+                .mapWith(Statement::getPredicate))
+            .filterKeep(RDFNode::isURIResource)
+            .mapWith(RDFNode::asResource)
+            .mapWith(Resource::getNameSpace)
+            .toSet();
     }
     
     public static String toStringTurtleFormat(PrefixMapping mapping) {

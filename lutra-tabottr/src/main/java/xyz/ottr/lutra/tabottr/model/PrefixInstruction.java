@@ -45,7 +45,7 @@ public class PrefixInstruction extends Instruction {
 
         List<Map.Entry<String,String>> prefixes = new LinkedList<>();
 
-        for (List<String> pair : super.getRows(this.rowStart + 1, this.rowEnd, this.colIndices)) {
+        for (List<String> pair : super.getRows(this.rowStart + 1, this.rowEnd, colIndices)) {
             String prefix = pair.get(0);
             String ns = pair.get(1);
             prefixes.add(new AbstractMap.SimpleEntry(prefix, ns));
