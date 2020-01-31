@@ -5,9 +5,22 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 0.6.5
+
+### Bug fixes
+
+ - Fix possible infinite loop when fetching online templates
+ - Fix slow/frozen expansion by efficient handling of traces
+
+## 0.6.4
+
+### Added
+
+ - Reintroduce type checking instances from 0.6.2
+
 ## 0.6.3
 
-### Added 
+### Added
 
 - Minor improvements to weblutra
 - Adding unit tests for pOTTR's stOTTR files
@@ -23,7 +36,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Core Type checking instances
 - CLI: Support loading multiple libraries
 - WebLutra: preload tpl.ottr.xyz library
-	
+
 ## 0.6.1
 
 ### Added
