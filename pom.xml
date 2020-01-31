@@ -4,7 +4,7 @@
 
 	<groupId>xyz.ottr.lutra</groupId>
 	<artifactId>lutra</artifactId>
-	<version>0.6.5-SNAPSHOT</version>
+	<version>0.6.6-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<modules>
 		<module>lutra-core</module>
