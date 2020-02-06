@@ -139,7 +139,11 @@ public class ExcelReaderTest {
         runAtomicTest("untypedLiterals");
     }
     
-    @Test public void testTypedUntyped() {
+    @Test public void testTypedText() {
         runAtomicTest("typedText");
+    }
+
+    @Test public void testTypedList() {
+        runAtomicTest("typedList");
     }
 }
