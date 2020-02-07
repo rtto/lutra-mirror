@@ -56,6 +56,12 @@ public class MessageHandler {
         this.quiet = isQuiet;
     }
 
+    public void add(Message msg) {
+        Trace t = new Trace();
+        t.addMessages(msg);
+        add(t);
+    }
+
     public void add(Trace trace) {
         if (trace != null) {
             this.traces.add(trace);
