@@ -30,7 +30,7 @@ import picocli.CommandLine.Command;
 import picocli.CommandLine.IVersionProvider;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;
-
+import xyz.ottr.lutra.io.FormatName;
 import xyz.ottr.lutra.result.Message;
 
 @Command(
@@ -74,8 +74,6 @@ import xyz.ottr.lutra.result.Message;
     versionProvider = Settings.JarFileVersionProvider.class)
 public class Settings {
 
-    public enum Format { legacy, wottr, stottr, tabottr, bottr }
-
     @Option(names = {"--extension", "-e"}, split = ",",
         description = {"File extension of files to use as input to template library.%n"
                        + "(default: ${DEFAULT-VALUE})"})
@@ -90,18 +88,18 @@ public class Settings {
         description = {"Input format of instances.%n"
                        + "(legal values: ${COMPLETION-CANDIDATES}"
                        + " default: ${DEFAULT-VALUE})"})
-    public Format inputFormat = Format.wottr;
+    public FormatName inputFormat = FormatName.wottr;
 
     @Option(names = {"-O", "--outputFormat"}, completionCandidates = OutputFormat.class,
         description = {"Output format of output of operation defined by the mode.%n"
                        + "(legal values: ${COMPLETION-CANDIDATES}; "
                        + "default: ${DEFAULT-VALUE})"})
-    public Format outputFormat = Format.wottr;
+    public FormatName outputFormat = FormatName.wottr;
 
     @Option(names = {"-L", "--libraryFormat"}, completionCandidates = TplInputFormat.class,
         description = {"The input format of the libraries. If omitted, all available formats are attempted.%n"
                        + "(legal values: ${COMPLETION-CANDIDATES})"})
-    public Format libraryFormat;
+    public FormatName libraryFormat;
 
 
     @Option(names = {"-f", "--fetchMissing"},
@@ -118,7 +116,7 @@ public class Settings {
 
     @Option(names = {"-F", "--fetchFormat"},
         description = {"The input format of the templates fetched via the -f flag."})
-    public Format fetchFormat;
+    public FormatName fetchFormat;
 
     @Option(names = {"-l", "--library"}, 
         description = {"Folder containing templates to use as library."
@@ -162,17 +160,17 @@ public class Settings {
                        + "default: ${DEFAULT-VALUE})"})
     public boolean deepTrace = false;
     
-    /* The following classes restrict the selections of Format to supported formats. */
+    /* The following classes restrict the selections of FormatName to supported formats. */
     private static class InsInputFormat extends ArrayList<String> {
 
         static final long serialVersionUID = 0L; // Not correct!
 
         InsInputFormat() {
             super(List.of(
-                    Format.legacy.toString(),
-                    Format.wottr.toString(),
-                    Format.stottr.toString(),
-                    Format.tabottr.toString()));
+                    FormatName.legacy.toString(),
+                    FormatName.wottr.toString(),
+                    FormatName.stottr.toString(),
+                    FormatName.tabottr.toString()));
         }
     }
 
@@ -182,9 +180,9 @@ public class Settings {
 
         TplInputFormat() {
             super(List.of(
-                    Format.stottr.toString(),
-                    Format.legacy.toString(),
-                    Format.wottr.toString()));
+                    FormatName.stottr.toString(),
+                    FormatName.legacy.toString(),
+                    FormatName.wottr.toString()));
         }
     }
 
@@ -194,9 +192,9 @@ public class Settings {
 
         OutputFormat() {
             super(List.of(
-                    Format.legacy.toString(),
-                    Format.stottr.toString(),
-                    Format.wottr.toString()));
+                    FormatName.legacy.toString(),
+                    FormatName.stottr.toString(),
+                    FormatName.wottr.toString()));
         }
     }
     

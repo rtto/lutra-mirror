@@ -41,6 +41,7 @@ import picocli.CommandLine;
 import picocli.CommandLine.ParameterException;
 
 import xyz.ottr.lutra.OTTR;
+import xyz.ottr.lutra.io.FormatManager;
 import xyz.ottr.lutra.io.InstanceReader;
 import xyz.ottr.lutra.io.InstanceWriter;
 import xyz.ottr.lutra.io.TemplateReader;
@@ -67,12 +68,15 @@ public class CLI {
     private final PrintStream outStream;
     private final PrintStream errStream;
     private final MessageHandler messageHandler;
+    private final FormatManager formatManager;
 
     public CLI(PrintStream outStream, PrintStream errStream) {
         this.settings = new Settings();
         this.outStream = outStream;
         this.errStream = errStream;
         this.messageHandler = new MessageHandler(errStream);
+        this.formatManager = new FormatManager();
+        Utils.registerReaders(this.formatManager);
     }
 
     public CLI() {
@@ -136,10 +140,9 @@ public class CLI {
     /// MAIN EXECUTION                                       ///
     ////////////////////////////////////////////////////////////
 
-
     private void execute() {
 
-        TemplateStore store = new DependencyGraph(ReaderRegistryImpl.getReaderRegistry());
+        TemplateStore store = new DependencyGraph(this.formatManager);
         Result<PrefixMapping> prefixes = parseLibraryInto(store);
 
         if (StringUtils.isNotBlank(this.settings.prefixes)) {
@@ -176,14 +179,14 @@ public class CLI {
             Result<TemplateReader> reader;
             // check if libraryFormat is set or not
             if (this.settings.libraryFormat != null) {
-                reader = store.getReaderRegistry().getTemplateReaders(this.settings.libraryFormat.toString());
+                reader = store.getFormatManager().getTemplateReader(this.settings.libraryFormat);
                 reader.map(readerFunction)
                     .map(mgs -> mgs.toSingleMessage("Attempt of parsing templates as "
                             + this.settings.libraryFormat + " format failed:"))
                     .ifPresent(mgs -> mgs.ifPresent(reader::addMessage));
                 prefixes.addResult(reader, (m, r) -> m.setNsPrefixes(r.getPrefixes()));
             } else {
-                reader = store.getReaderRegistry().attemptAllReaders(readerFunction);
+                reader = store.getFormatManager().attemptAllFormats(readerFunction);
             }
             prefixes.addResult(reader, (m, r) -> m.setNsPrefixes(r.getPrefixes()));
         }
@@ -301,7 +304,7 @@ public class CLI {
         if (this.settings.inputs.isEmpty()) {
             return Result.error("No input file provided.");
         }
-        return ReaderRegistryImpl.getReaderRegistry().getInstanceReader(this.settings.inputFormat.toString());
+        return this.formatManager.getInstanceReader(this.settings.inputFormat);
     }
 
     private Result<Function<Instance, ResultStream<Instance>>> makeExpander(TemplateStore store) {

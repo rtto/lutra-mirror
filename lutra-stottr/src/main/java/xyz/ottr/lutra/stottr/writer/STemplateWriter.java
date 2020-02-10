@@ -27,6 +27,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import xyz.ottr.lutra.io.FormatName;
 import xyz.ottr.lutra.io.TemplateWriter;
 import xyz.ottr.lutra.model.ParameterList;
 import xyz.ottr.lutra.model.Template;
@@ -187,5 +188,10 @@ public class STemplateWriter implements TemplateWriter {
 
     public void printDefinitions() {
         //TODO
+    }
+    
+    @Override
+    public FormatName getFormat() {
+        return FormatName.stottr;
     }
 }

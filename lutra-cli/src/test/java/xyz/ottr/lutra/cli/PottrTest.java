@@ -33,6 +33,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
+
+import xyz.ottr.lutra.io.FormatManager;
 import xyz.ottr.lutra.io.InstanceReader;
 import xyz.ottr.lutra.io.TemplateReader;
 import xyz.ottr.lutra.model.Instance;
@@ -108,7 +110,9 @@ public class PottrTest {
     }
 
     private TemplateStore getStore() {
-        TemplateStore store = new DependencyGraph(ReaderRegistryImpl.getReaderRegistry());
+        FormatManager fm = new FormatManager();
+        Utils.registerReaders(fm);
+        TemplateStore store = new DependencyGraph(fm);
         store.addOTTRBaseTemplates();
         return store;
     }
