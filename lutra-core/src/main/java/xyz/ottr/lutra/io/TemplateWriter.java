@@ -54,4 +54,5 @@ public interface TemplateWriter extends Consumer<TemplateSignature> {
 
     String write(String iri);
     
+    FormatName getFormat();
 }

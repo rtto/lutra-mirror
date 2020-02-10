@@ -40,4 +40,6 @@ public interface InstanceWriter extends Consumer<Instance> {
     }
 
     String write();
+    
+    FormatName getFormat();
 }

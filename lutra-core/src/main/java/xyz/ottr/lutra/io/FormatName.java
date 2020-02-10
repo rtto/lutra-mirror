@@ -27,5 +27,6 @@ public enum FormatName {
     wottr,
     stottr,
     tabottr,
-    bottr
+    bottr,
+    unknown // Denotes an unknown format
 }

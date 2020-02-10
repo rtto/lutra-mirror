@@ -73,20 +73,20 @@ public class FormatManager {
     }
 
 
-    public Optional<Message> registerInstanceReader(FormatName name, InstanceReader format) {
-        return registerFormatTo(name, format, this.instanceReaders, allowedInstanceReaderFormats, "instance input");
+    public Optional<Message> registerInstanceReader(InstanceReader format) {
+        return registerFormatTo(format.getFormat(), format, this.instanceReaders, allowedInstanceReaderFormats, "instance input");
     }
 
-    public Optional<Message> registerInstanceWriter(FormatName name, InstanceWriter format) {
-        return registerFormatTo(name, format, this.instanceWriters, allowedInstanceWriterFormats, "instance output");
+    public Optional<Message> registerInstanceWriter(InstanceWriter format) {
+        return registerFormatTo(format.getFormat(), format, this.instanceWriters, allowedInstanceWriterFormats, "instance output");
     }
 
-    public Optional<Message> registerTemplateReader(FormatName name, TemplateReader format) {
-        return registerFormatTo(name, format, this.templateReaders, allowedTemplateReaderFormats, "template input");
+    public Optional<Message> registerTemplateReader(TemplateReader format) {
+        return registerFormatTo(format.getFormat(), format, this.templateReaders, allowedTemplateReaderFormats, "template input");
     }
 
-    public Optional<Message> registerTemplateWriter(FormatName name, TemplateWriter format) {
-        return registerFormatTo(name, format, this.templateWriters, allowedTemplateWriterFormats, "template output");
+    public Optional<Message> registerTemplateWriter(TemplateWriter format) {
+        return registerFormatTo(format.getFormat(), format, this.templateWriters, allowedTemplateWriterFormats, "template output");
     }
 
     public Map<FormatName, InstanceReader> getInstanceReaders() {

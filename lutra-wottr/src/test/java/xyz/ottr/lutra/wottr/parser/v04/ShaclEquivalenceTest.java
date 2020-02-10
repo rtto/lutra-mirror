@@ -38,9 +38,9 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
-import xyz.ottr.lutra.io.Utils;
 import xyz.ottr.lutra.io.InstanceReader;
 import xyz.ottr.lutra.io.TemplateReader;
+import xyz.ottr.lutra.io.Utils;
 import xyz.ottr.lutra.model.Instance;
 import xyz.ottr.lutra.model.TemplateSignature;
 import xyz.ottr.lutra.result.Message;

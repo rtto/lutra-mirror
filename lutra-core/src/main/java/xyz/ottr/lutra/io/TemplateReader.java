@@ -45,10 +45,10 @@ public class TemplateReader implements Function<String, ResultStream<TemplateSig
     private final Function<String, ResultStream<TemplateSignature>> templatePipeline;
     private final TemplateParser<?> parser; // Needed for retrieving used prefixes
     private static final Logger log = LoggerFactory.getLogger(TemplateReader.class);
-    private final String format;
+    private final FormatName format;
 
     public <M> TemplateReader(InputReader<String, M> templateInputReader,
-            TemplateParser<M> templateParser, String format) {
+            TemplateParser<M> templateParser, FormatName format) {
         this.templatePipeline = ResultStream.innerFlatMapCompose(templateInputReader, templateParser);
         this.parser = templateParser;
         this.format = format;
@@ -56,14 +56,14 @@ public class TemplateReader implements Function<String, ResultStream<TemplateSig
 
     public <M> TemplateReader(InputReader<String, M> templateInputReader,
             TemplateParser<M> templateParser) {
-        this(templateInputReader, templateParser, "unknown");
+        this(templateInputReader, templateParser, FormatName.unknown);
     }
 
     public Map<String, String> getPrefixes() {
         return this.parser.getPrefixes();
     }
     
-    public String getFormat() {
+    public FormatName getFormat() {
         return this.format;
     }
 
