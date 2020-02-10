@@ -30,7 +30,7 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 import xyz.ottr.lutra.OTTR;
-import xyz.ottr.lutra.io.ReaderRegistry;
+import xyz.ottr.lutra.io.FormatManager;
 import xyz.ottr.lutra.io.TemplateReader;
 import xyz.ottr.lutra.model.Instance;
 import xyz.ottr.lutra.model.Template;
@@ -299,10 +299,10 @@ public interface TemplateStore extends Consumer<TemplateSignature> {
 
         ResultConsumer<TemplateReader> messages = new ResultConsumer<>();
         
-        ReaderRegistry readerRegistry = getReaderRegistry();
-        if (readerRegistry == null) {
+        FormatManager formatManager = getFormatManager();
+        if (formatManager == null) {
             messages.accept(Result.error(
-                    "Attempted fetching missing templates, but has no ReaderRegistry provided."));
+                    "Attempted fetching missing templates, but has no formats registered."));
             return messages.getMessageHandler();
         }
 
@@ -314,7 +314,7 @@ public interface TemplateStore extends Consumer<TemplateSignature> {
 
         while (!missing.isEmpty()) {
             for (String toFetch : missing) {
-                messages.accept(readerRegistry.attemptAllReaders(reader -> reader.populateTemplateStore(this, toFetch)));
+                messages.accept(formatManager.attemptAllFormats(reader -> reader.populateTemplateStore(this, toFetch)));
                 if (!getTemplate(toFetch).isPresent()) { // Check if fetched and added to store
                     failed.add(toFetch);
                 }
@@ -325,5 +325,5 @@ public interface TemplateStore extends Consumer<TemplateSignature> {
         return messages.getMessageHandler();
     }
 
-    ReaderRegistry getReaderRegistry();
+    FormatManager getFormatManager();
 }

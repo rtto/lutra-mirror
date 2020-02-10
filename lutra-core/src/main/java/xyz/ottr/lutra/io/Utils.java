@@ -23,6 +23,8 @@ package xyz.ottr.lutra.io;
  */
 
 import java.io.File;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
@@ -40,13 +42,36 @@ import xyz.ottr.lutra.result.Message;
 import xyz.ottr.lutra.result.Result;
 import xyz.ottr.lutra.result.ResultStream;
 
-public enum Files {
+public enum Utils {
     ;
 
     private static final IOFileFilter hiddenFiles = new NotFileFilter(
             FileFilterUtils.or(new PrefixFileFilter("."), new PrefixFileFilter("#")));
     private static final Function<String, IOFileFilter> extFilter = string -> FileFilterUtils.suffixFileFilter(string,
             IOCase.INSENSITIVE);
+
+    
+    public static String getFileSuffix(FormatName format) {
+
+        switch (format) {
+            case legacy:
+            case wottr:
+                return ".ttl";
+            case stottr:
+                return ".stottr";
+            default:
+                return "";
+        }
+    }
+
+    public static String iriToDirectory(String pathStr) {
+        Path folder = Paths.get(pathStr).getParent();
+        return folder == null ? null : folder.toString();
+    }
+
+    public static String iriToPath(String iriStr) throws URISyntaxException {
+        return new URI(iriStr).getPath();
+    }
 
     public static Message checkFolderReadable(String folder) throws SecurityException {
         Path path = Paths.get(folder);

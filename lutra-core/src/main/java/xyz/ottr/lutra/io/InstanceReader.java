@@ -95,6 +95,6 @@ public class InstanceReader implements Function<String, ResultStream<Instance>> 
 
         this.log.info("Loading all template instaces from folder " + folder + " with suffix "
                 + Arrays.toString(this.includeExtensions) + " except " + Arrays.toString(this.excludeExtensions));
-        return readInstances(Files.loadFromFolder(folder, this.includeExtensions, this.excludeExtensions));
+        return readInstances(Utils.loadFromFolder(folder, this.includeExtensions, this.excludeExtensions));
     }
 }

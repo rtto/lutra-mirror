@@ -1,30 +1,55 @@
 package xyz.ottr.lutra;
 
+/*-
+ * #%L
+ * lutra-core
+ * %%
+ * Copyright (C) 2018 - 2020 University of Oslo
+ * %%
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation, either version 2.1 of the
+ * License, or (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Lesser Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Lesser Public
+ * License along with this program.  If not, see
+ * <http://www.gnu.org/licenses/lgpl-2.1.html>.
+ * #L%
+ */
+
 import java.io.IOException;
-import java.io.PrintStream;
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
+import java.util.Optional;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.jena.shared.PrefixMapping;
 
+import xyz.ottr.lutra.io.FormatManager;
+import xyz.ottr.lutra.io.FormatName;
 import xyz.ottr.lutra.io.InstanceReader;
 import xyz.ottr.lutra.io.InstanceWriter;
 import xyz.ottr.lutra.io.TemplateReader;
 import xyz.ottr.lutra.io.TemplateWriter;
+import xyz.ottr.lutra.io.Utils;
 import xyz.ottr.lutra.model.Instance;
-import xyz.ottr.lutra.model.TemplateSignature;
 import xyz.ottr.lutra.result.Message;
 import xyz.ottr.lutra.result.MessageHandler;
 import xyz.ottr.lutra.result.Result;
 import xyz.ottr.lutra.result.ResultConsumer;
 import xyz.ottr.lutra.result.ResultStream;
 import xyz.ottr.lutra.result.Trace;
+import xyz.ottr.lutra.store.DependencyGraph;
 import xyz.ottr.lutra.store.TemplateStore;
 
 public class TemplateManager {
@@ -49,14 +74,14 @@ public class TemplateManager {
     /**
      * Populated store with parsed templates, and returns messages with potensial errors
      */
-    public MessageHandler parseLibraryInto(TemplateStore store, String.. library) {
+    public MessageHandler parseLibraryInto(TemplateStore store, String... library) {
         return parseLibraryInto(store, null, library);
     }
 
     /**
      * Populated store with parsed templates, and returns messages with potensial errors
      */
-    public MessageHandler parseLibraryInto(TemplateStore store, FormatName format, String.. library) {
+    public MessageHandler parseLibraryInto(TemplateStore store, FormatName format, String... library) {
         
         MessageHandler messages = new MessageHandler();
 
@@ -73,27 +98,27 @@ public class TemplateManager {
             Result<TemplateReader> reader;
             // check if libraryFormat is set or not
             if (format != null) {
-                reader = store.getReaderRegistry().getTemplateReaders(format);
+                reader = store.getFormatManager().getTemplateReader(format);
                 reader.map(readerFunction).map(messages::combine);
             } else {
-                reader = store.getReaderRegistry().attemptAllReaders(readerFunction);
+                reader = store.getFormatManager().attemptAllFormats(readerFunction);
             }
-            messages.addResult(reader);
+            messages.add(reader);
             reader.ifPresent(r -> this.prefixes.setNsPrefixes(r.getPrefixes()));
         }
 
         if (this.settings.fetchMissingDependencies) {
             MessageHandler msgs = store.fetchMissingDependencies();
-            messageHandler.combine(msgs);
+            messages.combine(msgs);
         }
         
         return messages;
     } 
 
-    public ResultStream<Instance> parseInstances(FormatName format, String.. files) {
+    public ResultStream<Instance> parseInstances(FormatName format, String... files) {
 
         Result<InstanceReader> reader = makeInstanceReader(format);
-        ResultStream<String> fileStream = ResultStream.innerOf(Arrrays.toList(files));
+        ResultStream<String> fileStream = ResultStream.innerOf(Arrays.asList(files));
 
         return reader.mapToStream(fileStream::innerFlatMap);
     }
@@ -134,7 +159,7 @@ public class TemplateManager {
 
         Result<InstanceWriter> writerRes = makeInstanceWriter(format);
 
-        return writeObjects(instances, writerRes, (writer, msgs) -> writeInstances(writer.write(), out).ifPresent(msgs::add));
+        return writeObjects(instances, writerRes, (writer, msgs) -> writeInstancesTo(writer.write(), out).ifPresent(msgs::add));
     }
 
     public MessageHandler writeTemplates(TemplateStore store, FormatName format, String folder) { 
@@ -143,18 +168,18 @@ public class TemplateManager {
 
         return writeObjects(store.getAllTemplateObjects(), writerRes, (writer, msgs) -> {
             for (String iri : writer.getIRIs()) {
-                writeTemplate(iri, writer.write(iri), folder).ifPresent(msgs::add);
+                writeTemplate(iri, format, writer.write(iri), folder).ifPresent(msgs::add);
             }
         });
     }
 
-    private <T, W implements Consumer<T>> MessageHandler writeObjects(ResultStream<T> objects,
+    private <T, W extends Consumer<T>> MessageHandler writeObjects(ResultStream<T> objects,
             Result<W> writerRes, BiConsumer<W, MessageHandler> fileWriter) { 
 
         MessageHandler msgs = new MessageHandler();
         msgs.add(writerRes);
 
-        witerRes.ifPresent(writer -> {
+        writerRes.ifPresent(writer -> {
             ResultConsumer<T> consumer = new ResultConsumer<>(writer);
             objects.forEach(consumer);
             msgs.combine(consumer.getMessageHandler());
@@ -169,7 +194,7 @@ public class TemplateManager {
     // !!! Move all methods below to own class (e.g. Files.java) !!!
     //////
     
-    private Optional<Message> writeInstances(String output, String filePath) {
+    private Optional<Message> writeInstancesTo(String output, String filePath) {
 
         try {
             Files.write(Paths.get(filePath), output.getBytes(Charset.forName("UTF-8")));
@@ -180,41 +205,19 @@ public class TemplateManager {
         return Optional.empty();
     }
 
-    private Optional<Message> writeTemplate(String iri, String output, String folder) {
+    private Optional<Message> writeTemplate(String iri, FormatName format, String output, String folder) {
 
         try {
             // TODO: cli-arg to decide extension
-            String iriPath = iriToPath(iri);
-            Files.createDirectories(Paths.get(folder, iriToDirectory(iriPath)));
-            Files.write(Paths.get(folder, iriPath + getFileSuffix()), output.getBytes(Charset.forName("UTF-8")));
+            String iriPath = Utils.iriToPath(iri);
+            Files.createDirectories(Paths.get(folder, Utils.iriToDirectory(iriPath)));
+            Files.write(Paths.get(folder, iriPath + Utils.getFileSuffix(format)), output.getBytes(Charset.forName("UTF-8")));
         } catch (IOException | URISyntaxException ex) {
             Message err = Message.error(
                 "Error when writing output -- " + ex.getMessage());
             return Optional.of(err);
         }
         return Optional.empty();
-    }
-
-    private String getFileSuffix(FormatName format) {
-
-        switch (format) {
-            case legacy:
-            case wottr:
-                return ".ttl";
-            case stottr:
-                return ".stottr";
-            default:
-                return "";
-        }
-    }
-
-    private static String iriToDirectory(String pathStr) {
-        Path folder = Paths.get(pathStr).getParent();
-        return folder == null ? null : folder.toString();
-    }
-
-    private static String iriToPath(String iriStr) throws URISyntaxException {
-        return new URI(iriStr).getPath();
     }
 
     static class Settings {
@@ -226,6 +229,6 @@ public class TemplateManager {
         public String[] extensions = { };
         public String[] ignoreExtensions = { };
 
-        public FormatName fetchFormat;
+        //public FormatName fetchFormat; // TODO: Find how to use
     }
 }

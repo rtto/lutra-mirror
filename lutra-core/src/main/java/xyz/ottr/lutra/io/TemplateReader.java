@@ -112,7 +112,7 @@ public class TemplateReader implements Function<String, ResultStream<TemplateSig
                 + Arrays.toString(includeExtensions) + " except " + Arrays.toString(excludeExtensions));
 
         return populateTemplateStore(store,
-                                     Files.loadFromFolder(folder,
+                                     Utils.loadFromFolder(folder,
                                                           includeExtensions,
                                                           excludeExtensions));
     }
@@ -134,7 +134,7 @@ public class TemplateReader implements Function<String, ResultStream<TemplateSig
 
         this.log.info("Loading all templates from folder " + folder + " with suffix "
                 + Arrays.toString(includeExtensions) + " except " + Arrays.toString(excludeExtensions));
-        return Files.loadFromFolder(folder, includeExtensions, excludeExtensions)
+        return Utils.loadFromFolder(folder, includeExtensions, excludeExtensions)
             .innerFlatMap(this.templatePipeline);
     }
     

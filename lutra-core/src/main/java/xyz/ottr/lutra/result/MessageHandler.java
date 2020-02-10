@@ -58,7 +58,7 @@ public class MessageHandler {
 
     public void add(Message msg) {
         Trace t = new Trace();
-        t.addMessages(msg);
+        t.addMessage(msg);
         add(t);
     }
 

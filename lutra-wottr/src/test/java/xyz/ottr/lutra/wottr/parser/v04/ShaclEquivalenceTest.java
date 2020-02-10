@@ -38,7 +38,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
-import xyz.ottr.lutra.io.Files;
+import xyz.ottr.lutra.io.Utils;
 import xyz.ottr.lutra.io.InstanceReader;
 import xyz.ottr.lutra.io.TemplateReader;
 import xyz.ottr.lutra.model.Instance;
@@ -118,14 +118,14 @@ public class ShaclEquivalenceTest {
     @Parameters(name = "{index}: {0} is {1}")
     public static List<Object[]> data() {
 
-        List<Object[]> input = Files.loadFromFolder(correct, new String[] { "ttl" }, new String[0])
+        List<Object[]> input = Utils.loadFromFolder(correct, new String[] { "ttl" }, new String[0])
             .getStream()
             .map(Result::get)
             .sorted()
             .map(r -> new Object[]{ r, true })
             .collect(Collectors.toList());
 
-        input.addAll(Files.loadFromFolder(incorrect, new String[] { "ttl" }, new String[0])
+        input.addAll(Utils.loadFromFolder(incorrect, new String[] { "ttl" }, new String[0])
             .getStream()
             //.filter(x -> false) // for debugging
             .map(Result::get)
