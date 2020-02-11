@@ -189,9 +189,4 @@ public class STemplateWriter implements TemplateWriter {
     public void printDefinitions() {
         //TODO
     }
-    
-    @Override
-    public FormatName getFormat() {
-        return FormatName.stottr;
-    }
 }

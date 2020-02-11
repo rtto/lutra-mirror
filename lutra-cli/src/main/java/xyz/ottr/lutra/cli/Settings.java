@@ -22,7 +22,7 @@ package xyz.ottr.lutra.cli;
  * #L%
  */
 
-import java.util.ArrayList;
+import java.util.ArrayList; 
 import java.util.LinkedList;
 import java.util.List;
 
@@ -30,7 +30,6 @@ import picocli.CommandLine.Command;
 import picocli.CommandLine.IVersionProvider;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;
-import xyz.ottr.lutra.io.FormatName;
 import xyz.ottr.lutra.result.Message;
 
 @Command(
@@ -73,6 +72,8 @@ import xyz.ottr.lutra.result.Message;
     mixinStandardHelpOptions = true, 
     versionProvider = Settings.JarFileVersionProvider.class)
 public class Settings {
+
+    enum FormatName { legacy, wottr, stottr, tabottr, bottr }
 
     @Option(names = {"--extension", "-e"}, split = ",",
         description = {"File extension of files to use as input to template library.%n"

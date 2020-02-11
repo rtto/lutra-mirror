@@ -35,8 +35,8 @@ import java.util.function.Function;
 
 import org.apache.jena.shared.PrefixMapping;
 
+import xyz.ottr.lutra.io.Format;
 import xyz.ottr.lutra.io.FormatManager;
-import xyz.ottr.lutra.io.FormatName;
 import xyz.ottr.lutra.io.InstanceReader;
 import xyz.ottr.lutra.io.InstanceWriter;
 import xyz.ottr.lutra.io.TemplateReader;
@@ -64,6 +64,10 @@ public class TemplateManager {
         this.prefixes = PrefixMapping.Factory.create().setNsPrefixes(OTTR.getDefaultPrefixes());
         Trace.setDeepTrace(this.settings.deepTrace);
     }
+    
+    public void registerFormat(Format format) {
+        this.formatManager.register(format);
+    }
 
     public TemplateStore makeDefaultStore() {
         TemplateStore store = new DependencyGraph(this.formatManager);
@@ -81,7 +85,7 @@ public class TemplateManager {
     /**
      * Populated store with parsed templates, and returns messages with potensial errors
      */
-    public MessageHandler parseLibraryInto(TemplateStore store, FormatName format, String... library) {
+    public MessageHandler parseLibraryInto(TemplateStore store, Format format, String... library) {
         
         MessageHandler messages = new MessageHandler();
 
@@ -98,7 +102,7 @@ public class TemplateManager {
             Result<TemplateReader> reader;
             // check if libraryFormat is set or not
             if (format != null) {
-                reader = store.getFormatManager().getTemplateReader(format);
+                reader = format.getTemplateReader();
                 reader.map(readerFunction).map(messages::combine);
             } else {
                 reader = store.getFormatManager().attemptAllFormats(readerFunction);
@@ -115,34 +119,14 @@ public class TemplateManager {
         return messages;
     } 
 
-    public ResultStream<Instance> parseInstances(FormatName format, String... files) {
+    public ResultStream<Instance> parseInstances(Format format, String... files) {
 
-        Result<InstanceReader> reader = makeInstanceReader(format);
+        Result<InstanceReader> reader = format.getInstanceReader();
         ResultStream<String> fileStream = ResultStream.innerOf(Arrays.asList(files));
 
         return reader.mapToStream(fileStream::innerFlatMap);
     }
     
-    ////////////////////////////////////////////////////////////
-    /// MAKER-METHODS                                        ///
-    ////////////////////////////////////////////////////////////
-            
-    public Result<InstanceReader> makeInstanceReader(FormatName format) {
-        return this.formatManager.getInstanceReader(format);
-    }
-
-    public Result<InstanceWriter> makeInstanceWriter(FormatName format) {
-        return this.formatManager.getInstanceWriter(format);
-    }
-
-    public Result<TemplateReader> makeTemplateReader(FormatName format) {
-        return this.formatManager.getTemplateReader(format);
-    }
-
-    public Result<TemplateWriter> makeTemplateWriter(FormatName format) {
-        return this.formatManager.getTemplateWriter(format);
-    }
-
     public Function<Instance, ResultStream<Instance>> makeExpander(TemplateStore store) {
         if (this.settings.fetchMissingDependencies) {
             return store::expandInstanceFetch;
@@ -151,24 +135,20 @@ public class TemplateManager {
         }
     }
 
-    ////////////////////////////////////////////////////////////
-    /// WRITER-METHODS, WRITING THINGS TO FILE               ///
-    ////////////////////////////////////////////////////////////
+    public MessageHandler writeInstances(ResultStream<Instance> instances, Format format, String out) {
 
-    public MessageHandler writeInstances(ResultStream<Instance> instances, FormatName format, String out) {
-
-        Result<InstanceWriter> writerRes = makeInstanceWriter(format);
+        Result<InstanceWriter> writerRes = format.getInstanceWriter();
 
         return writeObjects(instances, writerRes, (writer, msgs) -> writeInstancesTo(writer.write(), out).ifPresent(msgs::add));
     }
 
-    public MessageHandler writeTemplates(TemplateStore store, FormatName format, String folder) { 
+    public MessageHandler writeTemplates(TemplateStore store, Format format, String folder) { 
 
-        Result<TemplateWriter> writerRes = makeTemplateWriter(format);
+        Result<TemplateWriter> writerRes = format.getTemplateWriter();
 
         return writeObjects(store.getAllTemplateObjects(), writerRes, (writer, msgs) -> {
             for (String iri : writer.getIRIs()) {
-                writeTemplate(iri, format, writer.write(iri), folder).ifPresent(msgs::add);
+                writeTemplate(iri, format.getDefaultFileSuffix(), writer.write(iri), folder).ifPresent(msgs::add);
             }
         });
     }
@@ -205,13 +185,13 @@ public class TemplateManager {
         return Optional.empty();
     }
 
-    private Optional<Message> writeTemplate(String iri, FormatName format, String output, String folder) {
+    private Optional<Message> writeTemplate(String iri, String suffix, String output, String folder) {
 
         try {
             // TODO: cli-arg to decide extension
             String iriPath = Utils.iriToPath(iri);
             Files.createDirectories(Paths.get(folder, Utils.iriToDirectory(iriPath)));
-            Files.write(Paths.get(folder, iriPath + Utils.getFileSuffix(format)), output.getBytes(Charset.forName("UTF-8")));
+            Files.write(Paths.get(folder, iriPath + suffix), output.getBytes(Charset.forName("UTF-8")));
         } catch (IOException | URISyntaxException ex) {
             Message err = Message.error(
                 "Error when writing output -- " + ex.getMessage());

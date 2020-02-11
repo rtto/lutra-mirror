@@ -1,5 +1,8 @@
 package xyz.ottr.lutra.io;
 
+import java.util.Collection;
+import java.util.Collections;
+
 /*-
  * #%L
  * lutra-core
@@ -22,10 +25,7 @@ package xyz.ottr.lutra.io;
  * #L%
  */
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
@@ -36,103 +36,44 @@ import xyz.ottr.lutra.result.Result;
 
 public class FormatManager {
 
-    public static final Set<FormatName> allowedInstanceReaderFormats = Collections.unmodifiableSet(Set.of(
-            FormatName.legacy, FormatName.wottr, FormatName.stottr, FormatName.tabottr, FormatName.bottr));
-    public static final Set<FormatName> allowedInstanceWriterFormats = Collections.unmodifiableSet(Set.of(
-            FormatName.wottr, FormatName.stottr));
-    public static final Set<FormatName> allowedTemplateReaderFormats = Collections.unmodifiableSet(Set.of(
-            FormatName.legacy, FormatName.wottr, FormatName.stottr));
-    public static final Set<FormatName> allowedTemplateWriterFormats = Collections.unmodifiableSet(Set.of(
-            FormatName.wottr, FormatName.stottr));
+    private final Set<Format> formats;
 
-    private final Map<FormatName, InstanceReader> instanceReaders;
-    private final Map<FormatName, InstanceWriter> instanceWriters;
-    private final Map<FormatName, TemplateReader> templateReaders;
-    private final Map<FormatName, TemplateWriter> templateWriters;
+    public FormatManager(Collection<Format> formats) {
+        this.formats = new HashSet<>(formats);
+    }
 
     public FormatManager() {
-        this.instanceReaders = new HashMap<>();
-        this.instanceWriters = new HashMap<>();
-        this.templateReaders = new HashMap<>();
-        this.templateWriters = new HashMap<>();
+        this(new HashSet<>());
     }
 
-    private static <T> Optional<Message> registerFormatTo(FormatName name, T format, Map<FormatName, T> formats,
-            Collection<FormatName> allowed, String operation) {
-
-        if (!allowed.contains(name)) {
-            return Optional.of(Message.error("Format " + name + " not allowed as " + operation + " format."));
-        }
-
-        if (formats.containsKey(name)) {
-            return Optional.of(Message.error("Format " + name + " already added to this FormatManager as " + operation + "."));
-        }
-
-        formats.put(name, format);
-        return Optional.empty();
+    public void register(Format format) {
+        this.formats.add(format);
     }
 
-
-    public Optional<Message> registerInstanceReader(InstanceReader format) {
-        return registerFormatTo(format.getFormat(), format, this.instanceReaders, allowedInstanceReaderFormats, "instance input");
+    public void register(Collection<Format> formats) {
+        this.formats.addAll(formats);
     }
-
-    public Optional<Message> registerInstanceWriter(InstanceWriter format) {
-        return registerFormatTo(format.getFormat(), format, this.instanceWriters, allowedInstanceWriterFormats, "instance output");
-    }
-
-    public Optional<Message> registerTemplateReader(TemplateReader format) {
-        return registerFormatTo(format.getFormat(), format, this.templateReaders, allowedTemplateReaderFormats, "template input");
-    }
-
-    public Optional<Message> registerTemplateWriter(TemplateWriter format) {
-        return registerFormatTo(format.getFormat(), format, this.templateWriters, allowedTemplateWriterFormats, "template output");
-    }
-
-    public Map<FormatName, InstanceReader> getInstanceReaders() {
-        return Collections.unmodifiableMap(this.instanceReaders);
-    }
-
-    public Map<FormatName, InstanceWriter> getInstanceWriters() {
-        return Collections.unmodifiableMap(this.instanceWriters);
-    }
-
-    public Map<FormatName, TemplateReader> getTemplateReaders() {
-        return Collections.unmodifiableMap(this.templateReaders);
-    }
-
-    public Map<FormatName, TemplateWriter> getTemplateWriters() {
-        return Collections.unmodifiableMap(this.templateWriters);
-    }
-
-    public Result<InstanceReader> getInstanceReader(FormatName name) {
-        return Result.ofNullable(this.instanceReaders.get(name));
-    }
-
-    public Result<InstanceWriter> getInstanceWriter(FormatName name) {
-        return Result.ofNullable(this.instanceWriters.get(name));
-    }
-
-    public Result<TemplateReader> getTemplateReader(FormatName name) {
-        return Result.ofNullable(this.templateReaders.get(name));
-    }
-
-    public Result<TemplateWriter> getTemplateWriter(FormatName name) {
-        return Result.ofNullable(this.templateWriters.get(name));
+    
+    public Set<Format> getFormats() {
+        return Collections.unmodifiableSet(this.formats);
     }
 
     public Result<TemplateReader> attemptAllFormats(Function<TemplateReader, MessageHandler> readerFunction) {
         
         Result<TemplateReader> unsuccessful = Result.empty(); // Return in case of no succeed
-        for (Map.Entry<FormatName, TemplateReader> reader : getTemplateReaders().entrySet()) {
-            MessageHandler msgs = readerFunction.apply(reader.getValue());
+        for (Format format : this.formats) {
+            if (!format.supportsTemplateReader()) {
+                continue;
+            }
+            TemplateReader reader = format.getTemplateReader().get();
+            MessageHandler msgs = readerFunction.apply(reader);
 
             if (Message.moreSevere(msgs.getMostSevere(), Message.ERROR)) {
                 msgs.toSingleMessage("Attempt of parsing templates as "
-                    + reader.getKey() + " format failed:")
+                    + reader.toString() + " format failed:")
                     .ifPresent(unsuccessful::addMessage);
             } else {
-                Result<TemplateReader> readerRes = Result.of(reader.getValue());
+                Result<TemplateReader> readerRes = Result.of(reader);
                 msgs.toSingleMessage("")
                     .ifPresent(readerRes::addMessage);
                 return readerRes;
@@ -144,7 +85,7 @@ public class FormatManager {
         allMsgs.add(unsuccessful);
         Optional<Message> errors = allMsgs.toSingleMessage(
             "Attempts of parsing library on all available formats " 
-            + getTemplateReaders().keySet().toString() + " failed with following errors:\n");
+            + this.formats.toString() + " failed with following errors:\n");
 
         return errors.isPresent() ? Result.empty(errors.get()) : Result.empty();
     }

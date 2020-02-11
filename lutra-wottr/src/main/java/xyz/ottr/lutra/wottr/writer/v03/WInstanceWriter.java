@@ -29,7 +29,6 @@ import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.shared.PrefixMapping;
 
-import xyz.ottr.lutra.io.FormatName;
 import xyz.ottr.lutra.io.InstanceWriter;
 import xyz.ottr.lutra.model.ArgumentList;
 import xyz.ottr.lutra.model.Instance;
@@ -100,10 +99,5 @@ public class WInstanceWriter implements InstanceWriter {
             model.add(argumentNode, WOTTR.index, model.createTypedLiteral(index, XSDDatatype.XSDint));
             index++;
         }
-    }
-    
-    @Override
-    public FormatName getFormat() {
-        return FormatName.legacy;
     }
 }

@@ -26,7 +26,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import xyz.ottr.lutra.io.FormatName;
 import xyz.ottr.lutra.io.InstanceWriter;
 import xyz.ottr.lutra.model.ArgumentList;
 import xyz.ottr.lutra.model.Instance;
@@ -105,10 +104,5 @@ public class SInstanceWriter implements InstanceWriter {
             sep = STOTTR.Terms.insArgSep + " ";
         }
         return builder;
-    }
-    
-    @Override
-    public FormatName getFormat() {
-        return FormatName.stottr;
     }
 }

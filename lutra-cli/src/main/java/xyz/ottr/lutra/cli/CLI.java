@@ -41,6 +41,7 @@ import picocli.CommandLine;
 import picocli.CommandLine.ParameterException;
 
 import xyz.ottr.lutra.OTTR;
+import xyz.ottr.lutra.io.Format;
 import xyz.ottr.lutra.io.FormatManager;
 import xyz.ottr.lutra.io.InstanceReader;
 import xyz.ottr.lutra.io.InstanceWriter;
@@ -68,15 +69,14 @@ public class CLI {
     private final PrintStream outStream;
     private final PrintStream errStream;
     private final MessageHandler messageHandler;
-    private final FormatManager formatManager;
+    private final FormatUtils formatUtils;
 
     public CLI(PrintStream outStream, PrintStream errStream) {
         this.settings = new Settings();
         this.outStream = outStream;
         this.errStream = errStream;
         this.messageHandler = new MessageHandler(errStream);
-        this.formatManager = new FormatManager();
-        Utils.registerReaders(this.formatManager);
+        this.formatUtils = new FormatUtils();
     }
 
     public CLI() {
@@ -142,8 +142,9 @@ public class CLI {
 
     private void execute() {
 
-        TemplateStore store = new DependencyGraph(this.formatManager);
+        TemplateStore store = new DependencyGraph(this.formatUtils.getFormatManager());
         Result<PrefixMapping> prefixes = parseLibraryInto(store);
+        prefixes.ifPresent(this.formatUtils::addPrefixes);
 
         if (StringUtils.isNotBlank(this.settings.prefixes)) {
             Result<Model> userPrefixes = new RDFFileReader().parse(this.settings.prefixes);
@@ -179,7 +180,7 @@ public class CLI {
             Result<TemplateReader> reader;
             // check if libraryFormat is set or not
             if (this.settings.libraryFormat != null) {
-                reader = store.getFormatManager().getTemplateReader(this.settings.libraryFormat);
+                reader = this.formatUtils.getFormat(this.settings.libraryFormat).getTemplateReader();
                 reader.map(readerFunction)
                     .map(mgs -> mgs.toSingleMessage("Attempt of parsing templates as "
                             + this.settings.libraryFormat + " format failed:"))
@@ -304,7 +305,7 @@ public class CLI {
         if (this.settings.inputs.isEmpty()) {
             return Result.error("No input file provided.");
         }
-        return this.formatManager.getInstanceReader(this.settings.inputFormat);
+        return FormatUtils.getFormat(this.settings.inputFormat).getInstanceReader();
     }
 
     private Result<Function<Instance, ResultStream<Instance>>> makeExpander(TemplateStore store) {

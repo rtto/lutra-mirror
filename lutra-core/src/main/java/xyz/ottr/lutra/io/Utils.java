@@ -51,19 +51,6 @@ public enum Utils {
             IOCase.INSENSITIVE);
 
     
-    public static String getFileSuffix(FormatName format) {
-
-        switch (format) {
-            case legacy:
-            case wottr:
-                return ".ttl";
-            case stottr:
-                return ".stottr";
-            default:
-                return "";
-        }
-    }
-
     public static String iriToDirectory(String pathStr) {
         Path folder = Paths.get(pathStr).getParent();
         return folder == null ? null : folder.toString();
@@ -109,7 +96,7 @@ public enum Utils {
             .map(extFilter)
             .reduce(FileFilterUtils.falseFileFilter(), FileFilterUtils::or);
 
-        // conjuction of negations
+        // conjunction of negations
         IOFileFilter excludes = Arrays.stream(excludeExtensions)
             .map(extFilter)
             .map(FileFilterUtils::notFileFilter)

@@ -35,7 +35,6 @@ import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.shared.PrefixMapping;
 import org.apache.jena.vocabulary.RDF;
 
-import xyz.ottr.lutra.io.FormatName;
 import xyz.ottr.lutra.io.TemplateWriter;
 import xyz.ottr.lutra.model.Instance;
 import xyz.ottr.lutra.model.ParameterList;
@@ -142,10 +141,5 @@ public class WTemplateWriter implements TemplateWriter {
             paramLst = paramLst.with(paramNode);
         }
         model.add(iri, WOTTR.parameters, paramLst);
-    }
-
-    @Override
-    public FormatName getFormat() {
-        return FormatName.wottr;
     }
 }

@@ -28,5 +28,4 @@ public enum FormatName {
     stottr,
     tabottr,
     bottr,
-    unknown // Denotes an unknown format
 }

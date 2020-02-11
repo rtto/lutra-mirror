@@ -22,7 +22,7 @@ package xyz.ottr.lutra.wottr.writer.v04;
  * #L%
  */
 
-import java.util.Objects;
+import java.util.Objects; 
 
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
@@ -31,7 +31,6 @@ import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.shared.PrefixMapping;
 
-import xyz.ottr.lutra.io.FormatName;
 import xyz.ottr.lutra.io.InstanceWriter;
 import xyz.ottr.lutra.model.ArgumentList;
 import xyz.ottr.lutra.model.Instance;
@@ -110,10 +109,5 @@ public class WInstanceWriter implements InstanceWriter {
             argsLst = argsLst.with(argNode);
         }
         model.add(iri, WOTTR.arguments, argsLst);
-    }
-
-    @Override
-    public FormatName getFormat() {
-        return FormatName.wottr;
     }
 }
