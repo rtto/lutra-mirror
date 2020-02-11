@@ -30,22 +30,12 @@ import xyz.ottr.lutra.OTTR;
  */
 
 import xyz.ottr.lutra.bottr.BottrFormat;
-import xyz.ottr.lutra.bottr.io.BInstanceReader;
 import xyz.ottr.lutra.io.Format;
 import xyz.ottr.lutra.io.FormatManager;
-import xyz.ottr.lutra.io.InstanceReader;
-import xyz.ottr.lutra.io.TemplateReader;
 import xyz.ottr.lutra.stottr.StottrFormat;
-import xyz.ottr.lutra.stottr.io.SFileReader;
-import xyz.ottr.lutra.stottr.parser.SInstanceParser;
-import xyz.ottr.lutra.stottr.parser.STemplateParser;
 import xyz.ottr.lutra.tabottr.TabottrFormat;
-import xyz.ottr.lutra.tabottr.parser.ExcelReader;
 import xyz.ottr.lutra.wottr.LegacyFormat;
 import xyz.ottr.lutra.wottr.WottrFormat;
-import xyz.ottr.lutra.wottr.io.RDFFileReader;
-import xyz.ottr.lutra.wottr.parser.v04.WInstanceParser;
-import xyz.ottr.lutra.wottr.parser.v04.WTemplateParser;
 
 public class FormatUtils {
     

@@ -22,12 +22,11 @@ package xyz.ottr.lutra.stottr.writer;
  * #L%
  */
 
-import java.util.HashMap;
+import java.util.HashMap; 
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import xyz.ottr.lutra.io.FormatName;
 import xyz.ottr.lutra.io.TemplateWriter;
 import xyz.ottr.lutra.model.ParameterList;
 import xyz.ottr.lutra.model.Template;

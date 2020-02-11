@@ -41,8 +41,6 @@ import picocli.CommandLine;
 import picocli.CommandLine.ParameterException;
 
 import xyz.ottr.lutra.OTTR;
-import xyz.ottr.lutra.io.Format;
-import xyz.ottr.lutra.io.FormatManager;
 import xyz.ottr.lutra.io.InstanceReader;
 import xyz.ottr.lutra.io.InstanceWriter;
 import xyz.ottr.lutra.io.TemplateReader;
@@ -305,7 +303,7 @@ public class CLI {
         if (this.settings.inputs.isEmpty()) {
             return Result.error("No input file provided.");
         }
-        return FormatUtils.getFormat(this.settings.inputFormat).getInstanceReader();
+        return this.formatUtils.getFormat(this.settings.inputFormat).getInstanceReader();
     }
 
     private Result<Function<Instance, ResultStream<Instance>>> makeExpander(TemplateStore store) {
