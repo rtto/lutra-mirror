@@ -57,35 +57,74 @@ public class TemplateManager {
     private final Settings settings;
     private final PrefixMapping prefixes;
     private final FormatManager formatManager;
+    private final TemplateStore store;
 
-    public TemplateManager(FormatManager formatManager, Settings settings) {
+    private TemplateManager(FormatManager formatManager, TemplateStore store) {
+        this.store = store;
         this.formatManager = formatManager;
-        this.settings = settings;
+        this.settings = new Settings();
         this.prefixes = PrefixMapping.Factory.create().setNsPrefixes(OTTR.getDefaultPrefixes());
         Trace.setDeepTrace(this.settings.deepTrace);
+    }
+    
+    public TemplateManager(FormatManager formatManager) {
+        this(formatManager, makeDefaultStore(formatManager));
+    }
+    
+    public TemplateManager(TemplateStore store) {
+        this(store.getFormatManager(), store);
+    }
+    
+    public void setDeepTrace(boolean enable) {
+        this.settings.deepTrace = enable;
+        Trace.setDeepTrace(this.settings.deepTrace);
+    }
+    
+    public void setFetchMissingDependencies(boolean enable) {
+        this.settings.fetchMissingDependencies = enable;
+    }
+
+    public void setHaltOn(int lvl) {
+        this.settings.haltOn = lvl;
+    }
+
+    public void setExtensions(String[] ext) {
+        this.settings.extensions = ext;
+    }
+
+    public void setIgnoreExtensions(String[] ignore) {
+        this.settings.ignoreExtensions = ignore;
     }
     
     public void registerFormat(Format format) {
         this.formatManager.register(format);
     }
 
-    public TemplateStore makeDefaultStore() {
-        TemplateStore store = new DependencyGraph(this.formatManager);
+    public static TemplateStore makeDefaultStore(FormatManager formatManager) {
+        TemplateStore store = new DependencyGraph(formatManager);
         store.addOTTRBaseTemplates();
         return store;
     }
-
-    /**
-     * Populated store with parsed templates, and returns messages with potensial errors
-     */
-    public MessageHandler parseLibraryInto(TemplateStore store, String... library) {
-        return parseLibraryInto(store, null, library);
+    
+    public PrefixMapping getPrefixes() {
+        return this.prefixes;
+    }
+    
+    public void addPrefifxes(PrefixMapping other) {
+        this.prefixes.setNsPrefixes(other);
     }
 
     /**
      * Populated store with parsed templates, and returns messages with potensial errors
      */
-    public MessageHandler parseLibraryInto(TemplateStore store, Format format, String... library) {
+    public MessageHandler parseLibraryInto(String... library) {
+        return parseLibraryInto(null, library);
+    }
+
+    /**
+     * Populated store with parsed templates, and returns messages with potensial errors
+     */
+    public MessageHandler parseLibraryInto(Format format, String... library) {
         
         MessageHandler messages = new MessageHandler();
 
@@ -95,9 +134,9 @@ public class TemplateManager {
 
             Function<TemplateReader, MessageHandler> readerFunction =
                 Files.isDirectory(Paths.get(library[i]))
-                    ? reader -> reader.loadTemplatesFromFolder(store, lib,
+                    ? reader -> reader.loadTemplatesFromFolder(this.store, lib,
                     this.settings.extensions, this.settings.ignoreExtensions)
-                    : reader -> reader.loadTemplatesFromFile(store, lib);
+                    : reader -> reader.loadTemplatesFromFile(this.store, lib);
 
             Result<TemplateReader> reader;
             // check if libraryFormat is set or not
@@ -105,14 +144,14 @@ public class TemplateManager {
                 reader = format.getTemplateReader();
                 reader.map(readerFunction).map(messages::combine);
             } else {
-                reader = store.getFormatManager().attemptAllFormats(readerFunction);
+                reader = this.store.getFormatManager().attemptAllFormats(readerFunction);
             }
             messages.add(reader);
             reader.ifPresent(r -> this.prefixes.setNsPrefixes(r.getPrefixes()));
         }
 
         if (this.settings.fetchMissingDependencies) {
-            MessageHandler msgs = store.fetchMissingDependencies();
+            MessageHandler msgs = this.store.fetchMissingDependencies();
             messages.combine(msgs);
         }
         
@@ -127,26 +166,26 @@ public class TemplateManager {
         return reader.mapToStream(fileStream::innerFlatMap);
     }
     
-    public Function<Instance, ResultStream<Instance>> makeExpander(TemplateStore store) {
+    public Function<Instance, ResultStream<Instance>> makeExpander() {
         if (this.settings.fetchMissingDependencies) {
-            return store::expandInstanceFetch;
+            return this.store::expandInstanceFetch;
         } else {
-            return store::expandInstance;
+            return this.store::expandInstance;
         }
     }
-
+    
     public MessageHandler writeInstances(ResultStream<Instance> instances, Format format, String out) {
 
         Result<InstanceWriter> writerRes = format.getInstanceWriter();
-
-        return writeObjects(instances, writerRes, (writer, msgs) -> writeInstancesTo(writer.write(), out).ifPresent(msgs::add));
+        return writeObjects(instances, writerRes, (writer, msgs) ->
+            writeInstancesTo(writer.write(), out).ifPresent(msgs::add));
     }
 
-    public MessageHandler writeTemplates(TemplateStore store, Format format, String folder) { 
+    public MessageHandler writeTemplates(Format format, String folder) { 
 
         Result<TemplateWriter> writerRes = format.getTemplateWriter();
 
-        return writeObjects(store.getAllTemplateObjects(), writerRes, (writer, msgs) -> {
+        return writeObjects(this.store.getAllTemplateObjects(), writerRes, (writer, msgs) -> {
             for (String iri : writer.getIRIs()) {
                 writeTemplate(iri, format.getDefaultFileSuffix(), writer.write(iri), folder).ifPresent(msgs::add);
             }

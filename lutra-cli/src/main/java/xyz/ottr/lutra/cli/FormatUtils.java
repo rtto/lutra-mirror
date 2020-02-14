@@ -1,12 +1,5 @@
 package xyz.ottr.lutra.cli;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import org.apache.jena.shared.PrefixMapping;
-
-import xyz.ottr.lutra.OTTR;
-
 /*-
  * #%L
  * lutra-cli
@@ -29,6 +22,12 @@ import xyz.ottr.lutra.OTTR;
  * #L%
  */
 
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.apache.jena.shared.PrefixMapping;
+
 import xyz.ottr.lutra.bottr.BottrFormat;
 import xyz.ottr.lutra.io.Format;
 import xyz.ottr.lutra.io.FormatManager;
@@ -40,14 +39,9 @@ import xyz.ottr.lutra.wottr.WottrFormat;
 public class FormatUtils {
     
     private final Map<Settings.FormatName, Format> formats;
-    private final FormatManager formatManager;
-    private final PrefixMapping prefixes;
     
     public FormatUtils() {
         this.formats = new HashMap<>();
-        this.formatManager = new FormatManager();
-        this.prefixes = PrefixMapping.Factory.create();
-        this.prefixes.setNsPrefixes(OTTR.getDefaultPrefixes());
         registerFormats();
     }
     
@@ -55,20 +49,15 @@ public class FormatUtils {
         return this.formats.get(formatName);
     }
     
-    public FormatManager getFormatManager() {
-        return this.formatManager;
+    public Collection<Format> getFormats() {
+        return this.formats.values();
     }
     
-    public void addPrefixes(PrefixMapping newPrefixes) {
-        this.prefixes.setNsPrefixes(newPrefixes);
-    }
-
     private void registerFormats() {
-        
-        this.formatManager.register(new WottrFormat(this.prefixes));
-        this.formatManager.register(new LegacyFormat());
-        this.formatManager.register(new StottrFormat(this.prefixes.getNsPrefixMap()));
-        this.formatManager.register(new TabottrFormat());
-        this.formatManager.register(new BottrFormat());
+        this.formats.put(Settings.FormatName.wottr, new WottrFormat(this.formatManager.getPrefixes()));
+        this.formats.put(Settings.FormatName.legacy, new LegacyFormat());
+        this.formats.put(Settings.FormatName.stottr, new StottrFormat(this.formatManager.getPrefixes()));
+        this.formats.put(Settings.FormatName.tabottr, new TabottrFormat());
+        this.formats.put(Settings.FormatName.bottr, new BottrFormat());
     }
 }

@@ -41,6 +41,8 @@ import picocli.CommandLine;
 import picocli.CommandLine.ParameterException;
 
 import xyz.ottr.lutra.OTTR;
+import xyz.ottr.lutra.TemplateManager;
+import xyz.ottr.lutra.io.FormatManager;
 import xyz.ottr.lutra.io.InstanceReader;
 import xyz.ottr.lutra.io.InstanceWriter;
 import xyz.ottr.lutra.io.TemplateReader;
@@ -68,6 +70,7 @@ public class CLI {
     private final PrintStream errStream;
     private final MessageHandler messageHandler;
     private final FormatUtils formatUtils;
+    private final TemplateManager templateManager;
 
     public CLI(PrintStream outStream, PrintStream errStream) {
         this.settings = new Settings();
@@ -75,6 +78,13 @@ public class CLI {
         this.errStream = errStream;
         this.messageHandler = new MessageHandler(errStream);
         this.formatUtils = new FormatUtils();
+        
+        this.templateManager = new TemplateManager(new FormatManager(this.formatUtils.getFormats()));
+        this.templateManager.setDeepTrace(this.settings.deepTrace);
+        this.templateManager.haltOn(this.settings.haltOn);
+        this.templateManager.fetchMissingDependencies(this.settings.fetchMissingDependencies);
+        this.templateManager.setExtensions(this.settings.extensions);
+        this.templateManager.setIgnoreExtensions(this.settings.ignoreExtensions);
     }
 
     public CLI() {
@@ -97,7 +107,6 @@ public class CLI {
         }
 
         this.messageHandler.setQuiet(this.settings.quiet);
-        Trace.setDeepTrace(this.settings.deepTrace);
 
         if (cli.isUsageHelpRequested()) {
             cli.usage(this.outStream);
@@ -140,82 +149,39 @@ public class CLI {
 
     private void execute() {
 
-        TemplateStore store = new DependencyGraph(this.formatUtils.getFormatManager());
-        Result<PrefixMapping> prefixes = parseLibraryInto(store);
-        prefixes.ifPresent(this.formatUtils::addPrefixes);
+        if (this.settings.library == null || this.settings.library.length == 0) {
+            Format libraryFormat = this.formatUtils.getFormat(this.settings.libraryFormat);
+            this.templateManager.parseLibraryInto(libraryFormat, this.settings.library);
+        }
 
         if (StringUtils.isNotBlank(this.settings.prefixes)) {
             Result<Model> userPrefixes = new RDFFileReader().parse(this.settings.prefixes);
-            prefixes.addResult(userPrefixes, (a, b) -> a.withDefaultMappings(b));
+            this.messageHandler.use(userPrefixes, up -> this.templateManager.addPrefifxes(up));
         }
 
-        this.messageHandler.use(prefixes, p -> executeMode(store, p));
+        executeMode();
     }
 
-    /**
-     * Populated store with parsed templates, and returns true if error occurred, and false otherwise.
-     */
-    private Result<PrefixMapping> parseLibraryInto(TemplateStore store) {
-        
-        store.addOTTRBaseTemplates();
+    private void executeExpand() {
 
-        Result<PrefixMapping> prefixes = Result.of(OTTR.getDefaultPrefixes());
+        Format outFormat = this.formatUtils.getFormat(this.settings.outputFormat);
+        ResultStream<Instance> ins = parseAndExpandInstances();
 
-        if (this.settings.library == null || this.settings.library.length == 0) {
-            return prefixes;
+        if (shouldPrintOutput()) {
+            // TODO: Print to stdout
         }
 
-        for (int i = 0; i < this.settings.library.length; i++) {
-            // check if library is folder or file, and get readerFunction accordingly:
-            String lib = this.settings.library[i];
+        MessageHandler msgs = this.templateManager.writeInstances(ins, outFormat);
 
-            Function<TemplateReader, MessageHandler> readerFunction =
-                Files.isDirectory(Paths.get(this.settings.library[i]))
-                    ? reader -> reader.loadTemplatesFromFolder(store, lib,
-                    this.settings.extensions, this.settings.ignoreExtensions)
-                    : reader -> reader.loadTemplatesFromFile(store, lib);
-
-            Result<TemplateReader> reader;
-            // check if libraryFormat is set or not
-            if (this.settings.libraryFormat != null) {
-                reader = this.formatUtils.getFormat(this.settings.libraryFormat).getTemplateReader();
-                reader.map(readerFunction)
-                    .map(mgs -> mgs.toSingleMessage("Attempt of parsing templates as "
-                            + this.settings.libraryFormat + " format failed:"))
-                    .ifPresent(mgs -> mgs.ifPresent(reader::addMessage));
-                prefixes.addResult(reader, (m, r) -> m.setNsPrefixes(r.getPrefixes()));
-            } else {
-                reader = store.getFormatManager().attemptAllFormats(readerFunction);
-            }
-            prefixes.addResult(reader, (m, r) -> m.setNsPrefixes(r.getPrefixes()));
+        if (!this.settings.quiet) {
+            this.msgs.printMessages();
         }
+    }
 
-        if (this.settings.fetchMissingDependencies) {
-            MessageHandler msgs = store.fetchMissingDependencies();
-            prefixes.addMessages(msgs.getMessages());
-        }
-        
-        return prefixes;
-    } 
-    
-    private void executeExpand(TemplateStore store, PrefixMapping usedPrefixes) {
-
-        this.messageHandler.use(makeInstanceReader(),
-            reader -> {
-
-                this.messageHandler.use(makeExpander(store),
-                    expander -> {
-
-                        this.messageHandler.use(makeInstanceWriter(usedPrefixes),
-                            writer -> {
-                                
-                                expandAndWriteInstanes(reader, writer, expander);
-                            }
-                        );
-                    }
-                );
-            }
-        );
+    public ResultStream<Instance> parseAndExpandInstances() {
+        Format inFormat = this.formatUtils.getFormat(this.settings.inputFormat);
+        return this.templateManager.parseInstances(inFormat, this.settings.inputs)
+                .innerFlatMap(this.templateManager.makeExpander());
     }
 
     private void executeExpandLibrary(TemplateStore store, PrefixMapping usedPrefixes) {
