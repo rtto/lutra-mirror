@@ -49,6 +49,7 @@ import xyz.ottr.lutra.model.Template;
 import xyz.ottr.lutra.model.TemplateSignature;
 import xyz.ottr.lutra.model.Term;
 import xyz.ottr.lutra.result.Message;
+import xyz.ottr.lutra.result.MessageHandler;
 import xyz.ottr.lutra.result.Result;
 import xyz.ottr.lutra.result.ResultStream;
 import xyz.ottr.lutra.store.query.Check;
@@ -638,22 +639,25 @@ public class DependencyGraph implements TemplateStore {
         return expandOnly(vocabularyExpansionPredicate(iris));
     }
 
-    private List<Message> checkTemplatesFor(List<Check> checks) {
+    private MessageHandler checkTemplatesFor(List<Check> checks) {
 
         QueryEngine<DependencyGraph> engine = new DependencyGraphEngine(this);
-        return checks
+        List<Message> msgLst = checks
             .stream()
             .flatMap(c -> c.check(engine))
             .collect(Collectors.toList());
+        MessageHandler msgs = new MessageHandler();
+        msgLst.forEach(msgs::add);
+        return msgs;
     }
 
     @Override
-    public List<Message> checkTemplates() {
+    public MessageHandler checkTemplates() {
         return checkTemplatesFor(CheckFactory.allChecks);
     }
 
     @Override
-    public List<Message> checkTemplatesForErrorsOnly() {
+    public MessageHandler checkTemplatesForErrorsOnly() {
         return checkTemplatesFor(CheckFactory.failsOnErrorChecks);
     }
 

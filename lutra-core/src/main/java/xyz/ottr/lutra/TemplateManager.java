@@ -28,6 +28,7 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
@@ -58,13 +59,18 @@ public class TemplateManager {
     private final PrefixMapping prefixes;
     private final FormatManager formatManager;
     private final TemplateStore store;
-
-    private TemplateManager(FormatManager formatManager, TemplateStore store) {
+    
+    private TemplateManager(Settings settings, PrefixMapping prefixes, FormatManager formatManager, TemplateStore store) {
         this.store = store;
         this.formatManager = formatManager;
-        this.settings = new Settings();
-        this.prefixes = PrefixMapping.Factory.create().setNsPrefixes(OTTR.getDefaultPrefixes());
+        this.settings = settings;
+        this.prefixes = prefixes;
         Trace.setDeepTrace(this.settings.deepTrace);
+    }
+
+    private TemplateManager(FormatManager formatManager, TemplateStore store) {
+        this(new Settings(), PrefixMapping.Factory.create().setNsPrefixes(OTTR.getDefaultPrefixes()),
+            formatManager, store);
     }
     
     public TemplateManager(FormatManager formatManager) {
@@ -122,18 +128,24 @@ public class TemplateManager {
     }
 
     /**
-     * Populated store with parsed templates, and returns messages with potensial errors
+     * Populated store with parsed templates, and returns messages with potential errors
      */
     public MessageHandler parseLibraryInto(Format format, String... library) {
+        return parseLibraryInto(format, Arrays.asList(library));
+    }
+
+    /**
+     * Populated store with parsed templates, and returns messages with potential errors
+     */
+    public MessageHandler parseLibraryInto(Format format, Collection<String> library) {
         
         MessageHandler messages = new MessageHandler();
 
-        for (int i = 0; i < library.length; i++) {
+        for (String lib : library) {
             // check if library is folder or file, and get readerFunction accordingly:
-            String lib = library[i];
 
             Function<TemplateReader, MessageHandler> readerFunction =
-                Files.isDirectory(Paths.get(library[i]))
+                Files.isDirectory(Paths.get(lib))
                     ? reader -> reader.loadTemplatesFromFolder(this.store, lib,
                     this.settings.extensions, this.settings.ignoreExtensions)
                     : reader -> reader.loadTemplatesFromFile(this.store, lib);
@@ -159,9 +171,13 @@ public class TemplateManager {
     } 
 
     public ResultStream<Instance> parseInstances(Format format, String... files) {
+        return parseInstances(format, Arrays.asList(files));
+    }
+
+    public ResultStream<Instance> parseInstances(Format format, Collection<String> files) {
 
         Result<InstanceReader> reader = format.getInstanceReader();
-        ResultStream<String> fileStream = ResultStream.innerOf(Arrays.asList(files));
+        ResultStream<String> fileStream = ResultStream.innerOf(files);
 
         return reader.mapToStream(fileStream::innerFlatMap);
     }
@@ -172,6 +188,16 @@ public class TemplateManager {
         } else {
             return this.store::expandInstance;
         }
+    }
+    
+    public Result<TemplateManager> expandStore() {
+        return this.store.expandAll().map(expanded ->
+            new TemplateManager(this.settings, this.prefixes, this.formatManager, expanded)
+        );
+    }
+    
+    public MessageHandler checkTemplates() {
+        return this.store.checkTemplates();
     }
     
     public MessageHandler writeInstances(ResultStream<Instance> instances, Format format, String out) {

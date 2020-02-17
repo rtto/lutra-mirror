@@ -22,7 +22,7 @@ package xyz.ottr.lutra.store;
  * #L%
  */
 
-import java.util.Collection;
+import java.util.Collection; 
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -35,7 +35,6 @@ import xyz.ottr.lutra.io.TemplateReader;
 import xyz.ottr.lutra.model.Instance;
 import xyz.ottr.lutra.model.Template;
 import xyz.ottr.lutra.model.TemplateSignature;
-import xyz.ottr.lutra.result.Message;
 import xyz.ottr.lutra.result.MessageHandler;
 import xyz.ottr.lutra.result.Result;
 import xyz.ottr.lutra.result.ResultConsumer;
@@ -152,7 +151,7 @@ public interface TemplateStore extends Consumer<TemplateSignature> {
      * - Use of lists and expansion modifiers
      * - Missing template 
      */
-    List<Message> checkTemplates();
+    MessageHandler checkTemplates();
 
     /**
      * Performs the same checks as #checkTemplates(), except "Missing templates".
@@ -160,7 +159,7 @@ public interface TemplateStore extends Consumer<TemplateSignature> {
      * (without having its dependencies loaded in the store) or to check templates
      * in an unfinished library where not all templates are (yet) defined.
      */
-    List<Message> checkTemplatesForErrorsOnly();
+    MessageHandler checkTemplatesForErrorsOnly();
 
     /**
      * Expands all nodes without losing information, that is, it does not expand
