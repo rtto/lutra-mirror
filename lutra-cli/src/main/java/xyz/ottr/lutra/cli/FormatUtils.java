@@ -30,7 +30,6 @@ import org.apache.jena.shared.PrefixMapping;
 
 import xyz.ottr.lutra.bottr.BottrFormat;
 import xyz.ottr.lutra.io.Format;
-import xyz.ottr.lutra.io.FormatManager;
 import xyz.ottr.lutra.stottr.StottrFormat;
 import xyz.ottr.lutra.tabottr.TabottrFormat;
 import xyz.ottr.lutra.wottr.LegacyFormat;
@@ -40,9 +39,9 @@ public class FormatUtils {
     
     private final Map<Settings.FormatName, Format> formats;
     
-    public FormatUtils() {
+    public FormatUtils(PrefixMapping prefixes) {
         this.formats = new HashMap<>();
-        registerFormats();
+        registerFormats(prefixes);
     }
     
     public Format getFormat(Settings.FormatName formatName) {
@@ -53,10 +52,10 @@ public class FormatUtils {
         return this.formats.values();
     }
     
-    private void registerFormats() {
-        this.formats.put(Settings.FormatName.wottr, new WottrFormat(this.formatManager.getPrefixes()));
+    private void registerFormats(PrefixMapping prefixes) {
+        this.formats.put(Settings.FormatName.wottr, new WottrFormat(prefixes));
         this.formats.put(Settings.FormatName.legacy, new LegacyFormat());
-        this.formats.put(Settings.FormatName.stottr, new StottrFormat(this.formatManager.getPrefixes()));
+        this.formats.put(Settings.FormatName.stottr, new StottrFormat(prefixes.getNsPrefixMap()));
         this.formats.put(Settings.FormatName.tabottr, new TabottrFormat());
         this.formats.put(Settings.FormatName.bottr, new BottrFormat());
     }

@@ -110,8 +110,8 @@ public class PottrTest {
     }
 
     private TemplateStore getStore() {
-        FormatUtils fm = new FormatUtils();
-        TemplateStore store = new DependencyGraph(fm.getFormatManager());
+        FormatManager fm = new FormatManager();
+        TemplateStore store = new DependencyGraph(fm);
         store.addOTTRBaseTemplates();
         return store;
     }
@@ -121,13 +121,7 @@ public class PottrTest {
         reader.loadTemplatesFromFolder(store, resolve(path), new String[]{}, new String[]{});
         store.fetchMissingDependencies();
 
-        List<Message> tplMsg = store.checkTemplates();
-
-        int maxError = tplMsg.stream()
-            .mapToInt(Message::getLevel)
-            .min()
-            .orElse(Message.INFO);
-
+        int maxError = store.checkTemplates().getMostSevere();
         return !Message.moreSevere(maxError, Message.ERROR);
     }
 
