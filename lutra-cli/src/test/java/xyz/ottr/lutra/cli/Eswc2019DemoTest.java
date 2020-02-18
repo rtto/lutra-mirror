@@ -27,7 +27,7 @@ import org.junit.Test;
 public class Eswc2019DemoTest {
 
     private static final String ROOT = "src/test/resources/eswc2019/";
-    
+
     @Test
     public void expandNamedPizzaInstances() {
         CLIRunner.run("-I tabottr -f --stdout " + ROOT + "instances/NamedPizza-instances.xlsx");

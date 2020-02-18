@@ -54,7 +54,7 @@ public class CLI {
         this.outStream = outStream;
         //this.errStream = errStream;
         this.messageHandler = new MessageHandler(errStream);
-        
+
         // TODO: Fix this (almost) cyclical dependency between
         //       FormatManager, TemplateManager and FormatUtils (prefixes)
         FormatManager fm = new FormatManager();
@@ -131,7 +131,7 @@ public class CLI {
 
     private void execute() {
 
-        if (this.settings.library == null || this.settings.library.length == 0) {
+        if (this.settings.library != null && this.settings.library.length != 0) {
             Format libraryFormat = this.formatUtils.getFormat(this.settings.libraryFormat);
             this.templateManager.parseLibraryInto(libraryFormat, this.settings.library);
         }
@@ -159,7 +159,7 @@ public class CLI {
             msgs.printMessages();
         }
     }
-    
+
     public ResultStream<Instance> parseInstances() {
         Format inFormat = this.formatUtils.getFormat(this.settings.inputFormat);
         return this.templateManager.parseInstances(inFormat, this.settings.inputs);
@@ -170,7 +170,7 @@ public class CLI {
     }
 
     private void executeExpandLibrary() {
-        
+
         this.messageHandler.use(this.templateManager.expandStore(),
             expanded -> {
 
@@ -186,19 +186,19 @@ public class CLI {
     }
 
     private void executeFormatLibrary() {
-        
+
         Format outFormat = this.formatUtils.getFormat(this.settings.outputFormat);
         this.templateManager.writeTemplates(outFormat, this.settings.out);
     }
 
     private void executeFormat() {
-        
+
         Format outFormat = this.formatUtils.getFormat(this.settings.outputFormat);
         this.templateManager.writeInstances(parseInstances(), outFormat, this.settings.out);
     }
 
     private void executeMode() {
-        
+
         MessageHandler msgs = this.templateManager.checkTemplates();
         int severity = this.settings.quiet ? msgs.getMostSevere() : msgs.printMessages();
 
@@ -228,7 +228,7 @@ public class CLI {
             default:
                 Message err = Message.error("The mode " + this.settings.mode + " is not yet supported.");
                 this.messageHandler.printMessage(err);
-        } 
+        }
     }
 
     private boolean shouldPrintOutput() {

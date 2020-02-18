@@ -36,22 +36,22 @@ import xyz.ottr.lutra.wottr.LegacyFormat;
 import xyz.ottr.lutra.wottr.WottrFormat;
 
 public class FormatUtils {
-    
+
     private final Map<Settings.FormatName, Format> formats;
-    
+
     public FormatUtils(PrefixMapping prefixes) {
         this.formats = new HashMap<>();
         registerFormats(prefixes);
     }
-    
+
     public Format getFormat(Settings.FormatName formatName) {
         return this.formats.get(formatName);
     }
-    
+
     public Collection<Format> getFormats() {
         return this.formats.values();
     }
-    
+
     private void registerFormats(PrefixMapping prefixes) {
         this.formats.put(Settings.FormatName.wottr, new WottrFormat(prefixes));
         this.formats.put(Settings.FormatName.legacy, new LegacyFormat());
