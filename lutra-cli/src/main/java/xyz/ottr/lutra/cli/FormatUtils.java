@@ -26,9 +26,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.jena.shared.PrefixMapping;
-
-import xyz.ottr.lutra.OTTR;
+import xyz.ottr.lutra.TemplateManager;
 import xyz.ottr.lutra.bottr.BottrFormat;
 import xyz.ottr.lutra.io.Format;
 import xyz.ottr.lutra.stottr.StottrFormat;
@@ -36,17 +34,14 @@ import xyz.ottr.lutra.tabottr.TabottrFormat;
 import xyz.ottr.lutra.wottr.LegacyFormat;
 import xyz.ottr.lutra.wottr.WottrFormat;
 
-public class FormatUtils {
+public class FormatUtils extends TemplateManager {
 
     private final Map<Settings.FormatName, Format> formats;
 
-    public FormatUtils(PrefixMapping prefixes) {
-        this.formats = new HashMap<>();
-        registerFormats(prefixes);
-    }
-
     public FormatUtils() {
-        this(PrefixMapping.Factory.create().setNsPrefixes(OTTR.getDefaultPrefixes()));
+        super();
+        this.formats = new HashMap<>();
+        registerFormats();
     }
 
     public Format getFormat(Settings.FormatName formatName) {
@@ -57,11 +52,16 @@ public class FormatUtils {
         return this.formats.values();
     }
 
-    private void registerFormats(PrefixMapping prefixes) {
-        this.formats.put(Settings.FormatName.wottr, new WottrFormat(prefixes));
-        this.formats.put(Settings.FormatName.legacy, new LegacyFormat());
-        this.formats.put(Settings.FormatName.stottr, new StottrFormat(prefixes.getNsPrefixMap()));
-        this.formats.put(Settings.FormatName.tabottr, new TabottrFormat());
-        this.formats.put(Settings.FormatName.bottr, new BottrFormat());
+    private void registerFormat(Settings.FormatName name, Format format) {
+        this.formats.put(name, format);
+        registerFormat(format);
+    }
+
+    private void registerFormats() {
+        registerFormat(Settings.FormatName.wottr, new WottrFormat(getPrefixes()));
+        registerFormat(Settings.FormatName.legacy, new LegacyFormat());
+        registerFormat(Settings.FormatName.stottr, new StottrFormat(getPrefixes().getNsPrefixMap()));
+        registerFormat(Settings.FormatName.tabottr, new TabottrFormat());
+        registerFormat(Settings.FormatName.bottr, new BottrFormat());
     }
 }

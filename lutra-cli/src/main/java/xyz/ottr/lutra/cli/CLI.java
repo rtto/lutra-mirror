@@ -30,9 +30,7 @@ import org.apache.jena.rdf.model.Model;
 import picocli.CommandLine;
 import picocli.CommandLine.ParameterException;
 
-import xyz.ottr.lutra.TemplateManager;
 import xyz.ottr.lutra.io.Format;
-import xyz.ottr.lutra.io.FormatManager;
 import xyz.ottr.lutra.model.Instance;
 import xyz.ottr.lutra.result.Message;
 import xyz.ottr.lutra.result.MessageHandler;
@@ -46,31 +44,27 @@ public class CLI {
     private final PrintStream outStream;
     //private final PrintStream errStream;
     private final MessageHandler messageHandler;
-    private final FormatUtils formatUtils;
-    private final TemplateManager templateManager;
+    private final FormatUtils templateManager;
 
     public CLI(PrintStream outStream, PrintStream errStream) {
         this.settings = new Settings();
         this.outStream = outStream;
         //this.errStream = errStream;
         this.messageHandler = new MessageHandler(errStream);
+        this.templateManager = new FormatUtils();
+        setTemplateManagersSettings();
+    }
 
-        // TODO: Fix this (almost) cyclical dependency between
-        //       FormatManager, TemplateManager and FormatUtils (prefixes)
-        FormatManager fm = new FormatManager();
-        this.templateManager = new TemplateManager(fm);
+    public CLI() {
+        this(System.out, System.err);
+    }
+
+    private void setTemplateManagersSettings() {
         this.templateManager.setDeepTrace(this.settings.deepTrace);
         this.templateManager.setHaltOn(this.settings.haltOn);
         this.templateManager.setFetchMissingDependencies(this.settings.fetchMissingDependencies);
         this.templateManager.setExtensions(this.settings.extensions);
         this.templateManager.setIgnoreExtensions(this.settings.ignoreExtensions);
-
-        this.formatUtils = new FormatUtils(this.templateManager.getPrefixes());
-        fm.register(this.formatUtils.getFormats());
-    }
-
-    public CLI() {
-        this(System.out, System.err);
     }
 
     public static void main(String[] args) {
@@ -132,7 +126,7 @@ public class CLI {
     private void execute() {
 
         if (this.settings.library != null && this.settings.library.length != 0) {
-            Format libraryFormat = this.formatUtils.getFormat(this.settings.libraryFormat);
+            Format libraryFormat = this.templateManager.getFormat(this.settings.libraryFormat);
             this.templateManager.parseLibraryInto(libraryFormat, this.settings.library);
         }
 
@@ -147,7 +141,7 @@ public class CLI {
     private void executeExpand() {
 
         ResultStream<Instance> ins = parseAndExpandInstances();
-        Format outFormat = this.formatUtils.getFormat(this.settings.outputFormat);
+        Format outFormat = this.templateManager.getFormat(this.settings.outputFormat);
 
         if (shouldPrintOutput()) {
             // TODO: Print to stdout
@@ -162,7 +156,7 @@ public class CLI {
     }
 
     public ResultStream<Instance> parseInstances() {
-        Format inFormat = this.formatUtils.getFormat(this.settings.inputFormat);
+        Format inFormat = this.templateManager.getFormat(this.settings.inputFormat);
         return this.templateManager.parseInstances(inFormat, this.settings.inputs);
     }
 
@@ -175,7 +169,7 @@ public class CLI {
         this.messageHandler.use(this.templateManager.expandStore(),
             expanded -> {
 
-                Format outFormat = this.formatUtils.getFormat(this.settings.outputFormat);
+                Format outFormat = this.templateManager.getFormat(this.settings.outputFormat);
 
                 if (shouldPrintOutput()) {
                     // TODO: Print to stdout
@@ -188,13 +182,13 @@ public class CLI {
 
     private void executeFormatLibrary() {
 
-        Format outFormat = this.formatUtils.getFormat(this.settings.outputFormat);
+        Format outFormat = this.templateManager.getFormat(this.settings.outputFormat);
         this.templateManager.writeTemplates(outFormat, this.settings.out);
     }
 
     private void executeFormat() {
 
-        Format outFormat = this.formatUtils.getFormat(this.settings.outputFormat);
+        Format outFormat = this.templateManager.getFormat(this.settings.outputFormat);
         this.templateManager.writeInstances(parseInstances(), outFormat, this.settings.out);
     }
 

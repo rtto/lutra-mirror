@@ -73,12 +73,16 @@ public class TemplateManager {
             formatManager, store);
     }
     
+    public TemplateManager(TemplateStore store) {
+        this(store.getFormatManager(), store);
+    }
+    
     public TemplateManager(FormatManager formatManager) {
         this(formatManager, makeDefaultStore(formatManager));
     }
     
-    public TemplateManager(TemplateStore store) {
-        this(store.getFormatManager(), store);
+    public TemplateManager() {
+        this(new FormatManager());
     }
     
     public void setDeepTrace(boolean enable) {
