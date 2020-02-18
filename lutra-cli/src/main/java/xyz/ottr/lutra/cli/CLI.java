@@ -44,14 +44,14 @@ public class CLI {
     private final PrintStream outStream;
     //private final PrintStream errStream;
     private final MessageHandler messageHandler;
-    private final FormatUtils templateManager;
+    private final TemplateManagerWithFormats templateManager;
 
     public CLI(PrintStream outStream, PrintStream errStream) {
         this.settings = new Settings();
         this.outStream = outStream;
         //this.errStream = errStream;
         this.messageHandler = new MessageHandler(errStream);
-        this.templateManager = new FormatUtils();
+        this.templateManager = new TemplateManagerWithFormats();
         setTemplateManagersSettings();
     }
 

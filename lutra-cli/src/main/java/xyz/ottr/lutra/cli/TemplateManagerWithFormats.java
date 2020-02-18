@@ -34,11 +34,11 @@ import xyz.ottr.lutra.tabottr.TabottrFormat;
 import xyz.ottr.lutra.wottr.LegacyFormat;
 import xyz.ottr.lutra.wottr.WottrFormat;
 
-public class FormatUtils extends TemplateManager {
+public class TemplateManagerWithFormats extends TemplateManager {
 
     private final Map<Settings.FormatName, Format> formats;
 
-    public FormatUtils() {
+    public TemplateManagerWithFormats() {
         super();
         this.formats = new HashMap<>();
         registerFormats();

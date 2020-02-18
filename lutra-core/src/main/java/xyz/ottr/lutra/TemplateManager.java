@@ -115,6 +115,10 @@ public class TemplateManager {
         store.addOTTRBaseTemplates();
         return store;
     }
+
+    public TemplateStore getTemplateStore() {
+        return this.store;
+    }
     
     public PrefixMapping getPrefixes() {
         return this.prefixes;

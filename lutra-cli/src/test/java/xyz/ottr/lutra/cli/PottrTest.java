@@ -34,7 +34,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
-import xyz.ottr.lutra.io.FormatManager;
 import xyz.ottr.lutra.io.InstanceReader;
 import xyz.ottr.lutra.io.TemplateReader;
 import xyz.ottr.lutra.model.Instance;
@@ -110,14 +109,8 @@ public class PottrTest {
     }
 
     private TemplateStore getStore() {
-
-        FormatUtils formatUtils = new FormatUtils();
-        FormatManager fm = new FormatManager();
-        fm.register(formatUtils.getFormats());
-
-        TemplateStore store = new DependencyGraph(fm);
-        store.addOTTRBaseTemplates();
-        return store;
+        TemplateManagerWithFormats tmwf = new TemplateManagerWithFormats();
+        return tmwf.getTemplateStore();
     }
 
     private boolean testTemplates(TemplateStore store, String path) {
