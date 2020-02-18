@@ -22,14 +22,10 @@ package xyz.ottr.lutra;
  * #L%
  */
 
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -212,7 +208,7 @@ public class TemplateManager {
 
         Result<InstanceWriter> writerRes = format.getInstanceWriter();
         return writeObjects(instances, writerRes, (writer, msgs) ->
-            writeInstancesTo(writer.write(), out).ifPresent(msgs::add));
+            Utils.writeInstancesTo(writer.write(), out).ifPresent(msgs::add));
     }
 
     public MessageHandler writeTemplates(Format format, String folder) { 
@@ -221,7 +217,7 @@ public class TemplateManager {
 
         return writeObjects(this.store.getAllTemplateObjects(), writerRes, (writer, msgs) -> {
             for (String iri : writer.getIRIs()) {
-                writeTemplate(iri, format.getDefaultFileSuffix(), writer.write(iri), folder).ifPresent(msgs::add);
+                Utils.writeTemplate(iri, format.getDefaultFileSuffix(), writer.write(iri), folder).ifPresent(msgs::add);
             }
         });
     }
@@ -242,35 +238,6 @@ public class TemplateManager {
             }
         });
         return msgs;
-    }
-    //////
-    // !!! Move all methods below to own class (e.g. Files.java) !!!
-    //////
-    
-    private Optional<Message> writeInstancesTo(String output, String filePath) {
-
-        try {
-            Files.write(Paths.get(filePath), output.getBytes(Charset.forName("UTF-8")));
-        } catch (IOException ex) {
-            Message err = Message.error("Error writing output: " + ex.getMessage());
-            return Optional.of(err);
-        }
-        return Optional.empty();
-    }
-
-    private Optional<Message> writeTemplate(String iri, String suffix, String output, String folder) {
-
-        try {
-            // TODO: cli-arg to decide extension
-            String iriPath = Utils.iriToPath(iri);
-            Files.createDirectories(Paths.get(folder, Utils.iriToDirectory(iriPath)));
-            Files.write(Paths.get(folder, iriPath + suffix), output.getBytes(Charset.forName("UTF-8")));
-        } catch (IOException | URISyntaxException ex) {
-            Message err = Message.error(
-                "Error when writing output -- " + ex.getMessage());
-            return Optional.of(err);
-        }
-        return Optional.empty();
     }
 
     static class Settings {
