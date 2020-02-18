@@ -28,6 +28,7 @@ import java.util.Map;
 
 import org.apache.jena.shared.PrefixMapping;
 
+import xyz.ottr.lutra.OTTR;
 import xyz.ottr.lutra.bottr.BottrFormat;
 import xyz.ottr.lutra.io.Format;
 import xyz.ottr.lutra.stottr.StottrFormat;
@@ -42,6 +43,10 @@ public class FormatUtils {
     public FormatUtils(PrefixMapping prefixes) {
         this.formats = new HashMap<>();
         registerFormats(prefixes);
+    }
+
+    public FormatUtils() {
+        this(PrefixMapping.Factory.create().setNsPrefixes(OTTR.getDefaultPrefixes()));
     }
 
     public Format getFormat(Settings.FormatName formatName) {

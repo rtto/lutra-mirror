@@ -110,7 +110,11 @@ public class PottrTest {
     }
 
     private TemplateStore getStore() {
+
+        FormatUtils formatUtils = new FormatUtils();
         FormatManager fm = new FormatManager();
+        fm.register(formatUtils.getFormats());
+
         TemplateStore store = new DependencyGraph(fm);
         store.addOTTRBaseTemplates();
         return store;

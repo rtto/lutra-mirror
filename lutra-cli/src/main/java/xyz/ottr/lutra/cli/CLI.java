@@ -153,10 +153,11 @@ public class CLI {
             // TODO: Print to stdout
             this.outStream.println();
         }
-        MessageHandler msgs = this.templateManager.writeInstances(ins, outFormat, this.settings.out);
-
-        if (!this.settings.quiet) {
-            msgs.printMessages();
+        if (this.settings.out != null) {
+            MessageHandler msgs = this.templateManager.writeInstances(ins, outFormat, this.settings.out);
+            if (!this.settings.quiet) {
+                msgs.printMessages();
+            }
         }
     }
 
