@@ -26,7 +26,9 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Optional;
 import java.util.function.BiConsumer;
+import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -38,7 +40,6 @@ import xyz.ottr.lutra.io.InstanceReader;
 import xyz.ottr.lutra.io.InstanceWriter;
 import xyz.ottr.lutra.io.TemplateReader;
 import xyz.ottr.lutra.io.TemplateWriter;
-import xyz.ottr.lutra.io.Utils;
 import xyz.ottr.lutra.model.Instance;
 import xyz.ottr.lutra.result.Message;
 import xyz.ottr.lutra.result.MessageHandler;
@@ -204,20 +205,22 @@ public class TemplateManager {
         return this.store.checkTemplates();
     }
     
-    public MessageHandler writeInstances(ResultStream<Instance> instances, Format format, String out) {
+    public MessageHandler writeInstances(ResultStream<Instance> instances, Format format,
+                                         Function<String, Optional<Message>> stringConsumer) {
 
         Result<InstanceWriter> writerRes = format.getInstanceWriter();
         return writeObjects(instances, writerRes, (writer, msgs) ->
-            Utils.writeInstancesTo(writer.write(), out).ifPresent(msgs::add));
+            stringConsumer.apply(writer.write()).ifPresent(msgs::add));
     }
 
-    public MessageHandler writeTemplates(Format format, String folder) { 
+    public MessageHandler writeTemplates(Format format,
+                                         BiFunction<String, String, Optional<Message>> stringConsumer) {
 
         Result<TemplateWriter> writerRes = format.getTemplateWriter();
 
         return writeObjects(this.store.getAllTemplateObjects(), writerRes, (writer, msgs) -> {
             for (String iri : writer.getIRIs()) {
-                Utils.writeTemplate(iri, format.getDefaultFileSuffix(), writer.write(iri), folder).ifPresent(msgs::add);
+                stringConsumer.apply(iri, writer.write(iri)).ifPresent(msgs::add);
             }
         });
     }

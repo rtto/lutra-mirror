@@ -23,6 +23,9 @@ package xyz.ottr.lutra.cli;
  */
 
 import java.io.PrintStream;
+import java.util.Optional;
+import java.util.function.BiFunction;
+import java.util.function.Function;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.jena.rdf.model.Model;
@@ -30,7 +33,9 @@ import org.apache.jena.rdf.model.Model;
 import picocli.CommandLine;
 import picocli.CommandLine.ParameterException;
 
+import xyz.ottr.lutra.TemplateManager;
 import xyz.ottr.lutra.io.Format;
+import xyz.ottr.lutra.io.Utils;
 import xyz.ottr.lutra.model.Instance;
 import xyz.ottr.lutra.result.Message;
 import xyz.ottr.lutra.result.MessageHandler;
@@ -125,34 +130,51 @@ public class CLI {
 
     private void execute() {
 
-        if (this.settings.library != null && this.settings.library.length != 0) {
-            Format libraryFormat = this.templateManager.getFormat(this.settings.libraryFormat);
-            this.templateManager.parseLibraryInto(libraryFormat, this.settings.library);
+        if (Message.moreSevere(parseLibrary(), this.settings.haltOn)) {
+            return;
         }
-
-        if (StringUtils.isNotBlank(this.settings.prefixes)) {
-            Result<Model> userPrefixes = new RDFFileReader().parse(this.settings.prefixes);
-            this.messageHandler.use(userPrefixes, up -> this.templateManager.addPrefifxes(up));
+        if (Message.moreSevere(parsePrefixes(), this.settings.haltOn)) {
+            return;
         }
-
+        if (Message.moreSevere(checkLibrary(), this.settings.haltOn)) {
+            return;
+        }
         executeMode();
     }
 
+    private int checkLibrary() {
+        MessageHandler msgs = this.templateManager.checkTemplates();
+        int severity = this.settings.quiet ? msgs.getMostSevere() : msgs.printMessages();
+
+        if (this.settings.mode == Settings.Mode.lint
+            && !this.settings.quiet
+            && Message.moreSevere(Message.WARNING, severity)) {
+
+            // Print message if linting and no errors found
+            this.outStream.println("No errors found.");
+        }
+        return severity;
+    }
+
+    private int parseLibrary() {
+        if (this.settings.library != null && this.settings.library.length != 0) {
+            Format libraryFormat = this.templateManager.getFormat(this.settings.libraryFormat);
+            return this.templateManager.parseLibraryInto(libraryFormat, this.settings.library)
+                .printMessages();
+        }
+        return Message.INFO; // Least severe
+    }
+
+    private int parsePrefixes() {
+        if (StringUtils.isNotBlank(this.settings.prefixes)) {
+            Result<Model> userPrefixes = new RDFFileReader().parse(this.settings.prefixes);
+            return this.messageHandler.use(userPrefixes, up -> this.templateManager.addPrefifxes(up));
+        }
+        return Message.INFO; // Least severe
+    }
+
     private void executeExpand() {
-
-        ResultStream<Instance> ins = parseAndExpandInstances();
-        Format outFormat = this.templateManager.getFormat(this.settings.outputFormat);
-
-        if (shouldPrintOutput()) {
-            // TODO: Print to stdout
-            this.outStream.println();
-        }
-        if (this.settings.out != null) {
-            MessageHandler msgs = this.templateManager.writeInstances(ins, outFormat, this.settings.out);
-            if (!this.settings.quiet) {
-                msgs.printMessages();
-            }
-        }
+        writeInstances(parseAndExpandInstances());
     }
 
     public ResultStream<Instance> parseInstances() {
@@ -164,42 +186,56 @@ public class CLI {
         return parseInstances().innerFlatMap(this.templateManager.makeExpander());
     }
 
+    private void executeFormat() {
+        writeInstances(parseInstances());
+    }
+
+    private void writeInstances(ResultStream<Instance> ins) {
+
+        Format outFormat = this.templateManager.getFormat(this.settings.outputFormat);
+        this.templateManager
+            .writeInstances(ins, outFormat, makeInstanceWriter(outFormat.getDefaultFileSuffix()))
+            .printMessages();
+    }
+
     private void executeExpandLibrary() {
-
-        this.messageHandler.use(this.templateManager.expandStore(),
-            expanded -> {
-
-                Format outFormat = this.templateManager.getFormat(this.settings.outputFormat);
-
-                if (shouldPrintOutput()) {
-                    // TODO: Print to stdout
-                    this.outStream.println();
-                }
-                expanded.writeTemplates(outFormat, this.settings.out);
-            }
-        );
+        this.messageHandler.use(this.templateManager.expandStore(), this::writeTemplates);
     }
 
     private void executeFormatLibrary() {
-
-        Format outFormat = this.templateManager.getFormat(this.settings.outputFormat);
-        this.templateManager.writeTemplates(outFormat, this.settings.out);
+        writeTemplates(this.templateManager);
     }
 
-    private void executeFormat() {
-
+    private void writeTemplates(TemplateManager templateManager) {
         Format outFormat = this.templateManager.getFormat(this.settings.outputFormat);
-        this.templateManager.writeInstances(parseInstances(), outFormat, this.settings.out);
+        templateManager.writeTemplates(outFormat, makeTemplateWriter(outFormat.getDefaultFileSuffix()));
+    }
+
+    private Function<String, Optional<Message>> makeInstanceWriter(String suffix) {
+        return str -> {
+            if (shouldPrintOutput()) {
+                this.outStream.println(str);
+            }
+            if (this.settings.out != null) {
+                return Utils.writeInstancesTo(str, suffix, this.settings.out);
+            }
+            return Optional.empty();
+        };
+    }
+
+    private BiFunction<String, String, Optional<Message>> makeTemplateWriter(String suffix) {
+        return (iri, str) -> {
+            if (shouldPrintOutput()) {
+                this.outStream.println(str);
+            }
+            if (this.settings.out != null) {
+                return Utils.writeTemplatesTo(iri, str, suffix, this.settings.out);
+            }
+            return Optional.empty();
+        };
     }
 
     private void executeMode() {
-
-        MessageHandler msgs = this.templateManager.checkTemplates();
-        int severity = this.settings.quiet ? msgs.getMostSevere() : msgs.printMessages();
-
-        if (Message.moreSevere(severity, this.settings.haltOn)) {
-            return;
-        }
 
         switch (this.settings.mode) {
             case expand:
@@ -215,10 +251,6 @@ public class CLI {
                 executeFormat();
                 break;
             case lint:
-                // Simply load templates and check for messages, as done before the switch
-                if (!this.settings.quiet && Message.moreSevere(Message.WARNING, severity)) {
-                    this.outStream.println("No errors found.");
-                }
                 break;
             default:
                 Message err = Message.error("The mode " + this.settings.mode + " is not yet supported.");

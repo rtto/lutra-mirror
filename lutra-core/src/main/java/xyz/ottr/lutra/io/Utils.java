@@ -54,10 +54,10 @@ public enum Utils {
     private static final Function<String, IOFileFilter> extFilter = string -> FileFilterUtils.suffixFileFilter(string,
             IOCase.INSENSITIVE);
 
-    public static Optional<Message> writeInstancesTo(String output, String filePath) {
+    public static Optional<Message> writeInstancesTo(String output, String suffix, String filePath) {
 
         try {
-            Files.write(Paths.get(filePath), output.getBytes(Charset.forName("UTF-8")));
+            Files.write(Paths.get(filePath + suffix), output.getBytes(Charset.forName("UTF-8")));
         } catch (IOException ex) {
             Message err = Message.error("Error writing output: " + ex.getMessage());
             return Optional.of(err);
@@ -65,7 +65,7 @@ public enum Utils {
         return Optional.empty();
     }
 
-    public static Optional<Message> writeTemplate(String iri, String suffix, String output, String folder) {
+    public static Optional<Message> writeTemplatesTo(String iri, String output, String suffix, String folder) {
 
         try {
             // TODO: cli-arg to decide extension

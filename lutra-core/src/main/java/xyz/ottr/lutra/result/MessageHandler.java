@@ -92,11 +92,11 @@ public class MessageHandler {
      * @param consumer
      *     Consumer which will consume value in element if present
      */
-    public <T> void use(Result<T> element, Consumer<T> consumer) {
+    public <T> int use(Result<T> element, Consumer<T> consumer) {
         // TODO: This only depends on this.output and it not so natural,  perhaps move
         ResultConsumer<T> resConsumer = new ResultConsumer<>(consumer, this.printStream);
         resConsumer.accept(element);
-        resConsumer.getMessageHandler().printMessages();
+        return resConsumer.getMessageHandler().printMessages();
     }
 
     /**
