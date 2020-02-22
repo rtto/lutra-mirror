@@ -40,7 +40,7 @@ import xyz.ottr.lutra.model.ListExpander;
 import xyz.ottr.lutra.model.Parameter;
 import xyz.ottr.lutra.model.Substitution;
 import xyz.ottr.lutra.model.Template;
-import xyz.ottr.lutra.model.TermWrapper;
+import xyz.ottr.lutra.model.HasGetTerm;
 import xyz.ottr.lutra.model.terms.ListTerm;
 import xyz.ottr.lutra.model.terms.Term;
 import xyz.ottr.lutra.model.types.ComplexType;
@@ -103,7 +103,7 @@ public class DependencyGraphEngine extends QueryEngine<DependencyGraph> {
 
         // TODO: Make index(t, ps, i, v) be false for none in place of v
 
-        List<TermWrapper> terms = tuple.getAs(List.class, params);
+        List<HasGetTerm> terms = tuple.getAs(List.class, params);
 
         if (tuple.hasBound(index)) {
             Integer boundIndex = tuple.getAs(Integer.class, index);
@@ -123,7 +123,7 @@ public class DependencyGraphEngine extends QueryEngine<DependencyGraph> {
         // bind i, but only at v terms, if v is bound
         Term boundVal = tuple.hasBound(val) ? tuple.getAs(Term.class, val) : null;
         Stream.Builder<Tuple> tuples = Stream.builder();
-        List<Term> paramList = terms.stream().map(TermWrapper::getTerm).collect(Collectors.toList());
+        List<Term> paramList = terms.stream().map(HasGetTerm::getTerm).collect(Collectors.toList());
         for (int boundIndex = 0; boundIndex < paramList.size(); boundIndex++) {
             if (paramList.get(boundIndex) != null
                     && (boundVal == null || paramList.get(boundIndex).equals(boundVal))) {

@@ -55,7 +55,7 @@ public class DependencyGraphTest {
 
     private void expandAndCheckEquality(Set<Template> toExpand, Set<Template> shouldEqual) {
         
-        Signature base = Signature.builder()
+        Signature base = Signature.superbuilder()
             .iri("base")
             .parameter(Parameter.builder().term(var("x")).build())
             .parameter(Parameter.builder().term(var("y")).build())
@@ -86,7 +86,7 @@ public class DependencyGraphTest {
     public void simpleExpansion() {
 
         Set<Template> toExpand = Set.of(
-            Template.superbuilder()
+            Template.builder()
                 .iri("t1")
                 .parameter(Parameter.builder().term(var("a")).build())
                 .parameter(Parameter.builder().term(var("b")).build())
@@ -101,46 +101,46 @@ public class DependencyGraphTest {
                     .argument(Argument.builder().term(var("b")).build())
                     .build())
                 .build(),
-            Template.superbuilder()
+            Template.builder()
                 .iri("t2")
-                .parameters(Parameter.of(var("v"), var("u")))
+                .parameters(Parameter.listOf(var("v"), var("u")))
                 .instance(Instance.builder()
                     .iri("base")
-                    .arguments(Argument.of(var("v"), cons(3)))
+                    .arguments(Argument.listOf(var("v"), cons(3)))
                     .build())
                 .instance(Instance.builder()
                     .iri("t1")
-                    .arguments(Argument.of(cons(4), var("u")))
+                    .arguments(Argument.listOf(cons(4), var("u")))
                     .build())
                 .build());
 
         Set<Template> shouldEqual = Set.of(
-            Template.superbuilder()
+            Template.builder()
                 .iri("t1")
-                .parameters(Parameter.of(var("a"), var("b")))
+                .parameters(Parameter.listOf(var("a"), var("b")))
                 .instance(Instance.builder()
                     .iri("base")
-                    .arguments(Argument.of(var("a"), cons(1)))
+                    .arguments(Argument.listOf(var("a"), cons(1)))
                     .build())
                 .instance(Instance.builder()
                     .iri("base")
-                    .arguments(Argument.of(cons(2), var("b")))
+                    .arguments(Argument.listOf(cons(2), var("b")))
                     .build())
                 .build(),
-            Template.superbuilder()
+            Template.builder()
                 .iri("t2")
-                .parameters(Parameter.of(var("v"), var("u")))
+                .parameters(Parameter.listOf(var("v"), var("u")))
                 .instance(Instance.builder()
                     .iri("base")
-                    .arguments(Argument.of(var("v"), cons(3)))
+                    .arguments(Argument.listOf(var("v"), cons(3)))
                     .build())
                 .instance(Instance.builder()
                     .iri("base")
-                    .arguments(Argument.of(var("4"), cons(1)))
+                    .arguments(Argument.listOf(var("4"), cons(1)))
                     .build())
                 .instance(Instance.builder()
                     .iri("base")
-                    .arguments(Argument.of(cons(2), var("u")))
+                    .arguments(Argument.listOf(cons(2), var("u")))
                     .build())
                 .build());
 
@@ -153,23 +153,23 @@ public class DependencyGraphTest {
         DependencyGraph graph = new DependencyGraph(null);
 
         graph.addTemplate(
-            Template.superbuilder()
+            Template.builder()
                 .iri("t1")
-                .parameters(Parameter.of(var("a"), var("b")))
+                .parameters(Parameter.listOf(var("a"), var("b")))
                 .instance(Instance.builder()
                     .iri("t2")
-                    .arguments(Argument.of(var("a"), cons(1)))
+                    .arguments(Argument.listOf(var("a"), cons(1)))
                     .build())
                 .instance(Instance.builder()
                     .iri("base")
-                    .arguments(Argument.of(cons(2), var("b")))
+                    .arguments(Argument.listOf(cons(2), var("b")))
                     .build())
                 .build());
 
         graph.addTemplateSignature(
-            BaseTemplate.superbuilder()
+            BaseTemplate.builder()
                 .iri("base")
-                .parameters(Parameter.of(var("x"), var("y")))
+                .parameters(Parameter.listOf(var("x"), var("y")))
                 .build()
         );
 
@@ -183,29 +183,29 @@ public class DependencyGraphTest {
     public void optionalSafe() {
 
         Set<Template> toExpand = Set.of(
-            Template.superbuilder()
+            Template.builder()
                 .iri("t1")
-                .parameters(Parameter.of(var("a"), var("b")))
+                .parameters(Parameter.listOf(var("a"), var("b")))
                 .instance(Instance.builder()
                     .iri("base")
-                    .arguments(Argument.of(var("a"), cons(1)))
+                    .arguments(Argument.listOf(var("a"), cons(1)))
                     .build())
                 .instance(Instance.builder()
                     .iri("base")
-                    .arguments(Argument.of(cons(2), var("b")))
+                    .arguments(Argument.listOf(cons(2), var("b")))
                     .build())
                 .build(),
-            Template.superbuilder()
+            Template.builder()
                 .iri("t2")
                 .parameter(Parameter.builder().term(var("v")).build())
                 .parameter(Parameter.builder().term(var("u")).optional(true).build())
                 .instance(Instance.builder()
                     .iri("base")
-                    .arguments(Argument.of(var("v"), cons(3)))
+                    .arguments(Argument.listOf(var("v"), cons(3)))
                     .build())
                 .instance(Instance.builder()
                     .iri("t1")
-                    .arguments(Argument.of(cons(4), var("u")))
+                    .arguments(Argument.listOf(cons(4), var("u")))
                     .build())
                 .build());
 
@@ -218,21 +218,21 @@ public class DependencyGraphTest {
         ListTerm toListExpand = new ListTerm(List.of(var("v1"), var("v2")), true);
 
         Set<Template> toExpand = Set.of(
-            Template.superbuilder()
+            Template.builder()
                 .iri("t1")
-                .parameters(Parameter.of(var("a"), var("b")))
+                .parameters(Parameter.listOf(var("a"), var("b")))
                 .instance(Instance.builder()
                     .iri("base")
-                    .arguments(Argument.of(var("a"), cons(1)))
+                    .arguments(Argument.listOf(var("a"), cons(1)))
                     .build())
                 .instance(Instance.builder()
                     .iri("base")
-                    .arguments(Argument.of(cons(2), var("b")))
+                    .arguments(Argument.listOf(cons(2), var("b")))
                     .build())
                 .build(),
-            Template.superbuilder()
+            Template.builder()
                 .iri("t2")
-                .parameters(Parameter.of(toListExpand, var("u")))
+                .parameters(Parameter.listOf(toListExpand, var("u")))
                 .instance(Instance.builder()
                     .iri("t1")
                     .listExpander(ListExpander.cross)
@@ -241,7 +241,7 @@ public class DependencyGraphTest {
                     .build())
                 .instance(Instance.builder()
                     .iri("base")
-                    .arguments(Argument.of(cons(4), var("u")))
+                    .arguments(Argument.listOf(cons(4), var("u")))
                     .build())
                 .build());
 
@@ -250,9 +250,9 @@ public class DependencyGraphTest {
 
     private void expandInstanceAndCheckEquality(Instance ins, Set<Instance> shouldEqual, Set<Template> templates) {
         
-        BaseTemplate base = BaseTemplate.superbuilder()
+        BaseTemplate base = BaseTemplate.builder()
             .iri("base")
-            .parameters(Parameter.of(var("x"), var("y")))
+            .parameters(Parameter.listOf(var("x"), var("y")))
             .build();
 
         DependencyGraph graph = new DependencyGraph(null);
@@ -290,45 +290,45 @@ public class DependencyGraphTest {
     public void simpleInstanceExpansion() {
 
         Set<Template> templates = Set.of(
-            Template.superbuilder()
+            Template.builder()
                 .iri("t1")
-                .parameters(Parameter.of(var("a"), var("b")))
+                .parameters(Parameter.listOf(var("a"), var("b")))
                 .instance(Instance.builder()
                     .iri("base")
-                    .arguments(Argument.of(var("a"), cons(1)))
+                    .arguments(Argument.listOf(var("a"), cons(1)))
                     .build())
                 .instance(Instance.builder()
                     .iri("base")
-                    .arguments(Argument.of(cons(2), var("b")))
+                    .arguments(Argument.listOf(cons(2), var("b")))
                     .build())
                 .build(),
-            Template.superbuilder()
+            Template.builder()
                 .iri("t2")
-                .parameters(Parameter.of(var("v"), var("u")))
+                .parameters(Parameter.listOf(var("v"), var("u")))
                 .instance(Instance.builder()
                     .iri("base")
-                    .arguments(Argument.of(var("v"), cons(3)))
+                    .arguments(Argument.listOf(var("v"), cons(3)))
                     .build())
                 .instance(Instance.builder()
                     .iri("t1")
-                    .arguments(Argument.of(cons(4), var("u")))
+                    .arguments(Argument.listOf(cons(4), var("u")))
                     .build())
                 .build());
         
-        Instance ins = Instance.builder().iri("t2").arguments(Argument.of(cons(1), cons(2))).build();
+        Instance ins = Instance.builder().iri("t2").arguments(Argument.listOf(cons(1), cons(2))).build();
 
         Set<Instance> expandedIns = Set.of(
             Instance.builder()
                 .iri("base")
-                .arguments(Argument.of(cons(1), cons(3)))
+                .arguments(Argument.listOf(cons(1), cons(3)))
                 .build(),
             Instance.builder()
                 .iri("base")
-                .arguments(Argument.of(cons(4), cons(1)))
+                .arguments(Argument.listOf(cons(4), cons(1)))
                 .build(),
             Instance.builder()
                 .iri("base")
-                .arguments(Argument.of(cons(2), cons(2)))
+                .arguments(Argument.listOf(cons(2), cons(2)))
                 .build());
 
         expandInstanceAndCheckEquality(ins, expandedIns, templates);
@@ -339,17 +339,17 @@ public class DependencyGraphTest {
 
         DependencyGraph graph = new DependencyGraph(null);
         graph.addTemplateSignature(
-            BaseTemplate.superbuilder()
+            BaseTemplate.builder()
                 .iri("base")
-                .parameters(Parameter.of(var("x"), var("y")))
+                .parameters(Parameter.listOf(var("x"), var("y")))
                 .build()
         );
 
         ObjectTerm toListExpand = var("a");
         graph.addTemplate(
-            Template.superbuilder()
+            Template.builder()
                 .iri("withCross")
-                .parameters(Parameter.of(var("a"), var("b")))
+                .parameters(Parameter.listOf(var("a"), var("b")))
                 .instance(Instance.builder()
                     .iri("base")
                     .listExpander(ListExpander.cross)
@@ -358,20 +358,20 @@ public class DependencyGraphTest {
                     .build())
                 .instance(Instance.builder()
                     .iri("base")
-                    .arguments(Argument.of(cons(2), var("b")))
+                    .arguments(Argument.listOf(cons(2), var("b")))
                     .build())
                 .build());
 
         graph.addTemplateSignature(
-            Signature.builder()
+            Signature.superbuilder()
                 .iri("signature")
-                .parameters(Parameter.of(var("v"), var("u")))
+                .parameters(Parameter.listOf(var("v"), var("u")))
                 .build());
         
         List<Instance> inss = List.of(
-            Instance.builder().iri("withCross").arguments(Argument.of(new BlankNodeTerm(), cons(2))).build(),
-            Instance.builder().iri("signature").arguments(Argument.of(cons(1), cons(2))).build(),
-            Instance.builder().iri("undefined").arguments(Argument.of(cons(1), cons(2))).build()
+            Instance.builder().iri("withCross").arguments(Argument.listOf(new BlankNodeTerm(), cons(2))).build(),
+            Instance.builder().iri("signature").arguments(Argument.listOf(cons(1), cons(2))).build(),
+            Instance.builder().iri("undefined").arguments(Argument.listOf(cons(1), cons(2))).build()
         );
 
         for (Instance ins : inss) {
@@ -385,43 +385,43 @@ public class DependencyGraphTest {
     public void optionalInstanceExpansion() {
 
         Set<Template> templates = Set.of(
-            Template.superbuilder()
+            Template.builder()
                 .iri("t1")
                 .parameter(Parameter.builder().term(var("a")).build())
                 .parameter(Parameter.builder().term(var("b")).optional(true).build())
                 .instance(Instance.builder()
                     .iri("base")
-                    .arguments(Argument.of(var("a"), cons(1)))
+                    .arguments(Argument.listOf(var("a"), cons(1)))
                     .build())
                 .instance(Instance.builder()
                     .iri("base")
-                    .arguments(Argument.of(cons(2), var("b")))
+                    .arguments(Argument.listOf(cons(2), var("b")))
                     .build())
                 .build(),
-            Template.superbuilder()
+            Template.builder()
                 .iri("t2")
                 .parameter(Parameter.builder().term(var("v")).build())
                 .parameter(Parameter.builder().term(var("u")).optional(true).build())
                 .instance(Instance.builder()
                     .iri("base")
-                    .arguments(Argument.of(var("v"), cons(3)))
+                    .arguments(Argument.listOf(var("v"), cons(3)))
                     .build())
                 .instance(Instance.builder()
                     .iri("t1")
-                    .arguments(Argument.of(cons(4), var("u")))
+                    .arguments(Argument.listOf(cons(4), var("u")))
                     .build())
                 .build());
 
-        Instance ins = Instance.builder().iri("t2").arguments(Argument.of(cons(1), new NoneTerm())).build();
+        Instance ins = Instance.builder().iri("t2").arguments(Argument.listOf(cons(1), new NoneTerm())).build();
 
         Set<Instance> expandedIns = Set.of(
             Instance.builder()
                 .iri("base")
-                .arguments(Argument.of(cons(1), cons(3)))
+                .arguments(Argument.listOf(cons(1), cons(3)))
                 .build(),
             Instance.builder()
                 .iri("base")
-                .arguments(Argument.of(cons(4), cons(1)))
+                .arguments(Argument.listOf(cons(4), cons(1)))
                 .build());
 
         expandInstanceAndCheckEquality(ins, expandedIns, templates);

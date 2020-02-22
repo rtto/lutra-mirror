@@ -35,7 +35,7 @@ import java.util.stream.Stream;
 import org.apache.commons.collections4.iterators.PermutationIterator;
 import org.apache.commons.math3.util.CombinatoricsUtils;
 import xyz.ottr.lutra.model.Substitution;
-import xyz.ottr.lutra.model.TermSubstitutable;
+import xyz.ottr.lutra.model.HasApplySubstitution;
 import xyz.ottr.lutra.model.types.TermType;
 
 public abstract class QueryEngine<S extends TemplateStore> {
@@ -757,8 +757,8 @@ public abstract class QueryEngine<S extends TemplateStore> {
         Object boundElem = tuple.get(elem);
         Object boundUnified;
 
-        if (boundElem instanceof TermSubstitutable) {
-            boundUnified = ((TermSubstitutable)boundElem).apply(boundSubs);
+        if (boundElem instanceof HasApplySubstitution) {
+            boundUnified = ((HasApplySubstitution)boundElem).apply(boundSubs);
         } else {
             throw new VariableNotBoundException("Variable " + elem
                     + " not bound to type a unifier can be applied to.");

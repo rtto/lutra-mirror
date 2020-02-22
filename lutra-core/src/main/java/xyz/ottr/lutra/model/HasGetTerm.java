@@ -24,7 +24,8 @@ package xyz.ottr.lutra.model;
 
 import xyz.ottr.lutra.model.terms.Term;
 
-public interface TermWrapper {
+@FunctionalInterface
+public interface HasGetTerm {
 
     Term getTerm();
 }

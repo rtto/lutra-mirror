@@ -22,10 +22,6 @@ package xyz.ottr.lutra.io;
  * #L%
  */
 
-//import java.util.Iterator;
-//import java.util.LinkedList;
-//import java.util.Queue;
-
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Set;

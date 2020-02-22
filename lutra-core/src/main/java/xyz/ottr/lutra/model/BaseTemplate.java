@@ -25,12 +25,13 @@ package xyz.ottr.lutra.model;
 import java.util.List;
 
 import lombok.Builder;
+import lombok.NonNull;
 import lombok.Singular;
 
 public class BaseTemplate extends Signature {
 
-    @Builder(builderMethodName = "superbuilder")
-    public BaseTemplate(String iri, @Singular List<Parameter> parameters) {
+    @Builder
+    private BaseTemplate(@NonNull String iri, @Singular List<Parameter> parameters) {
         super(iri, parameters);
     }
 

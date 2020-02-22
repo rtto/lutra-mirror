@@ -22,7 +22,8 @@ package xyz.ottr.lutra.model;
  * #L%
  */
 
-public interface TermSubstitutable<E> {
+@FunctionalInterface
+public interface HasApplySubstitution<E> {
 
     E apply(Substitution substitution);
 

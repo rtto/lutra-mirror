@@ -474,7 +474,7 @@ public class DependencyGraph implements TemplateStore {
             }
         });
         return resTemplate.map(template ->
-            Template.superbuilder()
+            Template.builder()
                 .iri(template.getIri())
                 .parameters(template.getParameters())
                 .instances(instances)
@@ -484,15 +484,17 @@ public class DependencyGraph implements TemplateStore {
     @Override
     public Result<Signature> getTemplateSignature(String iri) {
 
+        // TODO is this correct: the method is called getSignature, but returns a BaseTemplate in some cases.
+
         Result<TemplateNode> resTemplate = checkIsTemplate(iri);
 
         return resTemplate.map(template ->
             template.isBase()
-                ? BaseTemplate.superbuilder()
+                ? BaseTemplate.builder()
                     .iri(template.getIri())
                     .parameters(template.getParameters())
                     .build()
-                : Signature.builder()
+                : Signature.superbuilder()
                     .iri(template.getIri())
                     .parameters(template.getParameters())
                     .build());

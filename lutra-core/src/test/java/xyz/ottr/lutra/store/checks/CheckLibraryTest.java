@@ -59,17 +59,17 @@ public class CheckLibraryTest {
         
         DependencyGraph store = new DependencyGraph(null);
         store.addTemplateSignature(
-            Signature.builder()
+            Signature.superbuilder()
                 .iri("base2")
-                .parameters(Parameter.of(
+                .parameters(Parameter.listOf(
                     ObjectTerm.var("x"),
                     ObjectTerm.var("y")))
                 .build());
 
         store.addTemplateSignature(
-            Signature.builder()
+            Signature.superbuilder()
                 .iri("base3")
-                .parameters(Parameter.of(
+                .parameters(Parameter.listOf(
                     ObjectTerm.var("x"),
                     ObjectTerm.var("y"),
                     ObjectTerm.var("z")))
@@ -100,14 +100,14 @@ public class CheckLibraryTest {
 
         DependencyGraph store = initStore();
         store.addTemplate(
-            Template.superbuilder()
+            Template.builder()
                 .iri("test")
-                .parameters(Parameter.of(
+                .parameters(Parameter.listOf(
                     ObjectTerm.var("a"),
                     ObjectTerm.var("b")))
                 .instance(Instance.builder()
                     .iri("base2")
-                    .arguments(Argument.of(
+                    .arguments(Argument.listOf(
                             ObjectTerm.var("a"),
                             ObjectTerm.cons(1)))
                     .build())
@@ -123,12 +123,12 @@ public class CheckLibraryTest {
 
         DependencyGraph store = initStore();
         store.addTemplate(
-            Template.superbuilder().iri("test")
-                .parameters(Parameter.of(
+            Template.builder().iri("test")
+                .parameters(Parameter.listOf(
                     ObjectTerm.var("a"),
                     ObjectTerm.var("b")))
                 .instance(Instance.builder().iri("base2")
-                        .arguments(Argument.of(
+                        .arguments(Argument.listOf(
                             new ListTerm(ObjectTerm.var("a")),
                                 new ListTerm(ObjectTerm.cons(1),
                                     new ListTerm(ObjectTerm.var("b")))))
@@ -145,14 +145,14 @@ public class CheckLibraryTest {
 
         DependencyGraph store = initStore();
         store.addTemplate(
-            Template.superbuilder()
+            Template.builder()
                 .iri("test")
-                .parameters(Parameter.of(
+                .parameters(Parameter.listOf(
                     ObjectTerm.var("a"),
                     ObjectTerm.var("a")))
                 .instance(Instance.builder()
                     .iri("base2")
-                    .arguments(Argument.of(
+                    .arguments(Argument.listOf(
                         ObjectTerm.var("a"),
                         ObjectTerm.cons(1)))
                     .build())
@@ -168,13 +168,13 @@ public class CheckLibraryTest {
 
         DependencyGraph store = initStore();
         store.addTemplate(
-            Template.superbuilder().iri("test")
-                .parameters(Parameter.of(
+            Template.builder().iri("test")
+                .parameters(Parameter.listOf(
                     ObjectTerm.var("a"),
                     ObjectTerm.var("b")))
                 .instance(Instance.builder()
                     .iri("base3")
-                    .arguments(Argument.of(
+                    .arguments(Argument.listOf(
                         ObjectTerm.var("a"),
                         ObjectTerm.var("b")))
                     .build())
@@ -190,21 +190,21 @@ public class CheckLibraryTest {
 
         DependencyGraph store = new DependencyGraph(null);
         store.addTemplateSignature(
-            Template.superbuilder()
+            Template.builder()
                 .iri("base")
                 .parameter(Parameter.builder().term(ObjectTerm.var("x")).nonBlank(true).build())
                 .parameter(Parameter.builder().term(ObjectTerm.var("y")).build())
                 .build());
 
         store.addTemplate(
-            Template.superbuilder()
+            Template.builder()
                 .iri("test")
-                .parameters(Parameter.of(
+                .parameters(Parameter.listOf(
                     ObjectTerm.var("a"),
                     ObjectTerm.var("b")))
                 .instance(Instance.builder()
                     .iri("base")
-                    .arguments(Argument.of(
+                    .arguments(Argument.listOf(
                         ObjectTerm.var("a"),
                         ObjectTerm.var("b")))
                     .build())
@@ -221,47 +221,47 @@ public class CheckLibraryTest {
         DependencyGraph store = initStore();
 
         store.addTemplate(
-            Template.superbuilder()
+            Template.builder()
                 .iri("test1")
-                .parameters(Parameter.of(
+                .parameters(Parameter.listOf(
                     ObjectTerm.var("a"),
                     ObjectTerm.var("b")))
                 .instance(Instance.builder()
                     .iri("base2")
-                    .arguments(Argument.of(
+                    .arguments(Argument.listOf(
                         ObjectTerm.var("a"),
                         ObjectTerm.var("b")))
                     .build())
                 .instance(Instance.builder()
                     .iri("test3")
-                    .arguments(Argument.of(
+                    .arguments(Argument.listOf(
                         ObjectTerm.var("b"),
                         ObjectTerm.var("a")))
                     .build())
                 .build());
 
         store.addTemplate(
-            Template.superbuilder().iri("test2")
-                .parameters(Parameter.of(
+            Template.builder().iri("test2")
+                .parameters(Parameter.listOf(
                     ObjectTerm.var("a"),
                     ObjectTerm.var("b")))
                 .instance(Instance.builder()
                     .iri("test1")
-                    .arguments(Argument.of(
+                    .arguments(Argument.listOf(
                         ObjectTerm.var("a"),
                         ObjectTerm.var("b")))
                     .build())
                 .build());
 
         store.addTemplate(
-            Template.superbuilder()
+            Template.builder()
                 .iri("test3")
-                .parameters(Parameter.of(
+                .parameters(Parameter.listOf(
                     ObjectTerm.var("a"),
                     ObjectTerm.var("b")))
                 .instance(Instance.builder()
                     .iri("test2")
-                    .arguments(Argument.of(
+                    .arguments(Argument.listOf(
                         ObjectTerm.var("a"),
                         ObjectTerm.var("b")))
                     .build())
@@ -283,9 +283,9 @@ public class CheckLibraryTest {
         Term varBase3 = LiteralTerm.createTypedLiteral("7", TypeRegistry.getType(XSD.integer).getIri());
 
         store.addTemplateSignature(
-            Signature.builder()
+            Signature.superbuilder()
                 .iri("hasInt")
-                .parameters(Parameter.of(varBase1, varBase2, varBase3))
+                .parameters(Parameter.listOf(varBase1, varBase2, varBase3))
                 .build());
 
         Term varC1 = new IRITerm("ex.com/iri");
@@ -299,16 +299,16 @@ public class CheckLibraryTest {
         Term constC2 = new IRITerm("ex.com/niceonlyprop");
 
         store.addTemplate(
-            Template.superbuilder()
+            Template.builder()
                 .iri("testCorrect")
-                .parameters(Parameter.of(varC1, varC2))
+                .parameters(Parameter.listOf(varC1, varC2))
                 .instance(Instance.builder()
                     .iri("hasInt")
-                    .arguments(Argument.of(varC1b, constC1, varC2b))
+                    .arguments(Argument.listOf(varC1b, constC1, varC2b))
                     .build())
                 .instance(Instance.builder()
                     .iri("hasInt")
-                    .arguments(Argument.of(constC1, constC2, varC2b))
+                    .arguments(Argument.listOf(constC1, constC2, varC2b))
                     .build()
                 ).build());
 
@@ -330,9 +330,9 @@ public class CheckLibraryTest {
         Term intVar = LiteralTerm.createTypedLiteral("7", TypeRegistry.getType(XSD.integer).getIri());
 
         store.addTemplateSignature(
-            Signature.builder()
+            Signature.superbuilder()
                 .iri("hasInt")
-                .parameters(Parameter.of(classVar, objpropVar, intVar))
+                .parameters(Parameter.listOf(classVar, objpropVar, intVar))
                 .build());
 
         Term classVar2 = new IRITerm("ex.com/class");
@@ -348,16 +348,16 @@ public class CheckLibraryTest {
         Term prop = new IRITerm("ex.com/niceonlyprop");
 
         store.addTemplate(
-            Template.superbuilder()
+            Template.builder()
                 .iri("testIncorrect")
-                .parameters(Parameter.of(classVar2, intVar2))
+                .parameters(Parameter.listOf(classVar2, intVar2))
                 .instance(Instance.builder()
                         .iri("hasInt")
-                        .arguments(Argument.of(classVar2b, propClass1, intVar21b))
+                        .arguments(Argument.listOf(classVar2b, propClass1, intVar21b))
                         .build())
                 .instance(Instance.builder()
                     .iri("hasInt")
-                    .arguments(Argument.of(propClass2, prop, intVar22b))
+                    .arguments(Argument.listOf(propClass2, prop, intVar22b))
                     .build())
             .build());
 
@@ -379,9 +379,9 @@ public class CheckLibraryTest {
         Term varBase3 = LiteralTerm.createTypedLiteral("7", TypeRegistry.getType(XSD.integer).getIri());
 
         store.addTemplateSignature(
-            Signature.builder()
+            Signature.superbuilder()
                 .iri("hasInt")
-                .parameters(Parameter.of(varBase1, varBase2, varBase3))
+                .parameters(Parameter.listOf(varBase1, varBase2, varBase3))
                 .build());
 
         Term var1 = new IRITerm("ex.com/iri");
@@ -394,12 +394,12 @@ public class CheckLibraryTest {
         Term cons1 = new IRITerm("ex.com/prop1");
 
         store.addTemplate(
-            Template.superbuilder()
+            Template.builder()
                 .iri("testIncorrect")
-                .parameters(Parameter.of(var1, var2))
+                .parameters(Parameter.listOf(var1, var2))
                 .instance(Instance.builder()
                     .iri("hasInt")
-                    .arguments(Argument.of(var1b, cons1, var2b))
+                    .arguments(Argument.listOf(var1b, cons1, var2b))
                     .build())
                 .build());
 
@@ -418,9 +418,9 @@ public class CheckLibraryTest {
         varBase.setType(new NEListType(TypeRegistry.getType(OWL.Class)));
 
         store.addTemplateSignature(
-            Signature.builder()
+            Signature.superbuilder()
                 .iri("areClasses")
-                .parameters(Parameter.of(varBase))
+                .parameters(Parameter.listOf(varBase))
                 .build());
 
         Term var = new BlankNodeTerm("_:class");
@@ -429,12 +429,12 @@ public class CheckLibraryTest {
         Term cons = new BlankNodeTerm("_:b");
 
         store.addTemplate(
-            Template.superbuilder()
+            Template.builder()
                 .iri("testCorrect1")
-                .parameters(Parameter.of(var))
+                .parameters(Parameter.listOf(var))
                 .instance(Instance.builder()
                     .iri("areClasses")
-                    .arguments(Argument.of(new ListTerm(cons, var)))
+                    .arguments(Argument.listOf(new ListTerm(cons, var)))
                     .build())
                 .build());
 
@@ -454,9 +454,9 @@ public class CheckLibraryTest {
         varBase.setType(new NEListType(TypeRegistry.getType(OWL.Class)));
 
         store.addTemplateSignature(
-            Signature.builder()
+            Signature.superbuilder()
                 .iri("areClasses")
-                .parameters(Parameter.of(varBase))
+                .parameters(Parameter.listOf(varBase))
                 .build());
 
         Term varClass = new BlankNodeTerm("_:class");
@@ -465,11 +465,11 @@ public class CheckLibraryTest {
         Term one = LiteralTerm.createTypedLiteral("1", TypeRegistry.getType(XSD.integer).getIri());
 
         store.addTemplate(
-            Template.superbuilder().iri("testCorrect1")
-                .parameters(Parameter.of(varClass))
+            Template.builder().iri("testCorrect1")
+                .parameters(Parameter.listOf(varClass))
                 .instance(Instance.builder()
                     .iri("areClasses")
-                    .arguments(Argument.of(new ListTerm(one, varClass)))
+                    .arguments(Argument.listOf(new ListTerm(one, varClass)))
                     .build())
                 .build());
 
@@ -487,9 +487,9 @@ public class CheckLibraryTest {
         varBase.setType(new NEListType(new NEListType(TypeRegistry.getType(OWL.Class))));
 
         store.addTemplateSignature(
-            Signature.builder()
+            Signature.superbuilder()
                 .iri("deepLists")
-                .parameters(Parameter.of(varBase))
+                .parameters(Parameter.listOf(varBase))
                 .build());
 
         Term varClass = new BlankNodeTerm("_:class");
@@ -498,11 +498,11 @@ public class CheckLibraryTest {
         Term one = LiteralTerm.createTypedLiteral("1", TypeRegistry.getType(XSD.integer).getIri());
 
         store.addTemplate(
-            Template.superbuilder().iri("testCorrect1")
-                .parameters(Parameter.of(varClass))
+            Template.builder().iri("testCorrect1")
+                .parameters(Parameter.listOf(varClass))
                 .instance(Instance.builder()
                     .iri("areClasses")
-                    .arguments(Argument.of(new ListTerm(
+                    .arguments(Argument.listOf(new ListTerm(
                                 new ListTerm(new BlankNodeTerm(), varClass), // (_:a ?var) OK
                                 new ListTerm(one, varClass))))              // (1 ?var)   ERR
                     .build())

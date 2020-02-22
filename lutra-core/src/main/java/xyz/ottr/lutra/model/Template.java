@@ -43,10 +43,10 @@ import xyz.ottr.lutra.model.types.TermType;
 @Getter
 public class Template extends Signature {
 
-    @Singular private final @NonNull Set<Instance> instances;
+    private final @NonNull Set<Instance> instances;
 
-    @Builder(builderMethodName = "superbuilder") // Cannot use @SuperBuilder as we need to run our own constructor.
-    public Template(String iri, @Singular List<Parameter> parameters, @Singular Set<Instance> instances) {
+    @Builder
+    private Template(@NonNull String iri, @Singular List<Parameter> parameters, @Singular Set<Instance> instances) {
         super(iri, parameters);
         this.instances = instances;
         setVariableFlagsAndTypes();

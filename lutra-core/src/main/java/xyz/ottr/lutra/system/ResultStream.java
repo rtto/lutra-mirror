@@ -151,6 +151,14 @@ public class ResultStream<E> {
     }
 
     /**
+     * Returns a new ResultStream which contains all Results of
+     * the list of argument streams.
+     */
+    public static <R> ResultStream<R> concat(List<ResultStream<R>> streams) {
+        return streams.stream().reduce(empty(), ResultStream::concat);
+    }
+
+    /**
      * @see Stream#flatMap(Function)
      */
     public <R> ResultStream<R> flatMap(Function<? super Result<E>, ? extends ResultStream<R>> f) {

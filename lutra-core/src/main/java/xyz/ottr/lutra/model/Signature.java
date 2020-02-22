@@ -26,25 +26,22 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Singular;
 import org.apache.jena.shared.PrefixMapping;
 import xyz.ottr.lutra.OTTR;
+import xyz.ottr.lutra.model.terms.IRITerm;
+import xyz.ottr.lutra.system.Result;
 
 @Getter
+@Builder(builderMethodName = "superbuilder")
 public class Signature {
 
     private final @NonNull String iri;
-    private final @NonNull List<Parameter> parameters; // TODO enforce no duplicates in list
-
-    @Builder // Cannot use @SuperBuilder as we need to run our own constructor.
-    protected Signature(String iri, @Singular List<Parameter> parameters) {
-        this.iri = iri;
-        this.parameters = parameters;
-        this.parameters.forEach(p -> p.getTerm().setVariable(true));
-    }
+    private final @NonNull @Singular List<Parameter> parameters; // TODO enforce no duplicates in list
 
     @Override
     public String toString() {

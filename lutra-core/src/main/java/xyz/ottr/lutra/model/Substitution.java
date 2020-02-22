@@ -76,13 +76,13 @@ public class Substitution {
         return Result.of(new Substitution(termSubstitution));
     }
 
-    public <E> List<E> apply(List<? extends TermSubstitutable<E>> list) {
+    public <E> List<E> apply(List<? extends HasApplySubstitution<E>> list) {
         return list.stream()
             .map(element -> element.apply(this))
             .collect(Collectors.toList());
     }
 
-    public <E> Set<E> apply(Set<? extends TermSubstitutable<E>> list) {
+    public <E> Set<E> apply(Set<? extends HasApplySubstitution<E>> list) {
         return list.stream()
             .map(element -> element.apply(this))
             .collect(Collectors.toSet());

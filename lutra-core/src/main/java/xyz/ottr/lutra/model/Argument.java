@@ -37,12 +37,12 @@ import xyz.ottr.lutra.model.terms.Term;
 @Getter
 @EqualsAndHashCode
 @Builder(toBuilder = true)
-public class Argument implements TermWrapper, TermSubstitutable<Argument> {
+public class Argument implements HasGetTerm, HasApplySubstitution<Argument> {
 
     private final @NonNull Term term;
     private final boolean listExpander;
 
-    public static List<Argument> of(Term... terms) {
+    public static List<Argument> listOf(Term... terms) {
         return Arrays.stream(terms)
             .map(t -> builder().term(t).build())
             .collect(Collectors.toList());

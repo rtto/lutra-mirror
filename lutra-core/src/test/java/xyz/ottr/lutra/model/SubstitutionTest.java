@@ -39,12 +39,12 @@ public class SubstitutionTest {
 
     @Test
     public void simpleSubstitution() {
-        List<Parameter> params = Parameter.of(
+        List<Parameter> params = Parameter.listOf(
                 ObjectTerm.var("a"),
                 ObjectTerm.var("b"),
                 ObjectTerm.var("c"));
 
-        List<Argument> args = Argument.of(
+        List<Argument> args = Argument.listOf(
                 ObjectTerm.cons(1),
                 ObjectTerm.cons(2),
                 ObjectTerm.cons(3));
@@ -69,13 +69,13 @@ public class SubstitutionTest {
     @Test
     public void listSubstitution() {
 
-        List<Parameter> params = Parameter.of(
+        List<Parameter> params = Parameter.listOf(
             ObjectTerm.var("a"),
             ObjectTerm.var("b"),
             ObjectTerm.var("c"));
 
         ListTerm arg02 = new ListTerm(ObjectTerm.cons(1));
-        List<Argument> args = Argument.of(arg02, ObjectTerm.cons(2), arg02);
+        List<Argument> args = Argument.listOf(arg02, ObjectTerm.cons(2), arg02);
 
         Result<Substitution> subsRes = Substitution.resultOf(args, params);
         assertTrue(subsRes.isPresent());
@@ -102,12 +102,12 @@ public class SubstitutionTest {
             Parameter.builder().term(ObjectTerm.var("c")).build()
         );
 
-        List<Argument> argsWithoutNone = Argument.of(
+        List<Argument> argsWithoutNone = Argument.listOf(
                 ObjectTerm.cons(1),
                 ObjectTerm.cons(2),
                 ObjectTerm.cons(3));
 
-        List<Argument> argsWithNone = Argument.of(
+        List<Argument> argsWithNone = Argument.listOf(
                 new NoneTerm(),
                 ObjectTerm.cons(2),
                 ObjectTerm.cons(3));
@@ -142,12 +142,12 @@ public class SubstitutionTest {
     @Test
     public void wrongConstruction() {
 
-        List<Parameter> params = Parameter.of(
+        List<Parameter> params = Parameter.listOf(
                 ObjectTerm.var("a"),
                 ObjectTerm.var("b"),
                 ObjectTerm.var("c"));
 
-        List<Argument> args = Argument.of(
+        List<Argument> args = Argument.listOf(
                 ObjectTerm.cons(1),
                 ObjectTerm.cons(2));
 

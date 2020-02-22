@@ -33,25 +33,37 @@ import lombok.NonNull;
 import org.apache.jena.shared.PrefixMapping;
 import xyz.ottr.lutra.OTTR;
 import xyz.ottr.lutra.model.terms.Term;
+import xyz.ottr.lutra.system.Result;
 
 @Getter
-@Builder
-public class Parameter implements TermWrapper {
+@Builder(toBuilder = true, builderMethodName = "")
+public class Parameter implements HasGetTerm {
 
     private final @NonNull Term term;
     private final boolean nonBlank;
     private final boolean optional;
     private final Term defaultValue;
 
-    public boolean hasDefaultValue() {
-        return Objects.nonNull(this.defaultValue);
+    @Builder
+    public Parameter(@NonNull Term term, boolean nonBlank, boolean optional, Term defaultValue) {
+        this.term = term;
+        this.nonBlank = nonBlank;
+        this.optional = optional;
+        this.defaultValue = defaultValue;
+        term.setVariable(true);
     }
 
-    public static List<Parameter> of(Term... terms) {
+
+    public static List<Parameter> listOf(Term... terms) {
         return Arrays.stream(terms)
             .map(t -> builder().term(t).build())
             .collect(Collectors.toList());
     }
+
+    public boolean hasDefaultValue() {
+        return Objects.nonNull(this.defaultValue);
+    }
+
 
     @Override
     public String toString() {

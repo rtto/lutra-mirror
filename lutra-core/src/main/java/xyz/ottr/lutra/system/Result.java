@@ -452,6 +452,22 @@ public class Result<E> {
         this.trace.addMessage(newMsg);
     }
 
+    public void addFatal(String newMsg) {
+        this.trace.addMessage(Message.fatal(newMsg));
+    }
+
+    public void addError(String newMsg) {
+        this.trace.addMessage(Message.error(newMsg));
+    }
+
+    public void addWarning(String newMsg) {
+        this.trace.addMessage(Message.warning(newMsg));
+    }
+
+    public void addInfo(String newMsg) {
+        this.trace.addMessage(Message.info(newMsg));
+    }
+
     /**
      * Adds the argument Message-s to this' list of Message-s.
      */

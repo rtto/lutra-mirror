@@ -25,10 +25,10 @@ package xyz.ottr.lutra.model.terms;
 import java.util.Optional;
 
 import org.apache.jena.shared.PrefixMapping;
-import xyz.ottr.lutra.model.TermSubstitutable;
+import xyz.ottr.lutra.model.HasApplySubstitution;
 import xyz.ottr.lutra.model.types.TermType;
 
-public interface Term extends TermSubstitutable<Term> {
+public interface Term extends HasApplySubstitution<Term> {
 
     Object getIdentifier();
 
