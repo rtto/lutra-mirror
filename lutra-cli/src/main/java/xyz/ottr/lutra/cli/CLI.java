@@ -142,6 +142,45 @@ public class CLI {
         executeMode();
     }
 
+    private void executeMode() {
+
+        switch (this.settings.mode) {
+        case expand:
+            executeExpand();
+            break;
+        case expandLibrary:
+            executeExpandLibrary();
+            break;
+        case formatLibrary:
+            executeFormatLibrary();
+            break;
+        case format:
+            executeFormat();
+            break;
+        case lint:
+            break;
+        default:
+            Message err = Message.error("The mode " + this.settings.mode + " is not yet supported.");
+            this.messageHandler.printMessage(err);
+        }
+    }
+
+    private void executeExpand() {
+        writeInstances(parseAndExpandInstances());
+    }
+
+    private void executeFormat() {
+        writeInstances(parseInstances());
+    }
+
+    private void executeExpandLibrary() {
+        this.messageHandler.use(this.templateManager.expandStore(), this::writeTemplates);
+    }
+
+    private void executeFormatLibrary() {
+        writeTemplates(this.templateManager);
+    }
+
     private int checkLibrary() {
         MessageHandler msgs = this.templateManager.checkTemplates();
         int severity = this.settings.quiet ? msgs.getMostSevere() : msgs.printMessages();
@@ -156,25 +195,25 @@ public class CLI {
         return severity;
     }
 
+    ////////////////////////////////////////////////////////////
+    /// Parsing and writing                                  ///
+    ////////////////////////////////////////////////////////////
+
     private int parseLibrary() {
-        if (this.settings.library != null && this.settings.library.length != 0) {
-            Format libraryFormat = this.templateManager.getFormat(this.settings.libraryFormat);
-            return this.templateManager.parseLibraryInto(libraryFormat, this.settings.library)
-                .printMessages();
+        if (this.settings.library == null || this.settings.library.length == 0) {
+            return Message.INFO; // Least severe
         }
-        return Message.INFO; // Least severe
+        Format libraryFormat = this.templateManager.getFormat(this.settings.libraryFormat);
+        return this.templateManager.parseLibraryInto(libraryFormat, this.settings.library)
+            .printMessages();
     }
 
     private int parsePrefixes() {
-        if (StringUtils.isNotBlank(this.settings.prefixes)) {
-            Result<Model> userPrefixes = new RDFFileReader().parse(this.settings.prefixes);
-            return this.messageHandler.use(userPrefixes, up -> this.templateManager.addPrefifxes(up));
+        if (!StringUtils.isNotBlank(this.settings.prefixes)) {
+            return Message.INFO; // Least severe
         }
-        return Message.INFO; // Least severe
-    }
-
-    private void executeExpand() {
-        writeInstances(parseAndExpandInstances());
+        Result<Model> userPrefixes = new RDFFileReader().parse(this.settings.prefixes);
+        return this.messageHandler.use(userPrefixes, up -> this.templateManager.addPrefifxes(up));
     }
 
     public ResultStream<Instance> parseInstances() {
@@ -186,24 +225,12 @@ public class CLI {
         return parseInstances().innerFlatMap(this.templateManager.makeExpander());
     }
 
-    private void executeFormat() {
-        writeInstances(parseInstances());
-    }
-
     private void writeInstances(ResultStream<Instance> ins) {
 
         Format outFormat = this.templateManager.getFormat(this.settings.outputFormat);
         this.templateManager
             .writeInstances(ins, outFormat, makeInstanceWriter(outFormat.getDefaultFileSuffix()))
             .printMessages();
-    }
-
-    private void executeExpandLibrary() {
-        this.messageHandler.use(this.templateManager.expandStore(), this::writeTemplates);
-    }
-
-    private void executeFormatLibrary() {
-        writeTemplates(this.templateManager);
     }
 
     private void writeTemplates(TemplateManager templateManager) {
@@ -233,29 +260,6 @@ public class CLI {
             }
             return Optional.empty();
         };
-    }
-
-    private void executeMode() {
-
-        switch (this.settings.mode) {
-            case expand:
-                executeExpand();
-                break;
-            case expandLibrary:
-                executeExpandLibrary();
-                break;
-            case formatLibrary:
-                executeFormatLibrary();
-                break;
-            case format:
-                executeFormat();
-                break;
-            case lint:
-                break;
-            default:
-                Message err = Message.error("The mode " + this.settings.mode + " is not yet supported.");
-                this.messageHandler.printMessage(err);
-        }
     }
 
     private boolean shouldPrintOutput() {
