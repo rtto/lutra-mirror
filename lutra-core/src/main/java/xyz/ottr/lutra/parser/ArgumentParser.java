@@ -1,6 +1,7 @@
 package xyz.ottr.lutra.parser;
 
 import lombok.Builder;
+import lombok.NonNull;
 import xyz.ottr.lutra.OTTR;
 import xyz.ottr.lutra.model.Argument;
 import xyz.ottr.lutra.model.terms.IRITerm;
@@ -10,7 +11,9 @@ import xyz.ottr.lutra.system.Result;
 public class ArgumentParser  {
 
     @Builder
-    private static Result<Argument> createArgument(Result<Term> term, Result<Boolean> listExpander) {
+    private static Result<Argument> createArgument(@NonNull Result<Term> term, Result<Boolean> listExpander) {
+
+        listExpander = Result.nullToEmpty(listExpander);
 
         var builder = Result.of(Argument.builder());
         builder.addResult(term, Argument.ArgumentBuilder::term);

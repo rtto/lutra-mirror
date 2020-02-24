@@ -38,7 +38,7 @@ import org.apache.jena.shared.PrefixMapping;
 import org.apache.jena.vocabulary.XSD;
 import xyz.ottr.lutra.system.Result;
 import xyz.ottr.lutra.tabottr.TabOTTR;
-import xyz.ottr.lutra.wottr.vocabulary.v04.WOTTR;
+import xyz.ottr.lutra.wottr.WOTTR;
 
 public class RDFNodeFactory {
 

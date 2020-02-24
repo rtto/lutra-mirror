@@ -42,7 +42,9 @@ public abstract class InstanceParser<E> implements Function<E, ResultStream<Inst
     @Builder
     private static Result<Instance> createInstance(@NonNull Result<String> iri, @NonNull Result<List<Argument>> arguments, Result<ListExpander> listExpander) {
 
-            var builder = Result.of(Instance.builder());
+        listExpander = Result.nullToEmpty(listExpander);
+
+        var builder = Result.of(Instance.builder());
             builder.addResult(iri, Instance.InstanceBuilder::iri);
             builder.addResult(arguments, Instance.InstanceBuilder::arguments);
             builder.addResult(listExpander, Instance.InstanceBuilder::listExpander);

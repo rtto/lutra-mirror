@@ -40,8 +40,8 @@ import xyz.ottr.lutra.system.MessageHandler;
 import xyz.ottr.lutra.system.Result;
 import xyz.ottr.lutra.tabottr.parser.ExcelReader;
 import xyz.ottr.lutra.wottr.io.RDFFileReader;
-import xyz.ottr.lutra.wottr.parser.v04.WInstanceParser;
-import xyz.ottr.lutra.wottr.parser.v04.WTemplateParser;
+import xyz.ottr.lutra.wottr.parser.WInstanceParser;
+import xyz.ottr.lutra.wottr.parser.WTemplateParser;
 
 public class ReaderRegistryImpl implements ReaderRegistry {
     

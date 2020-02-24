@@ -1,4 +1,4 @@
-package xyz.ottr.lutra.wottr.vocabulary.v04;
+package xyz.ottr.lutra.wottr;
 
 /*-
  * #%L
@@ -31,17 +31,16 @@ import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.ResourceFactory;
 import xyz.ottr.lutra.OTTR;
-import xyz.ottr.lutra.model.ArgumentList;
-import xyz.ottr.lutra.wottr.vocabulary.WOTTRVocabulary;
+import xyz.ottr.lutra.model.ListExpander;
 
-public class WOTTR implements WOTTRVocabulary {
+public class WOTTR {
 
-    protected static final String ns = OTTR.namespace;
+    public static final String ns = OTTR.namespace;
     public static final String prefix = "ottr";
    
     // Classes
     public static final Resource Template = getResource(ns + "Template");
-    public static final Resource TemplateSignature = getResource(ns + "Signature");
+    public static final Resource Signature = getResource(ns + "Signature");
     public static final Resource BaseTemplate = getResource(ns + "BaseTemplate");
     public static final Resource Instance = getResource(ns + "Instance");
 
@@ -69,13 +68,13 @@ public class WOTTR implements WOTTRVocabulary {
     public static final Property value = getProperty(ns + "value");
     public static final Property annotation = getProperty(ns + "annotation");
 
-    public static final BidiMap<Resource, ArgumentList.Expander> listExpanders;
+    public static final BidiMap<Resource, ListExpander> listExpanders;
 
     static {
-        BidiMap<Resource, ArgumentList.Expander> map = new DualHashBidiMap<>();
-        map.put(cross, ArgumentList.Expander.CROSS);
-        map.put(zipMin, ArgumentList.Expander.ZIPMIN);
-        map.put(zipMax, ArgumentList.Expander.ZIPMAX);
+        BidiMap<Resource, ListExpander> map = new DualHashBidiMap<>();
+        map.put(cross, ListExpander.cross);
+        map.put(zipMin, ListExpander.zipMin);
+        map.put(zipMax, ListExpander.zipMax);
         listExpanders = UnmodifiableBidiMap.unmodifiableBidiMap(map);
     }
 
@@ -93,14 +92,5 @@ public class WOTTR implements WOTTRVocabulary {
     protected static <X> List<X> getList(X... objects) {
         return List.of(objects);
     }
-
-    public static final WOTTRVocabulary theInstance = new WOTTR();
-
-    @Override
-    public Resource getNoneResource() {
-        return none;
-    }
-
-
 
 }

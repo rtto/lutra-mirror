@@ -163,6 +163,13 @@ public class Result<E> {
         return new Result<>(Optional.empty(), msgs);
     }
 
+    /**
+     * Returns a new empty Result if input is null and is otherwise the identity on input.
+     */
+    public static <R> Result<R> nullToEmpty(Result<R> result) {
+        return Objects.requireNonNullElse(result, empty());
+    }
+
     public static <R> Result<R> fatal(String msg) {
         return empty(Message.fatal(msg));
     }

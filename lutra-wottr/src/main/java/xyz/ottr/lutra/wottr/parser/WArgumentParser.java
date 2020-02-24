@@ -1,4 +1,4 @@
-package xyz.ottr.lutra.wottr.parser.v04;
+package xyz.ottr.lutra.wottr.parser;
 
 /*-
  * #%L
@@ -22,7 +22,6 @@ package xyz.ottr.lutra.wottr.parser.v04;
  * #L%
  */
 
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.function.Function;
@@ -30,36 +29,32 @@ import java.util.function.Function;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
+import xyz.ottr.lutra.model.Argument;
 import xyz.ottr.lutra.model.terms.Term;
+import xyz.ottr.lutra.parser.ArgumentParser;
 import xyz.ottr.lutra.system.Result;
-import xyz.ottr.lutra.wottr.parser.TermFactory;
 import xyz.ottr.lutra.wottr.util.ModelSelector;
 import xyz.ottr.lutra.wottr.util.RDFNodes;
-import xyz.ottr.lutra.wottr.vocabulary.v04.WOTTR;
+import xyz.ottr.lutra.wottr.WOTTR;
 
-public class WArgumentParser implements Function<RDFNode, Result<Term>> {
+public class WArgumentParser extends ArgumentParser implements Function<RDFNode, Result<Argument>> {
 
     private final Model model;
     private final TermFactory rdfTermFactory;
-    private final Set<Term> expanderValues;
 
-    public WArgumentParser(Model model) {
+    WArgumentParser(Model model) {
         this.model = model;
-        this.rdfTermFactory = new TermFactory(WOTTR.theInstance);
-        this.expanderValues = new HashSet<>();
+        this.rdfTermFactory = new TermFactory();
     }
 
-    public Result<Term> apply(RDFNode argumentNode) {
+    public Result<Argument> apply(RDFNode argumentNode) {
 
-        Result<Resource> argumentResource = RDFNodes.cast(argumentNode, Resource.class);
+        var argumentResource = RDFNodes.cast(argumentNode, Resource.class);
 
-        Result<Term> term = argumentResource.flatMap(this::getArgumentTerm);
-        Result<Resource> listExpanderResource = argumentResource.flatMap(this::getListExpander);
-
-        // if present, addResult term to listexpander, and copy any messages to term system
-        term.addResult(listExpanderResource, (t, l) -> this.expanderValues.add(t));
-
-        return term;
+        return builder()
+            .term(argumentResource.flatMap(this::getArgumentTerm))
+            .listExpander(argumentResource.flatMap(this::getListExpander))
+            .build();
     }
 
     private Result<Term> getArgumentTerm(Resource argument) {
@@ -67,15 +62,12 @@ public class WArgumentParser implements Function<RDFNode, Result<Term>> {
             .flatMap(this.rdfTermFactory);
     }
 
-    private Result<Resource> getListExpander(Resource argument) {
+    private Result<Boolean> getListExpander(Resource argument) {
         return ModelSelector.getOptionalResourceObject(this.model, argument, WOTTR.modifier)
             .flatMap(r -> r.equals(WOTTR.listExpand)
-                ? Result.of(r)
+                ? Result.of(Boolean.TRUE)
                 : Result.error("Error parsing argument modifier, expected " + RDFNodes.toString(WOTTR.listExpand)
                 + ", but got " + RDFNodes.toString(r) + "."));
     }
 
-    public Set<Term> getExpanderValues() {
-        return Collections.unmodifiableSet(this.expanderValues);
-    }
 }

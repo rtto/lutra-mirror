@@ -33,7 +33,7 @@ import xyz.ottr.lutra.bottr.util.TermFactory;
 import xyz.ottr.lutra.model.terms.Term;
 import xyz.ottr.lutra.system.Result;
 import xyz.ottr.lutra.wottr.util.ModelSelector;
-import xyz.ottr.lutra.wottr.vocabulary.v04.WOTTR;
+import xyz.ottr.lutra.wottr.WOTTR;
 
 public class BTranslationSettingsParser extends CachedResourceWrapperParser<TranslationSettings> {
 

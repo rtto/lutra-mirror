@@ -35,7 +35,7 @@ import xyz.ottr.lutra.model.terms.LiteralTerm;
 import xyz.ottr.lutra.model.terms.NoneTerm;
 import xyz.ottr.lutra.model.terms.Term;
 import xyz.ottr.lutra.stottr.STOTTR;
-import xyz.ottr.lutra.wottr.vocabulary.v04.WOTTR;
+import xyz.ottr.lutra.wottr.WOTTR;
 
 public class STermWriter {
 
