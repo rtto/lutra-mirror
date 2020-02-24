@@ -36,8 +36,9 @@ import xyz.ottr.lutra.system.Message;
 import xyz.ottr.lutra.system.ResultConsumer;
 import xyz.ottr.lutra.system.ResultStream;
 import xyz.ottr.lutra.wottr.io.RDFFileReader;
+import xyz.ottr.lutra.wottr.parser.WInstanceParser;
 import xyz.ottr.lutra.wottr.util.ModelIO;
-import xyz.ottr.lutra.wottr.writer.v04.WInstanceWriter;
+import xyz.ottr.lutra.wottr.writer.WInstanceWriter;
 
 public enum ModelUtils {
 

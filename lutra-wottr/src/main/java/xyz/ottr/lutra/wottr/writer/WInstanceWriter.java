@@ -1,4 +1,4 @@
-package xyz.ottr.lutra.wottr.writer.v04;
+package xyz.ottr.lutra.wottr.writer;
 
 /*-
  * #%L
@@ -22,7 +22,7 @@ package xyz.ottr.lutra.wottr.writer.v04;
  * #L%
  */
 
-import java.util.Objects;
+import java.util.List;
 
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
@@ -30,13 +30,11 @@ import org.apache.jena.rdf.model.RDFList;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.shared.PrefixMapping;
-import xyz.ottr.lutra.model.ArgumentList;
+import xyz.ottr.lutra.model.Argument;
 import xyz.ottr.lutra.model.Instance;
-import xyz.ottr.lutra.model.terms.Term;
 import xyz.ottr.lutra.wottr.util.ModelIO;
 import xyz.ottr.lutra.wottr.util.PrefixMappings;
-import xyz.ottr.lutra.wottr.vocabulary.v04.WOTTR;
-import xyz.ottr.lutra.wottr.writer.RDFFactory;
+import xyz.ottr.lutra.wottr.WOTTR;
 import xyz.ottr.lutra.writer.InstanceWriter;
 
 public class WInstanceWriter implements InstanceWriter {
@@ -49,10 +47,10 @@ public class WInstanceWriter implements InstanceWriter {
     }
 
     public WInstanceWriter(PrefixMapping prefixes) {
-        this(prefixes, new RDFFactory(WOTTR.theInstance));
+        this(prefixes, new RDFFactory());
     }
 
-    public WInstanceWriter(PrefixMapping prefixes, RDFFactory rdfFactory) {
+    WInstanceWriter(PrefixMapping prefixes, RDFFactory rdfFactory) {
         this.model = ModelFactory.createDefaultModel();
         this.model.setNsPrefixes(prefixes); // Will trim unused before write
         this.rdfFactory = rdfFactory;
@@ -69,8 +67,7 @@ public class WInstanceWriter implements InstanceWriter {
 
     @Override
     public String write() {
-        PrefixMappings.trim(this.model);
-        return ModelIO.writeModel(this.model);
+        return ModelIO.writeModel(writeToModel());
     }
 
     public Model writeToModel() {
@@ -78,36 +75,49 @@ public class WInstanceWriter implements InstanceWriter {
         return this.model;
     }
 
-    public Resource createInstanceNode(Model model, Instance instance) {
-        Resource templateIRI = model.createResource(instance.getIri());
+    Resource createInstanceNode(Model model, Instance instance) {
+
         Resource instanceNode = model.createResource();
+        Resource templateIRI = model.createResource(instance.getIri());
         model.add(instanceNode, WOTTR.of, templateIRI);
 
-        ArgumentList arguments = instance.getArguments();
-        addArguments(arguments, instanceNode, model);
-        if (arguments.hasListExpander()) {
-            model.add(instanceNode, WOTTR.modifier, WOTTR.listExpanders.getKey(arguments.getListExpander()));
+        if (instance.hasListExpander()) {
+            model.add(instanceNode, WOTTR.modifier, WOTTR.listExpanders.getKey(instance.getListExpander()));
+            addArgumentsList(instance.getArguments(), instanceNode, model);
+        } else {
+            addValuesList(instance.getArguments(), instanceNode, model);
         }
+
         return instanceNode;
     }
 
-    private void addArguments(ArgumentList arguments, Resource iri, Model model) {
-
-        Objects.requireNonNull(arguments, "Cannot add arguments with no argument list.");
+    private void addValuesList(List<Argument> arguments, Resource instanceNode, Model model) {
 
         RDFList argsLst = model.createList();
 
-        for (Term arg : arguments.asList()) {
-            RDFNode val = this.rdfFactory.createRDFNode(model, arg);
+        for (Argument arg : arguments) {
+            RDFNode val = this.rdfFactory.createRDFNode(model, arg.getTerm());
+            argsLst = argsLst.with(val);
+        }
+        model.add(instanceNode, WOTTR.values, argsLst);
+
+    }
+
+    private void addArgumentsList(List<Argument> arguments, Resource instanceNode, Model model) {
+
+        RDFList argsLst = model.createList();
+
+        for (Argument arg : arguments) {
+            RDFNode val = this.rdfFactory.createRDFNode(model, arg.getTerm());
 
             Resource argNode = model.createResource();
             model.add(argNode, WOTTR.value, val);
 
-            if (arguments.hasListExpander(arg)) {
+            if (arg.isListExpander()) {
                 model.add(argNode, WOTTR.modifier, WOTTR.listExpand);
             }
             argsLst = argsLst.with(argNode);
         }
-        model.add(iri, WOTTR.arguments, argsLst);
+        model.add(instanceNode, WOTTR.arguments, argsLst);
     }
 }

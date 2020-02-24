@@ -22,9 +22,6 @@ package xyz.ottr.lutra.wottr.parser;
  * #L%
  */
 
-import java.util.List;
-import java.util.Set;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -32,42 +29,37 @@ import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Statement;
 import xyz.ottr.lutra.OTTR;
-import xyz.ottr.lutra.model.ArgumentList;
 import xyz.ottr.lutra.model.Instance;
 import xyz.ottr.lutra.model.terms.Term;
+import xyz.ottr.lutra.parser.ArgumentParser;
+import xyz.ottr.lutra.parser.InstanceParser;
 import xyz.ottr.lutra.system.Result;
 import xyz.ottr.lutra.system.ResultStream;
 import xyz.ottr.lutra.wottr.util.RDFNodes;
-import xyz.ottr.lutra.wottr.vocabulary.v04.WOTTR;
+import xyz.ottr.lutra.wottr.WOTTR;
 
-public class TripleInstanceFactory implements Supplier<ResultStream<Instance>> {
+public class TripleInstanceParser extends InstanceParser<Model> {
 
-    private static final TermFactory rdfTermFactory = new TermFactory(WOTTR.theInstance);
-
-    private final Model model;
-
-    public TripleInstanceFactory(Model model) {
-        this.model = model;
-    }
+    private static final TermFactory rdfTermFactory = new TermFactory();
 
     @Override
-    public ResultStream<Instance> get() {
-
-        Set<Result<Instance>> parsedTriples = this.model.listStatements()
-            .mapWith(TripleInstanceFactory::createTripleInstance)
-            .toSet();
-        return new ResultStream<>(parsedTriples);
+    public ResultStream<Instance> apply(Model model) {
+        return ResultStream.of(model.listStatements()
+                .mapWith(TripleInstanceParser::createTripleInstance)
+        );
     }
 
     private static Result<Instance> createTripleInstance(Statement stmt) {
 
-        List<Result<Term>> args = Stream.of(stmt.getSubject(), stmt.getPredicate(), stmt.getObject())
-            .map(TripleInstanceFactory::createTerm)
+        var arguments = Stream.of(stmt.getSubject(), stmt.getPredicate(), stmt.getObject())
+            .map(TripleInstanceParser::createTerm)
+            .map(t -> ArgumentParser.builder().term(t).build())
             .collect(Collectors.toList());
 
-        return Result.aggregate(args)
-            .map(ArgumentList::new)
-            .map(asVal -> new Instance(OTTR.BaseURI.NullableTriple, asVal));
+        return builder()
+            .iri(Result.of(OTTR.BaseURI.NullableTriple))
+            .arguments(Result.aggregate(arguments))
+            .build();
     }
 
     /**
@@ -88,4 +80,6 @@ public class TripleInstanceFactory implements Supplier<ResultStream<Instance>> {
             throw new IllegalArgumentException("Error converting RDFNode " + RDFNodes.toString(node) + " to Term. ");
         }
     }
+
+
 }

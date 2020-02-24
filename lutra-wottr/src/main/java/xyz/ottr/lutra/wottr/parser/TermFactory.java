@@ -42,8 +42,8 @@ import xyz.ottr.lutra.model.terms.LiteralTerm;
 import xyz.ottr.lutra.model.terms.NoneTerm;
 import xyz.ottr.lutra.model.terms.Term;
 import xyz.ottr.lutra.system.Result;
+import xyz.ottr.lutra.wottr.WOTTR;
 import xyz.ottr.lutra.wottr.util.RDFNodes;
-import xyz.ottr.lutra.wottr.vocabulary.WOTTRVocabulary;
 
 public class TermFactory implements Function<RDFNode, Result<Term>> {
 
@@ -51,10 +51,8 @@ public class TermFactory implements Function<RDFNode, Result<Term>> {
     private static final Map<RDFList, Result<ListTerm>> createdLists = new HashMap<>();
     private static final Map<String, BlankNodeTerm> createdBlanks = new HashMap<>();
 
-    private final WOTTRVocabulary vocabulary;
+    public TermFactory() {
 
-    public TermFactory(WOTTRVocabulary vocabulary) {
-        this.vocabulary = vocabulary;
     }
 
     public Result<Term> apply(RDFNode node) {
@@ -87,7 +85,7 @@ public class TermFactory implements Function<RDFNode, Result<Term>> {
 
     public Result<Term> createTerm(String uri) {
 
-        if (uri.equals(this.vocabulary.getNoneResource().getURI())) {
+        if (uri.equals(WOTTR.none)) {
             return Result.of(new NoneTerm());
         } else if (uri.equals(RDF.nil.getURI())) {
             return Result.of(new ListTerm());

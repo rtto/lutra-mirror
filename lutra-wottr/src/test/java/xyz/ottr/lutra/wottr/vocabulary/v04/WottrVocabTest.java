@@ -45,6 +45,7 @@ import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.ResourceFactory;
 import org.junit.Assert;
 import org.junit.Test;
+import xyz.ottr.lutra.wottr.WOTTR;
 
 public class WottrVocabTest {
 

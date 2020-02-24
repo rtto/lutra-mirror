@@ -1,4 +1,4 @@
-package xyz.ottr.lutra.wottr.writer.v04;
+package xyz.ottr.lutra.wottr.writer;
 
 /*-
  * #%L
@@ -23,8 +23,8 @@ package xyz.ottr.lutra.wottr.writer.v04;
  */
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 
 import org.apache.jena.rdf.model.Model;
@@ -34,16 +34,14 @@ import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.shared.PrefixMapping;
 import org.apache.jena.vocabulary.RDF;
+import xyz.ottr.lutra.model.BaseTemplate;
 import xyz.ottr.lutra.model.Instance;
-import xyz.ottr.lutra.model.ParameterList;
+import xyz.ottr.lutra.model.Parameter;
 import xyz.ottr.lutra.model.Signature;
 import xyz.ottr.lutra.model.Template;
-import xyz.ottr.lutra.model.terms.Term;
 import xyz.ottr.lutra.wottr.util.ModelIO;
 import xyz.ottr.lutra.wottr.util.PrefixMappings;
-import xyz.ottr.lutra.wottr.vocabulary.v04.WOTTR;
-import xyz.ottr.lutra.wottr.writer.RDFFactory;
-import xyz.ottr.lutra.wottr.writer.TypeFactory;
+import xyz.ottr.lutra.wottr.WOTTR;
 import xyz.ottr.lutra.writer.TemplateWriter;
 
 public class WTemplateWriter implements TemplateWriter {
@@ -58,10 +56,10 @@ public class WTemplateWriter implements TemplateWriter {
     }
 
     public WTemplateWriter(PrefixMapping prefixes) {
-        this(prefixes, new RDFFactory(WOTTR.theInstance));
+        this(prefixes, new RDFFactory());
     }
 
-    public WTemplateWriter(PrefixMapping prefixes, RDFFactory rdfFactory) {
+    WTemplateWriter(PrefixMapping prefixes, RDFFactory rdfFactory) {
         this.models = new HashMap<>();
         this.rdfFactory = rdfFactory;
         this.instanceWriter = new WInstanceWriter(prefixes, rdfFactory);
@@ -100,45 +98,50 @@ public class WTemplateWriter implements TemplateWriter {
         Resource templateType;
         if (template instanceof Template) {
             templateType = WOTTR.Template;
-        } else if (template.isBaseTemplate()) {
+        } else if (template instanceof BaseTemplate) {
             templateType = WOTTR.BaseTemplate;
         } else {
-            templateType = WOTTR.TemplateSignature;
+            templateType = WOTTR.Signature;
         }
 
         Resource templateIRI = model.createResource(template.getIri());
         model.add(templateIRI, RDF.type, templateType);
-        ParameterList parameters = template.getParameters();
-        addParameters(parameters, templateIRI, model);
+        addParameters(template.getParameters(), templateIRI, model);
         return templateIRI;
     }
 
-    private void addParameters(ParameterList parameters, Resource iri, Model model) {
-
-        Objects.requireNonNull(parameters, "Cannot add parameters with no parameter list.");
+    private void addParameters(List<Parameter> parameters, Resource iri, Model model) {
 
         RDFList paramLst = model.createList();
 
-        for (Term param : parameters.asList()) {
-            RDFNode variable = this.rdfFactory.createRDFNode(model, param);
-            Resource type = TypeFactory.createRDFType(model, param.getType());
-
-            Resource paramNode = model.createResource();
-            model.add(paramNode, WOTTR.variable, variable);
-            model.add(paramNode, WOTTR.type, type);
-
-            if (parameters.isOptional(param)) {
-                model.add(paramNode, WOTTR.modifier, WOTTR.optional);
-            }
-            if (parameters.isNonBlank(param)) {
-                model.add(paramNode, WOTTR.modifier, WOTTR.nonBlank);
-            }
-            if (parameters.hasDefaultValue(param)) {
-                RDFNode def = this.rdfFactory.createRDFNode(model, parameters.getDefaultValue(param));
-                model.add(paramNode, WOTTR.defaultVal, def);
-            }
-            paramLst = paramLst.with(paramNode);
+        for (Parameter param : parameters) {
+            paramLst = paramLst.with(addParameter(param, model));
         }
         model.add(iri, WOTTR.parameters, paramLst);
     }
+
+    private Resource addParameter(Parameter param, Model model) {
+
+        Resource paramNode = model.createResource();
+
+        RDFNode variable = this.rdfFactory.createRDFNode(model, param.getTerm());
+        Resource type = TypeFactory.createRDFType(model, param.getTerm().getType());
+
+        model.add(paramNode, WOTTR.variable, variable);
+        model.add(paramNode, WOTTR.type, type);
+
+        if (param.isOptional()) {
+            model.add(paramNode, WOTTR.modifier, WOTTR.optional);
+        }
+        if (param.isNonBlank()) {
+            model.add(paramNode, WOTTR.modifier, WOTTR.nonBlank);
+        }
+        if (param.hasDefaultValue()) {
+            RDFNode def = this.rdfFactory.createRDFNode(model, param.getDefaultValue());
+            model.add(paramNode, WOTTR.defaultVal, def);
+        }
+        return paramNode;
+    }
+
+
 }

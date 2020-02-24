@@ -35,6 +35,8 @@ public class ArgumentParser  {
     @SuppressWarnings("PMD.UnusedPrivateMethod")
     private static Result<Argument> createArgument(Result<Term> term, Result<Boolean> listExpander) {
 
+        listExpander = Result.nullToEmpty(listExpander);
+
         var builder = Result.of(Argument.builder());
         builder.addResult(term, Argument.ArgumentBuilder::term);
         builder.addResult(listExpander, Argument.ArgumentBuilder::listExpander);

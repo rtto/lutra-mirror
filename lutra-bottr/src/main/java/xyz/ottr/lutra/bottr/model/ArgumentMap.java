@@ -39,7 +39,7 @@ import xyz.ottr.lutra.model.types.ComplexType;
 import xyz.ottr.lutra.model.types.TermType;
 import xyz.ottr.lutra.system.Result;
 import xyz.ottr.lutra.system.ResultStream;
-import xyz.ottr.lutra.wottr.vocabulary.v04.WOTTR;
+import xyz.ottr.lutra.wottr.WOTTR;
 
 // TODO use lombok's @SuperBuilder once it has support in IDE, and make fields final. now we simply use setter methods.
 @Setter

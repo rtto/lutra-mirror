@@ -23,6 +23,7 @@ package xyz.ottr.lutra.parser;
  */
 
 import lombok.Builder;
+
 import xyz.ottr.lutra.model.Parameter;
 import xyz.ottr.lutra.model.terms.Term;
 import xyz.ottr.lutra.system.Result;
@@ -34,6 +35,10 @@ public class ParameterParser {
     private static Result<Parameter> createParameter(Result<Term> term, Result<Boolean> nonBlank,
         Result<Boolean> optional, Result<Term> defaultValue) {
 
+        nonBlank = Result.nullToEmpty(nonBlank);
+        optional = Result.nullToEmpty(optional);
+        defaultValue = Result.nullToEmpty(defaultValue);
+
         var builder = Result.of(Parameter.builder());
         builder.addResult(term, Parameter.ParameterBuilder::term);
         builder.addResult(nonBlank, Parameter.ParameterBuilder::nonBlank);
@@ -43,5 +48,4 @@ public class ParameterParser {
 
         return parameter;
     }
-
 }

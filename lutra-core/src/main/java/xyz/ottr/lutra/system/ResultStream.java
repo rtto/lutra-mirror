@@ -67,6 +67,13 @@ public class ResultStream<E> {
         return new ResultStream<>(results);
     }
 
+    public static <E> ResultStream<E> of(Iterator<Result<E>> iterator) {
+        Stream<Result<E>> stream = StreamSupport.stream(
+            Spliterators.spliteratorUnknownSize(iterator, Spliterator.ORDERED),
+            false);
+        return new ResultStream<E>(stream);
+    }
+
     /**
      * Returns a ResultStream consisting of one Result per element
      * in argument Collection.
@@ -82,7 +89,6 @@ public class ResultStream<E> {
     public static <R> ResultStream<R> innerOf(Stream<R> stream) {
         return new ResultStream<>(stream.map(Result::of));
     }
-
 
     /**
      * Returns a ResultStream consisting of one Result per element

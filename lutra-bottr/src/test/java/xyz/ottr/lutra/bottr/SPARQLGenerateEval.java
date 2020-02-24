@@ -57,9 +57,9 @@ import xyz.ottr.lutra.store.graph.DependencyGraph;
 import xyz.ottr.lutra.store.TemplateStore;
 
 import xyz.ottr.lutra.wottr.io.RDFFileReader;
-import xyz.ottr.lutra.wottr.parser.v04.WTemplateParser;
+import xyz.ottr.lutra.wottr.parser.WTemplateParser;
 import xyz.ottr.lutra.wottr.util.ModelIO;
-import xyz.ottr.lutra.wottr.writer.v04.WInstanceWriter;
+import xyz.ottr.lutra.wottr.writer.WInstanceWriter;
 
  */
 

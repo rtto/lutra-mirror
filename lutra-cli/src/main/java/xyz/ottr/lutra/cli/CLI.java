@@ -52,8 +52,8 @@ import xyz.ottr.lutra.system.MessageHandler;
 import xyz.ottr.lutra.system.Result;
 import xyz.ottr.lutra.system.ResultConsumer;
 import xyz.ottr.lutra.system.ResultStream;
-import xyz.ottr.lutra.wottr.writer.v04.WInstanceWriter;
-import xyz.ottr.lutra.wottr.writer.v04.WTemplateWriter;
+import xyz.ottr.lutra.wottr.writer.WInstanceWriter;
+import xyz.ottr.lutra.wottr.writer.WTemplateWriter;
 import xyz.ottr.lutra.writer.InstanceWriter;
 import xyz.ottr.lutra.writer.TemplateWriter;
 

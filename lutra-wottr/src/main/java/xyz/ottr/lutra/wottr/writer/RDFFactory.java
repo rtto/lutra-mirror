@@ -43,29 +43,26 @@ import xyz.ottr.lutra.model.terms.ListTerm;
 import xyz.ottr.lutra.model.terms.LiteralTerm;
 import xyz.ottr.lutra.model.terms.NoneTerm;
 import xyz.ottr.lutra.model.terms.Term;
-import xyz.ottr.lutra.wottr.vocabulary.WOTTRVocabulary;
+import xyz.ottr.lutra.wottr.WOTTR;
 
-public class RDFFactory {
+class RDFFactory {
 
     // TODO should this be static?
     private final Map<String, Resource> createdBlankNodes = new HashMap<>(); // reuse blank nodes
 
-    private final WOTTRVocabulary vocabulary;
-
-    public RDFFactory(WOTTRVocabulary vocabulary) {
-        this.vocabulary = vocabulary;
-    }
-
-    public static boolean isTriple(Instance instance) {
+    static boolean isTriple(Instance instance) {
         String templateIRI = instance.getIri();
         return OTTR.BaseURI.Triple.equals(templateIRI)
             || OTTR.BaseURI.NullableTriple.equals(templateIRI);
     }
 
-    public Statement createTriple(Model model, Instance instance) {
-        RDFNode s = createRDFNode(model, instance.getArguments().get(0));
-        RDFNode p = createRDFNode(model, instance.getArguments().get(1));
-        RDFNode o = createRDFNode(model, instance.getArguments().get(2));
+    Statement createTriple(Model model, Instance instance) {
+
+        var arguments = instance.getArguments();
+
+        RDFNode s = createRDFNode(model, arguments.get(0).getTerm());
+        RDFNode p = createRDFNode(model, arguments.get(1).getTerm());
+        RDFNode o = createRDFNode(model, arguments.get(2).getTerm());
 
         // TODO: these checks should be superfluous once instance type checking is in place.
         checkSubject(s, instance);
@@ -99,7 +96,7 @@ public class RDFFactory {
     }
 
 
-    public RDFNode createRDFNode(Model model, Term term) {
+    RDFNode createRDFNode(Model model, Term term) {
 
         if (term instanceof ListTerm) {
             return createRDFList(model, (ListTerm) term);
@@ -117,18 +114,18 @@ public class RDFFactory {
         }
     }
 
-    public RDFList createRDFList(Model model, ListTerm term) {
+    private RDFList createRDFList(Model model, ListTerm term) {
         Iterator<RDFNode> iterator = term.asList().stream()
             .map(t -> createRDFNode(model, t))
             .iterator();
         return model.createList(iterator);
     }
 
-    public Resource createURIResource(Model model, IRITerm term) {
+    private Resource createURIResource(Model model, IRITerm term) {
         return model.createResource(term.getIri());
     }
 
-    public Literal createLiteral(Model model, LiteralTerm term) {
+    private Literal createLiteral(Model model, LiteralTerm term) {
         String val = term.getValue();
         // TODO: Check correctness of typing below
         if (term.getLanguageTag() != null) { // Literal with language tag
@@ -143,14 +140,14 @@ public class RDFFactory {
         }
     }
 
-    public Resource createBlankNode(Model model, BlankNodeTerm term) {
+    private Resource createBlankNode(Model model, BlankNodeTerm term) {
         return this.createdBlankNodes.computeIfAbsent(term.getLabel(), l -> model.createResource(new AnonId(l)));
     }
 
-    public Resource createNone(Model model, NoneTerm term) {
+    private Resource createNone(Model model, NoneTerm term) {
         // Note: the resource is recreated *in/by the model* to allow the none-resource
         // to be cast to Property (by as(Property.class)). If we return the resource without
         // no "hosting" model, then the cast throws a UnsupportedPolymorphismException.
-        return model.createResource(this.vocabulary.getNoneResource().getURI());
+        return model.createResource(WOTTR.none);
     }
 }

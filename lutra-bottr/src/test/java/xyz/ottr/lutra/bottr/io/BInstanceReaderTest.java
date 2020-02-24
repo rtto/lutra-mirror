@@ -32,7 +32,7 @@ import xyz.ottr.lutra.model.Instance;
 import xyz.ottr.lutra.system.Result;
 import xyz.ottr.lutra.system.ResultConsumer;
 import xyz.ottr.lutra.wottr.util.ModelIO;
-import xyz.ottr.lutra.wottr.writer.v04.WInstanceWriter;
+import xyz.ottr.lutra.wottr.writer.WInstanceWriter;
 
 
 public class BInstanceReaderTest {

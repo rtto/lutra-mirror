@@ -30,7 +30,8 @@ import xyz.ottr.lutra.model.Template;
 import xyz.ottr.lutra.store.graph.DependencyGraph;
 import xyz.ottr.lutra.system.ResultConsumer;
 import xyz.ottr.lutra.wottr.io.RDFFileReader;
-import xyz.ottr.lutra.wottr.writer.v04.WTemplateWriter;
+import xyz.ottr.lutra.wottr.parser.WTemplateParser;
+import xyz.ottr.lutra.wottr.writer.WTemplateWriter;
 
 public class PrototypeTest {
 
@@ -45,7 +46,7 @@ public class PrototypeTest {
 
     @BeforeClass    
     public static void load() {
-        legacyReader = new TemplateReader(new RDFFileReader(), new xyz.ottr.lutra.wottr.parser.v03.WTemplateParser());
+        legacyReader = new TemplateReader(new RDFFileReader(), new xyz.ottr.lutra.wottr.parser.WTemplateParser());
         templateReader = new TemplateReader(new RDFFileReader(), new WTemplateParser());
         graph = new DependencyGraph(null);
     }
