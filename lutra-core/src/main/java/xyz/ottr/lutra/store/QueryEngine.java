@@ -34,8 +34,8 @@ import java.util.stream.Stream;
 
 import org.apache.commons.collections4.iterators.PermutationIterator;
 import org.apache.commons.math3.util.CombinatoricsUtils;
-import xyz.ottr.lutra.model.Substitution;
 import xyz.ottr.lutra.model.HasApplySubstitution;
+import xyz.ottr.lutra.model.Substitution;
 import xyz.ottr.lutra.model.types.TermType;
 
 public abstract class QueryEngine<S extends TemplateStore> {

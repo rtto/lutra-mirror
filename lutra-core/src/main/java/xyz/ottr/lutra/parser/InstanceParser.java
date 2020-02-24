@@ -28,9 +28,6 @@ import java.util.stream.Collectors;
 
 import lombok.Builder;
 import lombok.NonNull;
-import lombok.Singular;
-import org.apache.jena.rdf.model.Model;
-import org.apache.jena.rdf.model.Resource;
 import xyz.ottr.lutra.model.Argument;
 import xyz.ottr.lutra.model.Instance;
 import xyz.ottr.lutra.model.ListExpander;
@@ -40,18 +37,20 @@ import xyz.ottr.lutra.system.ResultStream;
 public abstract class InstanceParser<E> implements Function<E, ResultStream<Instance>> {
 
     @Builder
-    private static Result<Instance> createInstance(@NonNull Result<String> iri, @NonNull Result<List<Argument>> arguments, Result<ListExpander> listExpander) {
+    @SuppressWarnings("PMD.UnusedPrivateMethod")
+    private static Result<Instance> createInstance(@NonNull Result<String> iri,
+        @NonNull Result<List<Argument>> arguments, Result<ListExpander> listExpander) {
 
-            var builder = Result.of(Instance.builder());
-            builder.addResult(iri, Instance.InstanceBuilder::iri);
-            builder.addResult(arguments, Instance.InstanceBuilder::arguments);
-            builder.addResult(listExpander, Instance.InstanceBuilder::listExpander);
-            var instance = builder.map(Instance.InstanceBuilder::build);
+        var builder = Result.of(Instance.builder());
+        builder.addResult(iri, Instance.InstanceBuilder::iri);
+        builder.addResult(arguments, Instance.InstanceBuilder::arguments);
+        builder.addResult(listExpander, Instance.InstanceBuilder::listExpander);
+        var instance = builder.map(Instance.InstanceBuilder::build);
 
-            validateListExpanders(instance);
+        validateListExpanders(instance);
 
-            return instance;
-        }
+        return instance;
+    }
 
     private static void validateListExpanders(Result<Instance> instance) {
         instance.ifPresent(i -> {

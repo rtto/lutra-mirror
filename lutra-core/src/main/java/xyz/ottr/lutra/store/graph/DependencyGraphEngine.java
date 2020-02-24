@@ -35,12 +35,12 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import xyz.ottr.lutra.model.Argument;
+import xyz.ottr.lutra.model.HasGetTerm;
 import xyz.ottr.lutra.model.Instance;
 import xyz.ottr.lutra.model.ListExpander;
 import xyz.ottr.lutra.model.Parameter;
 import xyz.ottr.lutra.model.Substitution;
 import xyz.ottr.lutra.model.Template;
-import xyz.ottr.lutra.model.HasGetTerm;
 import xyz.ottr.lutra.model.terms.ListTerm;
 import xyz.ottr.lutra.model.terms.Term;
 import xyz.ottr.lutra.model.types.ComplexType;

@@ -33,7 +33,6 @@ import lombok.NonNull;
 import org.apache.jena.shared.PrefixMapping;
 import xyz.ottr.lutra.OTTR;
 import xyz.ottr.lutra.model.terms.Term;
-import xyz.ottr.lutra.system.Result;
 
 @Getter
 @Builder(toBuilder = true, builderMethodName = "")

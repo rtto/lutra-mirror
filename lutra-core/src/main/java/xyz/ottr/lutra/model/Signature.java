@@ -26,15 +26,12 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Singular;
 import org.apache.jena.shared.PrefixMapping;
 import xyz.ottr.lutra.OTTR;
-import xyz.ottr.lutra.model.terms.IRITerm;
-import xyz.ottr.lutra.system.Result;
 
 @Getter
 @Builder(builderMethodName = "superbuilder")

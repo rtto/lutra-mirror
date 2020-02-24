@@ -29,7 +29,6 @@ import java.util.function.Function;
 
 import lombok.Builder;
 import lombok.NonNull;
-import lombok.Singular;
 import xyz.ottr.lutra.model.BaseTemplate;
 import xyz.ottr.lutra.model.Instance;
 import xyz.ottr.lutra.model.Parameter;
@@ -44,6 +43,7 @@ public abstract class TemplateParser<E> implements Function<E, ResultStream<Sign
 
     public abstract Map<String, String> getPrefixes();
 
+    @SuppressWarnings("PMD.UnusedPrivateMethod")
     @Builder(builderMethodName = "signatureBuilder", builderClassName = "SignatureBuilder")
     private static Result<Signature> createSignature(@NonNull Result<String> iri, @NonNull Result<List<Parameter>> parameters) {
         var builder = Result.of(Signature.superbuilder());
@@ -52,6 +52,7 @@ public abstract class TemplateParser<E> implements Function<E, ResultStream<Sign
         return builder.map(Signature.SignatureBuilder::build);
     }
 
+    @SuppressWarnings("PMD.UnusedPrivateMethod")
     @Builder(builderMethodName = "templateBuilder", builderClassName = "TemplateBuilder")
     private static Result<Template> createTemplate(@NonNull Result<Signature> signature, @NonNull Result<Set<Instance>> instances) {
         var builder = Result.of(Template.builder());
@@ -63,6 +64,7 @@ public abstract class TemplateParser<E> implements Function<E, ResultStream<Sign
         return builder.map(Template.TemplateBuilder::build);
     }
 
+    @SuppressWarnings("PMD.UnusedPrivateMethod")
     @Builder(builderMethodName = "baseTemplateBuilder", builderClassName = "BaseTemplateBuilder")
     private static Result<BaseTemplate> createBaseTemplate(@NonNull Result<Signature> signature) {
         var builder = Result.of(BaseTemplate.builder());
@@ -72,6 +74,5 @@ public abstract class TemplateParser<E> implements Function<E, ResultStream<Sign
         });
         return builder.map(BaseTemplate.BaseTemplateBuilder::build);
     }
-
 }
 
