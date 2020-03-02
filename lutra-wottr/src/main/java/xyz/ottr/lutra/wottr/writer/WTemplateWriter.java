@@ -39,9 +39,9 @@ import xyz.ottr.lutra.model.Instance;
 import xyz.ottr.lutra.model.Parameter;
 import xyz.ottr.lutra.model.Signature;
 import xyz.ottr.lutra.model.Template;
+import xyz.ottr.lutra.wottr.WOTTR;
 import xyz.ottr.lutra.wottr.util.ModelIO;
 import xyz.ottr.lutra.wottr.util.PrefixMappings;
-import xyz.ottr.lutra.wottr.WOTTR;
 import xyz.ottr.lutra.writer.TemplateWriter;
 
 public class WTemplateWriter implements TemplateWriter {

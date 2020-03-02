@@ -50,7 +50,7 @@ public class DependencyEdge {
     public final @NonNull TemplateNode to;
 
     boolean hasListExpander() {
-        return Objects.nonNull(listExpander);
+        return Objects.nonNull(this.listExpander);
     }
 
     public boolean shouldDiscard() {

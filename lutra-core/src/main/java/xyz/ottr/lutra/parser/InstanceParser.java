@@ -22,52 +22,11 @@ package xyz.ottr.lutra.parser;
  * #L%
  */
 
-import java.util.List;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
-import lombok.Builder;
-import lombok.NonNull;
-import xyz.ottr.lutra.model.Argument;
 import xyz.ottr.lutra.model.Instance;
-import xyz.ottr.lutra.model.ListExpander;
-import xyz.ottr.lutra.system.Result;
 import xyz.ottr.lutra.system.ResultStream;
 
-public abstract class InstanceParser<E> implements Function<E, ResultStream<Instance>> {
-
-    @Builder
-    @SuppressWarnings("PMD.UnusedPrivateMethod")
-    private static Result<Instance> createInstance(@NonNull Result<String> iri,
-        @NonNull Result<List<Argument>> arguments, Result<ListExpander> listExpander) {
-
-        listExpander = Result.nullToEmpty(listExpander);
-
-        var builder = Result.of(Instance.builder());
-        builder.addResult(iri, Instance.InstanceBuilder::iri);
-        builder.addResult(arguments, Instance.InstanceBuilder::arguments);
-        builder.addResult(listExpander, Instance.InstanceBuilder::listExpander);
-        var instance = builder.map(Instance.InstanceBuilder::build);
-
-        validateListExpanders(instance);
-
-        return instance;
-    }
-
-    private static void validateListExpanders(Result<Instance> instance) {
-        instance.ifPresent(i -> {
-            var forExpansion = i.getArguments().stream()
-                .filter(arg -> arg.isListExpander())
-                .collect(Collectors.toList());
-
-            if (i.hasListExpander() && forExpansion.isEmpty()) {
-                instance.addError("Instance is marked with listExpander "
-                    + i.getListExpander() + ", but no arguments are marked for list expansion.");
-            } else if (!i.hasListExpander() && !forExpansion.isEmpty()) {
-                instance.addError("Instance has arguments which are marked for list expansion:"
-                    + forExpansion + ", but the instance is not marked with listExpander");
-            }
-        });
-    }
+public interface InstanceParser<E> extends Function<E, ResultStream<Instance>> {
 
 }

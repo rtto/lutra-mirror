@@ -23,6 +23,7 @@ package xyz.ottr.lutra.system;
  * #L%
  */
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
@@ -170,6 +171,10 @@ public class Result<E> {
         return Objects.requireNonNullElse(result, empty());
     }
 
+    public static <R> Result<R> nullToEmpty(Result<R> result, Message message) {
+        return Objects.requireNonNullElse(result, empty(message));
+    }
+
     public static <R> Result<R> fatal(String msg) {
         return empty(Message.fatal(msg));
     }
@@ -185,6 +190,11 @@ public class Result<E> {
     public static <R> Result<R> info(String msg) {
         return empty(Message.info(msg));
     }
+
+    public static boolean allIsPresent(Result<?>... results) {
+        return Arrays.stream(results).allMatch(Result::isPresent);
+    }
+
 
     /**
      * Returns an empty system with this system as trace and with the argument message.
@@ -342,6 +352,13 @@ public class Result<E> {
      */
     public boolean isPresent() {
         return this.result.isPresent();
+    }
+
+    /**
+     * @see Optional#isEmpty()
+     */
+    public boolean isEmpty() {
+        return this.result.isEmpty();
     }
 
     /**

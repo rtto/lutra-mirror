@@ -27,24 +27,29 @@ import xyz.ottr.lutra.OTTR;
 import xyz.ottr.lutra.model.Argument;
 import xyz.ottr.lutra.model.terms.IRITerm;
 import xyz.ottr.lutra.model.terms.Term;
+import xyz.ottr.lutra.system.Message;
 import xyz.ottr.lutra.system.Result;
 
-public class ArgumentParser  {
+public abstract class ArgumentBuilder {
 
     @Builder
     @SuppressWarnings("PMD.UnusedPrivateMethod")
     private static Result<Argument> createArgument(Result<Term> term, Result<Boolean> listExpander) {
 
+        term = Result.nullToEmpty(term, Message.error("Missing value. An argument must have a term value."));
         listExpander = Result.nullToEmpty(listExpander);
 
         var builder = Result.of(Argument.builder());
         builder.addResult(term, Argument.ArgumentBuilder::term);
         builder.addResult(listExpander, Argument.ArgumentBuilder::listExpander);
-        var argument = builder.map(Argument.ArgumentBuilder::build);
 
-        validateValue(argument);
-
-        return argument;
+        if (Result.allIsPresent(term)) {
+            var argument = builder.map(Argument.ArgumentBuilder::build);
+            validateValue(argument);
+            return argument;
+        } else {
+            return Result.empty(builder);
+        }
     }
 
     // Warning if value is a URI in the ottr namespace.

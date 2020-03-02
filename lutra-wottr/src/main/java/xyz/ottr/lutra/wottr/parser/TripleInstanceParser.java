@@ -31,14 +31,14 @@ import org.apache.jena.rdf.model.Statement;
 import xyz.ottr.lutra.OTTR;
 import xyz.ottr.lutra.model.Instance;
 import xyz.ottr.lutra.model.terms.Term;
-import xyz.ottr.lutra.parser.ArgumentParser;
+import xyz.ottr.lutra.parser.ArgumentBuilder;
+import xyz.ottr.lutra.parser.InstanceBuilder;
 import xyz.ottr.lutra.parser.InstanceParser;
 import xyz.ottr.lutra.system.Result;
 import xyz.ottr.lutra.system.ResultStream;
 import xyz.ottr.lutra.wottr.util.RDFNodes;
-import xyz.ottr.lutra.wottr.WOTTR;
 
-public class TripleInstanceParser extends InstanceParser<Model> {
+public class TripleInstanceParser implements InstanceParser<Model> {
 
     private static final TermFactory rdfTermFactory = new TermFactory();
 
@@ -53,10 +53,10 @@ public class TripleInstanceParser extends InstanceParser<Model> {
 
         var arguments = Stream.of(stmt.getSubject(), stmt.getPredicate(), stmt.getObject())
             .map(TripleInstanceParser::createTerm)
-            .map(t -> ArgumentParser.builder().term(t).build())
+            .map(t -> ArgumentBuilder.builder().term(t).build())
             .collect(Collectors.toList());
 
-        return builder()
+        return InstanceBuilder.builder()
             .iri(Result.of(OTTR.BaseURI.NullableTriple))
             .arguments(Result.aggregate(arguments))
             .build();

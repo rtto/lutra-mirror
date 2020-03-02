@@ -22,6 +22,8 @@ package xyz.ottr.lutra.wottr.parser;
  * #L%
  */
 
+import java.util.List;
+import java.util.Set;
 import java.util.function.Function;
 
 import org.apache.jena.rdf.model.Model;
@@ -29,15 +31,13 @@ import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 import xyz.ottr.lutra.model.Parameter;
 import xyz.ottr.lutra.model.terms.Term;
-import xyz.ottr.lutra.parser.ParameterParser;
+import xyz.ottr.lutra.parser.ParameterBuilder;
 import xyz.ottr.lutra.system.Result;
-import xyz.ottr.lutra.wottr.parser.TermFactory;
-import xyz.ottr.lutra.wottr.parser.TermTypeFactory;
+import xyz.ottr.lutra.wottr.WOTTR;
 import xyz.ottr.lutra.wottr.util.ModelSelector;
 import xyz.ottr.lutra.wottr.util.RDFNodes;
-import xyz.ottr.lutra.wottr.WOTTR;
 
-public class WParameterParser extends ParameterParser implements Function<RDFNode, Result<Parameter>> {
+public class WParameterParser implements Function<RDFNode, Result<Parameter>> {
 
     private final Model model;
     private final TermFactory rdfTermFactory;
@@ -51,14 +51,27 @@ public class WParameterParser extends ParameterParser implements Function<RDFNod
 
     public Result<Parameter> apply(RDFNode paramNode) {
 
-        var parameter = RDFNodes.cast(paramNode, Resource.class);
+        var parameterResource = RDFNodes.cast(paramNode, Resource.class);
 
-        return builder()
-            .term(parameter.flatMap(this::getTerm))
-            .optional(parameter.flatMap(this::getOptional))
-            .nonBlank(parameter.flatMap(this::getNonBlank))
-            .defaultValue(parameter.flatMap(this::getDefaultValue))
+        var modifiers = parameterResource.map(this::getModifiers);
+
+        var parameter = ParameterBuilder.builder()
+            .term(parameterResource.flatMap(this::getTerm))
+            .optional(modifiers.map(mods -> mods.contains(WOTTR.optional)))
+            .nonBlank(modifiers.map(mods -> mods.contains(WOTTR.nonBlank)))
+            .defaultValue(parameterResource.flatMap(this::getDefaultValue))
             .build();
+
+        modifiers.ifPresent(mods -> {
+            var unknowns = mods.removeAll(WOTTR.argumentModifiers);
+            if (!mods.isEmpty()) {
+                parameter.addError("Unknown modifier. Permissible modifiers are "
+                    + RDFNodes.toString(WOTTR.argumentModifiers) + ", but found "
+                    + RDFNodes.toString(mods));
+                }
+            });
+
+        return parameter;
     }
 
     private Result<Term> getTerm(Resource parameter) {
@@ -79,13 +92,8 @@ public class WParameterParser extends ParameterParser implements Function<RDFNod
             .flatMap(this.rdfTermFactory);
     }
 
-    private Result<Boolean> getOptional(Resource parameter) {
-        return Result.of(this.model.contains(parameter, WOTTR.modifier, WOTTR.optional));
+    private Set<RDFNode> getModifiers(Resource parameter) {
+        return this.model.listObjectsOfProperty(parameter, WOTTR.modifier).toSet();
     }
 
-    private Result<Boolean> getNonBlank(Resource parameter) {
-        return Result.of(this.model.contains(parameter, WOTTR.modifier, WOTTR.nonBlank));
-    }
-
-    // TODO check if there are other modifiers than optional and nonBlank, or rather use SHACL?
 }

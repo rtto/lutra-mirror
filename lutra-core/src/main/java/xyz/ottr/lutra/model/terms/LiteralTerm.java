@@ -73,11 +73,11 @@ public class LiteralTerm extends AbstractTerm<String> {
     }
 
     public boolean isLanguageTagged() {
-        return Objects.nonNull(languageTag);
+        return Objects.nonNull(this.languageTag);
     }
 
     public boolean isPlainLiteral() {
-        return PLAIN_STRING_DATATYPE.equals(datatype);
+        return PLAIN_STRING_DATATYPE.equals(this.datatype);
     }
 
     @Override

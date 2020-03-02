@@ -35,15 +35,16 @@ import org.apache.jena.rdf.model.Resource;
 import xyz.ottr.lutra.model.Argument;
 import xyz.ottr.lutra.model.Instance;
 import xyz.ottr.lutra.model.ListExpander;
-import xyz.ottr.lutra.parser.ArgumentParser;
+import xyz.ottr.lutra.parser.ArgumentBuilder;
+import xyz.ottr.lutra.parser.InstanceBuilder;
 import xyz.ottr.lutra.parser.InstanceParser;
 import xyz.ottr.lutra.system.Result;
 import xyz.ottr.lutra.system.ResultStream;
+import xyz.ottr.lutra.wottr.WOTTR;
 import xyz.ottr.lutra.wottr.util.ModelSelector;
 import xyz.ottr.lutra.wottr.util.RDFNodes;
-import xyz.ottr.lutra.wottr.WOTTR;
 
-public class WInstanceParser extends InstanceParser<Model> {
+public class WInstanceParser implements InstanceParser<Model> {
 
     @Override
     public ResultStream<Instance> apply(Model model) {
@@ -68,7 +69,7 @@ public class WInstanceParser extends InstanceParser<Model> {
     }
 
     Result<Instance> parseInstance(Model model, Resource instanceNode) {
-        return builder()
+        return InstanceBuilder.builder()
             .iri(getSignatureIRI(model, instanceNode))
             .arguments(getArgumentList(model, instanceNode))
             .listExpander(getListExpander(model, instanceNode))
@@ -101,7 +102,7 @@ public class WInstanceParser extends InstanceParser<Model> {
         } else {
             // create a parser for values to simple arguments:
             var parser = new TermFactory()
-                .andThen(termResult -> ArgumentParser.builder().term(termResult).build());
+                .andThen(termResult -> ArgumentBuilder.builder().term(termResult).build());
 
             return values.flatMap(args -> parseArguments(model, args, parser));
         }

@@ -41,8 +41,8 @@ public abstract class ComplexType implements TermType {
     public abstract String getOuterIRI();
 
     public BasicType getInnermost() {
-        return inner instanceof ComplexType
-            ? ((ComplexType) inner).getInnermost()
-            : (BasicType) inner;
+        return this.inner instanceof ComplexType
+            ? ((ComplexType) this.inner).getInnermost()
+            : (BasicType) this.inner;
     }
 }

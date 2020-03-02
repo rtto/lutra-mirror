@@ -41,13 +41,12 @@ public class LUBType extends ComplexType {
     @Override
     public boolean isSubTypeOf(TermType other) {
 
-        if (other instanceof LUBType) {
+        return other instanceof LUBType
             // For other LUB-types, LUB<P> is only subtype of itself
-            return this.inner.equals(((LUBType) other).getInner());
-        } else {
+            ? this.inner.equals(((LUBType) other).getInner())
+
             // LUB<P> subtype of P, and thus all subtypes of P
-            return this.inner.isSubTypeOf(other);
-        }
+            : this.inner.isSubTypeOf(other);
     }
 
     @Override

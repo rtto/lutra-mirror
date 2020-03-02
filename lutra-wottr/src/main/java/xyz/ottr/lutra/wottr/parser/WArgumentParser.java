@@ -22,8 +22,6 @@ package xyz.ottr.lutra.wottr.parser;
  * #L%
  */
 
-import java.util.HashSet;
-import java.util.Set;
 import java.util.function.Function;
 
 import org.apache.jena.rdf.model.Model;
@@ -31,13 +29,13 @@ import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 import xyz.ottr.lutra.model.Argument;
 import xyz.ottr.lutra.model.terms.Term;
-import xyz.ottr.lutra.parser.ArgumentParser;
+import xyz.ottr.lutra.parser.ArgumentBuilder;
 import xyz.ottr.lutra.system.Result;
+import xyz.ottr.lutra.wottr.WOTTR;
 import xyz.ottr.lutra.wottr.util.ModelSelector;
 import xyz.ottr.lutra.wottr.util.RDFNodes;
-import xyz.ottr.lutra.wottr.WOTTR;
 
-public class WArgumentParser extends ArgumentParser implements Function<RDFNode, Result<Argument>> {
+public class WArgumentParser implements Function<RDFNode, Result<Argument>> {
 
     private final Model model;
     private final TermFactory rdfTermFactory;
@@ -51,7 +49,7 @@ public class WArgumentParser extends ArgumentParser implements Function<RDFNode,
 
         var argumentResource = RDFNodes.cast(argumentNode, Resource.class);
 
-        return builder()
+        return ArgumentBuilder.builder()
             .term(argumentResource.flatMap(this::getArgumentTerm))
             .listExpander(argumentResource.flatMap(this::getListExpander))
             .build();

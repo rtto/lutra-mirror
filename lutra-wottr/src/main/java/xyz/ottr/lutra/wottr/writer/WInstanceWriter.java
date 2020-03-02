@@ -32,9 +32,9 @@ import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.shared.PrefixMapping;
 import xyz.ottr.lutra.model.Argument;
 import xyz.ottr.lutra.model.Instance;
+import xyz.ottr.lutra.wottr.WOTTR;
 import xyz.ottr.lutra.wottr.util.ModelIO;
 import xyz.ottr.lutra.wottr.util.PrefixMappings;
-import xyz.ottr.lutra.wottr.WOTTR;
 import xyz.ottr.lutra.writer.InstanceWriter;
 
 public class WInstanceWriter implements InstanceWriter {

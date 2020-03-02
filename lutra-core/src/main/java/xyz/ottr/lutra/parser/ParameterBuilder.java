@@ -23,18 +23,19 @@ package xyz.ottr.lutra.parser;
  */
 
 import lombok.Builder;
-
 import xyz.ottr.lutra.model.Parameter;
 import xyz.ottr.lutra.model.terms.Term;
+import xyz.ottr.lutra.system.Message;
 import xyz.ottr.lutra.system.Result;
 
-public class ParameterParser {
+public class ParameterBuilder {
 
     @Builder
     @SuppressWarnings("PMD.UnusedPrivateMethod")
     private static Result<Parameter> createParameter(Result<Term> term, Result<Boolean> nonBlank,
         Result<Boolean> optional, Result<Term> defaultValue) {
 
+        term = Result.nullToEmpty(term, Message.error("Missing variable. A parameter must have a variable term."));
         nonBlank = Result.nullToEmpty(nonBlank);
         optional = Result.nullToEmpty(optional);
         defaultValue = Result.nullToEmpty(defaultValue);
@@ -44,8 +45,22 @@ public class ParameterParser {
         builder.addResult(nonBlank, Parameter.ParameterBuilder::nonBlank);
         builder.addResult(optional, Parameter.ParameterBuilder::optional);
         builder.addResult(defaultValue, Parameter.ParameterBuilder::defaultValue);
-        var parameter = builder.map(Parameter.ParameterBuilder::build);
 
-        return parameter;
+        if (Result.allIsPresent(term)) {
+            var parameter = builder.map(Parameter.ParameterBuilder::build);
+            validate(parameter);
+            return parameter;
+        } else {
+            return Result.empty(builder);
+        }
+    }
+
+    private static void validate(Result<Parameter> parameter) {
+
+        parameter.ifPresent(p -> {
+            if (p.isOptional() && p.hasDefaultValue()) {
+                parameter.addWarning("Superfluous optional. Parameter is optional *and* has a default value.");
+            }
+        });
     }
 }

@@ -22,57 +22,15 @@ package xyz.ottr.lutra.parser;
  * #L%
  */
 
-import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.function.Function;
 
-import lombok.Builder;
-import lombok.NonNull;
-import xyz.ottr.lutra.model.BaseTemplate;
-import xyz.ottr.lutra.model.Instance;
-import xyz.ottr.lutra.model.Parameter;
 import xyz.ottr.lutra.model.Signature;
-import xyz.ottr.lutra.model.Template;
-import xyz.ottr.lutra.system.Result;
 import xyz.ottr.lutra.system.ResultStream;
 
-// TODO should we split this into different parsers and introduce a new class TemplateSource which orchestrates the different parsers?
+public interface TemplateParser<E> extends Function<E, ResultStream<Signature>> {
 
-public abstract class TemplateParser<E> implements Function<E, ResultStream<Signature>> {
+    Map<String, String> getPrefixes();
 
-    public abstract Map<String, String> getPrefixes();
-
-    @SuppressWarnings("PMD.UnusedPrivateMethod")
-    @Builder(builderMethodName = "signatureBuilder", builderClassName = "SignatureBuilder")
-    private static Result<Signature> createSignature(@NonNull Result<String> iri, @NonNull Result<List<Parameter>> parameters) {
-        var builder = Result.of(Signature.superbuilder());
-        builder.addResult(iri, Signature.SignatureBuilder::iri);
-        builder.addResult(parameters, Signature.SignatureBuilder::parameters);
-        return builder.map(Signature.SignatureBuilder::build);
-    }
-
-    @SuppressWarnings("PMD.UnusedPrivateMethod")
-    @Builder(builderMethodName = "templateBuilder", builderClassName = "TemplateBuilder")
-    private static Result<Template> createTemplate(@NonNull Result<Signature> signature, @NonNull Result<Set<Instance>> instances) {
-        var builder = Result.of(Template.builder());
-        builder.addResult(signature, (bldr, sign) -> {
-            bldr.iri(sign.getIri());
-            bldr.parameters(sign.getParameters());
-        });
-        builder.addResult(instances, Template.TemplateBuilder::instances);
-        return builder.map(Template.TemplateBuilder::build);
-    }
-
-    @SuppressWarnings("PMD.UnusedPrivateMethod")
-    @Builder(builderMethodName = "baseTemplateBuilder", builderClassName = "BaseTemplateBuilder")
-    private static Result<BaseTemplate> createBaseTemplate(@NonNull Result<Signature> signature) {
-        var builder = Result.of(BaseTemplate.builder());
-        builder.addResult(signature, (bldr, sign) -> {
-            bldr.iri(sign.getIri());
-            bldr.parameters(sign.getParameters());
-        });
-        return builder.map(BaseTemplate.BaseTemplateBuilder::build);
-    }
 }
 

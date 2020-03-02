@@ -36,17 +36,18 @@ import org.apache.jena.shared.PrefixMapping;
 import xyz.ottr.lutra.model.Instance;
 import xyz.ottr.lutra.model.Parameter;
 import xyz.ottr.lutra.model.Signature;
+import xyz.ottr.lutra.parser.TemplateBuilder;
 import xyz.ottr.lutra.parser.TemplateParser;
 import xyz.ottr.lutra.system.Result;
 import xyz.ottr.lutra.system.ResultStream;
+import xyz.ottr.lutra.wottr.WOTTR;
 import xyz.ottr.lutra.wottr.util.ModelSelector;
 import xyz.ottr.lutra.wottr.util.RDFNodes;
-import xyz.ottr.lutra.wottr.WOTTR;
 
 // TODO Most methods take Model as an input. Should we convert the class from a Function to a Supplier
 // that takes the model as a constructor argument?
 
-public class WTemplateParser extends TemplateParser<Model> {
+public class WTemplateParser implements TemplateParser<Model> {
 
     private static final List<Resource> templateTypes = List.of(WOTTR.Template, WOTTR.Signature, WOTTR.BaseTemplate);
 
@@ -82,7 +83,7 @@ public class WTemplateParser extends TemplateParser<Model> {
 
     private Result<Signature> parseSignature(Model model, Resource signature) {
 
-        var result = signatureBuilder()
+        var result = TemplateBuilder.signatureBuilder()
             .iri(this.parseSignatureIRI(signature))
             .parameters(this.parseParameters(model, signature))
             .build();
@@ -96,7 +97,7 @@ public class WTemplateParser extends TemplateParser<Model> {
     }
 
     private Result<Signature> parseTemplate(Model model, Resource template) {
-        return templateBuilder()
+        return TemplateBuilder.templateBuilder()
             .signature(this.parseSignature(model, template))
             .instances(this.parsePattern(model, template))
             .build()
@@ -105,7 +106,7 @@ public class WTemplateParser extends TemplateParser<Model> {
 
     private Result<Signature> parseBaseTemplate(Model model, Resource baseTemplate) {
 
-        var result = baseTemplateBuilder()
+        var result = TemplateBuilder.baseTemplateBuilder()
             .signature(this.parseSignature(model, baseTemplate))
             .build();
 

@@ -42,13 +42,11 @@ public class Substitution {
     private final Map<Term, Term> termSubstitution; // Represents substitution of simple terms
     
     public Substitution(Map<Term, Term> termSubstitution) {
-        this.termSubstitution = new HashMap<>();
-        this.termSubstitution.putAll(termSubstitution);
-        // TODO why not just: this.termSubstitution = new HashMap<>(termSubstitution);
+        this.termSubstitution = new HashMap<>(termSubstitution);
     }
 
     public Substitution() {
-        this(new HashMap<>()); // TODO why not: this.termSubstitution = new HashMap<>();
+        this(new HashMap<>());
     }
 
     public static Result<Substitution> resultOf(List<Argument> args, List<Parameter> parameters) {
@@ -64,12 +62,10 @@ public class Substitution {
             if (argument instanceof NoneTerm && parameters.get(i).hasDefaultValue()) {
                 Term defaultValue = parameters.get(i).getDefaultValue();
                 // reassign argument with default value
-                if (defaultValue instanceof BlankNodeTerm) {
-                    // Blank node default results in fresh blank node
-                    argument = new BlankNodeTerm();
-                } else {
-                    argument = defaultValue;
-                }
+                // Blank node default results in fresh blank node
+                argument = defaultValue instanceof BlankNodeTerm
+                    ? new BlankNodeTerm()
+                    : defaultValue;
             }
             termSubstitution.put(parameters.get(i).getTerm(), argument);
         }

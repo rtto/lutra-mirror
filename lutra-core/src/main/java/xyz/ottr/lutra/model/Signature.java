@@ -46,7 +46,7 @@ public class Signature {
     }
 
     public String toString(PrefixMapping prefixes) {
-        return prefixes.shortForm(iri)
+        return prefixes.shortForm(this.iri)
             + this.parameters.stream()
                 .map(t -> t.toString(prefixes))
                 .collect(Collectors.joining(", ", "[ ", " ]"));
