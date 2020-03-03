@@ -30,7 +30,8 @@ import xyz.ottr.lutra.model.terms.Term;
 import xyz.ottr.lutra.system.Message;
 import xyz.ottr.lutra.system.Result;
 
-public class ArgumentBuilder {
+public enum ArgumentBuilder {
+    ;
 
     @Builder
     public static Result<Argument> createArgument(Result<Term> term, Result<Boolean> listExpander) {
@@ -57,7 +58,7 @@ public class ArgumentBuilder {
             var term = arg.getTerm();
             if (term instanceof IRITerm && ((IRITerm) term).getIri().startsWith(OTTR.namespace)) {
                 argument.addWarning("Suspicious argument value: " + term
-                    + " is in the ottr namespace: " + OTTR.namespace);
+                    + ". The value is in the ottr namespace: " + OTTR.namespace);
             }
         });
     }

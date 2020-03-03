@@ -32,7 +32,8 @@ import xyz.ottr.lutra.model.ListExpander;
 import xyz.ottr.lutra.system.Message;
 import xyz.ottr.lutra.system.Result;
 
-public class InstanceBuilder {
+public enum InstanceBuilder {
+    ;
 
     @Builder
     public static Result<Instance> createInstance(Result<String> iri, Result<List<Argument>> arguments,

@@ -22,7 +22,7 @@ package xyz.ottr.lutra.wottr.parser;
  * #L%
  */
 
-import java.util.List;
+import java.util.ArrayList;
 import java.util.Set;
 import java.util.function.Function;
 
@@ -63,7 +63,7 @@ public class WParameterParser implements Function<RDFNode, Result<Parameter>> {
             .build();
 
         modifiers.ifPresent(mods -> {
-            var modifierCopy = List.copyOf(mods); // make a copy in case we want to use modifiers later.
+            var modifierCopy = new ArrayList<>(mods); // make a copy in case we want to make use of modifiers later.
             modifierCopy.removeAll(WOTTR.argumentModifiers);
             if (!modifierCopy.isEmpty()) {
                 parameter.addError("Unknown modifier. Permissible modifiers are "

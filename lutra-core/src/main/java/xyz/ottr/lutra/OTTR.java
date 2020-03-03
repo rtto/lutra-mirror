@@ -85,7 +85,7 @@ public enum OTTR  {
                 .build();
 
             NullableTriple = Template.builder()
-                .iri(OTTR.BaseURI.Triple)
+                .iri(OTTR.BaseURI.NullableTriple)
                 .parameter(Parameter.builder().term(sub).optional(true).build())
                 .parameter(Parameter.builder().term(pred).optional(true).nonBlank(true).build())
                 .parameter(Parameter.builder().term(obj).optional(true).build())

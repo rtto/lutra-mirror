@@ -25,6 +25,8 @@ package xyz.ottr.lutra.model.types;
 import lombok.EqualsAndHashCode;
 import xyz.ottr.lutra.OTTR;
 
+// TODO should NEListType extend ListType. Seems that there is a bit of a code overlap.
+
 @EqualsAndHashCode(callSuper = true)
 public class NEListType extends ComplexType {
 

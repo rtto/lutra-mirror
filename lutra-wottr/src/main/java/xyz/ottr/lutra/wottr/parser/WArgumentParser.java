@@ -50,12 +50,12 @@ public class WArgumentParser implements Function<RDFNode, Result<Argument>> {
         var argumentResource = RDFNodes.cast(argumentNode, Resource.class);
 
         return ArgumentBuilder.builder()
-            .term(argumentResource.flatMap(this::getArgumentTerm))
+            .term(argumentResource.flatMap(this::getArgumentValue))
             .listExpander(argumentResource.flatMap(this::getListExpander))
             .build();
     }
 
-    private Result<Term> getArgumentTerm(Resource argument) {
+    private Result<Term> getArgumentValue(Resource argument) {
         return ModelSelector.getRequiredObject(this.model, argument, WOTTR.value)
             .flatMap(this.rdfTermFactory);
     }

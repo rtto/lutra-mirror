@@ -28,7 +28,8 @@ import xyz.ottr.lutra.model.terms.Term;
 import xyz.ottr.lutra.system.Message;
 import xyz.ottr.lutra.system.Result;
 
-public class ParameterBuilder {
+public enum ParameterBuilder {
+    ;
 
     @Builder
     public static Result<Parameter> createParameter(Result<Term> term, Result<Boolean> nonBlank,

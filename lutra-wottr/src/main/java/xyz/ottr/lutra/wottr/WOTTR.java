@@ -78,7 +78,7 @@ public class WOTTR {
         listExpanders = UnmodifiableBidiMap.unmodifiableBidiMap(map);
     }
 
-    public static final List<Resource> argumentModifiers = getList(optional, nonBlank);
+    public static final List<Resource> argumentModifiers = List.of(optional, nonBlank);
 
     // Utility methods
     protected static Resource getResource(String uri) {
@@ -88,9 +88,5 @@ public class WOTTR {
     protected static Property getProperty(String uri) {
         return ResourceFactory.createProperty(uri);
     }
-
-    protected static <X> List<X> getList(X... objects) {
-        return List.of(objects);
-    }
-
+    
 }

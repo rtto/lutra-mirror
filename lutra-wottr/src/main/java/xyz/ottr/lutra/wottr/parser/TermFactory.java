@@ -51,15 +51,11 @@ public class TermFactory implements Function<RDFNode, Result<Term>> {
     private static final Map<RDFList, Result<ListTerm>> createdLists = new HashMap<>();
     private static final Map<String, BlankNodeTerm> createdBlanks = new HashMap<>();
 
-    public TermFactory() {
-
-    }
-
     public Result<Term> apply(RDFNode node) {
         return createTerm(node);
     }
 
-    public Result<Term> createTerm(RDFNode node) {
+    private Result<Term> createTerm(RDFNode node) {
 
         if (node.isResource()) {
             return createTerm(node.asResource());
@@ -70,7 +66,7 @@ public class TermFactory implements Function<RDFNode, Result<Term>> {
         }
     }
 
-    public Result<Term> createTerm(Resource node) {
+    private Result<Term> createTerm(Resource node) {
 
         if (node.isURIResource()) {
             return createTerm(node.getURI());
@@ -83,9 +79,9 @@ public class TermFactory implements Function<RDFNode, Result<Term>> {
         }
     }
 
-    public Result<Term> createTerm(String uri) {
+    Result<Term> createTerm(String uri) {
 
-        if (uri.equals(WOTTR.none)) {
+        if (uri.equals(WOTTR.none.getURI())) {
             return Result.of(new NoneTerm());
         } else if (uri.equals(RDF.nil.getURI())) {
             return Result.of(new ListTerm());
@@ -94,7 +90,7 @@ public class TermFactory implements Function<RDFNode, Result<Term>> {
         }
     }
 
-    public Result<ListTerm> createTermList(RDFList list) {
+    private Result<ListTerm> createTermList(RDFList list) {
 
         if (createdLists.containsKey(list)) {
             return createdLists.get(list);
@@ -109,7 +105,7 @@ public class TermFactory implements Function<RDFNode, Result<Term>> {
         }
     }
     
-    public Result<LiteralTerm> createLiteralTerm(Literal literal) {
+    Result<LiteralTerm> createLiteralTerm(Literal literal) {
 
         // collect all "components" of literal, some may be blank or null
         String value = literal.getLexicalForm();
@@ -129,7 +125,7 @@ public class TermFactory implements Function<RDFNode, Result<Term>> {
     }
 
 
-    public Result<BlankNodeTerm> createBlankNodeTerm(BlankNodeId blankNodeId) {
+    Result<BlankNodeTerm> createBlankNodeTerm(BlankNodeId blankNodeId) {
 
         // Mint new labels, but keep map of which term was created
         // for which original (system) label

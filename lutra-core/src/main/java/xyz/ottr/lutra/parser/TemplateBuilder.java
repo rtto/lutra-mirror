@@ -36,7 +36,8 @@ import xyz.ottr.lutra.system.Result;
 
 // TODO should we split this into different parsers and introduce a new class TemplateSource which orchestrates the different parsers?
 
-public class TemplateBuilder {
+public enum TemplateBuilder {
+    ;
 
     @Builder(builderMethodName = "signatureBuilder", builderClassName = "InnerSignatureBuilder")
     public static Result<Signature> createSignature(Result<String> iri, Result<List<Parameter>> parameters) {

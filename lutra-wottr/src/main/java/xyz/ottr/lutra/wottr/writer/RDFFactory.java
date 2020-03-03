@@ -73,24 +73,26 @@ class RDFFactory {
 
     private void checkSubject(RDFNode subject, Instance instance) throws IllegalArgumentException {
         if (!subject.isResource()) {
-            throw new IllegalArgumentException("Error creating triple of instance " + instance
+            throw new IllegalArgumentException("Error creating a triple of the instance " + instance
                 + ". Expected a resource on subject position, but found "
                 + (subject.isLiteral() ? "a literal: " + subject.asLiteral() : subject));
         }
     }
 
     private void checkPredicate(RDFNode predicate, Instance instance) throws IllegalArgumentException {
-        String error;
-        if (predicate.isLiteral()) {
-            error = "a literal: " + predicate.asLiteral();
-        } else if (predicate.isAnon()) {
-            error = "a blank node: " + predicate;
-        } else {
-            error = predicate.toString();
-        }
 
         if (!predicate.canAs(Property.class)) {
-            throw new IllegalArgumentException("Error creating triple of instance " + instance
+
+            String error;
+            if (predicate.isLiteral()) {
+                error = "a literal: " + predicate.asLiteral();
+            } else if (predicate.isAnon()) {
+                error = "a blank node: " + predicate;
+            } else {
+                error = predicate.toString();
+            }
+
+            throw new IllegalArgumentException("Error creating a triple of the instance " + instance
                 + ". Expected a property on predicate position, but found " + error);
         }
     }
