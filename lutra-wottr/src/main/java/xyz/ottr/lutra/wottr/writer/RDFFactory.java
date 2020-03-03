@@ -147,9 +147,6 @@ class RDFFactory {
     }
 
     private Resource createNone(Model model) {
-        // Note: the resource is recreated *in/by the model* to allow the none-resource
-        // to be cast to Property (by as(Property.class)). If we return the resource without
-        // no "hosting" model, then the cast throws a UnsupportedPolymorphismException.
-        return model.createResource(WOTTR.none);
+        return WOTTR.none.inModel(model);
     }
 }
