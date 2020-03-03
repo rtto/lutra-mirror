@@ -76,7 +76,7 @@ public class WInstanceParser implements InstanceParser<Model> {
             .build();
     }
 
-    private Result<String> getSignatureIRI(Model model, Resource instance){
+    private Result<String> getSignatureIRI(Model model, Resource instance) {
         return ModelSelector.getRequiredURIResourceObject(model, instance, WOTTR.of)
             .map(Resource::getURI);
     }
@@ -98,17 +98,17 @@ public class WInstanceParser implements InstanceParser<Model> {
             return Result.error("An instance must have either one " + RDFNodes.toString(WOTTR.arguments)
                 + " or one " + RDFNodes.toString(WOTTR.values) + ".");
         } else if (arguments.isPresent()) {
-            return arguments.flatMap(args -> parseArguments(model, args, new WArgumentParser(model)));
+            return arguments.flatMap(args -> parseArguments(args, new WArgumentParser(model)));
         } else {
             // create a parser for values to simple arguments:
             var parser = new TermFactory()
                 .andThen(termResult -> ArgumentBuilder.builder().term(termResult).build());
 
-            return values.flatMap(args -> parseArguments(model, args, parser));
+            return values.flatMap(args -> parseArguments(args, parser));
         }
     }
 
-    private Result<List<Argument>> parseArguments(Model model, RDFList argumentList, Function<RDFNode, Result<Argument>> parser) {
+    private Result<List<Argument>> parseArguments(RDFList argumentList, Function<RDFNode, Result<Argument>> parser) {
 
         List<Result<Argument>> arguments = argumentList.asJavaList().stream()
             .map(parser)

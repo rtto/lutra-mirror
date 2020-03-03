@@ -107,7 +107,7 @@ class RDFFactory {
         } else if (term instanceof BlankNodeTerm) {
             return createBlankNode(model, (BlankNodeTerm) term);
         } else if (term instanceof NoneTerm) {
-            return createNone(model, (NoneTerm) term);
+            return createNone(model);
         } else {
             throw new IllegalArgumentException("Error converting term " + term + " to RDFNode. "
                 + "Unexpected term class: " + term.getClass().getSimpleName());
@@ -144,7 +144,7 @@ class RDFFactory {
         return this.createdBlankNodes.computeIfAbsent(term.getLabel(), l -> model.createResource(new AnonId(l)));
     }
 
-    private Resource createNone(Model model, NoneTerm term) {
+    private Resource createNone(Model model) {
         // Note: the resource is recreated *in/by the model* to allow the none-resource
         // to be cast to Property (by as(Property.class)). If we return the resource without
         // no "hosting" model, then the cast throws a UnsupportedPolymorphismException.

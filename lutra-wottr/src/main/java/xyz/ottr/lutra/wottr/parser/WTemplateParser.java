@@ -49,7 +49,7 @@ import xyz.ottr.lutra.wottr.util.RDFNodes;
 
 public class WTemplateParser implements TemplateParser<Model> {
 
-    private static final List<Resource> templateTypes = List.of(WOTTR.Template, WOTTR.Signature, WOTTR.BaseTemplate);
+    //private static final List<Resource> templateTypes = List.of(WOTTR.Template, WOTTR.Signature, WOTTR.BaseTemplate);
 
     private final WInstanceParser instanceParser;
     private final PrefixMapping prefixes;

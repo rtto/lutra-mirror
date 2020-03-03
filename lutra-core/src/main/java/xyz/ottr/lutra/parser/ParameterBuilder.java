@@ -31,8 +31,7 @@ import xyz.ottr.lutra.system.Result;
 public class ParameterBuilder {
 
     @Builder
-    @SuppressWarnings("PMD.UnusedPrivateMethod")
-    private static Result<Parameter> createParameter(Result<Term> term, Result<Boolean> nonBlank,
+    public static Result<Parameter> createParameter(Result<Term> term, Result<Boolean> nonBlank,
         Result<Boolean> optional, Result<Term> defaultValue) {
 
         term = Result.nullToEmpty(term, Message.error("Missing variable. A parameter must have a variable term."));

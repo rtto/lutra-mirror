@@ -36,11 +36,10 @@ import xyz.ottr.lutra.system.Result;
 
 // TODO should we split this into different parsers and introduce a new class TemplateSource which orchestrates the different parsers?
 
-public abstract class TemplateBuilder {
+public class TemplateBuilder {
 
-    @SuppressWarnings("PMD.UnusedPrivateMethod")
     @Builder(builderMethodName = "signatureBuilder", builderClassName = "InnerSignatureBuilder")
-    private static Result<Signature> createSignature(Result<String> iri, Result<List<Parameter>> parameters) {
+    public static Result<Signature> createSignature(Result<String> iri, Result<List<Parameter>> parameters) {
 
         iri = Result.nullToEmpty(iri, Message.error("Missing IRI. A signature must have an IRI."));
         parameters = Result.nullToEmpty(parameters, Message.error("Missing parameter list. A signature must have "
@@ -55,9 +54,8 @@ public abstract class TemplateBuilder {
             : Result.empty(builder);
     }
 
-    @SuppressWarnings("PMD.UnusedPrivateMethod")
     @Builder(builderMethodName = "templateBuilder", builderClassName = "InnerTemplateBuilder")
-    private static Result<Template> createTemplate(Result<Signature> signature, Result<Set<Instance>> instances) {
+    public static Result<Template> createTemplate(Result<Signature> signature, Result<Set<Instance>> instances) {
 
         signature = Result.nullToEmpty(signature, Message.error("Missing signature. A template must have "
             + "a signature."));
@@ -76,9 +74,8 @@ public abstract class TemplateBuilder {
             : Result.empty(builder);
     }
 
-    @SuppressWarnings("PMD.UnusedPrivateMethod")
     @Builder(builderMethodName = "baseTemplateBuilder", builderClassName = "InnerBaseTemplateBuilder")
-    private static Result<BaseTemplate> createBaseTemplate(Result<Signature> signature) {
+    public static Result<BaseTemplate> createBaseTemplate(Result<Signature> signature) {
 
         signature = Result.nullToEmpty(signature, Message.error("Missing signature. A base template must have "
             + "a signature."));

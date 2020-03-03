@@ -30,11 +30,10 @@ import xyz.ottr.lutra.model.terms.Term;
 import xyz.ottr.lutra.system.Message;
 import xyz.ottr.lutra.system.Result;
 
-public abstract class ArgumentBuilder {
+public class ArgumentBuilder {
 
     @Builder
-    @SuppressWarnings("PMD.UnusedPrivateMethod")
-    private static Result<Argument> createArgument(Result<Term> term, Result<Boolean> listExpander) {
+    public static Result<Argument> createArgument(Result<Term> term, Result<Boolean> listExpander) {
 
         term = Result.nullToEmpty(term, Message.error("Missing value. An argument must have a term value."));
         listExpander = Result.nullToEmpty(listExpander);

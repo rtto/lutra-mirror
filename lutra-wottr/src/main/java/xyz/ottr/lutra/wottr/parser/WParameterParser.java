@@ -63,13 +63,14 @@ public class WParameterParser implements Function<RDFNode, Result<Parameter>> {
             .build();
 
         modifiers.ifPresent(mods -> {
-            var unknowns = mods.removeAll(WOTTR.argumentModifiers);
-            if (!mods.isEmpty()) {
+            var modifierCopy = List.copyOf(mods); // make a copy in case we want to use modifiers later.
+            modifierCopy.removeAll(WOTTR.argumentModifiers);
+            if (!modifierCopy.isEmpty()) {
                 parameter.addError("Unknown modifier. Permissible modifiers are "
                     + RDFNodes.toString(WOTTR.argumentModifiers) + ", but found "
-                    + RDFNodes.toString(mods));
-                }
-            });
+                    + RDFNodes.toString(modifierCopy));
+            }
+        });
 
         return parameter;
     }

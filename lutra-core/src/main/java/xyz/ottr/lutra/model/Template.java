@@ -46,7 +46,7 @@ public class Template extends Signature {
     private final @NonNull Set<Instance> instances;
 
     @Builder
-    private Template(@NonNull String iri, @Singular List<Parameter> parameters, @Singular Set<Instance> instances) {
+    private Template(String iri, @Singular List<Parameter> parameters, @Singular Set<Instance> instances) {
         super(iri, parameters);
         this.instances = instances;
         setVariableFlagsAndTypes();

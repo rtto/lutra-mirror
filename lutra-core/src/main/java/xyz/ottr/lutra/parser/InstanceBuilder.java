@@ -32,11 +32,10 @@ import xyz.ottr.lutra.model.ListExpander;
 import xyz.ottr.lutra.system.Message;
 import xyz.ottr.lutra.system.Result;
 
-public abstract class InstanceBuilder {
+public class InstanceBuilder {
 
     @Builder
-    @SuppressWarnings("PMD.UnusedPrivateMethod")
-    private static Result<Instance> createInstance(Result<String> iri, Result<List<Argument>> arguments,
+    public static Result<Instance> createInstance(Result<String> iri, Result<List<Argument>> arguments,
                                                    Result<ListExpander> listExpander) {
 
         iri = Result.nullToEmpty(iri, Message.error("Missing IRI. An instance must have an IRI (that refers to a signature)."));
