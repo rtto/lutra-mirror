@@ -30,11 +30,9 @@ import static org.junit.Assert.assertTrue;
 import static xyz.ottr.lutra.model.terms.ObjectTerm.cons;
 import static xyz.ottr.lutra.model.terms.ObjectTerm.var;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 import org.junit.Assert;

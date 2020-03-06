@@ -1,4 +1,4 @@
-package xyz.ottr.lutra.wottr.vocabulary.v04;
+package xyz.ottr.lutra.wottr.vocabulary;
 
 /*-
  * #%L

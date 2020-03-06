@@ -22,6 +22,7 @@ package xyz.ottr.lutra.model.terms;
  * #L%
  */
 
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
@@ -88,7 +89,7 @@ public class ListTerm extends AbstractTerm<Long> {
     }
 
     public List<Term> asList() {
-        return this.terms;
+        return Collections.unmodifiableList(this.terms);
     }
 
     public boolean equalContentAs(ListTerm o) {

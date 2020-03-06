@@ -55,7 +55,7 @@ public class RDFFileReader implements InputReader<String, Model> {
 
         String path = isURL(url) ? url : FilenameUtils.separatorsToSystem(Paths.get(url).toAbsolutePath().toString());
 
-        Result<Model> result = null;
+        Result<Model> result;
         try {
             Model model = ModelIO.readModel(path);
             this.prefixes.setNsPrefixes(model);

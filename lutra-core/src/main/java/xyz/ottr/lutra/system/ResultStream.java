@@ -71,7 +71,7 @@ public class ResultStream<E> {
         Stream<Result<E>> stream = StreamSupport.stream(
             Spliterators.spliteratorUnknownSize(iterator, Spliterator.ORDERED),
             false);
-        return new ResultStream<E>(stream);
+        return new ResultStream<>(stream);
     }
 
     /**

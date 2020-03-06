@@ -22,6 +22,7 @@ package xyz.ottr.lutra.store.checks;
  * #L%
  */
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.util.List;
@@ -92,7 +93,7 @@ public class CheckLibraryTest {
             msgs.forEach(m -> m.log(this.log));
         }
 
-        assertTrue(assStr, msgs.size() == numErrors); 
+        assertEquals(assStr, msgs.size(), numErrors);
     }
 
     @Test

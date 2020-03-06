@@ -1,4 +1,4 @@
-package xyz.ottr.lutra.wottr.parser.v04;
+package xyz.ottr.lutra.wottr.parser;
 
 /*-
  * #%L
@@ -22,57 +22,57 @@ package xyz.ottr.lutra.wottr.parser.v04;
  * #L%
  */
 
+import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 
 import org.apache.jena.rdf.model.Model;
-import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.jena.riot.Lang;
+import org.junit.Assert;
 import xyz.ottr.lutra.io.InstanceReader;
-import xyz.ottr.lutra.io.TemplateReader;
 import xyz.ottr.lutra.model.Instance;
 import xyz.ottr.lutra.store.TemplateStore;
 import xyz.ottr.lutra.store.graph.DependencyGraph;
 import xyz.ottr.lutra.system.Message;
-import xyz.ottr.lutra.system.MessageHandler;
-import xyz.ottr.lutra.system.Result;
 import xyz.ottr.lutra.system.ResultConsumer;
 import xyz.ottr.lutra.system.ResultStream;
 import xyz.ottr.lutra.wottr.io.RDFFileReader;
 import xyz.ottr.lutra.wottr.parser.WInstanceParser;
-import xyz.ottr.lutra.wottr.parser.WTemplateParser;
+import xyz.ottr.lutra.wottr.util.ModelIO;
 import xyz.ottr.lutra.wottr.writer.WInstanceWriter;
 
-public class BlankNodeTest {
+public enum ModelUtils {
 
-    private static final Logger log = LoggerFactory.getLogger(BlankNodeTest.class);
+    ; // singleton enum utility class
 
-    // Tests if a template including a blank node is correctly instantiated.
+    public static void testIsomorphicModels(Model actual, Model expected) {
 
-    // Input:
-    //   * instances: correct/instances/blank1/in.ttl
-    //   * template definition: correct/definitions/Blank.ttl
-    // Check that the expansion is isomorphic to:
-    // instances: correct/instances/blank1/out.ttl
+        boolean isIsomorphic = actual.isIsomorphicWith(expected);
 
-    @Test
-    public void shouldBeIsomorphic() {
+        if (isIsomorphic) {
+            Assert.assertTrue(isIsomorphic);
+        } else { // if error, i.e., models are different, print nice error message
+
+            // clear prefixes to better diff-ing
+            actual.clearNsPrefixMap();
+            expected.clearNsPrefixMap();
+
+            String rdfActual = ModelIO.writeModel(actual, Lang.TURTLE);
+            String rdfExpected = ModelIO.writeModel(expected, Lang.TURTLE);
+
+            Assert.assertThat(rdfActual, is(rdfExpected));
+        }
+    }
+
+
+    // read RDF file, expand instances (only base instances), and return OTTR parsed RDF model
+    public static Model getOTTRParsedRDFModel(String filename) {
 
         TemplateStore store = new DependencyGraph(null);
         store.addOTTRBaseTemplates();
 
-        // Read templates
-        TemplateReader tempReader = new TemplateReader(new RDFFileReader(), new WTemplateParser());
-        ResultStream<String> tempIRI = ResultStream.innerOf("src/test/resources/correct/definitions/core/Blank.ttl");
-        MessageHandler errorMessages = tempReader.populateTemplateStore(store, tempIRI);
-        assertFalse(Message.moreSevere(errorMessages.printMessages(),
-                Message.ERROR)); // No errors when parsing
-
-        // Read in-instances and expand
         InstanceReader insReader = new InstanceReader(new RDFFileReader(), new WInstanceParser());
         ResultStream<Instance> expandedInInstances = insReader
-            .apply("src/test/resources/correct/instances/blank1/in.ttl")
+            .apply(filename)
             .innerFlatMap(store::expandInstance);
 
         // Write expanded instances to model
@@ -80,17 +80,9 @@ public class BlankNodeTest {
         ResultConsumer<Instance> expansionErrors = new ResultConsumer<>(insWriter);
         expandedInInstances.forEach(expansionErrors);
         assertFalse(Message.moreSevere(expansionErrors.getMessageHandler().printMessages(),
-                Message.ERROR)); // No errors when expanding
-        Model in = insWriter.writeToModel();
-
-        // Read out-model
-        Result<Model> outRes = new RDFFileReader().parse("src/test/resources/correct/instances/blank1/out.ttl");
-        if (!outRes.isPresent()) {
-            log.error(outRes.toString());
-        }
-        assertTrue(outRes.isPresent());
-        Model out = outRes.get();
-
-        ModelUtils.testIsomorphicModels(in, out);
+            Message.ERROR)); // No errors when expanding
+        return insWriter.writeToModel();
     }
+
+
 }

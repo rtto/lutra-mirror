@@ -99,6 +99,6 @@ public class Tuple {
      * when displaying the value of an index in a Message, and not internally.
      */
     public String getAsEndUserIndex(String name) {
-        return "" + (getAs(Integer.class, name) + 1);
+        return Integer.toString(getAs(Integer.class, name) + 1);
     }
 }

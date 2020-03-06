@@ -42,9 +42,6 @@ public enum PrefixMappings {
 
     /**
      * Add a namespace to mapping, giving it some fresh prefix.
-     *
-     * @param mapping
-     * @param namespace
      */
     public static void addNamespace(PrefixMapping mapping, String namespace) {
         if (!containsNamespace(mapping, namespace)) {

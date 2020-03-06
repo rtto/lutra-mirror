@@ -23,11 +23,15 @@ package xyz.ottr.lutra.store.graph;
  */
 
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 import lombok.Getter;
 import lombok.Setter;
+import xyz.ottr.lutra.model.BaseTemplate;
 import xyz.ottr.lutra.model.Parameter;
+import xyz.ottr.lutra.model.Signature;
+import xyz.ottr.lutra.model.Template;
 import xyz.ottr.lutra.model.terms.Term;
 
 @Getter
@@ -40,9 +44,15 @@ public class TemplateNode {
      *              other templates, i.e. we do not (yet) have a definition of the template
      * - BASE: The node is added as a base template 
      * - SIGNATURE: The node is added as a signature template
-     * - DEFINITION: The template has been added with a definition
+     * - TEMPLATE: The node has been added with a definition
      */
-    enum Type { UNDEFINED, BASE, SIGNATURE, DEFINITION }
+    enum Type { UNDEFINED, BASE, SIGNATURE, TEMPLATE }
+
+    private static Map<Class, Type> typeMap = Map.of(
+        Template.class, Type.TEMPLATE,
+        BaseTemplate.class, Type.BASE,
+        Signature.class, Type.SIGNATURE
+    );
 
     private final String iri;
     private List<Parameter> parameters;
@@ -54,6 +64,10 @@ public class TemplateNode {
         this.parameters = null;
     }
 
+    public static TemplateNode.Type getTemplateNodeType(Signature signature) {
+        return typeMap.getOrDefault(signature.getClass(), Type.UNDEFINED);
+    }
+
     boolean isBase() {
         return this.type == Type.BASE;
     }
@@ -63,7 +77,7 @@ public class TemplateNode {
     }
 
     boolean isDefinition() {
-        return this.type == Type.DEFINITION;
+        return this.type == Type.TEMPLATE;
     }
 
     boolean isUndefined() {

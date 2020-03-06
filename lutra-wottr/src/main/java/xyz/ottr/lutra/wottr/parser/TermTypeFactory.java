@@ -58,12 +58,10 @@ public class TermTypeFactory implements Function<RDFNode, Result<TermType>> {
 
         TermType type = TypeRegistry.getType(node.getURI());
 
-        if (type == null) {
-            return Result.error("Expected a resource denoting a simple type, but no simple type "
+        return type != null
+            ? Result.of(type)
+            : Result.error("Expected a resource denoting a simple type, but no simple type "
                 + RDFNodes.toString(node) + " exists.");
-        } else {
-            return Result.of(type);
-        }
     }
 
     private Result<TermType> parseComplexType(Iterator<RDFNode> complexType) {
@@ -85,13 +83,13 @@ public class TermTypeFactory implements Function<RDFNode, Result<TermType>> {
         } else if (type.getURI().equals(OTTR.TypeURI.LUB)) {
             if (rest.isPresent() && !(rest.get() instanceof BasicType)) {
                 return Result.error("Expected simple type as argument to LUB-type, but got "
-                    + rest.get().toString());
+                    + rest.get());
             }
             return rest.flatMap(inner -> Result.of(new LUBType((BasicType) inner)));
         } else if (!rest.isPresent()) {
             return parseSimpleType(type);
         } else {
-            return Result.error("Unrecognized type constructor " + type.toString() + ".");
+            return Result.error("Unrecognized type constructor " + type + ".");
         }
     }
 }

@@ -773,7 +773,7 @@ public abstract class QueryEngine<S extends TemplateStore> {
     /**
      * Utility class used in unification above.
      */
-    static class TupleComparator implements Comparator<Tuple>, Serializable {
+    private static class TupleComparator implements Comparator<Tuple>, Serializable {
 
         public static final long serialVersionUID = 19013L; // TODO: Not correct
 

@@ -40,7 +40,7 @@ public enum ModelSelector {
 
     ; // singleton enum
 
-    enum CardinalityOne {
+    private enum CardinalityOne {
 
         ZERO_ONE("optionally 1"),
         ONE("exactly 1"),

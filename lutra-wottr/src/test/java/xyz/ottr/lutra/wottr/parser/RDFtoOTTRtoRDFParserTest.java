@@ -1,4 +1,4 @@
-package xyz.ottr.lutra.wottr.parser.v04;
+package xyz.ottr.lutra.wottr.parser;
 
 /*-
  * #%L
@@ -23,6 +23,7 @@ package xyz.ottr.lutra.wottr.parser.v04;
  */
 
 import static org.junit.Assume.assumeNotNull;
+import static org.junit.Assume.assumeTrue;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -32,6 +33,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.apache.jena.rdf.model.Model;
+import org.apache.jena.shared.JenaException;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -65,13 +67,9 @@ public class RDFtoOTTRtoRDFParserTest {
         Model rdfModel = null;
         try {
             rdfModel = ModelIO.readModel(this.filename);
-        } catch (Exception ex) {
-            // Do nothing here, we ignore Jena parser errors, which we assume
-            // are caused by negative tests.
+        } catch (JenaException ex) {
+            assumeNotNull(rdfModel, ex); // abort test if the model is not correctly parsed by Jena.
         }
-        // Continue test only if model is correctly parsed by Jena
-        assumeNotNull(rdfModel); 
-
         Model ottrModel = ModelUtils.getOTTRParsedRDFModel(this.filename);
 
         ModelUtils.testIsomorphicModels(ottrModel, rdfModel);

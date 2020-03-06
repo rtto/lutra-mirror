@@ -49,13 +49,11 @@ public class ListExpanderTest {
 
 
     private static List<List<Term>> expandToTerms(List<Argument> arguments, ListExpander expander) {
-
-        List<List<Term>> expanded = expander.expand(arguments).stream()
+        return expander.expand(arguments).stream()
             .map(list -> list.stream()
                 .map(Argument::getTerm)
                 .collect(Collectors.toList()))
             .collect(Collectors.toList());
-        return expanded;
     }
 
 
@@ -102,12 +100,12 @@ public class ListExpanderTest {
 
     @Test
     public void crossTest2Empty() {
-        test(this.args2, ListExpander.cross, Collections.<List<Term>>emptyList());
+        test(this.args2, ListExpander.cross, Collections.emptyList());
     }
 
     @Test
     public void zipMinTest2Empty() {
-        test(this.args2, ListExpander.zipMin, Collections.<List<Term>>emptyList());
+        test(this.args2, ListExpander.zipMin, Collections.emptyList());
     }
 
 }

@@ -1,4 +1,4 @@
-package xyz.ottr.lutra.wottr.parser.v04;
+package xyz.ottr.lutra.wottr.parser;
 
 /*-
  * #%L
@@ -157,7 +157,7 @@ public class ShaclEquivalenceTest {
         templates.forEach(tpl -> {
             if (correct) {
                 assertTrue("Should parse: " + file + ", but failed with errors:\n"
-                    + tpl.getAllMessages().toString(), tpl.isPresent());
+                    + tpl.getAllMessages(), tpl.isPresent());
             }
             tplErrorMessages.accept(tpl);
         });
@@ -169,7 +169,7 @@ public class ShaclEquivalenceTest {
             assertFalse("Should produce error messages: " + file, errors.isEmpty());
         } else {
             assertTrue("File " + file + " should not produce any error messages, but gave:\n"
-                + errors.toString(), errors.isEmpty());
+                + errors, errors.isEmpty());
             assertTrue("File " + file + " should produce a template, but no templates produced.",
                 store.getAllTemplateObjects().getStream().count() > 0);
         }
@@ -182,7 +182,7 @@ public class ShaclEquivalenceTest {
         instances.forEach(ins -> {
             if (correct) {
                 assertTrue("Should parse: " + file + ", but failed with errors:\n"
-                    + ins.getAllMessages().toString(), ins.isPresent());
+                    + ins.getAllMessages(), ins.isPresent());
             }
             insErrorMessages.accept(ins);
         });
@@ -193,7 +193,7 @@ public class ShaclEquivalenceTest {
         }
         if (correct) {
             assertFalse("File " + file + " should not produce any error messages, but gave:\n"
-                + insErrorMessages.getMessageHandler().getMessages().toString(),
+                + insErrorMessages.getMessageHandler().getMessages(),
                 Message.moreSevere(msgLvl, Message.ERROR));
         }
     }

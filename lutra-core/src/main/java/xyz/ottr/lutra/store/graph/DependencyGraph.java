@@ -161,19 +161,11 @@ public class DependencyGraph implements TemplateStore {
         log.info("Adding template signature " + signature.getIri());
         TemplateNode node = addTemplateNode(signature.getIri());
         node.setParameters(signature.getParameters());
-        node.setType(getTemplateNodeType(signature));
+        node.setType(TemplateNode.getTemplateNodeType(signature));
         return true;
     }
 
-    private TemplateNode.Type getTemplateNodeType(Signature signature) {
-        if (signature instanceof Template) {
-            return TemplateNode.Type.DEFINITION;
-        } else if (signature instanceof BaseTemplate) {
-            return TemplateNode.Type.BASE;
-        } else {
-            return TemplateNode.Type.SIGNATURE;
-        }
-    }
+
 
     @Override
     public boolean addTemplate(Template template) {
@@ -192,7 +184,7 @@ public class DependencyGraph implements TemplateStore {
                 TemplateNode insNode = addTemplateNode(i.getIri());
                 addDependency(tempNode, i.getArguments(), i.getListExpander(), insNode);
             }
-            tempNode.setType(TemplateNode.Type.DEFINITION);
+            tempNode.setType(TemplateNode.Type.TEMPLATE);
         }
         return true;
     }
@@ -563,13 +555,12 @@ public class DependencyGraph implements TemplateStore {
             toExpandRes = expanded;
         }
 
-        ResultStream<Instance> expandedInstances = new ResultStream<>(finalExpansion)
+        return new ResultStream<>(finalExpansion)
             .innerMap(dep -> Instance.builder()
                 .iri(dep.to.getIri())
                 .arguments(dep.argumentList)
                 .listExpander(dep.listExpander)
                 .build());
-        return expandedInstances;
     }
 
     private Result<DependencyEdge> checkArguments(DependencyEdge ins) {
@@ -680,16 +671,16 @@ public class DependencyGraph implements TemplateStore {
 
         for (Map.Entry<TemplateNode, Set<DependencyEdge>> ens : this.dependencies.entrySet()) {
             TemplateNode node = ens.getKey();
-            str.append(node + ":" + "\n");
+            str.append(node).append(":").append("\n");
             Map<TemplateNode, Set<List<Argument>>> deps = new HashMap<>();
             for (DependencyEdge e : ens.getValue()) {
                 deps.putIfAbsent(e.to, new HashSet<>());
                 deps.get(e.to).add(e.argumentList);
             }
             for (Map.Entry<TemplateNode, Set<List<Argument>>> dep : deps.entrySet()) {
-                str.append("  " + dep.getKey() + "\n");
+                str.append("  ").append(dep.getKey()).append("\n");
                 for (List<Argument> args : dep.getValue()) {
-                    str.append("    => " + args + "\n");
+                    str.append("    => ").append(args).append("\n");
                 }
             }
             str.append("\n\n");

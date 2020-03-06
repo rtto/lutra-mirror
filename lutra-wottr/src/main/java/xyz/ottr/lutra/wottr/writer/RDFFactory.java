@@ -71,7 +71,7 @@ class RDFFactory {
         return model.createStatement(s.asResource(), p.as(Property.class), o);
     }
 
-    private void checkSubject(RDFNode subject, Instance instance) throws IllegalArgumentException {
+    private void checkSubject(RDFNode subject, Instance instance) {
         if (!subject.isResource()) {
             throw new IllegalArgumentException("Error creating a triple of the instance " + instance
                 + ". Expected a resource on subject position, but found "
@@ -79,7 +79,7 @@ class RDFFactory {
         }
     }
 
-    private void checkPredicate(RDFNode predicate, Instance instance) throws IllegalArgumentException {
+    private void checkPredicate(RDFNode predicate, Instance instance) {
 
         if (!predicate.canAs(Property.class)) {
 

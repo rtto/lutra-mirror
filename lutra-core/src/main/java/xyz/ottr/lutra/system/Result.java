@@ -37,6 +37,8 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+// TODO: should we move some methods to UtilityClasses?
+
 public class Result<E> {
 
     private final Trace trace;
