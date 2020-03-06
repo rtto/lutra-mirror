@@ -30,7 +30,6 @@ import org.apache.jena.vocabulary.XSD;
 
 import xyz.ottr.lutra.model.Parameter;
 import xyz.ottr.lutra.model.Signature;
-import xyz.ottr.lutra.model.Template;
 import xyz.ottr.lutra.model.terms.BlankNodeTerm;
 import xyz.ottr.lutra.model.terms.Term;
 import xyz.ottr.lutra.model.types.TypeRegistry;
@@ -77,14 +76,23 @@ public enum OTTR  {
             Term obj = new BlankNodeTerm("_:o");
             obj.setType(obj.getVariableType());
 
-            Triple = Template.builder()
+            Triple = xyz.ottr.lutra.model.BaseTemplate.builder()
                 .iri(OTTR.BaseURI.Triple)
                 .parameter(Parameter.builder().term(sub).build())
                 .parameter(Parameter.builder().term(pred).nonBlank(true).build())
                 .parameter(Parameter.builder().term(obj).build())
                 .build();
+        }
 
-            NullableTriple = Template.builder()
+        static {
+            Term sub = new BlankNodeTerm("_:s");
+            sub.setType(TypeRegistry.getType(OTTR.TypeURI.IRI));
+            Term pred = new BlankNodeTerm("_:p");
+            pred.setType(TypeRegistry.getType(OTTR.TypeURI.IRI));
+            Term obj = new BlankNodeTerm("_:o");
+            obj.setType(obj.getVariableType());
+
+            NullableTriple = xyz.ottr.lutra.model.BaseTemplate.builder()
                 .iri(OTTR.BaseURI.NullableTriple)
                 .parameter(Parameter.builder().term(sub).optional(true).build())
                 .parameter(Parameter.builder().term(pred).optional(true).nonBlank(true).build())

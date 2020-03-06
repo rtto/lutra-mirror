@@ -25,16 +25,21 @@ package xyz.ottr.lutra.store.graph;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static xyz.ottr.lutra.model.terms.ObjectTerm.cons;
 import static xyz.ottr.lutra.model.terms.ObjectTerm.var;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 import org.junit.Assert;
 import org.junit.Test;
+import xyz.ottr.lutra.OTTR;
 import xyz.ottr.lutra.model.Argument;
 import xyz.ottr.lutra.model.BaseTemplate;
 import xyz.ottr.lutra.model.Instance;
@@ -43,6 +48,7 @@ import xyz.ottr.lutra.model.Parameter;
 import xyz.ottr.lutra.model.Signature;
 import xyz.ottr.lutra.model.Template;
 import xyz.ottr.lutra.model.terms.BlankNodeTerm;
+import xyz.ottr.lutra.model.terms.IRITerm;
 import xyz.ottr.lutra.model.terms.ListTerm;
 import xyz.ottr.lutra.model.terms.NoneTerm;
 import xyz.ottr.lutra.model.terms.ObjectTerm;
@@ -145,6 +151,28 @@ public class DependencyGraphTest {
                 .build());
 
         expandAndCheckEquality(toExpand, shouldEqual);
+    }
+
+    @Test
+    public void simpleTripleExpansion()  {
+
+        var tripleInstance = Instance.builder()
+            .iri(OTTR.BaseURI.Triple)
+            .arguments(Argument.listOf(
+                new IRITerm("http://example.com#subject"),
+                new IRITerm("http://example.com#predicate"),
+                new IRITerm("http://example.com#object")))
+            .build();
+
+        DependencyGraph graph = new DependencyGraph(null);
+
+        graph.addOTTRBaseTemplates();
+
+        var expanded = graph.expandInstance(tripleInstance).collect(Collectors.toList());
+
+        assertThat(expanded.size(), is(1));
+        assertThat(expanded.get(0).get(), is(tripleInstance));
+
     }
 
     @Test
