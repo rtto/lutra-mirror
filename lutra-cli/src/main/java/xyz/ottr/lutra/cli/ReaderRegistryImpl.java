@@ -66,11 +66,6 @@ public class ReaderRegistryImpl implements ReaderRegistry {
             new SFileReader(), new STemplateParser(),
             Settings.Format.stottr.toString()));
 
-        // legacy
-        registerTemplateReader(new TemplateReader(
-            new RDFFileReader(), new xyz.ottr.lutra.wottr.parser.v03.WTemplateParser(),
-            Settings.Format.legacy.toString()));
-
         // Add instance readers
         
         // wottr
@@ -92,11 +87,6 @@ public class ReaderRegistryImpl implements ReaderRegistry {
         registerInstanceReader(new InstanceReader(
             new ExcelReader(),
             Settings.Format.tabottr.toString()));
-
-        // legacy
-        registerInstanceReader(new InstanceReader(
-            new RDFFileReader(), new xyz.ottr.lutra.wottr.parser.v03.WInstanceParser(),
-            Settings.Format.legacy.toString()));
 
     }
     
