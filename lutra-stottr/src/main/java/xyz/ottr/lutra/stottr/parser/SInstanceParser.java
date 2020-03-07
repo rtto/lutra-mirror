@@ -53,14 +53,14 @@ public class SInstanceParser extends SParser<Instance> implements InstanceParser
      * for parsing instances within a template's body.
      */
     public SInstanceParser(Map<String, String> prefixes, Map<String, Term> variables) {
-        this();
         super.setPrefixesAndVariables(prefixes, variables);
+        this.argumentParser = new SArgumentParser(getTermParser());
     }
 
     @Override
     protected void initSubParsers() {
-        this.argumentParser = new SArgumentParser(getTermParser());
-    } // TODO Remove? already in the constructor?
+
+    }
 
     public ResultStream<Instance> apply(CharStream in) {
         return parseDocument(in);

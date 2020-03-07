@@ -51,7 +51,7 @@ public class STemplateParser extends SParser<Signature> implements TemplateParse
 
     @Override
     protected void initSubParsers() {
-        this.paramsParser = new SParameterParser(getTermParser()); // TODO is this necessary, its already in the constructor?
+
     }
 
     @Override
