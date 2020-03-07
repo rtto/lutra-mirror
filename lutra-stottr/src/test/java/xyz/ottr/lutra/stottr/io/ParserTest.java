@@ -168,7 +168,7 @@ public class ParserTest {
     }
 
 
-    public void testSignatureParsing(String signatureString) {
+    private void testSignatureParsing(String signatureString) {
 
         STemplateParser parser = new STemplateParser();
 
@@ -179,8 +179,25 @@ public class ParserTest {
     }
 
     @Test
-    public void testSignature1 () {
+    public void testSignature1() {
         testSignatureParsing("<http://example.com#T1> [ ?s ] :: BASE .");
+    }
+
+    @Test
+    public void testTemplate1() {
+
+        String template = "@prefix rdf:    <http://www.w3.org/1999/02/22-rdf-syntax-ns#> . "
+            + "@prefix foaf:   <http://xmlns.com/foaf/0.1/> . "
+            + "@prefix ex:     <http://example.com/ns#> . "
+            + "@prefix ottr:   <http://ns.ottr.xyz/0.4/> . "
+            + " ex:Person[ ?firstName, ?lastName, ?email ] :: { "
+            + "  ottr:Triple (_:person, rdf:type, foaf:Person ), "
+            + "  ottr:Triple (_:person, foaf:firstName, ?firstName ), "
+            + "  ottr:Triple (_:person, foaf:lastName, ?lastName ), "
+            + "  ottr:Triple (_:person, foaf:mbox, ?email ) "
+            + "} .";
+
+        testSignatureParsing(template);
     }
 
 

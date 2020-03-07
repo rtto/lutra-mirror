@@ -43,6 +43,7 @@ import xyz.ottr.lutra.stottr.parser.SInstanceParser;
 import xyz.ottr.lutra.stottr.parser.STemplateParser;
 import xyz.ottr.lutra.stottr.writer.SInstanceWriter;
 import xyz.ottr.lutra.system.Message;
+import xyz.ottr.lutra.system.MessageHandler;
 import xyz.ottr.lutra.system.ResultConsumer;
 import xyz.ottr.lutra.system.ResultStream;
 
@@ -115,7 +116,10 @@ public class PottrTest {
 
     private boolean testTemplates(TemplateStore store, String path) {
         TemplateReader reader = new TemplateReader(new SFileReader(), new STemplateParser());
-        reader.loadTemplatesFromFolder(store, resolve(path), new String[]{}, new String[]{});
+        MessageHandler messages = reader.loadTemplatesFromFolder(store, resolve(path), new String[]{}, new String[]{});
+
+        messages.printMessages();
+
         store.fetchMissingDependencies();
 
         List<Message> tplMsg = store.checkTemplates();
