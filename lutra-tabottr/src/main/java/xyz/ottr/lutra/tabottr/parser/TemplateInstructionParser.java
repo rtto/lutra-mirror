@@ -26,15 +26,15 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Stream;
 
-import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.shared.PrefixMapping;
-import xyz.ottr.lutra.model.ArgumentList;
+import xyz.ottr.lutra.model.Argument;
 import xyz.ottr.lutra.model.Instance;
 import xyz.ottr.lutra.model.terms.Term;
+import xyz.ottr.lutra.parser.ArgumentBuilder;
+import xyz.ottr.lutra.parser.InstanceBuilder;
 import xyz.ottr.lutra.system.Result;
 import xyz.ottr.lutra.tabottr.model.TemplateInstruction;
 import xyz.ottr.lutra.wottr.parser.TermFactory;
-import xyz.ottr.lutra.wottr.WOTTR;
 
 public class TemplateInstructionParser {
 
@@ -43,18 +43,23 @@ public class TemplateInstructionParser {
     
     public TemplateInstructionParser(PrefixMapping prefixes) {
         this.dataFactory = new RDFNodeFactory(prefixes);
-        this.termFactory = new TermFactory(WOTTR.theInstance);
+        this.termFactory = new TermFactory();
     }
     
     private Result<Instance> createTemplateInstance(String templateIRI, List<String> arguments, List<String> argumentTypes) {
-        List<Result<Term>> members = new LinkedList<>();
+
+        List<Result<Argument>> listArguments = new LinkedList<>();
         for (int i = 0; i < arguments.size(); i += 1) {
-            Result<RDFNode> rdfNode = this.dataFactory.toRDFNode(arguments.get(i), argumentTypes.get(i));
-            members.add(rdfNode.flatMap(this.termFactory));
+            Result<Term> term = this.dataFactory.toRDFNode(arguments.get(i), argumentTypes.get(i))
+                .flatMap(this.termFactory);
+            Result<Argument> argument = ArgumentBuilder.builder().term(term).build();
+            listArguments.add(argument);
         }
-        Result<List<Term>> rsArguments = Result.aggregate(members);
-        return rsArguments.map(args ->
-                new Instance(templateIRI, new ArgumentList(args)));
+
+        return InstanceBuilder.builder()
+            .iri(Result.of(templateIRI))
+            .arguments(Result.aggregate(listArguments))
+            .build();
     }
 
     Stream<Result<Instance>> processTemplateInstruction(TemplateInstruction instruction) {

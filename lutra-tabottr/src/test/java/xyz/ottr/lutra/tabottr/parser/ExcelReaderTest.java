@@ -32,9 +32,9 @@ import org.junit.Test;
 import xyz.ottr.lutra.model.Instance;
 import xyz.ottr.lutra.system.ResultConsumer;
 import xyz.ottr.lutra.system.ResultStream;
-import xyz.ottr.lutra.wottr.parser.v03.WInstanceParser;
+import xyz.ottr.lutra.wottr.parser.WInstanceParser;
 import xyz.ottr.lutra.wottr.util.ModelIO;
-import xyz.ottr.lutra.wottr.writer.v03.WInstanceWriter;
+import xyz.ottr.lutra.wottr.writer.WInstanceWriter;
 
 public class ExcelReaderTest {
 

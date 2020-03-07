@@ -1,18 +1,18 @@
 @prefix ex:    <http://example.org#> .
 @prefix owl:   <http://www.w3.org/2002/07/owl#> .
 @prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
-@prefix ottr:  <http://ns.ottr.xyz/templates#> .
+@prefix ottr:  <http://ns.ottr.xyz/0.4/> .
 @prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
 @prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
 
-[ ] ottr:templateRef  ex:NoTemplate ;
-    ottr:withValues   ( "1.345"^^xsd:string ) .
+[ ] ottr:of  ex:NoTemplate ;
+    ottr:values   ( "1.345"^^xsd:string ) .
 
-[ ] ottr:templateRef  ex:NoTemplate ;
-    ottr:withValues   ( "hello"^^xsd:string ) .
+[ ] ottr:of  ex:NoTemplate ;
+    ottr:values   ( "hello"^^xsd:string ) .
 
-[ ] ottr:templateRef  ex:NoTemplate ;
-    ottr:withValues   ( "TRUE"^^xsd:string ) .
+[ ] ottr:of  ex:NoTemplate ;
+    ottr:values   ( "TRUE"^^xsd:string ) .
 
-[ ] ottr:templateRef  ex:NoTemplate ;
-    ottr:withValues   ( "!#"^^xsd:string ) .
+[ ] ottr:of  ex:NoTemplate ;
+    ottr:values   ( "!#"^^xsd:string ) .
