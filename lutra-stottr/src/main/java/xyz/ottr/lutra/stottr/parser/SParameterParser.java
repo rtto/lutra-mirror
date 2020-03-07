@@ -1,0 +1,99 @@
+package xyz.ottr.lutra.stottr.parser;
+
+/*-
+ * #%L
+ * lutra-stottr
+ * %%
+ * Copyright (C) 2018 - 2019 University of Oslo
+ * %%
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation, either version 2.1 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Lesser Public License for more details.
+ *
+ * You should have received a copy of the GNU General Lesser Public
+ * License along with this program.  If not, see
+ * <http://www.gnu.org/licenses/lgpl-2.1.html>.
+ * #L%
+ */
+
+import java.util.Collections;
+import java.util.Set;
+import java.util.stream.Collectors;
+import org.antlr.v4.runtime.Token;
+import org.antlr.v4.runtime.tree.TerminalNode;
+import xyz.ottr.lutra.model.Parameter;
+import xyz.ottr.lutra.model.terms.BlankNodeTerm;
+import xyz.ottr.lutra.model.terms.Term;
+import xyz.ottr.lutra.model.types.TermType;
+import xyz.ottr.lutra.parser.ParameterBuilder;
+import xyz.ottr.lutra.stottr.STOTTR;
+import xyz.ottr.lutra.stottr.antlr.stOTTRParser;
+import xyz.ottr.lutra.system.Result;
+
+class SParameterParser extends SBaseParserVisitor<Parameter> {
+
+    private final STypeParser typeParser;
+    private final STermParser termParser;
+
+    SParameterParser(STermParser termParser) {
+        this.termParser = termParser;
+        this.typeParser = new STypeParser(termParser);
+    }
+
+
+    public Result<Parameter> visitParameter(stOTTRParser.ParameterContext ctx) {
+
+        var modifiers = parseModifiers(ctx);
+
+        return ParameterBuilder.builder()
+            .term(parseTerm(ctx))
+            .optional(Result.of(modifiers.contains(STOTTR.Parameters.optional)))
+            .nonBlank(Result.of(modifiers.contains(STOTTR.Parameters.nonBlank)))
+            .defaultValue(parseDefaultValue(ctx))
+            .build();
+    }
+
+    private Set<String> parseModifiers(stOTTRParser.ParameterContext ctx) {
+
+        return ctx.ParameterMode() != null
+            ? ctx.ParameterMode().stream()
+                .map(TerminalNode::getSymbol)
+                .map(Token::getText)
+                .collect(Collectors.toSet())
+            : Collections.emptySet();
+    }
+
+    private Result<Term> parseDefaultValue(stOTTRParser.ParameterContext ctx) {
+
+        return ctx.defaultValue() != null
+            ? this.termParser.visit(ctx.defaultValue().constant())
+            : Result.empty();
+    }
+
+    private Result<Term> parseTerm(stOTTRParser.ParameterContext ctx) {
+
+        Term var = new BlankNodeTerm(this.termParser.getVariableLabel(ctx.Variable()));
+        var.setVariable(true); // TODO: Remove? Is is not already covered by Signature.setVariables()?
+        var term = Result.of(var);
+
+        term.addResult(parseType(ctx), Term::setType);
+
+        // TODO do we need this still or is it set in core?
+        //  var.getVariableType())); // TODO: Remove? Should be covered by core?
+        return term;
+    }
+
+    private Result<TermType> parseType(stOTTRParser.ParameterContext ctx) {
+
+        return ctx.type() != null
+            ? this.typeParser.visit(ctx)
+            : Result.empty();
+    }
+}
+

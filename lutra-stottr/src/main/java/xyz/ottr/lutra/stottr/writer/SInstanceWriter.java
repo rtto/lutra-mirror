@@ -26,9 +26,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import xyz.ottr.lutra.model.ArgumentList;
+import xyz.ottr.lutra.model.Argument;
 import xyz.ottr.lutra.model.Instance;
-import xyz.ottr.lutra.model.terms.Term;
 import xyz.ottr.lutra.stottr.STOTTR;
 import xyz.ottr.lutra.writer.InstanceWriter;
 
@@ -73,10 +72,9 @@ public class SInstanceWriter implements InstanceWriter {
 
         StringBuilder builder = new StringBuilder();
 
-        ArgumentList args = instance.getArguments();
-        if (args.hasListExpander()) {
+        if (instance.hasListExpander()) {
             builder
-                .append(STOTTR.Expanders.map.inverseBidiMap().getKey(args.getListExpander()))
+                .append(STOTTR.Expanders.map.inverseBidiMap().getKey(instance.getListExpander()))
                 .append(" ")
                 .append(STOTTR.Expanders.expanderSep)
                 .append(" ");
@@ -84,23 +82,23 @@ public class SInstanceWriter implements InstanceWriter {
 
         builder.append(this.termWriter.writeIRI(instance.getIri()));
         builder.append(STOTTR.Terms.insArgStart)
-            .append(writeArguments(args))
+            .append(writeArguments(instance.getArguments()))
             .append(STOTTR.Terms.insArgEnd);
 
         return builder;
     }
 
-    private StringBuilder writeArguments(ArgumentList args) {
+    private StringBuilder writeArguments(List<Argument> args) {
 
         StringBuilder builder = new StringBuilder();
         String sep = "";
 
-        for (Term arg : args.asList()) {
+        for (Argument arg : args) {
             builder.append(sep);
-            if (args.getExpanderValues().contains(arg)) {
+            if (arg.isListExpander()) {
                 builder.append(STOTTR.Expanders.expander);
             }
-            builder.append(this.termWriter.write(arg));
+            builder.append(this.termWriter.write(arg.getTerm()));
             sep = STOTTR.Terms.insArgSep + " ";
         }
         return builder;

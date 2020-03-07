@@ -43,13 +43,13 @@ public class STermWriter {
     private final Set<String> usedPrefixes;
     private final Set<Term> variables;
 
-    public STermWriter(Map<String, String> prefixes, Set<Term> variables) {
+    STermWriter(Map<String, String> prefixes, Set<Term> variables) {
         this.prefixes = prefixes;
         this.variables = variables;
         this.usedPrefixes = new HashSet<>();
     }
 
-    public STermWriter(Map<String, String> prefixes) {
+    STermWriter(Map<String, String> prefixes) {
         this(prefixes, new HashSet<>());
     }
 
@@ -57,7 +57,7 @@ public class STermWriter {
         return Collections.unmodifiableMap(this.prefixes);
     }
 
-    public Set<String> getUsedPrefixes() {
+    Set<String> getUsedPrefixes() {
         return Collections.unmodifiableSet(this.usedPrefixes);
     }
 
@@ -78,7 +78,7 @@ public class STermWriter {
         }
     }
 
-    public String writeIRI(String iri) {
+    String writeIRI(String iri) {
 
         if (iri.equals(WOTTR.none.getURI())) {
             return STOTTR.Terms.none;
@@ -97,7 +97,7 @@ public class STermWriter {
         return out;
     }
 
-    public String writeLiteral(LiteralTerm literal) {
+    private String writeLiteral(LiteralTerm literal) {
 
         String val = "\"" + literal.getValue() + "\"";
         if (literal.getDatatype() != null) {
@@ -108,7 +108,8 @@ public class STermWriter {
         return val;
     }
     
-    public String writeBlank(BlankNodeTerm blank) {
+    private String writeBlank(BlankNodeTerm blank) {
+
         String label = blank.getLabel();
         String prefix = this.variables.contains(blank)
             ? STOTTR.Terms.variablePrefix
@@ -116,7 +117,7 @@ public class STermWriter {
         return prefix + label;
     }
 
-    public String writeList(ListTerm list) {
+    private String writeList(ListTerm list) {
         return list.asList()
             .stream()
             .map(this::write)

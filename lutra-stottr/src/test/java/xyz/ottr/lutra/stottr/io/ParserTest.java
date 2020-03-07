@@ -26,22 +26,20 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import org.apache.jena.vocabulary.XSD;
 import org.junit.Test;
-import xyz.ottr.lutra.model.ArgumentList;
+import xyz.ottr.lutra.model.Argument;
 import xyz.ottr.lutra.model.Instance;
+import xyz.ottr.lutra.model.ListExpander;
 import xyz.ottr.lutra.model.terms.IRITerm;
+import xyz.ottr.lutra.model.terms.ListTerm;
 import xyz.ottr.lutra.model.terms.LiteralTerm;
 import xyz.ottr.lutra.model.terms.NoneTerm;
 import xyz.ottr.lutra.model.terms.Term;
-import xyz.ottr.lutra.model.terms.ListTerm;
 import xyz.ottr.lutra.stottr.parser.SInstanceParser;
 import xyz.ottr.lutra.stottr.parser.SParserUtils;
 import xyz.ottr.lutra.stottr.parser.SPrefixParser;
@@ -102,30 +100,40 @@ public class ParserTest {
 
     private List<Instance> makeInstances() {
 
-        ListTerm lst = new ListTerm(
-            LiteralTerm.createPlainLiteral("one"),
-            LiteralTerm.createPlainLiteral("two"),
-            LiteralTerm.createPlainLiteral("three"));
-        Set<Term> toExpand = new HashSet<>();
-        toExpand.add(lst);
 
-        return Stream.of(
-            new Instance("http://base.org/T1",
-                new ArgumentList(
-                    LiteralTerm.createTypedLiteral("true", XSD.xboolean.getURI()),
-                    new NoneTerm(),
-                    new IRITerm("http://www.w3.org/1999/02/22-rdf-syntax-ns#type"),
-                    new IRITerm("http://some.uri/with#part"))),
-            new Instance("http://example.org/T2",
-                new ArgumentList(
-                    new ListTerm(LiteralTerm.createLanguageTagLiteral("hello", "no"), lst),
-                    toExpand, ArgumentList.Expander.CROSS)),
-            new Instance("http://base.org/T3",
-                new ArgumentList(
-                    LiteralTerm.createTypedLiteral("42", XSD.integer.getURI()),
-                    LiteralTerm.createTypedLiteral("42.01", XSD.decimal.getURI()),
-                    LiteralTerm.createTypedLiteral("42.02", XSD.decimal.getURI())))
-        ).collect(Collectors.toList());
+        var i1 = Instance.builder()
+            .iri("http://base.org/T1")
+            .arguments(Argument.listOf(
+                LiteralTerm.createTypedLiteral("true", XSD.xboolean.getURI()),
+                new NoneTerm(),
+                new IRITerm("http://www.w3.org/1999/02/22-rdf-syntax-ns#type"),
+                new IRITerm("http://some.uri/with#part"))
+            ).build();
+
+        var i2 = Instance.builder()
+            .iri("http://example.org/T2")
+            .argument(Argument.builder().term(new ListTerm(
+                    LiteralTerm.createLanguageTagLiteral("hello", "no")))
+                .build())
+            .argument(Argument.builder().term(new ListTerm(
+                    LiteralTerm.createPlainLiteral("one"),
+                    LiteralTerm.createPlainLiteral("two"),
+                    LiteralTerm.createPlainLiteral("three")))
+                .listExpander(true)
+                .build())
+            .listExpander(ListExpander.cross)
+            .build();
+
+        var i3 = Instance.builder()
+            .iri("http://base.org/T3")
+            .arguments(Argument.listOf(
+                LiteralTerm.createTypedLiteral("42", XSD.integer.getURI()),
+                LiteralTerm.createTypedLiteral("42.01", XSD.decimal.getURI()),
+                LiteralTerm.createTypedLiteral("42.02", XSD.decimal.getURI()))
+            ).build();
+
+        return List.of(i1, i2, i3);
+
     }
 
     @Test
@@ -145,8 +153,8 @@ public class ParserTest {
             // TODO: Should be implemented on objects in future
 
             assertEquals(mins.getIri(), pins.getIri());
-            List<Term> pterms = pins.getArguments().asList();
-            List<Term> mterms = mins.getArguments().asList();
+            List<Term> pterms = pins.getArguments().stream().map(Argument::getTerm).collect(Collectors.toList());
+            List<Term> mterms = mins.getArguments().stream().map(Argument::getTerm).collect(Collectors.toList());
             assertEquals(mterms.size(), pterms.size());
 
             // TODO: Check equality of terms

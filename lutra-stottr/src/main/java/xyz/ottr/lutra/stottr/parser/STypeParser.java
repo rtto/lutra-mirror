@@ -34,36 +34,31 @@ import xyz.ottr.lutra.system.Result;
 
 public class STypeParser extends SBaseParserVisitor<TermType> {
 
-    public STermParser termParser;
+    private final STermParser termParser;
 
-    public STypeParser(STermParser termParser) {
+    STypeParser(STermParser termParser) {
         this.termParser = termParser;
     }
 
-    @Override
     public Result<TermType> visitType(stOTTRParser.TypeContext ctx) {
         return visitChildren(ctx);
     }
 
-    @Override
     public Result<TermType> visitListType(stOTTRParser.ListTypeContext ctx) {
         Result<TermType> innerRes = visitType(ctx.type());
         return innerRes.flatMap(inner -> Result.of(new ListType(inner)));
     }
     
-    @Override
     public Result<TermType> visitNeListType(stOTTRParser.NeListTypeContext ctx) {
         Result<TermType> innerRes = visitType(ctx.type());
         return innerRes.flatMap(inner -> Result.of(new NEListType(inner)));
     }
     
-    @Override
     public Result<TermType> visitLubType(stOTTRParser.LubTypeContext ctx) {
         Result<TermType> innerRes = visitBasicType(ctx.basicType());
         return innerRes.flatMap(inner -> Result.of(new LUBType((BasicType) inner)));
     }
     
-    @Override
     public Result<TermType> visitBasicType(stOTTRParser.BasicTypeContext ctx) {
         Result<String> iriRes = this.termParser.visit(ctx).map(term -> ((IRITerm) term).getIri());
         return iriRes.map(TypeRegistry::getType);

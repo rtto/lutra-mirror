@@ -10,12 +10,12 @@ package xyz.ottr.lutra.stottr.parser;
  * it under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation, either version 2.1 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Lesser Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Lesser Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/lgpl-2.1.html>.
@@ -23,35 +23,35 @@ package xyz.ottr.lutra.stottr.parser;
  */
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.antlr.v4.runtime.CharStream;
 import xyz.ottr.lutra.model.Instance;
-import xyz.ottr.lutra.model.ParameterList;
+import xyz.ottr.lutra.model.Parameter;
 import xyz.ottr.lutra.model.Signature;
-import xyz.ottr.lutra.model.Template;
-import xyz.ottr.lutra.model.terms.BlankNodeTerm;
 import xyz.ottr.lutra.model.terms.IRITerm;
 import xyz.ottr.lutra.model.terms.Term;
+import xyz.ottr.lutra.parser.TemplateBuilder;
 import xyz.ottr.lutra.parser.TemplateParser;
 import xyz.ottr.lutra.stottr.antlr.stOTTRParser;
 import xyz.ottr.lutra.system.Result;
 import xyz.ottr.lutra.system.ResultStream;
 
 public class STemplateParser extends SParser<Signature> implements TemplateParser<CharStream> {
-    
-    private SParameterListParser paramsParser;
+
+    private SParameterParser paramsParser;
 
     public STemplateParser() {
-        super();
-        this.paramsParser = new SParameterListParser(getTermParser());
+        this.paramsParser = new SParameterParser(getTermParser());
     }
 
     @Override
     protected void initSubParsers() {
-        this.paramsParser = new SParameterListParser(getTermParser());
+        this.paramsParser = new SParameterParser(getTermParser()); // TODO is this necessary, its already in the constructor?
     }
 
     @Override
@@ -64,62 +64,67 @@ public class STemplateParser extends SParser<Signature> implements TemplateParse
         return visitChildren(ctx);
     }
 
-    private Result<String> parseName(stOTTRParser.TemplateNameContext ctx) {
-
-        return getTermParser().visit(ctx).flatMap(term -> Result.of(((IRITerm) term).getIri()));
-    }
-
-    private Result<Signature> makeSignature(stOTTRParser.TemplateNameContext nameCtx,
-                                            stOTTRParser.ParameterListContext paramsCtx, boolean isBase) {
-        
-        Result<String> iriRes = parseName(nameCtx);
-        Result<ParameterList> paramsRes = this.paramsParser.visit(paramsCtx);
-        return Result.zip(iriRes, paramsRes, (iri, params) ->
-            isBase
-                ? Template.createBaseTemplate(iri, params)
-                : Template.createSignature(iri, params));
-    }
-
-    @Override
     public Result<Signature> visitSignature(stOTTRParser.SignatureContext ctx) {
-        return makeSignature(ctx.templateName(), ctx.parameterList(), false);
+        return TemplateBuilder.signatureBuilder()
+            .iri(parseIRI(ctx))
+            .parameters(parseParameters(ctx))
+            .build();
     }
-    
-    @Override
-    public Result<Signature> visitBaseTemplate(stOTTRParser.BaseTemplateContext ctx) {
 
-        stOTTRParser.SignatureContext sigCtx = ctx.signature();
-        return makeSignature(sigCtx.templateName(), sigCtx.parameterList(), true);
+    public Result<Signature> visitBaseTemplate(stOTTRParser.BaseTemplateContext ctx) {
+        return TemplateBuilder.baseTemplateBuilder()
+            .signature(visitSignature(ctx.signature()))
+            .build()
+            .map(t -> (Signature)t);
     }
-    
-    @Override
+
     public Result<Signature> visitTemplate(stOTTRParser.TemplateContext ctx) {
 
-        Result<Signature> sigRes = visitSignature(ctx.signature());
-        Map<String, Term> variables = makeVariablesMap(sigRes);
+        var signature = visitSignature(ctx.signature());
 
+        Map<String, Term> variables = getVariableMap(signature);
         SInstanceParser instanceParser = new SInstanceParser(getPrefixes(), variables);
+
+        return TemplateBuilder.templateBuilder()
+            .signature(signature)
+            .instances(parseInstances(ctx, instanceParser))
+            .build()
+            .map(t -> (Signature)t);
+    }
+
+    private Result<String> parseIRI(stOTTRParser.SignatureContext ctx) {
+        return getTermParser().visit(ctx.templateName())
+            .map(term -> (IRITerm) term)
+            .map(IRITerm::getIri);
+    }
+
+    private Result<List<Parameter>> parseParameters(stOTTRParser.SignatureContext ctx) {
+
+        var paramList = ctx.parameterList().parameter().stream()
+            .map(param -> this.paramsParser.visitParameter(param))
+            .collect(Collectors.toList());
+
+        return Result.aggregate(paramList);
+    }
+
+    private Map<String, Term> getVariableMap(Result<Signature> signature) {
+        return signature.isPresent()
+            ? signature.get().getParameters().stream()
+            .map(Parameter::getTerm)
+            .collect(Collectors.toMap(
+                term -> term.getIdentifier().toString(),
+                Function.identity()))
+            : new HashMap<>();
+    }
+
+    private Result<Set<Instance>> parseInstances(stOTTRParser.TemplateContext ctx, SInstanceParser parser) {
+
         Set<Result<Instance>> resBody = ctx.patternList()
             .instance()
             .stream()
-            .map(instanceParser::visitInstance)
+            .map(parser::visitInstance)
             .collect(Collectors.toSet());
 
-        Result<Set<Instance>> bodyRes = Result.aggregate(resBody);
-
-        return Result.zip(sigRes, bodyRes, Template::createTemplate);
-    }
-
-    private Map<String, Term> makeVariablesMap(Result<Signature> resSig) {
-
-        Map<String, Term> variables = new HashMap<>();
-        if (!resSig.isPresent()) {
-            return variables;
-        }
-
-        for (Term var : resSig.get().getParameters().asList()) {
-            variables.put(((BlankNodeTerm) var).getLabel(), var);
-        }
-        return variables;
+        return Result.aggregate(resBody);
     }
 }

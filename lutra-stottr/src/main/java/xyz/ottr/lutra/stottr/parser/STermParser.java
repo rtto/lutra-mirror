@@ -55,11 +55,11 @@ public class STermParser extends SBaseParserVisitor<Term> {
     // Maps labels to already parsed (blank node) variable terms
     private final Map<String, Term> variables;
 
-    public STermParser(Map<String, String> prefixes) {
+    STermParser(Map<String, String> prefixes) {
         this(prefixes, new HashMap<>());
     }
 
-    public STermParser(Map<String, String> prefixes, Map<String, Term> variables) {
+    STermParser(Map<String, String> prefixes, Map<String, Term> variables) {
         this.prefixes = prefixes;
         this.variables = variables;
         this.blanks = new HashMap<>();
@@ -80,12 +80,10 @@ public class STermParser extends SBaseParserVisitor<Term> {
         }
     }
 
-    @Override
     public Result<Term> visitNone(stOTTRParser.NoneContext ctx) {
         return Result.of(new NoneTerm());
     }
 
-    @Override
     public Result<Term> visitTerm(stOTTRParser.TermContext ctx) {
 
         if (ctx.Variable() != null) {
@@ -99,13 +97,12 @@ public class STermParser extends SBaseParserVisitor<Term> {
                     + SParserUtils.getLineAndColumnString(ctx)));
     }
 
-    public String getVariableLabel(TerminalNode var) {
+    String getVariableLabel(TerminalNode var) {
         String label = var.getSymbol().getText();
         // Need to remove variablePrefix to get label
         return  label.substring(STOTTR.Terms.variablePrefix.length());
     }
-    
-    @Override
+
     public Result<Term> visitLiteral(stOTTRParser.LiteralContext ctx) {
 
         if (ctx.BooleanLiteral() != null) {
@@ -114,8 +111,7 @@ public class STermParser extends SBaseParserVisitor<Term> {
         }
         return visitChildren(ctx);
     }
-    
-    @Override
+
     public Result<Term> visitList(stOTTRParser.ListContext ctx) {
 
         List<Result<Term>> termResLst = ctx.term()
@@ -126,8 +122,7 @@ public class STermParser extends SBaseParserVisitor<Term> {
         Result<List<Term>> termLstRes = Result.aggregate(termResLst);
         return termLstRes.map(ListTerm::new);
     }
-    
-    @Override
+
     public Result<Term> visitNumericLiteral(stOTTRParser.NumericLiteralContext ctx) {
 
         String type;
@@ -147,8 +142,7 @@ public class STermParser extends SBaseParserVisitor<Term> {
         String val = valNode.getSymbol().getText();
         return Result.of(LiteralTerm.createTypedLiteral(val, type));
     }
-    
-    @Override
+
     public Result<Term> visitRdfLiteral(stOTTRParser.RdfLiteralContext ctx) {
 
         String valStr = ctx.String().getSymbol().getText();
@@ -171,8 +165,7 @@ public class STermParser extends SBaseParserVisitor<Term> {
 
         return Result.of(LiteralTerm.createPlainLiteral(val));
     }
-    
-    @Override
+
     public Result<Term> visitIri(stOTTRParser.IriContext ctx) {
 
         stOTTRParser.PrefixedNameContext prefixCtx = ctx.prefixedName();
@@ -189,17 +182,13 @@ public class STermParser extends SBaseParserVisitor<Term> {
             return Result.of(new IRITerm(iri));
         }
     }
-    
-    @Override
+
     public Result<Term> visitPrefixedName(stOTTRParser.PrefixedNameContext ctx) {
 
         String qname;
-        TerminalNode onlyNS = ctx.PNAME_NS(); 
-        if (onlyNS != null) { // Of the form ex: (i.e. nothing after colon)
-            qname = onlyNS.getSymbol().getText();
-        } else {
-            qname = ctx.PNAME_LN().getSymbol().getText();
-        }
+        TerminalNode onlyNS = ctx.PNAME_NS();
+        // Of the form ex: (i.e. nothing after colon)
+        qname = onlyNS != null ? onlyNS.getSymbol().getText() : ctx.PNAME_LN().getSymbol().getText();
 
         int lastColon = qname.indexOf(':'); // Cannot simply split, can e.g. have ex:local:name
         String prefixName = qname.substring(0, lastColon);
@@ -217,8 +206,7 @@ public class STermParser extends SBaseParserVisitor<Term> {
         }
         return Result.of(new IRITerm(iri));
     }
-    
-    @Override
+
     public Result<Term> visitBlankNode(stOTTRParser.BlankNodeContext ctx) {
 
         if (ctx.anon() != null) { // Of the form [], i.e. no label
@@ -228,8 +216,7 @@ public class STermParser extends SBaseParserVisitor<Term> {
         String label = ctx.BLANK_NODE_LABEL().getSymbol().getText();
         return Result.of(makeBlank(label));
     }
-    
-    @Override
+
     public Result<Term> visitAnon(stOTTRParser.AnonContext ctx) {
         return Result.of(new BlankNodeTerm());
     }

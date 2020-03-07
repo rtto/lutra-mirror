@@ -23,14 +23,15 @@ package xyz.ottr.lutra.stottr.writer;
  */
 
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
-import xyz.ottr.lutra.model.ParameterList;
+import xyz.ottr.lutra.model.BaseTemplate;
+import xyz.ottr.lutra.model.Parameter;
 import xyz.ottr.lutra.model.Signature;
 import xyz.ottr.lutra.model.Template;
-import xyz.ottr.lutra.model.terms.Term;
 import xyz.ottr.lutra.model.types.BasicType;
 import xyz.ottr.lutra.model.types.LUBType;
 import xyz.ottr.lutra.model.types.ListType;
@@ -68,12 +69,15 @@ public class STemplateWriter implements TemplateWriter {
             return null;
         }
 
-        Set<Term> variables = new HashSet<>(template.getParameters().asList());
-        STermWriter termWriter = new STermWriter(this.prefixes, variables);
+        var parameterVariables = template.getParameters().stream()
+            .map(Parameter::getTerm)
+            .collect(Collectors.toSet());
+
+        STermWriter termWriter = new STermWriter(this.prefixes, parameterVariables);
 
         builder.append(writeSignature(template, termWriter));
 
-        if (template.isBaseTemplate()) {
+        if (template instanceof BaseTemplate) {
             builder.append(" " + STOTTR.Statements.signatureSep + " " + STOTTR.Statements.baseBody);
         } else if (template instanceof Template) {
             builder.append(" " + STOTTR.Statements.signatureSep + " " + STOTTR.Statements.bodyStart + "\n");
@@ -85,7 +89,6 @@ public class STemplateWriter implements TemplateWriter {
 
         // Write used prefixes at start of String
         builder.insert(0, writeUsedPrefixes(termWriter.getUsedPrefixes()));
-
 
         return builder.toString();
     }
@@ -108,19 +111,19 @@ public class STemplateWriter implements TemplateWriter {
         builder.append(termWriter.writeIRI(template.getIri()));
         builder.append(STOTTR.Parameters.sigParamsStart);
 
-        ParameterList params = template.getParameters();
+        List<Parameter> params = template.getParameters();
         String sep = "";
         
-        for (Term param : params.asList()) {
+        for (Parameter param : params) {
 
             builder.append(sep);
-            builder.append(writeModes(params.isNonBlank(param), params.isOptional(param)));
-            builder.append(writeType(param.getType(), termWriter));
+            builder.append(writeModes(param.isNonBlank(), param.isOptional()));
+            builder.append(writeType(param.getTerm().getType(), termWriter));
             builder.append(" ");
-            builder.append(termWriter.write(param));
+            builder.append(termWriter.write(param.getTerm()));
 
-            if (params.hasDefaultValue(param)) {
-                builder.append(STOTTR.Parameters.defaultValSep).append(termWriter.write(params.getDefaultValue(param)));
+            if (param.hasDefaultValue()) {
+                builder.append(STOTTR.Parameters.defaultValSep).append(termWriter.write(param.getDefaultValue()));
             }
 
             sep = STOTTR.Parameters.paramSep + " ";

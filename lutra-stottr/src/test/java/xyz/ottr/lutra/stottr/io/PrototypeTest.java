@@ -48,6 +48,6 @@ public class PrototypeTest {
                 + "ex:H4(1, 2.32, .45) .\n"
                 + "ex:H5(\"1\"^^xsd:int, \"hello\"@en) .\n"
                 + "ex:T6([], _:blank) .")
-            .forEach(res -> Message.info("Parsed :" + res.toString()).log(log));
+            .forEach(res -> Message.info("Parsed :" + res).log(log));
     }
 }

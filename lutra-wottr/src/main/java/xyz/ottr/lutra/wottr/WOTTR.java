@@ -33,8 +33,7 @@ import org.apache.jena.rdf.model.ResourceFactory;
 import xyz.ottr.lutra.OTTR;
 import xyz.ottr.lutra.model.ListExpander;
 
-public enum WOTTR {
-    ;
+public class WOTTR {
 
     public static final String ns = OTTR.namespace;
     public static final String prefix = "ottr";

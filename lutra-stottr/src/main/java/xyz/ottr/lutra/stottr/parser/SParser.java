@@ -46,7 +46,7 @@ public abstract class SParser<T> extends SBaseParserVisitor<T> {
         return Collections.unmodifiableMap(this.prefixes);
     }
 
-    protected void setPrefixesAndVariables(Map<String, String> prefixes, Map<String, Term> variables) {
+    void setPrefixesAndVariables(Map<String, String> prefixes, Map<String, Term> variables) {
         this.prefixes = prefixes;
         this.termParser = new STermParser(prefixes, variables);
     }
@@ -58,18 +58,17 @@ public abstract class SParser<T> extends SBaseParserVisitor<T> {
      */
     protected abstract void initSubParsers();
 
-    @Override
     public abstract Result<T> visitStatement(stOTTRParser.StatementContext ctx);
 
     public ResultStream<T> parseString(String str) {
         return parseDocument(CharStreams.fromString(str));
     }
 
-    protected STermParser getTermParser() {
+    STermParser getTermParser() {
         return this.termParser;
     }
 
-    protected ResultStream<T> parseDocument(CharStream in) {
+    ResultStream<T> parseDocument(CharStream in) {
         // Make parser
         ErrorToMessageListener errListener = new ErrorToMessageListener();
         stOTTRParser parser = SParserUtils.makeParser(in, errListener);

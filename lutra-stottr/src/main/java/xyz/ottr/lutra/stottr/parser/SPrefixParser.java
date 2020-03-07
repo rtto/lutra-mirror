@@ -34,7 +34,6 @@ import xyz.ottr.lutra.system.ResultStream;
 
 public class SPrefixParser extends SBaseParserVisitor<Map<String, String>> {
 
-    @Override
     public Result<Map<String, String>> visitStOTTRDoc(stOTTRParser.StOTTRDocContext ctx) {
 
         if (ctx.directive().isEmpty()) {
@@ -56,22 +55,19 @@ public class SPrefixParser extends SBaseParserVisitor<Map<String, String>> {
 
     private static class SDirectiveParser extends stOTTRBaseVisitor<PrefixPair> {
 
-        @Override
+
         public PrefixPair visitPrefixID(stOTTRParser.PrefixIDContext ctx) {
             return PrefixPair.makePrefix(ctx.PNAME_NS(), ctx.IRIREF());
         }
 
-        @Override
         public PrefixPair visitBase(stOTTRParser.BaseContext ctx) {
             return PrefixPair.makeBase(ctx.IRIREF());
         }
 
-        @Override
         public PrefixPair visitSparqlBase(stOTTRParser.SparqlBaseContext ctx) {
             return PrefixPair.makeBase(ctx.IRIREF());
         }
 
-        @Override
         public PrefixPair visitSparqlPrefix(stOTTRParser.SparqlPrefixContext ctx) {
             return PrefixPair.makePrefix(ctx.PNAME_NS(), ctx.IRIREF());
         }
@@ -86,7 +82,7 @@ public class SPrefixParser extends SBaseParserVisitor<Map<String, String>> {
         public final String ns;
         public final String prefix;
 
-        public PrefixPair(String ns, String prefix) {
+        PrefixPair(String ns, String prefix) {
             this.ns = stripNamespace(ns);
             this.prefix = stripPrefix(prefix);
         }
@@ -99,12 +95,12 @@ public class SPrefixParser extends SBaseParserVisitor<Map<String, String>> {
             return angularPat.matcher(prefix).replaceAll("");
         }
 
-        public static PrefixPair makeBase(TerminalNode prefixNode) {
+        static PrefixPair makeBase(TerminalNode prefixNode) {
             String prefix = prefixNode.getSymbol().getText();
             return new PrefixPair(BASE_PREFIX, prefix);
         }
 
-        public static PrefixPair makePrefix(TerminalNode nsNode, TerminalNode prefixNode) {
+        static PrefixPair makePrefix(TerminalNode nsNode, TerminalNode prefixNode) {
             String ns = nsNode.getSymbol().getText();
             String prefix = prefixNode.getSymbol().getText();
             return new PrefixPair(ns, prefix);

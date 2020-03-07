@@ -25,7 +25,7 @@ package xyz.ottr.lutra.stottr;
 import org.apache.commons.collections4.BidiMap;
 import org.apache.commons.collections4.bidimap.DualHashBidiMap;
 import org.apache.commons.collections4.bidimap.UnmodifiableBidiMap;
-import xyz.ottr.lutra.model.ArgumentList;
+import xyz.ottr.lutra.model.ListExpander;
 
 public class STOTTR {
 
@@ -71,13 +71,13 @@ public class STOTTR {
         public static final String expanderSep = "|";
         public static final String expander = "++";
 
-        public static final BidiMap<String, ArgumentList.Expander> map;
+        public static final BidiMap<String, ListExpander> map;
 
         static {
-            BidiMap<String, ArgumentList.Expander> tempMap = new DualHashBidiMap<>();
-            tempMap.put(cross, ArgumentList.Expander.CROSS);
-            tempMap.put(zipMin, ArgumentList.Expander.ZIPMIN);
-            tempMap.put(zipMax, ArgumentList.Expander.ZIPMAX);
+            BidiMap<String, ListExpander> tempMap = new DualHashBidiMap<>();
+            tempMap.put(cross, ListExpander.cross);
+            tempMap.put(zipMin, ListExpander.zipMin);
+            tempMap.put(zipMax, ListExpander.zipMax);
             map = UnmodifiableBidiMap.unmodifiableBidiMap(tempMap);
         }
     }
