@@ -23,6 +23,7 @@ package xyz.ottr.lutra.stottr.io;
  */
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.util.HashMap;
@@ -35,6 +36,8 @@ import org.junit.Test;
 import xyz.ottr.lutra.model.Argument;
 import xyz.ottr.lutra.model.Instance;
 import xyz.ottr.lutra.model.ListExpander;
+import xyz.ottr.lutra.model.Signature;
+import xyz.ottr.lutra.model.Template;
 import xyz.ottr.lutra.model.terms.IRITerm;
 import xyz.ottr.lutra.model.terms.ListTerm;
 import xyz.ottr.lutra.model.terms.LiteralTerm;
@@ -43,7 +46,10 @@ import xyz.ottr.lutra.model.terms.Term;
 import xyz.ottr.lutra.stottr.parser.SInstanceParser;
 import xyz.ottr.lutra.stottr.parser.SParserUtils;
 import xyz.ottr.lutra.stottr.parser.SPrefixParser;
+import xyz.ottr.lutra.stottr.parser.STemplateParser;
+import xyz.ottr.lutra.system.Message;
 import xyz.ottr.lutra.system.Result;
+import xyz.ottr.lutra.system.ResultConsumer;
 
 public class ParserTest {
 
@@ -161,6 +167,22 @@ public class ParserTest {
         }
     }
 
-    // TODO: Add unit tests for templates
+
+    public void testSignatureParsing(String signatureString) {
+
+        STemplateParser parser = new STemplateParser();
+
+        ResultConsumer<Signature> consumer = new ResultConsumer<>();
+        parser.parseString(signatureString).forEach(consumer);
+
+        assertFalse(Message.moreSevere(consumer.getMessageHandler().printMessages(), Message.ERROR)); // No errors when expanding
+    }
+
+    @Test
+    public void testSignature1 () {
+        testSignatureParsing("<http://example.com#T1> [ ?s ] :: BASE .");
+    }
+
+
 }
 
