@@ -42,7 +42,7 @@ public class InstanceMap<V> implements Supplier<ResultStream<Instance>> {
     @Override
     public ResultStream<Instance> get() {
         return this.source.execute(this.query, this.argumentMaps)
-            .innerMap(args -> new Instance(this.templateIRI, args));
+            .innerMap(args -> Instance.builder().iri(this.templateIRI).arguments(args).build());
     }
 
 }

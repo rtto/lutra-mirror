@@ -39,7 +39,6 @@ import xyz.ottr.lutra.model.types.ComplexType;
 import xyz.ottr.lutra.model.types.TermType;
 import xyz.ottr.lutra.system.Result;
 import xyz.ottr.lutra.system.ResultStream;
-import xyz.ottr.lutra.wottr.WOTTR;
 
 // TODO use lombok's @SuperBuilder once it has support in IDE, and make fields final. now we simply use setter methods.
 @Setter
@@ -56,7 +55,7 @@ public abstract class ArgumentMap<V> implements Function<V, Result<Term>> {
 
     protected ArgumentMap(PrefixMapping prefixMapping) {
         //this.prefixMapping = prefixMapping;
-        this.termFactory = new TermFactory(WOTTR.theInstance, prefixMapping);
+        this.termFactory = new TermFactory(prefixMapping);
         this.translationSettings = TranslationSettings.builder().build();
         //this.translationTable = new TranslationTable();
     }

@@ -46,8 +46,8 @@ import xyz.ottr.lutra.model.types.TypeRegistry;
 import xyz.ottr.lutra.system.Message;
 import xyz.ottr.lutra.system.Result;
 import xyz.ottr.lutra.system.ResultStream;
+import xyz.ottr.lutra.wottr.WOTTR;
 import xyz.ottr.lutra.wottr.util.RDFNodes;
-import xyz.ottr.lutra.wottr.vocabulary.WOTTRVocabulary;
 
 // TODO suggest to move this to core.mode.terms, see issue #190 and align with xyz.ottr.lutra.wottr.parser.TermFactory.
 
@@ -56,12 +56,10 @@ public class TermFactory {
     private final Map<RDFList, Result<ListTerm>> createdLists = new HashMap<>();
     private final Map<String, BlankNodeTerm> labelledBlanks = new HashMap<>();
 
-    private final WOTTRVocabulary vocabulary;
     private final PrefixMapping prefixMapping;
 
-    public TermFactory(WOTTRVocabulary vocabulary, PrefixMapping prefixMapping) {
+    public TermFactory(PrefixMapping prefixMapping) {
         this.prefixMapping = prefixMapping;
-        this.vocabulary = vocabulary;
     }
 
     public static Result<BlankNodeTerm> createBlankNode() {
@@ -166,7 +164,7 @@ public class TermFactory {
 
     public Result<Term> createTermByURI(String uri) {
 
-        if (uri.equals(this.vocabulary.getNoneResource().getURI())) {
+        if (uri.equals(WOTTR.none.getURI())) {
             return Result.of(new NoneTerm());
         } else if (uri.equals(RDF.nil.getURI())) {
             return Result.of(new ListTerm());

@@ -25,14 +25,14 @@ package xyz.ottr.lutra.bottr.model;
 import java.util.List;
 
 import org.apache.jena.shared.PrefixMapping;
-import xyz.ottr.lutra.model.ArgumentList;
+import xyz.ottr.lutra.model.Argument;
 import xyz.ottr.lutra.system.ResultStream;
 
 public interface Source<V> {
 
     ResultStream<List<V>> execute(String query);
 
-    ResultStream<ArgumentList> execute(String query, ArgumentMaps<V> argumentMaps);
+    ResultStream<List<Argument>> execute(String query, ArgumentMaps<V> argumentMaps);
 
     ArgumentMap<V> createArgumentMap(PrefixMapping prefixMapping);
 

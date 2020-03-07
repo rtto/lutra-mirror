@@ -41,7 +41,7 @@ public class BOTTR extends WOTTR {
     public static final Resource RDFFileSource = getResource(ns + "RDFFileSource");
     public static final Resource H2Source = getResource(ns + "H2Source");
 
-    public static final List<Resource> sources = getList(JDBCSource, SPARQLEndpointSource, RDFFileSource, H2Source);
+    public static final List<Resource> sources = List.of(JDBCSource, SPARQLEndpointSource, RDFFileSource, H2Source);
     
     // Properties
     public static final Property template = getProperty(ns + "template");

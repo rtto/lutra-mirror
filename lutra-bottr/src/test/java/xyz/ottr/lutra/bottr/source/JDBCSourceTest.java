@@ -1,5 +1,27 @@
 package xyz.ottr.lutra.bottr.source;
 
+/*-
+ * #%L
+ * lutra-bottr
+ * %%
+ * Copyright (C) 2018 - 2019 University of Oslo
+ * %%
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation, either version 2.1 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Lesser Public License for more details.
+ *
+ * You should have received a copy of the GNU General Lesser Public
+ * License along with this program.  If not, see
+ * <http://www.gnu.org/licenses/lgpl-2.1.html>.
+ * #L%
+ */
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -15,32 +37,10 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import xyz.ottr.lutra.bottr.model.ArgumentMaps;
-import xyz.ottr.lutra.model.ArgumentList;
+import xyz.ottr.lutra.model.Argument;
 import xyz.ottr.lutra.model.terms.LiteralTerm;
 import xyz.ottr.lutra.system.Result;
 import xyz.ottr.lutra.system.ResultStream;
-
-/*-
- * #%L
- * lutra-bottr
- * %%
- * Copyright (C) 2018 - 2019 University of Oslo
- * %%
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as
- * published by the Free Software Foundation, either version 2.1 of the
- * License, or (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Lesser Public License for more details.
- * 
- * You should have received a copy of the GNU General Lesser Public
- * License along with this program.  If not, see
- * <http://www.gnu.org/licenses/lgpl-2.1.html>.
- * #L%
- */
 
 public class JDBCSourceTest {
   
@@ -85,14 +85,14 @@ public class JDBCSourceTest {
 
         ArgumentMaps<String> argMaps = new ArgumentMaps<>(PrefixMapping.Standard, jdbcTest);
 
-        ResultStream<ArgumentList> rowStream = jdbcTest.execute("SELECT ID, NAME, SALARY FROM CUSTOMER;", argMaps);
+        ResultStream<List<Argument>> rowStream = jdbcTest.execute("SELECT ID, NAME, SALARY FROM CUSTOMER;", argMaps);
 
         Set<List<String>> dbOutput = rowStream
             .getStream()
             .filter(Result::isPresent)
             .map(Result::get)
-            .map(ArgumentList::asList)
             .map(list -> list.stream()
+                .map(Argument::getTerm)
                 .map(t -> (LiteralTerm)t)
                 .map(LiteralTerm::getValue)
                 .collect(Collectors.toList()))

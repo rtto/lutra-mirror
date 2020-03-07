@@ -42,7 +42,7 @@ import xyz.ottr.lutra.bottr.BOTTR;
 import xyz.ottr.lutra.bottr.model.ArgumentMap;
 import xyz.ottr.lutra.bottr.model.ArgumentMaps;
 import xyz.ottr.lutra.bottr.model.Source;
-import xyz.ottr.lutra.model.ArgumentList;
+import xyz.ottr.lutra.model.Argument;
 import xyz.ottr.lutra.system.Message;
 import xyz.ottr.lutra.system.Result;
 import xyz.ottr.lutra.system.ResultStream;
@@ -83,7 +83,7 @@ public abstract class AbstractSPARQLSource implements Source<RDFNode> {
         return streamQuery(query, Result::of);
     }
 
-    public ResultStream<ArgumentList> execute(String query, ArgumentMaps argumentMaps) {
+    public ResultStream<List<Argument>> execute(String query, ArgumentMaps argumentMaps) {
         return streamQuery(query, argumentMaps);
     }
 

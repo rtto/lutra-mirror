@@ -29,11 +29,12 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.apache.jena.shared.PrefixMapping;
-import xyz.ottr.lutra.model.ArgumentList;
+import xyz.ottr.lutra.model.Argument;
 import xyz.ottr.lutra.model.terms.Term;
+import xyz.ottr.lutra.parser.ArgumentBuilder;
 import xyz.ottr.lutra.system.Result;
 
-public class ArgumentMaps<V> implements Function<List<V>, Result<ArgumentList>> {
+public class ArgumentMaps<V> implements Function<List<V>, Result<List<Argument>>> {
 
     private final PrefixMapping prefixMapping;
     private final List<ArgumentMap<V>> argumentMaps;
@@ -50,7 +51,7 @@ public class ArgumentMaps<V> implements Function<List<V>, Result<ArgumentList>> 
     }
 
     @Override
-    public Result<ArgumentList> apply(List<V> inValues) {
+    public Result<List<Argument>> apply(List<V> inValues) {
 
         List<Result<Term>> outValues;
 
@@ -68,8 +69,11 @@ public class ArgumentMaps<V> implements Function<List<V>, Result<ArgumentList>> 
             }
         }
 
-        return Result.aggregate(outValues)
-            .map(ArgumentList::new);
+        List<Result<Argument>> arguments = outValues.stream()
+            .map(t -> ArgumentBuilder.builder().term(t).build())
+            .collect(Collectors.toList());
+
+        return Result.aggregate(arguments);
     }
 
 }

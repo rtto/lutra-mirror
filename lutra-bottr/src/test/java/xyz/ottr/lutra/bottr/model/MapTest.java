@@ -25,7 +25,6 @@ package xyz.ottr.lutra.bottr.model;
 import static org.hamcrest.CoreMatchers.is;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -35,7 +34,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import xyz.ottr.lutra.OTTR;
 import xyz.ottr.lutra.bottr.source.StringArgumentMap;
-import xyz.ottr.lutra.model.ArgumentList;
+import xyz.ottr.lutra.model.Argument;
 import xyz.ottr.lutra.model.Instance;
 import xyz.ottr.lutra.model.terms.IRITerm;
 import xyz.ottr.lutra.model.types.TypeRegistry;
@@ -68,7 +67,7 @@ public class MapTest {
             }
 
             @Override
-            public ResultStream<ArgumentList> execute(String query, ArgumentMaps<String> argumentMaps) {
+            public ResultStream<List<Argument>> execute(String query, ArgumentMaps<String> argumentMaps) {
                 return new ResultStream<>(this.rows.stream()
                     .map(argumentMaps));
             }
@@ -94,21 +93,25 @@ public class MapTest {
             OTTR.BaseURI.Triple,
             valMap);
 
-        // Output: "Manually" build two instances      
-        Instance inst1 = new Instance(OTTR.BaseURI.Triple,
-                new ArgumentList(
-                        new IRITerm(ns + "A1"),
-                        new IRITerm(ns + "B1"),
-                        new IRITerm(ns + "C1")));
-        Instance inst2 = new Instance(OTTR.BaseURI.Triple,
-                new ArgumentList(
-                        new IRITerm(ns + "A2"),
-                        new IRITerm(ns + "B2"),
-                        new IRITerm(ns + "C2")));
-        
-        Set<Instance> output = new HashSet<>();
-        output.add(inst1);
-        output.add(inst2);
+        // Output: "Manually" build two instances
+
+        Instance inst1 = Instance.builder()
+            .iri(OTTR.BaseURI.Triple)
+            .arguments(Argument.listOf(
+                new IRITerm(ns + "A1"),
+                new IRITerm(ns + "B1"),
+                new IRITerm(ns + "C1"))
+            ).build();
+
+        Instance inst2 = Instance.builder()
+            .iri(OTTR.BaseURI.Triple)
+            .arguments(Argument.listOf(
+                new IRITerm(ns + "A2"),
+                new IRITerm(ns + "B2"),
+                new IRITerm(ns + "C2"))
+            ).build();
+
+        Set<Instance> output = Set.of(inst1, inst2);
 
         // get input instances
         Set<Instance> input = myMap.get()

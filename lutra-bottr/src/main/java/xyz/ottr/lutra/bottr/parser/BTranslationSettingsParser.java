@@ -33,7 +33,6 @@ import xyz.ottr.lutra.bottr.util.TermFactory;
 import xyz.ottr.lutra.model.terms.Term;
 import xyz.ottr.lutra.system.Result;
 import xyz.ottr.lutra.wottr.util.ModelSelector;
-import xyz.ottr.lutra.wottr.WOTTR;
 
 public class BTranslationSettingsParser extends CachedResourceWrapperParser<TranslationSettings> {
 
@@ -41,7 +40,7 @@ public class BTranslationSettingsParser extends CachedResourceWrapperParser<Tran
 
     public BTranslationSettingsParser(Resource resource) {
         super(resource);
-        this.termFactory = new TermFactory(WOTTR.theInstance, this.model);
+        this.termFactory = new TermFactory(this.model);
     }
 
     @Override

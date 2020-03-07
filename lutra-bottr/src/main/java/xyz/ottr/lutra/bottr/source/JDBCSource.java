@@ -1,28 +1,5 @@
 package xyz.ottr.lutra.bottr.source;
 
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import lombok.Builder;
-import org.apache.commons.dbcp2.BasicDataSource;
-import org.apache.commons.dbutils.QueryRunner;
-import org.apache.commons.dbutils.handlers.ArrayListHandler;
-import org.apache.jena.shared.PrefixMapping;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import xyz.ottr.lutra.bottr.model.ArgumentMap;
-import xyz.ottr.lutra.bottr.model.ArgumentMaps;
-import xyz.ottr.lutra.bottr.model.Source;
-import xyz.ottr.lutra.model.ArgumentList;
-import xyz.ottr.lutra.system.Result;
-import xyz.ottr.lutra.system.ResultStream;
-
 /*-
  * #%L
  * lutra-bottr
@@ -44,6 +21,29 @@ import xyz.ottr.lutra.system.ResultStream;
  * <http://www.gnu.org/licenses/lgpl-2.1.html>.
  * #L%
  */
+
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Objects;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import lombok.Builder;
+import org.apache.commons.dbcp2.BasicDataSource;
+import org.apache.commons.dbutils.QueryRunner;
+import org.apache.commons.dbutils.handlers.ArrayListHandler;
+import org.apache.jena.shared.PrefixMapping;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import xyz.ottr.lutra.bottr.model.ArgumentMap;
+import xyz.ottr.lutra.bottr.model.ArgumentMaps;
+import xyz.ottr.lutra.bottr.model.Source;
+import xyz.ottr.lutra.model.Argument;
+import xyz.ottr.lutra.system.Result;
+import xyz.ottr.lutra.system.ResultStream;
 
 public class JDBCSource implements Source<String> {
 
@@ -87,7 +87,7 @@ public class JDBCSource implements Source<String> {
     }
 
     @Override
-    public ResultStream<ArgumentList> execute(String query, ArgumentMaps<String> argumentMaps) {
+    public ResultStream<List<Argument>> execute(String query, ArgumentMaps<String> argumentMaps) {
         return streamQuery(query, argumentMaps);
     }
 
