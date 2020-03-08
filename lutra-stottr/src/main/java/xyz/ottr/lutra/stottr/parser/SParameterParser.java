@@ -82,10 +82,11 @@ class SParameterParser extends SBaseParserVisitor<Parameter> {
         var.setVariable(true); // TODO: Remove? Is is not already covered by Signature.setVariables()?
         var term = Result.of(var);
 
-        term.addResult(parseType(ctx), Term::setType);
+        Result<TermType> type = parseType(ctx)
+            .flatMapOrElse(Result::of, Result.of(var.getVariableType())); // TODO: is there a better "or"?
 
-        // TODO do we need this still or is it set in core?
-        //  var.getVariableType())); // TODO: Remove? Should be covered by core?
+        term.addResult(type, Term::setType);
+
         return term;
     }
 
