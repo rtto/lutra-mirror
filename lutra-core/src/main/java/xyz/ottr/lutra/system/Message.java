@@ -22,10 +22,12 @@ package xyz.ottr.lutra.system;
  * #L%
  */
 
-import java.util.Objects;
-
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import org.slf4j.Logger;
 
+@Getter
+@EqualsAndHashCode
 public class Message {
 
     public static final int FATAL   = 0;
@@ -33,12 +35,12 @@ public class Message {
     public static final int WARNING = 2;
     public static final int INFO    = 3;
 
-    private final int lvl;
-    private final String msg;
+    private final int level;
+    private final String message;
 
-    public Message(int lvl, String msg) {
-        this.lvl = lvl;
-        this.msg = msg;
+    public Message(int level, String message) {
+        this.level = level;
+        this.message = message;
     }
 
     public static Message fatal(String msg) {
@@ -57,10 +59,6 @@ public class Message {
         return new Message(INFO, msg);
     }
 
-    public int getLevel() {
-        return this.lvl;
-    }
-
     /**
      * Returns true if the first argument denotes a message level
      * that is more severe than the level denoted by the second
@@ -70,34 +68,16 @@ public class Message {
         return lvl1 <= lvl2;
     }
 
-    public String getMessage() {
-        return this.msg;
-    }
-
-    @Override
-    public int hashCode() {
-        return (this.lvl + 1) * this.msg.hashCode();
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        return this == o
-            || Objects.nonNull(o)
-            && this.getClass() == o.getClass()
-            && this.lvl == ((Message) o).lvl
-            && Objects.equals(this.msg, ((Message) o).msg);
-    }
-
     public void log(Logger log) {
-        switch (this.lvl) {
+        switch (this.level) {
             case WARNING:
-                log.warn(this.msg);
+                log.warn(this.message);
                 break;
             case INFO:
-                log.trace(this.msg);
+                log.trace(this.message);
                 break;
-            default:
-                log.error(this.msg);
+            default: // covers both ERROR and FATAL
+                log.error(this.message);
         }
     }
 
@@ -113,6 +93,6 @@ public class Message {
 
     @Override
     public String toString() {
-        return "[" + toString(this.lvl) + "] " + this.msg;
+        return "[" + toString(this.level) + "] " + this.message;
     }
 }
