@@ -55,10 +55,9 @@
                         </goals>
                         <configuration>
                             <unpack>true</unpack>
-                            <!--url>https://gitlab.com/ottr/spec/pOTTR/-/jobs/artifacts/0.1/download?job=release</url-->
-                            <url>https://gitlab.com/ottr/spec/pOTTR/-/jobs/332608553/artifacts/download</url>
-                            <outputFileName>pOTTR.zip</outputFileName>
-                            <outputDirectory>${project.basedir}/src/test/resources/</outputDirectory>
+                            <url>http://primer.ottr.xyz/master.zip</url>
+                            <outputFileName>master.zip</outputFileName>
+                            <outputDirectory>${project.basedir}/src/test/resources/primer</outputDirectory>
                             <!--md5>MD5 SUM HERE</md5 -->
                             <skipCache>true</skipCache>
                         </configuration>

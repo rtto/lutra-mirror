@@ -50,16 +50,16 @@ import xyz.ottr.lutra.system.ResultStream;
 @RunWith(Parameterized.class)
 public class PottrTest {
 
-    private static final Path ROOT = Paths.get("src", "test", "resources", ".temp-deploy", "pOTTR", "0.1", "files");
+    private static final Path ROOT = Paths.get("src", "test", "resources", "primer", "files");
 
     private final String instancePath;
     private final String templatePath;
-    private final boolean expextedResults;
+    private final boolean expectedResults;
 
-    public PottrTest(String instance, String template, boolean expextedResults) {
+    public PottrTest(String instance, String template, boolean expectedResults) {
         this.instancePath = instance;
         this.templatePath = template;
-        this.expextedResults = expextedResults;
+        this.expectedResults = expectedResults;
     }
 
     @Parameterized.Parameters(name = "{index}: instance: {0}, template: {1}")
@@ -87,7 +87,7 @@ public class PottrTest {
 
 
     @Test public void test() {
-        runExpand(this.instancePath, this.templatePath, this.expextedResults);
+        runExpand(this.instancePath, this.templatePath, this.expectedResults);
     }
 
     private String resolve(String pathFromRoot) {
