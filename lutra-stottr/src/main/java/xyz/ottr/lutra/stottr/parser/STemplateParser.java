@@ -45,7 +45,7 @@ import xyz.ottr.lutra.system.ResultStream;
 
 public class STemplateParser extends SParser<Signature> implements TemplateParser<CharStream> {
 
-    private SParameterParser paramsParser;
+    private final SParameterParser paramsParser;
 
     public STemplateParser() {
         this.paramsParser = new SParameterParser(getTermParser());
@@ -53,7 +53,7 @@ public class STemplateParser extends SParser<Signature> implements TemplateParse
 
     @Override
     protected void initSubParsers() {
-
+        // noop
     }
 
     @Override
@@ -110,7 +110,8 @@ public class STemplateParser extends SParser<Signature> implements TemplateParse
     }
 
     private Map<String, Term> getVariableMap(Result<Signature> signature) {
-        if(!signature.isPresent()) {
+
+        if (!signature.isPresent()) {
             return new HashMap<>();
         } else {
             return signature.get().getParameters().stream()

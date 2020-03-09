@@ -42,7 +42,7 @@ import xyz.ottr.lutra.system.ResultStream;
 
 public class SInstanceParser extends SParser<Instance> implements InstanceParser<CharStream> {
 
-    private SArgumentParser argumentParser;
+    private final SArgumentParser argumentParser;
 
     public SInstanceParser() {
         this.argumentParser = new SArgumentParser(getTermParser());
@@ -59,7 +59,7 @@ public class SInstanceParser extends SParser<Instance> implements InstanceParser
 
     @Override
     protected void initSubParsers() {
-
+        // noop
     }
 
     public ResultStream<Instance> apply(CharStream in) {
