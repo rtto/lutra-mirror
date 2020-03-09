@@ -175,12 +175,12 @@ public class DependencyGraph implements TemplateStore {
             return false;
         }
         TemplateNode tempNode = tempNodeRes.get();
-        if (template.getInstances() != null) {
+        if (template.getPattern() != null) {
             if (!this.dependencies.get(tempNode).isEmpty()) {
                 return false;
             }
             log.info("Adding pattern for template " + template.getIri());
-            for (Instance i : template.getInstances()) {
+            for (Instance i : template.getPattern()) {
                 TemplateNode insNode = addTemplateNode(i.getIri());
                 addDependency(tempNode, i.getArguments(), i.getListExpander(), insNode);
             }
@@ -671,7 +671,7 @@ public class DependencyGraph implements TemplateStore {
 
         for (Map.Entry<TemplateNode, Set<DependencyEdge>> ens : this.dependencies.entrySet()) {
             TemplateNode node = ens.getKey();
-            str.append(node).append(":").append("\n");
+            str.append(node).append(":\n");
             Map<TemplateNode, Set<List<Argument>>> deps = new HashMap<>();
             for (DependencyEdge e : ens.getValue()) {
                 deps.putIfAbsent(e.to, new HashSet<>());

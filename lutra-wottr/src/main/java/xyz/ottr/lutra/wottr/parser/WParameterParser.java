@@ -31,6 +31,7 @@ import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 import xyz.ottr.lutra.model.Parameter;
 import xyz.ottr.lutra.model.terms.Term;
+import xyz.ottr.lutra.model.types.TermType;
 import xyz.ottr.lutra.parser.ParameterBuilder;
 import xyz.ottr.lutra.system.Result;
 import xyz.ottr.lutra.wottr.WOTTR;
@@ -57,6 +58,7 @@ public class WParameterParser implements Function<RDFNode, Result<Parameter>> {
 
         var parameter = ParameterBuilder.builder()
             .term(parameterResource.flatMap(this::getTerm))
+            .type(parameterResource.flatMap(this::getType))
             .optional(modifiers.map(mods -> mods.contains(WOTTR.optional)))
             .nonBlank(modifiers.map(mods -> mods.contains(WOTTR.nonBlank)))
             .defaultValue(parameterResource.flatMap(this::getDefaultValue))
@@ -76,16 +78,13 @@ public class WParameterParser implements Function<RDFNode, Result<Parameter>> {
     }
 
     private Result<Term> getTerm(Resource parameter) {
-        var term = ModelSelector.getRequiredObject(this.model, parameter, WOTTR.variable)
+        return ModelSelector.getRequiredObject(this.model, parameter, WOTTR.variable)
             .flatMap(this.rdfTermFactory);
+    }
 
-        var type = ModelSelector.getOptionalResourceObject(this.model, parameter, WOTTR.type)
+    private Result<TermType> getType(Resource parameter) {
+        return ModelSelector.getOptionalResourceObject(this.model, parameter, WOTTR.type)
             .flatMap(this.typeFactory);
-
-        term.addResult(type, Term::setType);
-        // TODO: do we need to set type to term.getVariableType() if no type is specified?
-
-        return term;
     }
 
     private Result<Term> getDefaultValue(Resource param) {

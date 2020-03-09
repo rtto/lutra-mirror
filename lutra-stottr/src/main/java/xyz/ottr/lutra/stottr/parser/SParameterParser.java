@@ -53,6 +53,7 @@ class SParameterParser extends SBaseParserVisitor<Parameter> {
 
         return ParameterBuilder.builder()
             .term(parseTerm(ctx))
+            .type(parseType(ctx))
             .optional(Result.of(modifiers.contains(STOTTR.Parameters.optional)))
             .nonBlank(Result.of(modifiers.contains(STOTTR.Parameters.nonBlank)))
             .defaultValue(parseDefaultValue(ctx))
@@ -60,7 +61,6 @@ class SParameterParser extends SBaseParserVisitor<Parameter> {
     }
 
     private Set<String> parseModifiers(stOTTRParser.ParameterContext ctx) {
-
         return ctx.ParameterMode() != null
             ? ctx.ParameterMode().stream()
                 .map(TerminalNode::getSymbol)
@@ -70,28 +70,16 @@ class SParameterParser extends SBaseParserVisitor<Parameter> {
     }
 
     private Result<Term> parseDefaultValue(stOTTRParser.ParameterContext ctx) {
-
         return ctx.defaultValue() != null
             ? this.termParser.visit(ctx.defaultValue().constant())
             : Result.empty();
     }
 
     private Result<Term> parseTerm(stOTTRParser.ParameterContext ctx) {
-
-        Term var = new BlankNodeTerm(this.termParser.getVariableLabel(ctx.Variable()));
-        var.setVariable(true); // TODO: Remove? Is is not already covered by Signature.setVariables()?
-        var term = Result.of(var);
-
-        Result<TermType> type = parseType(ctx)
-            .flatMapOrElse(Result::of, Result.of(var.getVariableType())); // TODO: is there a better "or"?
-
-        term.addResult(type, Term::setType);
-
-        return term;
+        return Result.of(new BlankNodeTerm(this.termParser.getVariableLabel(ctx.Variable())));
     }
 
     private Result<TermType> parseType(stOTTRParser.ParameterContext ctx) {
-
         return ctx.type() != null
             ? this.typeParser.visit(ctx)
             : Result.empty();

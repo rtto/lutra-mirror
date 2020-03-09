@@ -36,6 +36,7 @@ import xyz.ottr.lutra.model.terms.ListTerm;
 import xyz.ottr.lutra.model.terms.Term;
 import xyz.ottr.lutra.model.types.BasicType;
 import xyz.ottr.lutra.model.types.ComplexType;
+import xyz.ottr.lutra.model.types.ListType;
 import xyz.ottr.lutra.model.types.TermType;
 import xyz.ottr.lutra.system.Result;
 import xyz.ottr.lutra.system.ResultStream;
@@ -92,7 +93,7 @@ public abstract class ArgumentMap<V> implements Function<V, Result<Term>> {
             return Result.of(this.translationSettings.getNullValue());
         } else if (StringUtils.isNotEmpty(blankNodeLabel)) {
             term = this.termFactory.createBlankNode(blankNodeLabel).map(t -> (Term)t);
-        } else if (type.isListType()) {
+        } else if (type instanceof ListType) {
             term = getListTerm(toString(value), (ComplexType)type);
         } else {
             term = getBasicTerm(value, (BasicType)type);

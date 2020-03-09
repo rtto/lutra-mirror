@@ -64,7 +64,7 @@ public enum TemplateBuilder {
 
     private static void checkEmptyPattern(Result<Template> template) {
         template.ifPresent(t -> {
-            if (t.getInstances().isEmpty()) {
+            if (t.getPattern().isEmpty()) {
                 template.addWarning("Template has an empty pattern.");
             }
         });

@@ -78,7 +78,7 @@ public class WTemplateWriter implements TemplateWriter {
         
         Resource signatureNode = createSignature(model, template);
         if (template instanceof Template) {
-            for (Instance instance : ((Template) template).getInstances()) {
+            for (Instance instance : ((Template) template).getPattern()) {
                 Resource instanceNode = this.instanceWriter.createInstanceNode(model, instance);
                 model.add(signatureNode, WOTTR.pattern, instanceNode);
             }

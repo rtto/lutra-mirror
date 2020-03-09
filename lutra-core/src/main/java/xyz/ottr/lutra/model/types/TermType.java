@@ -40,10 +40,6 @@ public interface TermType {
         return isSubTypeOf(other) && !this.equals(other);
     }
 
-    default boolean isListType() {
-        return this instanceof ListType || this instanceof NEListType;
-    }
-
     boolean isCompatibleWith(TermType other);
 
     default boolean isIncompatibleWith(TermType other) {

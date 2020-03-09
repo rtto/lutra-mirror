@@ -188,7 +188,9 @@ public class STermParser extends SBaseParserVisitor<Term> {
         String qname;
         TerminalNode onlyNS = ctx.PNAME_NS();
         // Of the form ex: (i.e. nothing after colon)
-        qname = onlyNS != null ? onlyNS.getSymbol().getText() : ctx.PNAME_LN().getSymbol().getText();
+        qname = onlyNS != null
+            ? onlyNS.getSymbol().getText()
+            : ctx.PNAME_LN().getSymbol().getText();
 
         int lastColon = qname.indexOf(':'); // Cannot simply split, can e.g. have ex:local:name
         String prefixName = qname.substring(0, lastColon);

@@ -120,24 +120,6 @@ public class DependencyEdge {
             + " --> " + Objects.toString(this.to, "");
     }
 
-    /* TODO: remove if lombok annotations work
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(this.from, this.argumentList, this.to);
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            return this == o
-                || o != null
-                && this.getClass().equals(o.getClass())
-                && Objects.equals(this.from, ((DependencyEdge) o).from)
-                && Objects.equals(this.argumentList, ((DependencyEdge) o).argumentList)
-                && Objects.equals(this.to, ((DependencyEdge) o).to);
-        }
-    */
-
 }
 
 

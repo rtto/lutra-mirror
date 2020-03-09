@@ -184,7 +184,7 @@ public class STemplateWriter implements TemplateWriter {
 
     private String writePattern(Template template, STermWriter termWriter) {
         SInstanceWriter instanceWriter = new SPatternInstanceWriter(termWriter);
-        template.getInstances().forEach(instanceWriter);
+        template.getPattern().forEach(instanceWriter);
         return instanceWriter.write();
     }
 

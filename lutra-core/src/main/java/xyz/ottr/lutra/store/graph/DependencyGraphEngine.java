@@ -308,7 +308,7 @@ public class DependencyGraphEngine extends QueryEngine<DependencyGraph> {
             return Stream.empty(); //  argument is not a template
         }
         Template boundTemplate = this.store.getTemplate(resBoundTemplate.get().getIri()).get();
-        Set<Instance> deps = boundTemplate.getInstances();
+        Set<Instance> deps = boundTemplate.getPattern();
 
         if (tuple.hasBound(body)) {
             return deps.equals(tuple.get(body)) ? Stream.of(tuple) : Stream.empty();

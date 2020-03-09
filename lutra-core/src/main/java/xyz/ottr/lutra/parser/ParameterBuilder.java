@@ -25,6 +25,7 @@ package xyz.ottr.lutra.parser;
 import lombok.Builder;
 import xyz.ottr.lutra.model.Parameter;
 import xyz.ottr.lutra.model.terms.Term;
+import xyz.ottr.lutra.model.types.TermType;
 import xyz.ottr.lutra.system.Message;
 import xyz.ottr.lutra.system.Result;
 
@@ -32,16 +33,18 @@ public enum ParameterBuilder {
     ;
 
     @Builder
-    public static Result<Parameter> createParameter(Result<Term> term, Result<Boolean> nonBlank,
-        Result<Boolean> optional, Result<Term> defaultValue) {
+    public static Result<Parameter> createParameter(Result<Term> term, Result<TermType> type, Result<Boolean> nonBlank,
+                                                    Result<Boolean> optional, Result<Term> defaultValue) {
 
         term = Result.nullToEmpty(term, Message.error("Missing variable. A parameter must have a variable term."));
+        type = Result.nullToEmpty(type);
         nonBlank = Result.nullToEmpty(nonBlank);
         optional = Result.nullToEmpty(optional);
         defaultValue = Result.nullToEmpty(defaultValue);
 
         var builder = Result.of(Parameter.builder());
         builder.addResult(term, Parameter.ParameterBuilder::term);
+        builder.addResult(type, Parameter.ParameterBuilder::type);
         builder.addResult(nonBlank, Parameter.ParameterBuilder::nonBlank);
         builder.addResult(optional, Parameter.ParameterBuilder::optional);
         builder.addResult(defaultValue, Parameter.ParameterBuilder::defaultValue);

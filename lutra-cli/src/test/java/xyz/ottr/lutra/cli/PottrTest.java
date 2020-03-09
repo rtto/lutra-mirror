@@ -115,19 +115,19 @@ public class PottrTest {
     }
 
     private boolean testTemplates(TemplateStore store, String path) {
+        
         TemplateReader reader = new TemplateReader(new SFileReader(), new STemplateParser());
         MessageHandler messages = reader.loadTemplatesFromFolder(store, resolve(path), new String[]{}, new String[]{});
 
-        messages.printMessages();
+        int maxError = messages.printMessages();
 
         store.fetchMissingDependencies();
-
         List<Message> tplMsg = store.checkTemplates();
 
-        int maxError = tplMsg.stream()
+        maxError = Math.max(maxError, tplMsg.stream()
             .mapToInt(Message::getLevel)
             .min()
-            .orElse(Message.INFO);
+            .orElse(Message.INFO));
 
         return !Message.moreSevere(maxError, Message.ERROR);
     }

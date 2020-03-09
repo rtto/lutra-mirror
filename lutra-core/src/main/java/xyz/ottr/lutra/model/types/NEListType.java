@@ -25,10 +25,8 @@ package xyz.ottr.lutra.model.types;
 import lombok.EqualsAndHashCode;
 import xyz.ottr.lutra.OTTR;
 
-// TODO should NEListType extend ListType. Seems that there is a bit of a code overlap.
-
 @EqualsAndHashCode(callSuper = true)
-public class NEListType extends ComplexType {
+public class NEListType extends ListType {
 
     public NEListType(TermType inner) {
         super(inner);
@@ -41,20 +39,16 @@ public class NEListType extends ComplexType {
 
     @Override
     public boolean isSubTypeOf(TermType other) {
-        return other.equals(TypeRegistry.TOP)
+        return super.isSubTypeOf(other)
             || other instanceof NEListType
-               && getInner().isSubTypeOf(((NEListType) other).getInner())
-            || other instanceof ListType
-               && getInner().isSubTypeOf(((ListType) other).getInner());
+               && getInner().isSubTypeOf(((NEListType) other).getInner());
     }
 
     @Override
     public boolean isCompatibleWith(TermType other) {
-        return other.equals(TypeRegistry.TOP)
+        return super.isCompatibleWith(other)
             || other instanceof NEListType
-                && getInner().isCompatibleWith(((NEListType) other).getInner())
-            || other instanceof ListType
-                && getInner().isCompatibleWith(((ListType) other).getInner());
+                && getInner().isCompatibleWith(((NEListType) other).getInner());
     }
 
     @Override

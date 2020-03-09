@@ -91,15 +91,16 @@ public class SInstanceParser extends SParser<Instance> implements InstanceParser
     private Result<ListExpander> parseExpander(stOTTRParser.InstanceContext ctx) {
 
         TerminalNode expanderNode = ctx.ListExpander();
-        if (expanderNode != null) {
-            String expanderValue = expanderNode.getSymbol().getText();
 
-            return STOTTR.Expanders.map.containsKey(expanderValue)
-                ? Result.of(STOTTR.Expanders.map.get(expanderValue))
-                : Result.error("Unrecognized listExpander: " + expanderValue);
-        } else {
+        if (expanderNode == null) {
             return Result.empty();
         }
+
+        String expanderValue = expanderNode.getSymbol().getText();
+
+        return STOTTR.Expanders.map.containsKey(expanderValue)
+            ? Result.of(STOTTR.Expanders.map.get(expanderValue))
+            : Result.error("Unrecognized listExpander: " + expanderValue);
     }
 
     private Result<List<Argument>> parseArguments(stOTTRParser.InstanceContext ctx) {

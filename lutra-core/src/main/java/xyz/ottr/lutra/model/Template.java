@@ -43,33 +43,37 @@ import xyz.ottr.lutra.model.types.TermType;
 @Getter
 public class Template extends Signature {
 
-    private final @NonNull Set<Instance> instances;
+    private final @NonNull Set<Instance> pattern;
 
     @Builder
     private Template(String iri, @Singular List<Parameter> parameters, @Singular Set<Instance> instances) {
         super(iri, parameters);
-        this.instances = instances;
-        setVariableFlagsAndTypes();
+        this.pattern = instances;
+        updatePatternVariables();
     }
 
-    private void setVariableFlagsAndTypes() {
+    /**
+     * Propagates type and variable setting of parameter terms to identical terms in instances, i.e.,
+     * turns instance terms into variables.
+     */
+    private void updatePatternVariables() {
         // Collect parameter types
         Map<Object, TermType> parameterTypes = getParameters().stream()
             .map(Parameter::getTerm)
             .collect(Collectors.toMap(Term::getIdentifier, Term::getType, (t1, t2) -> t1));
 
-        this.instances.forEach(instance ->
-            setVariableFlagsAndTypes(
+        this.pattern.forEach(instance ->
+            setTermsToVariables(
                 instance.getArguments().stream()
                     .map(Argument::getTerm)
                     .collect(Collectors.toList()), parameterTypes));
     }
 
-    private void setVariableFlagsAndTypes(List<Term> terms, Map<Object, TermType> parameterTypes) {
+    private void setTermsToVariables(List<Term> terms, Map<Object, TermType> parameterTypes) {
         terms.forEach(term -> {
             if (term instanceof ListTerm) {
                 ListTerm tl = (ListTerm) term;
-                setVariableFlagsAndTypes(tl.asList(), parameterTypes);
+                setTermsToVariables(tl.asList(), parameterTypes);
                 tl.recomputeType();
             } else if (parameterTypes.containsKey(term.getIdentifier())) {
                 term.setVariable(true);
@@ -86,7 +90,7 @@ public class Template extends Signature {
     public String toString(PrefixMapping prefixes) {
         return super.toString(prefixes)
             + " ::\n"
-            + this.instances.stream()
+            + this.pattern.stream()
                 .map(ins -> "\t" + ins.toString(prefixes))
                 .collect(Collectors.joining(",\n", "{", "}"))
             + " .";

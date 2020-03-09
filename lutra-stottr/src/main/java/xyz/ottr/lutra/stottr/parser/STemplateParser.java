@@ -110,13 +110,15 @@ public class STemplateParser extends SParser<Signature> implements TemplateParse
     }
 
     private Map<String, Term> getVariableMap(Result<Signature> signature) {
-        return signature.isPresent()
-            ? signature.get().getParameters().stream()
-            .map(Parameter::getTerm)
-            .collect(Collectors.toMap(
-                term -> term.getIdentifier().toString(),
-                Function.identity()))
-            : new HashMap<>();
+        if(!signature.isPresent()) {
+            return new HashMap<>();
+        } else {
+            return signature.get().getParameters().stream()
+                .map(Parameter::getTerm)
+                .collect(Collectors.toMap(
+                    term -> term.getIdentifier().toString(),
+                    Function.identity()));
+        }
     }
 
     private Result<Set<Instance>> parseInstances(stOTTRParser.TemplateContext ctx, SInstanceParser parser) {
