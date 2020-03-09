@@ -51,14 +51,18 @@ public enum InstanceBuilder {
 
         if (Result.allIsPresent(iri, arguments)) {
             var instance = builder.map(Instance.InstanceBuilder::build);
-            validateListExpanders(instance);
+            validate(instance);
             return instance;
         } else {
             return Result.empty(builder);
         }
     }
 
-    private static void validateListExpanders(Result<Instance> instance) {
+    private static void validate(Result<Instance> instance) {
+        checkListExpanders(instance);
+    }
+
+    private static void checkListExpanders(Result<Instance> instance) {
         instance.ifPresent(i -> {
             var forExpansion = i.getArguments().stream()
                 .filter(Argument::isListExpander)

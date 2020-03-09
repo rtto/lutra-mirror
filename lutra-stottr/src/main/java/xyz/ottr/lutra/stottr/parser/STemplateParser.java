@@ -35,6 +35,8 @@ import xyz.ottr.lutra.model.Parameter;
 import xyz.ottr.lutra.model.Signature;
 import xyz.ottr.lutra.model.terms.IRITerm;
 import xyz.ottr.lutra.model.terms.Term;
+import xyz.ottr.lutra.parser.BaseTemplateBuilder;
+import xyz.ottr.lutra.parser.SignatureBuilder;
 import xyz.ottr.lutra.parser.TemplateBuilder;
 import xyz.ottr.lutra.parser.TemplateParser;
 import xyz.ottr.lutra.stottr.antlr.stOTTRParser;
@@ -65,14 +67,14 @@ public class STemplateParser extends SParser<Signature> implements TemplateParse
     }
 
     public Result<Signature> visitSignature(stOTTRParser.SignatureContext ctx) {
-        return TemplateBuilder.signatureBuilder()
+        return SignatureBuilder.builder()
             .iri(parseIRI(ctx))
             .parameters(parseParameters(ctx))
             .build();
     }
 
     public Result<Signature> visitBaseTemplate(stOTTRParser.BaseTemplateContext ctx) {
-        return TemplateBuilder.baseTemplateBuilder()
+        return BaseTemplateBuilder.builder()
             .signature(visitSignature(ctx.signature()))
             .build()
             .map(t -> (Signature)t);
@@ -85,7 +87,7 @@ public class STemplateParser extends SParser<Signature> implements TemplateParse
         Map<String, Term> variables = getVariableMap(signature);
         SInstanceParser instanceParser = new SInstanceParser(getPrefixes(), variables);
 
-        return TemplateBuilder.templateBuilder()
+        return TemplateBuilder.builder()
             .signature(signature)
             .instances(parseInstances(ctx, instanceParser))
             .build()

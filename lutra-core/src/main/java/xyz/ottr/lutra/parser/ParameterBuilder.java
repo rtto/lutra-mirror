@@ -56,6 +56,10 @@ public enum ParameterBuilder {
     }
 
     private static void validate(Result<Parameter> parameter) {
+        checkOptionalDefault(parameter);
+    }
+
+    private static void checkOptionalDefault(Result<Parameter> parameter) {
 
         parameter.ifPresent(p -> {
             if (p.isOptional() && p.hasDefaultValue()) {

@@ -45,15 +45,19 @@ public enum ArgumentBuilder {
 
         if (Result.allIsPresent(term)) {
             var argument = builder.map(Argument.ArgumentBuilder::build);
-            validateValue(argument);
+            validate(argument);
             return argument;
         } else {
             return Result.empty(builder);
         }
     }
 
+    private static void validate(Result<Argument> argument) {
+        checkValue(argument);
+    }
+
     // Warning if value is a URI in the ottr namespace.
-    private static void validateValue(Result<Argument> argument) {
+    private static void checkValue(Result<Argument> argument) {
         argument.ifPresent(arg -> {
             var term = arg.getTerm();
             if (term instanceof IRITerm && ((IRITerm) term).getIri().startsWith(OTTR.namespace)) {

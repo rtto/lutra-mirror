@@ -36,6 +36,8 @@ import org.apache.jena.shared.PrefixMapping;
 import xyz.ottr.lutra.model.Instance;
 import xyz.ottr.lutra.model.Parameter;
 import xyz.ottr.lutra.model.Signature;
+import xyz.ottr.lutra.parser.BaseTemplateBuilder;
+import xyz.ottr.lutra.parser.SignatureBuilder;
 import xyz.ottr.lutra.parser.TemplateBuilder;
 import xyz.ottr.lutra.parser.TemplateParser;
 import xyz.ottr.lutra.system.Result;
@@ -83,7 +85,7 @@ public class WTemplateParser implements TemplateParser<Model> {
 
     private Result<Signature> parseSignature(Model model, Resource signature) {
 
-        var result = TemplateBuilder.signatureBuilder()
+        var result = SignatureBuilder.builder()
             .iri(this.parseSignatureIRI(signature))
             .parameters(this.parseParameters(model, signature))
             .build();
@@ -97,7 +99,7 @@ public class WTemplateParser implements TemplateParser<Model> {
     }
 
     private Result<Signature> parseTemplate(Model model, Resource template) {
-        return TemplateBuilder.templateBuilder()
+        return TemplateBuilder.builder()
             .signature(this.parseSignature(model, template))
             .instances(this.parsePattern(model, template))
             .build()
@@ -106,12 +108,12 @@ public class WTemplateParser implements TemplateParser<Model> {
 
     private Result<Signature> parseBaseTemplate(Model model, Resource baseTemplate) {
 
-        var result = TemplateBuilder.baseTemplateBuilder()
+        var result = BaseTemplateBuilder.builder()
             .signature(this.parseSignature(model, baseTemplate))
             .build();
 
         if (model.contains(baseTemplate, WOTTR.pattern, (RDFNode) null)) {
-            result.addWarning("The base template " + RDFNodes.toString(baseTemplate) + " contains a "
+            result.addError("The base template " + RDFNodes.toString(baseTemplate) + " contains a "
                 + RDFNodes.toString(WOTTR.pattern) + ", but this is not permitted.");
         }
 

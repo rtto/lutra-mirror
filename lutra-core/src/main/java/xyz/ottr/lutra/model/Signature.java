@@ -38,7 +38,7 @@ import xyz.ottr.lutra.OTTR;
 public class Signature {
 
     private final @NonNull String iri;
-    private final @NonNull @Singular List<Parameter> parameters; // TODO enforce no duplicates in list
+    private final @NonNull @Singular List<Parameter> parameters;
 
     @Override
     public String toString() {

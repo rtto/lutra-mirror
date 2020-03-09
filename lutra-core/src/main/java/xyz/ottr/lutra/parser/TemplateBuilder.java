@@ -22,41 +22,20 @@ package xyz.ottr.lutra.parser;
  * #L%
  */
 
-import java.util.List;
 import java.util.Set;
 
 import lombok.Builder;
-import xyz.ottr.lutra.model.BaseTemplate;
 import xyz.ottr.lutra.model.Instance;
-import xyz.ottr.lutra.model.Parameter;
 import xyz.ottr.lutra.model.Signature;
 import xyz.ottr.lutra.model.Template;
 import xyz.ottr.lutra.system.Message;
 import xyz.ottr.lutra.system.Result;
 
-// TODO should we split this into different parsers and introduce a new class TemplateSource which orchestrates the different parsers?
-
 public enum TemplateBuilder {
     ;
 
-    @Builder(builderMethodName = "signatureBuilder", builderClassName = "InnerSignatureBuilder")
-    public static Result<Signature> createSignature(Result<String> iri, Result<List<Parameter>> parameters) {
-
-        iri = Result.nullToEmpty(iri, Message.error("Missing IRI. A signature must have an IRI."));
-        parameters = Result.nullToEmpty(parameters, Message.error("Missing parameter list. A signature must have "
-            + "a (possibly empty) list of parameters."));
-
-        Result<Signature.SignatureBuilder> builder = Result.of(Signature.superbuilder());
-        builder.addResult(iri, Signature.SignatureBuilder::iri);
-        builder.addResult(parameters, Signature.SignatureBuilder::parameters);
-
-        return Result.allIsPresent(iri, parameters)
-            ? builder.map(Signature.SignatureBuilder::build)
-            : Result.empty(builder);
-    }
-
-    @Builder(builderMethodName = "templateBuilder", builderClassName = "InnerTemplateBuilder")
-    public static Result<Template> createTemplate(Result<Signature> signature, Result<Set<Instance>> instances) {
+    @Builder
+    public static Result<Template> create(Result<Signature> signature, Result<Set<Instance>> instances) {
 
         signature = Result.nullToEmpty(signature, Message.error("Missing signature. A template must have "
             + "a signature."));
@@ -70,26 +49,27 @@ public enum TemplateBuilder {
         });
         builder.addResult(instances, Template.TemplateBuilder::instances);
 
-        return Result.allIsPresent(signature, instances)
-            ? builder.map(Template.TemplateBuilder::build)
-            : Result.empty(builder);
+        if (Result.allIsPresent(signature, instances)) {
+            var template = builder.map(Template.TemplateBuilder::build);
+            validate(template);
+            return template;
+        } else {
+            return Result.empty(builder);
+        }
     }
 
-    @Builder(builderMethodName = "baseTemplateBuilder", builderClassName = "InnerBaseTemplateBuilder")
-    public static Result<BaseTemplate> createBaseTemplate(Result<Signature> signature) {
+    private static void validate(Result<Template> template) {
+        checkEmptyPattern(template);
+    }
 
-        signature = Result.nullToEmpty(signature, Message.error("Missing signature. A base template must have "
-            + "a signature."));
-
-        var builder = Result.of(BaseTemplate.builder());
-        builder.addResult(signature, (bldr, sign) -> {
-            bldr.iri(sign.getIri());
-            bldr.parameters(sign.getParameters());
+    private static void checkEmptyPattern(Result<Template> template) {
+        template.ifPresent(t -> {
+            if (t.getInstances().isEmpty()) {
+                template.addWarning("Template has an empty pattern.");
+            }
         });
-
-        return Result.allIsPresent(signature)
-            ? builder.map(BaseTemplate.BaseTemplateBuilder::build)
-            : Result.empty(builder);
     }
+
+
 }
 

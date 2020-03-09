@@ -162,8 +162,12 @@ public class ShaclEquivalenceTest {
             tplErrorMessages.accept(tpl);
         });
 
-        List<Message> errors = store.checkTemplatesForErrorsOnly();
-        errors.addAll(tplErrorMessages.getMessageHandler().getMessages());
+        var storeErrors = store.checkTemplatesForErrorsOnly();
+        var templateMessages = tplErrorMessages.getMessageHandler().getMessages();
+
+        var errors = Stream.concat(storeErrors.stream(), templateMessages.stream())
+            .filter(message -> Message.moreSevere(message.getLevel(), Message.ERROR))
+            .collect(Collectors.toList());
         
         if (!correct) {
             assertFalse("Should produce error messages: " + file, errors.isEmpty());
