@@ -145,23 +145,23 @@ public class CLI {
     private void executeMode() {
 
         switch (this.settings.mode) {
-        case expand:
-            executeExpand();
-            break;
-        case expandLibrary:
-            executeExpandLibrary();
-            break;
-        case formatLibrary:
-            executeFormatLibrary();
-            break;
-        case format:
-            executeFormat();
-            break;
-        case lint:
-            break;
-        default:
-            Message err = Message.error("The mode " + this.settings.mode + " is not yet supported.");
-            this.messageHandler.printMessage(err);
+            case expand:
+                executeExpand();
+                break;
+            case expandLibrary:
+                executeExpandLibrary();
+                break;
+            case formatLibrary:
+                executeFormatLibrary();
+                break;
+            case format:
+                executeFormat();
+                break;
+            case lint:
+                break;
+            default:
+                Message err = Message.error("The mode " + this.settings.mode + " is not yet supported.");
+                this.messageHandler.printMessage(err);
         }
     }
 
