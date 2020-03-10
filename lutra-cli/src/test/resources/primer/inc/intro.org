@@ -1,4 +1,0 @@
-
-#+HTML: <div id="toc-content">
-
-* Introduction
