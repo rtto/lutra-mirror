@@ -32,17 +32,16 @@ import xyz.ottr.lutra.model.terms.Term;
 import xyz.ottr.lutra.parser.ArgumentBuilder;
 import xyz.ottr.lutra.system.Result;
 import xyz.ottr.lutra.wottr.WOTTR;
-import xyz.ottr.lutra.wottr.util.ModelSelector;
 import xyz.ottr.lutra.wottr.util.RDFNodes;
 
 public class WArgumentParser implements Function<RDFNode, Result<Argument>> {
 
     private final Model model;
-    private final TermFactory rdfTermFactory;
+    private final TermSerializer termSerializer;
 
     WArgumentParser(Model model) {
         this.model = model;
-        this.rdfTermFactory = new TermFactory();
+        this.termSerializer = new TermSerializer();
     }
 
     public Result<Argument> apply(RDFNode argumentNode) {
@@ -50,17 +49,17 @@ public class WArgumentParser implements Function<RDFNode, Result<Argument>> {
         var argumentResource = RDFNodes.cast(argumentNode, Resource.class);
 
         return ArgumentBuilder.builder()
-            .term(argumentResource.flatMap(this::getArgumentValue))
-            .listExpander(argumentResource.flatMap(this::getListExpander))
+            .term(argumentResource.flatMap(this::parseArgumentValue))
+            .listExpander(argumentResource.flatMap(this::parseListExpander))
             .build();
     }
 
-    private Result<Term> getArgumentValue(Resource argument) {
+    private Result<Term> parseArgumentValue(Resource argument) {
         return ModelSelector.getRequiredObject(this.model, argument, WOTTR.value)
-            .flatMap(this.rdfTermFactory);
+            .flatMap(this.termSerializer);
     }
 
-    private Result<Boolean> getListExpander(Resource argument) {
+    private Result<Boolean> parseListExpander(Resource argument) {
         return ModelSelector.getOptionalResourceObject(this.model, argument, WOTTR.modifier)
             .flatMap(r -> r.equals(WOTTR.listExpand)
                 ? Result.of(Boolean.TRUE)

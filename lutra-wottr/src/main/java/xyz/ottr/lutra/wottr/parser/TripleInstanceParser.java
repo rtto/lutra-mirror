@@ -40,7 +40,7 @@ import xyz.ottr.lutra.wottr.util.RDFNodes;
 
 public class TripleInstanceParser implements InstanceParser<Model> {
 
-    private static final TermFactory rdfTermFactory = new TermFactory();
+    private static final TermSerializer termSerializer = new TermSerializer();
 
     @Override
     public ResultStream<Instance> apply(Model model) {
@@ -68,13 +68,13 @@ public class TripleInstanceParser implements InstanceParser<Model> {
     private static Result<Term> createTerm(RDFNode node) {
 
         if (node.isURIResource()) {
-            return rdfTermFactory.createTerm(node.asResource().getURI())
+            return termSerializer.toTerm(node.asResource().getURI())
                 .map(t -> (Term) t);
         } else if (node.isAnon()) {
-            return rdfTermFactory.createBlankNodeTerm(node.asResource().getId().getBlankNodeId())
+            return termSerializer.toBlankNodeTerm(node.asResource().getId().getBlankNodeId())
                 .map(t -> (Term) t);
         } else if (node.isLiteral()) {
-            return rdfTermFactory.createLiteralTerm(node.asLiteral())
+            return termSerializer.toLiteralTerm(node.asLiteral())
                 .map(t -> (Term) t);
         } else {
             throw new IllegalArgumentException("Error converting RDFNode " + RDFNodes.toString(node) + " to Term. ");

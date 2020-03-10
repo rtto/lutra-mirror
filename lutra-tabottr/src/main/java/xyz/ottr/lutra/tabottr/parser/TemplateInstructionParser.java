@@ -34,16 +34,16 @@ import xyz.ottr.lutra.parser.ArgumentBuilder;
 import xyz.ottr.lutra.parser.InstanceBuilder;
 import xyz.ottr.lutra.system.Result;
 import xyz.ottr.lutra.tabottr.model.TemplateInstruction;
-import xyz.ottr.lutra.wottr.parser.TermFactory;
+import xyz.ottr.lutra.wottr.parser.TermSerializer;
 
 public class TemplateInstructionParser {
 
     private final RDFNodeFactory dataFactory;
-    private final TermFactory termFactory;
+    private final TermSerializer termSerializer;
     
     public TemplateInstructionParser(PrefixMapping prefixes) {
         this.dataFactory = new RDFNodeFactory(prefixes);
-        this.termFactory = new TermFactory();
+        this.termSerializer = new TermSerializer();
     }
     
     private Result<Instance> createTemplateInstance(String templateIRI, List<String> arguments, List<String> argumentTypes) {
@@ -51,7 +51,7 @@ public class TemplateInstructionParser {
         List<Result<Argument>> listArguments = new LinkedList<>();
         for (int i = 0; i < arguments.size(); i += 1) {
             Result<Term> term = this.dataFactory.toRDFNode(arguments.get(i), argumentTypes.get(i))
-                .flatMap(this.termFactory);
+                .flatMap(this.termSerializer);
             Result<Argument> argument = ArgumentBuilder.builder().term(term).build();
             listArguments.add(argument);
         }

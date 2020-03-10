@@ -32,7 +32,7 @@ import org.apache.jena.shared.PrefixMapping;
 import org.apache.jena.sparql.util.NodeFactoryExtra;
 import org.junit.Test;
 
-public class TermFactoryTest {
+public class TermSerializerTest {
 
     PrefixMap prefixes = PrefixMapFactory.create(PrefixMapping.Standard);
 

@@ -30,7 +30,7 @@ import java.util.List;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
-import xyz.ottr.lutra.wottr.util.ModelIO;
+import xyz.ottr.lutra.wottr.io.Models;
 
 @RunWith(Parameterized.class)
 public class BaseInstanceExpansionTest {
@@ -59,6 +59,6 @@ public class BaseInstanceExpansionTest {
 
         ModelUtils.testIsomorphicModels(
             ModelUtils.getOTTRParsedRDFModel(this.input),
-            ModelIO.readModel(this.output));
+            Models.readModel(this.output));
     }
 }

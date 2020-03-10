@@ -1,4 +1,4 @@
-package xyz.ottr.lutra.wottr.util;
+package xyz.ottr.lutra.wottr.parser;
 
 /*-
  * #%L
@@ -35,6 +35,7 @@ import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdf.model.StmtIterator;
 import org.apache.jena.vocabulary.RDF;
 import xyz.ottr.lutra.system.Result;
+import xyz.ottr.lutra.wottr.util.RDFNodes;
 
 public enum ModelSelector {
 

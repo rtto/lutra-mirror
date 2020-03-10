@@ -35,9 +35,8 @@ import xyz.ottr.lutra.store.graph.DependencyGraph;
 import xyz.ottr.lutra.system.Message;
 import xyz.ottr.lutra.system.ResultConsumer;
 import xyz.ottr.lutra.system.ResultStream;
+import xyz.ottr.lutra.wottr.io.Models;
 import xyz.ottr.lutra.wottr.io.RDFFileReader;
-import xyz.ottr.lutra.wottr.parser.WInstanceParser;
-import xyz.ottr.lutra.wottr.util.ModelIO;
 import xyz.ottr.lutra.wottr.writer.WInstanceWriter;
 
 public enum ModelUtils {
@@ -56,8 +55,8 @@ public enum ModelUtils {
             actual.clearNsPrefixMap();
             expected.clearNsPrefixMap();
 
-            String rdfActual = ModelIO.writeModel(actual, Lang.TURTLE);
-            String rdfExpected = ModelIO.writeModel(expected, Lang.TURTLE);
+            String rdfActual = Models.writeModel(actual, Lang.TURTLE);
+            String rdfExpected = Models.writeModel(expected, Lang.TURTLE);
 
             Assert.assertThat(rdfActual, is(rdfExpected));
         }

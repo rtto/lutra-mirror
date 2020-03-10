@@ -41,7 +41,6 @@ import xyz.ottr.lutra.parser.InstanceParser;
 import xyz.ottr.lutra.system.Result;
 import xyz.ottr.lutra.system.ResultStream;
 import xyz.ottr.lutra.wottr.WOTTR;
-import xyz.ottr.lutra.wottr.util.ModelSelector;
 import xyz.ottr.lutra.wottr.util.RDFNodes;
 
 public class WInstanceParser implements InstanceParser<Model> {
@@ -70,25 +69,25 @@ public class WInstanceParser implements InstanceParser<Model> {
 
     Result<Instance> parseInstance(Model model, Resource instanceNode) {
         return InstanceBuilder.builder()
-            .iri(getSignatureIRI(model, instanceNode))
-            .arguments(getArgumentList(model, instanceNode))
-            .listExpander(getListExpander(model, instanceNode))
+            .iri(parseSignatureIRI(model, instanceNode))
+            .arguments(parseArgumentList(model, instanceNode))
+            .listExpander(parseListExpander(model, instanceNode))
             .build();
     }
 
-    private Result<String> getSignatureIRI(Model model, Resource instance) {
+    private Result<String> parseSignatureIRI(Model model, Resource instance) {
         return ModelSelector.getRequiredURIResourceObject(model, instance, WOTTR.of)
             .map(Resource::getURI);
     }
 
-    private Result<ListExpander> getListExpander(Model model, Resource instance) {
+    private Result<ListExpander> parseListExpander(Model model, Resource instance) {
         return ModelSelector.getOptionalResourceObject(model, instance, WOTTR.modifier)
             .flatMap(r -> WOTTR.listExpanders.keySet().contains(r)
                 ? Result.ofNullable(WOTTR.listExpanders.get(r))
                 : Result.error("Unknown listExpander " + RDFNodes.toString(r) + " in instance " + RDFNodes.toString(instance) + "."));
     }
 
-    private Result<List<Argument>> getArgumentList(Model model, Resource instance) {
+    private Result<List<Argument>> parseArgumentList(Model model, Resource instance) {
 
         // An instance must have arguments or values, but not both
         Result<RDFList> arguments = ModelSelector.getRequiredListObject(model, instance, WOTTR.arguments);
@@ -101,7 +100,7 @@ public class WInstanceParser implements InstanceParser<Model> {
             return arguments.flatMap(args -> parseArguments(args, new WArgumentParser(model)));
         } else {
             // create a parser for values to simple arguments:
-            var parser = new TermFactory()
+            var parser = new TermSerializer()
                 .andThen(termResult -> ArgumentBuilder.builder().term(termResult).build());
 
             return values.flatMap(args -> parseArguments(args, parser));

@@ -35,37 +35,61 @@ import xyz.ottr.lutra.model.types.TermType;
 import xyz.ottr.lutra.parser.ParameterBuilder;
 import xyz.ottr.lutra.system.Result;
 import xyz.ottr.lutra.wottr.WOTTR;
-import xyz.ottr.lutra.wottr.util.ModelSelector;
 import xyz.ottr.lutra.wottr.util.RDFNodes;
 
 public class WParameterParser implements Function<RDFNode, Result<Parameter>> {
 
     private final Model model;
-    private final TermFactory rdfTermFactory;
-    private final TermTypeFactory typeFactory;
+    private final TermSerializer termSerializer;
+    private final TermTypeSerialiser typeFactory;
 
     WParameterParser(Model model) {
         this.model = model;
-        this.rdfTermFactory = new TermFactory();
-        this.typeFactory = new TermTypeFactory();
+        this.termSerializer = new TermSerializer();
+        this.typeFactory = new TermTypeSerialiser();
     }
 
     public Result<Parameter> apply(RDFNode paramNode) {
 
         var parameterResource = RDFNodes.cast(paramNode, Resource.class);
 
-        var modifiers = parameterResource.map(this::getModifiers);
+        var modifiers = parameterResource.map(this::parseModifiers);
 
         var parameter = ParameterBuilder.builder()
-            .term(parameterResource.flatMap(this::getTerm))
-            .type(parameterResource.flatMap(this::getType))
+            .term(parameterResource.flatMap(this::parseTerm))
+            .type(parameterResource.flatMap(this::parseType))
             .optional(modifiers.map(mods -> mods.contains(WOTTR.optional)))
             .nonBlank(modifiers.map(mods -> mods.contains(WOTTR.nonBlank)))
-            .defaultValue(parameterResource.flatMap(this::getDefaultValue))
+            .defaultValue(parameterResource.flatMap(this::parseDefaultValue))
             .build();
 
+        checkUnexpectedModifiers(parameter, modifiers);
+
+        return parameter;
+    }
+
+    private Result<Term> parseTerm(Resource parameter) {
+        return ModelSelector.getRequiredObject(this.model, parameter, WOTTR.variable)
+            .flatMap(this.termSerializer);
+    }
+
+    private Result<TermType> parseType(Resource parameter) {
+        return ModelSelector.getOptionalResourceObject(this.model, parameter, WOTTR.type)
+            .flatMap(this.typeFactory);
+    }
+
+    private Result<Term> parseDefaultValue(Resource param) {
+        return ModelSelector.getOptionalObject(this.model, param, WOTTR.defaultVal)
+            .flatMap(this.termSerializer);
+    }
+
+    private Set<RDFNode> parseModifiers(Resource parameter) {
+        return this.model.listObjectsOfProperty(parameter, WOTTR.modifier).toSet();
+    }
+
+    private void checkUnexpectedModifiers(Result<Parameter> parameter, Result<Set<RDFNode>> modifiers) {
         modifiers.ifPresent(mods -> {
-            var modifierCopy = new ArrayList<>(mods); // make a copy in case we want to make use of modifiers later.
+            var modifierCopy = new ArrayList<>(mods); // make a copy so we don't change input.
             modifierCopy.removeAll(WOTTR.argumentModifiers);
             if (!modifierCopy.isEmpty()) {
                 parameter.addError("Unknown modifier. Permissible modifiers are "
@@ -74,26 +98,6 @@ public class WParameterParser implements Function<RDFNode, Result<Parameter>> {
             }
         });
 
-        return parameter;
-    }
-
-    private Result<Term> getTerm(Resource parameter) {
-        return ModelSelector.getRequiredObject(this.model, parameter, WOTTR.variable)
-            .flatMap(this.rdfTermFactory);
-    }
-
-    private Result<TermType> getType(Resource parameter) {
-        return ModelSelector.getOptionalResourceObject(this.model, parameter, WOTTR.type)
-            .flatMap(this.typeFactory);
-    }
-
-    private Result<Term> getDefaultValue(Resource param) {
-        return ModelSelector.getOptionalObject(this.model, param, WOTTR.defaultVal)
-            .flatMap(this.rdfTermFactory);
-    }
-
-    private Set<RDFNode> getModifiers(Resource parameter) {
-        return this.model.listObjectsOfProperty(parameter, WOTTR.modifier).toSet();
     }
 
 }

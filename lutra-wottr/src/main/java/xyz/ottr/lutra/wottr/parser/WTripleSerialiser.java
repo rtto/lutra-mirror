@@ -37,11 +37,13 @@ import org.apache.jena.rdf.model.StmtIterator;
 import org.apache.jena.vocabulary.RDF;
 import xyz.ottr.lutra.wottr.WOTTR;
 
+// TODO can this class be replaced by using WInstanceWriter instead?
+
 public class WTripleSerialiser {
 
     private final Model model;
 
-    public WTripleSerialiser(Model model) {
+    WTripleSerialiser(Model model) {
         this.model = model;
     }
 
@@ -50,7 +52,7 @@ public class WTripleSerialiser {
         return new ArrayList<>();
     }
 
-    public List<Statement> serialiseInstance(Resource instance) {
+    List<Statement> serialiseInstance(Resource instance) {
         List<Statement> triples = getCollection();
 
         triples.addAll(listStatements(instance));

@@ -58,7 +58,7 @@ import xyz.ottr.lutra.store.TemplateStore;
 
 import xyz.ottr.lutra.wottr.io.RDFFileReader;
 import xyz.ottr.lutra.wottr.parser.WTemplateParser;
-import xyz.ottr.lutra.wottr.util.ModelIO;
+import xyz.ottr.lutra.wottr.io.Models;
 import xyz.ottr.lutra.wottr.writer.WInstanceWriter;
 
  */
@@ -138,8 +138,8 @@ public class SPARQLGenerateEval {
 
         // print model
         String outFile = inFile + ".out.ttl";
-        //ModelIO.printModel(in);
-        Files.write(this.testRoot.resolve(outFile), ModelIO.writeModel(in).getBytes(Charset.forName("UTF-8")), StandardOpenOption.CREATE);
+        //Models.printModel(in);
+        Files.write(this.testRoot.resolve(outFile), Models.writeModel(in).getBytes(Charset.forName("UTF-8")), StandardOpenOption.CREATE);
     }
 
      */

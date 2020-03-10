@@ -41,20 +41,20 @@ import xyz.ottr.lutra.model.types.TypeRegistry;
 import xyz.ottr.lutra.system.Result;
 import xyz.ottr.lutra.wottr.util.RDFNodes;
 
-public class TermTypeFactory implements Function<RDFNode, Result<TermType>> {
+public class TermTypeSerialiser implements Function<RDFNode, Result<TermType>> {
 
     public Result<TermType> apply(RDFNode node) {
 
         if (node.canAs(RDFList.class)) {
-            return parseComplexType(node.as(RDFList.class).asJavaList().iterator());
+            return toComplexType(node.as(RDFList.class).asJavaList().iterator());
         } else {
             List<RDFNode> typeList = new LinkedList<>();
             typeList.add(node);
-            return parseComplexType(typeList.iterator());
+            return toComplexType(typeList.iterator());
         }
     }
 
-    private Result<TermType> parseSimpleType(Resource node) {
+    private Result<TermType> toSimpleType(Resource node) {
 
         TermType type = TypeRegistry.getType(node.getURI());
 
@@ -64,7 +64,7 @@ public class TermTypeFactory implements Function<RDFNode, Result<TermType>> {
                 + RDFNodes.toString(node) + " exists.");
     }
 
-    private Result<TermType> parseComplexType(Iterator<RDFNode> complexType) {
+    private Result<TermType> toComplexType(Iterator<RDFNode> complexType) {
 
         if (!complexType.hasNext()) {
             return Result.error("Expected a resource denoting a basic or complex type, but got nothing.");
@@ -75,21 +75,20 @@ public class TermTypeFactory implements Function<RDFNode, Result<TermType>> {
         }
         Resource type = typeNode.asResource();
 
-        Result<TermType> rest = parseComplexType(complexType);
+        Result<TermType> rest = toComplexType(complexType);
         if (type.getURI().equals(OTTR.TypeURI.NEList)) {
             return rest.flatMap(inner -> Result.of(new NEListType(inner)));
         } else if (type.equals(RDF.List)) {
             return rest.flatMap(inner -> Result.of(new ListType(inner)));
         } else if (type.getURI().equals(OTTR.TypeURI.LUB)) {
             if (rest.isPresent() && !(rest.get() instanceof BasicType)) {
-                return Result.error("Expected simple type as argument to LUB-type, but got "
-                    + rest.get());
+                return Result.error("Expected simple type as argument to LUB-type, but got " + rest.get());
             }
             return rest.flatMap(inner -> Result.of(new LUBType((BasicType) inner)));
         } else if (!rest.isPresent()) {
-            return parseSimpleType(type);
+            return toSimpleType(type);
         } else {
-            return Result.error("Unrecognized type constructor " + type + ".");
+            return Result.error("Unrecognized type " + type + ".");
         }
     }
 }

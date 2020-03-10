@@ -45,41 +45,41 @@ import xyz.ottr.lutra.system.Result;
 import xyz.ottr.lutra.wottr.WOTTR;
 import xyz.ottr.lutra.wottr.util.RDFNodes;
 
-public class TermFactory implements Function<RDFNode, Result<Term>> {
+public class TermSerializer implements Function<RDFNode, Result<Term>> {
 
     // TODO: Verify that this is correct. This only gives correct results if blank nodes across Jena models are unique.
     private static final Map<RDFList, Result<ListTerm>> createdLists = new HashMap<>();
     private static final Map<String, BlankNodeTerm> createdBlanks = new HashMap<>();
 
     public Result<Term> apply(RDFNode node) {
-        return createTerm(node);
+        return toTerm(node);
     }
 
-    private Result<Term> createTerm(RDFNode node) {
+    private Result<Term> toTerm(RDFNode node) {
 
         if (node.isResource()) {
-            return createTerm(node.asResource());
+            return toTerm(node.asResource());
         } else if (node.isLiteral()) {
-            return createLiteralTerm(node.asLiteral()).map(tl -> (Term) tl);
+            return toLiteralTerm(node.asLiteral()).map(tl -> (Term) tl);
         } else {
             return Result.error("Unable to parse RDFNode " + RDFNodes.toString(node) + " to Term.");
         }
     }
 
-    private Result<Term> createTerm(Resource node) {
+    private Result<Term> toTerm(Resource node) {
 
         if (node.isURIResource()) {
-            return createTerm(node.getURI());
+            return toTerm(node.getURI());
         } else if (node.canAs(RDFList.class)) {
-            return createTermList(node.as(RDFList.class)).map(tl -> (Term) tl); // Need to cast to Result<Term>
+            return toTermList(node.as(RDFList.class)).map(tl -> (Term) tl);
         } else if (node.isAnon()) {
-            return createBlankNodeTerm(node.getId().getBlankNodeId()).map(tl -> (Term) tl); // Need to cast to Result<Term>
+            return toBlankNodeTerm(node.getId().getBlankNodeId()).map(tl -> (Term) tl);
         } else {
             return Result.error("Unable to parse resource " + RDFNodes.toString(node) + " to Term.");
         }
     }
 
-    Result<Term> createTerm(String uri) {
+    Result<Term> toTerm(String uri) {
 
         if (uri.equals(WOTTR.none.getURI())) {
             return Result.of(new NoneTerm());
@@ -90,7 +90,7 @@ public class TermFactory implements Function<RDFNode, Result<Term>> {
         }
     }
 
-    private Result<ListTerm> createTermList(RDFList list) {
+    private Result<ListTerm> toTermList(RDFList list) {
 
         if (createdLists.containsKey(list)) {
             return createdLists.get(list);
@@ -105,7 +105,7 @@ public class TermFactory implements Function<RDFNode, Result<Term>> {
         }
     }
     
-    Result<LiteralTerm> createLiteralTerm(Literal literal) {
+    Result<LiteralTerm> toLiteralTerm(Literal literal) {
 
         // collect all "components" of literal, some may be blank or null
         String value = literal.getLexicalForm();
@@ -125,7 +125,7 @@ public class TermFactory implements Function<RDFNode, Result<Term>> {
     }
 
 
-    Result<BlankNodeTerm> createBlankNodeTerm(BlankNodeId blankNodeId) {
+    Result<BlankNodeTerm> toBlankNodeTerm(BlankNodeId blankNodeId) {
 
         // Mint new labels, but keep map of which term was created
         // for which original (system) label

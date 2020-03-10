@@ -47,7 +47,7 @@ import xyz.ottr.lutra.bottr.source.SPARQLEndpointSource;
 import xyz.ottr.lutra.bottr.util.DataParser;
 import xyz.ottr.lutra.system.Result;
 import xyz.ottr.lutra.system.ResultStream;
-import xyz.ottr.lutra.wottr.util.ModelSelector;
+import xyz.ottr.lutra.wottr.parser.ModelSelector;
 import xyz.ottr.lutra.wottr.util.RDFNodes;
 
 class BSourceParser implements Function<Resource, Result<Source<?>>> {

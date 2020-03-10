@@ -43,7 +43,6 @@ import xyz.ottr.lutra.parser.TemplateParser;
 import xyz.ottr.lutra.system.Result;
 import xyz.ottr.lutra.system.ResultStream;
 import xyz.ottr.lutra.wottr.WOTTR;
-import xyz.ottr.lutra.wottr.util.ModelSelector;
 import xyz.ottr.lutra.wottr.util.RDFNodes;
 
 // TODO Most methods take Model as an input. Should we convert the class from a Function to a Supplier

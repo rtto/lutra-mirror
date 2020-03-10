@@ -49,7 +49,7 @@ import xyz.ottr.lutra.system.ResultStream;
 import xyz.ottr.lutra.wottr.WOTTR;
 import xyz.ottr.lutra.wottr.util.RDFNodes;
 
-// TODO suggest to move this to core.mode.terms, see issue #190 and align with xyz.ottr.lutra.wottr.parser.TermFactory.
+// TODO suggest to move this to core.mode.terms, see issue #190 and align with xyz.ottr.lutra.wottr.parser.TermSerializer.
 
 public class TermFactory {
 

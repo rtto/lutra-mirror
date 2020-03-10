@@ -34,7 +34,7 @@ import xyz.ottr.lutra.bottr.model.InstanceMap;
 import xyz.ottr.lutra.bottr.model.Source;
 import xyz.ottr.lutra.system.Result;
 import xyz.ottr.lutra.system.ResultStream;
-import xyz.ottr.lutra.wottr.util.ModelSelector;
+import xyz.ottr.lutra.wottr.parser.ModelSelector;
 
 public class BInstanceMapParser implements Function<Model, ResultStream<InstanceMap>> {
 

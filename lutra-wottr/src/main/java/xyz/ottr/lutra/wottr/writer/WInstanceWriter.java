@@ -33,8 +33,7 @@ import org.apache.jena.shared.PrefixMapping;
 import xyz.ottr.lutra.model.Argument;
 import xyz.ottr.lutra.model.Instance;
 import xyz.ottr.lutra.wottr.WOTTR;
-import xyz.ottr.lutra.wottr.util.ModelIO;
-import xyz.ottr.lutra.wottr.util.PrefixMappings;
+import xyz.ottr.lutra.wottr.io.Models;
 import xyz.ottr.lutra.writer.InstanceWriter;
 
 public class WInstanceWriter implements InstanceWriter {
@@ -67,11 +66,11 @@ public class WInstanceWriter implements InstanceWriter {
 
     @Override
     public String write() {
-        return ModelIO.writeModel(writeToModel());
+        return Models.writeModel(writeToModel());
     }
 
     public Model writeToModel() {
-        PrefixMappings.trim(this.model);
+        Models.trimPrefixes(this.model);
         return this.model;
     }
 

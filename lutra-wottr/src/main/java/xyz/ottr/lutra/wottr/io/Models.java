@@ -1,4 +1,4 @@
-package xyz.ottr.lutra.wottr.util;
+package xyz.ottr.lutra.wottr.io;
 
 /*-
  * #%L
@@ -23,6 +23,7 @@ package xyz.ottr.lutra.wottr.util;
  */
 
 import java.io.StringWriter;
+import java.util.Set;
 
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.riot.Lang;
@@ -30,7 +31,7 @@ import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.util.FileManager;
 import org.apache.jena.util.FileUtils;
 
-public enum ModelIO {
+public enum Models {
 
     ; // singleton enum
 
@@ -60,5 +61,14 @@ public enum ModelIO {
         StringWriter out = new StringWriter();
         RDFDataMgr.write(out, model, language);
         return out.toString();
+    }
+
+    public static void trimPrefixes(Model model) {
+        Set<String> namespaces = model.listNameSpaces().toSet();
+        for (String prefixNamespace : model.getNsPrefixMap().values()) {
+            if (!namespaces.contains(prefixNamespace)) {
+                model.removeNsPrefix(model.getNsURIPrefix(prefixNamespace));
+            }
+        }
     }
 }

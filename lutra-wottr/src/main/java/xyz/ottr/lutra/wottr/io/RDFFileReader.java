@@ -35,7 +35,6 @@ import org.slf4j.LoggerFactory;
 import xyz.ottr.lutra.io.InputReader;
 import xyz.ottr.lutra.system.Result;
 import xyz.ottr.lutra.system.ResultStream;
-import xyz.ottr.lutra.wottr.util.ModelIO;
 
 public class RDFFileReader implements InputReader<String, Model> {
 
@@ -57,7 +56,7 @@ public class RDFFileReader implements InputReader<String, Model> {
 
         Result<Model> result;
         try {
-            Model model = ModelIO.readModel(path);
+            Model model = Models.readModel(path);
             this.prefixes.setNsPrefixes(model);
             result = Result.ofNullable(model);
             log.info("Adding model " + model.hashCode() + " with URI " + url);
