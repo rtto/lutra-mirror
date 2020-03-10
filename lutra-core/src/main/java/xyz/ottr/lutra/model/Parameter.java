@@ -38,7 +38,6 @@ import xyz.ottr.lutra.model.terms.Term;
 import xyz.ottr.lutra.model.types.TermType;
 
 @Getter
-@Builder(toBuilder = true, builderMethodName = "")
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class Parameter implements HasGetTerm {
 
