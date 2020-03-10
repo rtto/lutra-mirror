@@ -23,8 +23,10 @@ package xyz.ottr.lutra.cli;
  */
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import picocli.CommandLine.Command;
 import picocli.CommandLine.IVersionProvider;
@@ -83,19 +85,19 @@ public class Settings {
                        + "(default: ${DEFAULT-VALUE})"})
     public String[] ignoreExtensions = { };
 
-    @Option(names = {"-I", "--inputFormat"}, completionCandidates = InsInputFormat.class,
+    @Option(names = {"-I", "--inputFormat"}, completionCandidates = InstanceInputFormat.class,
         description = {"Input format of instances.%n"
                        + "(legal values: ${COMPLETION-CANDIDATES}"
                        + " default: ${DEFAULT-VALUE})"})
     public CLIFormat inputFormat = CLIFormat.wottr;
 
-    @Option(names = {"-O", "--outputFormat"}, completionCandidates = OutputFormat.class,
+    @Option(names = {"-O", "--outputFormat"}, completionCandidates = TemplateOutputFormat.class,
         description = {"Output format of output of operation defined by the mode.%n"
                        + "(legal values: ${COMPLETION-CANDIDATES}; "
                        + "default: ${DEFAULT-VALUE})"})
     public CLIFormat outputFormat = CLIFormat.wottr;
 
-    @Option(names = {"-L", "--libraryFormat"}, completionCandidates = TplInputFormat.class,
+    @Option(names = {"-L", "--libraryFormat"}, completionCandidates = TemplateInputFormat.class,
         description = {"The input format of the libraries. If omitted, all available formats are attempted.%n"
                        + "(legal values: ${COMPLETION-CANDIDATES})"})
     public CLIFormat libraryFormat;
@@ -161,40 +163,42 @@ public class Settings {
     public boolean deepTrace = false;
     
     /* The following classes restrict the selections of FormatName to supported formats. */
-    private static class InsInputFormat extends ArrayList<String> {
+    private static class InstanceInputFormat extends ArrayList<String> {
 
-        static final long serialVersionUID = 0L; // TODO Not correct!
+        private static final long serialVersionUID = 0L; // TODO Not correct!
 
-        InsInputFormat() {
-            super(List.of(
-                CLIFormat.legacy.name(),
-                CLIFormat.wottr.name(),
-                CLIFormat.stottr.name(),
-                CLIFormat.tabottr.name()));
+        InstanceInputFormat() {
+            super(Arrays.stream(CLIFormat.values())
+                .filter(f -> f.format.supportsInstanceReader())
+                .map(CLIFormat::name)
+                .collect(Collectors.toList())
+            );
         }
     }
 
-    private static class TplInputFormat extends ArrayList<String> {
+    private static class TemplateInputFormat extends ArrayList<String> {
 
-        static final long serialVersionUID = 0L; // TODO Not correct!
+        private static final long serialVersionUID = 0L; // TODO Not correct!
 
-        TplInputFormat() {
-            super(List.of(
-                CLIFormat.stottr.name(),
-                CLIFormat.legacy.name(),
-                CLIFormat.wottr.name()));
+        TemplateInputFormat() {
+            super(Arrays.stream(CLIFormat.values())
+                .filter(f -> f.format.supportsTemplateReader())
+                .map(CLIFormat::name)
+                .collect(Collectors.toList())
+            );
         }
     }
 
-    private static class OutputFormat extends ArrayList<String> {
+    private static class TemplateOutputFormat extends ArrayList<String> {
 
-        static final long serialVersionUID = 0L; // TODO Not correct!
+        private static final long serialVersionUID = 0L; // TODO Not correct!
 
-        OutputFormat() {
-            super(List.of(
-                CLIFormat.legacy.name(),
-                CLIFormat.stottr.name(),
-                CLIFormat.wottr.name()));
+        TemplateOutputFormat() {
+            super(Arrays.stream(CLIFormat.values())
+                .filter(f -> f.format.supportsTemplateWriter())
+                .map(CLIFormat::name)
+                .collect(Collectors.toList())
+            );
         }
     }
     
