@@ -24,17 +24,17 @@ package xyz.ottr.lutra.bottr.source;
 
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.shared.PrefixMapping;
-
 import xyz.ottr.lutra.bottr.model.ArgumentMap;
 import xyz.ottr.lutra.bottr.util.TypeFactory;
-import xyz.ottr.lutra.model.Term;
+import xyz.ottr.lutra.model.terms.Term;
 import xyz.ottr.lutra.model.types.BasicType;
 import xyz.ottr.lutra.model.types.TermType;
-import xyz.ottr.lutra.result.Result;
+import xyz.ottr.lutra.model.types.TypeRegistry;
+import xyz.ottr.lutra.system.Result;
 
 public class RDFNodeArgumentMap extends ArgumentMap<RDFNode> {
 
-    private static final TermType DEFAULT_TYPE = xyz.ottr.lutra.model.types.TypeFactory.TOP;
+    private static final TermType DEFAULT_TYPE = TypeRegistry.TOP;
 
     public RDFNodeArgumentMap(PrefixMapping prefixes, TermType type) {
         super(prefixes, type);

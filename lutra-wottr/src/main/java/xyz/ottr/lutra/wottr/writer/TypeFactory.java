@@ -35,11 +35,9 @@ public enum TypeFactory {
 
     public static Resource createRDFType(Model model, TermType type) {
 
-        if (type instanceof BasicType) {
-            return model.createResource(((BasicType) type).getIRI());
-        } else {
-            return createComplexRDFType(model, type);
-        }
+        return type instanceof BasicType
+            ? model.createResource(((BasicType) type).getIri())
+            : createComplexRDFType(model, type);
     }
 
     private static RDFList createComplexRDFType(Model model, TermType type) {
@@ -48,7 +46,7 @@ public enum TypeFactory {
             return rest.cons(model.createResource(((ComplexType) type).getOuterIRI()));
         } else {
             RDFList nil = model.createList();
-            Resource rdfType = model.createResource(((BasicType) type).getIRI());
+            Resource rdfType = model.createResource(((BasicType) type).getIri());
             return nil.cons(rdfType);
         }
     }

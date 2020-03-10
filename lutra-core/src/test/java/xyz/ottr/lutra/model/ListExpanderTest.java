@@ -22,90 +22,90 @@ package xyz.ottr.lutra.model;
  * #L%
  */
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.hamcrest.CoreMatchers.is;
+import static xyz.ottr.lutra.model.terms.ObjectTerm.cons;
 
-import java.util.HashSet;
+import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
+import org.junit.Assert;
 import org.junit.Test;
+import xyz.ottr.lutra.model.terms.ListTerm;
+import xyz.ottr.lutra.model.terms.NoneTerm;
+import xyz.ottr.lutra.model.terms.Term;
 
 public class ListExpanderTest {
 
+    private final List<Argument> args1 = List.of(
+        Argument.builder().term(new ListTerm(cons(1), cons(2), cons(3))).listExpander(true).build(),
+        Argument.builder().term(new ListTerm(cons(4), cons(5))).listExpander(true).build(),
+        Argument.builder().term(cons(6)).build());
+
+    private final List<Argument> args2 = List.of(
+        Argument.builder().term(new ListTerm(cons(1), cons(2), cons(3))).listExpander(true).build(),
+        Argument.builder().term(new ListTerm(cons(4), cons(5))).listExpander(true).build(),
+        Argument.builder().term(new ListTerm()).listExpander(true).build());
+
+
+    private static List<List<Term>> expandToTerms(List<Argument> arguments, ListExpander expander) {
+        return expander.expand(arguments).stream()
+            .map(list -> list.stream()
+                .map(Argument::getTerm)
+                .collect(Collectors.toList()))
+            .collect(Collectors.toList());
+    }
+
+
+    private static void test(List<Argument> input, ListExpander expander, List<List<Term>> expected) {
+        List<List<Term>> expanded = expandToTerms(input, expander);
+        Assert.assertThat(expanded, is(expected));
+    }
+
+
     @Test
-    public void crossTest() {
-        Term a1 = new TermList(new ObjectTerm(1), new ObjectTerm(2), new ObjectTerm(3));
-        Term a2 = new TermList(new ObjectTerm(4), new ObjectTerm(5));
-        TermList argTerms = new TermList(a1, a2, new ObjectTerm(6));
-        Set<Term> expanderValues = new HashSet<>();
-        expanderValues.add(a1);
-        expanderValues.add(a2);
-        ArgumentList args = new ArgumentList(argTerms, expanderValues, ArgumentList.Expander.CROSS);
+    public void crossTest1() {
 
-        List<ArgumentList> expanded = args.expandListExpander();
-        assertTrue(expanded.size() == 6);
+        List<List<Term>> shouldEqual = List.of(
+            List.of(cons(1), cons(4), cons(6)),
+            List.of(cons(1), cons(5), cons(6)),
+            List.of(cons(2), cons(4), cons(6)),
+            List.of(cons(2), cons(5), cons(6)),
+            List.of(cons(3), cons(4), cons(6)),
+            List.of(cons(3), cons(5), cons(6)));
 
-        Set<List<Term>> resultLists = expanded.stream().map(ArgumentList::asList).collect(Collectors.toSet());
-        
-        Set<List<ObjectTerm>> shouldEqual = Stream.of(
-                Stream.of(new ObjectTerm(1), new ObjectTerm(4), new ObjectTerm(6)).collect(Collectors.toList()),
-                Stream.of(new ObjectTerm(1), new ObjectTerm(5), new ObjectTerm(6)).collect(Collectors.toList()),
-                Stream.of(new ObjectTerm(2), new ObjectTerm(4), new ObjectTerm(6)).collect(Collectors.toList()),
-                Stream.of(new ObjectTerm(2), new ObjectTerm(5), new ObjectTerm(6)).collect(Collectors.toList()),
-                Stream.of(new ObjectTerm(3), new ObjectTerm(4), new ObjectTerm(6)).collect(Collectors.toList()),
-                Stream.of(new ObjectTerm(3), new ObjectTerm(5), new ObjectTerm(6)).collect(Collectors.toList())
-            ).collect(Collectors.toSet());
-
-        assertEquals(resultLists, shouldEqual);
+        test(this.args1, ListExpander.cross, shouldEqual);
     }
 
     @Test
-    public void zipMinTest() {
-        Term a1 = new TermList(new ObjectTerm(1), new ObjectTerm(2), new ObjectTerm(3));
-        Term a2 = new TermList(new ObjectTerm(4), new ObjectTerm(5));
-        TermList argTerms = new TermList(a1, a2, new ObjectTerm(6));
-        Set<Term> expanderValues = new HashSet<>();
-        expanderValues.add(a1);
-        expanderValues.add(a2);
-        ArgumentList args = new ArgumentList(argTerms, expanderValues, ArgumentList.Expander.ZIPMIN);
+    public void zipMinTest1() {
 
-        List<ArgumentList> expanded = args.expandListExpander();
-        assertTrue(expanded.size() == 2);
+        List<List<Term>> shouldEqual = List.of(
+            List.of(cons(1), cons(4), cons(6)),
+            List.of(cons(2), cons(5), cons(6)));
 
-        Set<List<Term>> resultLists = expanded.stream().map(ArgumentList::asList).collect(Collectors.toSet());
-        
-        Set<List<ObjectTerm>> shouldEqual = Stream.of(
-                Stream.of(new ObjectTerm(1), new ObjectTerm(4), new ObjectTerm(6)).collect(Collectors.toList()),
-                Stream.of(new ObjectTerm(2), new ObjectTerm(5), new ObjectTerm(6)).collect(Collectors.toList())
-            ).collect(Collectors.toSet());
-
-        assertEquals(resultLists, shouldEqual);
+        test(this.args1, ListExpander.zipMin, shouldEqual);
     }
 
     @Test
-    public void zipMaxTest() {
-        Term a1 = new TermList(new ObjectTerm(1), new ObjectTerm(2), new ObjectTerm(3));
-        Term a2 = new TermList(new ObjectTerm(4), new ObjectTerm(5));
-        TermList argTerms = new TermList(a1, a2, new ObjectTerm(6));
-        Set<Term> expanderValues = new HashSet<>();
-        expanderValues.add(a1);
-        expanderValues.add(a2);
-        ArgumentList args = new ArgumentList(argTerms, expanderValues, ArgumentList.Expander.ZIPMAX);
+    public void zipMaxTest1() {
 
-        List<ArgumentList> expanded = args.expandListExpander();
-        assertTrue(expanded.size() == 3);
+        List<List<Term>> shouldEqual = List.of(
+            List.of(cons(1), cons(4), cons(6)),
+            List.of(cons(2), cons(5), cons(6)),
+            List.of(cons(3), new NoneTerm(), cons(6)));
 
-        Set<List<Term>> resultLists = expanded.stream().map(ArgumentList::asList).collect(Collectors.toSet());
-        
-        Set<List<? extends Term>> shouldEqual = Stream.of(
-                Stream.of(new ObjectTerm(1), new ObjectTerm(4), new ObjectTerm(6)).collect(Collectors.toList()),
-                Stream.of(new ObjectTerm(2), new ObjectTerm(5), new ObjectTerm(6)).collect(Collectors.toList()),
-                Stream.of(new ObjectTerm(3), new NoneTerm(), new ObjectTerm(6)).collect(Collectors.toList())
-            ).collect(Collectors.toSet());
-
-        assertEquals(resultLists, shouldEqual);
+        test(this.args1, ListExpander.zipMax, shouldEqual);
     }
+
+    @Test
+    public void crossTest2Empty() {
+        test(this.args2, ListExpander.cross, Collections.emptyList());
+    }
+
+    @Test
+    public void zipMinTest2Empty() {
+        test(this.args2, ListExpander.zipMin, Collections.emptyList());
+    }
+
 }

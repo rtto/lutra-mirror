@@ -39,13 +39,12 @@ import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
-
 import xyz.ottr.lutra.bottr.model.ArgumentMaps;
 import xyz.ottr.lutra.bottr.model.InstanceMap;
 import xyz.ottr.lutra.bottr.model.Source;
-import xyz.ottr.lutra.result.Result;
-import xyz.ottr.lutra.result.ResultStream;
-import xyz.ottr.lutra.wottr.vocabulary.v04.WOTTR;
+import xyz.ottr.lutra.system.Result;
+import xyz.ottr.lutra.system.ResultStream;
+import xyz.ottr.lutra.wottr.WOTTR;
 
 public class H2SourceTest {
 
@@ -89,7 +88,7 @@ public class H2SourceTest {
     }
 
     private Set<List<String>> getExpectedResult() {
-        //Create expected result
+        //Create expected system
         Set<List<String>> expected = new HashSet<>();
         expected.add(List.of("1", "Paulo", "2500"));
         expected.add(List.of("2", "Pedro", "2700"));

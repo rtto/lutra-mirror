@@ -28,14 +28,14 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import xyz.ottr.lutra.model.BlankNodeTerm;
-import xyz.ottr.lutra.model.IRITerm;
-import xyz.ottr.lutra.model.LiteralTerm;
-import xyz.ottr.lutra.model.NoneTerm;
-import xyz.ottr.lutra.model.Term;
-import xyz.ottr.lutra.model.TermList;
+import xyz.ottr.lutra.model.terms.BlankNodeTerm;
+import xyz.ottr.lutra.model.terms.IRITerm;
+import xyz.ottr.lutra.model.terms.ListTerm;
+import xyz.ottr.lutra.model.terms.LiteralTerm;
+import xyz.ottr.lutra.model.terms.NoneTerm;
+import xyz.ottr.lutra.model.terms.Term;
 import xyz.ottr.lutra.stottr.STOTTR;
-import xyz.ottr.lutra.wottr.vocabulary.v04.WOTTR;
+import xyz.ottr.lutra.wottr.WOTTR;
 
 public class STermWriter {
 
@@ -43,13 +43,13 @@ public class STermWriter {
     private final Set<String> usedPrefixes;
     private final Set<Term> variables;
 
-    public STermWriter(Map<String, String> prefixes, Set<Term> variables) {
+    STermWriter(Map<String, String> prefixes, Set<Term> variables) {
         this.prefixes = prefixes;
         this.variables = variables;
         this.usedPrefixes = new HashSet<>();
     }
 
-    public STermWriter(Map<String, String> prefixes) {
+    STermWriter(Map<String, String> prefixes) {
         this(prefixes, new HashSet<>());
     }
 
@@ -57,7 +57,7 @@ public class STermWriter {
         return Collections.unmodifiableMap(this.prefixes);
     }
 
-    public Set<String> getUsedPrefixes() {
+    Set<String> getUsedPrefixes() {
         return Collections.unmodifiableSet(this.usedPrefixes);
     }
 
@@ -66,19 +66,19 @@ public class STermWriter {
         if (term instanceof NoneTerm) {
             return STOTTR.Terms.none;
         } else if (term instanceof IRITerm) {
-            return writeIRI(((IRITerm) term).getIRI());
+            return writeIRI(((IRITerm) term).getIri());
         } else if (term instanceof LiteralTerm) {
             return writeLiteral((LiteralTerm) term);
         } else if (term instanceof BlankNodeTerm) {
             return writeBlank((BlankNodeTerm) term);
-        } else if (term instanceof TermList) {
-            return writeList((TermList) term);
+        } else if (term instanceof ListTerm) {
+            return writeList((ListTerm) term);
         } else {
             return null; // TODO: Maybe use Result?
         }
     }
 
-    public String writeIRI(String iri) {
+    String writeIRI(String iri) {
 
         if (iri.equals(WOTTR.none.getURI())) {
             return STOTTR.Terms.none;
@@ -95,18 +95,19 @@ public class STermWriter {
         return "<" + iri + ">";
     }
 
-    public String writeLiteral(LiteralTerm literal) {
+    private String writeLiteral(LiteralTerm literal) {
 
-        String val = "\"" + literal.getPureValue() + "\"";
+        String val = "\"" + literal.getValue() + "\"";
         if (literal.getDatatype() != null) {
             val += "^^" + writeIRI(literal.getDatatype());
-        } else if (literal.getLangTag() != null) {
-            val += "@" + literal.getLangTag();
+        } else if (literal.getLanguageTag() != null) {
+            val += "@" + literal.getLanguageTag();
         }
         return val;
     }
     
-    public String writeBlank(BlankNodeTerm blank) {
+    private String writeBlank(BlankNodeTerm blank) {
+
         String label = blank.getLabel();
         String prefix = this.variables.contains(blank)
             ? STOTTR.Terms.variablePrefix
@@ -114,7 +115,7 @@ public class STermWriter {
         return prefix + label;
     }
 
-    public String writeList(TermList list) {
+    private String writeList(ListTerm list) {
         return list.asList()
             .stream()
             .map(this::write)

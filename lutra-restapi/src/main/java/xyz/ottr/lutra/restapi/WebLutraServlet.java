@@ -29,7 +29,6 @@ import java.nio.file.Files;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
-
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -44,7 +43,7 @@ import org.eclipse.jgit.api.errors.GitAPIException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import xyz.ottr.lutra.bottr.BOTTR;
-import xyz.ottr.lutra.result.Message;
+import xyz.ottr.lutra.system.Message;
 
 public class WebLutraServlet extends HttpServlet {
 

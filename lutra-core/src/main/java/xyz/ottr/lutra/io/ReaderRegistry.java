@@ -25,8 +25,8 @@ package xyz.ottr.lutra.io;
 import java.util.Map;
 import java.util.function.Function;
 
-import xyz.ottr.lutra.result.MessageHandler;
-import xyz.ottr.lutra.result.Result;
+import xyz.ottr.lutra.system.MessageHandler;
+import xyz.ottr.lutra.system.Result;
 
 public interface ReaderRegistry {
 

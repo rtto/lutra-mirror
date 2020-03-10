@@ -22,7 +22,7 @@ package xyz.ottr.lutra.wottr.io;
  * #L%
  */
 
-import java.nio.file.Paths; 
+import java.nio.file.Paths;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.validator.routines.UrlValidator;
@@ -30,14 +30,11 @@ import org.apache.jena.atlas.web.HttpException;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.shared.JenaException;
 import org.apache.jena.shared.PrefixMapping;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import xyz.ottr.lutra.io.InputReader;
-import xyz.ottr.lutra.result.Result;
-import xyz.ottr.lutra.result.ResultStream;
-import xyz.ottr.lutra.wottr.util.ModelIO;
+import xyz.ottr.lutra.system.Result;
+import xyz.ottr.lutra.system.ResultStream;
 
 public class RDFFileReader implements InputReader<String, Model> {
 
@@ -57,9 +54,9 @@ public class RDFFileReader implements InputReader<String, Model> {
 
         String path = isURL(url) ? url : FilenameUtils.separatorsToSystem(Paths.get(url).toAbsolutePath().toString());
 
-        Result<Model> result = null;
+        Result<Model> result;
         try {
-            Model model = ModelIO.readModel(path);
+            Model model = Models.readModel(path);
             this.prefixes.setNsPrefixes(model);
             result = Result.ofNullable(model);
             log.info("Adding model " + model.hashCode() + " with URI " + url);

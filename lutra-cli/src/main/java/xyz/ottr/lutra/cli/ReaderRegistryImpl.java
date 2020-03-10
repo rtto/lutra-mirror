@@ -32,16 +32,16 @@ import xyz.ottr.lutra.bottr.io.BInstanceReader;
 import xyz.ottr.lutra.io.InstanceReader;
 import xyz.ottr.lutra.io.ReaderRegistry;
 import xyz.ottr.lutra.io.TemplateReader;
-import xyz.ottr.lutra.result.Message;
-import xyz.ottr.lutra.result.MessageHandler;
-import xyz.ottr.lutra.result.Result;
 import xyz.ottr.lutra.stottr.io.SFileReader;
 import xyz.ottr.lutra.stottr.parser.SInstanceParser;
 import xyz.ottr.lutra.stottr.parser.STemplateParser;
+import xyz.ottr.lutra.system.Message;
+import xyz.ottr.lutra.system.MessageHandler;
+import xyz.ottr.lutra.system.Result;
 import xyz.ottr.lutra.tabottr.parser.ExcelReader;
 import xyz.ottr.lutra.wottr.io.RDFFileReader;
-import xyz.ottr.lutra.wottr.parser.v04.WInstanceParser;
-import xyz.ottr.lutra.wottr.parser.v04.WTemplateParser;
+import xyz.ottr.lutra.wottr.parser.WInstanceParser;
+import xyz.ottr.lutra.wottr.parser.WTemplateParser;
 
 public class ReaderRegistryImpl implements ReaderRegistry {
     
@@ -66,11 +66,6 @@ public class ReaderRegistryImpl implements ReaderRegistry {
             new SFileReader(), new STemplateParser(),
             Settings.Format.stottr.toString()));
 
-        // legacy
-        registerTemplateReader(new TemplateReader(
-            new RDFFileReader(), new xyz.ottr.lutra.wottr.parser.v03.WTemplateParser(),
-            Settings.Format.legacy.toString()));
-
         // Add instance readers
         
         // wottr
@@ -92,11 +87,6 @@ public class ReaderRegistryImpl implements ReaderRegistry {
         registerInstanceReader(new InstanceReader(
             new ExcelReader(),
             Settings.Format.tabottr.toString()));
-
-        // legacy
-        registerInstanceReader(new InstanceReader(
-            new RDFFileReader(), new xyz.ottr.lutra.wottr.parser.v03.WInstanceParser(),
-            Settings.Format.legacy.toString()));
 
     }
     

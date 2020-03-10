@@ -24,14 +24,14 @@ package xyz.ottr.lutra.bottr.source;
 
 import java.util.Collections;
 import java.util.List;
+
 import org.apache.jena.query.QueryExecution;
 import org.apache.jena.query.QueryExecutionFactory;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
-
 import org.apache.jena.shared.PrefixMapping;
-import xyz.ottr.lutra.result.Result;
-import xyz.ottr.lutra.result.ResultStream;
+import xyz.ottr.lutra.system.Result;
+import xyz.ottr.lutra.system.ResultStream;
 import xyz.ottr.lutra.wottr.io.RDFFileReader;
 
 public class RDFFileSource extends AbstractSPARQLSource {

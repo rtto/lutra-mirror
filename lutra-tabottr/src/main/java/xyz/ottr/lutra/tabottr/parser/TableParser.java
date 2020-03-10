@@ -26,10 +26,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.apache.jena.shared.PrefixMapping;
-
 import xyz.ottr.lutra.model.Instance;
-import xyz.ottr.lutra.result.Result;
-import xyz.ottr.lutra.result.ResultStream;
+import xyz.ottr.lutra.system.Result;
+import xyz.ottr.lutra.system.ResultStream;
 import xyz.ottr.lutra.tabottr.model.Instruction;
 import xyz.ottr.lutra.tabottr.model.Table;
 import xyz.ottr.lutra.tabottr.model.TemplateInstruction;

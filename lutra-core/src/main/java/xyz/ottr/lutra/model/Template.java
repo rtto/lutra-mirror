@@ -22,89 +22,78 @@ package xyz.ottr.lutra.model;
  * #L%
  */
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
+
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NonNull;
+import lombok.Singular;
+
 import org.apache.jena.shared.PrefixMapping;
 
+import xyz.ottr.lutra.OTTR;
+import xyz.ottr.lutra.model.terms.ListTerm;
+import xyz.ottr.lutra.model.terms.Term;
 import xyz.ottr.lutra.model.types.TermType;
 
 @SuppressWarnings("PMD.UselessOverridingMethod")
-public class Template extends TemplateSignature {
+@Getter
+public class Template extends Signature {
 
-    //private Set<Instance> head;
-    private final Set<Instance> body;
-    
-    public Template(String iri, ParameterList params, Set<Instance> body) {
-        super(iri, params);
-        this.body = body;
-        setVariableFlagsAndTypes();
+    private final @NonNull Set<Instance> pattern;
+
+    @Builder
+    private Template(String iri, @Singular List<Parameter> parameters, @Singular Set<Instance> instances) {
+        super(iri, parameters);
+        this.pattern = instances;
+        updatePatternVariables();
     }
 
-    public Template(TemplateSignature signature, Set<Instance> body) {
-        this(signature.getIRI(), signature.getParameters(), body);
+    /**
+     * Propagates type and variable setting of parameter terms to identical terms in instances, i.e.,
+     * turns instance terms into variables.
+     */
+    private void updatePatternVariables() {
+        // Collect parameter types
+        Map<Object, TermType> parameterTypes = getParameters().stream()
+            .map(Parameter::getTerm)
+            .collect(Collectors.toMap(Term::getIdentifier, Term::getType, (t1, t2) -> t1));
+
+        this.pattern.forEach(instance ->
+            setTermsToVariables(
+                instance.getArguments().stream()
+                    .map(Argument::getTerm)
+                    .collect(Collectors.toList()), parameterTypes));
     }
 
-    public Set<Instance> getBody() {
-        return this.body;
-    }
-
-    private void setVariableFlagsAndTypes() {
-        if (getParameters() == null) {
-            return;
-        }
-
-        Map<Object, TermType> idTypes = new HashMap<>();
-        for (Term var : getParameters().asList()) {
-            var.setIsVariable(true);
-            idTypes.put(var.getIdentifier(), var.getType());
-        }
-
-        if (this.body != null) {
-            this.body.stream()
-                .forEach(instance ->
-                    setVariableFlagsAndTypes(instance.getArguments().asList(), idTypes));
-        }
-    }
-
-    private void setVariableFlagsAndTypes(List<Term> terms, Map<Object, TermType> idTypes) {
-        terms.stream()
-            .forEach(term -> {
-                if (term instanceof TermList) {
-                    TermList tl = (TermList) term;
-                    setVariableFlagsAndTypes(tl.asList(), idTypes);
-                    tl.recomputeType();
-                } else if (idTypes.containsKey(term.getIdentifier())) {
-                    term.setIsVariable(true);
-                    term.setType(idTypes.get(term.getIdentifier()));
-                }
-            });
-    }
-        
-
-    @Override
-    public String toString(PrefixMapping prefixes) {
-        String headStr = super.toString(prefixes);
-        headStr += " ::\n";
-        StringBuilder bodyStr = new StringBuilder();
-        for (Instance ins : getBody()) {
-            bodyStr.append("    " + ins.toString(prefixes));
-            bodyStr.append("\n");
-        }
-        return headStr + bodyStr.toString();
+    private void setTermsToVariables(List<Term> terms, Map<Object, TermType> parameterTypes) {
+        terms.forEach(term -> {
+            if (term instanceof ListTerm) {
+                ListTerm tl = (ListTerm) term;
+                setTermsToVariables(tl.asList(), parameterTypes);
+                tl.recomputeType();
+            } else if (parameterTypes.containsKey(term.getIdentifier())) {
+                term.setVariable(true);
+                term.setType(parameterTypes.get(term.getIdentifier()));
+            }
+        });
     }
 
     @Override
     public String toString() {
-        String headStr = super.toString();
-        headStr += " ::\n";
-        StringBuilder bodyStr = new StringBuilder();
-        for (Instance ins : getBody()) {
-            bodyStr.append("    " + ins.toString());
-            bodyStr.append("\n");
-        }
-        return headStr + bodyStr.toString();
+        return toString(OTTR.getDefaultPrefixes());
+    }
+
+    public String toString(PrefixMapping prefixes) {
+        return super.toString(prefixes)
+            + " ::\n"
+            + this.pattern.stream()
+                .map(ins -> "\t" + ins.toString(prefixes))
+                .collect(Collectors.joining(",\n", "{", "}"))
+            + " .";
     }
 
     @Override

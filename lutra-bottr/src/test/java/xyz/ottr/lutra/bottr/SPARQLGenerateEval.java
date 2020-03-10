@@ -47,19 +47,19 @@ import xyz.ottr.lutra.bottr.source.H2Source;
 import xyz.ottr.lutra.bottr.source.StringArgumentMap;
 import xyz.ottr.lutra.io.TemplateReader;
 import xyz.ottr.lutra.model.Instance;
-import xyz.ottr.lutra.model.types.TypeFactory;
-import xyz.ottr.lutra.result.Message;
-import xyz.ottr.lutra.result.MessageHandler;
-import xyz.ottr.lutra.result.Result;
-import xyz.ottr.lutra.result.ResultConsumer;
-import xyz.ottr.lutra.result.ResultStream;
-import xyz.ottr.lutra.store.DependencyGraph;
+import xyz.ottr.lutra.model.types.TypeRegistry;
+import xyz.ottr.lutra.system.Message;
+import xyz.ottr.lutra.system.MessageHandler;
+import xyz.ottr.lutra.system.Result;
+import xyz.ottr.lutra.system.ResultConsumer;
+import xyz.ottr.lutra.system.ResultStream;
+import xyz.ottr.lutra.store.graph.DependencyGraph;
 import xyz.ottr.lutra.store.TemplateStore;
 
 import xyz.ottr.lutra.wottr.io.RDFFileReader;
-import xyz.ottr.lutra.wottr.parser.v04.WTemplateParser;
-import xyz.ottr.lutra.wottr.util.ModelIO;
-import xyz.ottr.lutra.wottr.writer.v04.WInstanceWriter;
+import xyz.ottr.lutra.wottr.parser.WTemplateParser;
+import xyz.ottr.lutra.wottr.io.Models;
+import xyz.ottr.lutra.wottr.writer.WInstanceWriter;
 
  */
 
@@ -94,13 +94,13 @@ public class SPARQLGenerateEval {
 
         // Set up map to translate source to triple instances
         ArgumentMaps<String> valMap = new ArgumentMaps<>(prefixes, h2, List.of(
-            new StringArgumentMap(prefixes, TypeFactory.IRI),
+            new StringArgumentMap(prefixes, TypeRegistry.IRI),
             new StringArgumentMap(prefixes),
-            new StringArgumentMap(prefixes, TypeFactory.IRI),
-            new StringArgumentMap(prefixes, TypeFactory.IRI),
-            new StringArgumentMap(prefixes, TypeFactory.getType(XSD.dateTime.toString())),
-            new StringArgumentMap(prefixes, TypeFactory.getType(XSD.decimal.toString())),
-            new StringArgumentMap(prefixes, TypeFactory.getType(XSD.decimal.toString()))
+            new StringArgumentMap(prefixes, TypeRegistry.IRI),
+            new StringArgumentMap(prefixes, TypeRegistry.IRI),
+            new StringArgumentMap(prefixes, TypeRegistry.getType(XSD.dateTime.toString())),
+            new StringArgumentMap(prefixes, TypeRegistry.getType(XSD.decimal.toString())),
+            new StringArgumentMap(prefixes, TypeRegistry.getType(XSD.decimal.toString()))
         ));
 
         // map data to triples
@@ -138,8 +138,8 @@ public class SPARQLGenerateEval {
 
         // print model
         String outFile = inFile + ".out.ttl";
-        //ModelIO.printModel(in);
-        Files.write(this.testRoot.resolve(outFile), ModelIO.writeModel(in).getBytes(Charset.forName("UTF-8")), StandardOpenOption.CREATE);
+        //Models.printModel(in);
+        Files.write(this.testRoot.resolve(outFile), Models.writeModel(in).getBytes(Charset.forName("UTF-8")), StandardOpenOption.CREATE);
     }
 
      */

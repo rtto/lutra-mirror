@@ -37,11 +37,11 @@ import xyz.ottr.lutra.bottr.model.TranslationSettings;
 import xyz.ottr.lutra.bottr.model.TranslationTable;
 import xyz.ottr.lutra.bottr.util.DataParser;
 import xyz.ottr.lutra.model.types.TermType;
-import xyz.ottr.lutra.result.Message;
-import xyz.ottr.lutra.result.Result;
-import xyz.ottr.lutra.result.ResultStream;
-import xyz.ottr.lutra.wottr.parser.TermTypeFactory;
-import xyz.ottr.lutra.wottr.util.ModelSelector;
+import xyz.ottr.lutra.system.Message;
+import xyz.ottr.lutra.system.Result;
+import xyz.ottr.lutra.system.ResultStream;
+import xyz.ottr.lutra.wottr.parser.ModelSelector;
+import xyz.ottr.lutra.wottr.parser.TermTypeSerialiser;
 import xyz.ottr.lutra.wottr.util.RDFNodes;
 
 class BArgumentMapsParser implements Function<RDFList, Result<ArgumentMaps>> {
@@ -92,7 +92,7 @@ class BArgumentMapsParser implements Function<RDFList, Result<ArgumentMaps>> {
 
         private Result<TermType> getType(Resource map) {
             return ModelSelector.getOptionalResourceObject(BArgumentMapsParser.this.model, map, BOTTR.type)
-                .flatMap(new TermTypeFactory());
+                .flatMap(new TermTypeSerialiser());
         }
 
         private Result<String> getLanguageTag(Resource map) {

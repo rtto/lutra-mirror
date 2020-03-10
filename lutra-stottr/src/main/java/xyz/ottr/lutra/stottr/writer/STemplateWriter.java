@@ -23,25 +23,26 @@ package xyz.ottr.lutra.stottr.writer;
  */
 
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
-import xyz.ottr.lutra.io.TemplateWriter;
-import xyz.ottr.lutra.model.ParameterList;
+import xyz.ottr.lutra.model.BaseTemplate;
+import xyz.ottr.lutra.model.Parameter;
+import xyz.ottr.lutra.model.Signature;
 import xyz.ottr.lutra.model.Template;
-import xyz.ottr.lutra.model.TemplateSignature;
-import xyz.ottr.lutra.model.Term;
 import xyz.ottr.lutra.model.types.BasicType;
 import xyz.ottr.lutra.model.types.LUBType;
 import xyz.ottr.lutra.model.types.ListType;
 import xyz.ottr.lutra.model.types.NEListType;
 import xyz.ottr.lutra.model.types.TermType;
 import xyz.ottr.lutra.stottr.STOTTR;
+import xyz.ottr.lutra.writer.TemplateWriter;
 
 public class STemplateWriter implements TemplateWriter {
 
-    private final Map<String, TemplateSignature> templates;
+    private final Map<String, Signature> templates;
     private final Map<String, String> prefixes;
 
     public STemplateWriter(Map<String, String> prefixes) {
@@ -55,25 +56,28 @@ public class STemplateWriter implements TemplateWriter {
     }
 
     @Override
-    public void accept(TemplateSignature template) {
-        this.templates.put(template.getIRI(), template);
+    public void accept(Signature template) {
+        this.templates.put(template.getIri(), template);
     }
 
     public String write(String iri) {
 
         StringBuilder builder = new StringBuilder();
-        TemplateSignature template = this.templates.get(iri);
+        Signature template = this.templates.get(iri);
 
         if  (template == null) {
             return null;
         }
 
-        Set<Term> variables = new HashSet<>(template.getParameters().asList());
-        STermWriter termWriter = new STermWriter(this.prefixes, variables);
+        var parameterVariables = template.getParameters().stream()
+            .map(Parameter::getTerm)
+            .collect(Collectors.toSet());
+
+        STermWriter termWriter = new STermWriter(this.prefixes, parameterVariables);
 
         builder.append(writeSignature(template, termWriter));
 
-        if (template.isBaseTemplate()) {
+        if (template instanceof BaseTemplate) {
             builder.append(" " + STOTTR.Statements.signatureSep + " " + STOTTR.Statements.baseBody);
         } else if (template instanceof Template) {
             builder.append(" " + STOTTR.Statements.signatureSep + " " + STOTTR.Statements.bodyStart + "\n");
@@ -85,7 +89,6 @@ public class STemplateWriter implements TemplateWriter {
 
         // Write used prefixes at start of String
         builder.insert(0, writeUsedPrefixes(termWriter.getUsedPrefixes()));
-
 
         return builder.toString();
     }
@@ -101,26 +104,26 @@ public class STemplateWriter implements TemplateWriter {
         return SPrefixWriter.write(usedPrefixMap);
     }
 
-    private StringBuilder writeSignature(TemplateSignature template, STermWriter termWriter) {
+    private StringBuilder writeSignature(Signature template, STermWriter termWriter) {
 
         StringBuilder builder = new StringBuilder();
 
-        builder.append(termWriter.writeIRI(template.getIRI()));
+        builder.append(termWriter.writeIRI(template.getIri()));
         builder.append(STOTTR.Parameters.sigParamsStart);
 
-        ParameterList params = template.getParameters();
+        List<Parameter> params = template.getParameters();
         String sep = "";
         
-        for (Term param : params.asList()) {
+        for (Parameter param : params) {
 
             builder.append(sep);
-            builder.append(writeModes(params.isNonBlank(param), params.isOptional(param)));
-            builder.append(writeType(param.getType(), termWriter));
+            builder.append(writeModes(param.isNonBlank(), param.isOptional()));
+            builder.append(writeType(param.getTerm().getType(), termWriter));
             builder.append(" ");
-            builder.append(termWriter.write(param));
+            builder.append(termWriter.write(param.getTerm()));
 
-            if (params.hasDefaultValue(param)) {
-                builder.append(STOTTR.Parameters.defaultValSep).append(termWriter.write(params.getDefaultValue(param)));
+            if (param.hasDefaultValue()) {
+                builder.append(STOTTR.Parameters.defaultValSep).append(termWriter.write(param.getDefaultValue()));
             }
 
             sep = STOTTR.Parameters.paramSep + " ";
@@ -155,7 +158,7 @@ public class STemplateWriter implements TemplateWriter {
         StringBuilder builder = new StringBuilder();
 
         if (type instanceof BasicType) {
-            builder.append(termWriter.writeIRI(((BasicType) type).getIRI()));
+            builder.append(termWriter.writeIRI(((BasicType) type).getIri()));
         } else {
 
             String typeStr;
@@ -181,7 +184,7 @@ public class STemplateWriter implements TemplateWriter {
 
     private String writePattern(Template template, STermWriter termWriter) {
         SInstanceWriter instanceWriter = new SPatternInstanceWriter(termWriter);
-        template.getBody().forEach(instanceWriter);
+        template.getPattern().forEach(instanceWriter);
         return instanceWriter.write();
     }
 

@@ -31,10 +31,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.junit.Test;
-
-import xyz.ottr.lutra.io.InstanceParser;
 import xyz.ottr.lutra.model.Instance;
-import xyz.ottr.lutra.result.Result;
+import xyz.ottr.lutra.parser.InstanceParser;
+import xyz.ottr.lutra.system.Result;
 
 public class ExcelSheetTest {
 

@@ -22,18 +22,15 @@ package xyz.ottr.lutra.io;
  * #L%
  */
 
-import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.function.Function;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import xyz.ottr.lutra.model.Instance;
-import xyz.ottr.lutra.result.Message;
-import xyz.ottr.lutra.result.Result;
-import xyz.ottr.lutra.result.ResultStream;
+import xyz.ottr.lutra.parser.InstanceParser;
+import xyz.ottr.lutra.system.ResultStream;
 
 public class InstanceReader implements Function<String, ResultStream<Instance>> {
 
@@ -54,7 +51,7 @@ public class InstanceReader implements Function<String, ResultStream<Instance>> 
     }
 
     public <M> InstanceReader(InputReader<String, M> inputReader,
-            InstanceParser<M> instanceParser, String format) {
+                              InstanceParser<M> instanceParser, String format) {
         this(ResultStream.innerFlatMapCompose(inputReader, instanceParser), format);
     }
     
@@ -72,17 +69,9 @@ public class InstanceReader implements Function<String, ResultStream<Instance>> 
     }
 
     public ResultStream<Instance> apply(String filename) {
-        try {
-            if (Paths.get(filename).toFile().isDirectory()) {
-                return loadInstancesFromFolder(filename);
-            } else {
-                return this.instancePipeline.apply(filename);
-            }
-        } catch (IOException ex) {
-            return ResultStream.of(Result.empty(Message.error(
-                        "Problem reading file or folder "
-                            + filename + ": " + ex.getMessage())));
-        }
+        return Paths.get(filename).toFile().isDirectory()
+            ? loadInstancesFromFolder(filename)
+            : this.instancePipeline.apply(filename);
     }
 
     /**
@@ -91,7 +80,7 @@ public class InstanceReader implements Function<String, ResultStream<Instance>> 
      * @param folder
      *            the folder containing templates to load
      */
-    public ResultStream<Instance> loadInstancesFromFolder(String folder) throws IOException {
+    public ResultStream<Instance> loadInstancesFromFolder(String folder) {
 
         this.log.info("Loading all template instaces from folder " + folder + " with suffix "
                 + Arrays.toString(this.includeExtensions) + " except " + Arrays.toString(this.excludeExtensions));
