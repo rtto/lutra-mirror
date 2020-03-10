@@ -1,0 +1,1627 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2020-03-09 Mon 11:37 -->
+<meta  charset="utf-8" />
+<meta  name="viewport" content="width=device-width, initial-scale=1" />
+<title>pOTTR: The Basics of Reasonable Ontology Templates</title>
+<meta  name="generator" content="Org-mode" />
+<meta  name="author" content="root" />
+<link rel="stylesheet" type="text/css" href="https://www.ottr.xyz/inc/spec.css" />
+<script type="application/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script type="application/javascript" src="https://www.ottr.xyz/inc/toc.js"></script>
+<link rel="stylesheet" type="text/css" href="https://weblutra.ottr.xyz/js/weblutrabox.css" />
+<script type="application/javascript" src="https://weblutra.ottr.xyz/js/weblutrabox.js"></script>
+<link rel="stylesheet" type="text/css" href="./inc/pottr.css" />
+<script type="application/javascript" src="./inc/pottr.js"></script>
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+        displayAlign: "center",
+        displayIndent: "0em",
+
+        "HTML-CSS": { scale: 100,
+                        linebreaks: { automatic: "false" },
+                        webFont: "TeX"
+                       },
+        SVG: {scale: 100,
+              linebreaks: { automatic: "false" },
+              font: "TeX"},
+        NativeMML: {scale: 100},
+        TeX: { equationNumbers: {autoNumber: "AMS"},
+               MultLineWidth: "85%",
+               TagSide: "right",
+               TagIndent: ".8em"
+             }
+});
+</script>
+<script type="text/javascript"
+        src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML"></script>
+</head>
+<body>
+<div id="content">
+<header>
+<h1 class="title">pOTTR: The Basics of Reasonable Ontology Templates</h1>
+</header><div id="left">
+<p>
+<a href="#top">top</a>
+</p>
+<h4>Table of Contents</h4>
+<div id="toc"></div>
+</div>
+
+<div id="right">
+
+<h1 id="top" class="title">The Basics of Reasonable Ontology Templates</h1>
+<img id="logo" alt="pOTTR" src="http://www.ottr.xyz/logo/pOTTR.png"/>
+<p>
+<b>Learn the basics of OTTR</b>
+</p>
+
+<dl class="org-dl">
+<dt>Authors</dt><dd>Leif Harald Karlsen, Martin G. Skjæveland</dd>
+<dt>Issues</dt><dd><a href="https://gitlab.com/ottr/language/pOTTR/issues">https://gitlab.com/ottr/language/pOTTR/issues</a></dd>
+</dl>
+
+<div id="toc-content">
+
+<div id="outline-container-orgheadline2" class="outline-2">
+<h2 id="orgheadline2"><span class="section-number-2">1</span> Introduction</h2>
+<div class="outline-text-2" id="text-1">
+<p>
+This primer is a lightweight introduction to the basics concepts of
+OTTR templates. The fundamentals of OTTR are formally defined in mOTTR
+[<a href="#orgtarget1">1</a>]. The syntax used in this document is stOTTR [<a href="#orgtarget2">3</a>].
+</p>
+</div>
+
+<div id="outline-container-orgheadline1" class="outline-3">
+<h3 id="prefixes"><a id="orgheadline1"></a><span class="section-number-3">1.1</span> Prefixes</h3>
+<div class="outline-text-3" id="text-prefixes">
+<p>
+The following prefixes are used throughout the document, and may be
+used in the text input areas of the interactive examples without
+declaration.
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-ttl" id="orgsrcblock1">@prefix rdf:    &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#&gt; . 
+@prefix rdfs:   &lt;http://www.w3.org/2000/01/rdf-schema#&gt; . 
+@prefix owl:    &lt;http://www.w3.org/2002/07/owl#&gt; . 
+@prefix xsd:    &lt;http://www.w3.org/2001/XMLSchema#&gt; . 
+@prefix foaf:   &lt;http://xmlns.com/foaf/0.1/&gt; . 
+@prefix dbp:    &lt;http://dbpedia.org/ontology/&gt; . 
+@prefix ex:     &lt;http://example.com/ns#&gt; . 
+@prefix ottr:   &lt;http://ns.ottr.xyz/0.4/&gt; . 
+@prefix ax:     &lt;http://tpl.ottr.xyz/owl/axiom/0.1/&gt; . 
+@prefix rstr:   &lt;http://tpl.ottr.xyz/owl/restriction/0.1/&gt; .
+</pre>
+</div>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-orgheadline9" class="outline-2">
+<h2 id="orgheadline9"><span class="section-number-2">2</span> Templates and Instances</h2>
+<div class="outline-text-2" id="text-2">
+<p>
+The core concepts in OTTR are <i>templates</i> and <i>instances</i> of
+templates.
+</p>
+
+<p>
+Here are two instances of the template <code>ex:Person</code>, which is listed
+below. The first instance specifies the 3 <i>arguments</i>: ~"Ann"~, ~"Strong"~ and
+<code>&lt;mailto:ann.strong@gmail.com&gt;</code>:
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-ttl" id="orgsrcblock2">ex:Person("Ann", "Strong", &lt;mailto:ann.strong@gmail.com&gt;) .
+ex:Person("Bob", "Brite", &lt;mailto:bob.brite@gmail.com&gt;) .
+</pre>
+</div>
+
+<p>
+A template consists of a <i>signature</i> and a <i>pattern</i>.  The signature
+of template specifies its <i>identifier</i> and its parameters.  The
+pattern contains (other) instances and may use the template's
+parameters as arguments.
+</p>
+
+<p>
+This is the <code>ex:Person</code> template. It specifies 3 parameters,
+<code>?firstName</code>, <code>?lastName</code> and <code>?email</code>, and contains 3 instances of
+the <code>ottr:Triple</code> template in its pattern. The arguments of an
+instance must match the parameters of its template.
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-ttl" id="orgsrcblock3">ex:Person[ ?firstName, ?lastName, ?email ] :: {
+  ottr:Triple (_:person, rdf:type, foaf:Person ),
+  ottr:Triple (_:person, foaf:firstName, ?firstName ),
+  ottr:Triple (_:person, foaf:lastName, ?lastName ),
+  ottr:Triple (_:person, foaf:mbox, ?email )
+} .
+</pre>
+</div>
+
+<p>
+An instance represents a replica of the template pattern where the
+template's parameters have been replaced by the arguments of the
+instance. An instance can be <i>expanded</i> by recursively replacing
+instances with the pattern they represent.
+</p>
+
+
+<p>
+This is the expansion of the example <code>ex:Person</code> instance when we
+expand to stOTTR [<a href="#orgtarget2">3</a>] syntax:
+</p>
+
+<pre class="example">
+nil
+</pre>
+
+<p>
+This is the expansion of the instance when we expand to wOTTR [<a href="#orgtarget3">4</a>]
+syntax, the RDF serialisation format of OTTR:
+</p>
+
+<pre class="example">
+nil
+</pre>
+
+<p>
+The expansion is done by our reference implementation Lutra. Lutra has
+special support for instances of the template <code>ottr:Triple</code> and treats
+them as regular RDF triples.
+</p>
+</div>
+
+<div id="outline-container-orgheadline3" class="outline-3">
+<h3 id="orgheadline3"><span class="section-number-3">2.1</span> Exercise: Getting familiar with the interactive exercise form</h3>
+<div class="outline-text-3" id="text-2-1">
+<p>
+This primer contains interactive exercises where you can test and
+run your solution directly. Usually each exercise contains one
+input box for template instances, and one box for templates. When
+clicking the "Run" button at the bottom, the instances in the
+instance box are expanded using the templates in the template box,
+or using templates fetched by their IRI or the templates found in
+the standard library at <a href="http://tpl.ottr.xyz/">http://tpl.ottr.xyz/</a>, if these options set
+to true.  
+</p>
+
+<p>
+One can also change the what should happen when one clicks "Run"
+by changing "Action" on the same line as "Run", and change the
+output format to, e.g., stOTTR.
+</p>
+
+
+<div class="weblutra">
+<div class="input">
+<p>
+<textarea cols="80" rows="2">
+ex:Person("Ann", "Strong", <mailto:ann.strong@gmail.com>) .
+ex:Person("Bob", "Brite", <mailto:bob.brite@gmail.com>) .
+</textarea>
+</p>
+
+</div>
+<div class="library">
+<p>
+<textarea cols="80" rows="6">
+ex:Person[ ?firstName, ?lastName, ?email ] :: {
+  ottr:Triple (_:person, rdf:type, foaf:Person ),
+  ottr:Triple (_:person, foaf:firstName, ?firstName ),
+  ottr:Triple (_:person, foaf:lastName, ?lastName ),
+  ottr:Triple (_:person, foaf:mbox, ?email )
+} .
+</textarea>
+</p>
+
+</div>
+
+</div>
+
+
+<p>
+In this exercise we will get familiar with this setup, so do the
+following:
+</p>
+
+<ul class="org-ul">
+<li>Click the "Run" button to expand the instances</li>
+<li>Add a few more instances of the <code>ex:Person</code> template in the
+instance-box and click "Run" to expand them</li>
+<li>Do some changes in the pattern of the <code>ex:Person</code> template,
+e.g., change <code>foaf:lastName</code> to <code>foaf:surname</code>, click "Run" and
+see the effects of the expansion.</li>
+<li>Change the output format to stOTTR and click "Run"</li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-orgheadline5" class="outline-3">
+<h3 id="orgheadline5"><span class="section-number-3">2.2</span> Exercise: Create a new template</h3>
+<div class="outline-text-3" id="text-2-2">
+<p>
+Create a template <code>ex:Organization</code> such that the instance below
+expands to the following RDF graph:
+</p>
+
+<p>
+Note that <code>#</code> can be used to add comments.
+</p>
+
+<pre class="example">
+nil
+</pre>
+
+<div class="weblutra">
+<div class="input">
+<p>
+<textarea cols="80" rows="1">
+ex:Organization("University of Oslo", "208"^^xsd:int, <http://uio.no>) .
+</textarea>
+</p>
+
+</div>
+
+<div class="library">
+<p>
+<textarea cols="80" rows="3">
+ex:Organization[ , , ] :: {
+  # add instances here
+} .
+</textarea>
+</p>
+
+</div>
+
+</div>
+</div>
+
+<div id="outline-container-orgheadline4" class="outline-4">
+<h4 id="orgheadline4">Solution</h4>
+<div class="outline-text-4" id="text-orgheadline4">
+<div class="org-src-container">
+
+<pre class="src src-ttl" id="orgsrcblock4">ex:Organization[ ?name, ?age, ?url] :: {
+    ottr:Triple(_:org, rdf:type, foaf:Organization),
+    ottr:Triple(_:org, foaf:name, ?name),
+    ottr:Triple(_:org, foaf:age, ?age),
+    ottr:Triple(_:org, foaf:homepage, ?url)
+} .
+</pre>
+</div>
+</div>
+</div>
+</div>
+
+
+
+<div id="outline-container-orgheadline6" class="outline-3">
+<h3 id="orgheadline6"><span class="section-number-3">2.3</span> Base templates</h3>
+<div class="outline-text-3" id="text-2-3">
+<p>
+A <i>base template</i> is a template with no pattern.
+</p>
+
+<p>
+This is an example of a base template:
+</p>
+<div class="org-src-container">
+
+<pre class="src src-ttl">ex:MyTriple{?s, ?p, ?o} :: BASE .
+</pre>
+</div>
+
+<p>
+The process of expanding instances terminates until all instances
+are instances of base templates. Any further processing of base
+template instances must be handled by the implementation. In the
+current specification and implementation, <code>ottr:Triple</code> is the only
+such base template; and instances of <code>ottr:Triple</code> represent
+(regular) RDF triples.
+</p>
+
+<p>
+It is possible to specify your own base templates, however we do
+not yet support specifying how such instances are handled, so an
+instance of a user defined template will simply be "left as is".
+</p>
+</div>
+</div>
+
+<div id="outline-container-orgheadline8" class="outline-3">
+<h3 id="orgheadline8"><span class="section-number-3">2.4</span> Exercise: Create a base template</h3>
+<div class="outline-text-3" id="text-2-4">
+<p>
+Exercise: Declare the <code>ex:Organization</code> template as a <i>base
+template</i>, expand and see the results.
+</p>
+
+<div class="weblutra">
+<div class="input">
+<p>
+<textarea cols="80" rows="1">
+</textarea>
+</p>
+
+</div>
+
+<div class="library">
+<p>
+<textarea cols="80" rows="3">
+ex:Organization[ , , ] :: {
+
+} .
+</textarea>
+</p>
+
+</div>
+
+</div>
+</div>
+
+<div id="outline-container-orgheadline7" class="outline-4">
+<h4 id="orgheadline7">Solution</h4>
+<div class="outline-text-4" id="text-orgheadline7">
+<div class="org-src-container">
+
+<pre class="src src-ttl">ex:Organisation[?name, ?age, ?homepage] :: BASE .
+</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgheadline14" class="outline-2">
+<h2 id="orgheadline14"><span class="section-number-2">3</span> Nesting templates</h2>
+<div class="outline-text-2" id="text-3">
+<p>
+The pattern of a template can contain any template instances, not
+just instances of <code>ottr:Triple</code> as we have seen in the examples so
+far. However, cyclic template definitions are not allowed and will
+result in an error.
+</p>
+
+<p>
+The ability to compose templates from existing templates is a
+powerful feature of OTTR templates which allows templates to hide
+the complexity of modelling patterns at different levels of
+abstraction.
+</p>
+</div>
+
+<div id="outline-container-orgheadline11" class="outline-3">
+<h3 id="orgheadline11"><span class="section-number-3">3.1</span> Exercise: Refactoring</h3>
+<div class="outline-text-3" id="text-3-1">
+<p>
+Below is the definition of the template <code>ex:Type</code>. (This templates'
+parameters are <i>typed</i>&#x2014;ignore this for now, we will learn what
+types are in the next section.)
+</p>
+
+<p>
+Change the templates in the previous exercises to use this template
+instead of the <code>ottr:Triple</code> instances with <code>rdf:type</code> as argument.
+</p>
+
+<p>
+To see what the <code>ex:Type</code> template expands to, we have provided
+some example instances below.
+</p>
+
+<div class="weblutra">
+<div class="input">
+<p>
+<textarea cols="80" rows="4">
+ex:Type(ex:Per, foaf:Person) .
+ex:Type(ex:Kari, foaf:Person) .
+
+ex:Type(foaf:Person, rdfs:Class) .
+</textarea>
+</p>
+
+</div>
+
+<div class="library">
+<p>
+<textarea cols="80" rows="3">
+ex:Type[ottr:IRI ?individual, ottr:IRI ?type] :: {
+  ottr:Triple(?individual, rdf:type, ?type)
+} .
+</textarea>
+</p>
+
+</div>
+
+</div>
+</div>
+
+<div id="outline-container-orgheadline10" class="outline-4">
+<h4 id="orgheadline10">Solution</h4>
+<div class="outline-text-4" id="text-orgheadline10">
+<div class="org-src-container">
+
+<pre class="src src-ttl">ex:Organization[?name, ?age, ?url] :: {
+    ex:Type(_:org, foaf:Organization),
+    ottr:Triple(_:org, foaf:name, ?name),
+    ottr:Triple(_:org, foaf:age, ?age),
+    ottr:Triple(_:org, foaf:homepage, ?url)
+} .
+</pre>
+</div>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgheadline13" class="outline-3">
+<h3 id="orgheadline13"><span class="section-number-3">3.2</span> Exercise</h3>
+<div class="outline-text-3" id="text-3-2">
+<p>
+The templates below are ill-defined; why?
+</p>
+
+<div class="error weblutra">
+<div class="input">
+<p>
+<textarea cols="80" rows="1">
+ex:A(ex:uri) .
+</textarea>
+</p>
+
+</div>
+
+<div class="library">
+<p>
+<textarea cols="80" rows="3">
+ex:A[?x] :: { ex:B(?x) } .
+ex:B[?x] :: { ex:C(?x) } .
+ex:C[?x] :: { ex:A(?x) } .
+</textarea>
+</p>
+
+</div>
+
+</div>
+</div>
+
+<div id="outline-container-orgheadline12" class="outline-4">
+<h4 id="orgheadline12">Solution</h4>
+<div class="outline-text-4" id="text-orgheadline12">
+<p>
+The templates are ill-defined because there is a cyclic dependency: 
+</p>
+
+
+<figure>
+<p><img src="exercise-cycle.png" alt="exercise-cycle.png" />
+</p>
+</figure>
+
+
+<p>
+Lutra will print these errors:
+</p>
+
+<pre class="example">
+nil
+</pre>
+</div>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-orgheadline21" class="outline-2">
+<h2 id="orgheadline21"><span class="section-number-2">4</span> Types</h2>
+<div class="outline-text-2" id="text-4">
+<p>
+Each template parameter has a <i>type</i>. The type specifies the
+permissible type or datatype the corresponding argument may
+have, the argument type must be <i>compatible</i> [<a href="#orgtarget1">1</a>] with the parameter
+type. In essence, a parameter with type <code>X</code> requires that the type
+of the argument is <code>X</code> or a subtype of <code>X</code>.
+</p>
+
+<p>
+The permissible types are classes from the RDF, RDFS, OWL and XSD
+vocabularies and specifications, including lists; see rOTTR [<a href="#orgtarget4">2</a>]
+for the full list and hierarchy.
+</p>
+
+<p>
+The default type which is used in case no type is specified, as in
+the previous examples, is the most general one, <code>rdfs:Resource</code>.
+</p>
+
+<p>
+We also check that arguments are consistently typed. This is
+relevant for arguments where the lexical value does not identify its
+type, such as for subtypes of <code>ottr:IRI</code>, e.g., <code>owl:Class</code> and
+<code>owl:ObjectProperty</code>. An argument can not be used in way that forces
+it to have an illegal or non-existing type, for instance an argument
+cannot have both the type <code>owl:ObjectProperty</code> and
+<code>owl:DatatypeProperty</code>.
+</p>
+
+
+<p>
+Types are specified like the following, by setting the type before 
+the parameter variable. Here we extend the <code>ex:Person</code> template seen earlier
+with types, showing only the signature:
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-ttl">ex:Person[ 
+  ottr:IRI ?person, 
+  xsd:string ?firstName, 
+  xsd:string ?lastName, 
+  ottr:IRI ?email ] .
+</pre>
+</div>
+</div>
+
+<div id="outline-container-orgheadline16" class="outline-3">
+<h3 id="orgheadline16"><span class="section-number-3">4.1</span> Exercise</h3>
+<div class="outline-text-3" id="text-4-1">
+<p>
+What is the type error?
+</p>
+
+<div class="error weblutra">
+<input type="hidden" class="reset-value" data-name="mode" value="lint"/>
+<div class="library">
+<p>
+<textarea cols="80" rows="3">
+ex:A[ ottr:IRI ?x ] :: BASE .
+
+ex:B [ xsd:string ?x ] :: { ex:A(?x) } .
+</textarea>
+</p>
+
+</div>
+
+</div>
+</div>
+
+<div id="outline-container-orgheadline15" class="outline-4">
+<h4 id="orgheadline15">Solution</h4>
+<div class="outline-text-4" id="text-orgheadline15">
+<p>
+Lutra's error message explains:
+</p>
+
+nil
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-orgheadline18" class="outline-3">
+<h3 id="orgheadline18"><span class="section-number-3">4.2</span> Exercise</h3>
+<div class="outline-text-3" id="text-4-2">
+<p>
+What is the type error?
+</p>
+
+<div class="error weblutra">
+<input type="hidden" class="reset-value" data-name="mode" value="lint"/>
+<div class="library">
+<p>
+<textarea cols="80" rows="7">
+ex:A[ ottr:IRI ?x ] :: BASE .
+
+ex:B [ owl:ObjectProperty ?x ] :: { ex:A(?x) } .
+
+ex:C [ owl:AnnotationProperty ?x ] :: { ex:A(?x) } .
+
+ex:D [ ?x ] :: { ex:B(?x), ex:C(?x) } .
+</textarea>
+</p>
+
+</div>
+
+</div>
+</div>
+
+<div id="outline-container-orgheadline17" class="outline-4">
+<h4 id="orgheadline17">Solution</h4>
+<div class="outline-text-4" id="text-orgheadline17">
+<p>
+Lutra's error message explains: 
+</p>
+
+nil
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-orgheadline20" class="outline-3">
+<h3 id="orgheadline20"><span class="section-number-3">4.3</span> Exercise: Specifying types</h3>
+<div class="outline-text-3" id="text-4-3">
+<p>
+Specify reasonable types for the template <code>ex:Organization</code>
+below. Note, that the template is slightly changed from the above
+and now includes the IRI of the organisation. 
+</p>
+
+<div class="weblutra">
+<div class="input">
+<p>
+<textarea cols="80" rows="1">
+ex:Organization(ex:uio, "University of Oslo", "208"^^xsd:int, <http://uio.no>) .
+</textarea>
+</p>
+
+</div>
+
+<div class="library">
+<p>
+<textarea cols="80" rows="10">
+ex:Organization[?org, ?name, ?age, ?url] :: {
+    ex:Type(?org, foaf:Organization),
+    ottr:Triple(?org, foaf:name, ?name),
+    ottr:Triple(?org, foaf:age, ?age),
+    ottr:Triple(?org, foaf:homepage, ?url)
+} .
+
+ex:Type[ottr:IRI ?individual, ottr:IRI ?type] :: {
+  ottr:Triple(?individual, rdf:type, ?type)
+} .
+</textarea>
+</p>
+
+</div>
+
+</div>
+</div>
+
+<div id="outline-container-orgheadline19" class="outline-4">
+<h4 id="orgheadline19">Solution</h4>
+<div class="outline-text-4" id="text-orgheadline19">
+<div class="org-src-container">
+
+<pre class="src src-ttl" id="orgsrcblock5">ex:Organization[ottr:IRI ?org, xsd:string ?name, xsd:int ?age, ottr:IRI ?url] :: {
+    ex:Type(?org, foaf:Organization),
+    ottr:Triple(?org, foaf:name, ?name),
+    ottr:Triple(?org, foaf:age, ?age),
+    ottr:Triple(?org, foaf:homepage, ?url)
+} .
+</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-orgheadline24" class="outline-2">
+<h2 id="orgheadline24"><span class="section-number-2">5</span> NonBlank</h2>
+<div class="outline-text-2" id="text-5">
+<p>
+A parameter can be specified as <i>nonblank</i>, which means it will not
+accept a blank node as argument.
+</p>
+
+<p>
+A parameter is set to be nonblank by writing <code>!</code> before the
+parameter type, e.g., the <code>ottr:Triple</code>, which according to the RDF
+specification should not allow blank nodes as predicates, can be
+written as:
+</p>
+<div class="org-src-container">
+
+<pre class="src src-ttl">ottr:Triple [ ottr:IRI ?subject, ! ottr:IRI ?predicate, rdfs:Resource ?object ] :: BASE .
+</pre>
+</div>
+</div>
+
+<div id="outline-container-orgheadline23" class="outline-3">
+<h3 id="orgheadline23"><span class="section-number-3">5.1</span> Exercise</h3>
+<div class="outline-text-3" id="text-5-1">
+<p>
+The following template is ill-defined; why? Can you fix it?
+</p>
+
+<div class="error weblutra">
+<div class="input">
+<p>
+<textarea cols="80" rows="2">
+ex:Relative(ex:Bart, ex:hasFather, ex:Homer) .
+ex:Relative(ex:Bart, ex:hasMother, ex:Marge) .
+</textarea>
+</p>
+
+</div>
+
+<div class="library">
+<p>
+<textarea cols="80" rows="3">
+ex:Relative[ ottr:IRI ?person, ottr:IRI ?relation, ottr:IRI ?other ] :: {
+  ottr:Triple(?person, ?relation, ?other)
+} .
+</textarea>
+</p>
+
+</div>
+
+</div>
+</div>
+
+<div id="outline-container-orgheadline22" class="outline-4">
+<h4 id="orgheadline22">Solution</h4>
+<div class="outline-text-4" id="text-orgheadline22">
+<p>
+Lutra explains:
+</p>
+
+nil
+</div>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgheadline29" class="outline-2">
+<h2 id="orgheadline29"><span class="section-number-2">6</span> Optionals and None</h2>
+<div class="outline-text-2" id="text-6">
+<p>
+A parameter can be specified as <i>optional</i>. This determines how the
+parameter treats arguments which are equal to the specific IRI
+<code>ottr:none</code>, which in stOTTR can be written as just <code>none</code>. <code>none</code>
+is a term that represents a missing or no value.
+</p>
+
+<p>
+An instance with <code>none</code> as an argument to a non-optional parameter
+will be removed in the expansion, while if the parameter is
+optional, then the instance is not removed. Essentially, optional
+parameters allow <code>none</code> to be passed on in the expansion.
+</p>
+
+<p>
+Note that all the parameters of the <code>ottr:Triple</code> template are
+non-optional. If want wants to produce triples with <code>none</code>, one can
+use the base template <code>ottr:NullableTriple</code>.
+</p>
+
+<p>
+A parameter is specified as optional by adding <code>?</code> before its type. 
+</p>
+
+<p>
+<code>ottr:NullableTriple</code> can be specified as
+</p>
+<div class="org-src-container">
+
+<pre class="src src-ttl">ottr:NullableTriple[? ottr:IRI ?subject, !? ottr:IRI ?predicate, ? rdfs:Resource ?object ] :: BASE .
+</pre>
+</div>
+</div>
+
+<div id="outline-container-orgheadline26" class="outline-3">
+<h3 id="orgheadline26"><span class="section-number-3">6.1</span> Exercise: Triple vs. NullableTriple</h3>
+<div class="outline-text-3" id="text-6-1">
+<p>
+Observe the difference of expanding <code>ottr:Triple</code> and
+<code>ottr:NullableTriple</code> by changing the pattern of <code>ex:TripleWrapper</code>
+from using <code>ottr:Triple</code> to using <code>ottr:NullableTriple</code>.
+</p>
+
+<p>
+Look closely at the signature of <code>ex:TripleWrapper</code> and make sure
+you understand it.
+</p>
+
+<div class="weblutra">
+<div class="input">
+<p>
+<textarea cols="80" rows="4">
+ex:TripleWrapper(ex:s1, ex:p1, ex:o1) .
+ex:TripleWrapper(none, ex:p2, ex:o2) .
+ex:TripleWrapper(ex:s3, none, ex:o3) .
+ex:TripleWrapper(ex:s4, ex:p4, none) .
+</textarea>
+</p>
+
+</div>
+
+<div class="library">
+<p>
+<textarea cols="80" rows="4">
+ex:TripleWrapper[ ? ottr:IRI ?s, !? ottr:IRI ?p, ??o ] :: { 
+  ottr:Triple(?s, ?p, ?o ) 
+  # ottr:NullableTriple(?s, ?p, ?o ) 
+} .
+</textarea>
+</p>
+
+</div>
+
+</div>
+</div>
+
+<div id="outline-container-orgheadline25" class="outline-4">
+<h4 id="orgheadline25">Solution</h4>
+<div class="outline-text-4" id="text-orgheadline25">
+<p>
+Here is an explanation of the parameters of the
+<code>ex:TripleWrapper</code>:
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-ttl">ex:TripleWrapper[ 
+  ? ottr:IRI ?s,   # ? = optional, ottr:IRI = type, ?s = parameter
+  !? ottr:IRI ?p,  # ? = optional, ! = nonBlank, ottr:IRI = type, ?p = parameter
+  ??o              # ? = optional, [no type, means rdfs:Resource], ?o = parameter
+] .
+</pre>
+</div>
+
+<p>
+If the <code>ottr:TripleWrapper</code> does not contain <code>ottr:NullableTriple</code> in
+the pattern, the resulting graph will contain no <code>none</code> values (which
+is shorthand for the IRI <code>ottr:none</code>). This is because none of the
+parameters of the <code>ottr:Triple</code> template are optional. If using
+<code>ottr:NullableTriple</code>, <code>ottr:none</code> resources will appear in the
+resulting expansion, since all of <code>ottr:NullableTriple</code>'s parameters
+are optional.
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgheadline28" class="outline-3">
+<h3 id="orgheadline28"><span class="section-number-3">6.2</span> Exercise: Optionals</h3>
+<div class="outline-text-3" id="text-6-2">
+<p>
+Change the <code>ex:Person</code> template below so the first name is
+optional, and the instances below expand to the following:
+</p>
+
+<pre class="example">
+nil
+</pre>
+
+<div class="weblutra">
+<div class="input">
+<p>
+<textarea cols="80" rows="2">
+ex:Person(ex:mary, "Mary", "Stone", <mailto:mstone@mail.com>) .
+ex:Person(ex:smith, none, "Smith", <mailto:smith@mail.com>) .
+</textarea>
+</p>
+
+</div>
+
+<div class="library">
+<p>
+<textarea cols="80" rows="10">
+ex:Person[ ottr:IRI ?person, xsd:string ?firstName, xsd:string ?lastName, ottr:IRI ?email ] :: {
+  ex:Type (?person, foaf:Person ),
+  ottr:Triple (?person, foaf:firstName, ?firstName ),
+  ottr:Triple (?person, foaf:lastName, ?lastName ),
+  ottr:Triple (?person, foaf:mbox, ?email )
+} .
+
+ex:Type[ottr:IRI ?individual, ottr:IRI ?type] :: {
+  ottr:Triple(?individual, rdf:type, ?type)
+} .
+</textarea>
+</p>
+
+</div>
+
+</div>
+</div>
+
+
+<div id="outline-container-orgheadline27" class="outline-4">
+<h4 id="orgheadline27">Solution</h4>
+<div class="outline-text-4" id="text-orgheadline27">
+<div class="org-src-container">
+
+<pre class="src src-ttl" id="orgsrcblock6">ex:Person[ ottr:IRI ?person, ? xsd:string ?firstName, xsd:string ?lastName, ottr:IRI ?email ] :: {
+  ex:Type (?person, foaf:Person ),
+  ottr:Triple (?person, foaf:firstName, ?firstName ),
+  ottr:Triple (?person, foaf:lastName, ?lastName ),
+  ottr:Triple (?person, foaf:mbox, ?email )
+} .
+
+ex:Type[ottr:IRI ?individual, ottr:IRI ?type] :: {
+  ottr:Triple(?individual, rdf:type, ?type)
+} .
+</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgheadline38" class="outline-2">
+<h2 id="orgheadline38"><span class="section-number-2">7</span> Default values</h2>
+<div class="outline-text-2" id="text-7">
+<p>
+Parameters can specify a <i>default value</i>. The default value is used
+if the argument is <code>none</code>. The default value can be any term. If the
+default value is a blank node, a fresh blank node will be used for
+each instance.
+</p>
+
+<p>
+A default value is specified appending the value to the parameter
+variable separated by <code>=</code>, i.e., <code>?variable=default</code>.
+</p>
+</div>
+
+<div id="outline-container-orgheadline31" class="outline-3">
+<h3 id="orgheadline31"><span class="section-number-3">7.1</span> Exercise</h3>
+<div class="outline-text-3" id="text-7-1">
+<p>
+The template 
+</p>
+<pre class="example">
+ax:SubObjectSomeValuesFrom[owl:Class ?class, owl:ObjectProperty ?property, owl:Class ?qualifier ] . 
+</pre>
+<p>
+can be used to create OWL axioms of the form \(C \sqsubseteq \exists P . D\)
+</p>
+
+<p>
+How would you need to change the signature so that the instance
+</p>
+<pre class="example">
+ax:SubObjectSomeValuesFrom(ex:A, ex:Q, none) .
+</pre>
+<p>
+would produce
+\(A \sqsubseteq \exists Q . \top\)
+</p>
+</div>
+
+<div id="outline-container-orgheadline30" class="outline-4">
+<h4 id="orgheadline30">Solution</h4>
+<div class="outline-text-4" id="text-orgheadline30">
+<p>
+Change the signature to
+</p>
+
+<pre class="example">
+ax:SubObjectSomeValuesFrom[owl:Class ?class, owl:ObjectProperty ?property, owl:Class ?qualifier = owl:Thing ] . 
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgheadline33" class="outline-3">
+<h3 id="orgheadline33"><span class="section-number-3">7.2</span> Exercise: Setting concrete default values</h3>
+<div class="outline-text-3" id="text-7-2">
+<p>
+Change the template <code>ex:Organization</code> to include an extra argument
+<code>?loc</code> which states that the organisation is <code>dbp:locatedIn ?loc</code>
+and which defaults to <code>ex:norway</code>, so that the following instances
+expand to:
+</p>
+
+<pre class="example">
+nil
+</pre>
+
+<div class="weblutra">
+<div class="input">
+<p>
+<textarea cols="80" rows="2">
+ex:Organization(ex:uio, "University of Oslo", "208"^^xsd:int, <http://uio.no>, none) .
+ex:Organization(ex:google, "Google AS", "21"^^xsd:int, <http://google.com>, ex:usa) .
+</textarea>
+</p>
+
+</div>
+
+<div class="library">
+<p>
+<textarea cols="80" rows="10">
+ex:Organization[ottr:IRI ?org, xsd:string ?name, xsd:int ?age, ottr:IRI ?url] :: {
+    ex:Type(?org, foaf:Organization),
+    ottr:Triple(?org, foaf:name, ?name),
+    ottr:Triple(?org, foaf:age, ?age),
+    ottr:Triple(?org, foaf:homepage, ?url)
+} .
+
+ex:Type[ottr:IRI ?individual, ottr:IRI ?type] :: {
+  ottr:Triple(?individual, rdf:type, ?type)
+} .
+</textarea>
+</p>
+
+</div>
+
+</div>
+</div>
+
+
+<div id="outline-container-orgheadline32" class="outline-4">
+<h4 id="orgheadline32">Solution</h4>
+<div class="outline-text-4" id="text-orgheadline32">
+<div class="org-src-container">
+
+<pre class="src src-ttl" id="orgsrcblock7">ex:Organization[ottr:IRI ?org, xsd:string ?name, xsd:int ?age, ottr:IRI ?url, ottr:IRI ?loc=ex:norway] :: {
+    ex:Type(?org, foaf:Organization),
+    ottr:Triple(?org, foaf:name, ?name),
+    ottr:Triple(?org, foaf:age, ?age),
+    ottr:Triple(?org, dbp:locatedIn, ?loc),
+    ottr:Triple(?org, foaf:homepage, ?url)
+} .
+</pre>
+</div>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgheadline35" class="outline-3">
+<h3 id="orgheadline35"><span class="section-number-3">7.3</span> Exercise: Setting blank node default values</h3>
+<div class="outline-text-3" id="text-7-3">
+<p>
+Change the template <code>ex:Person</code> so that it generates
+a fresh blank node if no IRI is provided for the person.
+The instances below should expand to:
+</p>
+
+<pre class="example">
+nil
+</pre>
+
+<div class="weblutra">
+<div class="input">
+<p>
+<textarea cols="80" rows="3">
+ex:Person(none, "Ann", "Jones", <mailto:ann@mail.com>) .
+ex:Person(none, "Bill", "Bright", <mailto:bill@mail.com>) .
+ex:Person(ex:cindy, "Cindy", "Stevens", <mailto:cindy@mail.com>) .
+</textarea>
+</p>
+
+</div>
+
+<div class="library">
+<p>
+<textarea cols="80" rows="10">
+ex:Person[ ottr:IRI ?person, ? xsd:string ?firstName, xsd:string ?lastName, ottr:IRI ?email ] :: {
+  ex:Type (?person, foaf:Person ),
+  ottr:Triple (?person, foaf:firstName, ?firstName ),
+  ottr:Triple (?person, foaf:lastName, ?lastName ),
+  ottr:Triple (?person, foaf:mbox, ?email )
+} .
+
+ex:Type[ottr:IRI ?individual, ottr:IRI ?type] :: {
+  ottr:Triple(?individual, rdf:type, ?type)
+} .
+</textarea>
+</p>
+
+</div>
+
+</div>
+</div>
+
+<div id="outline-container-orgheadline34" class="outline-4">
+<h4 id="orgheadline34">Solution</h4>
+<div class="outline-text-4" id="text-orgheadline34">
+<div class="org-src-container">
+
+<pre class="src src-ttl" id="orgsrcblock8">ex:Person[ ottr:IRI ?person=_:person, xsd:string ?firstName, xsd:string ?lastName, ottr:IRI ?email ] :: {
+  ex:Type (?person, foaf:Person ),
+  ottr:Triple (?person, foaf:firstName, ?firstName ),
+  ottr:Triple (?person, foaf:lastName, ?lastName ),
+  ottr:Triple (?person, foaf:mbox, ?email )
+} .
+</pre>
+</div>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgheadline37" class="outline-3">
+<h3 id="orgheadline37"><span class="section-number-3">7.4</span> Exercise: Specifying relationship between organisation and persons</h3>
+<div class="outline-text-3" id="text-7-4">
+<p>
+Make a new template <code>ex:Member</code> that takes three arguments:
+</p>
+<ol class="org-ol">
+<li><code>?org</code> the IRI of an organisation,</li>
+<li><code>?person</code> the IRI of a person,</li>
+<li><code>?relation</code> the IRI of the relationship between the
+organisation and the person (e.g. <code>foaf:member</code>, <code>ex:employee</code>,
+<code>ex:associate</code>). It should default to <code>foaf:member</code>.</li>
+</ol>
+
+<p>
+Add types and other necessary flags to make the template
+correct. The pattern should contain a single triple instance
+stating that the <code>?org</code> is <code>?relation</code> related to <code>?person</code>, so
+that the following instances expands to:
+</p>
+
+<pre class="example">
+nil
+</pre>
+
+<div class="weblutra">
+<div class="input">
+<p>
+<textarea cols="80" rows="2">
+ex:Member(ex:busAZ, ex:bob, ex:employee) .
+ex:Member(ex:united_nations, ex:norway, none) .
+</textarea>
+</p>
+
+</div>
+
+<div class="library">
+<p>
+<textarea cols="80" rows="3">
+ex:Member[ ?org, ?person, ?relation ] :: {
+
+} .
+</textarea>
+</p>
+
+</div>
+
+</div>
+</div>
+
+
+<div id="outline-container-orgheadline36" class="outline-4">
+<h4 id="orgheadline36">Solution</h4>
+<div class="outline-text-4" id="text-orgheadline36">
+<div class="org-src-container">
+
+<pre class="src src-ttl" id="orgsrcblock9">ex:Member[ottr:IRI ?org, ottr:IRI ?person, ! ottr:IRI ?relation=foaf:member] :: {
+    ottr:Triple(?org, ?relation, ?person)
+} .
+</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgheadline48" class="outline-2">
+<h2 id="orgheadline48"><span class="section-number-2">8</span> Expansion modes</h2>
+<div class="outline-text-2" id="text-8">
+<p>
+Instances in a template pattern can be marked with an <i>expansion
+mode</i>. Expansion modes are used to create multiple instances from
+arguments which are lists. There are different expansion modes which
+behave differently when multiple list arguments are in play. The
+current list of expansion modes are <code>cross</code>, <code>zipMin</code> and <code>zipMax</code>.
+</p>
+
+<p>
+An pattern instance is marked by adding the expansion mode like this:
+<code>cross | [Instance]</code>
+</p>
+
+<p>
+The list argument to which the expansion mode is applied must be
+selected. This is done by adding <code>++</code> to the argument like this:
+<code>++?argument</code>
+</p>
+</div>
+
+<div id="outline-container-orgheadline40" class="outline-3">
+<h3 id="orgheadline40"><span class="section-number-3">8.1</span> Exercise: Getting acquainted with expansion modes</h3>
+<div class="outline-text-3" id="text-8-1">
+<p>
+The template <code>ex:Types</code> below can be used to express that an IRI
+has multiple classes. This is done by marking the instance
+<code>ex:Type</code> in the pattern of <code>ex:Types</code> with an expansion mode. The
+result of expanding the instance below is the following:
+</p>
+
+<pre class="example">
+nil
+</pre>
+
+<p>
+Essentially, the expansion mode specifies that an instance of
+<code>ex:Type</code> is created for each element in the list of the second
+argument of <code>ex:Types</code>. What really happens is that an instance for
+each element in the cross product of all the arguments to <code>ex:Type</code> is
+created, temporarily treating all arguments as lists:
+\(\langle ann \rangle \times \langle Person, Employee \rangle 
+= \{ \langle ann, Person \rangle ,\langle ann, Employee \rangle \}\)
+</p>
+
+
+
+<div class="weblutra">
+<div class="input">
+<p>
+<textarea cols="80" rows="1">
+ex:Types(ex:ann, (ex:Person, ex:Employee)) .
+</textarea>
+</p>
+
+</div>
+
+<div class="library">
+<p>
+<textarea cols="80" rows="7">
+ex:Types[ ottr:IRI ?inst, List<ottr:IRI> ?class ] :: {
+  cross | ex:Type(?inst, ++?class)
+} .
+
+ex:Type[ottr:IRI ?individual, ottr:IRI ?type] :: {
+  ottr:Triple(?individual, rdf:type, ?type)
+} .
+</textarea>
+</p>
+
+</div>
+
+</div>
+
+<p>
+Exercises: 
+</p>
+<ol class="org-ol">
+<li><p>
+Change the signature of <code>ex:Types</code> so that the type of the first
+parameter is also <code>List&lt;ottr:IRI&gt;</code> and mark the argument <code>?inst</code> in
+the pattern with <code>++</code>. Now change the instance in the input box to
+</p>
+<pre class="example">
+ex:Types((ex:ann, ex:bob, ex:cindy, ex:david), (ex:Person, ex:Employee))
+</pre>
+<p>
+and see what this expands to.
+</p></li>
+<li>Keep the setup as in 1., but now change the expansion mode to
+<code>zipMin</code> and see what happens with the expansion results.</li>
+<li>Now change the expansion mode to <code>zipMax</code> and see what happens.</li>
+</ol>
+</div>
+
+<div id="outline-container-orgheadline39" class="outline-4">
+<h4 id="orgheadline39">Solution</h4>
+<div class="outline-text-4" id="text-orgheadline39">
+<ol class="org-ol">
+<li><code>cross</code>: &lang; A, B, C &rang; &times; &lang; X, Y &rang; = 
+{
+ &lang; A, X &rang; ,
+ &lang; B, X &rang; ,
+ &lang; C, X &rang; ,
+ &lang; A, Y &rang; ,
+ &lang; B, Y &rang; ,
+ &lang; C, Y &rang; }</li>
+
+<li><code>zipMin</code> zips the lists, but only the size of the shortest list: 
+zipMin(&lang; A, B, C &rang;,   &lang; X, Y &rang;)= 
+{
+ &lang; A, X &rang; ,
+ &lang; B, Y &rang; }.</li>
+
+<li><code>zipMax</code> zips the lists, and appends shorter lists with <code>none</code> to match the size of the longest list: 
+zipMax(&lang; A, B, C &rang;,   &lang; X, Y &rang;)= 
+{
+ &lang; A, X &rang; ,
+ &lang; B, Y &rang; 
+ &lang; C, none &rang; }.</li>
+</ol>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgheadline42" class="outline-3">
+<h3 id="orgheadline42"><span class="section-number-3">8.2</span> Exercise: Setting expansion modes</h3>
+<div class="outline-text-3" id="text-8-2">
+<p>
+Make a new template <code>ex:Members</code> that takes an organisation, a
+list of individuals (given as IRIs), and a relation as argument
+and produces a <code>ex:Member</code> instance between the organization and
+each of the persons in the list. The instances below should expand
+to:
+</p>
+
+<pre class="example">
+nil
+</pre>
+
+<p>
+Note the use of optional flag in the signature so that a <code>none</code>
+value gets passed on to the <code>ex:Member</code> template, which then uses
+the default value <code>foaf:member</code>.
+</p>
+
+<div class="weblutra">
+<div class="input">
+<p>
+<textarea cols="80" rows="2">
+ex:Members(ex:fast, (ex:ann, ex:bob, ex:carl), ex:employee) .
+ex:Members(ex:united_nations, (ex:usa, ex:germany, ex:france, ex:norway), none) .
+</textarea>
+</p>
+
+</div>
+
+<div class="library">
+<p>
+<textarea cols="80" rows="7">
+ex:Members[ ottr:IRI ?org, List<ottr:IRI> ?members, !? ottr:IRI ?relation] :: {
+
+} .
+
+ex:Member[ottr:IRI ?org, ottr:IRI ?person, ! ottr:IRI ?relation=foaf:member] :: {
+    ottr:Triple(?org, ?relation, ?person)
+} .
+</textarea>
+</p>
+
+</div>
+
+</div>
+</div>
+
+<div id="outline-container-orgheadline41" class="outline-4">
+<h4 id="orgheadline41">Solution</h4>
+<div class="outline-text-4" id="text-orgheadline41">
+<div class="org-src-container">
+
+<pre class="src src-ttl" id="orgsrcblock10">ex:Members[ ottr:IRI ?org, List&lt;ottr:IRI&gt; ?members, !? ottr:IRI ?relation ] :: {
+    cross | ex:Member(?org, ++?members, ?relation)
+} .
+</pre>
+</div>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-orgheadline44" class="outline-3">
+<h3 id="orgheadline44"><span class="section-number-3">8.3</span> Exercise (*): Exploiting expansion modes</h3>
+<div class="outline-text-3" id="text-8-3">
+<p>
+Make a template <code>ex:Friends</code> with the signature below, that from
+the given the instances produces the following, i.e., everybody
+knows everybody.
+</p>
+
+<pre class="example">
+nil
+</pre>
+
+<div class="weblutra">
+<div class="input">
+<p>
+<textarea cols="80" rows="1">
+ex:Friends((ex:ann, ex:bob, ex:carl)) .
+</textarea>
+</p>
+
+</div>
+
+<div class="library">
+<p>
+<textarea cols="80" rows="3">
+ex:Friends[ List<ottr:IRI> ?friends] :: {
+
+} .
+</textarea>
+</p>
+
+</div>
+
+</div>
+</div>
+
+<div id="outline-container-orgheadline43" class="outline-4">
+<h4 id="orgheadline43">Solution</h4>
+<div class="outline-text-4" id="text-orgheadline43">
+<div class="org-src-container">
+
+<pre class="src src-ttl" id="orgsrcblock11">ex:Friends[ List&lt;ottr:IRI&gt; ?friends] :: {
+  cross | ottr:Triple(++?friends, foaf:knows, ++?friends)
+} .
+</pre>
+</div>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgheadline45" class="outline-3">
+<h3 id="orgheadline45"><span class="section-number-3">8.4</span> Exercise: NamedPizza</h3>
+<div class="outline-text-3" id="text-8-4">
+<p>
+The NamedPizza template, published at
+<a href="http://tpl.ottr.xyz/pizza/0.1/NamedPizza">http://tpl.ottr.xyz/pizza/0.1/NamedPizza</a>, uses lists both with and
+without expansion modes. The list of toppings is used to create a
+union of classes using the
+<a href="http://tpl.ottr.xyz/owl/restriction/0.1/ObjectUnionOf">http://tpl.ottr.xyz/owl/restriction/0.1/ObjectUnionOf</a> template,
+<b>and</b> to create a instance of
+<a href="http://tpl.ottr.xyz/owl/axiom/0.1/SubObjectSomeValuesFrom">http://tpl.ottr.xyz/owl/axiom/0.1/SubObjectSomeValuesFrom</a> for each
+topping in the list.
+</p>
+
+<p>
+Try and make new pizzas and see the results.
+</p>
+
+<div class="weblutra">
+<div class="input">
+<p>
+<textarea cols="80" rows="9">
+@prefix o-pizza: <http://tpl.ottr.xyz/pizza/0.1/> .
+
+o-pizza:NamedPizza(ex:Margerita, ex:Italy, (ex:Tomato, ex:Mozzarella)) .
+
+o-pizza:NamedPizza(ex:QuattroFormaggi, ex:Italy, (ex:Tomato, ex:Mozzarella, ex:Gorgonzola, ex:Parmesan, ex:Stracchino)) .
+
+o-pizza:NamedPizza(ex:Grandiosa, ex:Norway, (ex:Tomato, ex:Cheese, ex:BellPepper, ex:Ham)) .
+
+o-pizza:NamedPizza(ex:PepperoniPizza, ottr:none, (ex:Tomato, ex:Cheese, ex:Pepperoni)) .
+</textarea>
+</p>
+
+</div>
+
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgheadline47" class="outline-3">
+<h3 id="orgheadline47"><span class="section-number-3">8.5</span> Exercise (**): Using multiple expansion modes</h3>
+<div class="outline-text-3" id="text-8-5">
+<p>
+Make a template <code>ex:OrganizationMembers</code> with the given signature,
+that given the instance below expands to the following:
+</p>
+
+<pre class="example">
+nil
+</pre>
+
+<div class="weblutra">
+<div class="input">
+<p>
+<textarea cols="80" rows="7">
+ex:OrganizationMembers(
+  ex:uio, "University of Oslo", "208"^^xsd:int, <http://uio.no>, none, ex:employee,
+  (ex:leif,                     ex:daniel,                    ex:martin),
+  ("Leif Harald",               "Daniel",                     "Martin"),
+  ("Karlsen",                   "Lupp",                       "Skjæveland"),
+  (<mailto:leifhka@ifi.uio.no>, <mailto:danielup@ifi.uio.no>, <mailto:martige@ifi.uio.no>)
+) .
+</textarea>
+</p>
+
+</div>
+
+<div class="library">
+<p>
+<textarea cols="80" rows="44">
+ex:OrganizationMembers[
+    ottr:IRI ?org, xsd:string ?name, xsd:int ?age, ottr:IRI ?url,
+    ? ottr:IRI ?loc, !? ottr:IRI ?relation,
+    List<ottr:IRI>   ?members,
+    List<xsd:string> ?memberFirstNames,
+    List<xsd:string> ?memberLastNames,
+    List<ottr:IRI>   ?memberMboxes
+] :: {
+
+
+} .
+
+#### no need to change the templates below this line
+
+ex:Type[ottr:IRI ?individual, ottr:IRI ?type] :: {
+  ottr:Triple(?individual, rdf:type, ?type)
+} .
+
+ex:Person[ ottr:IRI ?person=_:person, xsd:string ?firstName, xsd:string ?lastName, ottr:IRI ?email ] :: {
+  ex:Type (?person, foaf:Person ),
+  ottr:Triple (?person, foaf:firstName, ?firstName ),
+  ottr:Triple (?person, foaf:lastName, ?lastName ),
+  ottr:Triple (?person, foaf:mbox, ?email )
+} .
+
+ex:Organization[ottr:IRI ?org, xsd:string ?name, xsd:int ?age, ottr:IRI ?url, ottr:IRI ?loc=ex:norway] :: {
+    ex:Type(?org, foaf:Organization),
+    ottr:Triple(?org, foaf:name, ?name),
+    ottr:Triple(?org, foaf:age, ?age),
+    ottr:Triple(?org, dbp:locatedIn, ?loc),
+    ottr:Triple(?org, foaf:homepage, ?url)
+} .
+
+ex:Members[ ottr:IRI ?org, List<ottr:IRI> ?members, !? ottr:IRI ?relation ] :: {
+    cross | ex:Member(?org, ++?members, ?relation)
+} .
+
+ex:Member[ottr:IRI ?org, ottr:IRI ?person, ! ottr:IRI ?relation=foaf:member] :: {
+    ottr:Triple(?org, ?relation, ?person)
+} .
+
+ex:Friends[ List<ottr:IRI> ?friends] :: {
+  cross | ottr:Triple(++?friends, foaf:knows, ++?friends)
+} .
+</textarea>
+</p>
+
+</div>
+
+</div>
+</div>
+
+<div id="outline-container-orgheadline46" class="outline-4">
+<h4 id="orgheadline46">Solution</h4>
+<div class="outline-text-4" id="text-orgheadline46">
+<div class="org-src-container">
+
+<pre class="src src-ttl">ex:OrganizationMembers[
+    ottr:IRI ?org, xsd:string ?name, xsd:int ?age, ottr:IRI ?url,
+    ? ottr:IRI ?loc, !? ottr:IRI ?relation,
+    List&lt;ottr:IRI&gt;   ?members,
+    List&lt;xsd:string&gt; ?memberFirstNames,
+    List&lt;xsd:string&gt; ?memberLastNames,
+    List&lt;ottr:IRI&gt;   ?memberMboxes]
+:: {
+  ex:Organization(?org, ?name, ?age, ?url, ?loc),
+  zipMin | ex:Person(++?members, ++?memberFirstNames, ++?memberLastNames, ++?memberMboxes),
+  ex:Members(?org, ?members, ?relation),
+  ex:Friends(?members) 
+} .
+</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgheadline49" class="outline-2">
+<h2 id="orgheadline49"><span class="section-number-2">9</span> References</h2>
+<div class="outline-text-2" id="text-9">
+<ol class="org-ol">
+<li><a id="orgtarget1"></a> mOTTR: Concepts and Abstract Model for Reasonable Ontology
+Templates <a href="http://spec.ottr.xyz/mOTTR/0.1/">http://spec.ottr.xyz/mOTTR/0.1/</a></li>
+<li><a id="orgtarget4"></a> rOTTR: Adapting Reasonable Ontology Templates to RDF
+<a href="http://spec.ottr.xyz/rOTTR/0.2/">http://spec.ottr.xyz/rOTTR/0.2/</a></li>
+<li><a id="orgtarget2"></a> stOTTR: Terse Syntax for Reasonable Ontology Templates
+<a href="http://spec.ottr.xyz/stOTTR/0.1/">http://spec.ottr.xyz/stOTTR/0.1/</a></li>
+<li><a id="orgtarget3"></a> wOTTR: Web Reasonable Ontology Templates
+<a href="http://spec.ottr.xyz/wOTTR/0.4/">http://spec.ottr.xyz/wOTTR/0.4/</a></li>
+</ol>
+</div>
+</div>
+
+<div id="outline-container-orgheadline51" class="outline-2">
+<h2 id="orgheadline51"><span class="section-number-2">10</span> Appendix</h2>
+<div class="outline-text-2" id="text-10">
+</div><div id="outline-container-orgheadline50" class="outline-3">
+<h3 id="orgheadline50"><span class="section-number-3">10.1</span> WebLutra</h3>
+<div class="outline-text-3" id="text-10-1">
+<p>
+The web application that drives the interactive examples in this
+primer, called WebLutra, uses Lutra, the reference application for
+OTTR. Both applications are open source and available at
+<a href="http://gitlab.com/ottr/lutra/lutra">http://gitlab.com/ottr/lutra/lutra</a>. If you experience errors or have
+suggestions for improvements, please take a look at existing issues
+or file a new issue: <a href="http://gitlab.com/ottr/lutra/lutra/issues">http://gitlab.com/ottr/lutra/lutra/issues</a>
+</p>
+</div>
+</div>
+</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,229 @@
+#+INCLUDE: "./inc/header.org"
+
+#+HTML:   <h1 id="top" class="title">Converting spreadsheets to knowledge graphs with tabOTTR</h1>
+#+HTML:   <img id="logo" alt="pOTTR" src="http://www.ottr.xyz/logo/pOTTR.png"/>
+#+TITLE: pOTTR: Converting spreadsheets to knowledge graphs with tabOTTR
+
+  *Convert spreadsheets to OTTR template instances*
+
+ - Authors :: Martin G. Skjæveland
+ - Issues :: https://gitlab.com/ottr/language/pOTTR/issues
+
+#+INCLUDE: "./inc/intro.org"
+
+  This chapter introduces tabOTTR [[[tabottr]]] by giving exercises on
+  using tabOTTR to annotate spreadsheets for specifying OTTR template
+  instances.
+
+  More examples and introductory text can be found in the tabOTTR
+  specification [[[tabottr]]].
+
+** Prefixes
+   :PROPERTIES:
+   :CUSTOM_ID: prefixes
+   :END:
+
+   The following prefixes are used throughout the document, and may be
+   used in the text input areas of the interactive examples without
+   declaration.
+
+#+NAME: turtle-prefixes
+#+BEGIN_SRC ttl
+@prefix rdf: 	<http://www.w3.org/1999/02/22-rdf-syntax-ns#> . 
+@prefix rdfs: 	<http://www.w3.org/2000/01/rdf-schema#> . 
+@prefix owl: 	<http://www.w3.org/2002/07/owl#> . 
+@prefix xsd: 	<http://www.w3.org/2001/XMLSchema#> . 
+@prefix foaf: 	<http://xmlns.com/foaf/0.1/> . 
+@prefix dbp: 	<http://dbpedia.org/ontology/> . 
+@prefix ex: 	<http://example.com/ns#> . 
+@prefix ottr: 	<http://ns.ottr.xyz/0.4/> . 
+@prefix ax: 	<http://tpl.ottr.xyz/owl/axiom/0.1/> . 
+@prefix rstr: 	<http://tpl.ottr.xyz/owl/restriction/0.1/> .
+#+END_SRC
+
+
+* Expanding instances
+** Exercise: Add prefix declaration and instance data
+
+    The spreadsheet [[./files/03-tabOTTR/types.xlsx][types.xlsx]] contains one sheet with instances of
+    the ~ex:Type~ template that expands to RDF on the following form:
+
+#+BEGIN_EXAMPLE
+<http://example.com/data#a11>
+        a       <http://example.com/schema#ClassA> .
+#+END_EXAMPLE
+
+    Download the spreadsheet and do the following.
+
+    Add a new prefix declaration with the prefix ~test~ and namespace
+    ~http://example.com/test#~ to the already existing prefix
+    instruction in the first sheet of the spreadsheet file, and all
+    more instances to the existing template instruction:
+
+    | instance data | type data     |
+    |---------------+---------------|
+    | test:b12      | schema:ClassB |
+    | test:b13      | schema:ClassB |
+    | test:b14      | schema:ClassB |
+
+    Expand the spreadsheet.
+
+#+BEGIN_weblutra
+
+#+HTML: <div class="menu">tabOTTR Excel file<br/>
+#+HTML:   <input id="fileInput" type="file" name="fileInput">
+#+HTML:   <input type="hidden" name="inputFormat" value="tabottr"/>
+#+HTML: </div>
+
+#+BEGIN_library
+#+ATTR_HTML: :textarea t
+#+BEGIN_SRC ttl :noweb yes
+<<tpl-type>>
+#+END_SRC
+#+END_library
+
+#+END_weblutra
+
+** Exercise: Add tabOTTR template instruction
+
+    The second sheet of the spreadsheet file [[./files/03-tabOTTR/types.xlsx][types.xlsx]] contains data
+    which is not annotated with tabOTTR instructions. Add the
+    necessary tabOTTR instructions so that the row
+       
+    | c11 | ClassC |
+    
+    expands to
+#+BEGIN_EXAMPLE
+<http://example.com/test#c11>
+        a       <http://example.com/schema#ClassC> .
+#+END_EXAMPLE
+
+    Try to solve the exercise without altering the data, but rather
+    create new columns that use spreadsheet the formula ~CONCATENATE~
+    to add the required prefixes to the data. (Note that not all
+    functions are supported by the external API that WebLutra/Lutra
+    uses, however ~CONCATENATE~ is, (but ~CONCAT~ is not).)
+
+    Use the indices of the template instruction to select the columns
+    that should become instance arguments.
+       
+#+BEGIN_weblutra
+
+#+HTML: <div class="menu">tabOTTR Excel file<br/>
+#+HTML:   <input id="fileInput" type="file" name="fileInput">
+#+HTML:   <input type="hidden" name="inputFormat" value="tabottr"/>
+#+HTML: </div>
+
+#+BEGIN_library
+#+ATTR_HTML: :textarea t
+#+NAME: tpl-type
+#+BEGIN_SRC ttl
+ex:Type[ottr:IRI ?individual, ottr:IRI ?type] :: {
+  ottr:Triple(?individual, rdf:type, ?type)
+} .
+#+END_SRC
+#+END_library
+#+END_weblutra
+
+** Exercise: Expand NamedPizza instances
+
+    The spreadsheet [[./files/03-tabOTTR/PizzaOntologyInstances.xlsx][PizzaOntologyInstances.xlsx]] contains several
+    instances of the [[http://tpl.ottr.xyz/pizza/0.1/NamedPizza][NamedPizza]] template.
+
+    Download the spreadsheet and note how lists are defined, and how
+    types are set. Expand the spreadsheet.
+
+#+BEGIN_weblutra
+
+#+HTML: <input type="hidden" class="reset-value" data-name="fetchMissing" value="true"/>
+#+HTML: <div class="menu">tabOTTR Excel file<br/>
+#+HTML:   <input id="fileInput" type="file" name="fileInput">
+#+HTML:   <input type="hidden" name="inputFormat" value="tabottr"/>
+#+HTML: </div>
+#+END_weblutra
+
+* Adapting tabular data to template signatures
+** Exercise: Adapt and instantiate Organization
+
+    The spreadsheet [[./files/03-tabOTTR/organizations.xlsx][organizations.xlsx]] contains data about
+    organisations. Add the neccesary tabOTTR instructions to the
+    spreadsheet so that the data can be expanded as instances of the
+    ~ex:Organization~ template below. You may also make adjustments to
+    the template ~ex:Organization~ if you wish.
+
+    Tips:
+    - Remember to add a prefix instruction, if you use prefixes.
+    - Try to use auto typing:
+      https://spec.ottr.xyz/tabOTTR/0.3/#2.3.3_auto_typing
+    - Invent an IRI for each organization, use a blank node, or change
+      the signature of ~ex:Organization~ by setting a blank node as
+      default value.
+    - You can use the formula ~=DATEDIF([cellref], TODAY(), "y")~ to
+      calculate the difference in years between ~[cellref]~ and
+      today. Note however, that this function is not supported by the
+      external API that WebLutra/Lutra uses, therefore you must copy
+      the contents of the column into a new column and remove the
+      column containing the formulas.
+
+#+BEGIN_weblutra
+
+#+HTML: <div class="menu">tabOTTR Excel file<br/>
+#+HTML:   <input id="fileInput" type="file" name="fileInput">
+#+HTML:   <input type="hidden" name="inputFormat" value="tabottr"/>
+#+HTML: </div>
+
+#+BEGIN_library
+#+ATTR_HTML: :textarea t
+#+BEGIN_SRC ttl :noweb yes
+ex:Organization[ottr:IRI ?org, xsd:string ?name, xsd:int ?age, ottr:IRI ?url] :: {
+    ex:Type(?org, foaf:Organization),
+    ottr:Triple(?org, foaf:name, ?name),
+    ottr:Triple(?org, foaf:age, ?age),
+    ottr:Triple(?org, foaf:homepage, ?url)
+} .
+
+<<tpl-type>>
+#+END_SRC
+#+END_library
+
+#+END_weblutra
+
+** Exercise: Adapt and instantiate Person
+
+    The spreadsheet [[./files/03-tabOTTR/persons.xlsx][persons.xlsx]] contains data about persons. Add the
+    neccesary tabOTTR instructions to the spreadsheet so that the data
+    can be expanded as instances of the ~ex:Person~ template below.
+    Try to extend the template to include all the information in the
+    spreadsheet.
+
+#+BEGIN_weblutra
+
+#+HTML: <div class="menu">tabOTTR Excel file<br/>
+#+HTML:   <input id="fileInput" type="file" name="fileInput">
+#+HTML:   <input type="hidden" name="inputFormat" value="tabottr"/>
+#+HTML: </div>
+
+#+BEGIN_library
+#+ATTR_HTML: :textarea t
+#+BEGIN_SRC ttl
+ex:Person[ ?person, ?firstName, ?lastName, ?email ] :: {
+  ottr:Triple (?person, rdf:type, foaf:Person ),
+  ottr:Triple (?person, foaf:firstName, ?firstName ),
+  ottr:Triple (?person, foaf:lastName, ?lastName ),
+  ottr:Triple (?person, foaf:mbox, ?email )
+} .
+#+END_SRC
+#+END_library
+
+#+END_weblutra
+
+
+* References
+
+  - <<tabottr>> Tabular OTTR template instances  http://spec.ottr.xyz/tabOTTR/0.3/
+
+* Appendix
+#+INCLUDE: "./inc/appendix.org"
+
+
+

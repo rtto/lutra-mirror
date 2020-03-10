@@ -1,0 +1,382 @@
+#+INCLUDE: "./inc/header.org"
+
+#+HTML:   <h1 id="top" class="title">Extract, transform and Load with bOTTR</h1>
+#+HTML:   <img id="logo" alt="pOTTR" src="http://www.ottr.xyz/logo/pOTTR.png"/>
+#+TITLE: pOTTR: Extract, transform and Load with bOTTR
+
+ *Convert queryable sources to OTTR template instances*
+
+ - Authors :: Martin G. Skjæveland
+ - Issues :: https://gitlab.com/ottr/language/pOTTR/issues
+
+#+INCLUDE: "./inc/intro.org"
+
+  This chapter contains exercises that show how bOTTR [[[bottr]]] can be
+  used to extract data by quering RDF files, SPARQL endpoints, CSV
+  files and relational database and converting the query results to
+  OTTR template instances.
+
+** Prefixes
+   :PROPERTIES:
+   :CUSTOM_ID: prefixes
+   :END:
+
+   The following prefixes are used throughout the document, and may be
+   used in the text input areas of the interactive examples without
+   declaration.
+
+#+NAME: turtle-prefixes
+#+BEGIN_SRC ttl
+@prefix rdf: 	<http://www.w3.org/1999/02/22-rdf-syntax-ns#> . 
+@prefix rdfs: 	<http://www.w3.org/2000/01/rdf-schema#> . 
+@prefix owl: 	<http://www.w3.org/2002/07/owl#> . 
+@prefix xsd: 	<http://www.w3.org/2001/XMLSchema#> . 
+@prefix foaf: 	<http://xmlns.com/foaf/0.1/> . 
+@prefix dbp: 	<http://dbpedia.org/ontology/> . 
+@prefix ex: 	<http://example.com/ns#> . 
+@prefix ottr: 	<http://ns.ottr.xyz/0.4/> . 
+@prefix ax: 	<http://tpl.ottr.xyz/owl/axiom/0.1/> . 
+@prefix rstr: 	<http://tpl.ottr.xyz/owl/restriction/0.1/> .
+#+END_SRC
+
+
+* Extracting data from RDF files and SPARQL endpoints
+** Exercise: Copying triples from SPARQL endpoints
+
+    The bOTTR map below retrieves 5 triples the SPARQL endpoint at
+    http://dbpedia.org/sparql and instantiates the base template
+    ~ottr:Triple~.
+
+    Change the ~ottr:InstanceMap~ so that it instead selects 5 type
+    relationships, i.e., triples with a ~rdf:type~ predicate, and
+    instantiates the ~ex:Type~ template found below.
+
+#+BEGIN_weblutra
+#+HTML: <input type="hidden" class="reset-value" data-name="inputFormat" value="bottr"/>
+#+BEGIN_input
+#+ATTR_HTML: :textarea t
+#+BEGIN_SRC ttl :noweb yes
+[] a ottr:InstanceMap ;
+    ottr:template ottr:Triple ;
+    ottr:query """
+        SELECT ?s ?p ?o 
+        WHERE { ?s ?p ?o } 
+        LIMIT 5
+    """ ;
+    ottr:source
+        [ a ottr:SPARQLEndpointSource ;
+          ottr:sourceURL "http://dbpedia.org/sparql" ] .
+#+END_SRC
+#+END_input
+
+#+BEGIN_library
+#+ATTR_HTML: :textarea t
+#+NAME: tpl-type
+#+BEGIN_SRC ttl :noweb yes
+ex:Type[ottr:IRI ?individual, ottr:IRI ?type] :: {
+  ottr:Triple(?individual, rdf:type, ?type)
+} .
+#+END_SRC
+#+END_library
+#+END_weblutra
+
+** Exercise: Collecting properties from RDF, RDFS and OWL
+
+    The following map collects 15 triples from the vocabulary
+    specifications of the RDF standards using ~ottr:RDFFileSource~ as
+    source.
+
+    1. Change the map so that it uses the ~ex:Type~ template and
+       outputs all the all properties that are defined in the RDF and
+       RDFS standards. The RDFS vocabulary is found at its IRI
+       ~http://www.w3.org/2000/01/rdf-schema~.
+
+    2. Add an additional ~ottr:InstanceMap~ that is based on the map
+       from 1., but which collects all the classes from the RDF, RDFS
+       and OWL vocabularies. The OWL vocabulary can be found at
+       ~http://www.w3.org/2002/07/owl~.
+
+#+BEGIN_weblutra
+#+HTML: <input type="hidden" class="reset-value" data-name="inputFormat" value="bottr"/>
+#+BEGIN_input
+#+ATTR_HTML: :textarea t
+#+BEGIN_SRC ttl :noweb yes
+[] a ottr:InstanceMap ;
+    ottr:template ottr:Triple ;
+    ottr:query """
+        SELECT ?s ?p ?o  
+	{ ?s ?p ?o }
+	LIMIT 15
+    """ ;
+    ottr:source
+        [ a ottr:RDFFileSource ;
+          ottr:sourceURL 
+	    "http://www.w3.org/2000/01/rdf-schema"
+        ] .
+#+END_SRC
+#+END_input
+
+#+BEGIN_library
+#+ATTR_HTML: :textarea t
+#+BEGIN_SRC ttl :noweb yes
+<<tpl-type>>
+#+END_SRC
+#+END_library
+#+END_weblutra
+
+** Exercise: Instantiating Person with data from dbpedia
+
+    The following map retrieves data about persons by querying
+    dbpedia's SPARQL endpoint. However, the output of the query does
+    not match the signature of the template. Change either the query
+    or the template so that the expansion works.
+
+#+BEGIN_weblutra
+#+HTML: <input type="hidden" class="reset-value" data-name="inputFormat" value="bottr"/>
+#+BEGIN_input
+#+ATTR_HTML: :textarea t
+#+BEGIN_SRC ttl :noweb yes
+[] a ottr:InstanceMap ;
+    ottr:template ex:Person ;
+    ottr:query """
+        PREFIX bif:<bif:> # virtuoso functions
+        SELECT 
+            ?person ?givenname ?surname
+            (bif:datediff('year', xsd:dateTime(str(?born)), xsd:dateTime(str(?died))) AS ?age)
+        WHERE { 
+	    ?person foaf:givenName ?givenname ;
+	       foaf:surname ?surname ;
+	       dbp:deathDate ?died ;
+               dbp:birthDate ?born .
+	    # ensure correct date format
+	    FILTER(regex(str(?born), "[0-9]{4}-[0-9]{2}-[0-9]{2}"))
+	    FILTER(regex(str(?died), "[0-9]{4}-[0-9]{2}-[0-9]{2}"))
+        }
+        LIMIT 20 
+    """ ;
+    ottr:source
+        [ a ottr:SPARQLEndpointSource ;
+          ottr:sourceURL "http://dbpedia.org/sparql" ] .
+#+END_SRC
+#+END_input
+
+#+BEGIN_library
+#+ATTR_HTML: :textarea t
+#+NAME: tpl-person
+#+BEGIN_SRC ttl
+ex:Person[ ?person, ?firstName, ?lastName, ?email ] :: {
+  ottr:Triple (?person, rdf:type, foaf:Person ),
+  ottr:Triple (?person, foaf:firstName, ?firstName ),
+  ottr:Triple (?person, foaf:lastName, ?lastName ),
+  ottr:Triple (?person, foaf:mbox, ?email )
+} .
+#+END_SRC
+#+END_library
+#+END_weblutra
+
+
+** Exercise: Instantiating NamedPizza directly from the PizzaOntology
+
+    The following map instantiates the NamedPizza template by querying
+    the PizzaOntology. Note the use of ~GROUP_CONCAT~ to create a list
+    (represented as a list), and the use of ~ottr:argumentMaps~ to
+    split this list into a list argument.
+
+#+BEGIN_weblutra
+
+#+HTML: <input type="hidden" class="reset-value" data-name="inputFormat" value="bottr"/>
+#+HTML: <input type="hidden" class="reset-value" data-name="fetchMissing" value="true"/>
+#+BEGIN_input
+#+ATTR_HTML: :textarea t
+#+BEGIN_SRC ttl :noweb yes
+[] a ottr:InstanceMap ;
+    ottr:template <http://tpl.ottr.xyz/pizza/0.1/NamedPizza> ;
+    ottr:query """
+PREFIX  p: <http://www.co-ode.org/ontologies/pizza/pizza.owl#>
+SELECT 
+  ?pizza 
+  ?country 
+  (GROUP_CONCAT(DISTINCT ?topping; SEPARATOR=";") AS ?toppingslist)
+WHERE
+  {
+    ?pizza  
+        rdfs:subClassOf  p:NamedPizza ;
+        rdfs:subClassOf [
+            owl:allValuesFrom   [ owl:unionOf ?toppings ; rdf:type owl:Class ] ;
+            owl:onProperty      p:hasTopping ;
+            rdf:type            owl:Restriction ] ;
+        rdfs:subClassOf [
+            owl:onProperty      p:hasTopping ;
+            owl:someValuesFrom  ?topping ;
+            rdf:type            owl:Restriction ] .
+
+    ?toppings  (rdf:rest)*/rdf:first ?topping .
+
+    OPTIONAL {
+        ?pizza  
+            rdfs:subClassOf [
+                owl:hasValue        ?country ;
+                owl:onProperty      p:hasCountryOfOrigin ;
+                rdf:type            owl:Restriction ] .
+    }                
+  }
+GROUP BY ?pizza ?country
+LIMIT 1
+ """ ;
+    ottr:source
+        [ a ottr:RDFFileSource ;
+          ottr:sourceURL 
+	    "https://protege.stanford.edu/ontologies/pizza/pizza.owl" ] ;
+    ottr:argumentMaps (
+      []
+      []
+      [ ottr:type (rdf:List ottr:IRI); 
+        ottr:translationSettings [ ottr:listSep ";"] 
+      ]
+   ) .
+#+END_SRC
+#+END_input
+#+END_weblutra
+
+
+* Extracting data from CSV files and relational databases
+
+** Exercise: Instantiate Person
+
+    The spreadsheet [[./files/04-bOTTR/persons.csv][persons.csv]] contains data about people. In order
+    to instantiate the ~ex:Person~ template, we shall do the following
+    changes:
+
+    - Use ~CONCAT~ function to create an IRI from the surname and use
+      this as 1. argument to the templat
+    - Create a email address from the given name and surname and use
+      this as 4. argument to the template
+    - Set the correct type of the argument maps.
+
+#+BEGIN_weblutra
+#+HTML: <input type="hidden" class="reset-value" data-name="inputFormat" value="bottr"/>
+#+BEGIN_input
+#+ATTR_HTML: :textarea t
+#+BEGIN_SRC ttl :noweb yes
+[] a ottr:InstanceMap ;
+    ottr:source [ a ottr:H2Source ] ;
+    ottr:query """
+      SELECT 
+          -- add something here
+        "Given name",
+        Surname, 
+          -- add something here
+      FROM CSVREAD('@@THIS_DIR@@/persons.csv');
+    """ ;
+    ottr:template ex:Person ;
+    ottr:argumentMaps (
+      [ ]
+      [ ]
+      [ ] 
+      [ ] 
+    ) .
+#+END_SRC
+#+END_input
+
+#+HTML: <div class="menu">CSV file<br/>
+#+HTML:   <input type="file" name="fileData">
+#+HTML: </div>
+
+#+BEGIN_library
+#+ATTR_HTML: :textarea t
+#+BEGIN_SRC ttl :noweb yes
+<<tpl-person>>
+#+END_SRC
+#+END_library
+#+END_weblutra
+
+** Exercise: Instantiate Organization
+
+    The spreadsheet [[./files/04-bOTTR/organizations.csv][organizations.csv]] contains data about
+    organisations and the map below is an attempt to instantiate the
+    ~ex:Organization~ template. However, to complete the map,
+    the 3. and 4. argumentmaps must have correct type, and
+    the 1. parameter of the template must accept missing values.
+
+#+BEGIN_weblutra
+#+HTML: <input type="hidden" class="reset-value" data-name="inputFormat" value="bottr"/>
+#+BEGIN_input
+#+ATTR_HTML: :textarea t
+#+BEGIN_SRC ttl :noweb yes
+[] a ottr:InstanceMap ;
+    ottr:source [ a ottr:H2Source ] ;
+    ottr:query """
+      SELECT 
+        NULL, -- change the template to accept none
+        Organization, 
+        DATEDIFF(YEAR, Founded, TODAY()), 
+        Homepage
+      FROM CSVREAD('@@THIS_DIR@@/organizations.csv');
+    """ ;
+    ottr:template ex:Organization ;
+    ottr:argumentMaps (
+      [ ]
+      [ ]
+      [ ] # set correct type
+      [ ] # set correct type
+    ) .
+#+END_SRC
+#+END_input
+
+#+HTML: <div class="menu">CSV file<br/>
+#+HTML:   <input type="file" name="fileData">
+#+HTML: </div>
+
+#+BEGIN_library
+#+ATTR_HTML: :textarea t
+#+BEGIN_SRC ttl :noweb yes
+ex:Organization[ottr:IRI ?org, xsd:string ?name, xsd:int ?age, ottr:IRI ?url] :: {
+    ex:Type(?org, foaf:Organization),
+    ottr:Triple(?org, foaf:name, ?name),
+    ottr:Triple(?org, foaf:age, ?age),
+    ottr:Triple(?org, foaf:homepage, ?url)
+} .
+
+<<tpl-type>>
+#+END_SRC
+#+END_library
+#+END_weblutra
+
+* Notes                                                            :noexport:
+
+#+BEGIN_SRC ttl
+SELECT ?name ?birth ?description ?person WHERE {
+      ?person a dbo:MusicalArtist .
+      ?person dbo:birthPlace :Berlin .
+      ?person dbo:birthDate ?birth .
+      ?person foaf:name ?name .
+      ?person rdfs:comment ?description .
+      FILTER (LANG(?description) = 'en') . 
+} ORDER BY ?name
+#+END_SRC
+
+#+BEGIN_SRC ttl
+SELECT * WHERE {      
+#?person dbo:birthPlace :Berlin .      
+?person dbo:birthDate ?birth .      
+?person foaf:name ?name .
+?person foaf:givenName ?givenname .      
+?person foaf:surname ?surname .      
+?person dbo:deathDate ?death . 
+?person <http://purl.org/dc/terms/description> ?description .
+?person foaf:gender ?gender . 
+#FILTER (?birth > "1900-01-01"^^xsd:date) . 
+} 
+LIMIT 30
+#+END_SRC
+
+
+
+
+* References
+
+  - <<bottr>> Batch Instantiation of OTTR templates http://spec.ottr.xyz/bOTTR/0.1/
+
+* Appendix
+#+INCLUDE: "./inc/appendix.org"
+

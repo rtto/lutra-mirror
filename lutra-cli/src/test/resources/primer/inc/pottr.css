@@ -1,0 +1,11 @@
+
+h2.showBtn::before, h4.showBtn::before {
+    content: "\25BF " ;
+    margin-right: 5px;
+}
+
+h2.hideBtn::before, h4.hideBtn::before {
+    content: "\25B9 ";
+    margin-right: 5px;
+}
+

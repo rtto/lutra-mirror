@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2020-03-09 Mon 11:37 -->
+<meta  charset="utf-8" />
+<meta  name="viewport" content="width=device-width, initial-scale=1" />
+<title>pOTTR: Converting spreadsheets to knowledge graphs with tabOTTR</title>
+<meta  name="generator" content="Org-mode" />
+<meta  name="author" content="root" />
+<link rel="stylesheet" type="text/css" href="https://www.ottr.xyz/inc/spec.css" />
+<script type="application/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script type="application/javascript" src="https://www.ottr.xyz/inc/toc.js"></script>
+<link rel="stylesheet" type="text/css" href="https://weblutra.ottr.xyz/js/weblutrabox.css" />
+<script type="application/javascript" src="https://weblutra.ottr.xyz/js/weblutrabox.js"></script>
+<link rel="stylesheet" type="text/css" href="./inc/pottr.css" />
+<script type="application/javascript" src="./inc/pottr.js"></script>
+</head>
+<body>
+<div id="content">
+<header>
+<h1 class="title">pOTTR: Converting spreadsheets to knowledge graphs with tabOTTR</h1>
+</header><div id="left">
+<p>
+<a href="#top">top</a>
+</p>
+<h4>Table of Contents</h4>
+<div id="toc"></div>
+</div>
+
+<div id="right">
+
+<h1 id="top" class="title">Converting spreadsheets to knowledge graphs with tabOTTR</h1>
+<img id="logo" alt="pOTTR" src="http://www.ottr.xyz/logo/pOTTR.png"/>
+<p>
+<b>Convert spreadsheets to OTTR template instances</b>
+</p>
+
+<dl class="org-dl">
+<dt>Authors</dt><dd>Martin G. Skjæveland</dd>
+<dt>Issues</dt><dd><a href="https://gitlab.com/ottr/language/pOTTR/issues">https://gitlab.com/ottr/language/pOTTR/issues</a></dd>
+</dl>
+
+<div id="toc-content">
+
+<div id="outline-container-orgheadline2" class="outline-2">
+<h2 id="orgheadline2"><span class="section-number-2">1</span> Introduction</h2>
+<div class="outline-text-2" id="text-1">
+<p>
+This chapter introduces tabOTTR [<a href="#orgtarget1">1</a>] by giving exercises on
+using tabOTTR to annotate spreadsheets for specifying OTTR template
+instances.
+</p>
+
+<p>
+More examples and introductory text can be found in the tabOTTR
+specification [<a href="#orgtarget1">1</a>].
+</p>
+</div>
+
+<div id="outline-container-orgheadline1" class="outline-3">
+<h3 id="prefixes"><a id="orgheadline1"></a><span class="section-number-3">1.1</span> Prefixes</h3>
+<div class="outline-text-3" id="text-prefixes">
+<p>
+The following prefixes are used throughout the document, and may be
+used in the text input areas of the interactive examples without
+declaration.
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-ttl" id="orgsrcblock1">@prefix rdf:    &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#&gt; . 
+@prefix rdfs:   &lt;http://www.w3.org/2000/01/rdf-schema#&gt; . 
+@prefix owl:    &lt;http://www.w3.org/2002/07/owl#&gt; . 
+@prefix xsd:    &lt;http://www.w3.org/2001/XMLSchema#&gt; . 
+@prefix foaf:   &lt;http://xmlns.com/foaf/0.1/&gt; . 
+@prefix dbp:    &lt;http://dbpedia.org/ontology/&gt; . 
+@prefix ex:     &lt;http://example.com/ns#&gt; . 
+@prefix ottr:   &lt;http://ns.ottr.xyz/0.4/&gt; . 
+@prefix ax:     &lt;http://tpl.ottr.xyz/owl/axiom/0.1/&gt; . 
+@prefix rstr:   &lt;http://tpl.ottr.xyz/owl/restriction/0.1/&gt; .
+</pre>
+</div>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-orgheadline6" class="outline-2">
+<h2 id="orgheadline6"><span class="section-number-2">2</span> Expanding instances</h2>
+<div class="outline-text-2" id="text-2">
+</div><div id="outline-container-orgheadline3" class="outline-3">
+<h3 id="orgheadline3"><span class="section-number-3">2.1</span> Exercise: Add prefix declaration and instance data</h3>
+<div class="outline-text-3" id="text-2-1">
+<p>
+The spreadsheet <a href="./files/03-tabOTTR/types.xlsx">types.xlsx</a> contains one sheet with instances of
+the <code>ex:Type</code> template that expands to RDF on the following form:
+</p>
+
+<pre class="example">
+&lt;http://example.com/data#a11&gt;
+        a       &lt;http://example.com/schema#ClassA&gt; .
+</pre>
+
+<p>
+Download the spreadsheet and do the following.
+</p>
+
+<p>
+Add a new prefix declaration with the prefix <code>test</code> and namespace
+<code>http://example.com/test#</code> to the already existing prefix
+instruction in the first sheet of the spreadsheet file, and all
+more instances to the existing template instruction:
+</p>
+
+<table>
+
+
+<colgroup>
+<col  class="org-left" />
+
+<col  class="org-left" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">instance data</th>
+<th scope="col" class="org-left">type data</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left">test:b12</td>
+<td class="org-left">schema:ClassB</td>
+</tr>
+
+<tr>
+<td class="org-left">test:b13</td>
+<td class="org-left">schema:ClassB</td>
+</tr>
+
+<tr>
+<td class="org-left">test:b14</td>
+<td class="org-left">schema:ClassB</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+Expand the spreadsheet.
+</p>
+
+<div class="weblutra">
+<p>
+
+</p>
+
+<div class="menu">tabOTTR Excel file<br/>
+<input id="fileInput" type="file" name="fileInput">
+<input type="hidden" name="inputFormat" value="tabottr"/>
+</div>
+
+<div class="library">
+<p>
+<textarea cols="80" rows="3">
+ex:Type[ottr:IRI ?individual, ottr:IRI ?type] :: {
+  ottr:Triple(?individual, rdf:type, ?type)
+} .
+</textarea>
+</p>
+
+</div>
+
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgheadline4" class="outline-3">
+<h3 id="orgheadline4"><span class="section-number-3">2.2</span> Exercise: Add tabOTTR template instruction</h3>
+<div class="outline-text-3" id="text-2-2">
+<p>
+The second sheet of the spreadsheet file <a href="./files/03-tabOTTR/types.xlsx">types.xlsx</a> contains data
+which is not annotated with tabOTTR instructions. Add the
+necessary tabOTTR instructions so that the row
+</p>
+
+<table>
+
+
+<colgroup>
+<col  class="org-left" />
+
+<col  class="org-left" />
+</colgroup>
+<tbody>
+<tr>
+<td class="org-left">c11</td>
+<td class="org-left">ClassC</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+expands to
+</p>
+<pre class="example">
+&lt;http://example.com/test#c11&gt;
+        a       &lt;http://example.com/schema#ClassC&gt; .
+</pre>
+
+<p>
+Try to solve the exercise without altering the data, but rather
+create new columns that use spreadsheet the formula <code>CONCATENATE</code>
+to add the required prefixes to the data. (Note that not all
+functions are supported by the external API that WebLutra/Lutra
+uses, however <code>CONCATENATE</code> is, (but <code>CONCAT</code> is not).)
+</p>
+
+<p>
+Use the indices of the template instruction to select the columns
+that should become instance arguments.
+</p>
+
+<div class="weblutra">
+<p>
+
+</p>
+
+<div class="menu">tabOTTR Excel file<br/>
+<input id="fileInput" type="file" name="fileInput">
+<input type="hidden" name="inputFormat" value="tabottr"/>
+</div>
+
+<div class="library">
+<p>
+<textarea cols="80" rows="3">
+ex:Type[ottr:IRI ?individual, ottr:IRI ?type] :: {
+  ottr:Triple(?individual, rdf:type, ?type)
+} .
+</textarea>
+</p>
+
+</div>
+
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgheadline5" class="outline-3">
+<h3 id="orgheadline5"><span class="section-number-3">2.3</span> Exercise: Expand NamedPizza instances</h3>
+<div class="outline-text-3" id="text-2-3">
+<p>
+The spreadsheet <a href="./files/03-tabOTTR/PizzaOntologyInstances.xlsx">PizzaOntologyInstances.xlsx</a> contains several
+instances of the <a href="http://tpl.ottr.xyz/pizza/0.1/NamedPizza">NamedPizza</a> template.
+</p>
+
+<p>
+Download the spreadsheet and note how lists are defined, and how
+types are set. Expand the spreadsheet.
+</p>
+
+<div class="weblutra">
+<p>
+
+</p>
+
+<input type="hidden" class="reset-value" data-name="fetchMissing" value="true"/>
+<div class="menu">tabOTTR Excel file<br/>
+<input id="fileInput" type="file" name="fileInput">
+<input type="hidden" name="inputFormat" value="tabottr"/>
+</div>
+
+</div>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgheadline9" class="outline-2">
+<h2 id="orgheadline9"><span class="section-number-2">3</span> Adapting tabular data to template signatures</h2>
+<div class="outline-text-2" id="text-3">
+</div><div id="outline-container-orgheadline7" class="outline-3">
+<h3 id="orgheadline7"><span class="section-number-3">3.1</span> Exercise: Adapt and instantiate Organization</h3>
+<div class="outline-text-3" id="text-3-1">
+<p>
+The spreadsheet <a href="./files/03-tabOTTR/organizations.xlsx">organizations.xlsx</a> contains data about
+organisations. Add the neccesary tabOTTR instructions to the
+spreadsheet so that the data can be expanded as instances of the
+<code>ex:Organization</code> template below. You may also make adjustments to
+the template <code>ex:Organization</code> if you wish.
+</p>
+
+<p>
+Tips:
+</p>
+<ul class="org-ul">
+<li>Remember to add a prefix instruction, if you use prefixes.</li>
+<li>Try to use auto typing:
+<a href="https://spec.ottr.xyz/tabOTTR/0.3/#2.3.3_auto_typing">https://spec.ottr.xyz/tabOTTR/0.3/#2.3.3_auto_typing</a></li>
+<li>Invent an IRI for each organization, use a blank node, or change
+the signature of <code>ex:Organization</code> by setting a blank node as
+default value.</li>
+<li>You can use the formula <code>=DATEDIF([cellref], TODAY(), "y")</code> to
+calculate the difference in years between <code>[cellref]</code> and
+today. Note however, that this function is not supported by the
+external API that WebLutra/Lutra uses, therefore you must copy
+the contents of the column into a new column and remove the
+column containing the formulas.</li>
+</ul>
+
+<div class="weblutra">
+<p>
+
+</p>
+
+<div class="menu">tabOTTR Excel file<br/>
+<input id="fileInput" type="file" name="fileInput">
+<input type="hidden" name="inputFormat" value="tabottr"/>
+</div>
+
+<div class="library">
+<p>
+<textarea cols="80" rows="10">
+ex:Organization[ottr:IRI ?org, xsd:string ?name, xsd:int ?age, ottr:IRI ?url] :: {
+    ex:Type(?org, foaf:Organization),
+    ottr:Triple(?org, foaf:name, ?name),
+    ottr:Triple(?org, foaf:age, ?age),
+    ottr:Triple(?org, foaf:homepage, ?url)
+} .
+
+ex:Type[ottr:IRI ?individual, ottr:IRI ?type] :: {
+  ottr:Triple(?individual, rdf:type, ?type)
+} .
+</textarea>
+</p>
+
+</div>
+
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgheadline8" class="outline-3">
+<h3 id="orgheadline8"><span class="section-number-3">3.2</span> Exercise: Adapt and instantiate Person</h3>
+<div class="outline-text-3" id="text-3-2">
+<p>
+The spreadsheet <a href="./files/03-tabOTTR/persons.xlsx">persons.xlsx</a> contains data about persons. Add the
+neccesary tabOTTR instructions to the spreadsheet so that the data
+can be expanded as instances of the <code>ex:Person</code> template below.
+Try to extend the template to include all the information in the
+spreadsheet.
+</p>
+
+<div class="weblutra">
+<p>
+
+</p>
+
+<div class="menu">tabOTTR Excel file<br/>
+<input id="fileInput" type="file" name="fileInput">
+<input type="hidden" name="inputFormat" value="tabottr"/>
+</div>
+
+<div class="library">
+<p>
+<textarea cols="80" rows="6">
+ex:Person[ ?person, ?firstName, ?lastName, ?email ] :: {
+  ottr:Triple (?person, rdf:type, foaf:Person ),
+  ottr:Triple (?person, foaf:firstName, ?firstName ),
+  ottr:Triple (?person, foaf:lastName, ?lastName ),
+  ottr:Triple (?person, foaf:mbox, ?email )
+} .
+</textarea>
+</p>
+
+</div>
+
+</div>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-orgheadline10" class="outline-2">
+<h2 id="orgheadline10"><span class="section-number-2">4</span> References</h2>
+<div class="outline-text-2" id="text-4">
+<ul class="org-ul">
+<li><a id="orgtarget1"></a> Tabular OTTR template instances  <a href="http://spec.ottr.xyz/tabOTTR/0.3/">http://spec.ottr.xyz/tabOTTR/0.3/</a></li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-orgheadline12" class="outline-2">
+<h2 id="orgheadline12"><span class="section-number-2">5</span> Appendix</h2>
+<div class="outline-text-2" id="text-5">
+</div><div id="outline-container-orgheadline11" class="outline-3">
+<h3 id="orgheadline11"><span class="section-number-3">5.1</span> WebLutra</h3>
+<div class="outline-text-3" id="text-5-1">
+<p>
+The web application that drives the interactive examples in this
+primer, called WebLutra, uses Lutra, the reference application for
+OTTR. Both applications are open source and available at
+<a href="http://gitlab.com/ottr/lutra/lutra">http://gitlab.com/ottr/lutra/lutra</a>. If you experience errors or have
+suggestions for improvements, please take a look at existing issues
+or file a new issue: <a href="http://gitlab.com/ottr/lutra/lutra/issues">http://gitlab.com/ottr/lutra/lutra/issues</a>
+</p>
+</div>
+</div>
+</div>
+</div>
+</body>
+</html>

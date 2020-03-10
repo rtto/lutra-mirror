@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2020-03-09 Mon 11:37 -->
+<meta  charset="utf-8" />
+<meta  name="viewport" content="width=device-width, initial-scale=1" />
+<title>pOTTR: Incrementally building a template library</title>
+<meta  name="generator" content="Org-mode" />
+<meta  name="author" content="root" />
+<link rel="stylesheet" type="text/css" href="https://www.ottr.xyz/inc/spec.css" />
+<script type="application/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script type="application/javascript" src="https://www.ottr.xyz/inc/toc.js"></script>
+<link rel="stylesheet" type="text/css" href="https://weblutra.ottr.xyz/js/weblutrabox.css" />
+<script type="application/javascript" src="https://weblutra.ottr.xyz/js/weblutrabox.js"></script>
+<link rel="stylesheet" type="text/css" href="./inc/pottr.css" />
+<script type="application/javascript" src="./inc/pottr.js"></script>
+</head>
+<body>
+<div id="content">
+<header>
+<h1 class="title">pOTTR: Incrementally building a template library</h1>
+</header><div id="left">
+<p>
+<a href="#top">top</a>
+</p>
+<h4>Table of Contents</h4>
+<div id="toc"></div>
+</div>
+
+<div id="right">
+
+<h1 id="top" class="title">Incrementally building a template library</h1>
+<img id="logo" alt="pOTTR" src="http://www.ottr.xyz/logo/pOTTR.png"/>
+<p>
+<b>A top-down modelling approach for building template libraries.</b>
+</p>
+
+<dl class="org-dl">
+<dt>Authors</dt><dd>Daniel Lupp</dd>
+<dt>Issues</dt><dd><a href="https://gitlab.com/ottr/language/pOTTR/issues">https://gitlab.com/ottr/language/pOTTR/issues</a></dd>
+</dl>
+
+<div id="toc-content">
+
+<div id="outline-container-orgheadline2" class="outline-2">
+<h2 id="orgheadline2"><span class="section-number-2">1</span> Introduction</h2>
+<div class="outline-text-2" id="text-1">
+<p>
+In this chapter will incrementally build a set of templates that model
+the domain of mobile phone with the goal of representing the design of
+the phone, i.e., which parts different models of phone consist of, and
+the specific parts a specific phone (individual) consists of.
+</p>
+
+<p>
+The reader should know the <a href="./01-basics.html">basics of OTTR</a>.
+</p>
+</div>
+
+<div id="outline-container-orgheadline1" class="outline-3">
+<h3 id="prefixes"><a id="orgheadline1"></a><span class="section-number-3">1.1</span> Prefixes</h3>
+<div class="outline-text-3" id="text-prefixes">
+<p>
+The following prefixes are used throughout the document, and may be
+used in the text input areas of the interactive examples without
+declaration.
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-ttl" id="orgsrcblock1">@prefix rdf:    &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#&gt; . 
+@prefix rdfs:   &lt;http://www.w3.org/2000/01/rdf-schema#&gt; . 
+@prefix owl:    &lt;http://www.w3.org/2002/07/owl#&gt; . 
+@prefix xsd:    &lt;http://www.w3.org/2001/XMLSchema#&gt; . 
+@prefix foaf:   &lt;http://xmlns.com/foaf/0.1/&gt; . 
+@prefix dbp:    &lt;http://dbpedia.org/ontology/&gt; . 
+@prefix ex:     &lt;http://example.com/ns#&gt; . 
+@prefix ottr:   &lt;http://ns.ottr.xyz/0.4/&gt; . 
+@prefix ax:     &lt;http://tpl.ottr.xyz/owl/axiom/0.1/&gt; . 
+@prefix rstr:   &lt;http://tpl.ottr.xyz/owl/restriction/0.1/&gt; .
+</pre>
+</div>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-orgheadline5" class="outline-2">
+<h2 id="orgheadline5"><span class="section-number-2">2</span> Defining core patterns</h2>
+<div class="outline-text-2" id="text-2">
+</div><div id="outline-container-orgheadline3" class="outline-3">
+<h3 id="orgheadline3"><span class="section-number-3">2.1</span> Exercise: Creating a signature</h3>
+<div class="outline-text-3" id="text-2-1">
+<p>
+Based on the following instances, write a suitable signature for
+the template <code>ex:Phone</code>. Ignore for now that it is a base
+template, in the following exercises we will define it in more
+detail.
+</p>
+
+<div class="weblutra">
+<div class="input">
+<p>
+<textarea cols="80" rows="3">
+ex:Phone(ex:Nokia3310, (ex:Screen, ex:HardCase, ex:CPU), "indestructible"^^xsd:string).
+ex:Phone(ex:SamsungS9, (ex:CurvedScreen, ex:FastCPU), none).
+ex:Phone(ex:iPhone8, (ex:RetinaScreen, ex:OtherFastCPU, ex:FPReader), "iphone"^^xsd:string).
+</textarea>
+</p>
+
+</div>
+
+<div class="library">
+<p>
+<textarea cols="80" rows="1">
+ex:Phone[<fill in>] :: BASE.
+</textarea>
+</p>
+
+</div>
+
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-orgheadline4" class="outline-3">
+<h3 id="orgheadline4"><span class="section-number-3">2.2</span> Exercise: Extending the signature to a template</h3>
+<div class="outline-text-3" id="text-2-2">
+<p>
+Use the templates below as well as existing OWL templates to
+create the <code>ex:Phone</code> template. Use <code>ex:ConsistsOf</code> as a black box
+(this template will be defined in the next exercise).
+</p>
+
+<div class="weblutra">
+<p>
+
+</p>
+
+<div class="input">
+<p>
+<textarea cols="80" rows="3">
+ex:Phone(ex:Nokia3310, (ex:Screen, ex:HardCase, ex:CPU), "indestructible"^^xsd:string).
+ex:Phone(ex:SamsungS9, (ex:CurvedScreen, ex:FastCPU), none).
+ex:Phone(ex:iPhone8, (ex:RetinaScreen, ex:OtherFastCPU, ex:FPReader), "iphone"^^xsd:string).
+</textarea>
+</p>
+
+</div>
+
+<div class="library">
+<p>
+<textarea cols="80" rows="15">
+# ?name: the name of a particular class of phone
+# ?components: the list of components the phone consists of
+# ?label: an optional label
+# Pattern description: ?name is a subclass of ex:Phone and consists of
+#   all components in ?components. It has an optional label ?label.
+
+ex:Phone[owl:Class ?name, NEList<owl:Class> ?components, ? xsd:string ?label] :: {
+  # <fill in>
+} .
+
+
+# ?device: the name of the device
+# ?components: the components the device consists of
+
+ex:ConsistsOf[owl:Class ?device, NEList<owl:Class> ?components] :: BASE.
+</textarea>
+</p>
+
+</div>
+
+</div>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgheadline8" class="outline-2">
+<h2 id="orgheadline8"><span class="section-number-2">3</span> Refining incrementally</h2>
+<div class="outline-text-2" id="text-3">
+</div><div id="outline-container-orgheadline6" class="outline-3">
+<h3 id="orgheadline6"><span class="section-number-3">3.1</span> Exercise: Add ConsistsOf</h3>
+<div class="outline-text-3" id="text-3-1">
+<p>
+Use the <code>ex:HasComponents</code> and <code>ex:OnlyComponents</code> templates below
+to define the <code>ex:ConsistsOf</code> template. We will define
+<code>ex:HasComponents</code> and <code>ex:OnlyComponents</code> in the next exercise.
+</p>
+
+<div class="weblutra">
+<input type="hidden" class="reset-value" data-name="fetchMissing" value="true"/>
+<div class="input">
+<p>
+<textarea cols="80" rows="3">
+ex:Phone(ex:Nokia3310, (ex:Screen, ex:HardCase, ex:CPU), "indestructible"^^xsd:string).
+ex:Phone(ex:SamsungS9, (ex:CurvedScreen, ex:FastCPU), none).
+ex:Phone(ex:iPhone8, (ex:RetinaScreen, ex:OtherFastCPU, ex:FPReader), "iphone"^^xsd:string).
+</textarea>
+</p>
+
+</div>
+
+<div class="library">
+<p>
+<textarea cols="80" rows="24">
+# ?device: the name of the class of device
+# ?components: the list of components ?device consists of
+# Pattern description: ?device consists of precisely the components in
+#   ?components: it has one component from each class in ?components,
+#   and any component ?device has must be from ?components
+
+ex:ConsistsOf[owl:Class ?device, NEList<owl:Class> ?components] :: {
+  # <fill in>
+}.
+
+# indicates that ?item has a component from each of the classes in ?components
+ex:HasComponents[owl:Class ?item, NEList<owl:Class> ?components] :: BASE.
+
+# indicates that ?item only has components from the classes in ?components
+ex:OnlyComponents[owl:Class ?item, NEList<owl:Class> ?components] :: BASE.
+
+
+### Previously defined:
+
+ex:Phone[owl:Class ?name, NEList<owl:Class> ?components, ? xsd:string ?label] :: {
+  ax:SubClassOf(?name, ex:Phone),
+  ottr:Triple(?name, rdfs:label, ?label),
+  ex:ConsistsOf(?name, ?components)
+}.
+</textarea>
+</p>
+
+</div>
+
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgheadline7" class="outline-3">
+<h3 id="orgheadline7"><span class="section-number-3">3.2</span> Exercise: Add HasComponents and OnlyComponents</h3>
+<div class="outline-text-3" id="text-3-2">
+<p>
+Use <code>ex:HasComponent</code> below as well as existing OWL and RDFS
+templates to define <code>ex:HasComponents</code> and
+<code>ex:OnlyComponents</code>. (Hint: look at <a href="http://tpl.ottr.xyz/owl/restriction/0.1/ObjectUnionOf.ttl">rstr:ObjectUnionOf</a> and
+<a href="http://tpl.ottr.xyz/owl/axiom/0.1/SubObjectAllValuesFrom.ttl">ax:SubObjectAllValuesFrom</a>).
+</p>
+
+
+<div class="weblutra">
+<input type="hidden" class="reset-value" data-name="fetchMissing" value="true"/>
+<div class="input">
+<p>
+<textarea cols="80" rows="3">
+ex:Phone(ex:Nokia3310, (ex:Screen, ex:HardCase, ex:CPU), "indestructible"^^xsd:string).
+ex:Phone(ex:SamsungS9, (ex:CurvedScreen, ex:FastCPU), none).
+ex:Phone(ex:iPhone8, (ex:RetinaScreen, ex:OtherFastCPU, ex:FPReader), "iphone"^^xsd:string).
+</textarea>
+</p>
+
+</div>
+
+<div class="library">
+<p>
+<textarea cols="80" rows="34">
+# ?item: the name of a class of items
+# ?components: a list of component classes
+# Pattern description: ?item has a component from each of the classes in ?components
+
+ex:HasComponents[owl:Class ?item, NEList<owl:Class> ?components] :: {
+  # <fill in>
+}.
+
+
+# ?item: the name of a class of items
+# ?components: a list of component classes
+# Pattern description: any component ?item is related to via
+#   ex:hasComponent must come from the union of classes in ?components
+
+ex:OnlyComponents[owl:Class ?item, NEList<owl:Class> ?components] :: {
+  # <fill in>
+}.
+
+ex:HasComponent[owl:Class ?item, owl:Class ?component] :: {
+  ax:SubObjectSomeValuesFrom(?item, ex:hasComponent, ?component)
+}.
+
+### Previously defined:
+
+ex:Phone[owl:Class ?name, NEList<owl:Class> ?components, ? xsd:string ?label] :: {
+  ax:SubClassOf(?name, ex:Phone),
+  ottr:Triple(?name, rdfs:label, ?label),
+  ex:ConsistsOf(?name, ?components)
+}.
+
+ex:ConsistsOf[owl:Class ?item, NEList<owl:Class> ?components] :: {
+  ex:HasComponents(?item, ?components),
+  ex:OnlyComponents(?item, ?components)
+}.
+</textarea>
+</p>
+
+</div>
+
+</div>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgheadline11" class="outline-2">
+<h2 id="orgheadline11"><span class="section-number-2">4</span> Instantiation</h2>
+<div class="outline-text-2" id="text-4">
+</div><div id="outline-container-orgheadline9" class="outline-3">
+<h3 id="orgheadline9"><span class="section-number-3">4.1</span> Exercise: Add PhoneInstance</h3>
+<div class="outline-text-3" id="text-4-1">
+<p>
+Now we are going to create a template for populating phone
+classes: <code>ex:PhoneInstance</code>. Define the template
+<code>ex:PhoneInstance</code> below.
+</p>
+
+<div class="weblutra">
+<input type="hidden" class="reset-value" data-name="fetchMissing" value="true"/>
+<div class="input">
+<p>
+<textarea cols="80" rows="3">
+ex:Phone(ex:Nokia3310, (ex:Screen, ex:HardCase, ex:CPU), "indestructible"^^xsd:string).
+ex:Phone(ex:SamsungS9, (ex:CurvedScreen, ex:FastCPU), none).
+ex:Phone(ex:iPhone8, (ex:RetinaScreen, ex:OtherFastCPU, ex:FPReader), "iphone"^^xsd:string).
+</textarea>
+</p>
+
+</div>
+
+<div class="library">
+<p>
+<textarea cols="80" rows="32">
+# ?phoneInstance: the identifer for a specific phone
+# ?phone: a class of phones
+# ?components: a list of specific components
+# Pattern description: ?phoneInstance is of type ?phone and has the
+#   components (i.e., is related to via ex:hasComponent) given in ?components.
+
+ex:PhoneInstance[owl:NamedIndividual ?phoneInstance, owl:Class ?phone, NEList<owl:NamedIndividual> ?components] :: {
+    # <fill in>
+}.
+
+
+### Previously defined:
+
+ex:Phone[owl:Class ?name, NEList<owl:Class> ?components, ? xsd:string ?label] :: {
+  ax:SubClassOf(?name, ex:Phone),
+  ottr:Triple(?name, rdfs:label, ?label),
+  ex:ConsistsOf(?name, ?components)
+}.
+ex:ConsistsOf[owl:Class ?item, NEList<owl:Class> ?components] :: {
+  ex:HasComponents(?item, ?components),
+  ex:OnlyComponents(?item, ?components)
+}.
+ex:HasComponent[owl:Class ?item, owl:Class ?component] :: {
+  ax:SubObjectSomeValuesFrom(?item, ex:hasComponent, ?component)
+}.
+ex:HasComponents[owl:Class ?item, NEList<owl:Class> ?components] :: {
+  cross | ex:HasComponent(?item, ++?components)
+}.
+ex:OnlyComponents[owl:Class ?item, NEList<owl:Class> ?components] :: {
+  rstr:ObjectUnionOf(_:b, ?components),
+  ax:SubObjectAllValuesFrom(?item, ex:hasComponent, _:b)
+}.
+</textarea>
+</p>
+
+</div>
+
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgheadline10" class="outline-3">
+<h3 id="orgheadline10"><span class="section-number-3">4.2</span> Exercise: Instantiation</h3>
+<div class="outline-text-3" id="text-4-2">
+<p>
+Create one or more new phone classes and populate them with
+specific phones.
+</p>
+
+<div class="weblutra">
+<input type="hidden" class="reset-value" data-name="fetchMissing" value="true"/>
+<div class="input">
+<p>
+<textarea cols="80" rows="3">
+ex:Phone(ex:Nokia3310, (ex:Screen, ex:HardCase, ex:CPU), "indestructible"^^xsd:string).
+ex:Phone(ex:SamsungS9, (ex:CurvedScreen, ex:FastCPU), none).
+ex:Phone(ex:iPhone8, (ex:RetinaScreen, ex:OtherFastCPU, ex:FPReader), "iphone"^^xsd:string).
+</textarea>
+</p>
+
+</div>
+
+<div class="library">
+<p>
+<textarea cols="80" rows="26">
+### Previously defined:
+
+ex:PhoneInstance[owl:NamedIndividual ?phoneInstance, owl:Class ?phone, NEList<owl:NamedIndividual> ?components] :: {
+   ottr:Triple(?phoneInstance, rdf:type, ?phone),
+   cross | ottr:Triple(?phoneInstance, ex:hasComponent, ++?components)
+}.
+
+ex:Phone[owl:Class ?name, NEList<owl:Class> ?components, ? xsd:string ?label] :: {
+  ax:SubClassOf(?name, ex:Phone),
+  ottr:Triple(?name, rdfs:label, ?label),
+  ex:ConsistsOf(?name, ?components)
+}.
+ex:ConsistsOf[owl:Class ?item, NEList<owl:Class> ?components] :: {
+  ex:HasComponents(?item, ?components),
+  ex:OnlyComponents(?item, ?components)
+}.
+ex:HasComponent[owl:Class ?item, owl:Class ?component] :: {
+  ax:SubObjectSomeValuesFrom(?item, ex:hasComponent, ?component)
+}.
+ex:HasComponents[owl:Class ?item, NEList<owl:Class> ?components] :: {
+  cross | ex:HasComponent(?item, ++?components)
+}.
+ex:OnlyComponents[owl:Class ?item, NEList<owl:Class> ?components] :: {
+  rstr:ObjectUnionOf(_:b, ?components),
+  ax:SubObjectAllValuesFrom(?item, ex:hasComponent, _:b)
+}.
+</textarea>
+</p>
+
+</div>
+
+</div>
+
+<div class="org-src-container">
+
+<pre class="src src-ttl">@prefix rdf:    &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#&gt; . 
+@prefix rdfs:   &lt;http://www.w3.org/2000/01/rdf-schema#&gt; . 
+@prefix owl:    &lt;http://www.w3.org/2002/07/owl#&gt; . 
+@prefix xsd:    &lt;http://www.w3.org/2001/XMLSchema#&gt; . 
+@prefix foaf:   &lt;http://xmlns.com/foaf/0.1/&gt; . 
+@prefix dbp:    &lt;http://dbpedia.org/ontology/&gt; . 
+@prefix ex:     &lt;http://example.com/ns#&gt; . 
+@prefix ottr:   &lt;http://ns.ottr.xyz/0.4/&gt; . 
+@prefix ax:     &lt;http://tpl.ottr.xyz/owl/axiom/0.1/&gt; . 
+@prefix rstr:   &lt;http://tpl.ottr.xyz/owl/restriction/0.1/&gt; .
+
+ex:Phone(ex:Nokia3310, (ex:Screen, ex:HardCase, ex:CPU), "indestructible"^^xsd:string).
+ex:Phone(ex:SamsungS9, (ex:CurvedScreen, ex:FastCPU), none).
+ex:Phone(ex:iPhone8, (ex:RetinaScreen, ex:OtherFastCPU, ex:FPReader), "iphone"^^xsd:string).
+</pre>
+</div>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-orgheadline13" class="outline-2">
+<h2 id="orgheadline13"><span class="section-number-2">5</span> Appendix</h2>
+<div class="outline-text-2" id="text-5">
+</div><div id="outline-container-orgheadline12" class="outline-3">
+<h3 id="orgheadline12"><span class="section-number-3">5.1</span> WebLutra</h3>
+<div class="outline-text-3" id="text-5-1">
+<p>
+The web application that drives the interactive examples in this
+primer, called WebLutra, uses Lutra, the reference application for
+OTTR. Both applications are open source and available at
+<a href="http://gitlab.com/ottr/lutra/lutra">http://gitlab.com/ottr/lutra/lutra</a>. If you experience errors or have
+suggestions for improvements, please take a look at existing issues
+or file a new issue: <a href="http://gitlab.com/ottr/lutra/lutra/issues">http://gitlab.com/ottr/lutra/lutra/issues</a>
+</p>
+</div>
+</div>
+</div>
+</div>
+</body>
+</html>

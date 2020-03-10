@@ -22,6 +22,7 @@ package xyz.ottr.lutra.stottr;
  * #L%
  */
 
+import java.util.HashMap;
 import java.util.Map;
 
 import xyz.ottr.lutra.io.Format;
@@ -42,6 +43,10 @@ public class StottrFormat implements Format {
     private final TemplateWriter templateWriter;
     private final InstanceReader instanceReader;
     private final InstanceWriter instanceWriter;
+
+    public StottrFormat() {
+        this(new HashMap<>());
+    }
     
     public StottrFormat(Map<String, String> prefixes) {
         this.templateReader = new TemplateReader(new SFileReader(), new STemplateParser());

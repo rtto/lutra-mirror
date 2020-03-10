@@ -49,27 +49,31 @@ public class CLI {
     private final PrintStream outStream;
     //private final PrintStream errStream;
     private final MessageHandler messageHandler;
-    private final TemplateManagerWithFormats templateManager;
+    private final TemplateManager templateManager;
 
     public CLI(PrintStream outStream, PrintStream errStream) {
         this.settings = new Settings();
         this.outStream = outStream;
         //this.errStream = errStream;
         this.messageHandler = new MessageHandler(errStream);
-        this.templateManager = new TemplateManagerWithFormats();
-        setTemplateManagersSettings();
+        this.templateManager = new TemplateManager();
+        initTemplateManager();
     }
 
     public CLI() {
         this(System.out, System.err);
     }
 
-    private void setTemplateManagersSettings() {
+    private void initTemplateManager() {
         this.templateManager.setDeepTrace(this.settings.deepTrace);
         this.templateManager.setHaltOn(this.settings.haltOn);
         this.templateManager.setFetchMissingDependencies(this.settings.fetchMissingDependencies);
         this.templateManager.setExtensions(this.settings.extensions);
         this.templateManager.setIgnoreExtensions(this.settings.ignoreExtensions);
+
+        for (CLIFormat format : CLIFormat.values()) {
+            this.templateManager.registerFormat(format.format);
+        }
     }
 
     public static void main(String[] args) {
@@ -203,7 +207,7 @@ public class CLI {
         if (this.settings.library == null || this.settings.library.length == 0) {
             return Message.INFO; // Least severe
         }
-        Format libraryFormat = this.templateManager.getFormat(this.settings.libraryFormat);
+        Format libraryFormat = this.templateManager.getFormat(this.settings.libraryFormat.toString());
         return this.templateManager.parseLibraryInto(libraryFormat, this.settings.library)
             .printMessages();
     }
@@ -213,11 +217,11 @@ public class CLI {
             return Message.INFO; // Least severe
         }
         Result<Model> userPrefixes = new RDFFileReader().parse(this.settings.prefixes);
-        return this.messageHandler.use(userPrefixes, up -> this.templateManager.addPrefifxes(up));
+        return this.messageHandler.use(userPrefixes, up -> this.templateManager.addPrefixes(up));
     }
 
     public ResultStream<Instance> parseInstances() {
-        Format inFormat = this.templateManager.getFormat(this.settings.inputFormat);
+        Format inFormat = this.templateManager.getFormat(this.settings.inputFormat.toString());
         return this.templateManager.parseInstances(inFormat, this.settings.inputs);
     }
 
@@ -227,14 +231,14 @@ public class CLI {
 
     private void writeInstances(ResultStream<Instance> ins) {
 
-        Format outFormat = this.templateManager.getFormat(this.settings.outputFormat);
+        Format outFormat = this.templateManager.getFormat(this.settings.outputFormat.toString());
         this.templateManager
             .writeInstances(ins, outFormat, makeInstanceWriter(outFormat.getDefaultFileSuffix()))
             .printMessages();
     }
 
     private void writeTemplates(TemplateManager templateManager) {
-        Format outFormat = this.templateManager.getFormat(this.settings.outputFormat);
+        Format outFormat = this.templateManager.getFormat(this.settings.outputFormat.toString());
         templateManager.writeTemplates(outFormat, makeTemplateWriter(outFormat.getDefaultFileSuffix()));
     }
 

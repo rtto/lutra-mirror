@@ -1,0 +1,71 @@
+#+OPTIONS: html-link-use-abs-url:nil html-postamble:nil html-preamble:nil html-scripts:nil html-style:nil html5-fancy:t
+#+OPTIONS:  tex:t toc:nil num:3 H:3 d:nil tags:nil
+#+HTML_DOCTYPE: xhtml5
+#+HTML_CONTAINER: div
+#+DESCRIPTION:
+#+KEYWORDS:
+#+SELECT_TAGS:
+#+EXCLUDE_TAGS: noexport
+#+TITLE: pOTTR: Reasonable Ontology Templates Primer
+
+#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="https://www.ottr.xyz/inc/spec.css" />
+
+#+HTML_HEAD: <script type="application/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+#+HTML_HEAD: <script type="application/javascript" src="https://www.ottr.xyz/inc/toc.js"></script>
+
+#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="weblutra.css" />
+#+HTML_HEAD: <script type="application/javascript" src="weblutra.js"></script>
+
+#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="pottr.css" />
+#+HTML_HEAD: <script type="application/javascript" src="pottr.js"></script>
+
+#+HTML_HEAD: <style>
+#+HTML_HEAD:   div.boxA { background-color: beige; }
+#+HTML_HEAD:   div.boxA::before { content: "SHACL"; }
+#+HTML_HEAD:   div.boxB { background-color: lavender; }
+#+HTML_HEAD:   div.boxB::before { content: "OWL"; }
+#+HTML_HEAD: </style>
+
+#+HTML: <div id="left">
+#+HTML: </div>
+
+#+HTML: <div id="right">
+#+HTML:   <h1 id="top" class="title">Reasonable Ontology Templates Primer (pOTTR)</h1>
+#+HTML:   <img id="logo" alt="pOTTR" src="https://www.ottr.xyz/logo/pOTTR.png"/>
+
+ *An introduction to Reasonable Ontology Templates.*
+
+ - Version :: 0.1.0
+ - Published :: 2019-10-24
+ - Authors :: Martin G. Skjæveland, Leif Harald Karlsen, Daniel Lupp
+ - Issues :: https://gitlab.com/ottr/language/pOTTR/issues
+
+ #+HTML: <div id="toc-content" style="margin-top: 50px">
+
+  The primer is divided into different independent chapters, each
+  chapter covering one topic. Each chapter contains explanatory text,
+  examples, and exercises with solutions.
+
+  - [[./01-basics.html][Basics of Reasonable Ontology Templates]] :: This chapter explains
+       the basics of OTTR for newcomers to OTTR. A basic understanding
+       of semantic web technologies is assumed.
+  - [[./02-modelling.html][Incrementally building a template library]] :: This chapter shows a
+       top-down approach for building a template library for a example
+       use case. The chapter assumes the reader is familiar with the
+       basics of OTTR.
+  - [[./03-tabular-data-instantiation.html][Converting spreadsheets to knowledge graphs with tabOTTR]] :: This
+       chapter shows how to annotate spreadsheets for convering
+       spreadsheet data to RDF/OWL via OTTR templates.
+  - [[./04-etl-bottr.html][Extract, Transform and Load with bOTTR]] ::  This chapter contains
+       exercises that show how bOTTR can be used to extract data by
+       quering RDF files, SPARQL endpoints, CSV files and relational
+       database and converting the query results to OTTR template
+       instances.
+
+* _footer
+:PROPERTIES:
+:HTML_CONTAINER_CLASS: footer
+:END:
+
+#+HTML: </div> <!-- end toc-content -->
+#+HTML: </div> <!-- end right -->

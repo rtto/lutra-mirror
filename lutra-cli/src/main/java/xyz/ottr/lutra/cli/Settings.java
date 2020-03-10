@@ -22,7 +22,7 @@ package xyz.ottr.lutra.cli;
  * #L%
  */
 
-import java.util.ArrayList; 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -73,8 +73,6 @@ import xyz.ottr.lutra.result.Message;
     versionProvider = Settings.JarFileVersionProvider.class)
 public class Settings {
 
-    enum FormatName { legacy, wottr, stottr, tabottr, bottr }
-
     @Option(names = {"--extension", "-e"}, split = ",",
         description = {"File extension of files to use as input to template library.%n"
                        + "(default: ${DEFAULT-VALUE})"})
@@ -89,18 +87,18 @@ public class Settings {
         description = {"Input format of instances.%n"
                        + "(legal values: ${COMPLETION-CANDIDATES}"
                        + " default: ${DEFAULT-VALUE})"})
-    public FormatName inputFormat = FormatName.wottr;
+    public CLIFormat inputFormat = CLIFormat.wottr;
 
     @Option(names = {"-O", "--outputFormat"}, completionCandidates = OutputFormat.class,
         description = {"Output format of output of operation defined by the mode.%n"
                        + "(legal values: ${COMPLETION-CANDIDATES}; "
                        + "default: ${DEFAULT-VALUE})"})
-    public FormatName outputFormat = FormatName.wottr;
+    public CLIFormat outputFormat = CLIFormat.wottr;
 
     @Option(names = {"-L", "--libraryFormat"}, completionCandidates = TplInputFormat.class,
         description = {"The input format of the libraries. If omitted, all available formats are attempted.%n"
                        + "(legal values: ${COMPLETION-CANDIDATES})"})
-    public FormatName libraryFormat;
+    public CLIFormat libraryFormat;
 
 
     @Option(names = {"-f", "--fetchMissing"},
@@ -117,7 +115,7 @@ public class Settings {
 
     @Option(names = {"-F", "--fetchFormat"},
         description = {"The input format of the templates fetched via the -f flag."})
-    public FormatName fetchFormat;
+    public CLIFormat fetchFormat;
 
     @Option(names = {"-l", "--library"}, 
         description = {"Folder containing templates to use as library."
@@ -157,45 +155,46 @@ public class Settings {
 
     @Option(names = {"--deepTrace"},
         description = {"This enables tracing such that printed messages get a stack trace "
-                       + "giving more information on the location of the concerned objects.%n"
+                       + "giving more information on the location of the concerned objects. "
+                       + "NB! Enabling this flag will deteriorate performance.%n"
                        + "default: ${DEFAULT-VALUE})"})
     public boolean deepTrace = false;
     
     /* The following classes restrict the selections of FormatName to supported formats. */
     private static class InsInputFormat extends ArrayList<String> {
 
-        static final long serialVersionUID = 0L; // Not correct!
+        static final long serialVersionUID = 0L; // TODO Not correct!
 
         InsInputFormat() {
             super(List.of(
-                    FormatName.legacy.toString(),
-                    FormatName.wottr.toString(),
-                    FormatName.stottr.toString(),
-                    FormatName.tabottr.toString()));
+                CLIFormat.legacy.name(),
+                CLIFormat.wottr.name(),
+                CLIFormat.stottr.name(),
+                CLIFormat.tabottr.name()));
         }
     }
 
     private static class TplInputFormat extends ArrayList<String> {
 
-        static final long serialVersionUID = 0L; // Not correct!
+        static final long serialVersionUID = 0L; // TODO Not correct!
 
         TplInputFormat() {
             super(List.of(
-                    FormatName.stottr.toString(),
-                    FormatName.legacy.toString(),
-                    FormatName.wottr.toString()));
+                CLIFormat.stottr.name(),
+                CLIFormat.legacy.name(),
+                CLIFormat.wottr.name()));
         }
     }
 
     private static class OutputFormat extends ArrayList<String> {
 
-        static final long serialVersionUID = 0L; // Not correct!
+        static final long serialVersionUID = 0L; // TODO Not correct!
 
         OutputFormat() {
             super(List.of(
-                    FormatName.legacy.toString(),
-                    FormatName.stottr.toString(),
-                    FormatName.wottr.toString()));
+                CLIFormat.legacy.name(),
+                CLIFormat.stottr.name(),
+                CLIFormat.wottr.name()));
         }
     }
     

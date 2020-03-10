@@ -42,6 +42,10 @@ public class WottrFormat implements Format {
     private final TemplateWriter templateWriter;
     private final InstanceReader instanceReader;
     private final InstanceWriter instanceWriter;
+
+    public WottrFormat() {
+        this(PrefixMapping.Factory.create());
+    }
     
     public WottrFormat(PrefixMapping prefixes) {
         this.templateReader = new TemplateReader(new RDFFileReader(), new WTemplateParser());
