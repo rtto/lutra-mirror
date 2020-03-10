@@ -27,6 +27,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NonNull;
@@ -37,26 +39,21 @@ import xyz.ottr.lutra.model.types.TermType;
 
 @Getter
 @Builder(toBuilder = true, builderMethodName = "")
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class Parameter implements HasGetTerm {
 
     private final @NonNull Term term;
-    private final TermType type;
     private final boolean nonBlank;
     private final boolean optional;
     private final Term defaultValue;
 
     @Builder
-    public Parameter(@NonNull Term term, TermType type, boolean nonBlank, boolean optional, Term defaultValue) {
-        this.term = term;
-        this.type = Objects.requireNonNullElse(type, term.getVariableType());
-        this.nonBlank = nonBlank;
-        this.optional = optional;
-        this.defaultValue = defaultValue;
-
+    public static Parameter create(@NonNull Term term, TermType type, boolean nonBlank, boolean optional, Term defaultValue) {
         term.setVariable(true);
-        term.setType(this.type);
-    }
+        term.setType(Objects.requireNonNullElse(type, term.getVariableType()));
 
+        return new Parameter(term, nonBlank, optional, defaultValue);
+    }
 
     public static List<Parameter> listOf(Term... terms) {
         return Arrays.stream(terms)

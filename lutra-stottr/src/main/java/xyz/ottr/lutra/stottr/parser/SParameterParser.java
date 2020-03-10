@@ -61,12 +61,15 @@ class SParameterParser extends SBaseParserVisitor<Parameter> {
     }
 
     private Set<String> parseModifiers(stOTTRParser.ParameterContext ctx) {
-        return ctx.ParameterMode() != null
-            ? ctx.ParameterMode().stream()
+
+        if (ctx.ParameterMode() == null) {
+            return Collections.emptySet();
+        } else {
+            return ctx.ParameterMode().stream()
                 .map(TerminalNode::getSymbol)
                 .map(Token::getText)
-                .collect(Collectors.toSet())
-            : Collections.emptySet();
+                .collect(Collectors.toSet());
+        }
     }
 
     private Result<Term> parseDefaultValue(stOTTRParser.ParameterContext ctx) {

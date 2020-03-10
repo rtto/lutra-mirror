@@ -85,12 +85,8 @@ public class CheckLibraryTest {
             .filter(msg -> Message.moreSevere(msg.getLevel(), severity))
             .collect(Collectors.toList());
 
-        String assStr = "Should give " + numErrors + " messages of higher severity than "
-            + severity + " but gave " + msgs.size();
-
-        if (msgs.size() != numErrors) {
-            msgs.forEach(m -> m.log(this.log));
-        }
+        String assStr = "Expected " + numErrors + " messages of severity " + Message.toString(severity) + " or higher"
+             + ", but got " + msgs.size() + " messages: " + msgs;
 
         assertEquals(assStr, msgs.size(), numErrors);
     }
