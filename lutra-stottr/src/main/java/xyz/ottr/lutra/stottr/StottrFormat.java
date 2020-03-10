@@ -22,9 +22,9 @@ package xyz.ottr.lutra.stottr;
  * #L%
  */
 
-import java.util.HashMap;
-import java.util.Map;
+import org.apache.jena.shared.PrefixMapping;
 
+import xyz.ottr.lutra.OTTR;
 import xyz.ottr.lutra.io.Format;
 import xyz.ottr.lutra.io.InstanceReader;
 import xyz.ottr.lutra.io.InstanceWriter;
@@ -39,42 +39,34 @@ import xyz.ottr.lutra.stottr.writer.STemplateWriter;
 
 public class StottrFormat implements Format {
     
-    private final TemplateReader templateReader;
-    private final TemplateWriter templateWriter;
-    private final InstanceReader instanceReader;
-    private final InstanceWriter instanceWriter;
+    private PrefixMapping prefixes;
 
     public StottrFormat() {
-        this(new HashMap<>());
+        this(OTTR.getDefaultPrefixes());
     }
     
-    public StottrFormat(Map<String, String> prefixes) {
-        this.templateReader = new TemplateReader(new SFileReader(), new STemplateParser());
-        this.templateWriter = new STemplateWriter(prefixes);
-        this.instanceReader = new InstanceReader(new SFileReader(), new SInstanceParser());
-        this.instanceWriter = new SInstanceWriter(prefixes);
+    public StottrFormat(PrefixMapping prefixes) {
+        this.prefixes = prefixes;
     }
 
     @Override
     public Result<TemplateReader> getTemplateReader() {
-        return Result.of(this.templateReader);
+        return Result.of(new TemplateReader(new SFileReader(), new STemplateParser()));
     }
 
     @Override
     public Result<TemplateWriter> getTemplateWriter() {
-        // TODO Auto-generated method stub
-        return Result.of(this.templateWriter);
+        return Result.of(new STemplateWriter(this.prefixes));
     }
 
     @Override
     public Result<InstanceReader> getInstanceReader() {
-        return Result.of(this.instanceReader);
+        return Result.of(new InstanceReader(new SFileReader(), new SInstanceParser()));
     }
 
     @Override
     public Result<InstanceWriter> getInstanceWriter() {
-        // TODO Auto-generated method stub
-        return Result.of(this.instanceWriter);
+        return Result.of(new SInstanceWriter(this.prefixes));
     }
 
     @Override
@@ -90,6 +82,11 @@ public class StottrFormat implements Format {
     @Override
     public String getFormatName() {
         return "STOTTR";
+    }
+
+    @Override
+    public void setPrefixMapping(PrefixMapping prefixes) {
+        this.prefixes = prefixes;
     }
 
 }

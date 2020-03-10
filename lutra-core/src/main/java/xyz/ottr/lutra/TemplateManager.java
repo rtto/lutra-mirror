@@ -104,6 +104,7 @@ public class TemplateManager {
     }
     
     public void registerFormat(Format format) {
+        format.setPrefixMapping(this.prefixes);
         this.formatManager.register(format);
     }
 

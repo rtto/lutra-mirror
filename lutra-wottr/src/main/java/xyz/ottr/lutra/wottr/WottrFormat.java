@@ -38,40 +38,34 @@ import xyz.ottr.lutra.wottr.writer.v04.WTemplateWriter;
 
 public class WottrFormat implements Format {
 
-    private final TemplateReader templateReader;
-    private final TemplateWriter templateWriter;
-    private final InstanceReader instanceReader;
-    private final InstanceWriter instanceWriter;
+    private PrefixMapping prefixes;
 
     public WottrFormat() {
         this(PrefixMapping.Factory.create());
     }
     
     public WottrFormat(PrefixMapping prefixes) {
-        this.templateReader = new TemplateReader(new RDFFileReader(), new WTemplateParser());
-        this.templateWriter = new WTemplateWriter(prefixes);
-        this.instanceReader = new InstanceReader(new RDFFileReader(), new WInstanceParser());
-        this.instanceWriter = new WInstanceWriter(prefixes);
+        this.prefixes = prefixes;
     }
 
     @Override
     public Result<TemplateReader> getTemplateReader() {
-        return Result.of(this.templateReader);
+        return Result.of(new TemplateReader(new RDFFileReader(), new WTemplateParser()));
     }
 
     @Override
     public Result<TemplateWriter> getTemplateWriter() {
-        return Result.of(this.templateWriter);
+        return Result.of(new WTemplateWriter(this.prefixes));
     }
 
     @Override
     public Result<InstanceReader> getInstanceReader() {
-        return Result.of(this.instanceReader);
+        return Result.of(new InstanceReader(new RDFFileReader(), new WInstanceParser()));
     }
 
     @Override
     public Result<InstanceWriter> getInstanceWriter() {
-        return Result.of(this.instanceWriter);
+        return Result.of(new WInstanceWriter(this.prefixes));
     }
 
     @Override
@@ -87,5 +81,10 @@ public class WottrFormat implements Format {
     @Override
     public String getFormatName() {
         return "WOTTR";
+    }
+
+    @Override
+    public void setPrefixMapping(PrefixMapping prefixes) {
+        this.prefixes = prefixes;
     }
 }

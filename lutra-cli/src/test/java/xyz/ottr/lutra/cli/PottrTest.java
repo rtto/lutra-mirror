@@ -132,7 +132,7 @@ public class PottrTest {
             .innerFlatMap(store::expandInstanceFetch);
 
         // Write expanded instances to model
-        SInstanceWriter insWriter = new SInstanceWriter(new HashMap<>());
+        SInstanceWriter insWriter = new SInstanceWriter();
         ResultConsumer<Instance> expansionErrors = new ResultConsumer<>(insWriter);
         expandedInInstances.forEach(expansionErrors);
 

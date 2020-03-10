@@ -1,5 +1,7 @@
 package xyz.ottr.lutra.io;
 
+import org.apache.jena.shared.PrefixMapping;
+
 /*-
  * #%L
  * lutra-core
@@ -67,4 +69,6 @@ public interface Format {
     default boolean supportsInstanceReader() {
         return supports(Operation.read, ObjectType.instance);
     }
+
+    void setPrefixMapping(PrefixMapping prefixes);
 }
