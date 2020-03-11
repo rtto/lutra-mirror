@@ -57,7 +57,6 @@ public class CLI {
         //this.errStream = errStream;
         this.messageHandler = new MessageHandler(errStream);
         this.templateManager = new TemplateManager();
-        initTemplateManager();
     }
 
     public CLI() {
@@ -91,6 +90,7 @@ public class CLI {
             return;
         }
 
+        initTemplateManager();
         this.messageHandler.setQuiet(this.settings.quiet);
 
         if (cli.isUsageHelpRequested()) {
