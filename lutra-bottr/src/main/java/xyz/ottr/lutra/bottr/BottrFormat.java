@@ -1,5 +1,7 @@
 package xyz.ottr.lutra.bottr;
 
+import org.apache.jena.shared.PrefixMapping;
+
 /*-
  * #%L
  * lutra-bottr
@@ -53,5 +55,10 @@ public class BottrFormat implements Format {
     @Override
     public String getFormatName() {
         return "BOTTR";
+    }
+
+    @Override
+    public void setPrefixMapping(PrefixMapping prefixes) {
+        // Does not need a PrefixMapping
     }
 }

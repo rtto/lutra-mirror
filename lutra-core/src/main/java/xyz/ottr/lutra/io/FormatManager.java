@@ -2,6 +2,15 @@ package xyz.ottr.lutra.io;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Optional;
+import java.util.function.Function;
+
+import xyz.ottr.lutra.result.Message;
+import xyz.ottr.lutra.result.MessageHandler;
+import xyz.ottr.lutra.result.Result;
 
 /*-
  * #%L
@@ -13,55 +22,66 @@ import java.util.Collections;
  * it under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation, either version 2.1 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Lesser Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Lesser Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/lgpl-2.1.html>.
  * #L%
  */
 
-import java.util.HashSet;
-import java.util.Optional;
-import java.util.Set;
-import java.util.function.Function;
-
-import xyz.ottr.lutra.result.Message;
-import xyz.ottr.lutra.result.MessageHandler;
-import xyz.ottr.lutra.result.Result;
-
 public class FormatManager {
 
-    private final Set<Format> formats;
+    private final Map<String, Format> formats;
 
-    public FormatManager(Collection<Format> formats) {
-        this.formats = new HashSet<>(formats);
+    public FormatManager(Map<String, Format> formats) {
+        this.formats = formats;
     }
 
     public FormatManager() {
-        this(new HashSet<>());
+        this(new HashMap<>());
+    }
+
+    public FormatManager(Collection<Format> formats) {
+        this();
+        register(formats);
+    }
+
+    private static String getKey(String formatName) {
+        return formatName.toLowerCase(Locale.getDefault());
     }
 
     public void register(Format format) {
-        this.formats.add(format);
+
+        String key = getKey(format.getFormatName());
+
+        if (this.formats.containsKey(key)) {
+            throw new IllegalArgumentException("Format named " + format.getFormatName() + " already registered in FormatManager.");
+        }
+
+        this.formats.put(getKey(format.getFormatName()), format);
     }
 
     public void register(Collection<Format> formats) {
-        this.formats.addAll(formats);
+        formats.forEach(this::register);
     }
-    
-    public Set<Format> getFormats() {
-        return Collections.unmodifiableSet(this.formats);
+
+    public Format getFormat(String formatName) {
+        return this.formats.get(getKey(formatName));
+    }
+
+    public Collection<Format> getFormats() {
+        return Collections.unmodifiableCollection(this.formats.values());
     }
 
     public Result<TemplateReader> attemptAllFormats(Function<TemplateReader, MessageHandler> readerFunction) {
         
         Result<TemplateReader> unsuccessful = Result.empty(); // Return in case of no succeed
-        for (Format format : this.formats) {
+        for (Format format : this.formats.values()) {
             if (!format.supportsTemplateReader()) {
                 continue;
             }
@@ -89,4 +109,5 @@ public class FormatManager {
 
         return errors.isPresent() ? Result.empty(errors.get()) : Result.empty();
     }
+
 }

@@ -1,5 +1,7 @@
 package xyz.ottr.lutra.wottr;
 
+import org.apache.jena.shared.PrefixMapping;
+
 /*-
  * #%L
  * lutra-wottr
@@ -72,5 +74,10 @@ public class LegacyFormat implements Format {
     @Override
     public String getFormatName() {
         return "legacy";
+    }
+
+    @Override
+    public void setPrefixMapping(PrefixMapping prefixes) {
+        // Does not need a PrefixMapping
     }
 }

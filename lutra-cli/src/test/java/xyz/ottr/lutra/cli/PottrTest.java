@@ -34,13 +34,13 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
+import xyz.ottr.lutra.TemplateManager;
 import xyz.ottr.lutra.io.InstanceReader;
 import xyz.ottr.lutra.io.TemplateReader;
 import xyz.ottr.lutra.model.Instance;
 import xyz.ottr.lutra.result.Message;
 import xyz.ottr.lutra.result.ResultConsumer;
 import xyz.ottr.lutra.result.ResultStream;
-import xyz.ottr.lutra.store.DependencyGraph;
 import xyz.ottr.lutra.store.TemplateStore;
 import xyz.ottr.lutra.stottr.io.SFileReader;
 import xyz.ottr.lutra.stottr.parser.SInstanceParser;
@@ -109,7 +109,10 @@ public class PottrTest {
     }
 
     private TemplateStore getStore() {
-        TemplateManagerWithFormats tmwf = new TemplateManagerWithFormats();
+        TemplateManager tmwf = new TemplateManager();
+        for (CLIFormat format : CLIFormat.values()) {
+            tmwf.registerFormat(format.format);
+        }
         return tmwf.getTemplateStore();
     }
 
@@ -129,7 +132,7 @@ public class PottrTest {
             .innerFlatMap(store::expandInstanceFetch);
 
         // Write expanded instances to model
-        SInstanceWriter insWriter = new SInstanceWriter(new HashMap<>());
+        SInstanceWriter insWriter = new SInstanceWriter();
         ResultConsumer<Instance> expansionErrors = new ResultConsumer<>(insWriter);
         expandedInInstances.forEach(expansionErrors);
 

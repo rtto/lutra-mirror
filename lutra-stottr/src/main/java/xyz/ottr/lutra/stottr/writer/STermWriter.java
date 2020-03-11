@@ -28,6 +28,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.apache.jena.shared.PrefixMapping;
+
 import xyz.ottr.lutra.model.BlankNodeTerm;
 import xyz.ottr.lutra.model.IRITerm;
 import xyz.ottr.lutra.model.LiteralTerm;
@@ -39,22 +41,22 @@ import xyz.ottr.lutra.wottr.vocabulary.v04.WOTTR;
 
 public class STermWriter {
 
-    private final Map<String, String> prefixes;
+    private final PrefixMapping prefixes;
     private final Set<String> usedPrefixes;
     private final Set<Term> variables;
 
-    public STermWriter(Map<String, String> prefixes, Set<Term> variables) {
+    public STermWriter(PrefixMapping prefixes, Set<Term> variables) {
         this.prefixes = prefixes;
         this.variables = variables;
         this.usedPrefixes = new HashSet<>();
     }
 
-    public STermWriter(Map<String, String> prefixes) {
+    public STermWriter(PrefixMapping prefixes) {
         this(prefixes, new HashSet<>());
     }
 
-    public Map<String, String> getPrefixes() {
-        return Collections.unmodifiableMap(this.prefixes);
+    public PrefixMapping getPrefixes() {
+        return this.prefixes;
     }
 
     public Set<String> getUsedPrefixes() {
@@ -85,7 +87,7 @@ public class STermWriter {
         }
 
         // Shorten to qname if possible
-        for (Map.Entry<String, String> nsln : this.prefixes.entrySet()) {
+        for (Map.Entry<String, String> nsln : this.prefixes.getNsPrefixMap().entrySet()) {
             if (iri.startsWith(nsln.getValue())) {
                 String suffix = iri.substring(nsln.getValue().length());
                 this.usedPrefixes.add(nsln.getKey());

@@ -104,7 +104,16 @@ public class TemplateManager {
     }
     
     public void registerFormat(Format format) {
+        format.setPrefixMapping(this.prefixes);
         this.formatManager.register(format);
+    }
+
+    public void registerFormats(Collection<Format> formats) {
+        this.formatManager.register(formats);
+    }
+
+    public Format getFormat(String formatName) {
+        return this.formatManager.getFormat(formatName);
     }
 
     public static TemplateStore makeDefaultStore(FormatManager formatManager) {
@@ -120,14 +129,15 @@ public class TemplateManager {
     public PrefixMapping getPrefixes() {
         return this.prefixes;
     }
-    
-    public void addPrefifxes(PrefixMapping other) {
+
+    public void addPrefixes(PrefixMapping other) {
         this.prefixes.setNsPrefixes(other);
     }
 
     /**
-     * Populated store with parsed templates, and returns messages with potensial errors
+     * Populated store with parsed templates, and returns messages with potential errors
      */
+    // TODO rename to readLibrary?
     public MessageHandler parseLibraryInto(String... library) {
         return parseLibraryInto(null, library);
     }
@@ -175,6 +185,7 @@ public class TemplateManager {
         return messages;
     } 
 
+    // TODO rename to readInstances?
     public ResultStream<Instance> parseInstances(Format format, String... files) {
         return parseInstances(format, Arrays.asList(files));
     }
@@ -242,6 +253,8 @@ public class TemplateManager {
         });
         return msgs;
     }
+
+
 
     static class Settings {
 

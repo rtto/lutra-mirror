@@ -24,8 +24,10 @@ package xyz.ottr.lutra.stottr.writer;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
+import org.apache.jena.shared.PrefixMapping;
+
+import xyz.ottr.lutra.OTTR;
 import xyz.ottr.lutra.io.InstanceWriter;
 import xyz.ottr.lutra.model.ArgumentList;
 import xyz.ottr.lutra.model.Instance;
@@ -42,8 +44,12 @@ public class SInstanceWriter implements InstanceWriter {
         this.termWriter = termWriter;
     }
 
-    public SInstanceWriter(Map<String, String> prefixes) {
+    public SInstanceWriter(PrefixMapping prefixes) {
         this(new STermWriter(prefixes));
+    }
+
+    public SInstanceWriter() {
+        this(OTTR.getDefaultPrefixes());
     }
 
     @Override

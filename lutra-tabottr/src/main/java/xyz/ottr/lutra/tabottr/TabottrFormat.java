@@ -1,5 +1,7 @@
 package xyz.ottr.lutra.tabottr;
 
+import org.apache.jena.shared.PrefixMapping;
+
 /*-
  * #%L
  * lutra-tabottr
@@ -53,5 +55,10 @@ public class TabottrFormat implements Format {
     @Override
     public String getFormatName() {
         return "TabOTTR";
+    }
+
+    @Override
+    public void setPrefixMapping(PrefixMapping prefixes) {
+        // Does not need a PrefixMapping
     }
 }
