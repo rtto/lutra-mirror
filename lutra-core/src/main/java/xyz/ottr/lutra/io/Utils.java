@@ -42,6 +42,7 @@ import org.apache.commons.io.filefilter.IOFileFilter;
 import org.apache.commons.io.filefilter.NotFileFilter;
 import org.apache.commons.io.filefilter.PrefixFileFilter;
 
+import org.apache.commons.io.filefilter.SuffixFileFilter;
 import xyz.ottr.lutra.result.Message;
 import xyz.ottr.lutra.result.Result;
 import xyz.ottr.lutra.result.ResultStream;
@@ -50,7 +51,12 @@ public enum Utils {
     ;
 
     private static final IOFileFilter hiddenFiles = new NotFileFilter(
-            FileFilterUtils.or(new PrefixFileFilter("."), new PrefixFileFilter("#")));
+            FileFilterUtils.or(
+                new PrefixFileFilter("."),
+                new PrefixFileFilter("#"),
+                new PrefixFileFilter("~"),
+                new SuffixFileFilter("~")
+            ));
     private static final Function<String, IOFileFilter> extFilter = string -> FileFilterUtils.suffixFileFilter(string,
             IOCase.INSENSITIVE);
 

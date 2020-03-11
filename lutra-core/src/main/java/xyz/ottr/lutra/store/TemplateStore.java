@@ -313,8 +313,8 @@ public interface TemplateStore extends Consumer<TemplateSignature> {
 
         while (!missing.isEmpty()) {
             for (String toFetch : missing) {
-                messages.accept(formatManager.attemptAllFormats(reader -> reader.populateTemplateStore(this, toFetch)));
-                if (!getTemplate(toFetch).isPresent()) { // Check if fetched and added to store
+                messages.accept(readerRegistry.attemptAllReaders(reader -> reader.populateTemplateStore(this, toFetch)));
+                if (!containsTemplate(toFetch)) { // Check if fetched and added to store
                     failed.add(toFetch);
                 }
             }

@@ -54,8 +54,10 @@ public class RDFNodeFactory {
 
     public Result<RDFNode> toRDFNode(String value, String type) {
 
-        // if is a list, split into values and parse into RDF nodes with a recursive call.
-        if (type.endsWith(TabOTTR.TYPE_LIST_POSTFIX)) {
+        if (DataValidator.isEmpty(value)) { // if value == empty -> ottr:none
+            return Result.of(WOTTR.none);
+        } else if (type.endsWith(TabOTTR.TYPE_LIST_POSTFIX)) {
+            // if is a list, split into values and parse into RDF nodes with a recursive call.
             String singleType = type.substring(0, type.length() - 1).trim(); // remove list operator from type
             List<Result<RDFNode>> nodes = new ArrayList<>();
             for (String item : value.split(Pattern.quote(TabOTTR.VALUE_LIST_SEPARATOR))) {
@@ -64,8 +66,6 @@ public class RDFNodeFactory {
             }
             Result<List<RDFNode>> resNodes = Result.aggregate(nodes);
             return resNodes.map(this::toList);
-        } else if (DataValidator.isEmpty(value)) { // if value == empty -> ottr:none
-            return Result.of(WOTTR.none);    
         } else if (TabOTTR.TYPE_IRI.equals(type)) {
             return Result.of(toResource(value));
         } else if (TabOTTR.TYPE_BLANK.equals(type)) {
