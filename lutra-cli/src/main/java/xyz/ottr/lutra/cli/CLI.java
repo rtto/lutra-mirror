@@ -22,61 +22,57 @@ package xyz.ottr.lutra.cli;
  * #L%
  */
 
-import java.io.IOException;
 import java.io.PrintStream;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.nio.charset.Charset;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.List;
+import java.util.Optional;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.jena.rdf.model.Model;
-import org.apache.jena.shared.PrefixMapping;
 
 import picocli.CommandLine;
 import picocli.CommandLine.ParameterException;
 
-import xyz.ottr.lutra.OTTR;
-import xyz.ottr.lutra.io.InstanceReader;
-import xyz.ottr.lutra.io.InstanceWriter;
-import xyz.ottr.lutra.io.TemplateReader;
-import xyz.ottr.lutra.io.TemplateWriter;
+import xyz.ottr.lutra.TemplateManager;
+import xyz.ottr.lutra.io.Format;
+import xyz.ottr.lutra.io.Utils;
 import xyz.ottr.lutra.model.Instance;
-import xyz.ottr.lutra.model.TemplateSignature;
 import xyz.ottr.lutra.result.Message;
 import xyz.ottr.lutra.result.MessageHandler;
 import xyz.ottr.lutra.result.Result;
-import xyz.ottr.lutra.result.ResultConsumer;
 import xyz.ottr.lutra.result.ResultStream;
-import xyz.ottr.lutra.result.Trace;
-import xyz.ottr.lutra.store.DependencyGraph;
-import xyz.ottr.lutra.store.TemplateStore;
-import xyz.ottr.lutra.stottr.writer.SInstanceWriter;
-import xyz.ottr.lutra.stottr.writer.STemplateWriter;
 import xyz.ottr.lutra.wottr.io.RDFFileReader;
-import xyz.ottr.lutra.wottr.writer.v04.WInstanceWriter;
-import xyz.ottr.lutra.wottr.writer.v04.WTemplateWriter;
 
 public class CLI {
 
     private final Settings settings;
     private final PrintStream outStream;
-    private final PrintStream errStream;
+    //private final PrintStream errStream;
     private final MessageHandler messageHandler;
+    private final TemplateManager templateManager;
 
     public CLI(PrintStream outStream, PrintStream errStream) {
         this.settings = new Settings();
         this.outStream = outStream;
-        this.errStream = errStream;
+        //this.errStream = errStream;
         this.messageHandler = new MessageHandler(errStream);
+        this.templateManager = new TemplateManager();
     }
 
     public CLI() {
         this(System.out, System.err);
+    }
+
+    private void initTemplateManager() {
+        this.templateManager.setDeepTrace(this.settings.deepTrace);
+        this.templateManager.setHaltOn(this.settings.haltOn);
+        this.templateManager.setFetchMissingDependencies(this.settings.fetchMissingDependencies);
+        this.templateManager.setExtensions(this.settings.extensions);
+        this.templateManager.setIgnoreExtensions(this.settings.ignoreExtensions);
+
+        for (CLIFormat format : CLIFormat.values()) {
+            this.templateManager.registerFormat(format.format);
+        }
     }
 
     public static void main(String[] args) {
@@ -94,8 +90,8 @@ public class CLI {
             return;
         }
 
+        initTemplateManager();
         this.messageHandler.setQuiet(this.settings.quiet);
-        Trace.setDeepTrace(this.settings.deepTrace);
 
         if (cli.isUsageHelpRequested()) {
             cli.usage(this.outStream);
@@ -136,323 +132,146 @@ public class CLI {
     /// MAIN EXECUTION                                       ///
     ////////////////////////////////////////////////////////////
 
-
     private void execute() {
 
-        TemplateStore store = new DependencyGraph(ReaderRegistryImpl.getReaderRegistry());
-        Result<PrefixMapping> prefixes = parseLibraryInto(store);
-
-        if (StringUtils.isNotBlank(this.settings.prefixes)) {
-            Result<Model> userPrefixes = new RDFFileReader().parse(this.settings.prefixes);
-            prefixes.addResult(userPrefixes, (a, b) -> a.withDefaultMappings(b));
-        }
-
-        this.messageHandler.use(prefixes, p -> executeMode(store, p));
-    }
-
-    /**
-     * Populated store with parsed templates, and returns true if error occurred, and false otherwise.
-     */
-    private Result<PrefixMapping> parseLibraryInto(TemplateStore store) {
-        
-        store.addOTTRBaseTemplates();
-
-        Result<PrefixMapping> prefixes = Result.of(OTTR.getDefaultPrefixes());
-
-        if (this.settings.library == null || this.settings.library.length == 0) {
-            return prefixes;
-        }
-
-        for (int i = 0; i < this.settings.library.length; i++) {
-            // check if library is folder or file, and get readerFunction accordingly:
-            String lib = this.settings.library[i];
-
-            Function<TemplateReader, MessageHandler> readerFunction =
-                Files.isDirectory(Paths.get(this.settings.library[i]))
-                    ? reader -> reader.loadTemplatesFromFolder(store, lib,
-                    this.settings.extensions, this.settings.ignoreExtensions)
-                    : reader -> reader.loadTemplatesFromFile(store, lib);
-
-            Result<TemplateReader> reader;
-            // check if libraryFormat is set or not
-            if (this.settings.libraryFormat != null) {
-                reader = store.getReaderRegistry().getTemplateReaders(this.settings.libraryFormat.toString());
-                reader.map(readerFunction)
-                    .map(mgs -> mgs.toSingleMessage("Attempt of parsing templates as "
-                            + this.settings.libraryFormat + " format failed:"))
-                    .ifPresent(mgs -> mgs.ifPresent(reader::addMessage));
-                prefixes.addResult(reader, (m, r) -> m.setNsPrefixes(r.getPrefixes()));
-            } else {
-                reader = store.getReaderRegistry().attemptAllReaders(readerFunction);
-            }
-            prefixes.addResult(reader, (m, r) -> m.setNsPrefixes(r.getPrefixes()));
-        }
-
-        if (this.settings.fetchMissingDependencies) {
-            MessageHandler msgs = store.fetchMissingDependencies();
-            prefixes.addMessages(msgs.getMessages());
-        }
-        
-        return prefixes;
-    } 
-    
-    private void executeExpand(TemplateStore store, PrefixMapping usedPrefixes) {
-
-        this.messageHandler.use(makeInstanceReader(),
-            reader -> {
-
-                this.messageHandler.use(makeExpander(store),
-                    expander -> {
-
-                        this.messageHandler.use(makeInstanceWriter(usedPrefixes),
-                            writer -> {
-                                
-                                expandAndWriteInstanes(reader, writer, expander);
-                            }
-                        );
-                    }
-                );
-            }
-        );
-    }
-
-    private void executeExpandLibrary(TemplateStore store, PrefixMapping usedPrefixes) {
-        
-        this.messageHandler.use(store.expandAll(),
-            expandedStore -> {
-
-                this.messageHandler.use(makeTemplateWriter(usedPrefixes),
-                    writer ->  {
-
-                        writeTemplates(expandedStore, writer);
-                    }
-                );
-            }
-        );
-    }
-
-    private void executeFormatLibrary(TemplateStore store, PrefixMapping usedPrefixes) {
-        
-        this.messageHandler.use(makeTemplateWriter(usedPrefixes),
-            writer ->  {
-
-                writeTemplates(store, writer);
-            }
-        );
-    }
-
-    private void executeFormat(PrefixMapping usedPrefixes) {
-        
-        this.messageHandler.use(makeInstanceReader(),
-            reader -> {
-
-                this.messageHandler.use(makeInstanceWriter(usedPrefixes),
-                    writer ->  {
-
-                        formatInstances(reader, writer);
-                    }
-                );
-            }
-        );
-    }
-
-    private void executeMode(TemplateStore store, PrefixMapping usedPrefixes) {
-        
-        int severity = Message.INFO; // Least severe
-        if (!this.settings.quiet) {
-            severity = checkTemplates(store);
-        }
-
-        if (Message.moreSevere(severity, this.settings.haltOn)) {
+        if (Message.moreSevere(parseLibrary(), this.settings.haltOn)) {
             return;
         }
+        if (Message.moreSevere(parsePrefixes(), this.settings.haltOn)) {
+            return;
+        }
+        if (Message.moreSevere(checkLibrary(), this.settings.haltOn)) {
+            return;
+        }
+        executeMode();
+    }
+
+    private void executeMode() {
 
         switch (this.settings.mode) {
             case expand:
-                executeExpand(store, usedPrefixes);
+                executeExpand();
                 break;
             case expandLibrary:
-                executeExpandLibrary(store, usedPrefixes);
+                executeExpandLibrary();
                 break;
             case formatLibrary:
-                executeFormatLibrary(store, usedPrefixes);
+                executeFormatLibrary();
                 break;
             case format:
-                executeFormat(usedPrefixes);
+                executeFormat();
                 break;
             case lint:
-                // Simply load templates and check for messages, as done before the switch
-                if (!this.settings.quiet && Message.moreSevere(Message.WARNING, severity)) {
-                    this.outStream.println("No errors found.");
-                }
                 break;
             default:
                 Message err = Message.error("The mode " + this.settings.mode + " is not yet supported.");
                 this.messageHandler.printMessage(err);
-        } 
+        }
     }
 
+    private void executeExpand() {
+        writeInstances(parseAndExpandInstances());
+    }
+
+    private void executeFormat() {
+        writeInstances(parseInstances());
+    }
+
+    private void executeExpandLibrary() {
+        this.messageHandler.use(this.templateManager.expandStore(), this::writeTemplates);
+    }
+
+    private void executeFormatLibrary() {
+        writeTemplates(this.templateManager);
+    }
+
+    private int checkLibrary() {
+        MessageHandler msgs = this.templateManager.checkTemplates();
+        int severity = this.settings.quiet ? msgs.getMostSevere() : msgs.printMessages();
+
+        if (this.settings.mode == Settings.Mode.lint
+            && !this.settings.quiet
+            && Message.moreSevere(Message.WARNING, severity)) {
+
+            // Print message if linting and no errors found
+            this.outStream.println("No errors found.");
+        }
+        return severity;
+    }
 
     ////////////////////////////////////////////////////////////
-    /// MAKER-METHODS, MAKING THINGS BASED ON FLAGS          ///
-    ////////////////////////////////////////////////////////////
-            
-    private Result<InstanceReader> makeInstanceReader() {
-        if (this.settings.inputs.isEmpty()) {
-            return Result.error("No input file provided.");
-        }
-        return ReaderRegistryImpl.getReaderRegistry().getInstanceReader(this.settings.inputFormat.toString());
-    }
-
-    private Result<Function<Instance, ResultStream<Instance>>> makeExpander(TemplateStore store) {
-        if (this.settings.fetchMissingDependencies) {
-            return Result.of(store::expandInstanceFetch);
-        } else {
-            return Result.of(store::expandInstance);
-        }
-    }
-
-    private Result<InstanceWriter> makeInstanceWriter(PrefixMapping usedPrefixes) {
-        switch (this.settings.outputFormat) {
-            case wottr:
-                return Result.of(new WInstanceWriter(usedPrefixes));
-            case stottr:
-                return Result.of(new SInstanceWriter(usedPrefixes.getNsPrefixMap()));
-            default:
-                return Result.error("Output format " + this.settings.outputFormat + " not (yet?) supported for instances.");
-        }
-    }
-
-    private Result<TemplateWriter> makeTemplateWriter(PrefixMapping usedPrefixes) {
-        switch (this.settings.outputFormat) {
-            case wottr:
-                return Result.of(new WTemplateWriter(usedPrefixes));
-            case stottr:
-                return Result.of(new STemplateWriter(usedPrefixes.getNsPrefixMap()));
-            default:
-                return Result.error("Output format " + this.settings.outputFormat + " not (yet?) supported for templates.");
-        }
-    }
-
-
-    ////////////////////////////////////////////////////////////
-    /// WRITER-METHODS, WRITING THINGS TO FILE               ///
+    /// Parsing and writing                                  ///
     ////////////////////////////////////////////////////////////
 
-    private void processInstances(Function<String, ResultStream<Instance>> processor, InstanceWriter writer) {
+    private int parseLibrary() {
 
-        ResultConsumer<Instance> consumer = new ResultConsumer<>(writer, this.errStream);
-        ResultStream.innerOf(this.settings.inputs)
-            .innerFlatMap(processor)
-            .forEach(consumer);
-
-        if (!Message.moreSevere(consumer.getMessageHandler().printMessages(), this.settings.haltOn)) {
-            writeInstances(writer.write());
-        }
-    }
-
-    private void formatInstances(InstanceReader reader, InstanceWriter writer) {
-        processInstances(reader, writer);
-    }
-
-    private void expandAndWriteInstanes(InstanceReader reader, InstanceWriter writer,
-        Function<Instance, ResultStream<Instance>> expander) {
-
-        processInstances(ResultStream.innerFlatMapCompose(reader, expander), writer);
-    }
-
-    private void writeInstances(String output) {
-
-        // If neither --stdout nor -o is set, default to --stdout
-        if (shouldPrintOutput()) {
-            this.outStream.println(output);
+        if (this.settings.library == null || this.settings.library.length == 0) {
+            return Message.INFO; // Least severe
         }
 
-        if (this.settings.out == null) {
-            return;
+        Format libraryFormat = this.settings.libraryFormat == null
+                ? null
+                : this.templateManager.getFormat(this.settings.libraryFormat.toString());
+
+        return this.templateManager.parseLibraryInto(libraryFormat, this.settings.library)
+            .printMessages();
+    }
+
+    private int parsePrefixes() {
+        if (!StringUtils.isNotBlank(this.settings.prefixes)) {
+            return Message.INFO; // Least severe
         }
-        try {
-            Files.write(Paths.get(this.settings.out), output.getBytes(Charset.forName("UTF-8")));
-        } catch (IOException ex) {
-            if (!this.settings.quiet) {
-                Message err = Message.error("Error writing output: " + ex.getMessage());
-                this.messageHandler.printMessage(err);
+        Result<Model> userPrefixes = new RDFFileReader().parse(this.settings.prefixes);
+        return this.messageHandler.use(userPrefixes, up -> this.templateManager.addPrefixes(up));
+    }
+
+    public ResultStream<Instance> parseInstances() {
+        Format inFormat = this.templateManager.getFormat(this.settings.inputFormat.toString());
+        return this.templateManager.parseInstances(inFormat, this.settings.inputs);
+    }
+
+    public ResultStream<Instance> parseAndExpandInstances() {
+        return parseInstances().innerFlatMap(this.templateManager.makeExpander());
+    }
+
+    private void writeInstances(ResultStream<Instance> ins) {
+
+        Format outFormat = this.templateManager.getFormat(this.settings.outputFormat.toString());
+        this.templateManager
+            .writeInstances(ins, outFormat, makeInstanceWriter(outFormat.getDefaultFileSuffix()))
+            .printMessages();
+    }
+
+    private void writeTemplates(TemplateManager templateManager) {
+        Format outFormat = this.templateManager.getFormat(this.settings.outputFormat.toString());
+        templateManager.writeTemplates(outFormat, makeTemplateWriter(outFormat.getDefaultFileSuffix()));
+    }
+
+    private Function<String, Optional<Message>> makeInstanceWriter(String suffix) {
+        return str -> {
+            if (shouldPrintOutput()) {
+                this.outStream.println(str);
             }
-        }
-    }
-
-    private void writeTemplates(TemplateStore store, TemplateWriter writer) {
-        ResultConsumer<TemplateSignature> consumer = new ResultConsumer<>(writer, this.errStream);
-        store.getAllTemplateObjects().forEach(consumer);
-
-        if (!Message.moreSevere(consumer.getMessageHandler().printMessages(), this.settings.haltOn)) {
-            for (String iri : writer.getIRIs()) {
-                writeTemplate(iri, writer.write(iri));
+            if (this.settings.out != null) {
+                return Utils.writeInstancesTo(str, suffix, this.settings.out);
             }
-        }
+            return Optional.empty();
+        };
     }
 
-    private void writeTemplate(String iri, String output) {
-
-        // If neither --stdout nor -o is set, default to --stdout
-        if (shouldPrintOutput()) {
-            this.outStream.println(output);
-        }
-
-        if (this.settings.out == null) {
-            return;
-        }
-        try {
-            // TODO: cli-arg to decide extension
-            String iriPath = iriToPath(iri);
-            Files.createDirectories(Paths.get(this.settings.out, iriToDirectory(iriPath)));
-            Files.write(Paths.get(this.settings.out, iriPath + getFileSuffix()), output.getBytes(Charset.forName("UTF-8")));
-        } catch (IOException | URISyntaxException ex) {
-            Message err = Message.error(
-                "Error when writing output -- " + ex.getMessage());
-            this.messageHandler.printMessage(err);
-        }
+    private BiFunction<String, String, Optional<Message>> makeTemplateWriter(String suffix) {
+        return (iri, str) -> {
+            if (shouldPrintOutput()) {
+                this.outStream.println(str);
+            }
+            if (this.settings.out != null) {
+                return Utils.writeTemplatesTo(iri, str, suffix, this.settings.out);
+            }
+            return Optional.empty();
+        };
     }
-
-
-    ////////////////////////////////////////////////////////////
-    /// UTILS                                                ///
-    ////////////////////////////////////////////////////////////
-
-    private String getFileSuffix() {
-
-        switch (this.settings.outputFormat) {
-            case legacy:
-            case wottr:
-                return ".ttl";
-            case stottr:
-                return ".stottr";
-            default:
-                return "";
-        }
-    }
-        
 
     private boolean shouldPrintOutput() {
         return this.settings.stdout || this.settings.out == null;
-    }
-
-    private static String iriToDirectory(String pathStr) {
-        Path folder = Paths.get(pathStr).getParent();
-        return folder == null ? null : folder.toString();
-    }
-
-    private static String iriToPath(String iriStr) throws URISyntaxException {
-        return new URI(iriStr).getPath();
-    }
-
-    private int checkTemplates(TemplateStore store) {
-        List<Message> msgs = store.checkTemplates();
-        msgs.forEach(this.messageHandler::printMessage);
-        int mostSevere = msgs.stream()
-            .mapToInt(Message::getLevel)
-            .min()
-            .orElse(Message.INFO);
-        return mostSevere;
     }
 }

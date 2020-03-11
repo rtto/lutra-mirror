@@ -45,28 +45,17 @@ public class TemplateReader implements Function<String, ResultStream<TemplateSig
     private final Function<String, ResultStream<TemplateSignature>> templatePipeline;
     private final TemplateParser<?> parser; // Needed for retrieving used prefixes
     private static final Logger log = LoggerFactory.getLogger(TemplateReader.class);
-    private final String format;
-
-    public <M> TemplateReader(InputReader<String, M> templateInputReader,
-            TemplateParser<M> templateParser, String format) {
-        this.templatePipeline = ResultStream.innerFlatMapCompose(templateInputReader, templateParser);
-        this.parser = templateParser;
-        this.format = format;
-    }
 
     public <M> TemplateReader(InputReader<String, M> templateInputReader,
             TemplateParser<M> templateParser) {
-        this(templateInputReader, templateParser, "unknown");
+        this.templatePipeline = ResultStream.innerFlatMapCompose(templateInputReader, templateParser);
+        this.parser = templateParser;
     }
 
     public Map<String, String> getPrefixes() {
         return this.parser.getPrefixes();
     }
     
-    public String getFormat() {
-        return this.format;
-    }
-
     public ResultStream<TemplateSignature> apply(String file) {
         return this.templatePipeline.apply(file);
     }
@@ -112,7 +101,7 @@ public class TemplateReader implements Function<String, ResultStream<TemplateSig
                 + Arrays.toString(includeExtensions) + " except " + Arrays.toString(excludeExtensions));
 
         return populateTemplateStore(store,
-                                     Files.loadFromFolder(folder,
+                                     Utils.loadFromFolder(folder,
                                                           includeExtensions,
                                                           excludeExtensions));
     }
@@ -134,7 +123,7 @@ public class TemplateReader implements Function<String, ResultStream<TemplateSig
 
         this.log.info("Loading all templates from folder " + folder + " with suffix "
                 + Arrays.toString(includeExtensions) + " except " + Arrays.toString(excludeExtensions));
-        return Files.loadFromFolder(folder, includeExtensions, excludeExtensions)
+        return Utils.loadFromFolder(folder, includeExtensions, excludeExtensions)
             .innerFlatMap(this.templatePipeline);
     }
     

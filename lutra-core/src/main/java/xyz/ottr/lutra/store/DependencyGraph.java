@@ -38,7 +38,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import xyz.ottr.lutra.OTTR;
-import xyz.ottr.lutra.io.ReaderRegistry;
+import xyz.ottr.lutra.io.FormatManager;
 import xyz.ottr.lutra.model.ArgumentList;
 import xyz.ottr.lutra.model.BlankNodeTerm;
 import xyz.ottr.lutra.model.Instance;
@@ -49,6 +49,7 @@ import xyz.ottr.lutra.model.Template;
 import xyz.ottr.lutra.model.TemplateSignature;
 import xyz.ottr.lutra.model.Term;
 import xyz.ottr.lutra.result.Message;
+import xyz.ottr.lutra.result.MessageHandler;
 import xyz.ottr.lutra.result.Result;
 import xyz.ottr.lutra.result.ResultStream;
 import xyz.ottr.lutra.store.query.Check;
@@ -78,23 +79,23 @@ public class DependencyGraph implements TemplateStore {
     private final Map<String, TemplateNode> nodes;
     private final Map<TemplateNode, Set<Dependency>> dependencies;
     private final Map<String, Set<String>> instanceIndex;
-    private final ReaderRegistry readerRegistry;
+    private final FormatManager formatManager;
 
     private static final Logger log = LoggerFactory.getLogger(DependencyGraph.class);
 
     /**
      * Constructs a graph representing template definitions and instances.
      */
-    public DependencyGraph(ReaderRegistry readerRegistry) {
+    public DependencyGraph(FormatManager formatManager) {
         this.roots = new HashSet<>();
         this.nodes = new HashMap<>();
         this.dependencies = new HashMap<>();
         this.instanceIndex = new HashMap<>();
-        this.readerRegistry = readerRegistry;
+        this.formatManager = formatManager;
     }
     
-    public DependencyGraph(ReaderRegistry readerRegistry, Template... ts) {
-        this(readerRegistry);
+    public DependencyGraph(FormatManager formatManager, Template... ts) {
+        this(formatManager);
         for (Template t : ts) {
             addTemplate(t);
         }
@@ -610,7 +611,7 @@ public class DependencyGraph implements TemplateStore {
         this.log.info("Expanding definitions.");
         List<TemplateNode> sorted = topologicallySort();
 
-        DependencyGraph ngraph = new DependencyGraph(this.readerRegistry);
+        DependencyGraph ngraph = new DependencyGraph(this.formatManager);
         Result<DependencyGraph> graphRes = Result.of(ngraph);
 
         for (TemplateNode n : sorted) {
@@ -638,22 +639,25 @@ public class DependencyGraph implements TemplateStore {
         return expandOnly(vocabularyExpansionPredicate(iris));
     }
 
-    private List<Message> checkTemplatesFor(List<Check> checks) {
+    private MessageHandler checkTemplatesFor(List<Check> checks) {
 
         QueryEngine<DependencyGraph> engine = new DependencyGraphEngine(this);
-        return checks
+        List<Message> msgLst = checks
             .stream()
             .flatMap(c -> c.check(engine))
             .collect(Collectors.toList());
+        MessageHandler msgs = new MessageHandler();
+        msgLst.forEach(msgs::add);
+        return msgs;
     }
 
     @Override
-    public List<Message> checkTemplates() {
+    public MessageHandler checkTemplates() {
         return checkTemplatesFor(CheckFactory.allChecks);
     }
 
     @Override
-    public List<Message> checkTemplatesForErrorsOnly() {
+    public MessageHandler checkTemplatesForErrorsOnly() {
         return checkTemplatesFor(CheckFactory.failsOnErrorChecks);
     }
 
@@ -682,8 +686,8 @@ public class DependencyGraph implements TemplateStore {
     }
 
     @Override
-    public ReaderRegistry getReaderRegistry() {
-        return this.readerRegistry;
+    public FormatManager getFormatManager() {
+        return this.formatManager;
     }
 
     static class Dependency {

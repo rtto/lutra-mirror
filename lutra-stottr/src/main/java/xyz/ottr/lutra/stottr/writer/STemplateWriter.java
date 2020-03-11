@@ -22,11 +22,14 @@ package xyz.ottr.lutra.stottr.writer;
  * #L%
  */
 
-import java.util.HashMap;
+import java.util.HashMap; 
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.jena.shared.PrefixMapping;
+
+import xyz.ottr.lutra.OTTR;
 import xyz.ottr.lutra.io.TemplateWriter;
 import xyz.ottr.lutra.model.ParameterList;
 import xyz.ottr.lutra.model.Template;
@@ -42,9 +45,13 @@ import xyz.ottr.lutra.stottr.STOTTR;
 public class STemplateWriter implements TemplateWriter {
 
     private final Map<String, TemplateSignature> templates;
-    private final Map<String, String> prefixes;
+    private final PrefixMapping prefixes;
 
-    public STemplateWriter(Map<String, String> prefixes) {
+    public STemplateWriter() {
+        this(OTTR.getDefaultPrefixes());
+    }
+
+    public STemplateWriter(PrefixMapping prefixes) {
         this.templates = new HashMap<>();
         this.prefixes = prefixes;
     }
@@ -92,10 +99,10 @@ public class STemplateWriter implements TemplateWriter {
 
     private String writeUsedPrefixes(Set<String> usedPrefixes) {
 
-        Map<String, String> usedPrefixMap = new HashMap<>();
-        for (Map.Entry<String, String> nsln : this.prefixes.entrySet()) {
+        PrefixMapping usedPrefixMap = PrefixMapping.Factory.create();
+        for (Map.Entry<String, String> nsln : this.prefixes.getNsPrefixMap().entrySet()) {
             if (usedPrefixes.contains(nsln.getKey())) {
-                usedPrefixMap.put(nsln.getKey(), nsln.getValue());
+                usedPrefixMap.setNsPrefix(nsln.getKey(), nsln.getValue());
             }
         }
         return SPrefixWriter.write(usedPrefixMap);

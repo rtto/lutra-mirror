@@ -22,7 +22,7 @@ package xyz.ottr.lutra.io;
  * #L%
  */
 
-import java.io.IOException;
+import java.io.IOException; 
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.function.Function;
@@ -42,31 +42,15 @@ public class InstanceReader implements Function<String, ResultStream<Instance>> 
 
     private final String[] includeExtensions = new String[0]; // TODO: Set via arguments
     private final String[] excludeExtensions = new String[0]; // TODO: Set via arguments
-    private final String format;
-
-    public InstanceReader(Function<String, ResultStream<Instance>> instancePipeline, String format) {
-        this.instancePipeline = instancePipeline;
-        this.format = format;
-    }
 
     public InstanceReader(Function<String, ResultStream<Instance>> instancePipeline) {
-        this(instancePipeline, "unknown");
+        this.instancePipeline = instancePipeline;
     }
 
-    public <M> InstanceReader(InputReader<String, M> inputReader,
-            InstanceParser<M> instanceParser, String format) {
-        this(ResultStream.innerFlatMapCompose(inputReader, instanceParser), format);
+    public <M> InstanceReader(InputReader<String, M> inputReader, InstanceParser<M> instanceParser) {
+        this(ResultStream.innerFlatMapCompose(inputReader, instanceParser));
     }
     
-    public <M> InstanceReader(InputReader<String, M> inputReader,
-            InstanceParser<M> instanceParser) {
-        this(inputReader, instanceParser, "unknown");
-    }
-    
-    public String getFormat() {
-        return this.format;
-    }
-
     public ResultStream<Instance> readInstances(ResultStream<String> files) {
         return files.innerFlatMap(this);
     }
@@ -95,6 +79,6 @@ public class InstanceReader implements Function<String, ResultStream<Instance>> 
 
         this.log.info("Loading all template instaces from folder " + folder + " with suffix "
                 + Arrays.toString(this.includeExtensions) + " except " + Arrays.toString(this.excludeExtensions));
-        return readInstances(Files.loadFromFolder(folder, this.includeExtensions, this.excludeExtensions));
+        return readInstances(Utils.loadFromFolder(folder, this.includeExtensions, this.excludeExtensions));
     }
 }

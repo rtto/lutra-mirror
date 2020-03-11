@@ -22,7 +22,7 @@ package xyz.ottr.lutra.store;
  * #L%
  */
 
-import java.util.Collection;
+import java.util.Collection; 
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -30,12 +30,11 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 import xyz.ottr.lutra.OTTR;
-import xyz.ottr.lutra.io.ReaderRegistry;
+import xyz.ottr.lutra.io.FormatManager;
 import xyz.ottr.lutra.io.TemplateReader;
 import xyz.ottr.lutra.model.Instance;
 import xyz.ottr.lutra.model.Template;
 import xyz.ottr.lutra.model.TemplateSignature;
-import xyz.ottr.lutra.result.Message;
 import xyz.ottr.lutra.result.MessageHandler;
 import xyz.ottr.lutra.result.Result;
 import xyz.ottr.lutra.result.ResultConsumer;
@@ -152,7 +151,7 @@ public interface TemplateStore extends Consumer<TemplateSignature> {
      * - Use of lists and expansion modifiers
      * - Missing template 
      */
-    List<Message> checkTemplates();
+    MessageHandler checkTemplates();
 
     /**
      * Performs the same checks as #checkTemplates(), except "Missing templates".
@@ -160,7 +159,7 @@ public interface TemplateStore extends Consumer<TemplateSignature> {
      * (without having its dependencies loaded in the store) or to check templates
      * in an unfinished library where not all templates are (yet) defined.
      */
-    List<Message> checkTemplatesForErrorsOnly();
+    MessageHandler checkTemplatesForErrorsOnly();
 
     /**
      * Expands all nodes without losing information, that is, it does not expand
@@ -299,10 +298,10 @@ public interface TemplateStore extends Consumer<TemplateSignature> {
 
         ResultConsumer<TemplateReader> messages = new ResultConsumer<>();
         
-        ReaderRegistry readerRegistry = getReaderRegistry();
-        if (readerRegistry == null) {
+        FormatManager formatManager = getFormatManager();
+        if (formatManager == null) {
             messages.accept(Result.error(
-                    "Attempted fetching missing templates, but has no ReaderRegistry provided."));
+                    "Attempted fetching missing templates, but has no formats registered."));
             return messages.getMessageHandler();
         }
 
@@ -314,7 +313,7 @@ public interface TemplateStore extends Consumer<TemplateSignature> {
 
         while (!missing.isEmpty()) {
             for (String toFetch : missing) {
-                messages.accept(readerRegistry.attemptAllReaders(reader -> reader.populateTemplateStore(this, toFetch)));
+                messages.accept(formatManager.attemptAllFormats(reader -> reader.populateTemplateStore(this, toFetch)));
                 if (!containsTemplate(toFetch)) { // Check if fetched and added to store
                     failed.add(toFetch);
                 }
@@ -325,5 +324,5 @@ public interface TemplateStore extends Consumer<TemplateSignature> {
         return messages.getMessageHandler();
     }
 
-    ReaderRegistry getReaderRegistry();
+    FormatManager getFormatManager();
 }

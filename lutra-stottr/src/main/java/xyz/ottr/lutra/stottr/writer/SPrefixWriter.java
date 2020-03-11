@@ -1,7 +1,7 @@
 package xyz.ottr.lutra.stottr.writer;
 
 /*-
- * #%L
+ * #%L 
  * lutra-stottr
  * %%
  * Copyright (C) 2018 - 2019 University of Oslo
@@ -24,14 +24,16 @@ package xyz.ottr.lutra.stottr.writer;
 
 import java.util.Map;
 import java.util.stream.Collectors;
+import org.apache.jena.shared.PrefixMapping;
 
 public enum SPrefixWriter {
 
     ; // util enum
 
-    public static String write(Map<String, String> prefixes) {
-        return prefixes.keySet().stream()
-            .map(key -> "@prefix " + key + ": <" + prefixes.get(key) + "> .")
+    public static String write(PrefixMapping prefixes) {
+        Map<String, String> pfMap = prefixes.getNsPrefixMap();
+        return pfMap.keySet().stream()
+            .map(key -> "@prefix " + key + ": <" + pfMap.get(key) + "> .")
             .collect(Collectors.joining("\n"));
     }
 }

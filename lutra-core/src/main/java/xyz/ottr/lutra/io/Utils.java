@@ -23,9 +23,15 @@ package xyz.ottr.lutra.io;
  */
 
 import java.io.File;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
@@ -41,7 +47,7 @@ import xyz.ottr.lutra.result.Message;
 import xyz.ottr.lutra.result.Result;
 import xyz.ottr.lutra.result.ResultStream;
 
-public enum Files {
+public enum Utils {
     ;
 
     private static final IOFileFilter hiddenFiles = new NotFileFilter(
@@ -54,17 +60,51 @@ public enum Files {
     private static final Function<String, IOFileFilter> extFilter = string -> FileFilterUtils.suffixFileFilter(string,
             IOCase.INSENSITIVE);
 
+    public static Optional<Message> writeInstancesTo(String output, String suffix, String filePath) {
+
+        try {
+            Files.write(Paths.get(filePath + suffix), output.getBytes(Charset.forName("UTF-8")));
+        } catch (IOException ex) {
+            Message err = Message.error("Error writing output: " + ex.getMessage());
+            return Optional.of(err);
+        }
+        return Optional.empty();
+    }
+
+    public static Optional<Message> writeTemplatesTo(String iri, String output, String suffix, String folder) {
+
+        try {
+            // TODO: cli-arg to decide extension
+            String iriPath = Utils.iriToPath(iri);
+            Files.createDirectories(Paths.get(folder, Utils.iriToDirectory(iriPath)));
+            Files.write(Paths.get(folder, iriPath + suffix), output.getBytes(Charset.forName("UTF-8")));
+        } catch (IOException | URISyntaxException ex) {
+            Message err = Message.error("Error when writing output -- " + ex.getMessage());
+            return Optional.of(err);
+        }
+        return Optional.empty();
+    }
+    
+    public static String iriToDirectory(String pathStr) {
+        Path folder = Paths.get(pathStr).getParent();
+        return folder == null ? null : folder.toString();
+    }
+
+    public static String iriToPath(String iriStr) throws URISyntaxException {
+        return new URI(iriStr).getPath();
+    }
+
     public static Message checkFolderReadable(String folder) throws SecurityException {
         Path path = Paths.get(folder);
 
         try {
-            if (!java.nio.file.Files.exists(path)) {
+            if (!Files.exists(path)) {
                 return Message.error("No folder with path " + folder + " exists.");
             }
-            if (!java.nio.file.Files.isDirectory(path)) {
+            if (!Files.isDirectory(path)) {
                 return Message.error("The path " + folder + " is not a folder.");
             }
-            if (!java.nio.file.Files.isReadable(path)) {
+            if (!Files.isReadable(path)) {
                 return Message.error("The folder " + folder + " is not readable.");
             }
         } catch (SecurityException ex) {
@@ -90,7 +130,7 @@ public enum Files {
             .map(extFilter)
             .reduce(FileFilterUtils.falseFileFilter(), FileFilterUtils::or);
 
-        // conjuction of negations
+        // conjunction of negations
         IOFileFilter excludes = Arrays.stream(excludeExtensions)
             .map(extFilter)
             .map(FileFilterUtils::notFileFilter)

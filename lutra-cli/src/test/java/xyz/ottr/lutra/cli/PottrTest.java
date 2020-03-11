@@ -33,13 +33,14 @@ import org.apache.commons.lang3.StringUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
+
+import xyz.ottr.lutra.TemplateManager;
 import xyz.ottr.lutra.io.InstanceReader;
 import xyz.ottr.lutra.io.TemplateReader;
 import xyz.ottr.lutra.model.Instance;
 import xyz.ottr.lutra.result.Message;
 import xyz.ottr.lutra.result.ResultConsumer;
 import xyz.ottr.lutra.result.ResultStream;
-import xyz.ottr.lutra.store.DependencyGraph;
 import xyz.ottr.lutra.store.TemplateStore;
 import xyz.ottr.lutra.stottr.io.SFileReader;
 import xyz.ottr.lutra.stottr.parser.SInstanceParser;
@@ -108,9 +109,11 @@ public class PottrTest {
     }
 
     private TemplateStore getStore() {
-        TemplateStore store = new DependencyGraph(ReaderRegistryImpl.getReaderRegistry());
-        store.addOTTRBaseTemplates();
-        return store;
+        TemplateManager tmwf = new TemplateManager();
+        for (CLIFormat format : CLIFormat.values()) {
+            tmwf.registerFormat(format.format);
+        }
+        return tmwf.getTemplateStore();
     }
 
     private boolean testTemplates(TemplateStore store, String path) {
@@ -118,13 +121,7 @@ public class PottrTest {
         reader.loadTemplatesFromFolder(store, resolve(path), new String[]{}, new String[]{});
         store.fetchMissingDependencies();
 
-        List<Message> tplMsg = store.checkTemplates();
-
-        int maxError = tplMsg.stream()
-            .mapToInt(Message::getLevel)
-            .min()
-            .orElse(Message.INFO);
-
+        int maxError = store.checkTemplates().getMostSevere();
         return !Message.moreSevere(maxError, Message.ERROR);
     }
 
@@ -135,7 +132,7 @@ public class PottrTest {
             .innerFlatMap(store::expandInstanceFetch);
 
         // Write expanded instances to model
-        SInstanceWriter insWriter = new SInstanceWriter(new HashMap<>());
+        SInstanceWriter insWriter = new SInstanceWriter();
         ResultConsumer<Instance> expansionErrors = new ResultConsumer<>(insWriter);
         expandedInInstances.forEach(expansionErrors);
 
