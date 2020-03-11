@@ -204,10 +204,15 @@ public class CLI {
     ////////////////////////////////////////////////////////////
 
     private int parseLibrary() {
+
         if (this.settings.library == null || this.settings.library.length == 0) {
             return Message.INFO; // Least severe
         }
-        Format libraryFormat = this.templateManager.getFormat(this.settings.libraryFormat.toString());
+
+        Format libraryFormat = this.settings.libraryFormat == null
+                ? null
+                : this.templateManager.getFormat(this.settings.libraryFormat.toString());
+
         return this.templateManager.parseLibraryInto(libraryFormat, this.settings.library)
             .printMessages();
     }
