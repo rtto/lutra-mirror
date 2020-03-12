@@ -27,15 +27,15 @@ import org.apache.jena.shared.PrefixMapping;
 import xyz.ottr.lutra.OTTR;
 import xyz.ottr.lutra.io.Format;
 import xyz.ottr.lutra.io.InstanceReader;
-import xyz.ottr.lutra.io.InstanceWriter;
 import xyz.ottr.lutra.io.TemplateReader;
-import xyz.ottr.lutra.io.TemplateWriter;
-import xyz.ottr.lutra.result.Result;
 import xyz.ottr.lutra.stottr.io.SFileReader;
 import xyz.ottr.lutra.stottr.parser.SInstanceParser;
 import xyz.ottr.lutra.stottr.parser.STemplateParser;
 import xyz.ottr.lutra.stottr.writer.SInstanceWriter;
 import xyz.ottr.lutra.stottr.writer.STemplateWriter;
+import xyz.ottr.lutra.system.Result;
+import xyz.ottr.lutra.writer.InstanceWriter;
+import xyz.ottr.lutra.writer.TemplateWriter;
 
 public class StottrFormat implements Format {
     

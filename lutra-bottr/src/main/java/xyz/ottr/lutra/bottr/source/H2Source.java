@@ -30,8 +30,8 @@ import java.util.Optional;
 import org.apache.jena.ext.com.google.common.io.Files;
 import xyz.ottr.lutra.bottr.BOTTR;
 import xyz.ottr.lutra.bottr.model.ArgumentMaps;
-import xyz.ottr.lutra.model.ArgumentList;
-import xyz.ottr.lutra.result.ResultStream;
+import xyz.ottr.lutra.model.Argument;
+import xyz.ottr.lutra.system.ResultStream;
 
 public class H2Source extends JDBCSource {
 
@@ -56,7 +56,7 @@ public class H2Source extends JDBCSource {
     }
 
     @Override
-    public ResultStream<ArgumentList> execute(String query, ArgumentMaps<String> argumentMaps) {
+    public ResultStream<List<Argument>> execute(String query, ArgumentMaps<String> argumentMaps) {
         return super.execute(setPWD(query), argumentMaps);
     }
 

@@ -28,6 +28,7 @@ import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 import xyz.ottr.lutra.model.types.TermType;
+import xyz.ottr.lutra.model.types.TypeRegistry;
 
 // TODO suggest to move this to core.mode.terms
 
@@ -43,13 +44,13 @@ public enum  TypeFactory {
 
     public static TermType getTermType(Resource value) {
         return value.isURIResource()
-            ? xyz.ottr.lutra.model.types.TypeFactory.IRI
-            : xyz.ottr.lutra.model.types.TypeFactory.TOP;
+            ? TypeRegistry.IRI
+            : TypeRegistry.TOP;
     }
 
     public static TermType getTermType(Literal value) {
         return Optional.ofNullable(value.getDatatypeURI())
-            .map(xyz.ottr.lutra.model.types.TypeFactory::getType)
-            .orElse(xyz.ottr.lutra.model.types.TypeFactory.LITERAL);
+            .map(TypeRegistry::getType)
+            .orElse(TypeRegistry.LITERAL);
     }
 }

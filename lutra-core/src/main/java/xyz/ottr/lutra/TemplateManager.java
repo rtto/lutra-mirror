@@ -37,18 +37,19 @@ import org.apache.jena.shared.PrefixMapping;
 import xyz.ottr.lutra.io.Format;
 import xyz.ottr.lutra.io.FormatManager;
 import xyz.ottr.lutra.io.InstanceReader;
-import xyz.ottr.lutra.io.InstanceWriter;
 import xyz.ottr.lutra.io.TemplateReader;
-import xyz.ottr.lutra.io.TemplateWriter;
 import xyz.ottr.lutra.model.Instance;
-import xyz.ottr.lutra.result.Message;
-import xyz.ottr.lutra.result.MessageHandler;
-import xyz.ottr.lutra.result.Result;
-import xyz.ottr.lutra.result.ResultConsumer;
-import xyz.ottr.lutra.result.ResultStream;
-import xyz.ottr.lutra.result.Trace;
-import xyz.ottr.lutra.store.DependencyGraph;
 import xyz.ottr.lutra.store.TemplateStore;
+import xyz.ottr.lutra.store.graph.DependencyGraph;
+import xyz.ottr.lutra.system.Message;
+import xyz.ottr.lutra.system.MessageHandler;
+import xyz.ottr.lutra.system.Result;
+import xyz.ottr.lutra.system.ResultConsumer;
+import xyz.ottr.lutra.system.ResultStream;
+import xyz.ottr.lutra.system.Trace;
+import xyz.ottr.lutra.writer.InstanceWriter;
+import xyz.ottr.lutra.writer.TemplateWriter;
+
 
 public class TemplateManager {
 

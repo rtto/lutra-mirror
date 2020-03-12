@@ -40,7 +40,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import xyz.ottr.lutra.tabottr.TabOTTR;
-import xyz.ottr.lutra.wottr.vocabulary.v04.WOTTR;
+import xyz.ottr.lutra.wottr.WOTTR;
 
 public class RDFNodeFactoryTest {
 

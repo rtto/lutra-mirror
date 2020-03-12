@@ -22,18 +22,14 @@ package xyz.ottr.lutra.model.types;
  * #L%
  */
 
+import lombok.EqualsAndHashCode;
 import xyz.ottr.lutra.OTTR;
 
-public class NEListType implements ComplexType {
-
-    private final TermType inner;
+@EqualsAndHashCode(callSuper = true)
+public class NEListType extends ListType {
 
     public NEListType(TermType inner) {
-        this.inner = inner;
-    }
-
-    public TermType getInner() {
-        return this.inner;
+        super(inner);
     }
 
     @Override
@@ -43,35 +39,26 @@ public class NEListType implements ComplexType {
 
     @Override
     public boolean isSubTypeOf(TermType other) {
-        return other.equals(TypeFactory.getTopType())
+        return super.isSubTypeOf(other)
             || other instanceof NEListType
-               && getInner().isSubTypeOf(((NEListType) other).getInner())
-            || other instanceof ListType
-               && getInner().isSubTypeOf(((ListType) other).getInner());
+               && getInner().isSubTypeOf(((NEListType) other).getInner());
     }
 
     @Override
     public boolean isCompatibleWith(TermType other) {
-        return other.equals(TypeFactory.getTopType())
+        return super.isCompatibleWith(other)
             || other instanceof NEListType
-                && getInner().isCompatibleWith(((NEListType) other).getInner())
-            || other instanceof ListType
-                && getInner().isCompatibleWith(((ListType) other).getInner());
+                && getInner().isCompatibleWith(((NEListType) other).getInner());
+    }
+
+    @Override
+    public TermType removeLUB() {
+        return new NEListType(getInner().removeLUB());
     }
 
     @Override
     public String toString() {
-        return "NEList<" + getInner().toString() + ">";
+        return "NEList<" + getInner() + ">";
     }
 
-    @Override
-    public boolean equals(Object other) {
-        return other instanceof NEListType
-            && getInner().equals(((NEListType) other).getInner());
-    }
-
-    @Override
-    public int hashCode() {
-        return 7 * getInner().hashCode();
-    }
 }

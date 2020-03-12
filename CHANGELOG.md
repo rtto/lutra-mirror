@@ -27,7 +27,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 
-- Revert Core Type checking instances from 0.6.2, bugs found.
+- Revert Core Type checking instances from 0.6.2, bugs found
 
 ## 0.6.2
 

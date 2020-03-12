@@ -25,16 +25,15 @@ package xyz.ottr.lutra.stottr.parser;
 import org.antlr.v4.runtime.BaseErrorListener;
 import org.antlr.v4.runtime.RecognitionException;
 import org.antlr.v4.runtime.Recognizer;
-
-import xyz.ottr.lutra.result.Message;
-import xyz.ottr.lutra.result.MessageHandler;
-import xyz.ottr.lutra.result.Result;
+import xyz.ottr.lutra.system.Message;
+import xyz.ottr.lutra.system.MessageHandler;
+import xyz.ottr.lutra.system.Result;
 
 public class ErrorToMessageListener extends BaseErrorListener {
 
     private final MessageHandler messageHandler;
 
-    public ErrorToMessageListener() {
+    ErrorToMessageListener() {
         this.messageHandler = new MessageHandler();
     }
     
@@ -46,7 +45,7 @@ public class ErrorToMessageListener extends BaseErrorListener {
         this.messageHandler.add(Result.empty(Message.error(err)));
     }
 
-    public MessageHandler getMessageHandler() {
+    MessageHandler getMessageHandler() {
         return this.messageHandler;
     }
 }

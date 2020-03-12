@@ -33,14 +33,14 @@ import xyz.ottr.lutra.OTTR;
 import xyz.ottr.lutra.io.FormatManager;
 import xyz.ottr.lutra.io.TemplateReader;
 import xyz.ottr.lutra.model.Instance;
+import xyz.ottr.lutra.model.Signature;
 import xyz.ottr.lutra.model.Template;
-import xyz.ottr.lutra.model.TemplateSignature;
-import xyz.ottr.lutra.result.MessageHandler;
-import xyz.ottr.lutra.result.Result;
-import xyz.ottr.lutra.result.ResultConsumer;
-import xyz.ottr.lutra.result.ResultStream;
+import xyz.ottr.lutra.system.MessageHandler;
+import xyz.ottr.lutra.system.Result;
+import xyz.ottr.lutra.system.ResultConsumer;
+import xyz.ottr.lutra.system.ResultStream;
 
-public interface TemplateStore extends Consumer<TemplateSignature> {
+public interface TemplateStore extends Consumer<Signature> {
 
     default void addOTTRBaseTemplates() {
         addTemplateSignature(OTTR.BaseTemplate.Triple);
@@ -57,14 +57,14 @@ public interface TemplateStore extends Consumer<TemplateSignature> {
      * (that is, without a definition) even if it infact is an
      * instance of Template.
      */
-    boolean addTemplateSignature(TemplateSignature templateSignature);
+    boolean addTemplateSignature(Signature signature);
 
     /**
      * If the argument object is instance of Template, then 
      * adds it as template (with addTemplate-method) to this store,
-     * otherwise adds it as TemplateSignature with addTemplateSignature-method.
+     * otherwise adds it as Signature with addTemplateSignature-method.
      */
-    default boolean addTemplateObject(TemplateSignature templateObj) {
+    default boolean addTemplateObject(Signature templateObj) {
         if (templateObj instanceof Template) {
             return addTemplate((Template) templateObj);
         } else {
@@ -98,7 +98,7 @@ public interface TemplateStore extends Consumer<TemplateSignature> {
 
     Result<Template> getTemplate(String iri);
 
-    Result<TemplateSignature> getTemplateSignature(String iri);
+    Result<Signature> getTemplateSignature(String iri);
 
     /**
      * Returns the set of IRIs of template objects contained in this store satifiying
@@ -199,7 +199,7 @@ public interface TemplateStore extends Consumer<TemplateSignature> {
      * @return
      *          a ResultStream of signatures
      */ 
-    default ResultStream<TemplateSignature> getAllTemplateSignatures() {
+    default ResultStream<Signature> getAllTemplateSignatures() {
         return getTemplateSignatures(getTemplateSignatureIRIs());
     }
 
@@ -210,10 +210,10 @@ public interface TemplateStore extends Consumer<TemplateSignature> {
      * @return
      *          a ResultStream of templates
      */ 
-    default ResultStream<TemplateSignature> getAllTemplateObjects() {
+    default ResultStream<Signature> getAllTemplateObjects() {
         return ResultStream.concat(
             getAllTemplateSignatures(),
-            getAllTemplates().innerMap(tmp -> (TemplateSignature) tmp));
+            getAllTemplates().innerMap(tmp -> (Signature) tmp));
     }
 
     /**
@@ -240,7 +240,7 @@ public interface TemplateStore extends Consumer<TemplateSignature> {
      *          a ResultStream of signatures where missing signatures
      *          results in empty Result-objects
      */ 
-    default ResultStream<TemplateSignature> getTemplateSignatures(Set<String> iris) {
+    default ResultStream<Signature> getTemplateSignatures(Set<String> iris) {
         return new ResultStream<>(iris.stream().map(this::getTemplateSignature));
     }
 
@@ -264,11 +264,11 @@ public interface TemplateStore extends Consumer<TemplateSignature> {
      */
     default ResultStream<Instance> expandInstanceFetch(Instance instance) {
 
-        if (!containsTemplate(instance.getIRI())) {
+        if (!containsTemplate(instance.getIri())) {
             // Need to fetch missing template
-            MessageHandler messages = fetchMissingDependencies(List.of(instance.getIRI()));
+            MessageHandler messages = fetchMissingDependencies(List.of(instance.getIri()));
             Result<Instance> insWithMsgs = Result.of(instance);
-            messages.toSingleMessage("Fetch missing template: " + instance.getIRI())
+            messages.toSingleMessage("Fetch missing template: " + instance.getIri())
                 .ifPresent(insWithMsgs::addMessage);
             return insWithMsgs.mapToStream(this::expandInstance);
         }

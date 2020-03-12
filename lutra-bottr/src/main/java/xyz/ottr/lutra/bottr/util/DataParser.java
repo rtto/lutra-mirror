@@ -26,9 +26,8 @@ import java.util.Locale;
 
 import org.apache.commons.lang3.LocaleUtils;
 import org.apache.commons.lang3.StringUtils;
-
 import org.apache.jena.ext.xerces.util.URI;
-import xyz.ottr.lutra.result.Result;
+import xyz.ottr.lutra.system.Result;
 
 // TODO suggest to move this to core.parser or core.util
 

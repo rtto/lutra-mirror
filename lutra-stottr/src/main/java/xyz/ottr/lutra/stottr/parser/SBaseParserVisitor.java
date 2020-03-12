@@ -23,9 +23,8 @@ package xyz.ottr.lutra.stottr.parser;
  */
 
 import org.antlr.v4.runtime.tree.RuleNode;
-
-import xyz.ottr.lutra.result.Result;
 import xyz.ottr.lutra.stottr.antlr.stOTTRBaseVisitor;
+import xyz.ottr.lutra.system.Result;
 
 public abstract class SBaseParserVisitor<T> extends stOTTRBaseVisitor<Result<T>> {
 

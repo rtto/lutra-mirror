@@ -22,28 +22,27 @@ package xyz.ottr.lutra.model.types;
  * #L%
  */
 
-public interface ComplexType extends TermType {
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
 
-    TermType getInner();
+@Getter
+@EqualsAndHashCode
+public abstract class ComplexType implements TermType {
+
+    protected final TermType inner;
+
+    protected ComplexType(TermType inner) {
+        this.inner = inner;
+    }
 
     /**
      * @return the IRI of the (outer) term.
      */
-    String getOuterIRI();
+    public abstract String getOuterIRI();
 
-    /**
-     * Get the level of nesting of complex types. Example List List X has depth 2.
-     * @return
-     */
-    default int getDepth() {
-        return getInner() instanceof ComplexType
-            ? 1 + ((ComplexType) getInner()).getDepth()
-            : 1;
-    }
-
-    default BasicType getInnermost() {
-        return getInner() instanceof ComplexType
-            ? ((ComplexType)getInner()).getInnermost()
-            : (BasicType)getInner();
+    public BasicType getInnermost() {
+        return this.inner instanceof ComplexType
+            ? ((ComplexType) this.inner).getInnermost()
+            : (BasicType) this.inner;
     }
 }

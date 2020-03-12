@@ -26,7 +26,7 @@ import java.util.function.Supplier;
 
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Resource;
-import xyz.ottr.lutra.result.Result;
+import xyz.ottr.lutra.system.Result;
 
 public abstract class ResourceWrapperParser<X> implements Supplier<Result<X>> {
 

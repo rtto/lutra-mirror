@@ -28,7 +28,6 @@ import xyz.ottr.lutra.bottr.BottrFormat;
 import xyz.ottr.lutra.io.Format;
 import xyz.ottr.lutra.stottr.StottrFormat;
 import xyz.ottr.lutra.tabottr.TabottrFormat;
-import xyz.ottr.lutra.wottr.LegacyFormat;
 import xyz.ottr.lutra.wottr.WottrFormat;
 
 public enum CLIFormat {
@@ -36,8 +35,7 @@ public enum CLIFormat {
     wottr(new WottrFormat()),
     stottr(new StottrFormat()),
     tabottr(new TabottrFormat()),
-    bottr(new BottrFormat()),
-    legacy(new LegacyFormat());
+    bottr(new BottrFormat());
 
     public final Format format;
 

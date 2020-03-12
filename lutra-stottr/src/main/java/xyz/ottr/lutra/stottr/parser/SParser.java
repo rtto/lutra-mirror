@@ -30,13 +30,12 @@ import java.util.stream.Stream;
 
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
-
-import xyz.ottr.lutra.model.Term;
-import xyz.ottr.lutra.result.Message;
-import xyz.ottr.lutra.result.MessageHandler;
-import xyz.ottr.lutra.result.Result;
-import xyz.ottr.lutra.result.ResultStream;
+import xyz.ottr.lutra.model.terms.Term;
 import xyz.ottr.lutra.stottr.antlr.stOTTRParser;
+import xyz.ottr.lutra.system.Message;
+import xyz.ottr.lutra.system.MessageHandler;
+import xyz.ottr.lutra.system.Result;
+import xyz.ottr.lutra.system.ResultStream;
 
 public abstract class SParser<T> extends SBaseParserVisitor<T> {
 
@@ -47,7 +46,7 @@ public abstract class SParser<T> extends SBaseParserVisitor<T> {
         return Collections.unmodifiableMap(this.prefixes);
     }
 
-    protected void setPrefixesAndVariables(Map<String, String> prefixes, Map<String, Term> variables) {
+    void setPrefixesAndVariables(Map<String, String> prefixes, Map<String, Term> variables) {
         this.prefixes = prefixes;
         this.termParser = new STermParser(prefixes, variables);
     }
@@ -59,18 +58,17 @@ public abstract class SParser<T> extends SBaseParserVisitor<T> {
      */
     protected abstract void initSubParsers();
 
-    @Override
     public abstract Result<T> visitStatement(stOTTRParser.StatementContext ctx);
 
     public ResultStream<T> parseString(String str) {
         return parseDocument(CharStreams.fromString(str));
     }
 
-    protected STermParser getTermParser() {
+    STermParser getTermParser() {
         return this.termParser;
     }
 
-    protected ResultStream<T> parseDocument(CharStream in) {
+    ResultStream<T> parseDocument(CharStream in) {
         // Make parser
         ErrorToMessageListener errListener = new ErrorToMessageListener();
         stOTTRParser parser = SParserUtils.makeParser(in, errListener);

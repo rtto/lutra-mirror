@@ -35,9 +35,9 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import xyz.ottr.lutra.bottr.model.InstanceMap;
-import xyz.ottr.lutra.io.Utils;
-import xyz.ottr.lutra.result.Result;
-import xyz.ottr.lutra.result.ResultStream;
+import xyz.ottr.lutra.io.Files;
+import xyz.ottr.lutra.system.Result;
+import xyz.ottr.lutra.system.ResultStream;
 import xyz.ottr.lutra.wottr.io.RDFFileReader;
 
 
@@ -49,7 +49,7 @@ public class BInstanceMapParserTest {
 
     @Parameterized.Parameters(name = "{index}: {0}")
     public static Collection<String[]> data() {
-        return Utils.getFolderContents(ROOT, new String[]{ "ttl" }, EMPTY_ARRAY)
+        return Files.getFolderContents(ROOT, new String[]{ "ttl" }, EMPTY_ARRAY)
             .innerMap(File::toString)
             .innerMap(string -> new String[] { string })
             .aggregate()

@@ -34,13 +34,13 @@ import picocli.CommandLine;
 import picocli.CommandLine.ParameterException;
 
 import xyz.ottr.lutra.TemplateManager;
+import xyz.ottr.lutra.io.Files;
 import xyz.ottr.lutra.io.Format;
-import xyz.ottr.lutra.io.Utils;
 import xyz.ottr.lutra.model.Instance;
-import xyz.ottr.lutra.result.Message;
-import xyz.ottr.lutra.result.MessageHandler;
-import xyz.ottr.lutra.result.Result;
-import xyz.ottr.lutra.result.ResultStream;
+import xyz.ottr.lutra.system.Message;
+import xyz.ottr.lutra.system.MessageHandler;
+import xyz.ottr.lutra.system.Result;
+import xyz.ottr.lutra.system.ResultStream;
 import xyz.ottr.lutra.wottr.io.RDFFileReader;
 
 public class CLI {
@@ -253,7 +253,7 @@ public class CLI {
                 this.outStream.println(str);
             }
             if (this.settings.out != null) {
-                return Utils.writeInstancesTo(str, suffix, this.settings.out);
+                return Files.writeInstancesTo(str, suffix, this.settings.out);
             }
             return Optional.empty();
         };
@@ -265,7 +265,7 @@ public class CLI {
                 this.outStream.println(str);
             }
             if (this.settings.out != null) {
-                return Utils.writeTemplatesTo(iri, str, suffix, this.settings.out);
+                return Files.writeTemplatesTo(iri, str, suffix, this.settings.out);
             }
             return Optional.empty();
         };

@@ -30,13 +30,12 @@ import java.nio.file.Paths;
 import java.util.List;
 
 import org.junit.Test;
-
-import xyz.ottr.lutra.io.InstanceParser;
 import xyz.ottr.lutra.model.Instance;
-import xyz.ottr.lutra.result.Message;
-import xyz.ottr.lutra.result.Result;
-import xyz.ottr.lutra.result.ResultConsumer;
-import xyz.ottr.lutra.result.ResultStream;
+import xyz.ottr.lutra.parser.InstanceParser;
+import xyz.ottr.lutra.system.Message;
+import xyz.ottr.lutra.system.Result;
+import xyz.ottr.lutra.system.ResultConsumer;
+import xyz.ottr.lutra.system.ResultStream;
 import xyz.ottr.lutra.tabottr.model.Table;
 
 public class PrototypeTest {

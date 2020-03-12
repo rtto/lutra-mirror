@@ -10,12 +10,12 @@ package xyz.ottr.lutra.bottr.source;
  * it under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation, either version 2.1 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Lesser Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Lesser Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/lgpl-2.1.html>.
@@ -40,10 +40,10 @@ import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
 import xyz.ottr.lutra.bottr.model.ArgumentMaps;
-import xyz.ottr.lutra.model.ArgumentList;
-import xyz.ottr.lutra.model.LiteralTerm;
-import xyz.ottr.lutra.result.Result;
-import xyz.ottr.lutra.result.ResultStream;
+import xyz.ottr.lutra.model.Argument;
+import xyz.ottr.lutra.model.terms.LiteralTerm;
+import xyz.ottr.lutra.system.Result;
+import xyz.ottr.lutra.system.ResultStream;
 
 public class JDBCSourceTest {
   
@@ -73,7 +73,7 @@ public class JDBCSourceTest {
         stmt.execute("INSERT into CUSTOMER values (6, 'Linhares', 42, 'Viamao', 2200);");
         stmt.execute("INSERT into CUSTOMER values (7, 'Lagreca', 28, 'Sao Paulo', 1000);");
 
-        //Create expected result
+        //Create expected system
         Set<List<String>> expected = new HashSet<>();
         expected.add(List.of("1", "Paulo", "2500"));
         expected.add(List.of("2", "Pedro", "2700"));
@@ -88,16 +88,16 @@ public class JDBCSourceTest {
 
         ArgumentMaps<String> argMaps = new ArgumentMaps<>(PrefixMapping.Standard, jdbcTest);
 
-        ResultStream<ArgumentList> rowStream = jdbcTest.execute("SELECT ID, NAME, SALARY FROM CUSTOMER;", argMaps);
+        ResultStream<List<Argument>> rowStream = jdbcTest.execute("SELECT ID, NAME, SALARY FROM CUSTOMER;", argMaps);
 
         Set<List<String>> dbOutput = rowStream
             .getStream()
             .filter(Result::isPresent)
             .map(Result::get)
-            .map(ArgumentList::asList)
             .map(list -> list.stream()
+                .map(Argument::getTerm)
                 .map(t -> (LiteralTerm)t)
-                .map(LiteralTerm::getPureValue)
+                .map(LiteralTerm::getValue)
                 .collect(Collectors.toList()))
             .collect(Collectors.toSet());
 

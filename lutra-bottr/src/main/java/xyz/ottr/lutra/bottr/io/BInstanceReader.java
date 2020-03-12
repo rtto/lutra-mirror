@@ -24,9 +24,9 @@ package xyz.ottr.lutra.bottr.io;
 
 import xyz.ottr.lutra.bottr.model.InstanceMap;
 import xyz.ottr.lutra.bottr.parser.BInstanceMapParser;
-import xyz.ottr.lutra.io.InstanceParser;
 import xyz.ottr.lutra.model.Instance;
-import xyz.ottr.lutra.result.ResultStream;
+import xyz.ottr.lutra.parser.InstanceParser;
+import xyz.ottr.lutra.system.ResultStream;
 import xyz.ottr.lutra.wottr.io.RDFFileReader;
 
 public class BInstanceReader implements InstanceParser<String> {

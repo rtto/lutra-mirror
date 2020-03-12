@@ -23,12 +23,10 @@ package xyz.ottr.lutra.stottr.io;
  */
 
 import org.junit.Test;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import xyz.ottr.lutra.result.Message;
 import xyz.ottr.lutra.stottr.parser.SInstanceParser;
+import xyz.ottr.lutra.system.Message;
 
 public class PrototypeTest {
 
@@ -50,6 +48,6 @@ public class PrototypeTest {
                 + "ex:H4(1, 2.32, .45) .\n"
                 + "ex:H5(\"1\"^^xsd:int, \"hello\"@en) .\n"
                 + "ex:T6([], _:blank) .")
-            .forEach(res -> Message.info("Parsed :" + res.toString()).log(log));
+            .forEach(res -> Message.info("Parsed :" + res).log(log));
     }
 }

@@ -22,20 +22,17 @@ package xyz.ottr.lutra;
  * #L%
  */
 
-import java.util.HashSet;
-import java.util.Set;
-
 import org.apache.jena.shared.PrefixMapping;
 import org.apache.jena.vocabulary.OWL;
 import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.RDFS;
 import org.apache.jena.vocabulary.XSD;
-import xyz.ottr.lutra.model.BlankNodeTerm;
-import xyz.ottr.lutra.model.ParameterList;
-import xyz.ottr.lutra.model.TemplateSignature;
-import xyz.ottr.lutra.model.Term;
-import xyz.ottr.lutra.model.TermList;
-import xyz.ottr.lutra.model.types.TypeFactory;
+
+import xyz.ottr.lutra.model.Parameter;
+import xyz.ottr.lutra.model.Signature;
+import xyz.ottr.lutra.model.terms.BlankNodeTerm;
+import xyz.ottr.lutra.model.terms.Term;
+import xyz.ottr.lutra.model.types.TypeRegistry;
 
 public enum OTTR  {
     ;
@@ -57,41 +54,50 @@ public enum OTTR  {
         public static final String subTypeOf = ns + "subTypeOf";
         
         public static final String NEList = ns + "NEList";
+        public static final String List = RDF.List.getURI();
         public static final String LUB = ns + "LUB";
-        
 
+        public static final String Top = RDFS.Resource.getURI();
+        public static final String Literal = RDFS.Literal.getURI();
         public static final String IRI = ns + "IRI";
         public static final String Bot = ns + "Bot";
     }
 
     public enum BaseTemplate {
         ;
-        public static final TemplateSignature Triple;
-        public static final TemplateSignature NullableTriple;
+        public static final Signature Triple;
+        public static final Signature NullableTriple;
 
         static {
             Term sub = new BlankNodeTerm("_:s");
-            sub.setType(TypeFactory.getType(OTTR.TypeURI.IRI));
+            sub.setType(TypeRegistry.getType(OTTR.TypeURI.IRI));
             Term pred = new BlankNodeTerm("_:p");
-            pred.setType(TypeFactory.getType(OTTR.TypeURI.IRI));
+            pred.setType(TypeRegistry.getType(OTTR.TypeURI.IRI));
             Term obj = new BlankNodeTerm("_:o");
-            obj.setType(TypeFactory.getVariableType(obj));
+            obj.setType(obj.getVariableType());
 
-            Set<Term> nonBlanks = new HashSet<>();
-            nonBlanks.add(pred);
-            Triple = new TemplateSignature(
-                OTTR.BaseURI.Triple,
-                new ParameterList(new TermList(sub, pred, obj), nonBlanks, null, null),
-                true);
+            Triple = xyz.ottr.lutra.model.BaseTemplate.builder()
+                .iri(OTTR.BaseURI.Triple)
+                .parameter(Parameter.builder().term(sub).build())
+                .parameter(Parameter.builder().term(pred).nonBlank(true).build())
+                .parameter(Parameter.builder().term(obj).build())
+                .build();
+        }
 
-            Set<Term> optionals = new HashSet<>();
-            optionals.add(sub);
-            optionals.add(pred);
-            optionals.add(obj);
-            NullableTriple = new TemplateSignature(
-                OTTR.BaseURI.NullableTriple,
-                new ParameterList(new TermList(sub, pred, obj), nonBlanks, optionals, null),
-                true);
+        static {
+            Term sub = new BlankNodeTerm("_:s");
+            sub.setType(TypeRegistry.getType(OTTR.TypeURI.IRI));
+            Term pred = new BlankNodeTerm("_:p");
+            pred.setType(TypeRegistry.getType(OTTR.TypeURI.IRI));
+            Term obj = new BlankNodeTerm("_:o");
+            obj.setType(obj.getVariableType());
+
+            NullableTriple = xyz.ottr.lutra.model.BaseTemplate.builder()
+                .iri(OTTR.BaseURI.NullableTriple)
+                .parameter(Parameter.builder().term(sub).optional(true).build())
+                .parameter(Parameter.builder().term(pred).optional(true).nonBlank(true).build())
+                .parameter(Parameter.builder().term(obj).optional(true).build())
+                .build();
         }
     }
     

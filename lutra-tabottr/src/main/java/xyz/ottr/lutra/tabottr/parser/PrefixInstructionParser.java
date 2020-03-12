@@ -31,10 +31,9 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.collections4.SetUtils;
 import org.apache.jena.shared.PrefixMapping;
-
 import xyz.ottr.lutra.OTTR;
-import xyz.ottr.lutra.result.Message;
-import xyz.ottr.lutra.result.Result;
+import xyz.ottr.lutra.system.Message;
+import xyz.ottr.lutra.system.Result;
 import xyz.ottr.lutra.tabottr.model.Instruction;
 import xyz.ottr.lutra.tabottr.model.PrefixInstruction;
 
@@ -76,7 +75,7 @@ public class PrefixInstructionParser {
                         return ns1; // if both are equal, then the first one will do.
                     }));
 
-        // NOTE: we keep the result even though there are errors in other to collect more possible errors.
+        // NOTE: we keep the system even though there are errors in other to collect more possible errors.
         Result<PrefixMapping> prefixes = Result.of(PrefixMapping.Factory.create().setNsPrefixes(pxMap));
         prefixes.addMessages(errors);
         return prefixes;
