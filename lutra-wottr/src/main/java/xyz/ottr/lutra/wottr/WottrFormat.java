@@ -26,15 +26,15 @@ import org.apache.jena.shared.PrefixMapping;
 
 import xyz.ottr.lutra.io.Format;
 import xyz.ottr.lutra.io.InstanceReader;
-import xyz.ottr.lutra.io.InstanceWriter;
 import xyz.ottr.lutra.io.TemplateReader;
-import xyz.ottr.lutra.io.TemplateWriter;
-import xyz.ottr.lutra.result.Result;
+import xyz.ottr.lutra.system.Result;
 import xyz.ottr.lutra.wottr.io.RDFFileReader;
-import xyz.ottr.lutra.wottr.parser.v04.WInstanceParser;
-import xyz.ottr.lutra.wottr.parser.v04.WTemplateParser;
-import xyz.ottr.lutra.wottr.writer.v04.WInstanceWriter;
-import xyz.ottr.lutra.wottr.writer.v04.WTemplateWriter;
+import xyz.ottr.lutra.wottr.parser.WInstanceParser;
+import xyz.ottr.lutra.wottr.parser.WTemplateParser;
+import xyz.ottr.lutra.wottr.writer.WInstanceWriter;
+import xyz.ottr.lutra.wottr.writer.WTemplateWriter;
+import xyz.ottr.lutra.writer.InstanceWriter;
+import xyz.ottr.lutra.writer.TemplateWriter;
 
 public class WottrFormat implements Format {
 

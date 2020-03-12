@@ -25,16 +25,14 @@ package xyz.ottr.lutra.bottr.parser;
 import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.Resource;
-
 import xyz.ottr.lutra.bottr.BOTTR;
 import xyz.ottr.lutra.bottr.model.TranslationSettings;
 import xyz.ottr.lutra.bottr.util.CachedResourceWrapperParser;
 import xyz.ottr.lutra.bottr.util.DataParser;
 import xyz.ottr.lutra.bottr.util.TermFactory;
-import xyz.ottr.lutra.model.Term;
-import xyz.ottr.lutra.result.Result;
-import xyz.ottr.lutra.wottr.util.ModelSelector;
-import xyz.ottr.lutra.wottr.vocabulary.v04.WOTTR;
+import xyz.ottr.lutra.model.terms.Term;
+import xyz.ottr.lutra.system.Result;
+import xyz.ottr.lutra.wottr.parser.ModelSelector;
 
 public class BTranslationSettingsParser extends CachedResourceWrapperParser<TranslationSettings> {
 
@@ -42,7 +40,7 @@ public class BTranslationSettingsParser extends CachedResourceWrapperParser<Tran
 
     public BTranslationSettingsParser(Resource resource) {
         super(resource);
-        this.termFactory = new TermFactory(WOTTR.theInstance, this.model);
+        this.termFactory = new TermFactory(this.model);
     }
 
     @Override

@@ -23,31 +23,33 @@ package xyz.ottr.lutra.stottr.io;
  */
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import org.apache.jena.vocabulary.XSD;
-
 import org.junit.Test;
-
-import xyz.ottr.lutra.model.ArgumentList;
-import xyz.ottr.lutra.model.IRITerm;
+import xyz.ottr.lutra.model.Argument;
 import xyz.ottr.lutra.model.Instance;
-import xyz.ottr.lutra.model.LiteralTerm;
-import xyz.ottr.lutra.model.NoneTerm;
-import xyz.ottr.lutra.model.Term;
-import xyz.ottr.lutra.model.TermList;
-import xyz.ottr.lutra.result.Result;
+import xyz.ottr.lutra.model.ListExpander;
+import xyz.ottr.lutra.model.Signature;
+import xyz.ottr.lutra.model.Template;
+import xyz.ottr.lutra.model.terms.IRITerm;
+import xyz.ottr.lutra.model.terms.ListTerm;
+import xyz.ottr.lutra.model.terms.LiteralTerm;
+import xyz.ottr.lutra.model.terms.NoneTerm;
+import xyz.ottr.lutra.model.terms.Term;
 import xyz.ottr.lutra.stottr.parser.SInstanceParser;
 import xyz.ottr.lutra.stottr.parser.SParserUtils;
 import xyz.ottr.lutra.stottr.parser.SPrefixParser;
+import xyz.ottr.lutra.stottr.parser.STemplateParser;
+import xyz.ottr.lutra.system.Message;
+import xyz.ottr.lutra.system.Result;
+import xyz.ottr.lutra.system.ResultConsumer;
 
 public class ParserTest {
 
@@ -104,27 +106,40 @@ public class ParserTest {
 
     private List<Instance> makeInstances() {
 
-        TermList lst = new TermList(new LiteralTerm("one"), new LiteralTerm("two"), new LiteralTerm("three"));
-        Set<Term> toExpand = new HashSet<>();
-        toExpand.add(lst);
 
-        return Stream.of(
-            new Instance("http://base.org/T1",
-                new ArgumentList(
-                    LiteralTerm.typedLiteral("true", XSD.xboolean.getURI()),
-                    new NoneTerm(),
-                    new IRITerm("http://www.w3.org/1999/02/22-rdf-syntax-ns#type"),
-                    new IRITerm("http://some.uri/with#part"))),
-            new Instance("http://example.org/T2",
-                new ArgumentList(
-                    new TermList(LiteralTerm.taggedLiteral("hello", "no"), lst),
-                    toExpand, ArgumentList.Expander.CROSS)),
-            new Instance("http://base.org/T3",
-                new ArgumentList(
-                    LiteralTerm.typedLiteral("42", XSD.integer.getURI()),
-                    LiteralTerm.typedLiteral("42.01", XSD.decimal.getURI()),
-                    LiteralTerm.typedLiteral("42.02", XSD.decimal.getURI())))
-        ).collect(Collectors.toList());
+        var i1 = Instance.builder()
+            .iri("http://base.org/T1")
+            .arguments(Argument.listOf(
+                LiteralTerm.createTypedLiteral("true", XSD.xboolean.getURI()),
+                new NoneTerm(),
+                new IRITerm("http://www.w3.org/1999/02/22-rdf-syntax-ns#type"),
+                new IRITerm("http://some.uri/with#part"))
+            ).build();
+
+        var i2 = Instance.builder()
+            .iri("http://example.org/T2")
+            .argument(Argument.builder().term(new ListTerm(
+                    LiteralTerm.createLanguageTagLiteral("hello", "no")))
+                .build())
+            .argument(Argument.builder().term(new ListTerm(
+                    LiteralTerm.createPlainLiteral("one"),
+                    LiteralTerm.createPlainLiteral("two"),
+                    LiteralTerm.createPlainLiteral("three")))
+                .listExpander(true)
+                .build())
+            .listExpander(ListExpander.cross)
+            .build();
+
+        var i3 = Instance.builder()
+            .iri("http://base.org/T3")
+            .arguments(Argument.listOf(
+                LiteralTerm.createTypedLiteral("42", XSD.integer.getURI()),
+                LiteralTerm.createTypedLiteral("42.01", XSD.decimal.getURI()),
+                LiteralTerm.createTypedLiteral("42.02", XSD.decimal.getURI()))
+            ).build();
+
+        return List.of(i1, i2, i3);
+
     }
 
     @Test
@@ -141,17 +156,50 @@ public class ParserTest {
 
             //assertEquals(mins, pins); // Fails for lists
             // Thus, need to check structural equality:
-            // TODO: Should be implemeted on objects in future
+            // TODO: Should be implemented on objects in future
 
-            assertEquals(mins.getIRI(), pins.getIRI());
-            List<Term> pterms = pins.getArguments().asList();
-            List<Term> mterms = mins.getArguments().asList();
+            assertEquals(mins.getIri(), pins.getIri());
+            List<Term> pterms = pins.getArguments().stream().map(Argument::getTerm).collect(Collectors.toList());
+            List<Term> mterms = mins.getArguments().stream().map(Argument::getTerm).collect(Collectors.toList());
             assertEquals(mterms.size(), pterms.size());
 
             // TODO: Check equality of terms
         }
     }
 
-    // TODO: Add unit tests for templates
+
+    private void testSignatureParsing(String signatureString) {
+
+        STemplateParser parser = new STemplateParser();
+
+        ResultConsumer<Signature> consumer = new ResultConsumer<>();
+        parser.parseString(signatureString).forEach(consumer);
+
+        assertFalse(Message.moreSevere(consumer.getMessageHandler().printMessages(), Message.ERROR)); // No errors when expanding
+    }
+
+    @Test
+    public void testSignature1() {
+        testSignatureParsing("<http://example.com#T1> [ ?s ] :: BASE .");
+    }
+
+    @Test
+    public void testTemplate1() {
+
+        String template = "@prefix rdf:    <http://www.w3.org/1999/02/22-rdf-syntax-ns#> . "
+            + "@prefix foaf:   <http://xmlns.com/foaf/0.1/> . "
+            + "@prefix ex:     <http://example.com/ns#> . "
+            + "@prefix ottr:   <http://ns.ottr.xyz/0.4/> . "
+            + " ex:Person[ ?firstName, ?lastName, ?email ] :: { "
+            + "  ottr:Triple (_:person, rdf:type, foaf:Person ), "
+            + "  ottr:Triple (_:person, foaf:firstName, ?firstName ), "
+            + "  ottr:Triple (_:person, foaf:lastName, ?lastName ), "
+            + "  ottr:Triple (_:person, foaf:mbox, ?email ) "
+            + "} .";
+
+        testSignatureParsing(template);
+    }
+
+
 }
 

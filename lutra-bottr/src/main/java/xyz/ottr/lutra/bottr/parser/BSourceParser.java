@@ -38,7 +38,6 @@ import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.vocabulary.RDF;
-
 import xyz.ottr.lutra.bottr.BOTTR;
 import xyz.ottr.lutra.bottr.model.Source;
 import xyz.ottr.lutra.bottr.source.H2Source;
@@ -46,9 +45,9 @@ import xyz.ottr.lutra.bottr.source.JDBCSource;
 import xyz.ottr.lutra.bottr.source.RDFFileSource;
 import xyz.ottr.lutra.bottr.source.SPARQLEndpointSource;
 import xyz.ottr.lutra.bottr.util.DataParser;
-import xyz.ottr.lutra.result.Result;
-import xyz.ottr.lutra.result.ResultStream;
-import xyz.ottr.lutra.wottr.util.ModelSelector;
+import xyz.ottr.lutra.system.Result;
+import xyz.ottr.lutra.system.ResultStream;
+import xyz.ottr.lutra.wottr.parser.ModelSelector;
 import xyz.ottr.lutra.wottr.util.RDFNodes;
 
 class BSourceParser implements Function<Resource, Result<Source<?>>> {

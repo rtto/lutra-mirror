@@ -22,18 +22,15 @@ package xyz.ottr.lutra.model.types;
  * #L%
  */
 
+import lombok.EqualsAndHashCode;
 import xyz.ottr.lutra.OTTR;
 
-public class LUBType implements ComplexType {
+@EqualsAndHashCode(callSuper = true)
+public class LUBType extends ComplexType {
 
-    private final BasicType inner;
 
     public LUBType(BasicType inner) {
-        this.inner = inner;
-    }
-
-    public BasicType getInner() {
-        return this.inner;
+        super(inner);
     }
 
     @Override
@@ -44,33 +41,27 @@ public class LUBType implements ComplexType {
     @Override
     public boolean isSubTypeOf(TermType other) {
 
-        if (other instanceof LUBType) {
+        return other instanceof LUBType
             // For other LUB-types, LUB<P> is only subtype of itself
-            return this.inner.equals(((LUBType) other).getInner());
-        } else {
+            ? this.inner.equals(((LUBType) other).getInner())
+
             // LUB<P> subtype of P, and thus all subtypes of P
-            return this.inner.isSubTypeOf(other);
-        }
+            : this.inner.isSubTypeOf(other);
     }
 
     @Override
     public boolean isCompatibleWith(TermType other) {
         return isSubTypeOf(other) || other.isSubTypeOf(this.inner);
     }
-    
+
+    @Override
+    public TermType removeLUB() {
+        return getInner();
+    }
+
     @Override
     public String toString() {
-        return "LUB<" + this.inner.toString() + ">";
+        return "LUB<" + this.inner + ">";
     }
 
-    @Override
-    public boolean equals(Object other) {
-        return other instanceof LUBType
-            && this.inner.equals(((LUBType) other).getInner());
-    }
-
-    @Override
-    public int hashCode() {
-        return 3 * this.inner.hashCode();
-    }
 }

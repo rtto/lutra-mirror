@@ -1,30 +1,30 @@
 @prefix ex:    <http://example.org#> .
 @prefix owl:   <http://www.w3.org/2002/07/owl#> .
 @prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
-@prefix ottr:  <http://ns.ottr.xyz/templates#> .
+@prefix ottr:  <http://ns.ottr.xyz/0.4/> .
 @prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
 @prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
 
-[ ] ottr:templateRef  ex:NoTemplate ;
-    ottr:withValues   ( 1.345 ) .
+[ ] ottr:of  ex:NoTemplate ;
+    ottr:values   ( 1.345 ) .
 
-[ ] ottr:templateRef  ex:NoTemplate ;
-    ottr:withValues   ( "hello" ) .
+[ ] ottr:of  ex:NoTemplate ;
+    ottr:values   ( "hello" ) .
 
-[ ] ottr:templateRef  ex:NoTemplate ;
-    ottr:withValues   ( true ) .
+[ ] ottr:of  ex:NoTemplate ;
+    ottr:values   ( true ) .
 
-[ ] ottr:templateRef  ex:NoTemplate ;
-    ottr:withValues   ( "!#" ) .
+[ ] ottr:of  ex:NoTemplate ;
+    ottr:values   ( "!#" ) .
 
-[ ] ottr:templateRef  ex:NoTemplate ;
-    ottr:withValues   ( ex:asdf ) .
+[ ] ottr:of  ex:NoTemplate ;
+    ottr:values   ( ex:asdf ) .
 
-[ ] ottr:templateRef  ex:NoTemplate ;
-    ottr:withValues   ( <http://asdf.com#test> ) .
+[ ] ottr:of  ex:NoTemplate ;
+    ottr:values   ( <http://asdf.com#test> ) .
 
-[ ] ottr:templateRef  ex:NoTemplate ;
-    ottr:withValues   ( "asdf"^^xsd:normalizedString ) .
+[ ] ottr:of  ex:NoTemplate ;
+    ottr:values   ( "asdf"^^xsd:normalizedString ) .
 
-[ ] ottr:templateRef  ex:NoTemplate ;
-    ottr:withValues   ( "asdf"^^ex:mydatatype ) .
+[ ] ottr:of  ex:NoTemplate ;
+    ottr:values   ( "asdf"^^ex:mydatatype ) .

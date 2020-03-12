@@ -38,21 +38,20 @@ import org.apache.jena.query.ResultSet;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.shared.JenaException;
 import org.apache.jena.shared.PrefixMapping;
-
 import xyz.ottr.lutra.bottr.BOTTR;
 import xyz.ottr.lutra.bottr.model.ArgumentMap;
 import xyz.ottr.lutra.bottr.model.ArgumentMaps;
 import xyz.ottr.lutra.bottr.model.Source;
-import xyz.ottr.lutra.model.ArgumentList;
-import xyz.ottr.lutra.result.Message;
-import xyz.ottr.lutra.result.Result;
-import xyz.ottr.lutra.result.ResultStream;
+import xyz.ottr.lutra.model.Argument;
+import xyz.ottr.lutra.system.Message;
+import xyz.ottr.lutra.system.Result;
+import xyz.ottr.lutra.system.ResultStream;
 
 public abstract class AbstractSPARQLSource implements Source<RDFNode> {
 
     // Used for ASK queries, disabled for now.
-    //private static final Result<LiteralTerm> TRUE = TermFactory.createTypedLiteral("true", XSDDatatype.XSDboolean.getURI());
-    //private static final Result<LiteralTerm> FALSE = TermFactory.createTypedLiteral("false", XSDDatatype.XSDboolean.getURI());
+    //private static final Result<LiteralTerm> TRUE = TermSerializer.createTypedLiteral("true", XSDDatatype.XSDboolean.getURI());
+    //private static final Result<LiteralTerm> FALSE = TermSerializer.createTypedLiteral("false", XSDDatatype.XSDboolean.getURI());
 
     protected abstract Result<QueryExecution> getQueryExecution(String query);
 
@@ -84,7 +83,7 @@ public abstract class AbstractSPARQLSource implements Source<RDFNode> {
         return streamQuery(query, Result::of);
     }
 
-    public ResultStream<ArgumentList> execute(String query, ArgumentMaps argumentMaps) {
+    public ResultStream<List<Argument>> execute(String query, ArgumentMaps argumentMaps) {
         return streamQuery(query, argumentMaps);
     }
 
@@ -105,8 +104,8 @@ public abstract class AbstractSPARQLSource implements Source<RDFNode> {
                         ResultSet resultSet = exec.execSelect();
                         return getResultSetStream(resultSet, translationFunction);
                     //} else if (q.isAskType()) {
-                    //    boolean result = exec.execAsk();
-                    //    return ResultStream.innerOf(result ? TRUE : FALSE);
+                    //    boolean system = exec.execAsk();
+                    //    return ResultStream.innerOf(system ? TRUE : FALSE);
                     } else {
                         return ResultStream.of(Result.empty(Message.error(
                                 "Unsupported SPARQL query type. Query must be SELECT.")));

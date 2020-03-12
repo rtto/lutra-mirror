@@ -27,7 +27,7 @@ import org.apache.jena.shared.PrefixMapping;
 import xyz.ottr.lutra.bottr.io.BInstanceReader;
 import xyz.ottr.lutra.io.Format;
 import xyz.ottr.lutra.io.InstanceReader;
-import xyz.ottr.lutra.result.Result;
+import xyz.ottr.lutra.system.Result;
 
 public class BottrFormat implements Format {
     

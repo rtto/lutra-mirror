@@ -22,55 +22,51 @@ package xyz.ottr.lutra.model;
  * #L%
  */
 
+import java.util.List;
 import java.util.Objects;
-import org.apache.jena.shared.PrefixMapping;
+import java.util.stream.Collectors;
 
-public class Instance {
+import lombok.Builder;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Singular;
+import org.apache.jena.shared.PrefixMapping;
+import xyz.ottr.lutra.OTTR;
+
+@Getter
+@EqualsAndHashCode
+@Builder(toBuilder = true)
+public class Instance implements HasApplySubstitution<Instance> {
 
     private final String iri;
-    private final ArgumentList args;
+    private final @Singular List<Argument> arguments;
+    private final ListExpander listExpander;
 
-    public Instance(String iri, ArgumentList args) {
-        this.iri = iri;
-        this.args = args;
+    public boolean hasListExpander() {
+        return this.listExpander != null;
     }
 
-    public String getIRI() {
-        return this.iri;
-    }
-
-    public ArgumentList getArguments() {
-        return this.args;
-    }
-
-    /**
-     * Returns a String similar to toString(), but
-     * IRIs are written as qnames according to the
-     * argument PrefixMapping.
-     */
-    public String toString(PrefixMapping prefixes) {
-        String pre = this.args.hasCrossExpander() ? "x | " : this.args.hasZipExpander() ? "z | " : "";
-        String qname = prefixes.qnameFor(this.iri);
-        return pre + ((qname == null) ? this.iri : qname) + this.args.toString(prefixes);
+    public boolean hasListExpander(int index) {
+        return this.arguments.get(index).isListExpander();
     }
 
     @Override
     public String toString() {
-        String pre = this.args.hasCrossExpander() ? "x | " : this.args.hasZipExpander() ? "z | " : "";
-        return pre + this.iri + this.args.toString();
+        return toString(OTTR.getDefaultPrefixes());
+    }
+
+    public String toString(PrefixMapping prefixes) {
+        return (Objects.isNull(this.listExpander) ? "" : this.listExpander + " | ")
+            + prefixes.shortForm(this.iri)
+            + this.arguments.stream()
+                .map(t -> t.toString(prefixes))
+                .collect(Collectors.joining(", ", "(", ")"));
     }
 
     @Override
-    public int hashCode() {
-        return Objects.hash(this.iri, this.args);
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        return this == o 
-                || Objects.nonNull(o) 
-                        && getClass() == o.getClass()
-                        && Objects.equals(this.getIRI(), ((Instance) o).getIRI())
-                        && Objects.equals(this.getArguments(), ((Instance) o).getArguments());
+    public Instance apply(Substitution substitution) {
+        return this.toBuilder()
+            .arguments(substitution.apply(this.arguments))
+            .build();
     }
 }

@@ -33,14 +33,14 @@ import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.shared.PrefixMapping;
 import xyz.ottr.lutra.bottr.util.ListParser;
 import xyz.ottr.lutra.bottr.util.TermFactory;
-import xyz.ottr.lutra.model.Term;
-import xyz.ottr.lutra.model.TermList;
+import xyz.ottr.lutra.model.terms.ListTerm;
+import xyz.ottr.lutra.model.terms.Term;
 import xyz.ottr.lutra.model.types.BasicType;
 import xyz.ottr.lutra.model.types.ComplexType;
+import xyz.ottr.lutra.model.types.ListType;
 import xyz.ottr.lutra.model.types.TermType;
-import xyz.ottr.lutra.result.Result;
-import xyz.ottr.lutra.result.ResultStream;
-import xyz.ottr.lutra.wottr.vocabulary.v04.WOTTR;
+import xyz.ottr.lutra.system.Result;
+import xyz.ottr.lutra.system.ResultStream;
 
 // TODO use lombok's @SuperBuilder once it has support in IDE, and make fields final. now we simply use setter methods.
 @Setter
@@ -55,7 +55,8 @@ public abstract class ArgumentMap<V> implements Function<V, Result<Term>> {
     protected final TermFactory termFactory;
 
     protected ArgumentMap(PrefixMapping prefixMapping) {
-        this.termFactory = new TermFactory(WOTTR.theInstance, prefixMapping);
+        //this.prefixMapping = prefixMapping;
+        this.termFactory = new TermFactory(prefixMapping);
         this.translationSettings = TranslationSettings.builder().build();
         this.translationTable = new TranslationTable();
     }
@@ -95,7 +96,7 @@ public abstract class ArgumentMap<V> implements Function<V, Result<Term>> {
             return translatedRDF.isAnon()
                     ? TermFactory.createBlankNode().map(t -> (Term) t)
                     : this.termFactory.createTerm(translatedRDF);
-        } else if (type.isListType()) {
+        } else if (type instanceof ListType) {
             return getListTerm(toString(value), (ComplexType)type);
         } else {
             return getBasicTerm(value, (BasicType)type);
@@ -133,6 +134,6 @@ public abstract class ArgumentMap<V> implements Function<V, Result<Term>> {
             })
             .aggregate()
             .map(stream -> stream.collect(Collectors.toList()))
-            .map(TermList::new);
+            .map(ListTerm::new);
     }
 }

@@ -26,10 +26,9 @@ import java.io.IOException;
 
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
-
 import xyz.ottr.lutra.io.InputReader;
-import xyz.ottr.lutra.result.Result;
-import xyz.ottr.lutra.result.ResultStream;
+import xyz.ottr.lutra.system.Result;
+import xyz.ottr.lutra.system.ResultStream;
 
 public class SFileReader implements InputReader<String, CharStream> {
 

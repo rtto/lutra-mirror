@@ -24,7 +24,9 @@ import org.apache.jena.shared.PrefixMapping;
  * #L%
  */
 
-import xyz.ottr.lutra.result.Result;
+import xyz.ottr.lutra.system.Result;
+import xyz.ottr.lutra.writer.InstanceWriter;
+import xyz.ottr.lutra.writer.TemplateWriter;
 
 public interface Format {
     

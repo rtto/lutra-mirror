@@ -31,38 +31,35 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.jena.ext.xerces.util.URI;
 import org.apache.jena.graph.BlankNodeId;
 import org.apache.jena.graph.Node;
-
 import org.apache.jena.rdf.model.RDFList;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.shared.PrefixMapping;
 import org.apache.jena.vocabulary.RDF;
-import xyz.ottr.lutra.model.BlankNodeTerm;
-import xyz.ottr.lutra.model.IRITerm;
-import xyz.ottr.lutra.model.LiteralTerm;
-import xyz.ottr.lutra.model.NoneTerm;
-import xyz.ottr.lutra.model.Term;
-import xyz.ottr.lutra.model.TermList;
+import xyz.ottr.lutra.model.terms.BlankNodeTerm;
+import xyz.ottr.lutra.model.terms.IRITerm;
+import xyz.ottr.lutra.model.terms.ListTerm;
+import xyz.ottr.lutra.model.terms.LiteralTerm;
+import xyz.ottr.lutra.model.terms.NoneTerm;
+import xyz.ottr.lutra.model.terms.Term;
 import xyz.ottr.lutra.model.types.BasicType;
-import xyz.ottr.lutra.model.types.TypeFactory;
-import xyz.ottr.lutra.result.Message;
-import xyz.ottr.lutra.result.Result;
-import xyz.ottr.lutra.result.ResultStream;
+import xyz.ottr.lutra.model.types.TypeRegistry;
+import xyz.ottr.lutra.system.Message;
+import xyz.ottr.lutra.system.Result;
+import xyz.ottr.lutra.system.ResultStream;
+import xyz.ottr.lutra.wottr.WOTTR;
 import xyz.ottr.lutra.wottr.util.RDFNodes;
-import xyz.ottr.lutra.wottr.vocabulary.WOTTRVocabulary;
 
-// TODO suggest to move this to core.mode.terms, see issue #190 and align with xyz.ottr.lutra.wottr.parser.TermFactory.
+// TODO suggest to move this to core.mode.terms, see issue #190 and align with xyz.ottr.lutra.wottr.parser.TermSerializer.
 
 public class TermFactory {
 
-    private final Map<RDFList, Result<TermList>> createdLists = new HashMap<>();
+    private final Map<RDFList, Result<ListTerm>> createdLists = new HashMap<>();
     private final Map<String, BlankNodeTerm> labelledBlanks = new HashMap<>();
 
-    private final WOTTRVocabulary vocabulary;
     private final PrefixMapping prefixMapping;
 
-    public TermFactory(WOTTRVocabulary vocabulary, PrefixMapping prefixMapping) {
+    public TermFactory(PrefixMapping prefixMapping) {
         this.prefixMapping = prefixMapping;
-        this.vocabulary = vocabulary;
     }
 
     public static Result<BlankNodeTerm> createBlankNode() {
@@ -92,16 +89,16 @@ public class TermFactory {
     public static Result<LiteralTerm> createTypedLiteral(String value, String datatype) {
         return DataParser.asURI(datatype)
             .map(URI::toString)
-            .map(iri -> LiteralTerm.typedLiteral(value, iri));
+            .map(iri -> LiteralTerm.createTypedLiteral(value, iri));
     }
 
     public static Result<LiteralTerm> createLangLiteral(String value, String languageTag) {
         return DataParser.asLanguageTagString(languageTag)
-            .map(tag -> LiteralTerm.taggedLiteral(value, tag));
+            .map(tag -> LiteralTerm.createLanguageTagLiteral(value, tag));
     }
 
     public static Result<LiteralTerm> createPlainLiteral(String value) {
-        return Result.of(new LiteralTerm(value));
+        return Result.of(LiteralTerm.createPlainLiteral(value));
     }
 
     public static Result<LiteralTerm> createLiteral(String value, String datatype, String language) {
@@ -119,17 +116,17 @@ public class TermFactory {
     }
 
     public Result<Term> createTermByType(String value, BasicType type) {
-        if (type.isSubTypeOf(TypeFactory.IRI)) {
+        if (type.isSubTypeOf(TypeRegistry.IRI)) {
             return createIRI(value).map(t -> (Term)t);
-        } else if (type.equals(TypeFactory.LITERAL)) {
+        } else if (type.equals(TypeRegistry.LITERAL)) {
             return createPlainLiteral(value).map(t -> (Term)t);
-        } else if (type.isProperSubTypeOf(TypeFactory.LITERAL)) {
-            return createTypedLiteral(value, type.getIRI()).map(t -> (Term)t);
+        } else if (type.isProperSubTypeOf(TypeRegistry.LITERAL)) {
+            return createTypedLiteral(value, type.getIri()).map(t -> (Term)t);
         } else {
             Result<LiteralTerm> result = createPlainLiteral(value);
-            result.addMessage(Message.warning("Type " + RDFNodes.toString(type.getIRI())
+            result.addMessage(Message.warning("Type " + RDFNodes.toString(type.getIri())
                 + " too generic to materialise, defaulting to "
-                + RDFNodes.toString(TypeFactory.LITERAL.getIRI())));
+                + RDFNodes.toString(TypeRegistry.LITERAL.getIri())));
             return result.map(t -> (Term)t);
         }
     }
@@ -155,22 +152,22 @@ public class TermFactory {
         }
     }
 
-    public Result<TermList> createTermList(RDFList list) {
+    public Result<ListTerm> createTermList(RDFList list) {
         return this.createdLists.computeIfAbsent(list,
             l -> ResultStream.innerOf(l.asJavaList())
                 .mapFlatMap(this::createTerm)
                 .aggregate()
                 .map(stream -> stream.collect(Collectors.toList()))
                 .map(cast -> (List<Term>)cast)
-                .map(TermList::new));
+                .map(ListTerm::new));
     }
 
     public Result<Term> createTermByURI(String uri) {
 
-        if (uri.equals(this.vocabulary.getNoneResource().getURI())) {
+        if (uri.equals(WOTTR.none.getURI())) {
             return Result.of(new NoneTerm());
         } else if (uri.equals(RDF.nil.getURI())) {
-            return Result.of(new TermList());
+            return Result.of(new ListTerm());
         } else {
             return Result.of(new IRITerm(uri));
         }
