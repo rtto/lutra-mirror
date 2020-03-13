@@ -34,43 +34,103 @@ public interface Format {
 
     enum ObjectType { template, instance }
     
+    /**
+     * Gets a Result containing this Format's TemplateReader, if reading templates
+     * is supported, and an empty Result with an error Message otherwise.
+     */
     default Result<TemplateReader> getTemplateReader() {
         return Result.error("Reading templates not supported for format " + getFormatName());
     }
 
+    /**
+     * Gets a Result containing this Format's TemplateWriter, if writing templates
+     * is supported, and an empty Result with an error Message otherwise.
+     */
     default Result<TemplateWriter> getTemplateWriter() {
         return Result.error("Writing templates not supported for format " + getFormatName());
     }
 
+    /**
+     * Gets a Result containing this Format's InstanceReader, if reading instances
+     * is supported, and an empty Result with an error Message otherwise.
+     */
     default Result<InstanceReader> getInstanceReader() {
         return Result.error("Reading instances not supported for format " + getFormatName());
     }
 
+    /**
+     * Gets a Result containing this Format's InstanceWriter, if writing instances
+     * is supported, and an empty Result with an error Message otherwise.
+     */
     default Result<InstanceWriter> getInstanceWriter() {
         return Result.error("Writing instances not supported for format " + getFormatName());
     }
     
+    /**
+     * Returns true if the operation described by the argument enums is supported.
+     * Used as default implementation for all of the other supportsXXX-methods.
+     * 
+     * @param op
+     *      Either of the members of Format.Operation
+     * @param ot
+     *      Either of the members of Format.ObjectType
+     * @return
+     *      True if the operation described by the argument enums is supported,
+     *      false otherwise.
+     */
     boolean supports(Operation op, ObjectType ot);
     
+    /**
+     * Gets the default file suffix for this Format (e.g. ".ttl" for RDF-files).
+     */
     String getDefaultFileSuffix();
     
+    /**
+     * Gets the name of this Format. Used in Messages and for lookup.
+     */
     String getFormatName();
     
+    /**
+     * @see #supports(Operation, ObjectType)
+     */
     default boolean supportsTemplateWriter() {
         return supports(Operation.write, ObjectType.template);
     }
 
+    /**
+     * @see #supports(Operation, ObjectType)
+     */
     default boolean supportsTemplateReader() {
         return supports(Operation.read, ObjectType.template);
     }
 
+    /**
+     * @see #supports(Operation, ObjectType)
+     */
     default boolean supportsInstanceWriter() {
         return supports(Operation.write, ObjectType.instance);
     }
 
+    /**
+     * @see #supports(Operation, ObjectType)
+     */
     default boolean supportsInstanceReader() {
         return supports(Operation.read, ObjectType.instance);
     }
 
+    /**
+     * Sets the prefixes used for writing operations. If
+     * this Format does not support any writing operations
+     * this method should do nothing.
+     * 
+     * OBS: The TemplateManager assumes that the Format keeps
+     * the reference to the argument, and does not make a copy
+     * of the PrefixMapping, as more prefixes might be added to
+     * the map at a later stage.
+     * 
+     * @param prefixes
+     *      A PrefixMapping containing prefixes that should be used
+     *      for writing operations.
+     */
     void setPrefixMapping(PrefixMapping prefixes);
 }
