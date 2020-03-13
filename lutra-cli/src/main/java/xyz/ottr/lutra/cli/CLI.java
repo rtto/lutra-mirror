@@ -33,8 +33,9 @@ import org.apache.jena.rdf.model.Model;
 import picocli.CommandLine;
 import picocli.CommandLine.ParameterException;
 
-import xyz.ottr.lutra.StandardTemplateManager;
-import xyz.ottr.lutra.StandardFormat;
+import xyz.ottr.lutra.TemplateManager;
+import xyz.ottr.lutra.api.StandardTemplateManager;
+//import xyz.ottr.lutra.StandardFormat;
 import xyz.ottr.lutra.io.Files;
 import xyz.ottr.lutra.io.Format;
 import xyz.ottr.lutra.model.Instance;
@@ -70,6 +71,7 @@ public class CLI {
         this.templateManager.setFetchMissingDependencies(this.settings.fetchMissingDependencies);
         this.templateManager.setExtensions(this.settings.extensions);
         this.templateManager.setIgnoreExtensions(this.settings.ignoreExtensions);
+        this.templateManager.loadStandardTemplateLibrary();
     }
 
     public static void main(String[] args) {

@@ -42,6 +42,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
 import xyz.ottr.lutra.TemplateManager;
+import xyz.ottr.lutra.api.StandardFormat;
 import xyz.ottr.lutra.io.InstanceReader;
 import xyz.ottr.lutra.io.TemplateReader;
 import xyz.ottr.lutra.model.Instance;
@@ -127,7 +128,7 @@ public class PottrTest {
 
     private TemplateStore getStore() {
         TemplateManager tmwf = new TemplateManager();
-        for (CLIFormat format : CLIFormat.values()) {
+        for (StandardFormat format : StandardFormat.values()) {
             tmwf.registerFormat(format.format);
         }
         return tmwf.getTemplateStore();

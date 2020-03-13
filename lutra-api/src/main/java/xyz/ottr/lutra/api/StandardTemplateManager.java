@@ -1,4 +1,4 @@
-package xyz.ottr.lutra;
+package xyz.ottr.lutra.api;
 
 /*-
  * #%L
@@ -22,12 +22,14 @@ package xyz.ottr.lutra;
  * #L%
  */
 
+import xyz.ottr.lutra.TemplateManager;
 import xyz.ottr.lutra.system.MessageHandler;
 
 public class StandardTemplateManager extends TemplateManager {
 
     public StandardTemplateManager() {
         super();
+        loadFormats();
     }
 
     public MessageHandler loadStandardTemplateLibrary() {
@@ -35,7 +37,7 @@ public class StandardTemplateManager extends TemplateManager {
         return parseLibraryInto(folderURL.getPath());
     }
 
-    public void loadFormats() {
+    private void loadFormats() {
         for (StandardFormat format : StandardFormat.values()) {
             this.registerFormat(format.format);
         }

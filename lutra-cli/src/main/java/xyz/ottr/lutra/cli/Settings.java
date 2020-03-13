@@ -32,8 +32,8 @@ import picocli.CommandLine.Command;
 import picocli.CommandLine.IVersionProvider;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;
+import xyz.ottr.lutra.api.StandardFormat;
 import xyz.ottr.lutra.system.Message;
-import xyz.ottr.lutra.StandardFormat;
 
 @Command(
     name = "lutra",

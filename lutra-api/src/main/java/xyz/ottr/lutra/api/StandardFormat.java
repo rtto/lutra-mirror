@@ -1,4 +1,4 @@
-package xyz.ottr.lutra;
+package xyz.ottr.lutra.api;
 
 /*-
  * #%L
