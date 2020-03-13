@@ -1,4 +1,4 @@
-package xyz.ottr.lutra.cli;
+package xyz.ottr.lutra;
 
 /*-
  * #%L
@@ -30,7 +30,9 @@ import xyz.ottr.lutra.stottr.StottrFormat;
 import xyz.ottr.lutra.tabottr.TabottrFormat;
 import xyz.ottr.lutra.wottr.WottrFormat;
 
-public enum CLIFormat {
+public enum StandardFormat {
+
+    // Note: the enum name must ignore-case-match Format.getFormatName().
 
     wottr(new WottrFormat()),
     stottr(new StottrFormat()),
@@ -39,7 +41,7 @@ public enum CLIFormat {
 
     public final Format format;
 
-    CLIFormat(Format f) {
+    StandardFormat(Format f) {
         this.format = f;
         if (!f.getFormatName().equalsIgnoreCase(this.name())) {
             throw new IllegalArgumentException(this.getClass().getSimpleName() + " " + name()

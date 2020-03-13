@@ -125,3 +125,5 @@ lutra-stottr/src/test/resources/.temp-deploy/
 lutra-cli/src/test/resources/.temp-deploy/
 
 lutra-cli/src/test/resources/primer/
+
+lutra-api/src/main/resources/templates-master/

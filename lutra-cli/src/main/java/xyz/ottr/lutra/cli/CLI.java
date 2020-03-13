@@ -33,7 +33,8 @@ import org.apache.jena.rdf.model.Model;
 import picocli.CommandLine;
 import picocli.CommandLine.ParameterException;
 
-import xyz.ottr.lutra.TemplateManager;
+import xyz.ottr.lutra.StandardTemplateManager;
+import xyz.ottr.lutra.StandardFormat;
 import xyz.ottr.lutra.io.Files;
 import xyz.ottr.lutra.io.Format;
 import xyz.ottr.lutra.model.Instance;
@@ -49,14 +50,14 @@ public class CLI {
     private final PrintStream outStream;
     //private final PrintStream errStream;
     private final MessageHandler messageHandler;
-    private final TemplateManager templateManager;
+    private final StandardTemplateManager templateManager;
 
     public CLI(PrintStream outStream, PrintStream errStream) {
         this.settings = new Settings();
         this.outStream = outStream;
         //this.errStream = errStream;
         this.messageHandler = new MessageHandler(errStream);
-        this.templateManager = new TemplateManager();
+        this.templateManager = new StandardTemplateManager();
     }
 
     public CLI() {
@@ -69,10 +70,6 @@ public class CLI {
         this.templateManager.setFetchMissingDependencies(this.settings.fetchMissingDependencies);
         this.templateManager.setExtensions(this.settings.extensions);
         this.templateManager.setIgnoreExtensions(this.settings.ignoreExtensions);
-
-        for (CLIFormat format : CLIFormat.values()) {
-            this.templateManager.registerFormat(format.format);
-        }
     }
 
     public static void main(String[] args) {

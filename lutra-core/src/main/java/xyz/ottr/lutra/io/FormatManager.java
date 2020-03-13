@@ -1,17 +1,5 @@
 package xyz.ottr.lutra.io;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Optional;
-import java.util.function.Function;
-
-import xyz.ottr.lutra.system.Message;
-import xyz.ottr.lutra.system.MessageHandler;
-import xyz.ottr.lutra.system.Result;
-
 /*-
  * #%L
  * lutra-core
@@ -34,6 +22,18 @@ import xyz.ottr.lutra.system.Result;
  * #L%
  */
 
+import java.util.Collection;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Optional;
+import java.util.function.Function;
+
+import xyz.ottr.lutra.system.Message;
+import xyz.ottr.lutra.system.MessageHandler;
+import xyz.ottr.lutra.system.Result;
+
 public class FormatManager {
 
     private final Map<String, Format> formats;
@@ -43,7 +43,7 @@ public class FormatManager {
     }
 
     public FormatManager() {
-        this(new HashMap<>());
+        this(new LinkedHashMap<>());
     }
 
     public FormatManager(Collection<Format> formats) {

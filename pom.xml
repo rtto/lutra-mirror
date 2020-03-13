@@ -14,7 +14,8 @@
         <module>lutra-bottr</module>
 		<module>lutra-cli</module>
         <module>lutra-restapi</module>
-	</modules>
+        <module>lutra-api</module>
+    </modules>
 
 
     <issueManagement>
@@ -441,6 +442,11 @@
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>lutra-bottr</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>lutra-api</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>

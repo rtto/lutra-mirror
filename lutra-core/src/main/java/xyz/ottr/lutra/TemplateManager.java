@@ -71,11 +71,11 @@ public class TemplateManager {
             formatManager, store);
     }
     
-    public TemplateManager(TemplateStore store) {
+    private TemplateManager(TemplateStore store) {
         this(store.getFormatManager(), store);
     }
-    
-    public TemplateManager(FormatManager formatManager) {
+
+    private TemplateManager(FormatManager formatManager) {
         this(formatManager, makeDefaultStore(formatManager));
     }
     
