@@ -65,15 +65,6 @@ public class CLI {
         this(System.out, System.err);
     }
 
-    private void initTemplateManager() {
-        this.templateManager.setDeepTrace(this.settings.deepTrace);
-        this.templateManager.setHaltOn(this.settings.haltOn);
-        this.templateManager.setFetchMissingDependencies(this.settings.fetchMissingDependencies);
-        this.templateManager.setExtensions(this.settings.extensions);
-        this.templateManager.setIgnoreExtensions(this.settings.ignoreExtensions);
-        this.templateManager.loadStandardTemplateLibrary();
-    }
-
     public static void main(String[] args) {
         new CLI().run(args);
     }
@@ -89,7 +80,6 @@ public class CLI {
             return;
         }
 
-        initTemplateManager();
         this.messageHandler.setQuiet(this.settings.quiet);
 
         if (cli.isUsageHelpRequested()) {
@@ -133,6 +123,9 @@ public class CLI {
 
     private void execute() {
 
+        if (Message.moreSevere(initTemplateManager(), this.settings.haltOn)) {
+            return;
+        }
         if (Message.moreSevere(parseLibrary(), this.settings.haltOn)) {
             return;
         }
@@ -201,6 +194,21 @@ public class CLI {
     ////////////////////////////////////////////////////////////
     /// Parsing and writing                                  ///
     ////////////////////////////////////////////////////////////
+
+    private int initTemplateManager() {
+
+        // Transfer relevant settings
+        this.templateManager.setDeepTrace(this.settings.deepTrace);
+        this.templateManager.setHaltOn(this.settings.haltOn);
+        this.templateManager.setFetchMissingDependencies(this.settings.fetchMissingDependencies);
+        this.templateManager.setExtensions(this.settings.extensions);
+        this.templateManager.setIgnoreExtensions(this.settings.ignoreExtensions);
+
+        // Load standard library
+        var msgs = this.templateManager.loadStandardTemplateLibrary();
+        this.messageHandler.combine(msgs); // Use this.messageHandler's settings
+        return this.messageHandler.printMessages();
+    }
 
     private int parseLibrary() {
 
