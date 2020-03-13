@@ -23,18 +23,30 @@ package xyz.ottr.lutra.api;
  */
 
 import xyz.ottr.lutra.TemplateManager;
+import xyz.ottr.lutra.io.TemplateReader;
+import xyz.ottr.lutra.store.TemplateStore;
 import xyz.ottr.lutra.system.MessageHandler;
 
 public class StandardTemplateManager extends TemplateManager {
+    
+    private TemplateStore standardLibrary;
 
     public StandardTemplateManager() {
         super();
         loadFormats();
+        this.standardLibrary = makeDefaultStore(getFormatManager());
     }
 
     public MessageHandler loadStandardTemplateLibrary() {
-        var folderURL = getClass().getClassLoader().getResource("templates-master");
-        return parseLibraryInto(folderURL.getPath());
+        var folder = getClass().getClassLoader().getResource("templates-master").getPath();
+
+        TemplateReader reader = getFormat("wottr").getTemplateReader().get();
+        return reader.loadTemplatesFromFolder(this.standardLibrary, folder, new String[] { "ttl" }, new String[] {});
+    }
+    
+    @Override
+    public MessageHandler fetchMissingDependencies() {
+        return null; //TODO: Either use this.standardLibrary or fetch online
     }
 
     private void loadFormats() {
