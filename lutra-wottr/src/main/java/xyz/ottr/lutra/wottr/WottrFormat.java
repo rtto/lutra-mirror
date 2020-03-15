@@ -38,6 +38,8 @@ import xyz.ottr.lutra.writer.TemplateWriter;
 
 public class WottrFormat implements Format {
 
+    public static final String name = "wOTTR";
+
     private PrefixMapping prefixes;
 
     public WottrFormat() {
@@ -80,7 +82,7 @@ public class WottrFormat implements Format {
 
     @Override
     public String getFormatName() {
-        return "WOTTR";
+        return name;
     }
 
     @Override

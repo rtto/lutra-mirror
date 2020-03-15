@@ -38,7 +38,7 @@ class SPatternInstanceWriter extends SInstanceWriter {
         return this.instances.stream()
             .map(this::writeInstance)
             .map(StringBuilder::toString)
-            .collect(Collectors.joining(STOTTR.Statements.bodyInsSep + "\n", STOTTR.Statements.indent, ""));
+            .collect(Collectors.joining(STOTTR.Statements.bodyInsSep + "\n" + STOTTR.Statements.indent, STOTTR.Statements.indent, ""));
     }
 
 }

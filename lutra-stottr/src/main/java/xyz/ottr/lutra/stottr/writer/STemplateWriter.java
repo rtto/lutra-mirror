@@ -94,7 +94,7 @@ public class STemplateWriter implements TemplateWriter {
         builder.append(STOTTR.Statements.statementEnd);
 
         // Write used prefixes at start of String
-        builder.insert(0, writeUsedPrefixes(termWriter.getUsedPrefixes()));
+        builder.insert(0, writeUsedPrefixes(termWriter.getUsedPrefixes()) + "\n\n");
 
         return builder.toString();
     }

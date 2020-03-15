@@ -22,25 +22,29 @@ package xyz.ottr.lutra.api;
  * #L%
  */
 
+import lombok.Getter;
 import xyz.ottr.lutra.TemplateManager;
 import xyz.ottr.lutra.io.TemplateReader;
 import xyz.ottr.lutra.store.TemplateStore;
 import xyz.ottr.lutra.system.MessageHandler;
+import xyz.ottr.lutra.wottr.WottrFormat;
 
+@Getter
 public class StandardTemplateManager extends TemplateManager {
     
     private TemplateStore standardLibrary;
 
     public StandardTemplateManager() {
-        super();
-        loadFormats();
+        this.loadFormats();
         this.standardLibrary = makeDefaultStore(getFormatManager());
+        this.loadStandardTemplateLibrary();
     }
 
     public MessageHandler loadStandardTemplateLibrary() {
+
         var folder = getClass().getClassLoader().getResource("templates-master").getPath();
 
-        TemplateReader reader = getFormat("wottr").getTemplateReader().get();
+        TemplateReader reader = getFormat(WottrFormat.name).getTemplateReader().get();
         return reader.loadTemplatesFromFolder(this.standardLibrary, folder, new String[] { "ttl" }, new String[] {});
     }
     
