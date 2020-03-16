@@ -32,6 +32,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -46,13 +48,21 @@ public class FormatEquivalenceTest {
 
     private Format format;
     private Signature signature;
-    private StandardTemplateManager manager;
+    private static StandardTemplateManager manager;
 
+    @BeforeClass
+    public static void setup() {
+        manager = new StandardTemplateManager();
+    }
+
+    @AfterClass
+    public static void destroy() {
+        manager = null;
+    }
 
     public FormatEquivalenceTest(Signature signature, String uri, Format format, String formatName) {
         this.format = format;
         this.signature = signature;
-        this.manager = new StandardTemplateManager();
     }
 
     @Parameterized.Parameters(name = "{index}: {3}: {1} ")
