@@ -22,12 +22,24 @@ package xyz.ottr.lutra.api;
  * #L%
  */
 
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.LinkedList;
+import java.util.List;
+
 import lombok.Getter;
+
+import org.apache.commons.io.IOUtils;
+
 import xyz.ottr.lutra.TemplateManager;
-import xyz.ottr.lutra.io.TemplateReader;
+import xyz.ottr.lutra.model.Signature;
 import xyz.ottr.lutra.store.TemplateStore;
+import xyz.ottr.lutra.system.Message;
 import xyz.ottr.lutra.system.MessageHandler;
-import xyz.ottr.lutra.wottr.WottrFormat;
+import xyz.ottr.lutra.system.ResultConsumer;
+import xyz.ottr.lutra.system.ResultStream;
+import xyz.ottr.lutra.wottr.io.RDFInputStreamReader;
+import xyz.ottr.lutra.wottr.parser.WTemplateParser;
 
 @Getter
 public class StandardTemplateManager extends TemplateManager {
@@ -41,13 +53,28 @@ public class StandardTemplateManager extends TemplateManager {
     public MessageHandler loadStandardTemplateLibrary() {
 
         this.standardLibrary = makeDefaultStore(getFormatManager());
+
+        var classLoader = getClass().getClassLoader();
+        var reader = ResultStream.innerFlatMapCompose(new RDFInputStreamReader(), new WTemplateParser());
+        var msgs = new MessageHandler();
+        List<String> files = new LinkedList<>();
+
+        try {
+            files.addAll(IOUtils.readLines(classLoader.getResourceAsStream("templates-master/"), StandardCharsets.UTF_8));
+        } catch (IOException ex) {
+            msgs.add(Message.error(ex.getMessage()));
+        }
+
+        ResultConsumer<Signature> consumer = new ResultConsumer<>(this.standardLibrary);
+
+        ResultStream.innerOf(files)
+            .innerMap(classLoader::getResourceAsStream)
+            .innerFlatMap(reader)
+            .forEach(consumer);
+
         super.getTemplateStore().registerStandardLibrary(standardLibrary);
 
-        var folder = getClass().getClassLoader().getResource("templates-master").getPath();
-
-        TemplateReader reader = getFormat(WottrFormat.name).getTemplateReader().get();
-        super.getTemplateStore().registerStandardLibrary(standardLibrary);
-        return reader.loadTemplatesFromFolder(this.standardLibrary, folder, new String[] { "ttl" }, new String[] {});
+        return consumer.getMessageHandler().combine(msgs);
     }
     
     private void loadFormats() {
