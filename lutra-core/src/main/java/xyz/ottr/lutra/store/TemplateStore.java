@@ -25,6 +25,7 @@ package xyz.ottr.lutra.store;
 import java.util.Collection; 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
@@ -296,6 +297,7 @@ public interface TemplateStore extends Consumer<Signature> {
     
     default MessageHandler fetchMissingDependencies(Collection<String> initMissing) {
 
+        Optional<TemplateStore> stdLib = getStandardLibrary();
         ResultConsumer<TemplateReader> messages = new ResultConsumer<>();
         
         FormatManager formatManager = getFormatManager();
@@ -313,7 +315,11 @@ public interface TemplateStore extends Consumer<Signature> {
 
         while (!missing.isEmpty()) {
             for (String toFetch : missing) {
-                messages.accept(formatManager.attemptAllFormats(reader -> reader.populateTemplateStore(this, toFetch)));
+                if (stdLib.isPresent() && stdLib.get().containsTemplate(toFetch)) {
+                    stdLib.get().getTemplate(toFetch).ifPresent(this::addTemplate);
+                } else {
+                    messages.accept(formatManager.attemptAllFormats(reader -> reader.populateTemplateStore(this, toFetch)));
+                }
                 if (!containsTemplate(toFetch)) { // Check if fetched and added to store
                     failed.add(toFetch);
                 }
@@ -323,6 +329,10 @@ public interface TemplateStore extends Consumer<Signature> {
         }
         return messages.getMessageHandler();
     }
+    
+    Optional<TemplateStore> getStandardLibrary();
+    
+    void registerStandardLibrary(TemplateStore standardLibrary);
 
     FormatManager getFormatManager();
 }

@@ -67,8 +67,10 @@ public class FormatEquivalenceTest {
             .filter(Format::supportsTemplateWriter)
             .collect(Collectors.toList());
 
+        var stdLib = new StandardTemplateManager();
+        stdLib.loadStandardTemplateLibrary();
         // collect signatures
-        var signatures = new StandardTemplateManager().getStandardLibrary()
+        var signatures = stdLib.getStandardLibrary()
             .getAllTemplateObjects()
             .getStream()
             .map(Result::get)

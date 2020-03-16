@@ -33,30 +33,30 @@ import xyz.ottr.lutra.wottr.WottrFormat;
 public class StandardTemplateManager extends TemplateManager {
     
     private TemplateStore standardLibrary;
-
+    
     public StandardTemplateManager() {
         this.loadFormats();
-        this.standardLibrary = makeDefaultStore(getFormatManager());
-        this.loadStandardTemplateLibrary();
     }
 
     public MessageHandler loadStandardTemplateLibrary() {
 
+        this.standardLibrary = makeDefaultStore(getFormatManager());
+        super.getTemplateStore().registerStandardLibrary(standardLibrary);
+
         var folder = getClass().getClassLoader().getResource("templates-master").getPath();
 
         TemplateReader reader = getFormat(WottrFormat.name).getTemplateReader().get();
+        super.getTemplateStore().registerStandardLibrary(standardLibrary);
         return reader.loadTemplatesFromFolder(this.standardLibrary, folder, new String[] { "ttl" }, new String[] {});
     }
     
-    @Override
-    public MessageHandler fetchMissingDependencies() {
-        return null; //TODO: Either use this.standardLibrary or fetch online
-    }
-
     private void loadFormats() {
         for (StandardFormat format : StandardFormat.values()) {
             this.registerFormat(format.format);
         }
     }
 
+    public TemplateStore getStandardLibrary() {
+        return this.standardLibrary;
+    }
 }

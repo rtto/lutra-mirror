@@ -79,6 +79,7 @@ public class DependencyGraph implements TemplateStore {
     private final Map<TemplateNode, Set<DependencyEdge>> dependencies;
     private final Map<String, Set<String>> instanceIndex;
     private final FormatManager formatManager;
+    private Optional<TemplateStore> standardLibrary;
 
     private static final Logger log = LoggerFactory.getLogger(DependencyGraph.class);
 
@@ -91,6 +92,7 @@ public class DependencyGraph implements TemplateStore {
         this.dependencies = new HashMap<>();
         this.instanceIndex = new HashMap<>();
         this.formatManager = formatManager;
+        this.standardLibrary = Optional.empty();
     }
     
     public DependencyGraph(FormatManager formatManager, Template... ts) {
@@ -697,5 +699,14 @@ public class DependencyGraph implements TemplateStore {
         return this.formatManager;
     }
 
+    @Override
+    public Optional<TemplateStore> getStandardLibrary() {
+        return this.standardLibrary;
+    }
 
+    @Override
+    public void registerStandardLibrary(TemplateStore standardLibrary) {
+        this.standardLibrary = Optional.of(standardLibrary);
+        
+    }
 }
