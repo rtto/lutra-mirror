@@ -23,6 +23,7 @@ package xyz.ottr.lutra.api;
  */
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.LinkedList;
 import java.util.List;
@@ -34,15 +35,15 @@ import org.apache.commons.io.IOUtils;
 import xyz.ottr.lutra.TemplateManager;
 import xyz.ottr.lutra.model.Signature;
 import xyz.ottr.lutra.store.TemplateStore;
-import xyz.ottr.lutra.system.Message;
 import xyz.ottr.lutra.system.MessageHandler;
+import xyz.ottr.lutra.system.Result;
 import xyz.ottr.lutra.system.ResultConsumer;
 import xyz.ottr.lutra.system.ResultStream;
 import xyz.ottr.lutra.wottr.io.RDFInputStreamReader;
 import xyz.ottr.lutra.wottr.parser.WTemplateParser;
 
 @Getter
-public class StandardTemplateManager extends TemplateManager {
+public final class StandardTemplateManager extends TemplateManager {
     
     private TemplateStore standardLibrary;
     
@@ -53,34 +54,54 @@ public class StandardTemplateManager extends TemplateManager {
     public MessageHandler loadStandardTemplateLibrary() {
 
         this.standardLibrary = makeDefaultStore(getFormatManager());
-
-        var classLoader = getClass().getClassLoader();
         var reader = ResultStream.innerFlatMapCompose(new RDFInputStreamReader(), new WTemplateParser());
-        var msgs = new MessageHandler();
-        List<String> files = new LinkedList<>();
-
-        try {
-            files.addAll(IOUtils.readLines(classLoader.getResourceAsStream("templates-master/"), StandardCharsets.UTF_8));
-        } catch (IOException ex) {
-            msgs.add(Message.error(ex.getMessage()));
-        }
-
         ResultConsumer<Signature> consumer = new ResultConsumer<>(this.standardLibrary);
 
-        ResultStream.innerOf(files)
-            .innerMap(classLoader::getResourceAsStream)
+        getLibraryFiles("", "templates-master")
+            .innerMap(this::getResourceAsStream)
             .innerFlatMap(reader)
             .forEach(consumer);
 
         super.getTemplateStore().registerStandardLibrary(standardLibrary);
 
-        return consumer.getMessageHandler().combine(msgs);
+        return consumer.getMessageHandler();
+    }
+    
+    private ResultStream<String> getLibraryFiles(String path, String subfolder) {
+
+        String fullPath = path + subfolder + "/";
+        var resFolder = getResourceAsStream(fullPath);
+        
+        if (subfolder.isEmpty() || resFolder == null) {
+            return ResultStream.empty();
+        } else if (fullPath.endsWith(".ttl")) {
+            return ResultStream.innerOf(fullPath);
+        }
+
+        List<String> lines = new LinkedList<>();
+        try {
+            lines.addAll(IOUtils.readLines(resFolder, StandardCharsets.UTF_8));
+        } catch (IOException ex) {
+            return ResultStream.of(Result.error(ex.getMessage()));
+        }
+        return ResultStream.innerOf(lines)
+                .innerFlatMap(file -> getLibraryFiles(fullPath, file));
     }
     
     private void loadFormats() {
         for (StandardFormat format : StandardFormat.values()) {
             this.registerFormat(format.format);
         }
+    }
+
+    private InputStream getResourceAsStream(String resource) {
+        final InputStream in = getContextClassLoader().getResourceAsStream(resource);
+
+        return in == null ? getClass().getResourceAsStream(resource) : in;
+    }
+
+    private ClassLoader getContextClassLoader() {
+        return Thread.currentThread().getContextClassLoader();
     }
 
     public TemplateStore getStandardLibrary() {
