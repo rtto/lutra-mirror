@@ -53,7 +53,7 @@ public class RDFInputStreamReader implements InputReader<InputStream, Model> {
 
         Result<Model> result;
         try {
-            Model model = ModelFactory.createDefaultModel().read(input, null);
+            Model model = ModelFactory.createDefaultModel().read(input, null, "TTL");
             this.prefixes.setNsPrefixes(model);
             result = Result.ofNullable(model);
             log.info("Adding model " + model.hashCode() + " from input stream.");

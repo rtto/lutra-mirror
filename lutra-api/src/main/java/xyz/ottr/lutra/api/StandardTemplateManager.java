@@ -45,6 +45,7 @@ import xyz.ottr.lutra.wottr.parser.WTemplateParser;
 @Getter
 public final class StandardTemplateManager extends TemplateManager {
     
+    private static final String templatesListFile = "templates-list.txt";
     private TemplateStore standardLibrary;
     
     public StandardTemplateManager() {
@@ -54,10 +55,10 @@ public final class StandardTemplateManager extends TemplateManager {
     public MessageHandler loadStandardTemplateLibrary() {
 
         this.standardLibrary = makeDefaultStore(getFormatManager());
-        var reader = ResultStream.innerFlatMapCompose(new RDFInputStreamReader(), new WTemplateParser());
         ResultConsumer<Signature> consumer = new ResultConsumer<>(this.standardLibrary);
+        var reader = ResultStream.innerFlatMapCompose(new RDFInputStreamReader(), new WTemplateParser());
 
-        getLibraryFiles("", "templates-master")
+        getLibraryPaths()
             .innerMap(this::getResourceAsStream)
             .innerFlatMap(reader)
             .forEach(consumer);
@@ -67,41 +68,31 @@ public final class StandardTemplateManager extends TemplateManager {
         return consumer.getMessageHandler();
     }
     
-    private ResultStream<String> getLibraryFiles(String path, String subfolder) {
+    public ResultStream<String> getLibraryPaths() {
 
-        String fullPath = path + subfolder + "/";
-        var resFolder = getResourceAsStream(fullPath);
-        
-        if (subfolder.isEmpty() || resFolder == null) {
-            return ResultStream.empty();
-        } else if (fullPath.endsWith(".ttl")) {
-            return ResultStream.innerOf(fullPath);
+        var templatesList = getResourceAsStream(templatesListFile);
+        if (templatesList == null) {
+            return ResultStream.of(Result.error("File containing list of templates not found in standard library."));
         }
 
-        List<String> lines = new LinkedList<>();
+        List<String> paths = new LinkedList<>();
+
         try {
-            lines.addAll(IOUtils.readLines(resFolder, StandardCharsets.UTF_8));
+            paths.addAll(IOUtils.readLines(templatesList, StandardCharsets.UTF_8));
         } catch (IOException ex) {
             return ResultStream.of(Result.error(ex.getMessage()));
         }
-        return ResultStream.innerOf(lines)
-                .innerFlatMap(file -> getLibraryFiles(fullPath, file));
-    }
+        return ResultStream.innerOf(paths);
+    } 
     
+    private InputStream getResourceAsStream(String path) {
+        return this.getClass().getClassLoader().getResourceAsStream(path);
+    }
+
     private void loadFormats() {
         for (StandardFormat format : StandardFormat.values()) {
             this.registerFormat(format.format);
         }
-    }
-
-    private InputStream getResourceAsStream(String resource) {
-        final InputStream in = getContextClassLoader().getResourceAsStream(resource);
-
-        return in == null ? getClass().getResourceAsStream(resource) : in;
-    }
-
-    private ClassLoader getContextClassLoader() {
-        return Thread.currentThread().getContextClassLoader();
     }
 
     public TemplateStore getStandardLibrary() {
