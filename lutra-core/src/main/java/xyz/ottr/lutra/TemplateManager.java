@@ -71,11 +71,11 @@ public class TemplateManager {
             formatManager, store);
     }
     
-    public TemplateManager(TemplateStore store) {
+    private TemplateManager(TemplateStore store) {
         this(store.getFormatManager(), store);
     }
-    
-    public TemplateManager(FormatManager formatManager) {
+
+    private TemplateManager(FormatManager formatManager) {
         this(formatManager, makeDefaultStore(formatManager));
     }
     
@@ -117,6 +117,10 @@ public class TemplateManager {
         return this.formatManager.getFormat(formatName);
     }
 
+    public FormatManager getFormatManager() {
+        return this.formatManager;
+    }
+    
     public static TemplateStore makeDefaultStore(FormatManager formatManager) {
         TemplateStore store = new DependencyGraph(formatManager);
         store.addOTTRBaseTemplates();
@@ -177,14 +181,21 @@ public class TemplateManager {
             messages.add(reader);
             reader.ifPresent(r -> this.prefixes.setNsPrefixes(r.getPrefixes()));
         }
-
-        if (this.settings.fetchMissingDependencies) {
-            MessageHandler msgs = this.store.fetchMissingDependencies();
-            messages.combine(msgs);
-        }
         
+        messages.combine(fetchMissingDependencies());
+
         return messages;
     } 
+    
+    public MessageHandler fetchMissingDependencies() {
+
+        MessageHandler messages = new MessageHandler();
+        if (this.settings.fetchMissingDependencies) {
+            messages.combine(this.store.fetchMissingDependencies());
+        }
+        return messages;
+    }
+        
 
     // TODO rename to readInstances?
     public ResultStream<Instance> parseInstances(Format format, String... files) {

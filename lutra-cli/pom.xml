@@ -31,6 +31,10 @@
             <groupId>${project.groupId}</groupId>
             <artifactId>lutra-bottr</artifactId>
         </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>lutra-api</artifactId>
+        </dependency>
 
 
         <!-- https://mvnrepository.com/artifact/info.picocli/picocli -->

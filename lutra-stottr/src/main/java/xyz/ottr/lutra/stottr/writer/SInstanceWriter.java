@@ -79,7 +79,7 @@ public class SInstanceWriter implements InstanceWriter {
 
         if (instance.hasListExpander()) {
             builder
-                .append(STOTTR.Expanders.map.inverseBidiMap().getKey(instance.getListExpander()))
+                .append(STOTTR.Expanders.map.getKey(instance.getListExpander()))
                 .append(" ")
                 .append(STOTTR.Expanders.expanderSep)
                 .append(" ");

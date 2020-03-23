@@ -29,7 +29,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.function.Function;
 
@@ -43,17 +42,16 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
 import xyz.ottr.lutra.TemplateManager;
+import xyz.ottr.lutra.api.StandardFormat;
 import xyz.ottr.lutra.io.InstanceReader;
 import xyz.ottr.lutra.io.TemplateReader;
 import xyz.ottr.lutra.model.Instance;
 import xyz.ottr.lutra.store.TemplateStore;
-import xyz.ottr.lutra.store.graph.DependencyGraph;
 import xyz.ottr.lutra.stottr.io.SFileReader;
 import xyz.ottr.lutra.stottr.parser.SInstanceParser;
 import xyz.ottr.lutra.stottr.parser.STemplateParser;
 import xyz.ottr.lutra.stottr.writer.SInstanceWriter;
 import xyz.ottr.lutra.system.Message;
-import xyz.ottr.lutra.system.MessageHandler;
 import xyz.ottr.lutra.system.ResultConsumer;
 import xyz.ottr.lutra.system.ResultStream;
 
@@ -130,7 +128,7 @@ public class PottrTest {
 
     private TemplateStore getStore() {
         TemplateManager tmwf = new TemplateManager();
-        for (CLIFormat format : CLIFormat.values()) {
+        for (StandardFormat format : StandardFormat.values()) {
             tmwf.registerFormat(format.format);
         }
         return tmwf.getTemplateStore();

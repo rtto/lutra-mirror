@@ -32,6 +32,7 @@ import picocli.CommandLine.Command;
 import picocli.CommandLine.IVersionProvider;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;
+import xyz.ottr.lutra.api.StandardFormat;
 import xyz.ottr.lutra.system.Message;
 
 @Command(
@@ -89,18 +90,18 @@ public class Settings {
         description = {"Input format of instances.%n"
                        + "(legal values: ${COMPLETION-CANDIDATES}"
                        + " default: ${DEFAULT-VALUE})"})
-    public CLIFormat inputFormat = CLIFormat.wottr;
+    public StandardFormat inputFormat = StandardFormat.wottr;
 
     @Option(names = {"-O", "--outputFormat"}, completionCandidates = TemplateOutputFormat.class,
         description = {"Output format of output of operation defined by the mode.%n"
                        + "(legal values: ${COMPLETION-CANDIDATES}; "
                        + "default: ${DEFAULT-VALUE})"})
-    public CLIFormat outputFormat = CLIFormat.wottr;
+    public StandardFormat outputFormat = StandardFormat.wottr;
 
     @Option(names = {"-L", "--libraryFormat"}, completionCandidates = TemplateInputFormat.class,
         description = {"The input format of the libraries. If omitted, all available formats are attempted.%n"
                        + "(legal values: ${COMPLETION-CANDIDATES})"})
-    public CLIFormat libraryFormat;
+    public StandardFormat libraryFormat;
 
 
     @Option(names = {"-f", "--fetchMissing"},
@@ -117,7 +118,7 @@ public class Settings {
 
     @Option(names = {"-F", "--fetchFormat"},
         description = {"The input format of the templates fetched via the -f flag."})
-    public CLIFormat fetchFormat;
+    public StandardFormat fetchFormat;
 
     @Option(names = {"-l", "--library"}, 
         description = {"Folder containing templates to use as library."
@@ -168,9 +169,9 @@ public class Settings {
         private static final long serialVersionUID = 0L; // TODO Not correct!
 
         InstanceInputFormat() {
-            super(Arrays.stream(CLIFormat.values())
+            super(Arrays.stream(StandardFormat.values())
                 .filter(f -> f.format.supportsInstanceReader())
-                .map(CLIFormat::name)
+                .map(StandardFormat::name)
                 .collect(Collectors.toList())
             );
         }
@@ -181,9 +182,9 @@ public class Settings {
         private static final long serialVersionUID = 0L; // TODO Not correct!
 
         TemplateInputFormat() {
-            super(Arrays.stream(CLIFormat.values())
+            super(Arrays.stream(StandardFormat.values())
                 .filter(f -> f.format.supportsTemplateReader())
-                .map(CLIFormat::name)
+                .map(StandardFormat::name)
                 .collect(Collectors.toList())
             );
         }
@@ -194,9 +195,9 @@ public class Settings {
         private static final long serialVersionUID = 0L; // TODO Not correct!
 
         TemplateOutputFormat() {
-            super(Arrays.stream(CLIFormat.values())
+            super(Arrays.stream(StandardFormat.values())
                 .filter(f -> f.format.supportsTemplateWriter())
-                .map(CLIFormat::name)
+                .map(StandardFormat::name)
                 .collect(Collectors.toList())
             );
         }
