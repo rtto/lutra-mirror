@@ -33,9 +33,7 @@ import xyz.ottr.lutra.model.Parameter;
 import xyz.ottr.lutra.model.Signature;
 import xyz.ottr.lutra.model.Template;
 import xyz.ottr.lutra.model.types.BasicType;
-import xyz.ottr.lutra.model.types.LUBType;
-import xyz.ottr.lutra.model.types.ListType;
-import xyz.ottr.lutra.model.types.NEListType;
+import xyz.ottr.lutra.model.types.ComplexType;
 import xyz.ottr.lutra.model.types.TermType;
 import xyz.ottr.lutra.stottr.STOTTR;
 import xyz.ottr.lutra.writer.TemplateWriter;
@@ -60,53 +58,82 @@ public class STemplateWriter implements TemplateWriter {
         this.templates.put(template.getIri(), template);
     }
 
+    public String write() {
+        return SPrefixWriter.write(this.prefixes)
+            + STOTTR.Space.br2
+            + this.templates.values().stream()
+                .map(s -> write(s, false))
+                .collect(Collectors.joining(STOTTR.Space.br2));
+    }
+
     public String write(String iri) {
 
-        StringBuilder builder = new StringBuilder();
         Signature template = this.templates.get(iri);
+        return template == null
+            ? null
+            : write(template, true);
+    }
 
-        if  (template == null) {
-            return null;
-        }
+    private String write(Signature signature, boolean includePrefixes) {
 
-        var parameterVariables = template.getParameters().stream()
+        var parameterVariables = signature.getParameters().stream()
             .map(Parameter::getTerm)
             .collect(Collectors.toSet());
 
         STermWriter termWriter = new STermWriter(this.prefixes, parameterVariables);
 
-        builder.append(writeSignature(template, termWriter));
+        StringBuilder builder = new StringBuilder();
 
-        if (template instanceof BaseTemplate) {
-            builder.append(STOTTR.Statements.signatureSep);
-            builder.append(STOTTR.Statements.baseBody);
-        } else if (template instanceof Template) {
-            builder.append(STOTTR.Statements.signatureSep);
-            builder.append(STOTTR.Statements.bodyStart);
-            builder.append(STOTTR.Space.br);
-            builder.append(writePattern((Template) template, termWriter));
-            builder.append(STOTTR.Space.br);
-            builder.append(STOTTR.Statements.bodyEnd);
+        if (signature instanceof BaseTemplate) {
+            builder.append(writeBaseTemplate((BaseTemplate)signature, termWriter));
+        } else if (signature instanceof Template) {
+            builder.append(writeTemplate((Template)signature, termWriter));
+        } else {
+            builder.append(writeSignature(signature, termWriter));
         }
 
         builder.append(STOTTR.Statements.statementEnd);
 
         // Write used prefixes at start of String
-        builder.insert(0, SPrefixWriter.write(termWriter.getUsedPrefixes()) + STOTTR.Space.br2);
+        if (includePrefixes) {
+            builder.insert(0, SPrefixWriter.write(termWriter.getUsedPrefixes()) + STOTTR.Space.br2);
+        }
 
         return builder.toString();
     }
 
 
-    private StringBuilder writeSignature(Signature template, STermWriter termWriter) {
+    private StringBuilder writeSignature(Signature signature, STermWriter termWriter) {
 
         StringBuilder builder = new StringBuilder();
-        builder.append(termWriter.writeIRI(template.getIri()));
+        builder.append(termWriter.writeIRI(signature.getIri()));
         builder.append(STOTTR.Parameters.sigParamsStart);
-        builder.append(template.getParameters().stream()
+        builder.append(signature.getParameters().stream()
             .map(parameter -> writeParameter(parameter, termWriter))
             .collect(Collectors.joining(STOTTR.Parameters.paramSep)));
         builder.append(STOTTR.Parameters.sigParamsEnd);
+        return builder;
+    }
+
+    private StringBuilder writeBaseTemplate(BaseTemplate baseTemplate, STermWriter termWriter) {
+
+        StringBuilder builder = new StringBuilder();
+        builder.append(writeSignature(baseTemplate, termWriter));
+        builder.append(STOTTR.Statements.signatureSep);
+        builder.append(STOTTR.Statements.baseBody);
+        return builder;
+    }
+
+    private StringBuilder writeTemplate(Template template, STermWriter termWriter) {
+
+        StringBuilder builder = new StringBuilder();
+        builder.append(writeSignature(template, termWriter));
+        builder.append(STOTTR.Statements.signatureSep);
+        builder.append(STOTTR.Statements.bodyStart);
+        builder.append(STOTTR.Space.br);
+        builder.append(writePattern(template, termWriter));
+        builder.append(STOTTR.Space.br);
+        builder.append(STOTTR.Statements.bodyEnd);
         return builder;
     }
 
@@ -145,31 +172,22 @@ public class STemplateWriter implements TemplateWriter {
     }
 
     private StringBuilder writeType(TermType type, STermWriter termWriter) {
+        return type instanceof BasicType
+            ? new StringBuilder(termWriter.writeIRI(((BasicType) type).getIri()))
+            : writeComplexType((ComplexType)type, termWriter);
+    }
+
+    private StringBuilder writeComplexType(ComplexType type, STermWriter termWriter) {
+
+        String typeStr = STOTTR.Types.map.get(type.getClass());
+        TermType innerType = type.getInner();
 
         StringBuilder builder = new StringBuilder();
 
-        if (type instanceof BasicType) {
-            builder.append(termWriter.writeIRI(((BasicType) type).getIri()));
-        } else {
+        builder.append(typeStr).append(STOTTR.Types.innerTypeStart);
+        builder.append(writeType(innerType, termWriter));
+        builder.append(STOTTR.Types.innerTypeEnd);
 
-            String typeStr;
-            TermType innerType;
-
-            if (type instanceof LUBType) {
-                typeStr = STOTTR.Types.lub;
-                innerType = ((LUBType) type).getInner();
-            } else if (type instanceof ListType) {
-                typeStr = STOTTR.Types.list;
-                innerType = ((ListType) type).getInner();
-            } else { // instanceof NEListType
-                typeStr = STOTTR.Types.neList;
-                innerType = ((NEListType) type).getInner();
-            } 
-
-            builder.append(typeStr).append(STOTTR.Types.innerTypeStart);
-            builder.append(writeType(innerType, termWriter));
-            builder.append(STOTTR.Types.innerTypeEnd);
-        }
         return builder;
     }
 
@@ -177,9 +195,5 @@ public class STemplateWriter implements TemplateWriter {
         SInstanceWriter instanceWriter = new SPatternInstanceWriter(termWriter);
         template.getPattern().forEach(instanceWriter);
         return instanceWriter.write();
-    }
-
-    public void printDefinitions() {
-        //TODO
     }
 }

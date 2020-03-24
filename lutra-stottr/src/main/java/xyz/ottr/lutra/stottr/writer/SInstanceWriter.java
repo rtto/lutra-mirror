@@ -35,7 +35,8 @@ import xyz.ottr.lutra.writer.InstanceWriter;
 
 public class SInstanceWriter implements InstanceWriter {
 
-    protected static final Comparator<Instance> instanceSorter = Comparator.comparing(Instance::getIri);
+    protected static final Comparator<Instance> instanceSorter = Comparator.comparing(Instance::getIri)
+        .thenComparing(i -> i.getArguments().toString(), String::compareToIgnoreCase);
 
     protected final List<Instance> instances;
     private final STermWriter termWriter;
@@ -80,7 +81,7 @@ public class SInstanceWriter implements InstanceWriter {
 
         if (instance.hasListExpander()) {
             builder
-                .append(STOTTR.Expanders.map.getKey(instance.getListExpander()))
+                .append(STOTTR.Expanders.map.get(instance.getListExpander()))
                 .append(STOTTR.Expanders.expanderSep);
         }
 

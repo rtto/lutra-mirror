@@ -22,6 +22,7 @@ package xyz.ottr.lutra.stottr.writer;
  * #L%
  */
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -41,9 +42,9 @@ public class STermWriter {
 
     private final PrefixMapping prefixes;
     private final Set<String> usedPrefixNS;
-    private final Set<Term> variables;
+    private final Collection<Term> variables;
 
-    STermWriter(PrefixMapping prefixes, Set<Term> variables) {
+    STermWriter(PrefixMapping prefixes, Collection<Term> variables) {
         this.prefixes = prefixes;
         this.variables = variables;
         this.usedPrefixNS = new HashSet<>();

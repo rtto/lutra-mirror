@@ -26,6 +26,10 @@ import org.apache.commons.collections4.BidiMap;
 import org.apache.commons.collections4.bidimap.DualHashBidiMap;
 import org.apache.commons.collections4.bidimap.UnmodifiableBidiMap;
 import xyz.ottr.lutra.model.ListExpander;
+import xyz.ottr.lutra.model.types.ComplexType;
+import xyz.ottr.lutra.model.types.LUBType;
+import xyz.ottr.lutra.model.types.ListType;
+import xyz.ottr.lutra.model.types.NEListType;
 
 public class STOTTR {
 
@@ -75,6 +79,16 @@ public class STOTTR {
         public static final String neList = "NEList";
         public static final String innerTypeStart = "<";
         public static final String innerTypeEnd = ">";
+
+        public static final BidiMap<Class<? extends ComplexType>, String> map;
+
+        static {
+            BidiMap<Class<? extends ComplexType>, String> tempMap = new DualHashBidiMap<>();
+            tempMap.put(LUBType.class, lub);
+            tempMap.put(ListType.class, list);
+            tempMap.put(NEListType.class, neList);
+            map = UnmodifiableBidiMap.unmodifiableBidiMap(tempMap);
+        }
     }
 
     public enum Statements {
@@ -96,13 +110,13 @@ public class STOTTR {
         public static final String expanderSep = " | ";
         public static final String expander = "++";
 
-        public static final BidiMap<String, ListExpander> map;
+        public static final BidiMap<ListExpander, String> map;
 
         static {
-            BidiMap<String, ListExpander> tempMap = new DualHashBidiMap<>();
-            tempMap.put(cross, ListExpander.cross);
-            tempMap.put(zipMin, ListExpander.zipMin);
-            tempMap.put(zipMax, ListExpander.zipMax);
+            BidiMap<ListExpander, String> tempMap = new DualHashBidiMap<>();
+            tempMap.put(ListExpander.cross, cross);
+            tempMap.put(ListExpander.zipMin, zipMin);
+            tempMap.put(ListExpander.zipMax, zipMax);
             map = UnmodifiableBidiMap.unmodifiableBidiMap(tempMap);
         }
     }
