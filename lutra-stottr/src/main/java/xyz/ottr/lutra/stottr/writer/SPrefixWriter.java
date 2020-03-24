@@ -22,18 +22,25 @@ package xyz.ottr.lutra.stottr.writer;
  * #L%
  */
 
+import java.util.Comparator;
 import java.util.Map;
 import java.util.stream.Collectors;
 import org.apache.jena.shared.PrefixMapping;
+import xyz.ottr.lutra.stottr.STOTTR;
 
 public enum SPrefixWriter {
 
     ; // util enum
 
     public static String write(PrefixMapping prefixes) {
-        Map<String, String> pfMap = prefixes.getNsPrefixMap();
-        return pfMap.keySet().stream()
-            .map(key -> "@prefix " + key + ": <" + pfMap.get(key) + "> .")
-            .collect(Collectors.joining("\n"));
+        return prefixes.getNsPrefixMap().entrySet().stream()
+            .sorted(Comparator.comparing(Map.Entry::getKey))
+            .map(entry -> writePrefix(entry.getKey(), entry.getValue()))
+            .collect(Collectors.joining(STOTTR.Space.br));
     }
+
+    private static String writePrefix(String prefix, String namespace) {
+        return STOTTR.RDF.prefix + prefix + STOTTR.RDF.prefixSep + STOTTR.RDF.fullURI(namespace) + STOTTR.RDF.prefixEnd;
+    }
+
 }

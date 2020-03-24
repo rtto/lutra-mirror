@@ -26,7 +26,6 @@ import java.util.stream.Collectors;
 
 import xyz.ottr.lutra.stottr.STOTTR;
 
-// Only used by STemplateWriter, so visibility is package-private
 class SPatternInstanceWriter extends SInstanceWriter {
 
     SPatternInstanceWriter(STermWriter termWriter) {
@@ -35,10 +34,12 @@ class SPatternInstanceWriter extends SInstanceWriter {
 
     @Override
     public String write() {
-        return this.instances.stream()
-            .map(this::writeInstance)
-            .map(StringBuilder::toString)
-            .collect(Collectors.joining(STOTTR.Statements.bodyInsSep + "\n" + STOTTR.Statements.indent, STOTTR.Statements.indent, ""));
+        return STOTTR.Statements.indent
+            + this.instances.stream()
+                .sorted(instanceSorter)
+                .map(this::writeInstance)
+                .map(StringBuilder::toString)
+                .collect(Collectors.joining(STOTTR.Statements.bodyInsSep + STOTTR.Space.br + STOTTR.Statements.indent));
     }
 
 }

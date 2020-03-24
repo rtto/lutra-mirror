@@ -37,7 +37,6 @@ import xyz.ottr.lutra.model.Argument;
 import xyz.ottr.lutra.model.Instance;
 import xyz.ottr.lutra.model.ListExpander;
 import xyz.ottr.lutra.model.Signature;
-import xyz.ottr.lutra.model.Template;
 import xyz.ottr.lutra.model.terms.IRITerm;
 import xyz.ottr.lutra.model.terms.ListTerm;
 import xyz.ottr.lutra.model.terms.LiteralTerm;

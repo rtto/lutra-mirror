@@ -29,17 +29,43 @@ import xyz.ottr.lutra.model.ListExpander;
 
 public class STOTTR {
 
-    // Terms
+    public enum Space {
+        ;
+        public static final String space = " ";
+        public static final String br = System.lineSeparator();
+        public static final String br2 = br + br;
+    }
+
+    public enum RDF {
+        ;
+        public static final String prefix = "@prefix ";
+        public static final String prefixSep = ": ";
+        public static final String prefixEnd = " .";
+        public static final String qnameSep = ":";
+
+        public static String fullURI(String uri) {
+            return "<" + uri + ">";
+        }
+
+        public static final String literalLang = "@";
+        public static final String literalType = "^^";
+
+        public static String literal(String value) {
+            return "\"" + value + "\"";
+        }
+    }
+
     public enum Terms {
         ;
         public static final String none = "none";
         public static final String listStart = "(";
         public static final String listEnd = ")";
-        public static final String listSep = ",";
+        public static final String listSep = ", ";
         public static final String variablePrefix = "?";
+        public static final String blankPrefix = "_:";
         public static final String insArgStart = "(";
         public static final String insArgEnd = ")";
-        public static final String insArgSep = ",";
+        public static final String insArgSep = ", ";
     }
 
     public enum Types {
@@ -51,7 +77,6 @@ public class STOTTR {
         public static final String innerTypeEnd = ">";
     }
 
-    // Statements
     public enum Statements {
         ;
         public static final String indent = "\t";
@@ -59,8 +84,8 @@ public class STOTTR {
         public static final String bodyEnd = "}";
         public static final String bodyInsSep = ",";
         public static final String baseBody = "BASE";
-        public static final String signatureSep = "::";
-        public static final String statementEnd = ".";
+        public static final String signatureSep = " :: ";
+        public static final String statementEnd = " .";
     }
 
     public enum Expanders {
@@ -68,7 +93,7 @@ public class STOTTR {
         public static final String cross = "cross";
         public static final String zipMin = "zipMin";
         public static final String zipMax = "zipMax";
-        public static final String expanderSep = "|";
+        public static final String expanderSep = " | ";
         public static final String expander = "++";
 
         public static final BidiMap<String, ListExpander> map;
@@ -86,7 +111,7 @@ public class STOTTR {
         ;
         public static final String sigParamsStart = "[";
         public static final String sigParamsEnd = "]";
-        public static final String paramSep = ",";
+        public static final String paramSep = ", ";
         public static final String optional = "?";
         public static final String nonBlank = "!";
         public static final String defaultValSep = "=";

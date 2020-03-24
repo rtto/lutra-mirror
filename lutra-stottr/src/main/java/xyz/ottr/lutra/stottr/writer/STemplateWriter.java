@@ -23,13 +23,11 @@ package xyz.ottr.lutra.stottr.writer;
  */
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.apache.jena.shared.PrefixMapping;
-import xyz.ottr.lutra.OTTR;
 import xyz.ottr.lutra.model.BaseTemplate;
 import xyz.ottr.lutra.model.Parameter;
 import xyz.ottr.lutra.model.Signature;
@@ -46,10 +44,6 @@ public class STemplateWriter implements TemplateWriter {
 
     private final Map<String, Signature> templates;
     private final PrefixMapping prefixes;
-
-    public STemplateWriter() {
-        this(OTTR.getDefaultPrefixes());
-    }
 
     public STemplateWriter(PrefixMapping prefixes) {
         this.templates = new HashMap<>();
@@ -84,57 +78,51 @@ public class STemplateWriter implements TemplateWriter {
         builder.append(writeSignature(template, termWriter));
 
         if (template instanceof BaseTemplate) {
-            builder.append(" " + STOTTR.Statements.signatureSep + " " + STOTTR.Statements.baseBody);
+            builder.append(STOTTR.Statements.signatureSep);
+            builder.append(STOTTR.Statements.baseBody);
         } else if (template instanceof Template) {
-            builder.append(" " + STOTTR.Statements.signatureSep + " " + STOTTR.Statements.bodyStart + "\n");
+            builder.append(STOTTR.Statements.signatureSep);
+            builder.append(STOTTR.Statements.bodyStart);
+            builder.append(STOTTR.Space.br);
             builder.append(writePattern((Template) template, termWriter));
-            builder.append("\n" + STOTTR.Statements.bodyEnd);
+            builder.append(STOTTR.Space.br);
+            builder.append(STOTTR.Statements.bodyEnd);
         }
 
         builder.append(STOTTR.Statements.statementEnd);
 
         // Write used prefixes at start of String
-        builder.insert(0, writeUsedPrefixes(termWriter.getUsedPrefixes()) + "\n\n");
+        builder.insert(0, SPrefixWriter.write(termWriter.getUsedPrefixes()) + STOTTR.Space.br2);
 
         return builder.toString();
     }
 
-    private String writeUsedPrefixes(Set<String> usedPrefixes) {
-
-        PrefixMapping usedPrefixMap = PrefixMapping.Factory.create();
-        for (Map.Entry<String, String> nsln : this.prefixes.getNsPrefixMap().entrySet()) {
-            if (usedPrefixes.contains(nsln.getKey())) {
-                usedPrefixMap.setNsPrefix(nsln.getKey(), nsln.getValue());
-            }
-        }
-        return SPrefixWriter.write(usedPrefixMap);
-    }
 
     private StringBuilder writeSignature(Signature template, STermWriter termWriter) {
 
         StringBuilder builder = new StringBuilder();
-
         builder.append(termWriter.writeIRI(template.getIri()));
         builder.append(STOTTR.Parameters.sigParamsStart);
-
-        List<Parameter> params = template.getParameters();
-        String sep = "";
-        
-        for (Parameter param : params) {
-
-            builder.append(sep);
-            builder.append(writeModes(param.isNonBlank(), param.isOptional()));
-            builder.append(writeType(param.getTerm().getType(), termWriter));
-            builder.append(" ");
-            builder.append(termWriter.write(param.getTerm()));
-
-            if (param.hasDefaultValue()) {
-                builder.append(STOTTR.Parameters.defaultValSep).append(termWriter.write(param.getDefaultValue()));
-            }
-
-            sep = STOTTR.Parameters.paramSep + " ";
-        }
+        builder.append(template.getParameters().stream()
+            .map(parameter -> writeParameter(parameter, termWriter))
+            .collect(Collectors.joining(STOTTR.Parameters.paramSep)));
         builder.append(STOTTR.Parameters.sigParamsEnd);
+        return builder;
+    }
+
+    private StringBuilder writeParameter(Parameter parameter, STermWriter termWriter) {
+
+        StringBuilder builder = new StringBuilder();
+
+        builder.append(writeModes(parameter.isNonBlank(), parameter.isOptional()));
+        builder.append(writeType(parameter.getTerm().getType(), termWriter));
+        builder.append(STOTTR.Space.space);
+        builder.append(termWriter.write(parameter.getTerm()));
+
+        if (parameter.hasDefaultValue()) {
+            builder.append(STOTTR.Parameters.defaultValSep).append(termWriter.write(parameter.getDefaultValue()));
+        }
+
         return builder;
     }
 
@@ -142,18 +130,15 @@ public class STemplateWriter implements TemplateWriter {
 
         StringBuilder builder = new StringBuilder();
 
-        boolean written = false;
         if (isNonBlank) {
             builder.append(STOTTR.Parameters.nonBlank);
-            written = true;
         }
 
         if (isOptional) {
             builder.append(STOTTR.Parameters.optional);
-            written = true;
         }
 
-        if (written) {
+        if (builder.length() != 0) {
             builder.append(" ");
         }
         return builder;
