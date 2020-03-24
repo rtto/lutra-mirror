@@ -22,25 +22,33 @@ package xyz.ottr.lutra.system;
  * #L%
  */
 
+import java.util.Arrays;
+import java.util.stream.Collectors;
+
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import org.slf4j.Logger;
 
-@Getter
 @EqualsAndHashCode
 public class Message {
+
+    private static final boolean debug = true;
 
     public static final int FATAL   = 0;
     public static final int ERROR   = 1;
     public static final int WARNING = 2;
     public static final int INFO    = 3;
 
-    private final int level;
-    private final String message;
+    @Getter private final int level;
+    @Getter private final String message;
+    private final StackTraceElement[] stackTrace;
 
     public Message(int level, String message) {
         this.level = level;
         this.message = message;
+        this.stackTrace = debug
+            ? Thread.currentThread().getStackTrace()
+            : null;
     }
 
     public static Message fatal(String msg) {
@@ -93,6 +101,23 @@ public class Message {
 
     @Override
     public String toString() {
-        return "[" + toString(this.level) + "] " + this.message;
+
+        String output = "[" + toString(this.level) + "] " + this.message;
+
+        if (debug) {
+            output += printStackTrace();
+        }
+
+        return output;
+    }
+
+    private String printStackTrace() {
+        return
+            System.lineSeparator()
+            + Arrays.stream(this.stackTrace)
+                .filter(s -> s.getClassName().startsWith("xyz.ottr.lutra"))
+                .skip(2)
+                .map(stackTraceElement -> "\t" + stackTraceElement)
+                .collect(Collectors.joining(System.lineSeparator()));
     }
 }
