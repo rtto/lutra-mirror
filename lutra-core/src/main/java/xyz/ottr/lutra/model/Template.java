@@ -45,11 +45,34 @@ public class Template extends Signature {
 
     private final @NonNull Set<Instance> pattern;
 
-    @Builder
-    private Template(String iri, @Singular List<Parameter> parameters, @Singular Set<Instance> instances) {
+    private Template(String iri, List<Parameter> parameters, Set<Instance> instances) {
         super(iri, parameters);
         this.pattern = instances;
         updatePatternVariables();
+    }
+
+    /**
+     *
+     * @param iri
+     * @param parameters
+     * @param instances
+     * @param isEmptyPattern The isEmptyPattern flag is a safety precaution for avoiding inadvertently creating templates
+     *                       with empty patterns.
+     * @return
+     */
+    @Builder
+    public static Template create(String iri, @Singular List<Parameter> parameters, @Singular Set<Instance> instances,
+                                  boolean isEmptyPattern) {
+
+        if (isEmptyPattern != instances.isEmpty()) {
+            var message = "Creating template with "
+                + (instances.isEmpty() ? "empty" : "non-empty")
+                + " pattern, but isEmptyPattern flag is " + isEmptyPattern
+                + ".";
+            throw new IllegalArgumentException(message);
+        }
+
+        return new Template(iri, parameters, instances);
     }
 
     /**
