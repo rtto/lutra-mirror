@@ -34,12 +34,12 @@ class SPatternInstanceWriter extends SInstanceWriter {
 
     @Override
     public String write() {
-        return STOTTR.Statements.indent
+        return STOTTR.Space.indent
             + this.instances.stream()
                 .sorted(instanceSorter)
                 .map(this::writeInstance)
                 .map(StringBuilder::toString)
-                .collect(Collectors.joining(STOTTR.Statements.bodyInsSep + STOTTR.Space.br + STOTTR.Statements.indent));
+                .collect(Collectors.joining(STOTTR.Statements.bodyInsSep + STOTTR.Space.br + STOTTR.Space.indent));
     }
 
 }

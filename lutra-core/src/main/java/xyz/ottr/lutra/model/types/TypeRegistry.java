@@ -103,7 +103,7 @@ public enum TypeRegistry {
      * @param resource the Resource of the term type to get
      * @return the matching termtype, or null if no such termtype
      */
-    // TODO: rename to asType since getType could be taken to mean getting the type *of* the resource.
+    // TODO: rename to toType since getType could be taken to mean getting the type *of* the resource.
     public static BasicType getType(Resource resource)  {
         return getType(resource.getURI());
     }

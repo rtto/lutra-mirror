@@ -36,6 +36,7 @@ public class STOTTR {
     public enum Space {
         ;
         public static final String space = " ";
+        public static final String indent = "    ";
         public static final String br = System.lineSeparator();
         public static final String br2 = br + br;
     }
@@ -93,7 +94,7 @@ public class STOTTR {
 
     public enum Statements {
         ;
-        public static final String indent = "\t";
+        public static final String commentStart = "# ";
         public static final String bodyStart = "{";
         public static final String bodyEnd = "}";
         public static final String bodyInsSep = ",";

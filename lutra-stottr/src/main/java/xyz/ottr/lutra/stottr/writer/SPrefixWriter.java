@@ -34,7 +34,7 @@ public enum SPrefixWriter {
 
     public static String write(PrefixMapping prefixes) {
         return prefixes.getNsPrefixMap().entrySet().stream()
-            .sorted(Comparator.comparing(Map.Entry::getKey))
+            .sorted(Comparator.comparing(Map.Entry::getValue))
             .map(entry -> writePrefix(entry.getKey(), entry.getValue()))
             .collect(Collectors.joining(STOTTR.Space.br));
     }

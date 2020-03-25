@@ -22,6 +22,7 @@ package xyz.ottr.lutra.stottr.writer;
  * #L%
  */
 
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -39,6 +40,9 @@ import xyz.ottr.lutra.stottr.STOTTR;
 import xyz.ottr.lutra.writer.TemplateWriter;
 
 public class STemplateWriter implements TemplateWriter {
+
+    private static final Comparator<Signature> signatureComparator =
+        Comparator.comparing(sign -> sign.getClass().getSimpleName() + sign.getIri(), String::compareToIgnoreCase);
 
     private final Map<String, Signature> templates;
     private final PrefixMapping prefixes;
@@ -62,7 +66,8 @@ public class STemplateWriter implements TemplateWriter {
         return SPrefixWriter.write(this.prefixes)
             + STOTTR.Space.br2
             + this.templates.values().stream()
-                .map(s -> write(s, false))
+                .sorted(signatureComparator)
+                .map(signature -> write(signature, false))
                 .collect(Collectors.joining(STOTTR.Space.br2));
     }
 
@@ -166,7 +171,7 @@ public class STemplateWriter implements TemplateWriter {
         }
 
         if (builder.length() != 0) {
-            builder.append(" ");
+            builder.append(STOTTR.Space.space);
         }
         return builder;
     }
@@ -187,13 +192,19 @@ public class STemplateWriter implements TemplateWriter {
         builder.append(typeStr).append(STOTTR.Types.innerTypeStart);
         builder.append(writeType(innerType, termWriter));
         builder.append(STOTTR.Types.innerTypeEnd);
-
         return builder;
     }
 
     private String writePattern(Template template, STermWriter termWriter) {
+
         SInstanceWriter instanceWriter = new SPatternInstanceWriter(termWriter);
-        template.getPattern().forEach(instanceWriter);
-        return instanceWriter.write();
+        var pattern = template.getPattern();
+
+        if (pattern.isEmpty()) {
+            return STOTTR.Space.indent + STOTTR.Statements.commentStart + "Empty pattern";
+        } else {
+            pattern.forEach(instanceWriter);
+            return instanceWriter.write();
+        }
     }
 }

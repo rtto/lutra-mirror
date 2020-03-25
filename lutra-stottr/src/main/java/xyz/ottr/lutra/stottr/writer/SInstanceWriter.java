@@ -25,6 +25,7 @@ package xyz.ottr.lutra.stottr.writer;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import org.apache.jena.shared.PrefixMapping;
@@ -36,6 +37,7 @@ import xyz.ottr.lutra.writer.InstanceWriter;
 public class SInstanceWriter implements InstanceWriter {
 
     protected static final Comparator<Instance> instanceSorter = Comparator.comparing(Instance::getIri)
+        .thenComparing(i -> Objects.toString(i.getListExpander(), ""), String::compareToIgnoreCase)
         .thenComparing(i -> i.getArguments().toString(), String::compareToIgnoreCase);
 
     protected final List<Instance> instances;
