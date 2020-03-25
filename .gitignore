@@ -1,21 +1,3 @@
-##
-## Resources downloaded by maven plugin
-##
-
-lutra-core/src/main/resources/puntypes\.owl\.ttl
-lutra-core/src/main/resources/types\.owl\.ttl
-lutra-wottr/src/test/resources/spec/core-grammar\.shacl\.ttl
-lutra-wottr/src/test/resources/spec/core-vocabulary\.owl\.ttl
-
-
-##
-## Test files downloaded by maven plugin
-##
-
-lutra-wottr/src/test/resources/spec/examples/*\.ttl
-lutra-wottr/src/test/resources/spec/tests/correct/*\.ttl
-lutra-wottr/src/test/resources/spec/tests/incorrect/*\.ttl
-
 
 ##
 ## Java
@@ -114,16 +96,24 @@ Desktop.ini
 
 *.xml#
 
-lutra-cli/dependency-reduced-pom\.xml
+
+###
+### Lutra specifics
+###
+
+lutra-core/src/main/resources/puntypes\.owl\.ttl
+lutra-core/src/main/resources/types\.owl\.ttl
+lutra-wottr/src/test/resources/spec/core-grammar\.shacl\.ttl
+lutra-wottr/src/test/resources/spec/core-vocabulary\.owl\.ttl
+
+lutra-wottr/src/test/resources/spec/examples/*\.ttl
+lutra-wottr/src/test/resources/spec/tests/correct/*\.ttl
+lutra-wottr/src/test/resources/spec/tests/incorrect/*\.ttl
 
 lutra-stottr/src/main/antlr4/stOTTR\.g4
 
 lutra-stottr/src/main/antlr4/imports/Turtle\.g4
 
-lutra-stottr/src/test/resources/.temp-deploy/
-
-lutra-cli/src/test/resources/.temp-deploy/
-
 lutra-cli/src/test/resources/primer/
 
-lutra-api/src/main/resources/templates-master/
+lutra-api/src/main/resources/tpl-library/

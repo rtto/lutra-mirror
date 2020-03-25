@@ -45,7 +45,7 @@ import xyz.ottr.lutra.wottr.parser.WTemplateParser;
 @Getter
 public final class StandardTemplateManager extends TemplateManager {
     
-    private static final String templatesListFile = "templates-list.txt";
+    private static final String templatesListFile = "tpl-library/templates-list.txt";
     private TemplateStore standardLibrary;
     
     public StandardTemplateManager() {
