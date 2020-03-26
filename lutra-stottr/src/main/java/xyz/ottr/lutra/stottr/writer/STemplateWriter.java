@@ -29,6 +29,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.apache.jena.shared.PrefixMapping;
+import xyz.ottr.lutra.Space;
 import xyz.ottr.lutra.model.BaseTemplate;
 import xyz.ottr.lutra.model.Parameter;
 import xyz.ottr.lutra.model.Signature;
@@ -64,11 +65,11 @@ public class STemplateWriter implements TemplateWriter {
 
     public String write() {
         return SPrefixWriter.write(this.prefixes)
-            + STOTTR.Space.br2
+            + Space.LINE2
             + this.templates.values().stream()
                 .sorted(signatureComparator)
                 .map(signature -> write(signature, false))
-                .collect(Collectors.joining(STOTTR.Space.br2));
+                .collect(Collectors.joining(Space.LINE2));
     }
 
     public String write(String iri) {
@@ -101,7 +102,7 @@ public class STemplateWriter implements TemplateWriter {
 
         // Write used prefixes at start of String
         if (includePrefixes) {
-            builder.insert(0, SPrefixWriter.write(termWriter.getUsedPrefixes()) + STOTTR.Space.br2);
+            builder.insert(0, SPrefixWriter.write(termWriter.getUsedPrefixes()) + Space.LINE2);
         }
 
         return builder.toString();
@@ -135,9 +136,9 @@ public class STemplateWriter implements TemplateWriter {
         builder.append(writeSignature(template, termWriter));
         builder.append(STOTTR.Statements.signatureSep);
         builder.append(STOTTR.Statements.bodyStart);
-        builder.append(STOTTR.Space.br);
+        builder.append(Space.LINE);
         builder.append(writePattern(template, termWriter));
-        builder.append(STOTTR.Space.br);
+        builder.append(Space.LINE);
         builder.append(STOTTR.Statements.bodyEnd);
         return builder;
     }
@@ -148,7 +149,7 @@ public class STemplateWriter implements TemplateWriter {
 
         builder.append(writeModes(parameter.isNonBlank(), parameter.isOptional()));
         builder.append(writeType(parameter.getTerm().getType(), termWriter));
-        builder.append(STOTTR.Space.space);
+        builder.append(Space.space);
         builder.append(termWriter.write(parameter.getTerm()));
 
         if (parameter.hasDefaultValue()) {
@@ -171,7 +172,7 @@ public class STemplateWriter implements TemplateWriter {
         }
 
         if (builder.length() != 0) {
-            builder.append(STOTTR.Space.space);
+            builder.append(Space.space);
         }
         return builder;
     }
@@ -201,7 +202,7 @@ public class STemplateWriter implements TemplateWriter {
         var pattern = template.getPattern();
 
         if (pattern.isEmpty()) {
-            return STOTTR.Space.indent + STOTTR.Statements.commentStart + "Empty pattern";
+            return Space.INDENT + STOTTR.Statements.commentStart + "Empty pattern";
         } else {
             pattern.forEach(instanceWriter);
             return instanceWriter.write();

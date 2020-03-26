@@ -28,7 +28,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.apache.jena.shared.PrefixMapping;
-import xyz.ottr.lutra.OTTR;
+import xyz.ottr.lutra.RDFTurtle;
 import xyz.ottr.lutra.model.terms.BlankNodeTerm;
 import xyz.ottr.lutra.model.terms.IRITerm;
 import xyz.ottr.lutra.model.terms.ListTerm;
@@ -98,21 +98,21 @@ public class STermWriter {
         String qname = this.prefixes.qnameFor(iri);
 
         if (qname != null) {
-            String prefix = qname.split(STOTTR.RDF.qnameSep)[0];
+            String prefix = qname.split(RDFTurtle.qnameSep)[0];
             this.usedPrefixNS.add(this.prefixes.getNsPrefixURI(prefix));
             return qname;
         }
 
-        return STOTTR.RDF.fullURI(iri);
+        return RDFTurtle.fullURI(iri);
     }
 
     private String writeLiteral(LiteralTerm literal) {
 
-        String val = STOTTR.RDF.literal(literal.getValue());
+        String val = RDFTurtle.literal(literal.getValue());
         if (literal.getLanguageTag() != null) {
-            val += STOTTR.RDF.literalLang + literal.getLanguageTag();
-        } else if (literal.getDatatype() != null && !literal.getDatatype().equals(OTTR.TypeURI.String)) {
-            val += STOTTR.RDF.literalType + writeIRI(literal.getDatatype());
+            val += RDFTurtle.literalLang + literal.getLanguageTag();
+        } else if (literal.getDatatype() != null && !literal.getDatatype().equals(RDFTurtle.plainLiteralDatatype)) {
+            val += RDFTurtle.literalType + writeIRI(literal.getDatatype());
         }
         return val;
     }

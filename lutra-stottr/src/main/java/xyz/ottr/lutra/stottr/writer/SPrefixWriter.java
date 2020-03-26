@@ -26,7 +26,8 @@ import java.util.Comparator;
 import java.util.Map;
 import java.util.stream.Collectors;
 import org.apache.jena.shared.PrefixMapping;
-import xyz.ottr.lutra.stottr.STOTTR;
+import xyz.ottr.lutra.RDFTurtle;
+import xyz.ottr.lutra.Space;
 
 public enum SPrefixWriter {
 
@@ -36,11 +37,11 @@ public enum SPrefixWriter {
         return prefixes.getNsPrefixMap().entrySet().stream()
             .sorted(Comparator.comparing(Map.Entry::getValue))
             .map(entry -> writePrefix(entry.getKey(), entry.getValue()))
-            .collect(Collectors.joining(STOTTR.Space.br));
+            .collect(Collectors.joining(Space.LINE));
     }
 
     private static String writePrefix(String prefix, String namespace) {
-        return STOTTR.RDF.prefix + prefix + STOTTR.RDF.prefixSep + STOTTR.RDF.fullURI(namespace) + STOTTR.RDF.prefixEnd;
+        return RDFTurtle.prefix + prefix + RDFTurtle.prefixSep + RDFTurtle.fullURI(namespace) + RDFTurtle.prefixEnd;
     }
 
 }

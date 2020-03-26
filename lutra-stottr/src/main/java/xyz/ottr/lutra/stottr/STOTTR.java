@@ -33,33 +33,6 @@ import xyz.ottr.lutra.model.types.NEListType;
 
 public class STOTTR {
 
-    public enum Space {
-        ;
-        public static final String space = " ";
-        public static final String indent = "    ";
-        public static final String br = System.lineSeparator();
-        public static final String br2 = br + br;
-    }
-
-    public enum RDF {
-        ;
-        public static final String prefix = "@prefix ";
-        public static final String prefixSep = ": ";
-        public static final String prefixEnd = " .";
-        public static final String qnameSep = ":";
-
-        public static String fullURI(String uri) {
-            return "<" + uri + ">";
-        }
-
-        public static final String literalLang = "@";
-        public static final String literalType = "^^";
-
-        public static String literal(String value) {
-            return "\"" + value + "\"";
-        }
-    }
-
     public enum Terms {
         ;
         public static final String none = "none";

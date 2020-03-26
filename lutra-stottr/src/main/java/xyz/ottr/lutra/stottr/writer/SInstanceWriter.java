@@ -29,6 +29,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 import org.apache.jena.shared.PrefixMapping;
+import xyz.ottr.lutra.Space;
 import xyz.ottr.lutra.model.Argument;
 import xyz.ottr.lutra.model.Instance;
 import xyz.ottr.lutra.stottr.STOTTR;
@@ -64,7 +65,7 @@ public class SInstanceWriter implements InstanceWriter {
 
         builder
             .append(SPrefixWriter.write(this.termWriter.getPrefixes()))
-            .append(STOTTR.Space.br2);
+            .append(Space.LINE2);
 
         this.instances.stream()
             .sorted(instanceSorter)
@@ -72,7 +73,7 @@ public class SInstanceWriter implements InstanceWriter {
                 builder
                     .append(writeInstance(instance))
                     .append(STOTTR.Statements.statementEnd)
-                    .append(STOTTR.Space.br));
+                    .append(Space.LINE));
 
         return builder.toString();
     }
