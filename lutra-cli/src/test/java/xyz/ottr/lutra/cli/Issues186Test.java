@@ -22,6 +22,11 @@ package xyz.ottr.lutra.cli;
  * #L%
  */
 
+import static org.junit.Assert.assertTrue;
+
+import java.nio.file.Files;
+import java.nio.file.Paths;
+
 import org.junit.Test;
 
 public class Issues186Test {
@@ -31,7 +36,9 @@ public class Issues186Test {
     @Test
     public void test() {
         CLIRunner.run(
-            "-m expand -l " + ROOT + "/lib -L stottr -f -o out.ttl -O wottr -I tabottr " + ROOT + "instances.xlsx");
+            "-m expand -l " + ROOT + "/lib -L stottr -f -o " + ROOT + "out.ttl -O wottr -I tabottr " + ROOT + "instances.xlsx");
+
+        assertTrue("Output file not found.", Files.isRegularFile(Paths.get(ROOT + "out.ttl")));
     }
 
 }
