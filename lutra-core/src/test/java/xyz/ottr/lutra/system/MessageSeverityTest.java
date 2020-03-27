@@ -41,20 +41,21 @@ public class MessageSeverityTest {
         assertTrue(INFO.isLessThan(ERROR));
         assertTrue(INFO.isLessThan(FATAL));
 
+        assertTrue(WARNING.isGreaterThan(INFO));
         assertTrue(WARNING.isLessThan(ERROR));
         assertTrue(WARNING.isLessThan(FATAL));
 
+        assertTrue(ERROR.isGreaterThan(INFO));
+        assertTrue(ERROR.isGreaterThan(WARNING));
         assertTrue(ERROR.isLessThan(FATAL));
 
-        assertTrue(INFO.isGreaterEqualThan(least()));
-        assertTrue(WARNING.isGreaterEqualThan(least()));
-        assertTrue(ERROR.isGreaterEqualThan(least()));
-        assertTrue(FATAL.isGreaterEqualThan(least()));
+        assertTrue(FATAL.isGreaterThan(INFO));
+        assertTrue(FATAL.isGreaterThan(WARNING));
+        assertTrue(FATAL.isGreaterThan(ERROR));
 
-        assertTrue(INFO.isLessEqualThan(greatest()));
-        assertTrue(WARNING.isLessEqualThan(greatest()));
-        assertTrue(ERROR.isLessEqualThan(greatest()));
-        assertTrue(FATAL.isLessEqualThan(greatest()));
-
+        for (Message.Severity s : Message.Severity.values()) {
+            assertTrue(s.isLessEqualThan(greatest()));
+            assertTrue(s.isGreaterEqualThan(least()));
+        }
     }
 }
