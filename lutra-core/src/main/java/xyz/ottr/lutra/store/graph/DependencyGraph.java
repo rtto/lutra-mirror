@@ -590,13 +590,14 @@ public class DependencyGraph implements TemplateStore {
 
             if (!arg.getType().isCompatibleWith(param.getType())) {
                 String err = "Argument " + arg + " with index " + i
-                    + " to template with IRI " + ins.to.getIri() + " has incompatible type: "
-                    + "Expected type compatible with " + param.getType() + " but got " + arg.getType() + ".";
+                    + " to template with IRI " + ins.to.getIri() + " has an incompatible type. "
+                    + "Expected a type compatible with the parameter type " + param.getType()
+                    + ", but got " + arg.getType() + ".";
                 insRes = insRes.fail(Message.error(err));
             }
             if (arg instanceof BlankNodeTerm && params.get(i).isNonBlank()) {
                 String err = "Argument " + arg + " with index " + i
-                    + " to template with IRI " + ins.to.getIri() + " is a blank node, but "
+                    + " to template with IRI " + ins.to.getIri() + " is a blank node, but the "
                     + " corresponding parameter " + params.get(i) + " is marked as non-blank.";
                 insRes = insRes.fail(Message.error(err));
             }
