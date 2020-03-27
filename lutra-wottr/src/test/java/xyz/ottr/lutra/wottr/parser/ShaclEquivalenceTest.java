@@ -165,7 +165,7 @@ public class ShaclEquivalenceTest {
             .combine(tplErrorMessages.getMessageHandler())
             .getMessages();
 
-        errors.removeIf(message -> !Message.moreSevere(message.getLevel(), Message.ERROR));
+        errors.removeIf(message -> message.getSeverity().isLessThan(Message.Severity.ERROR));
 
         if (!correct) {
             assertFalse("Should produce error messages: " + file, errors.isEmpty());
@@ -189,14 +189,10 @@ public class ShaclEquivalenceTest {
             insErrorMessages.accept(ins);
         });
 
-        int msgLvl = insErrorMessages.getMessageHandler().printMessages();
-        if (!correct) {
-            assertTrue("Should produce error messages: " + file, Message.moreSevere(msgLvl, Message.ERROR));
-        }
         if (correct) {
-            assertFalse("File " + file + " should not produce any error messages, but gave:\n"
-                + insErrorMessages.getMessageHandler().getMessages(),
-                Message.moreSevere(msgLvl, Message.ERROR));
+            insErrorMessages.getMessageHandler().assertNoErrors();
+        } else {
+            insErrorMessages.getMessageHandler().assertAtLeast(Message.Severity.ERROR);
         }
     }
 

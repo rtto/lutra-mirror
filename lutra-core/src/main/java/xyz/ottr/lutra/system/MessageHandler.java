@@ -22,7 +22,11 @@ package xyz.ottr.lutra.system;
  * #L%
  */
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
+
 import java.io.PrintStream;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -31,6 +35,10 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
+
+import lombok.Setter;
 
 public class MessageHandler {
 
@@ -40,7 +48,8 @@ public class MessageHandler {
     private final PrintStream printStream;
     private final Set<String> printedMsgs;
 
-    private boolean quiet = false;
+    @Setter
+    private boolean quiet;
 
     public MessageHandler(PrintStream printStream) {
         this.printStream = printStream;
@@ -50,10 +59,6 @@ public class MessageHandler {
 
     public MessageHandler() {
         this(System.err);
-    }
-
-    public void setQuiet(boolean isQuiet) {
-        this.quiet = isQuiet;
     }
 
     public void add(Message msg) {
@@ -89,10 +94,8 @@ public class MessageHandler {
      *
      * @param element
      *     Element to applied the consumer to
-     * @param consumer
-     *     Consumer which will consume value in element if present
      */
-    public <T> int use(Result<T> element, Consumer<T> consumer) {
+    public <T> Message.Severity use(Result<T> element, Consumer<T> consumer) {
         // TODO: This only depends on this.output and it not so natural,  perhaps move
         ResultConsumer<T> resConsumer = new ResultConsumer<>(consumer, this.printStream);
         resConsumer.accept(element);
@@ -111,7 +114,7 @@ public class MessageHandler {
         return msgs;
     }
 
-    public int getMostSevere() {
+    public Message.Severity getMostSevere() {
         return visitMessagesAndTraces(_ignore -> { }, _ignore -> { });
     }
     
@@ -123,18 +126,16 @@ public class MessageHandler {
      *      Consumer that accepts all Messages on all Traces in this MessageHandler
      * @param traceConsumer
      *      Consumer that accepts all Traces containing at least one Message in this MessageHandler
-     * @return
-     *      an integer representing the level of the most severe Message (see e.g. Message.ERROR)
      */
-    private int visitMessagesAndTraces(Consumer<Message> msgConsumer, Consumer<Trace> traceConsumer) {
+    private Message.Severity visitMessagesAndTraces(Consumer<Message> msgConsumer, Consumer<Trace> traceConsumer) {
 
-        int[] mostSevere = {Integer.MAX_VALUE};
+        Message.Severity[] mostSevere = { Message.Severity.least() };
 
         Trace.visitTraces(this.traces, trace -> {
             for (Message msg : trace.getMessages()) {
                 msgConsumer.accept(msg);
-                if (Message.moreSevere(msg.getLevel(), mostSevere[0])) {
-                    mostSevere[0] = msg.getLevel();
+                if (msg.getSeverity().isGreaterEqualThan(mostSevere[0])) {
+                    mostSevere[0] = msg.getSeverity();
                 }
             }
             if (!trace.getMessages().isEmpty()) {
@@ -151,10 +152,10 @@ public class MessageHandler {
      * identifier, and returns an int representing
      * the level of the most severe Message.
      */
-    public int printMessages() {
-        int code = visitMessagesAndTraces(this::printMessage, this::printLocation);
+    public Message.Severity printMessages() {
+        var severity = visitMessagesAndTraces(this::printMessage, this::printLocation);
         this.printedMsgs.clear();
-        return code;
+        return severity;
     }
 
 
@@ -222,7 +223,7 @@ public class MessageHandler {
     
     public Optional<Message> toSingleMessage(String initialMessage) {
         StringBuilder str = new StringBuilder();
-        int severity = visitMessagesAndTraces(
+        var severity = visitMessagesAndTraces(
             msg -> str.append(msg).append("\n"),
             trace -> str.append(getLocation(trace)));
 
@@ -232,4 +233,33 @@ public class MessageHandler {
         str.insert(0, initialMessage + "\n");
         return Optional.of(new Message(severity, str.toString()));
     }
+
+    /*
+        If size is < 0, it means *any* size > 0.
+     */
+    private void assertSeverity(Predicate<Message.Severity> severityFilter, int size) {
+
+        var messages = this.getMessages().stream()
+            .filter(message -> severityFilter.test(message.getSeverity()))
+            .collect(Collectors.toList());
+
+        if (size < 0) {
+            assertThat("Expected matching messages, but got none", messages.size() > 0, is(true));
+        } else {
+            assertThat(messages.size(), is(size));
+        }
+
+        if (size == 0) {
+            assertThat(messages, is(Collections.EMPTY_LIST));
+        }
+    }
+
+    public void assertNoErrors() {
+        assertSeverity(s -> s.isGreaterEqualThan(Message.Severity.ERROR), 0);
+    }
+
+    public void assertAtLeast(Message.Severity severity) {
+        assertSeverity(s -> s.isGreaterEqualThan(severity), -1);
+    }
+
 }
