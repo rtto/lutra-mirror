@@ -29,6 +29,7 @@ import java.util.stream.Collectors;
 
 import org.apache.jena.vocabulary.OWL;
 import org.apache.jena.vocabulary.XSD;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -136,6 +137,7 @@ public class CheckLibraryTest {
         check(engine, 0, Message.WARNING);
     }
 
+    @Ignore("This test is now performed during parsing.")
     @Test
     public void variableDefinedTwiceError() {
 
