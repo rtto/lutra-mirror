@@ -50,26 +50,12 @@ public enum TemplateBuilder {
         builder.addResult(instances, Template.TemplateBuilder::instances);
 
         if (Result.allIsPresent(signature, instances)) {
-            var template = builder.map(Template.TemplateBuilder::build);
-            validate(template);
-            return template;
+            return builder.map(Template.TemplateBuilder::build)
+                .flatMap(Template::validate);
         } else {
             return Result.empty(builder);
         }
     }
-
-    private static void validate(Result<Template> template) {
-        checkEmptyPattern(template);
-    }
-
-    private static void checkEmptyPattern(Result<Template> template) {
-        template.ifPresent(t -> {
-            if (t.getPattern().isEmpty()) {
-                template.addWarning("Template has an empty pattern.");
-            }
-        });
-    }
-
 
 }
 

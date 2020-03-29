@@ -23,11 +23,8 @@ package xyz.ottr.lutra.parser;
  */
 
 import lombok.Builder;
-import xyz.ottr.lutra.OTTR;
 import xyz.ottr.lutra.model.Argument;
-import xyz.ottr.lutra.model.terms.IRITerm;
 import xyz.ottr.lutra.model.terms.Term;
-import xyz.ottr.lutra.model.types.ListType;
 import xyz.ottr.lutra.system.Message;
 import xyz.ottr.lutra.system.Result;
 
@@ -45,40 +42,11 @@ public enum ArgumentBuilder {
         builder.addResult(listExpander, Argument.ArgumentBuilder::listExpander);
 
         if (Result.allIsPresent(term)) {
-            var argument = builder.map(Argument.ArgumentBuilder::build);
-            validate(argument);
-            return argument;
+            return builder.map(Argument.ArgumentBuilder::build)
+                .flatMap(Argument::validate);
         } else {
             return Result.empty(builder);
         }
-    }
-
-    private static void validate(Result<Argument> argument) {
-        checkOTTRNamespaceIRI(argument);
-        checkListExpansionValue(argument);
-    }
-
-    // Warning if value is a URI in the ottr namespace.
-    private static void checkOTTRNamespaceIRI(Result<Argument> argument) {
-        argument.ifPresent(arg -> {
-            var term = arg.getTerm();
-            if (term instanceof IRITerm && ((IRITerm) term).getIri().startsWith(OTTR.namespace)) {
-                argument.addWarning("Suspicious argument value: " + term
-                    + ". The value is in the ottr namespace: " + OTTR.namespace);
-            }
-        });
-    }
-
-    private static void checkListExpansionValue(Result<Argument> argument) {
-        argument.ifPresent(arg -> {
-            if (arg.isListExpander()) {
-                var term = arg.getTerm();
-                if (!term.isVariable() && !(term.getType() instanceof ListType)) {
-                    argument.addError("Argument " + arg + "is marked for list expansion, "
-                        + "but argument value " + term + " is not a list, but of type: " + term.getType());
-                }
-            }
-        });
     }
 
 }

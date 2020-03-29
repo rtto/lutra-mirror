@@ -23,7 +23,6 @@ package xyz.ottr.lutra.parser;
  */
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import lombok.Builder;
 import xyz.ottr.lutra.model.Argument;
@@ -50,32 +49,10 @@ public enum InstanceBuilder {
         builder.addResult(listExpander, Instance.InstanceBuilder::listExpander);
 
         if (Result.allIsPresent(iri, arguments)) {
-            var instance = builder.map(Instance.InstanceBuilder::build);
-            validate(instance);
-            return instance;
+            return builder.map(Instance.InstanceBuilder::build)
+                .flatMap(Instance::validate);
         } else {
             return Result.empty(builder);
         }
     }
-
-    private static void validate(Result<Instance> instance) {
-        checkListExpanders(instance);
-    }
-
-    private static void checkListExpanders(Result<Instance> instance) {
-        instance.ifPresent(i -> {
-            var forExpansion = i.getArguments().stream()
-                .filter(Argument::isListExpander)
-                .collect(Collectors.toList());
-
-            if (i.hasListExpander() && forExpansion.isEmpty()) {
-                instance.addError("The instance is marked with the list expander "
-                    + i.getListExpander() + ", but no arguments are marked for list expansion.");
-            } else if (!i.hasListExpander() && !forExpansion.isEmpty()) {
-                instance.addError("The instance has arguments which are marked for list expansion:"
-                    + forExpansion + ", but the instance is not marked with a list expander");
-            }
-        });
-    }
-
 }

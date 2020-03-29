@@ -50,24 +50,12 @@ public enum ParameterBuilder {
         builder.addResult(defaultValue, Parameter.ParameterBuilder::defaultValue);
 
         if (Result.allIsPresent(term)) {
-            var parameter = builder.map(Parameter.ParameterBuilder::build);
-            validate(parameter);
-            return parameter;
+            return builder.map(Parameter.ParameterBuilder::build)
+                .flatMap(Parameter::validate);
         } else {
             return Result.empty(builder);
         }
     }
 
-    private static void validate(Result<Parameter> parameter) {
-        checkOptionalDefault(parameter);
-    }
 
-    private static void checkOptionalDefault(Result<Parameter> parameter) {
-
-        parameter.ifPresent(p -> {
-            if (p.isOptional() && p.hasDefaultValue()) {
-                parameter.addWarning("Superfluous optional. Parameter is optional *and* has a default value.");
-            }
-        });
-    }
 }

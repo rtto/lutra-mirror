@@ -23,8 +23,6 @@ package xyz.ottr.lutra.parser;
  */
 
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 import lombok.Builder;
 import xyz.ottr.lutra.model.Parameter;
@@ -47,39 +45,12 @@ public enum SignatureBuilder {
         builder.addResult(parameters, Signature.SignatureBuilder::parameters);
 
         if (Result.allIsPresent(iri, parameters)) {
-            var signature = builder.map(Signature.SignatureBuilder::build);
-            validate(signature);
-            return signature;
+            return builder.map(Signature.SignatureBuilder::build)
+                .flatMap(Signature::validate)
+                .map(s -> (Signature)s);
         } else {
             return Result.empty(builder);
         }
     }
-
-    private static void validate(Result<Signature> signature) {
-        checkDuplicateVariables(signature);
-    }
-
-    /**
-     * Check that parameter list does not contain multiple parameters that share the same variable name.
-     */
-    private static void checkDuplicateVariables(Result<Signature> signature) {
-        signature.ifPresent(s -> {
-            var duplicateVarNames =
-                s.getParameters().stream()
-                    .collect(Collectors.groupingBy(p -> p.getTerm().getIdentifier())) // group parameters by variable name
-                    .entrySet()
-                    .stream()
-                    .filter(e -> e.getValue().size() > 1)
-                    .map(Map.Entry::getKey)
-                    .collect(Collectors.toList());
-
-            if (!duplicateVarNames.isEmpty()) {
-                signature.addError("Parameter variables must be unique. Signature contains multiple occurrences "
-                    + "of the same variable name: " + duplicateVarNames);
-            }
-        });
-    }
-
-
 }
 

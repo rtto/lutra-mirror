@@ -36,10 +36,11 @@ import org.apache.jena.shared.PrefixMapping;
 import xyz.ottr.lutra.OTTR;
 import xyz.ottr.lutra.model.terms.Term;
 import xyz.ottr.lutra.model.types.TermType;
+import xyz.ottr.lutra.system.Result;
 
 @Getter
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-public class Parameter implements HasGetTerm {
+public class Parameter implements ModelElement, HasGetTerm {
 
     private final @NonNull Term term;
     private final boolean nonBlank;
@@ -64,12 +65,12 @@ public class Parameter implements HasGetTerm {
         return Objects.nonNull(this.defaultValue);
     }
 
-
     @Override
     public String toString() {
         return toString(OTTR.getDefaultPrefixes());
     }
 
+    @Override
     public String toString(PrefixMapping prefixMapping) {
 
         StringBuilder str = new StringBuilder();
@@ -90,4 +91,16 @@ public class Parameter implements HasGetTerm {
         return str.toString();
     }
 
+    @Override
+    public Result<Parameter> validate() {
+
+        var result = Result.of(this);
+
+        // optional *and* default value
+        if (this.optional && this.hasDefaultValue()) {
+            result.addWarning("Superfluous optional. Parameter is optional *and* has a default value.");
+        }
+
+        return result;
+    }
 }

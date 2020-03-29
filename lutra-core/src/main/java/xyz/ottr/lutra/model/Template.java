@@ -38,6 +38,7 @@ import xyz.ottr.lutra.OTTR;
 import xyz.ottr.lutra.model.terms.ListTerm;
 import xyz.ottr.lutra.model.terms.Term;
 import xyz.ottr.lutra.model.types.TermType;
+import xyz.ottr.lutra.system.Result;
 
 @SuppressWarnings("PMD.UselessOverridingMethod")
 @Getter
@@ -87,6 +88,7 @@ public class Template extends Signature {
         return toString(OTTR.getDefaultPrefixes());
     }
 
+    @Override
     public String toString(PrefixMapping prefixes) {
         return super.toString(prefixes)
             + " ::\n"
@@ -104,5 +106,18 @@ public class Template extends Signature {
     @Override
     public int hashCode() {
         return super.hashCode();
+    }
+
+    @Override
+    public Result<Template> validate() {
+
+        var result = super.validate()
+            .map(s -> (Template)s);
+
+        if (this.pattern.isEmpty()) {
+            result.addWarning("Template has an empty pattern.");
+        }
+
+        return result;
     }
 }
