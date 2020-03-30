@@ -46,7 +46,6 @@ import xyz.ottr.lutra.model.Signature;
 import xyz.ottr.lutra.model.Substitution;
 import xyz.ottr.lutra.model.Template;
 import xyz.ottr.lutra.model.terms.BlankNodeTerm;
-import xyz.ottr.lutra.model.terms.Term;
 import xyz.ottr.lutra.store.Query;
 import xyz.ottr.lutra.store.QueryEngine;
 import xyz.ottr.lutra.store.TemplateStore;
@@ -161,7 +160,7 @@ public class DependencyGraph implements TemplateStore {
 
     @Override
     public boolean addTemplateSignature(Signature signature) {
-        log.info("Adding template signature " + signature.getIri());
+        log.info("Adding signature " + signature.getIri());
         TemplateNode node = addTemplateNode(signature.getIri());
         node.setParameters(signature.getParameters());
         node.setType(TemplateNode.getTemplateNodeType(signature));
@@ -232,10 +231,11 @@ public class DependencyGraph implements TemplateStore {
      * IRI if the IRI has a template within this store, otherwise
      * returns empty Result.
      */
+    // TODO: should it be "Template" or "Signature", both method name and error message
     public Result<TemplateNode> checkIsTemplate(String iri) {
         TemplateNode node = this.nodes.get(iri);
         if (node == null) {
-            return Result.empty(Message.error("IRI not found in TemplateStore: " + iri + "."));
+            return Result.error("Unknown template " + iri + ".");
         }
         return Result.of(node);
     }
@@ -403,17 +403,17 @@ public class DependencyGraph implements TemplateStore {
             && edge.isInstance()) {
 
             res = Result.empty(Message.error(
-                    "Cannot expand listExpander on instance of template " + edge.to.getIri()
-                    + " with arguments " + edge.argumentList
-                    + ": it contains blank nodes."), res);
+                "List expansion error for instance " + edge.to.getIri() + edge.argumentList + ". "
+                + "A blank node is marked for list expansion."), res);
+            // TODO: Could the error message be: "Expected list expansion argument to be a list, but found [arg] of type [type].
+            // TODO contd: however the canExpandExpander method checks only if the arg is a variable or blank node.
         }
 
         if (edge.to.isUndefined() || edge.isInstance() && edge.to.isSignature()) {
             res = Result.empty(Message.error(
-                    "Cannot expand instance of template " + edge.to.getIri()
-                    + " with arguments " + edge.argumentList
-                    + (edge.from == null ? "" : " in body of " + edge.from.getIri())
-                    + ": missing definition."), res);
+                "Error expanding instance " + edge.to.getIri() + edge.argumentList
+                    + (edge.from != null ? " in the pattern of template " + edge.from.getIri() : "") + ". "
+                    + " Unknown signature or template " + edge.to.getIri() + "."), res);
         }
 
         return res;
@@ -421,7 +421,7 @@ public class DependencyGraph implements TemplateStore {
 
     /**
      * Used for expanding instances: Expands edges if template used correctly, and gives
-     * empty Result with error message othewise.
+     * empty Result with error message otherwise.
      */
     private Set<Result<DependencyEdge>> expandEdgeWithChecks(DependencyEdge edge) {
 
@@ -571,13 +571,14 @@ public class DependencyGraph implements TemplateStore {
         List<Argument> args = ins.argumentList;
         List<Parameter> params = ins.to.getParameters();
 
+        // TODO: suggestion, if this method finds one or more problems, should we collect all errors to one message?
+
         // First check correct number of arguments
         if (params == null) {
-            return Result.error("Missing definition of template with IRI " + ins.to.getIri() + ".");
+            return Result.error("Unknown signature or template " + ins.to.getIri() + ".");
         } else if (params.size() != args.size()) {
-            return Result.error("Instance of template with IRI " + ins.to.getIri()
-                + " with arguments " + args + " has " + args.size()
-                + " arguments, but template expects " + params.size() + ".");
+            return Result.error("Wrong number of arguments. Instance " + ins.to.getIri() + args
+                + " has " + args.size() + " arguments, but template expects " + params.size() + ".");
         }
 
         // Then check types and non-blanks
@@ -585,19 +586,19 @@ public class DependencyGraph implements TemplateStore {
         Result<DependencyEdge> insRes = Result.of(ins);
 
         for (int i = 0; i < args.size(); i++) {
-            Term arg = args.get(i).getTerm();
-            Term param = params.get(i).getTerm();
+            Argument arg = args.get(i);
+            Parameter param = params.get(i);
 
-            if (!arg.getType().isCompatibleWith(param.getType())) {
-                String err = "Argument " + arg + " with index " + i
-                    + " to template with IRI " + ins.to.getIri() + " has incompatible type: "
-                    + "Expected type compatible with " + param.getType() + " but got " + arg.getType() + ".";
+            if (!arg.getTerm().getType().isCompatibleWith(param.getTerm().getType())) {
+                String err = "Argument type error. Argument " + arg + " (index " + i + ") "
+                    + "in instance " + ins.to.getIri() + args + " has a type " + arg.getTerm().getType()
+                    + " which is incompatible with the type of the corresponding parameter " + param + ".";
                 insRes = insRes.fail(Message.error(err));
             }
-            if (arg instanceof BlankNodeTerm && params.get(i).isNonBlank()) {
-                String err = "Argument " + arg + " with index " + i
-                    + " to template with IRI " + ins.to.getIri() + " is a blank node, but "
-                    + " corresponding parameter " + params.get(i) + " is marked as non-blank.";
+            if (arg.getTerm() instanceof BlankNodeTerm && param.isNonBlank()) {
+                String err = "Argument non-blank error. Argument " + arg + " (index " + i + ") "
+                    + "in instance" + ins.to.getIri() + args + " is a blank node, but "
+                    + " the corresponding parameter " + params.get(i) + " is marked as non-blank.";
                 insRes = insRes.fail(Message.error(err));
             }
         }
