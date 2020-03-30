@@ -39,10 +39,10 @@ import xyz.ottr.lutra.model.types.BasicType;
 import xyz.ottr.lutra.model.types.ComplexType;
 import xyz.ottr.lutra.model.types.ListType;
 import xyz.ottr.lutra.model.types.TermType;
+import xyz.ottr.lutra.parser.TermParser;
 import xyz.ottr.lutra.system.Result;
 import xyz.ottr.lutra.system.ResultStream;
 
-// TODO use lombok's @SuperBuilder once it has support in IDE, and make fields final. now we simply use setter methods.
 @Setter
 public abstract class ArgumentMap<V> implements Function<V, Result<Term>> {
 
@@ -52,11 +52,11 @@ public abstract class ArgumentMap<V> implements Function<V, Result<Term>> {
     private TranslationTable translationTable;
     private TranslationSettings translationSettings;
 
-    protected final TermFactory termFactory;
+    protected final TermParser termParser;
 
     protected ArgumentMap(PrefixMapping prefixMapping) {
         //this.prefixMapping = prefixMapping;
-        this.termFactory = new TermFactory(prefixMapping);
+        this.termParser = new TermParser(prefixMapping);
         this.translationSettings = TranslationSettings.builder().build();
         this.translationTable = new TranslationTable();
     }
@@ -90,12 +90,12 @@ public abstract class ArgumentMap<V> implements Function<V, Result<Term>> {
         if (Objects.isNull(value)) {
             return Result.of(this.translationSettings.getNullValue());
         } else if (StringUtils.isNotEmpty(getBlankNodeLabel(value))) {
-            return this.termFactory.createBlankNode(getBlankNodeLabel(value)).map(t -> (Term) t);
+            return this.termParser.blankNodeTerm(getBlankNodeLabel(value)).map(t -> (Term) t);
         } else if (this.translationTable.containsKey(toRDFNode(value))) {
             var translatedRDF = this.translationTable.get(toRDFNode(value));
             return translatedRDF.isAnon()
                     ? TermFactory.createBlankNode().map(t -> (Term) t)
-                    : this.termFactory.createTerm(translatedRDF);
+                    : this.termParser.term(translatedRDF);
         } else if (type instanceof ListType) {
             return getListTerm(toString(value), (ComplexType)type);
         } else {

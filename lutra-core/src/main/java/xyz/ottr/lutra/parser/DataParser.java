@@ -1,4 +1,4 @@
-package xyz.ottr.lutra.bottr.util;
+package xyz.ottr.lutra.parser;
 
 /*-
  * #%L
@@ -26,35 +26,51 @@ import java.util.Locale;
 
 import org.apache.commons.lang3.LocaleUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.validator.routines.UrlValidator;
 import org.apache.jena.ext.xerces.util.URI;
+import xyz.ottr.lutra.system.Message;
 import xyz.ottr.lutra.system.Result;
 
-// TODO suggest to move this to core.parser or core.util
+public class DataParser {
 
-public enum DataParser {
 
-    ; // singleton enum utility class
+    private static final String[] DEFAULT_SCHEMES = { "http", "https", "ftp", "file" };
+    private static final UrlValidator validator = new UrlValidator(DEFAULT_SCHEMES);
 
-    public static Result<URI> asURI(String value) {
+    public static Result<String> asURL(String value) {
+        return validator.isValid(value)
+            ? Result.of(value)
+            : Result.empty(getMessage(Message.ERROR, value, "valid IRI"));
+    }
+
+    public static Result<String> asURI(String value) {
+
+        var result = Result.of(value);
         try {
-            return Result.of(new URI(value));
+            new URI(value);
         } catch (URI.MalformedURIException ex) {
-            return getError(value, "valid IRI", ex.getMessage());
+            result.addMessage(getMessage(Message.WARNING, value, "valid IRI", ex.getMessage()));
         }
+        return result;
     }
 
     public static Result<String> asLanguageTagString(String value) {
 
+        var result = Result.of(value);
         Locale locale = new Locale.Builder().setLanguageTag(value).build();
-        return LocaleUtils.isAvailableLocale(locale)
-            ? Result.of(value)
-            : getError(value, "language tag");
+        if (!LocaleUtils.isAvailableLocale(locale)) {
+            result.addMessage(getMessage(Message.WARNING, value, "language tag"));
+        }
+        return result;
     }
 
     public static Result<Character> asChar(String value) {
-        return value.length() == 1
-            ? Result.of(value.charAt(0))
-            : getError(value, "character");
+
+        var result = Result.of(value.charAt(0));
+        if (value.length() == 1) {
+            result.addMessage(getMessage(Message.ERROR, value, "character"));
+        }
+        return result;
     }
 
     /*
@@ -85,17 +101,17 @@ public enum DataParser {
     }
     */
 
-    private static Result getError(Object value, String valueType) {
-        return getError(value, valueType, null);
+    private static Message getMessage(int severity, Object value, String valueType) {
+        return getMessage(severity, value, valueType, null);
     }
 
-    private static Result getError(Object value, String valueType, String message) {
+    private static Message getMessage(int severity, Object value, String valueType, String message) {
         String errorMessage = "Value " + value + " is not a " + valueType;
         if (StringUtils.isNotEmpty(message)) {
             errorMessage += ": " + message;
         }
         errorMessage += ".";
-        return Result.error(errorMessage);
+        return new Message(severity, errorMessage);
     }
 
 

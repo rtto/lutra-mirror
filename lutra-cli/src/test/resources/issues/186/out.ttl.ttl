@@ -1,0 +1,59 @@
+@prefix ex:    <http://example.org/> .
+@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix owl:   <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+
+<http://example.org/class/HDD_1TB>
+        a       owl:Class .
+
+ex:hasComponent  a  owl:ObjectProperty .
+
+<http://example.org/individual/iph1>
+        a                <http://example.org/class/Iphone_8S> ;
+        ex:hasComponent  <http://example.org/individual/soc1> , <http://example.org/individual/lcd1> , <http://example.org/individual/ssd1> , <http://example.org/individual/cam1> .
+
+<http://example.org/class/RAM_2GB>
+        a       owl:Class .
+
+<http://example.org/class/ThinkPad_L420>
+        rdfs:label       "ThinkPad L420 Laptop" ;
+        rdfs:subClassOf  <http://example.org/class/Laptop> ;
+        rdfs:subClassOf  [ a                   owl:Restriction ;
+                           owl:onProperty      ex:hasComponent ;
+                           owl:someValuesFrom  <http://example.org/class/LCD15>
+                         ] ;
+        rdfs:subClassOf  [ a                   owl:Restriction ;
+                           owl:onProperty      ex:hasComponent ;
+                           owl:someValuesFrom  <http://example.org/class/HDD_1TB>
+                         ] ;
+        rdfs:subClassOf  [ a                   owl:Restriction ;
+                           owl:onProperty      ex:hasComponent ;
+                           owl:someValuesFrom  <http://example.org/class/Intel_i5>
+                         ] ;
+        rdfs:subClassOf  [ a                   owl:Restriction ;
+                           owl:onProperty      ex:hasComponent ;
+                           owl:someValuesFrom  <http://example.org/class/GPU_NVIDIA>
+                         ] ;
+        rdfs:subClassOf  [ a                   owl:Restriction ;
+                           owl:onProperty      ex:hasComponent ;
+                           owl:someValuesFrom  <http://example.org/class/RAM_2GB>
+                         ] ;
+        rdfs:subClassOf  [ a                  owl:Restriction ;
+                           owl:allValuesFrom  [ a            owl:Class ;
+                                                owl:unionOf  ( <http://example.org/class/Intel_i5> <http://example.org/class/GPU_NVIDIA> <http://example.org/class/RAM_2GB> <http://example.org/class/LCD15> <http://example.org/class/HDD_1TB> )
+                                              ] ;
+                           owl:onProperty     ex:hasComponent
+                         ] .
+
+<http://example.org/individual/soc1>
+        a                <http://example.org/class/SoC_i7> ;
+        ex:hasComponent  <http://example.org/individual/lte1> , <http://example.org/individual/amd1> , <http://example.org/individual/arm1> .
+
+<http://example.org/class/Intel_i5>
+        a       owl:Class .
+
+<http://example.org/class/LCD15>
+        a       owl:Class .
+
+<http://example.org/class/GPU_NVIDIA>
+        a       owl:Class .

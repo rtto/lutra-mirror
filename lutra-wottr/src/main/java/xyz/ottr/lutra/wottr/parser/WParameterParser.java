@@ -33,19 +33,21 @@ import xyz.ottr.lutra.model.Parameter;
 import xyz.ottr.lutra.model.terms.Term;
 import xyz.ottr.lutra.model.types.TermType;
 import xyz.ottr.lutra.parser.ParameterBuilder;
+import xyz.ottr.lutra.parser.TermParser;
 import xyz.ottr.lutra.system.Result;
 import xyz.ottr.lutra.wottr.WOTTR;
 import xyz.ottr.lutra.wottr.util.RDFNodes;
+import xyz.ottr.lutra.writer.RDFNodeWriter;
 
 public class WParameterParser implements Function<RDFNode, Result<Parameter>> {
 
     private final Model model;
-    private final TermSerializer termSerializer;
+    private final TermParser termParser;
     private final TermTypeSerialiser typeFactory;
 
     WParameterParser(Model model) {
         this.model = model;
-        this.termSerializer = new TermSerializer();
+        this.termParser = new TermParser();
         this.typeFactory = new TermTypeSerialiser();
     }
 
@@ -70,7 +72,7 @@ public class WParameterParser implements Function<RDFNode, Result<Parameter>> {
 
     private Result<Term> parseTerm(Resource parameter) {
         return ModelSelector.getRequiredObject(this.model, parameter, WOTTR.variable)
-            .flatMap(this.termSerializer);
+            .flatMap(this.termParser::term);
     }
 
     private Result<TermType> parseType(Resource parameter) {
@@ -80,7 +82,7 @@ public class WParameterParser implements Function<RDFNode, Result<Parameter>> {
 
     private Result<Term> parseDefaultValue(Resource param) {
         return ModelSelector.getOptionalObject(this.model, param, WOTTR.defaultVal)
-            .flatMap(this.termSerializer);
+            .flatMap(this.termParser::term);
     }
 
     private Set<RDFNode> parseModifiers(Resource parameter) {
@@ -93,8 +95,8 @@ public class WParameterParser implements Function<RDFNode, Result<Parameter>> {
             modifierCopy.removeAll(WOTTR.argumentModifiers);
             if (!modifierCopy.isEmpty()) {
                 parameter.addError("Unknown modifier. Permissible modifiers are "
-                    + RDFNodes.toString(WOTTR.argumentModifiers) + ", but found "
-                    + RDFNodes.toString(modifierCopy));
+                    + RDFNodeWriter.toString(WOTTR.argumentModifiers) + ", but found "
+                    + RDFNodeWriter.toString(modifierCopy));
             }
         });
 

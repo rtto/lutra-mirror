@@ -34,13 +34,14 @@ import xyz.ottr.lutra.model.terms.Term;
 import xyz.ottr.lutra.parser.ArgumentBuilder;
 import xyz.ottr.lutra.parser.InstanceBuilder;
 import xyz.ottr.lutra.parser.InstanceParser;
+import xyz.ottr.lutra.parser.TermParser;
 import xyz.ottr.lutra.system.Result;
 import xyz.ottr.lutra.system.ResultStream;
-import xyz.ottr.lutra.wottr.util.RDFNodes;
+import xyz.ottr.lutra.writer.RDFNodeWriter;
 
 public class TripleInstanceParser implements InstanceParser<Model> {
 
-    private static final TermSerializer termSerializer = new TermSerializer();
+    private static final TermParser termParser = new TermParser();
 
     @Override
     public ResultStream<Instance> apply(Model model) {
@@ -68,16 +69,16 @@ public class TripleInstanceParser implements InstanceParser<Model> {
     private static Result<Term> createTerm(RDFNode node) {
 
         if (node.isURIResource()) {
-            return termSerializer.toTerm(node.asResource().getURI())
+            return termParser.iriTerm(node.asResource().getURI())
                 .map(t -> (Term) t);
         } else if (node.isAnon()) {
-            return termSerializer.toBlankNodeTerm(node.asResource().getId().getBlankNodeId())
+            return termParser.blankNodeTerm(node.asResource().getId().getBlankNodeId())
                 .map(t -> (Term) t);
         } else if (node.isLiteral()) {
-            return termSerializer.toLiteralTerm(node.asLiteral())
+            return termParser.literalTerm(node.asLiteral())
                 .map(t -> (Term) t);
         } else {
-            throw new IllegalArgumentException("Error converting RDFNode " + RDFNodes.toString(node) + " to Term. ");
+            throw new IllegalArgumentException("Error converting RDFNode " + RDFNodeWriter.toString(node) + " to Term. ");
         }
     }
 

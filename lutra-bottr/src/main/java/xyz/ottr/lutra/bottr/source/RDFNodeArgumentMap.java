@@ -60,18 +60,18 @@ public class RDFNodeArgumentMap extends ArgumentMap<RDFNode> {
     protected Result<Term> getBasicTerm(RDFNode value, BasicType type) {
 
         if (this.literalLangTag != null) {
-            return this.termFactory.createLangLiteral(toString(value), this.literalLangTag)
+            return this.termParser.langLiteralTerm(toString(value), this.literalLangTag)
                 .map(t -> (Term)t);
         } else {
             TermType valueType = TypeFactory.getTermType(value);
             return valueType.isCompatibleWith(type)
-                ? this.termFactory.createTerm(value)
-                : this.termFactory.createTermByType(toString(value), type);
+                ? this.termParser.term(value)
+                : this.termParser.term(toString(value), type);
         }
     }
 
     @Override
     protected Result<Term> getListElementTerm(String value, BasicType type) {
-        return this.termFactory.createTermByType(value, type);
+        return this.termParser.term(value, type);
     }
 }

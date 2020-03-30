@@ -26,7 +26,6 @@ import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.ResourceFactory;
 import org.apache.jena.shared.PrefixMapping;
 import xyz.ottr.lutra.bottr.model.ArgumentMap;
-import xyz.ottr.lutra.bottr.util.TermFactory;
 import xyz.ottr.lutra.model.terms.Term;
 import xyz.ottr.lutra.model.types.BasicType;
 import xyz.ottr.lutra.model.types.TermType;
@@ -54,8 +53,8 @@ public class StringArgumentMap extends ArgumentMap<String> {
     protected Result<Term> getBasicTerm(String value, BasicType type) {
         return Result.ofNullable(this.literalLangTag)
             .flatMapOrElse(
-                tag -> TermFactory.createLangLiteral(toString(value), tag).map(t -> (Term)t),
-                this.termFactory.createTermByType(toString(value), type));
+                tag -> this.termParser.langLiteralTerm(toString(value), tag).map(t -> (Term)t),
+                this.termParser.term(toString(value), type));
     }
 
     @Override

@@ -30,18 +30,20 @@ import org.apache.jena.rdf.model.Resource;
 import xyz.ottr.lutra.model.Argument;
 import xyz.ottr.lutra.model.terms.Term;
 import xyz.ottr.lutra.parser.ArgumentBuilder;
+import xyz.ottr.lutra.parser.TermParser;
 import xyz.ottr.lutra.system.Result;
 import xyz.ottr.lutra.wottr.WOTTR;
 import xyz.ottr.lutra.wottr.util.RDFNodes;
+import xyz.ottr.lutra.writer.RDFNodeWriter;
 
 public class WArgumentParser implements Function<RDFNode, Result<Argument>> {
 
     private final Model model;
-    private final TermSerializer termSerializer;
+    private final TermParser termParser;
 
     WArgumentParser(Model model) {
         this.model = model;
-        this.termSerializer = new TermSerializer();
+        this.termParser = new TermParser();
     }
 
     public Result<Argument> apply(RDFNode argumentNode) {
@@ -56,15 +58,15 @@ public class WArgumentParser implements Function<RDFNode, Result<Argument>> {
 
     private Result<Term> parseArgumentValue(Resource argument) {
         return ModelSelector.getRequiredObject(this.model, argument, WOTTR.value)
-            .flatMap(this.termSerializer);
+            .flatMap(this.termParser::term);
     }
 
     private Result<Boolean> parseListExpander(Resource argument) {
         return ModelSelector.getOptionalResourceObject(this.model, argument, WOTTR.modifier)
             .flatMap(r -> r.equals(WOTTR.listExpand)
                 ? Result.of(Boolean.TRUE)
-                : Result.error("Error parsing argument modifier, expected " + RDFNodes.toString(WOTTR.listExpand)
-                + ", but got " + RDFNodes.toString(r) + "."));
+                : Result.error("Error parsing argument modifier, expected " + RDFNodeWriter.toString(WOTTR.listExpand)
+                + ", but got " + RDFNodeWriter.toString(r) + "."));
     }
 
 }

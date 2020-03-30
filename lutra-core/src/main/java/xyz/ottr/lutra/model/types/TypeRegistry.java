@@ -50,7 +50,7 @@ public enum TypeRegistry {
         init(OTTR.Files.StdTypes);
     }
 
-    // TODO: Move these elsewhere. and add other common types too, like LUB<TOP>
+    // TODO: Move these elsewhere?
     public static final BasicType TOP = getType(OTTR.TypeURI.Top);
     public static final BasicType BOT = getType(OTTR.TypeURI.Bot);
     public static final BasicType IRI = getType(OTTR.TypeURI.IRI);
@@ -73,9 +73,10 @@ public enum TypeRegistry {
 
     private static void initTypes(Model model) {
         iris = model.listResourcesWithProperty(RDF.type, model.createResource(OTTR.TypeURI.Type))
-            .toSet().stream()
-            .map(Resource::getURI)
-            .map(BasicType::new)
+            .mapWith(Resource::getURI)
+            .mapWith(BasicType::new)
+            .toSet()
+            .stream()
             .collect(Collectors.toMap(BasicType::getIri, Function.identity()));
     }
 

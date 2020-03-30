@@ -39,7 +39,7 @@ import xyz.ottr.lutra.model.types.NEListType;
 import xyz.ottr.lutra.model.types.TermType;
 import xyz.ottr.lutra.model.types.TypeRegistry;
 import xyz.ottr.lutra.system.Result;
-import xyz.ottr.lutra.wottr.util.RDFNodes;
+import xyz.ottr.lutra.writer.RDFNodeWriter;
 
 public class TermTypeSerialiser implements Function<RDFNode, Result<TermType>> {
 
@@ -61,7 +61,7 @@ public class TermTypeSerialiser implements Function<RDFNode, Result<TermType>> {
         return type != null
             ? Result.of(type)
             : Result.error("Expected a resource denoting a simple type, but no simple type "
-                + RDFNodes.toString(node) + " exists.");
+                + RDFNodeWriter.toString(node) + " exists.");
     }
 
     private Result<TermType> toComplexType(Iterator<RDFNode> complexType) {
@@ -71,7 +71,7 @@ public class TermTypeSerialiser implements Function<RDFNode, Result<TermType>> {
         }
         RDFNode typeNode = complexType.next();
         if (!typeNode.isResource() || typeNode.asResource().getURI() == null) {
-            return Result.error("A type constructor must be denoted by an IRI, but got " + RDFNodes.toString(typeNode));
+            return Result.error("A type constructor must be denoted by an IRI, but got " + RDFNodeWriter.toString(typeNode));
         }
         Resource type = typeNode.asResource();
 

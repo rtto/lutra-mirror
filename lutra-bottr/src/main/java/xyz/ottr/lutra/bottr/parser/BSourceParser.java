@@ -44,11 +44,12 @@ import xyz.ottr.lutra.bottr.source.H2Source;
 import xyz.ottr.lutra.bottr.source.JDBCSource;
 import xyz.ottr.lutra.bottr.source.RDFFileSource;
 import xyz.ottr.lutra.bottr.source.SPARQLEndpointSource;
-import xyz.ottr.lutra.bottr.util.DataParser;
+import xyz.ottr.lutra.parser.DataParser;
 import xyz.ottr.lutra.system.Result;
 import xyz.ottr.lutra.system.ResultStream;
 import xyz.ottr.lutra.wottr.parser.ModelSelector;
 import xyz.ottr.lutra.wottr.util.RDFNodes;
+import xyz.ottr.lutra.writer.RDFNodeWriter;
 
 class BSourceParser implements Function<Resource, Result<Source<?>>> {
 
@@ -80,7 +81,7 @@ class BSourceParser implements Function<Resource, Result<Source<?>>> {
 
         if (sourceTypes.size() != 1) {
             return Result.error("Expected exactly one source type, but found " + sourceTypes.size()
-                    + ": " + RDFNodes.toString(sourceTypes));
+                    + ": " + RDFNodeWriter.toString(sourceTypes));
         }
         
         RDFNode sourceType = sourceTypes.get(0);
@@ -94,8 +95,8 @@ class BSourceParser implements Function<Resource, Result<Source<?>>> {
         } else if (BOTTR.H2Source.equals(sourceType)) {
             return getH2Source(source);
         }
-        return Result.error("Error parsing source. Source type " + RDFNodes.toString(sourceType)
-            + " is not a supported source: " + RDFNodes.toString(BOTTR.sources));
+        return Result.error("Error parsing source. Source type " + RDFNodeWriter.toString(sourceType)
+            + " is not a supported source: " + RDFNodeWriter.toString(BOTTR.sources));
     }
 
     private Result<Source<?>> getSQLSource(Resource source) {
@@ -143,7 +144,7 @@ class BSourceParser implements Function<Resource, Result<Source<?>>> {
      */
     private String getPath(String file) {
 
-        if (this.absoluteFilePath.isEmpty() || DataParser.asURI(file).isPresent()) {
+        if (this.absoluteFilePath.isEmpty() || DataParser.asURL(file).isPresent()) {
             return file;
         } else {
             return Paths.get(this.absoluteFilePath.get()).resolveSibling(file).toAbsolutePath().toString();

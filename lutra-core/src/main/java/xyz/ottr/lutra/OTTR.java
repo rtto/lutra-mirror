@@ -41,6 +41,8 @@ public enum OTTR  {
     
     public static final String prefix = "ottr";
     public static final String namespace = ns;
+
+    public static final String none = ns + "none";
     
     public enum BaseURI {
         ;
