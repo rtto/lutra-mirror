@@ -452,4 +452,28 @@ public class DependencyGraphTest {
 
         expandInstanceAndCheckEquality(ins, expandedIns, templates);
     }
+
+    @Test // testing #212
+    public void listExpansion() {
+
+        Set<Template> templates = Set.of();
+
+        Instance ins = Instance.builder().iri("base")
+            .argument(Argument.builder().term(cons(1)).build())
+            .argument(Argument.builder().term(new ListTerm(List.of(cons("A"), cons("B")))).listExpander(true).build())
+            .listExpander(ListExpander.cross)
+            .build();
+
+        Set<Instance> expandedIns = Set.of(
+            Instance.builder()
+                .iri("base")
+                .arguments(Argument.listOf(cons(1), cons("A")))
+                .build(),
+            Instance.builder()
+                .iri("base")
+                .arguments(Argument.listOf(cons(1), cons("B")))
+                .build());
+
+        expandInstanceAndCheckEquality(ins, expandedIns, templates);
+    }
 }
