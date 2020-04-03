@@ -25,7 +25,6 @@ package xyz.ottr.lutra.model.terms;
 import java.util.Optional;
 
 import xyz.ottr.lutra.model.Substitution;
-import xyz.ottr.lutra.model.types.LUBType;
 import xyz.ottr.lutra.model.types.TypeRegistry;
 
 public class BlankNodeTerm extends AbstractTerm<String> {
