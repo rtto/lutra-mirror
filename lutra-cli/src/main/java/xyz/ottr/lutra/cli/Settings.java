@@ -128,7 +128,7 @@ public class Settings {
     @Parameters(description = {"Files of instances to which operations are to be applied."})
     public List<String> inputs = new LinkedList<>();
 
-    @Option(names = {"-o", "--output"}, description = {"Path to which output from operations are to be written."})
+    @Option(names = {"-o", "--output"}, description = {"Path for writing output."})
     public String out;
 
     @Option(names = {"--stdout"},
@@ -142,10 +142,10 @@ public class Settings {
     public boolean quiet = false;
 
     @Option(names = {"--haltOn"},
-        description = {"Halt on messages with a severity equal to or below the flag.%n"
-                       + "(legal values: 3=INFO, 2=WARNING, 1=ERROR, 0=FATAL; "
-                       + "default: ${DEFAULT-VALUE})"})
-    public int haltOn = Message.ERROR;
+        description = {"Halt execution upon receiving messages with a severity equal to or greater than this value.%n"
+                        + "(legal values: ${COMPLETION-CANDIDATES}; "
+                        + "default: ${DEFAULT-VALUE})"})
+    public Message.Severity haltOn = Message.Severity.ERROR;
 
 
     public enum Mode { expand, expandLibrary, format, formatLibrary, lint }

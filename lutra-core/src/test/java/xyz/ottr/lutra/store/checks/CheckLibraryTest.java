@@ -77,15 +77,15 @@ public class CheckLibraryTest {
         return store;
     }
 
-    private void check(QueryEngine<DependencyGraph> engine, int numErrors, int severity) {
+    private void check(QueryEngine<DependencyGraph> engine, int numErrors, Message.Severity severity) {
 
         List<Message> msgs = CheckLibrary.allChecks
             .stream()
             .flatMap(c -> c.check(engine))
-            .filter(msg -> Message.moreSevere(msg.getLevel(), severity))
+            .filter(msg -> msg.getSeverity().isGreaterEqualThan(severity))
             .collect(Collectors.toList());
 
-        String assStr = "Expected " + numErrors + " messages of severity " + Message.toString(severity) + " or higher"
+        String assStr = "Expected " + numErrors + " messages of severity " + severity + " or higher"
              + ", but got " + msgs.size() + " messages: " + msgs;
 
         assertEquals(assStr, msgs.size(), numErrors);
@@ -111,7 +111,7 @@ public class CheckLibraryTest {
 
         QueryEngine<DependencyGraph> engine = new DependencyGraphEngine(store);
 
-        check(engine, 1, Message.WARNING);
+        check(engine, 1, Message.Severity.WARNING);
     }
 
     @Test
@@ -133,7 +133,7 @@ public class CheckLibraryTest {
 
         QueryEngine<DependencyGraph> engine = new DependencyGraphEngine(store);
 
-        check(engine, 0, Message.WARNING);
+        check(engine, 0, Message.Severity.WARNING);
     }
 
     @Test
@@ -156,7 +156,7 @@ public class CheckLibraryTest {
 
         QueryEngine<DependencyGraph> engine = new DependencyGraphEngine(store);
 
-        check(engine, 1, Message.ERROR);
+        check(engine, 1, Message.Severity.ERROR);
     }
 
     @Test
@@ -178,7 +178,7 @@ public class CheckLibraryTest {
 
         QueryEngine<DependencyGraph> engine = new DependencyGraphEngine(store);
 
-        check(engine, 1, Message.ERROR);
+        check(engine, 1, Message.Severity.ERROR);
     }
 
     @Test
@@ -208,7 +208,7 @@ public class CheckLibraryTest {
 
         QueryEngine<DependencyGraph> engine = new DependencyGraphEngine(store);
 
-        check(engine, 1, Message.ERROR);
+        check(engine, 1, Message.Severity.ERROR);
     }
 
     @Test
@@ -265,7 +265,7 @@ public class CheckLibraryTest {
 
         QueryEngine<DependencyGraph> engine = new DependencyGraphEngine(store);
 
-        check(engine, 3, Message.ERROR); // One cycle for each testN
+        check(engine, 3, Message.Severity.ERROR); // One cycle for each testN
     }
 
     @Test
@@ -310,7 +310,7 @@ public class CheckLibraryTest {
 
         QueryEngine<DependencyGraph> engine = new DependencyGraphEngine(store);
 
-        check(engine, 0, Message.WARNING);
+        check(engine, 0, Message.Severity.WARNING);
     }
 
     @Test
@@ -359,7 +359,7 @@ public class CheckLibraryTest {
 
         QueryEngine<DependencyGraph> engine = new DependencyGraphEngine(store);
 
-        check(engine, 1, Message.ERROR);
+        check(engine, 1, Message.Severity.ERROR);
     }
 
     @Test
@@ -401,7 +401,7 @@ public class CheckLibraryTest {
 
         QueryEngine<DependencyGraph> engine = new DependencyGraphEngine(store);
 
-        check(engine, 1, Message.ERROR);
+        check(engine, 1, Message.Severity.ERROR);
     }
 
     @Test
@@ -436,7 +436,7 @@ public class CheckLibraryTest {
 
         QueryEngine<DependencyGraph> engine = new DependencyGraphEngine(store);
 
-        check(engine, 0, Message.ERROR);
+        check(engine, 0, Message.Severity.ERROR);
     }
 
     @Test
@@ -471,7 +471,7 @@ public class CheckLibraryTest {
 
         QueryEngine<DependencyGraph> engine = new DependencyGraphEngine(store);
 
-        check(engine, 1, Message.ERROR);
+        check(engine, 1, Message.Severity.ERROR);
     }
 
     @Test
@@ -506,6 +506,6 @@ public class CheckLibraryTest {
 
         QueryEngine<DependencyGraph> engine = new DependencyGraphEngine(store);
 
-        check(engine, 1, Message.ERROR);
+        check(engine, 1, Message.Severity.ERROR);
     }
 }

@@ -22,7 +22,6 @@ package xyz.ottr.lutra.wottr.parser;
  * #L%
  */
 
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import org.apache.jena.rdf.model.Model;
@@ -34,7 +33,7 @@ import xyz.ottr.lutra.io.TemplateReader;
 import xyz.ottr.lutra.model.Instance;
 import xyz.ottr.lutra.store.TemplateStore;
 import xyz.ottr.lutra.store.graph.DependencyGraph;
-import xyz.ottr.lutra.system.Message;
+import xyz.ottr.lutra.system.Assertions;
 import xyz.ottr.lutra.system.MessageHandler;
 import xyz.ottr.lutra.system.Result;
 import xyz.ottr.lutra.system.ResultConsumer;
@@ -63,9 +62,8 @@ public class BlankNodeTest {
         // Read templates
         TemplateReader tempReader = new TemplateReader(new RDFFileReader(), new WTemplateParser());
         ResultStream<String> tempIRI = ResultStream.innerOf("src/test/resources/correct/definitions/core/Blank.ttl");
-        MessageHandler errorMessages = tempReader.populateTemplateStore(store, tempIRI);
-        assertFalse(Message.moreSevere(errorMessages.printMessages(),
-                Message.ERROR)); // No errors when parsing
+        MessageHandler errorHandler = tempReader.populateTemplateStore(store, tempIRI);
+        Assertions.noErrors(errorHandler);
 
         // Read in-instances and expand
         InstanceReader insReader = new InstanceReader(new RDFFileReader(), new WInstanceParser());
@@ -77,8 +75,8 @@ public class BlankNodeTest {
         WInstanceWriter insWriter = new WInstanceWriter();
         ResultConsumer<Instance> expansionErrors = new ResultConsumer<>(insWriter);
         expandedInInstances.forEach(expansionErrors);
-        assertFalse(Message.moreSevere(expansionErrors.getMessageHandler().printMessages(),
-                Message.ERROR)); // No errors when expanding
+        Assertions.noErrors(expansionErrors);
+
         Model in = insWriter.writeToModel();
 
         // Read out-model

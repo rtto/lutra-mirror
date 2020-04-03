@@ -88,9 +88,8 @@ public class FormatManager {
             TemplateReader reader = format.getTemplateReader().get();
             MessageHandler msgs = readerFunction.apply(reader);
 
-            if (Message.moreSevere(msgs.getMostSevere(), Message.ERROR)) {
-                msgs.toSingleMessage("Attempt of parsing templates as "
-                    + reader.toString() + " format failed:")
+            if (msgs.getMostSevere().isGreaterEqualThan(Message.Severity.ERROR)) {
+                msgs.toSingleMessage("Attempt of parsing templates as " + reader + " format failed:")
                     .ifPresent(unsuccessful::addMessage);
             } else {
                 Result<TemplateReader> readerRes = Result.of(reader);
@@ -105,9 +104,11 @@ public class FormatManager {
         allMsgs.add(unsuccessful);
         Optional<Message> errors = allMsgs.toSingleMessage(
             "Attempts of parsing library on all available formats " 
-            + this.formats.toString() + " failed with following errors:\n");
+            + this.formats + " failed with following errors:\n");
 
-        return errors.isPresent() ? Result.empty(errors.get()) : Result.empty();
+        return errors.isPresent()
+            ? Result.empty(errors.get())
+            : Result.empty();
     }
 
 }

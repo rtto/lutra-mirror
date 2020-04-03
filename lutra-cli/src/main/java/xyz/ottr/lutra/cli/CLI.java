@@ -123,16 +123,16 @@ public class CLI {
 
     private void execute() {
 
-        if (Message.moreSevere(initTemplateManager(), this.settings.haltOn)) {
+        if (initTemplateManager().isGreaterEqualThan(this.settings.haltOn)) {
             return;
         }
-        if (Message.moreSevere(parseLibrary(), this.settings.haltOn)) {
+        if (parseLibrary().isGreaterEqualThan(this.settings.haltOn)) {
             return;
         }
-        if (Message.moreSevere(parsePrefixes(), this.settings.haltOn)) {
+        if (parsePrefixes().isGreaterEqualThan(this.settings.haltOn)) {
             return;
         }
-        if (Message.moreSevere(checkLibrary(), this.settings.haltOn)) {
+        if (checkLibrary().isGreaterEqualThan(this.settings.haltOn)) {
             return;
         }
         executeMode();
@@ -177,13 +177,13 @@ public class CLI {
         writeTemplates(this.templateManager);
     }
 
-    private int checkLibrary() {
+    private Message.Severity checkLibrary() {
         MessageHandler msgs = this.templateManager.checkTemplates();
-        int severity = this.settings.quiet ? msgs.getMostSevere() : msgs.printMessages();
+        Message.Severity severity = this.settings.quiet ? msgs.getMostSevere() : msgs.printMessages();
 
         if (this.settings.mode == Settings.Mode.lint
             && !this.settings.quiet
-            && Message.moreSevere(Message.WARNING, severity)) {
+            && severity.isLessThan(Message.Severity.WARNING)) {
 
             // Print message if linting and no errors found
             this.outStream.println("No errors found.");
@@ -195,7 +195,7 @@ public class CLI {
     /// Parsing and writing                                  ///
     ////////////////////////////////////////////////////////////
 
-    private int initTemplateManager() {
+    private Message.Severity initTemplateManager() {
 
         // Transfer relevant settings
         this.templateManager.setDeepTrace(this.settings.deepTrace);
@@ -210,10 +210,10 @@ public class CLI {
         return this.messageHandler.printMessages();
     }
 
-    private int parseLibrary() {
+    private Message.Severity parseLibrary() {
 
         if (this.settings.library == null || this.settings.library.length == 0) {
-            return Message.INFO; // Least severe
+            return Message.Severity.least();
         }
 
         Format libraryFormat = this.settings.libraryFormat == null
@@ -224,9 +224,9 @@ public class CLI {
             .printMessages();
     }
 
-    private int parsePrefixes() {
+    private Message.Severity parsePrefixes() {
         if (!StringUtils.isNotBlank(this.settings.prefixes)) {
-            return Message.INFO; // Least severe
+            return Message.Severity.least();
         }
         Result<Model> userPrefixes = new RDFFileReader().parse(this.settings.prefixes);
         return this.messageHandler.use(userPrefixes, up -> this.templateManager.addPrefixes(up));

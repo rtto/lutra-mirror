@@ -35,7 +35,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.junit.Assert;
 import org.junit.Test;
 import xyz.ottr.lutra.OTTR;
 import xyz.ottr.lutra.model.Argument;
@@ -50,6 +49,7 @@ import xyz.ottr.lutra.model.terms.IRITerm;
 import xyz.ottr.lutra.model.terms.ListTerm;
 import xyz.ottr.lutra.model.terms.NoneTerm;
 import xyz.ottr.lutra.model.terms.ObjectTerm;
+import xyz.ottr.lutra.system.Assertions;
 import xyz.ottr.lutra.system.Message;
 import xyz.ottr.lutra.system.Result;
 import xyz.ottr.lutra.system.ResultConsumer;
@@ -81,7 +81,8 @@ public class DependencyGraphTest {
         Set<Template> expanded = new HashSet<>();
         ResultConsumer<Template> consumer = new ResultConsumer<>(expanded::add);
         tempRes.forEach(consumer);
-        assertFalse(Message.moreSevere(consumer.getMessageHandler().printMessages(), Message.ERROR));
+
+        Assertions.noErrors(consumer);
 
         assertEquals(expanded, shouldEqual);
     }
@@ -202,7 +203,8 @@ public class DependencyGraphTest {
         Result<DependencyGraph> graphRes = graph.expandAll();
         ResultConsumer<DependencyGraph> consumer = new ResultConsumer<>();
         consumer.accept(graphRes);
-        assertTrue(Message.moreSevere(consumer.getMessageHandler().printMessages(), Message.ERROR));
+
+        Assertions.atLeast(consumer, Message.Severity.ERROR);
     }
 
     @Test
@@ -293,9 +295,10 @@ public class DependencyGraphTest {
         Set<Instance> expandedIns = new HashSet<>();
         ResultConsumer<Instance> consumer = new ResultConsumer<>(expandedIns::add);
         expandedInsRes.forEach(consumer);
-        assertFalse(Message.moreSevere(consumer.getMessageHandler().printMessages(), Message.ERROR));
 
-        Assert.assertThat(expandedIns, is(shouldEqual));
+        Assertions.noErrors(consumer);
+
+        assertThat(expandedIns, is(shouldEqual));
 
         Result<DependencyGraph> graphRes = graph.expandAll();
         assertTrue(graphRes.isPresent());
@@ -306,7 +309,7 @@ public class DependencyGraphTest {
         Set<Instance> expandedIns2 = new HashSet<>();
         ResultConsumer<Instance> consumer2 = new ResultConsumer<>(expandedIns2::add);
         expandedInsRes2.forEach(consumer2);
-        assertFalse(Message.moreSevere(consumer2.getMessageHandler().printMessages(), Message.ERROR));
+        Assertions.noErrors(consumer2);
 
         assertEquals(expandedIns2, shouldEqual);
     }
@@ -403,7 +406,7 @@ public class DependencyGraphTest {
         for (Instance ins : inss) {
             ResultConsumer<Instance> consumer = new ResultConsumer<>();
             graph.expandInstance(ins).forEach(consumer);
-            assertTrue(Message.moreSevere(consumer.getMessageHandler().printMessages(), Message.ERROR));
+            Assertions.atLeast(consumer, Message.Severity.ERROR);
         }
     }
 

@@ -92,8 +92,8 @@ public class TemplateManager {
         this.settings.fetchMissingDependencies = enable;
     }
 
-    public void setHaltOn(int lvl) {
-        this.settings.haltOn = lvl;
+    public void setHaltOn(Message.Severity severity) {
+        this.settings.haltOn = severity;
     }
 
     public void setExtensions(String[] ext) {
@@ -259,7 +259,7 @@ public class TemplateManager {
             objects.forEach(consumer);
             msgs.combine(consumer.getMessageHandler());
 
-            if (!Message.moreSevere(msgs.getMostSevere(), this.settings.haltOn)) {
+            if (msgs.getMostSevere().isLessThan(this.settings.haltOn)) {
                 fileWriter.accept(writer, msgs);
             }
         });
@@ -272,7 +272,7 @@ public class TemplateManager {
 
         public boolean deepTrace = false;
         public boolean fetchMissingDependencies = false;
-        public int haltOn = Message.ERROR;
+        public Message.Severity haltOn = Message.Severity.ERROR;
 
         public String[] extensions = { };
         public String[] ignoreExtensions = { };

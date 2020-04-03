@@ -32,7 +32,7 @@ import xyz.ottr.lutra.io.InstanceReader;
 import xyz.ottr.lutra.model.Instance;
 import xyz.ottr.lutra.store.TemplateStore;
 import xyz.ottr.lutra.store.graph.DependencyGraph;
-import xyz.ottr.lutra.system.Message;
+import xyz.ottr.lutra.system.Assertions;
 import xyz.ottr.lutra.system.ResultConsumer;
 import xyz.ottr.lutra.system.ResultStream;
 import xyz.ottr.lutra.wottr.io.Models;
@@ -78,8 +78,7 @@ public enum ModelUtils {
         WInstanceWriter insWriter = new WInstanceWriter();
         ResultConsumer<Instance> expansionErrors = new ResultConsumer<>(insWriter);
         expandedInInstances.forEach(expansionErrors);
-        assertFalse(Message.moreSevere(expansionErrors.getMessageHandler().printMessages(),
-            Message.ERROR)); // No errors when expanding
+        Assertions.noErrors(expansionErrors);
         return insWriter.writeToModel();
     }
 

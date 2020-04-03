@@ -116,7 +116,7 @@ public class PottrTest {
             messages.addAll(testInstances(store, fileInstance));
         }
 
-        messages.removeIf(message -> !Message.moreSevere(message.getLevel(), Message.ERROR));
+        messages.removeIf(message -> message.getSeverity().isLessThan(Message.Severity.ERROR));
 
         // create matcher based on expectedResults: is or is-not if expected is true or false.
         Function<Object, Matcher> matcher = expectedResults
