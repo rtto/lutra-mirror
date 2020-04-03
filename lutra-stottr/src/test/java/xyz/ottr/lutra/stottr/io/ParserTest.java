@@ -45,6 +45,7 @@ import xyz.ottr.lutra.stottr.parser.SInstanceParser;
 import xyz.ottr.lutra.stottr.parser.SParserUtils;
 import xyz.ottr.lutra.stottr.parser.SPrefixParser;
 import xyz.ottr.lutra.stottr.parser.STemplateParser;
+import xyz.ottr.lutra.system.Assertions;
 import xyz.ottr.lutra.system.Result;
 import xyz.ottr.lutra.system.ResultConsumer;
 
@@ -172,7 +173,7 @@ public class ParserTest {
         ResultConsumer<Signature> consumer = new ResultConsumer<>();
         parser.parseString(signatureString).forEach(consumer);
 
-        consumer.getMessageHandler().assertNoErrors();
+        Assertions.noErrors(consumer);
     }
 
     @Test

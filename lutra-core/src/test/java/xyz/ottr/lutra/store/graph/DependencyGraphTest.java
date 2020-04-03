@@ -49,6 +49,7 @@ import xyz.ottr.lutra.model.terms.IRITerm;
 import xyz.ottr.lutra.model.terms.ListTerm;
 import xyz.ottr.lutra.model.terms.NoneTerm;
 import xyz.ottr.lutra.model.terms.ObjectTerm;
+import xyz.ottr.lutra.system.Assertions;
 import xyz.ottr.lutra.system.Message;
 import xyz.ottr.lutra.system.Result;
 import xyz.ottr.lutra.system.ResultConsumer;
@@ -81,7 +82,7 @@ public class DependencyGraphTest {
         ResultConsumer<Template> consumer = new ResultConsumer<>(expanded::add);
         tempRes.forEach(consumer);
 
-        consumer.getMessageHandler().assertNoErrors();
+        Assertions.noErrors(consumer);
 
         assertEquals(expanded, shouldEqual);
     }
@@ -203,7 +204,7 @@ public class DependencyGraphTest {
         ResultConsumer<DependencyGraph> consumer = new ResultConsumer<>();
         consumer.accept(graphRes);
 
-        consumer.getMessageHandler().assertAtLeast(Message.Severity.ERROR);
+        Assertions.atLeast(consumer, Message.Severity.ERROR);
     }
 
     @Test
@@ -295,7 +296,7 @@ public class DependencyGraphTest {
         ResultConsumer<Instance> consumer = new ResultConsumer<>(expandedIns::add);
         expandedInsRes.forEach(consumer);
 
-        consumer.getMessageHandler().assertNoErrors();
+        Assertions.noErrors(consumer);
 
         assertThat(expandedIns, is(shouldEqual));
 
@@ -308,7 +309,7 @@ public class DependencyGraphTest {
         Set<Instance> expandedIns2 = new HashSet<>();
         ResultConsumer<Instance> consumer2 = new ResultConsumer<>(expandedIns2::add);
         expandedInsRes2.forEach(consumer2);
-        consumer2.getMessageHandler().assertNoErrors();
+        Assertions.noErrors(consumer2);
 
         assertEquals(expandedIns2, shouldEqual);
     }
@@ -405,7 +406,7 @@ public class DependencyGraphTest {
         for (Instance ins : inss) {
             ResultConsumer<Instance> consumer = new ResultConsumer<>();
             graph.expandInstance(ins).forEach(consumer);
-            consumer.getMessageHandler().assertAtLeast(Message.Severity.ERROR);
+            Assertions.atLeast(consumer, Message.Severity.ERROR);
         }
     }
 

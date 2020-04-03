@@ -22,11 +22,7 @@ package xyz.ottr.lutra.system;
  * #L%
  */
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
-
 import java.io.PrintStream;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -35,8 +31,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 import lombok.Setter;
 
@@ -232,34 +226,6 @@ public class MessageHandler {
         }
         str.insert(0, initialMessage + "\n");
         return Optional.of(new Message(severity, str.toString()));
-    }
-
-    /*
-        If size is < 0, it means *any* size > 0.
-     */
-    private void assertSeverity(Predicate<Message.Severity> severityFilter, int size) {
-
-        var messages = this.getMessages().stream()
-            .filter(message -> severityFilter.test(message.getSeverity()))
-            .collect(Collectors.toList());
-
-        if (size < 0) {
-            assertThat("Expected matching messages, but got none", messages.size() > 0, is(true));
-        } else {
-            assertThat(messages.size(), is(size));
-        }
-
-        if (size == 0) {
-            assertThat(messages, is(Collections.EMPTY_LIST));
-        }
-    }
-
-    public void assertNoErrors() {
-        assertSeverity(s -> s.isGreaterEqualThan(Message.Severity.ERROR), 0);
-    }
-
-    public void assertAtLeast(Message.Severity severity) {
-        assertSeverity(s -> s.isGreaterEqualThan(severity), -1);
     }
 
 }

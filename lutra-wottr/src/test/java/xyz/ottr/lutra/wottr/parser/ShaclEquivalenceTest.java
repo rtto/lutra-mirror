@@ -44,6 +44,7 @@ import xyz.ottr.lutra.model.Instance;
 import xyz.ottr.lutra.model.Signature;
 import xyz.ottr.lutra.store.TemplateStore;
 import xyz.ottr.lutra.store.graph.DependencyGraph;
+import xyz.ottr.lutra.system.Assertions;
 import xyz.ottr.lutra.system.Message;
 import xyz.ottr.lutra.system.Result;
 import xyz.ottr.lutra.system.ResultConsumer;
@@ -190,9 +191,9 @@ public class ShaclEquivalenceTest {
         });
 
         if (correct) {
-            insErrorMessages.getMessageHandler().assertNoErrors();
+            Assertions.noErrors(insErrorMessages);
         } else {
-            insErrorMessages.getMessageHandler().assertAtLeast(Message.Severity.ERROR);
+            Assertions.atLeast(insErrorMessages, Message.Severity.ERROR);
         }
     }
 
