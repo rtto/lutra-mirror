@@ -33,7 +33,7 @@ public class BlankNodeTerm extends AbstractTerm<String> {
     private static long newID = 0L;
 
     public BlankNodeTerm(String label) {
-        super(label, new LUBType(TypeRegistry.TOP)); // TODO make constant
+        super(label, TypeRegistry.LUB_TOP);
     }
 
     public BlankNodeTerm() {
