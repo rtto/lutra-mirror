@@ -44,9 +44,9 @@ import xyz.ottr.lutra.bottr.source.H2Source;
 import xyz.ottr.lutra.bottr.source.JDBCSource;
 import xyz.ottr.lutra.bottr.source.RDFFileSource;
 import xyz.ottr.lutra.bottr.source.SPARQLEndpointSource;
-import xyz.ottr.lutra.parser.DataParser;
 import xyz.ottr.lutra.system.Result;
 import xyz.ottr.lutra.system.ResultStream;
+import xyz.ottr.lutra.util.DataValidator;
 import xyz.ottr.lutra.wottr.parser.ModelSelector;
 import xyz.ottr.lutra.wottr.util.RDFNodes;
 import xyz.ottr.lutra.writer.RDFNodeWriter;
@@ -144,7 +144,7 @@ class BSourceParser implements Function<Resource, Result<Source<?>>> {
      */
     private String getPath(String file) {
 
-        if (this.absoluteFilePath.isEmpty() || DataParser.asURL(file).isPresent()) {
+        if (this.absoluteFilePath.isEmpty() || DataValidator.isURL(file)) {
             return file;
         } else {
             return Paths.get(this.absoluteFilePath.get()).resolveSibling(file).toAbsolutePath().toString();

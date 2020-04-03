@@ -23,7 +23,12 @@ package xyz.ottr.lutra.writer;
  */
 
 import java.util.Collection;
+import java.util.Iterator;
+import java.util.Spliterator;
+import java.util.Spliterators;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 import org.apache.jena.graph.Node;
 import org.apache.jena.rdf.model.Model;
@@ -35,26 +40,40 @@ public enum RDFNodeWriter {
 
     ;
 
-    public static String toString(Collection<? extends RDFNode> nodes) {
-        return nodes.stream()
-            .map(RDFNodeWriter::toString)
+    public static String toString(Collection<?> collection) {
+        return toString(collection.stream().map(RDFNodeWriter::toString));
+    }
+
+    public static String toString(Iterator<?> iterator) {
+        var stream = StreamSupport.stream(Spliterators.spliteratorUnknownSize(iterator, Spliterator.ORDERED), false);
+        return toString(stream);
+    }
+
+    private static String toString(Stream<String> stream) {
+        return stream
             .collect(Collectors.joining(", ", "[", "]"));
     }
 
+    public static String toString(RDFNode node) {
+        return toString(node.getModel(), node.asNode());
+    }
+
+    public static String toString(String uri) {
+        return OTTR.getDefaultPrefixes().shortForm(uri);
+    }
+
+    public static String toString(Object object) {
+        return toString(object.toString());
+    }
+
     public static String toString(Model model, Collection<? extends RDFNode> nodes) {
-        return nodes.stream()
-            .map(node -> toString(model, node))
-            .collect(Collectors.joining(", ", "[", "]"));
+        return toString(nodes.stream().map(node -> toString(model, node)));
     }
 
     public static String toString(Model model, RDFNode node) {
         return node.canAs(RDFList.class)
             ? toString(model, node.as(RDFList.class).asJavaList())
             : toString(model, node.asNode());
-    }
-
-    public static String toString(RDFNode node) {
-        return toString(node.getModel(), node.asNode());
     }
 
     public static String toString(Model model, Node node) {
@@ -67,9 +86,5 @@ public enum RDFNodeWriter {
         return (model == null)
             ? toString(nodeString)
             : model.shortForm(nodeString);
-    }
-
-    public static String toString(String nodeString) {
-        return OTTR.getDefaultPrefixes().shortForm(nodeString);
     }
 }

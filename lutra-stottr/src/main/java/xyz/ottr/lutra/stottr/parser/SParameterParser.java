@@ -30,7 +30,7 @@ import org.antlr.v4.runtime.tree.TerminalNode;
 import xyz.ottr.lutra.model.Parameter;
 import xyz.ottr.lutra.model.terms.BlankNodeTerm;
 import xyz.ottr.lutra.model.terms.Term;
-import xyz.ottr.lutra.model.types.TermType;
+import xyz.ottr.lutra.model.types.Type;
 import xyz.ottr.lutra.parser.ParameterBuilder;
 import xyz.ottr.lutra.stottr.STOTTR;
 import xyz.ottr.lutra.stottr.antlr.stOTTRParser;
@@ -82,7 +82,7 @@ class SParameterParser extends SBaseParserVisitor<Parameter> {
         return Result.of(new BlankNodeTerm(this.termParser.getVariableLabel(ctx.Variable())));
     }
 
-    private Result<TermType> parseType(stOTTRParser.ParameterContext ctx) {
+    private Result<Type> parseType(stOTTRParser.ParameterContext ctx) {
         return ctx.type() != null
             ? this.typeParser.visit(ctx)
             : Result.empty();

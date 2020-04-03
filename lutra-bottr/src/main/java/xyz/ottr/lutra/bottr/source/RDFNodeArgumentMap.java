@@ -25,18 +25,18 @@ package xyz.ottr.lutra.bottr.source;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.shared.PrefixMapping;
 import xyz.ottr.lutra.bottr.model.ArgumentMap;
-import xyz.ottr.lutra.bottr.util.TypeFactory;
+import xyz.ottr.lutra.bottr.util.Types;
 import xyz.ottr.lutra.model.terms.Term;
 import xyz.ottr.lutra.model.types.BasicType;
-import xyz.ottr.lutra.model.types.TermType;
+import xyz.ottr.lutra.model.types.Type;
 import xyz.ottr.lutra.model.types.TypeRegistry;
 import xyz.ottr.lutra.system.Result;
 
 public class RDFNodeArgumentMap extends ArgumentMap<RDFNode> {
 
-    private static final TermType DEFAULT_TYPE = TypeRegistry.TOP;
+    private static final Type DEFAULT_TYPE = TypeRegistry.TOP;
 
-    public RDFNodeArgumentMap(PrefixMapping prefixes, TermType type) {
+    public RDFNodeArgumentMap(PrefixMapping prefixes, Type type) {
         super(prefixes, type);
     }
 
@@ -63,7 +63,7 @@ public class RDFNodeArgumentMap extends ArgumentMap<RDFNode> {
             return this.termParser.langLiteralTerm(toString(value), this.literalLangTag)
                 .map(t -> (Term)t);
         } else {
-            TermType valueType = TypeFactory.getTermType(value);
+            Type valueType = Types.getIntrinsicType(value);
             return valueType.isCompatibleWith(type)
                 ? this.termParser.term(value)
                 : this.termParser.term(toString(value), type);

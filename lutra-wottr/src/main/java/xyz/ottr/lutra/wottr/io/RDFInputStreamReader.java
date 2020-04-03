@@ -38,7 +38,7 @@ import xyz.ottr.lutra.system.ResultStream;
 
 public class RDFInputStreamReader implements InputReader<InputStream, Model> {
 
-    private static final Logger log = LoggerFactory.getLogger(RDFFileReader.class);
+    private static final Logger log = LoggerFactory.getLogger(RDFInputStreamReader.class);
     private final PrefixMapping prefixes; // Gathers prefixes parsed for later output
     
     public RDFInputStreamReader() {

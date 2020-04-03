@@ -31,7 +31,7 @@ import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 import xyz.ottr.lutra.model.Parameter;
 import xyz.ottr.lutra.model.terms.Term;
-import xyz.ottr.lutra.model.types.TermType;
+import xyz.ottr.lutra.model.types.Type;
 import xyz.ottr.lutra.parser.ParameterBuilder;
 import xyz.ottr.lutra.parser.TermParser;
 import xyz.ottr.lutra.system.Result;
@@ -43,12 +43,12 @@ public class WParameterParser implements Function<RDFNode, Result<Parameter>> {
 
     private final Model model;
     private final TermParser termParser;
-    private final TermTypeSerialiser typeFactory;
+    private final WTypeParser typeFactory;
 
     WParameterParser(Model model) {
         this.model = model;
         this.termParser = new TermParser();
-        this.typeFactory = new TermTypeSerialiser();
+        this.typeFactory = new WTypeParser();
     }
 
     public Result<Parameter> apply(RDFNode paramNode) {
@@ -75,7 +75,7 @@ public class WParameterParser implements Function<RDFNode, Result<Parameter>> {
             .flatMap(this.termParser::term);
     }
 
-    private Result<TermType> parseType(Resource parameter) {
+    private Result<Type> parseType(Resource parameter) {
         return ModelSelector.getOptionalResourceObject(this.model, parameter, WOTTR.type)
             .flatMap(this.typeFactory);
     }
@@ -94,9 +94,8 @@ public class WParameterParser implements Function<RDFNode, Result<Parameter>> {
             var modifierCopy = new ArrayList<>(mods); // make a copy so we don't change input.
             modifierCopy.removeAll(WOTTR.argumentModifiers);
             if (!modifierCopy.isEmpty()) {
-                parameter.addError("Unknown modifier. Permissible modifiers are "
-                    + RDFNodeWriter.toString(WOTTR.argumentModifiers) + ", but found "
-                    + RDFNodeWriter.toString(modifierCopy));
+                parameter.addError("Unknown parameter modifier: " + RDFNodeWriter.toString(modifierCopy)
+                    + " Permissible modifiers are " + RDFNodeWriter.toString(WOTTR.argumentModifiers) + ".");
             }
         });
 

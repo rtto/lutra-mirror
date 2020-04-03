@@ -39,21 +39,21 @@ import xyz.ottr.lutra.system.Result;
 import xyz.ottr.lutra.system.ResultStream;
 import xyz.ottr.lutra.writer.RDFNodeWriter;
 
-public class TripleInstanceParser implements InstanceParser<Model> {
+public class WTripleInstanceParser implements InstanceParser<Model> {
 
     private static final TermParser termParser = new TermParser();
 
     @Override
     public ResultStream<Instance> apply(Model model) {
         return ResultStream.of(model.listStatements()
-                .mapWith(TripleInstanceParser::createTripleInstance)
+                .mapWith(WTripleInstanceParser::instance)
         );
     }
 
-    private static Result<Instance> createTripleInstance(Statement stmt) {
+    private static Result<Instance> instance(Statement stmt) {
 
         var arguments = Stream.of(stmt.getSubject(), stmt.getPredicate(), stmt.getObject())
-            .map(TripleInstanceParser::createTerm)
+            .map(WTripleInstanceParser::term)
             .map(t -> ArgumentBuilder.builder().term(t).build())
             .collect(Collectors.toList());
 
@@ -66,7 +66,7 @@ public class TripleInstanceParser implements InstanceParser<Model> {
     /**
      * Make sure that we do not create any term lists.
      */
-    private static Result<Term> createTerm(RDFNode node) {
+    private static Result<Term> term(RDFNode node) {
 
         if (node.isURIResource()) {
             return termParser.iriTerm(node.asResource().getURI())

@@ -34,14 +34,14 @@ import org.junit.Test;
 
 import xyz.ottr.lutra.OTTR;
 
-public class TermTypeTest {
+public class TypeTest {
 
     private BasicType byIRI(Resource iri) {
-        return TypeRegistry.getType(iri);
+        return TypeRegistry.asType(iri);
     }
     
     private BasicType byIRI(String iri) {
-        return TypeRegistry.getType(iri);
+        return TypeRegistry.asType(iri);
     }
 
     private BasicType owlOProp;
@@ -78,7 +78,7 @@ public class TermTypeTest {
     /* For debugging
     @Test
     public void test0() throws ModelIOException {
-        ModelIO.printModel(TermType.getModel(), ModelIO.Format.TURTLE);
+        ModelIO.printModel(Type.getModel(), ModelIO.Format.TURTLE);
     }
 
     @Test
@@ -88,7 +88,7 @@ public class TermTypeTest {
         for (Property p : new Property[]{OWL.disjointWith, RDFS.subClassOf, OTTR.unifiableWith}) {
 
             System.out.println(p.getLocalName());
-            for (Statement t : TermType.getModel().listStatements(op, p, (RDFNode)null).toList()) {
+            for (Statement t : Type.getModel().listStatements(op, p, (RDFNode)null).toList()) {
                 System.out.println("\t"
                         + t.getSubject().getLocalName()
                         + " -- "

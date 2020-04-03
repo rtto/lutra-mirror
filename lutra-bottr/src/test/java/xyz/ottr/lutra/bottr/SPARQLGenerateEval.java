@@ -98,9 +98,9 @@ public class SPARQLGenerateEval {
             new StringArgumentMap(prefixes),
             new StringArgumentMap(prefixes, TypeRegistry.IRI),
             new StringArgumentMap(prefixes, TypeRegistry.IRI),
-            new StringArgumentMap(prefixes, TypeRegistry.getType(XSD.dateTime.toString())),
-            new StringArgumentMap(prefixes, TypeRegistry.getType(XSD.decimal.toString())),
-            new StringArgumentMap(prefixes, TypeRegistry.getType(XSD.decimal.toString()))
+            new StringArgumentMap(prefixes, TypeRegistry.asType(XSD.dateTime.toString())),
+            new StringArgumentMap(prefixes, TypeRegistry.asType(XSD.decimal.toString())),
+            new StringArgumentMap(prefixes, TypeRegistry.asType(XSD.decimal.toString()))
         ));
 
         // map data to triples

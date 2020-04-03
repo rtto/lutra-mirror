@@ -29,16 +29,16 @@ import xyz.ottr.lutra.bottr.BOTTR;
 import xyz.ottr.lutra.bottr.model.TranslationSettings;
 import xyz.ottr.lutra.bottr.util.CachedResourceWrapperParser;
 import xyz.ottr.lutra.model.terms.Term;
-import xyz.ottr.lutra.parser.DataParser;
 import xyz.ottr.lutra.parser.TermParser;
 import xyz.ottr.lutra.system.Result;
+import xyz.ottr.lutra.util.DataValidator;
 import xyz.ottr.lutra.wottr.parser.ModelSelector;
 
 public class BTranslationSettingsParser extends CachedResourceWrapperParser<TranslationSettings> {
 
     private final TermParser termParser;
 
-    public BTranslationSettingsParser(Resource resource) {
+    BTranslationSettingsParser(Resource resource) {
         super(resource);
         this.termParser = new TermParser(this.model);
     }
@@ -70,6 +70,6 @@ public class BTranslationSettingsParser extends CachedResourceWrapperParser<Tran
 
     private Result<Character> getOptionalChar(Property property) {
         return getOptionalString(property)
-            .flatMap(DataParser::asChar);
+            .flatMap(DataValidator::asChar);
     }
 }

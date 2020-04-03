@@ -45,14 +45,14 @@ import xyz.ottr.lutra.model.terms.Term;
 public class TypeRegistryTest {
 
     private LiteralTerm typedLiteral(String val, Resource type) {
-        return LiteralTerm.createTypedLiteral(val, TypeRegistry.getType(type).getIri());
+        return LiteralTerm.createTypedLiteral(val, TypeRegistry.asType(type).getIri());
     }
 
     @Test
     public void simpleTypeSetting1() {
         assertEquals(
                 new IRITerm("example.com/v").getType(),
-                new LUBType(TypeRegistry.getType(OTTR.TypeURI.IRI)));
+                new LUBType(TypeRegistry.asType(OTTR.TypeURI.IRI)));
     }
 
     @Test
@@ -66,21 +66,21 @@ public class TypeRegistryTest {
     public void simpleTypeSetting3() {
         assertEquals(
                 LiteralTerm.createPlainLiteral("test").getType(),
-                TypeRegistry.getType(XSD.xstring));
+                TypeRegistry.asType(XSD.xstring));
     }
 
     @Test
     public void simpleTypeSetting4() {
         assertEquals(
                 typedLiteral("1", XSD.integer).getType(),
-                TypeRegistry.getType(XSD.integer));
+                TypeRegistry.asType(XSD.integer));
     }
 
     @Test
     public void simpleTypeSetting5() {
         assertEquals(
                 LiteralTerm.createTypedLiteral("val", "example.com/mytype").getType(),
-                TypeRegistry.getType(RDFS.Literal));
+                TypeRegistry.asType(RDFS.Literal));
     }
 
     @Test
@@ -108,10 +108,10 @@ public class TypeRegistryTest {
     public void templateVariableTypes() {
 
         Term var1 = new IRITerm("example.org/var1");
-        var1.setType(TypeRegistry.getType(OWL.Class));
+        var1.setType(TypeRegistry.asType(OWL.Class));
         Term var2 = typedLiteral("1", XSD.integer);
         Term var3 = new BlankNodeTerm("_:b");
-        var3.setType(new ListType(TypeRegistry.getType(XSD.xstring)));
+        var3.setType(new ListType(TypeRegistry.asType(XSD.xstring)));
 
         Term var1b1 = new IRITerm("example.org/var1");
         Term var1b2 = new IRITerm("example.org/var1");
@@ -154,13 +154,13 @@ public class TypeRegistryTest {
         // instances in template bodies are properly set
 
         Term var1 = new IRITerm("example.org/var1");
-        var1.setType(TypeRegistry.getType(OWL.Class));
+        var1.setType(TypeRegistry.asType(OWL.Class));
         Term var21 = new IRITerm("example.org/var21");
-        var21.setType(TypeRegistry.getType(OWL.Class));
+        var21.setType(TypeRegistry.asType(OWL.Class));
         Term var22 = new IRITerm("example.org/var22");
-        var22.setType(TypeRegistry.getType(OWL.Class));
+        var22.setType(TypeRegistry.asType(OWL.Class));
         Term var3 = new BlankNodeTerm("_:b");
-        var3.setType(new ListType(TypeRegistry.getType(XSD.xstring)));
+        var3.setType(new ListType(TypeRegistry.asType(XSD.xstring)));
 
         Term var1b1 = new IRITerm("example.org/var1");
         Term var1b2 = new IRITerm("example.org/var1");

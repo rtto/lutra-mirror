@@ -28,15 +28,15 @@ import org.apache.jena.shared.PrefixMapping;
 import xyz.ottr.lutra.bottr.model.ArgumentMap;
 import xyz.ottr.lutra.model.terms.Term;
 import xyz.ottr.lutra.model.types.BasicType;
-import xyz.ottr.lutra.model.types.TermType;
+import xyz.ottr.lutra.model.types.Type;
 import xyz.ottr.lutra.model.types.TypeRegistry;
 import xyz.ottr.lutra.system.Result;
 
 public class StringArgumentMap extends ArgumentMap<String> {
 
-    private static final TermType DEFAULT_TYPE = TypeRegistry.LITERAL;
+    private static final Type DEFAULT_TYPE = TypeRegistry.LITERAL;
 
-    public StringArgumentMap(PrefixMapping prefixes, TermType type) {
+    public StringArgumentMap(PrefixMapping prefixes, Type type) {
         super(prefixes, type);
     }
 

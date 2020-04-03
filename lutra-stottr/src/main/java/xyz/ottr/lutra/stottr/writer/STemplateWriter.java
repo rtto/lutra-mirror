@@ -38,7 +38,7 @@ import xyz.ottr.lutra.model.types.BasicType;
 import xyz.ottr.lutra.model.types.LUBType;
 import xyz.ottr.lutra.model.types.ListType;
 import xyz.ottr.lutra.model.types.NEListType;
-import xyz.ottr.lutra.model.types.TermType;
+import xyz.ottr.lutra.model.types.Type;
 import xyz.ottr.lutra.stottr.STOTTR;
 import xyz.ottr.lutra.writer.TemplateWriter;
 
@@ -159,7 +159,7 @@ public class STemplateWriter implements TemplateWriter {
         return builder;
     }
 
-    private StringBuilder writeType(TermType type, STermWriter termWriter) {
+    private StringBuilder writeType(Type type, STermWriter termWriter) {
 
         StringBuilder builder = new StringBuilder();
 
@@ -168,7 +168,7 @@ public class STemplateWriter implements TemplateWriter {
         } else {
 
             String typeStr;
-            TermType innerType;
+            Type innerType;
 
             if (type instanceof LUBType) {
                 typeStr = STOTTR.Types.lub;

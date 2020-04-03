@@ -30,7 +30,6 @@ import xyz.ottr.lutra.model.Template;
 import xyz.ottr.lutra.store.graph.DependencyGraph;
 import xyz.ottr.lutra.system.ResultConsumer;
 import xyz.ottr.lutra.wottr.io.RDFFileReader;
-import xyz.ottr.lutra.wottr.parser.WTemplateParser;
 import xyz.ottr.lutra.wottr.writer.WTemplateWriter;
 
 public class PrototypeTest {

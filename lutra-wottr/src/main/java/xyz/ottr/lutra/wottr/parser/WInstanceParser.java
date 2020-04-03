@@ -59,7 +59,7 @@ public class WInstanceParser implements InstanceParser<Model> {
         Model instanceModel = ModelFactory.createDefaultModel();
         instanceResources.forEach(i -> instanceModel.add(tripleSerialiser.serialiseInstance(i)));
         Model tripleModel = model.difference(instanceModel);
-        ResultStream<Instance> rdfInstances = new TripleInstanceParser().apply(tripleModel);
+        ResultStream<Instance> rdfInstances = new WTripleInstanceParser().apply(tripleModel);
 
         return ResultStream.concat(instances, rdfInstances);
     }

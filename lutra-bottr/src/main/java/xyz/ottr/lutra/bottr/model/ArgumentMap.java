@@ -32,13 +32,12 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.shared.PrefixMapping;
 import xyz.ottr.lutra.bottr.util.ListParser;
-import xyz.ottr.lutra.bottr.util.TermFactory;
 import xyz.ottr.lutra.model.terms.ListTerm;
 import xyz.ottr.lutra.model.terms.Term;
 import xyz.ottr.lutra.model.types.BasicType;
 import xyz.ottr.lutra.model.types.ComplexType;
 import xyz.ottr.lutra.model.types.ListType;
-import xyz.ottr.lutra.model.types.TermType;
+import xyz.ottr.lutra.model.types.Type;
 import xyz.ottr.lutra.parser.TermParser;
 import xyz.ottr.lutra.system.Result;
 import xyz.ottr.lutra.system.ResultStream;
@@ -46,7 +45,7 @@ import xyz.ottr.lutra.system.ResultStream;
 @Setter
 public abstract class ArgumentMap<V> implements Function<V, Result<Term>> {
 
-    protected TermType type;
+    protected Type type;
     protected String literalLangTag;
 
     private TranslationTable translationTable;
@@ -61,7 +60,7 @@ public abstract class ArgumentMap<V> implements Function<V, Result<Term>> {
         this.translationTable = new TranslationTable();
     }
 
-    protected ArgumentMap(PrefixMapping prefixMapping, TermType type) {
+    protected ArgumentMap(PrefixMapping prefixMapping, Type type) {
         this(prefixMapping);
         this.type = type;
     }
@@ -85,7 +84,7 @@ public abstract class ArgumentMap<V> implements Function<V, Result<Term>> {
             : StringUtils.EMPTY;
     }
 
-    private Result<Term> getTerm(V value, TermType type) {
+    private Result<Term> getTerm(V value, Type type) {
 
         if (Objects.isNull(value)) {
             return Result.of(this.translationSettings.getNullValue());
@@ -94,7 +93,7 @@ public abstract class ArgumentMap<V> implements Function<V, Result<Term>> {
         } else if (this.translationTable.containsKey(toRDFNode(value))) {
             var translatedRDF = this.translationTable.get(toRDFNode(value));
             return translatedRDF.isAnon()
-                    ? TermFactory.createBlankNode().map(t -> (Term) t)
+                    ? TermParser.blankNodeTerm().map(t -> (Term) t)
                     : this.termParser.term(translatedRDF);
         } else if (type instanceof ListType) {
             return getListTerm(toString(value), (ComplexType)type);

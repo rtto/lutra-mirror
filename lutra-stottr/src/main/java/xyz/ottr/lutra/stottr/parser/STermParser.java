@@ -33,14 +33,12 @@ import org.apache.jena.vocabulary.XSD;
 import xyz.ottr.lutra.model.terms.BlankNodeTerm;
 import xyz.ottr.lutra.model.terms.IRITerm;
 import xyz.ottr.lutra.model.terms.ListTerm;
-import xyz.ottr.lutra.model.terms.LiteralTerm;
-import xyz.ottr.lutra.model.terms.NoneTerm;
 import xyz.ottr.lutra.model.terms.Term;
+import xyz.ottr.lutra.parser.TermParser;
 import xyz.ottr.lutra.stottr.STOTTR;
 import xyz.ottr.lutra.stottr.antlr.stOTTRParser;
 import xyz.ottr.lutra.system.Message;
 import xyz.ottr.lutra.system.Result;
-import xyz.ottr.lutra.wottr.WOTTR;
 
 public class STermParser extends SBaseParserVisitor<Term> {
 
@@ -81,7 +79,7 @@ public class STermParser extends SBaseParserVisitor<Term> {
     }
 
     public Result<Term> visitNone(stOTTRParser.NoneContext ctx) {
-        return Result.of(new NoneTerm());
+        return TermParser.noneTerm();
     }
 
     public Result<Term> visitTerm(stOTTRParser.TermContext ctx) {
@@ -91,23 +89,23 @@ public class STermParser extends SBaseParserVisitor<Term> {
         }
 
         Result<Term> trm = visitChildren(ctx);
-        return trm != null 
+        return trm != null
             ? trm
             : Result.empty(Message.error("Expected term but found " + ctx.getText()
-                    + SParserUtils.getLineAndColumnString(ctx)));
+            + SParserUtils.getLineAndColumnString(ctx)));
     }
 
     String getVariableLabel(TerminalNode var) {
         String label = var.getSymbol().getText();
         // Need to remove variablePrefix to get label
-        return  label.substring(STOTTR.Terms.variablePrefix.length());
+        return label.substring(STOTTR.Terms.variablePrefix.length());
     }
 
     public Result<Term> visitLiteral(stOTTRParser.LiteralContext ctx) {
 
         if (ctx.BooleanLiteral() != null) {
             String litVal = ctx.BooleanLiteral().getSymbol().getText();
-            return Result.of(LiteralTerm.createTypedLiteral(litVal, XSD.xboolean.getURI()));
+            return TermParser.typedLiteralTerm(litVal, XSD.xboolean.getURI()).map(t -> (Term)t);
         }
         return visitChildren(ctx);
     }
@@ -134,13 +132,16 @@ public class STermParser extends SBaseParserVisitor<Term> {
         } else if (ctx.DECIMAL() != null) {
             type = XSD.decimal.getURI();
             valNode = ctx.DECIMAL();
-        } else { // ctx.DOUBLE() != null
+        } else if (ctx.DOUBLE() != null) {
             type = XSD.xdouble.getURI();
             valNode = ctx.DOUBLE();
+        } else {
+            throw new UnsupportedOperationException("Error stOTTR parser. Unsupported numeric literal context.");
         }
 
         String val = valNode.getSymbol().getText();
-        return Result.of(LiteralTerm.createTypedLiteral(val, type));
+
+        return TermParser.typedLiteralTerm(val, type).map(t -> (Term)t);
     }
 
     public Result<Term> visitRdfLiteral(stOTTRParser.RdfLiteralContext ctx) {
@@ -154,16 +155,26 @@ public class STermParser extends SBaseParserVisitor<Term> {
         if (ctx.LANGTAG() != null) { // Language tag present
             String tag = ctx.LANGTAG().getSymbol().getText();
             tag = atPat.matcher(tag).replaceFirst(""); // Remove the @-prefix
-            return Result.of(LiteralTerm.createLanguageTagLiteral(val, tag));
+            return TermParser.langLiteralTerm(val, tag)
+                .map(t -> (Term)t);
         }
 
-        if (ctx.iri() != null) { // Explicit type present
-            Result<Term> iriTermRes = visitIri(ctx.iri());
-            return iriTermRes.flatMap(iri ->
-                Result.of(LiteralTerm.createTypedLiteral(val, ((IRITerm) iri).getIri())));
+        if (ctx.iri() != null) { // Datatype present
+            Result<Term> datatype = visitIri(ctx.iri());
+
+            if (datatype.isPresent() && !(datatype.get() instanceof IRITerm)) {
+                return Result.error("Erroneous literal datatype. Expected IRI, but found " + datatype.get());
+            }
+
+            return datatype
+                .map(t -> (IRITerm)t)
+                .map(IRITerm::getIri)
+                .flatMap(iri -> TermParser.typedLiteralTerm(val, iri))
+                .map(t -> (Term)t);
         }
 
-        return Result.of(LiteralTerm.createPlainLiteral(val));
+        return TermParser.plainLiteralTerm(val)
+            .map(t -> (Term)t);
     }
 
     public Result<Term> visitIri(stOTTRParser.IriContext ctx) {
@@ -175,15 +186,15 @@ public class STermParser extends SBaseParserVisitor<Term> {
         } else {
             String iriBraces = ctx.IRIREF().getSymbol().getText();
             // IRIs in Lutra are always full, so do not use surrounding '<','>'
-            String iri = angularPat.matcher(iriBraces).replaceAll(""); 
-            if (iri.equals(WOTTR.none.getURI())) {
-                return Result.of(new NoneTerm());
-            }
-            return Result.of(new IRITerm(iri));
+            String iri = angularPat.matcher(iriBraces).replaceAll("");
+
+            return TermParser.term(iri);
         }
     }
 
     public Result<Term> visitPrefixedName(stOTTRParser.PrefixedNameContext ctx) {
+
+        // TODO can we simplify this by using Jena's PrefixMapping instead?
 
         String qname;
         TerminalNode onlyNS = ctx.PNAME_NS();
@@ -197,16 +208,14 @@ public class STermParser extends SBaseParserVisitor<Term> {
         String prefix = this.prefixes.get(prefixName);
 
         if (prefix == null) { // Prefix not found
-            return Result.empty(Message.error("Unrecognized prefix " + prefixName
-                    + " in qname " + qname + SParserUtils.getLineAndColumnString(ctx)));
+            return Result.error("Unrecognized prefix " + prefixName
+                + " in qname " + qname + SParserUtils.getLineAndColumnString(ctx));
         }
 
         String local = qname.substring(lastColon + 1);
         String iri = prefix + local;
-        if (iri.equals(WOTTR.none.getURI())) {
-            return Result.of(new NoneTerm());
-        }
-        return Result.of(new IRITerm(iri));
+
+        return TermParser.term(iri);
     }
 
     public Result<Term> visitBlankNode(stOTTRParser.BlankNodeContext ctx) {
@@ -220,7 +229,8 @@ public class STermParser extends SBaseParserVisitor<Term> {
     }
 
     public Result<Term> visitAnon(stOTTRParser.AnonContext ctx) {
-        return Result.of(new BlankNodeTerm());
+        return TermParser.blankNodeTerm().map(t -> (Term)t);
     }
 
 }
+

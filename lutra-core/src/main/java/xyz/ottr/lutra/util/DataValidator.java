@@ -1,4 +1,4 @@
-package xyz.ottr.lutra.parser;
+package xyz.ottr.lutra.util;
 
 /*-
  * #%L
@@ -25,22 +25,24 @@ package xyz.ottr.lutra.parser;
 import java.util.Locale;
 
 import org.apache.commons.lang3.LocaleUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.validator.routines.UrlValidator;
 import org.apache.jena.ext.xerces.util.URI;
 import xyz.ottr.lutra.system.Message;
 import xyz.ottr.lutra.system.Result;
 
-public class DataParser {
-
+public class DataValidator {
 
     private static final String[] DEFAULT_SCHEMES = { "http", "https", "ftp", "file" };
     private static final UrlValidator validator = new UrlValidator(DEFAULT_SCHEMES);
 
     public static Result<String> asURL(String value) {
-        return validator.isValid(value)
+        return isURL(value)
             ? Result.of(value)
-            : Result.empty(getMessage(Message.ERROR, value, "valid IRI"));
+            : Result.error("Invalid URL. Value " + value + " is not a valid URL.");
+    }
+
+    public static boolean isURL(String value) {
+        return validator.isValid(value);
     }
 
     public static Result<String> asURI(String value) {
@@ -49,7 +51,7 @@ public class DataParser {
         try {
             new URI(value);
         } catch (URI.MalformedURIException ex) {
-            result.addMessage(getMessage(Message.WARNING, value, "valid IRI", ex.getMessage()));
+            result.addMessage(Message.warning("Suspicious IRI. " + value + ". " + ex.getMessage() + "."));
         }
         return result;
     }
@@ -57,18 +59,22 @@ public class DataParser {
     public static Result<String> asLanguageTagString(String value) {
 
         var result = Result.of(value);
-        Locale locale = new Locale.Builder().setLanguageTag(value).build();
+        Locale locale = Locale.forLanguageTag(value.replace("-", "_"));
         if (!LocaleUtils.isAvailableLocale(locale)) {
-            result.addMessage(getMessage(Message.WARNING, value, "language tag"));
+            result.addMessage(Message.warning("Invalid language tag. Value " + value + " is not a valid language tag."));
         }
         return result;
+    }
+
+    public static boolean isChar(String value) {
+        return value.length() == 1;
     }
 
     public static Result<Character> asChar(String value) {
 
         var result = Result.of(value.charAt(0));
-        if (value.length() == 1) {
-            result.addMessage(getMessage(Message.ERROR, value, "character"));
+        if (isChar(value)) {
+            result.addMessage(Message.error("Invalid character. Value " + value + " is not a character."));
         }
         return result;
     }
@@ -100,20 +106,5 @@ public class DataParser {
         }
     }
     */
-
-    private static Message getMessage(int severity, Object value, String valueType) {
-        return getMessage(severity, value, valueType, null);
-    }
-
-    private static Message getMessage(int severity, Object value, String valueType, String message) {
-        String errorMessage = "Value " + value + " is not a " + valueType;
-        if (StringUtils.isNotEmpty(message)) {
-            errorMessage += ": " + message;
-        }
-        errorMessage += ".";
-        return new Message(severity, errorMessage);
-    }
-
-
 
 }

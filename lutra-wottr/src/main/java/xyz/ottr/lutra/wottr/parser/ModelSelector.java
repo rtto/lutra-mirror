@@ -65,7 +65,6 @@ public enum ModelSelector {
     }
 
     public static List<Result<Resource>> getResourceObjects(Model model, Resource subject, Property property) {
-
         return model.listStatements(subject, property, (RDFNode) null)
             .mapWith(Statement::getObject)
             .mapWith(o -> RDFNodes.cast(o, Resource.class))

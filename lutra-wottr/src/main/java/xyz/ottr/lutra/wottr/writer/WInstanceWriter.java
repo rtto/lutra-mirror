@@ -39,26 +39,20 @@ import xyz.ottr.lutra.writer.InstanceWriter;
 public class WInstanceWriter implements InstanceWriter {
 
     private final Model model;
-    private final RDFFactory rdfFactory;
 
     public WInstanceWriter() {
         this(PrefixMapping.Factory.create());
     }
 
     public WInstanceWriter(PrefixMapping prefixes) {
-        this(prefixes, new RDFFactory());
-    }
-
-    WInstanceWriter(PrefixMapping prefixes, RDFFactory rdfFactory) {
         this.model = ModelFactory.createDefaultModel();
         this.model.setNsPrefixes(prefixes); // Will trim unused before write
-        this.rdfFactory = rdfFactory;
     }
 
     @Override
     public synchronized void accept(Instance instance) { // Cannot write in parallel, Jena breaks
-        if (RDFFactory.isTriple(instance)) {
-            this.model.add(this.rdfFactory.createTriple(this.model, instance));
+        if (WTripleWriter.isTriple(instance)) {
+            this.model.add(WTripleWriter.write(this.model, instance));
         } else {
             createInstanceNode(this.model, instance);
         }
@@ -95,7 +89,7 @@ public class WInstanceWriter implements InstanceWriter {
         RDFList argsLst = model.createList();
 
         for (Argument arg : arguments) {
-            RDFNode val = this.rdfFactory.createRDFNode(model, arg.getTerm());
+            RDFNode val = WTermWriter.term(model, arg.getTerm());
             argsLst = argsLst.with(val);
         }
         model.add(instanceNode, WOTTR.values, argsLst);
@@ -107,7 +101,7 @@ public class WInstanceWriter implements InstanceWriter {
         RDFList argsLst = model.createList();
 
         for (Argument arg : arguments) {
-            RDFNode val = this.rdfFactory.createRDFNode(model, arg.getTerm());
+            RDFNode val = WTermWriter.term(model, arg.getTerm());
 
             Resource argNode = model.createResource();
             model.add(argNode, WOTTR.value, val);

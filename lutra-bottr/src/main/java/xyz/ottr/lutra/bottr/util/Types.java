@@ -27,30 +27,28 @@ import java.util.Optional;
 import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
-import xyz.ottr.lutra.model.types.TermType;
+import xyz.ottr.lutra.model.types.Type;
 import xyz.ottr.lutra.model.types.TypeRegistry;
 
-// TODO suggest to move this to core.mode.terms
-
-public enum  TypeFactory {
+public enum Types {
 
     ;
 
-    public static TermType getTermType(RDFNode value) {
+    public static Type getIntrinsicType(RDFNode value) {
         return value.isLiteral()
-            ? getTermType(value.asLiteral())
-            : getTermType(value.asResource());
+            ? getIntrinsicType(value.asLiteral())
+            : getIntrinsicType(value.asResource());
     }
 
-    public static TermType getTermType(Resource value) {
+    public static Type getIntrinsicType(Resource value) {
         return value.isURIResource()
             ? TypeRegistry.IRI
             : TypeRegistry.TOP;
     }
 
-    public static TermType getTermType(Literal value) {
+    public static Type getIntrinsicType(Literal value) {
         return Optional.ofNullable(value.getDatatypeURI())
-            .map(TypeRegistry::getType)
+            .map(TypeRegistry::asType)
             .orElse(TypeRegistry.LITERAL);
     }
 }

@@ -46,6 +46,7 @@ import xyz.ottr.lutra.model.types.BasicType;
 import xyz.ottr.lutra.model.types.TypeRegistry;
 import xyz.ottr.lutra.system.Message;
 import xyz.ottr.lutra.system.Result;
+import xyz.ottr.lutra.util.DataValidator;
 import xyz.ottr.lutra.writer.RDFNodeWriter;
 
 
@@ -65,6 +66,10 @@ public class TermParser {
         this.prefixMapping = prefixMapping;
     }
 
+    public static Result<Term> noneTerm() {
+        return Result.of(new NoneTerm());
+    }
+
     public Result<Term> term(RDFNode node) {
         if (node.isResource()) {
             return term(node.asResource());
@@ -80,7 +85,7 @@ public class TermParser {
         if (node.isURIResource()) {
             return term(node.getURI());
         } else if (node.canAs(RDFList.class)) {
-            return termlist(node.as(RDFList.class)).map(tl -> (Term) tl);
+            return listTerm(node.as(RDFList.class)).map(tl -> (Term) tl);
         } else if (node.isAnon()) {
             return blankNodeTerm(node.getId().getBlankNodeId()).map(tl -> (Term) tl);
         } else {
@@ -88,11 +93,10 @@ public class TermParser {
         }
     }
 
-    // TODO: same as bottrs createTermByURI
-    public Result<Term> term(String uri) {
+    public static Result<Term> term(String uri) {
 
         if (uri.equals(OTTR.none)) {
-            return Result.of(new NoneTerm());
+            return noneTerm();
         } else if (uri.equals(RDF.nil.getURI())) {
             return Result.of(new ListTerm());
         } else {
@@ -108,9 +112,8 @@ public class TermParser {
         } else {
             Result<LiteralTerm> result = plainLiteralTerm(value);
             if (!type.equals(TypeRegistry.LITERAL)) {
-                result.addMessage(Message.warning("Type " + RDFNodeWriter.toString(type.getIri())
-                    + " too generic to materialise, defaulting to "
-                    + RDFNodeWriter.toString(TypeRegistry.LITERAL.getIri())));
+                result.addMessage(Message.warning("Unknown literal datatype " + RDFNodeWriter.toString(type.getIri())
+                    + ", defaulting to " + RDFNodeWriter.toString(TypeRegistry.LITERAL.getIri())));
             }
             return result.map(t -> (Term)t);
         }
@@ -119,11 +122,11 @@ public class TermParser {
     public Result<IRITerm> iriTerm(String value) {
         return Result.of(value)
             .map(this.prefixMapping::expandPrefix)
-            .flatMap(DataParser::asURI)
+            .flatMap(DataValidator::asURI)
             .map(IRITerm::new);
     }
 
-    private Result<ListTerm> termlist(RDFList list) {
+    private Result<ListTerm> listTerm(RDFList list) {
 
         if (createdLists.containsKey(list)) {
             return createdLists.get(list);
@@ -138,7 +141,7 @@ public class TermParser {
         }
     }
 
-    public Result<LiteralTerm> literalTerm(Literal literal) {
+    public static Result<LiteralTerm> literalTerm(Literal literal) {
         return literalTerm(literal.getLexicalForm(), literal.getDatatypeURI(), literal.getLanguage());
     }
 
@@ -157,12 +160,12 @@ public class TermParser {
     }
 
     public static Result<LiteralTerm> typedLiteralTerm(String value, String datatype) {
-        return DataParser.asURI(datatype)
+        return DataValidator.asURI(datatype)
             .map(iri -> LiteralTerm.createTypedLiteral(value, iri));
     }
 
     public static Result<LiteralTerm> langLiteralTerm(String value, String languageTag) {
-        return DataParser.asLanguageTagString(languageTag)
+        return DataValidator.asLanguageTagString(languageTag)
             .map(tag -> LiteralTerm.createLanguageTagLiteral(value, tag));
     }
 
@@ -170,8 +173,12 @@ public class TermParser {
         return Result.of(LiteralTerm.createPlainLiteral(value));
     }
 
+    public static Result<BlankNodeTerm> blankNodeTerm() {
+        return Result.of(new BlankNodeTerm());
+    }
+
     public Result<BlankNodeTerm> blankNodeTerm(String value) {
-        return Result.of(this.createdBlanks.computeIfAbsent(value, _fresh -> new BlankNodeTerm()));
+        return Result.of(createdBlanks.computeIfAbsent(value, _fresh -> new BlankNodeTerm()));
     }
 
     public Result<BlankNodeTerm> blankNodeTerm(BlankNodeId blankNodeId) {

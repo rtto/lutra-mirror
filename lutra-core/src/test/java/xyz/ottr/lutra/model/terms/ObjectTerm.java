@@ -25,7 +25,7 @@ package xyz.ottr.lutra.model.terms;
 import java.util.Optional;
 
 import xyz.ottr.lutra.model.types.LUBType;
-import xyz.ottr.lutra.model.types.TermType;
+import xyz.ottr.lutra.model.types.Type;
 import xyz.ottr.lutra.model.types.TypeRegistry;
 
 public class ObjectTerm extends AbstractTerm<Object> {
@@ -43,7 +43,7 @@ public class ObjectTerm extends AbstractTerm<Object> {
         this.variable = variable;
     }
 
-    private static TermType getIntrinsicType(boolean variable) {
+    private static Type getIntrinsicType(boolean variable) {
         return variable ? TypeRegistry.TOP : new LUBType(TypeRegistry.TOP);
     }
 
