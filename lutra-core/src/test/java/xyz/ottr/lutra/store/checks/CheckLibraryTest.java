@@ -190,6 +190,7 @@ public class CheckLibraryTest {
                 .iri("base")
                 .parameter(Parameter.builder().term(ObjectTerm.var("x")).nonBlank(true).build())
                 .parameter(Parameter.builder().term(ObjectTerm.var("y")).build())
+                .isEmptyPattern(true)
                 .build());
 
         store.addTemplate(

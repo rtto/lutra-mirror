@@ -473,6 +473,7 @@ public class DependencyGraph implements TemplateStore {
                 .iri(template.getIri())
                 .parameters(template.getParameters())
                 .instances(instances)
+                .isEmptyPattern(instances.isEmpty())
                 .build());
     }
 

@@ -47,7 +47,10 @@ public enum TemplateBuilder {
             bldr.iri(sign.getIri());
             bldr.parameters(sign.getParameters());
         });
-        builder.addResult(instances, Template.TemplateBuilder::instances);
+        builder.addResult(instances, (bldr, insts) -> {
+            bldr.instances(insts);
+            bldr.isEmptyPattern(insts.isEmpty());
+        });
 
         if (Result.allIsPresent(signature, instances)) {
             var template = builder.map(Template.TemplateBuilder::build);
