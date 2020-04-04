@@ -40,7 +40,7 @@ class SPatternInstanceWriter extends SInstanceWriter {
                 .sorted(instanceSorter)
                 .map(this::writeInstance)
                 .map(StringBuilder::toString)
-                .collect(Collectors.joining(STOTTR.Statements.bodyInsSep + Space.LINE + Space.INDENT));
+                .collect(Collectors.joining(STOTTR.Statements.bodyInsSep + Space.LINEBR + Space.INDENT));
     }
 
 }

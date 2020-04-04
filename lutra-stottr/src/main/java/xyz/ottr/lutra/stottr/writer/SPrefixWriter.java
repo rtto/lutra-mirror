@@ -37,11 +37,11 @@ public enum SPrefixWriter {
         return prefixes.getNsPrefixMap().entrySet().stream()
             .sorted(Comparator.comparing(Map.Entry::getValue))
             .map(entry -> writePrefix(entry.getKey(), entry.getValue()))
-            .collect(Collectors.joining(Space.LINE));
+            .collect(Collectors.joining(Space.LINEBR));
     }
 
     private static String writePrefix(String prefix, String namespace) {
-        return RDFTurtle.prefix + prefix + RDFTurtle.prefixSep + RDFTurtle.fullURI(namespace) + RDFTurtle.prefixEnd;
+        return RDFTurtle.prefixInit + prefix + RDFTurtle.prefixSep + RDFTurtle.fullURI(namespace) + RDFTurtle.prefixEnd;
     }
 
 }

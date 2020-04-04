@@ -31,14 +31,14 @@ public enum RDFTurtle {
     public static final String plainLiteralDatatype = XSD.xstring.getURI();
     public static final String langStringDatatype = RDF.dtLangString.getURI(); // TODO add this type to the type hierarchy
 
-    public static final String prefix = "@prefix ";
+    public static final String prefixInit = "@prefix ";
     public static final String prefixSep = ": ";
     public static final String prefixEnd = " .";
 
     public static final String qnameSep = ":";
 
-    public static final String literalLang = "@";
-    public static final String literalType = "^^";
+    public static final String literalLangSep = "@";
+    public static final String literalTypeSep = "^^";
     
     public static String fullURI(String uri) {
         return "<" + uri + ">";

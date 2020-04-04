@@ -31,6 +31,13 @@ import xyz.ottr.lutra.model.types.LUBType;
 import xyz.ottr.lutra.model.types.ListType;
 import xyz.ottr.lutra.model.types.NEListType;
 
+/**
+ * Constants used for *writing* (and not for parsing) stOTTR syntax.
+ * Parsing stOTTR is defined by an Antrl grammar.
+ */
+
+// TODO: move to writer package?
+// TODO: none, LUB, List, NEList and expanders should come from core.
 public class STOTTR {
 
     public enum Terms {

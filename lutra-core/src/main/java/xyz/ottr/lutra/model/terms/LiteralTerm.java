@@ -48,8 +48,8 @@ public class LiteralTerm extends AbstractTerm<String> {
     private static String getIdentifier(String value, String datatype, String languageTag) {
         return RDFTurtle.literal(value)
             + (Objects.nonNull(languageTag)
-                ? RDFTurtle.literalLang + languageTag
-                : RDFTurtle.literalType + datatype);
+                ? RDFTurtle.literalLangSep + languageTag
+                : RDFTurtle.literalTypeSep + datatype);
     }
 
     private static TermType getIntrinsicType(String datatype) {

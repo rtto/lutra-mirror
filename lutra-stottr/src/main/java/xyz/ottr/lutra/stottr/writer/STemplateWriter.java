@@ -65,11 +65,11 @@ public class STemplateWriter implements TemplateWriter {
 
     public String write() {
         return SPrefixWriter.write(this.prefixes)
-            + Space.LINE2
+            + Space.LINEBR2
             + this.templates.values().stream()
                 .sorted(signatureComparator)
                 .map(signature -> write(signature, false))
-                .collect(Collectors.joining(Space.LINE2));
+                .collect(Collectors.joining(Space.LINEBR2));
     }
 
     public String write(String iri) {
@@ -102,7 +102,7 @@ public class STemplateWriter implements TemplateWriter {
 
         // Write used prefixes at start of String
         if (includePrefixes) {
-            builder.insert(0, SPrefixWriter.write(termWriter.getUsedPrefixes()) + Space.LINE2);
+            builder.insert(0, SPrefixWriter.write(termWriter.getUsedPrefixes()) + Space.LINEBR2);
         }
 
         return builder.toString();
@@ -136,9 +136,9 @@ public class STemplateWriter implements TemplateWriter {
         builder.append(writeSignature(template, termWriter));
         builder.append(STOTTR.Statements.signatureSep);
         builder.append(STOTTR.Statements.bodyStart);
-        builder.append(Space.LINE);
+        builder.append(Space.LINEBR);
         builder.append(writePattern(template, termWriter));
-        builder.append(Space.LINE);
+        builder.append(Space.LINEBR);
         builder.append(STOTTR.Statements.bodyEnd);
         return builder;
     }
@@ -149,7 +149,7 @@ public class STemplateWriter implements TemplateWriter {
 
         builder.append(writeModes(parameter.isNonBlank(), parameter.isOptional()));
         builder.append(writeType(parameter.getTerm().getType(), termWriter));
-        builder.append(Space.space);
+        builder.append(Space.SPACE);
         builder.append(termWriter.write(parameter.getTerm()));
 
         if (parameter.hasDefaultValue()) {
@@ -172,7 +172,7 @@ public class STemplateWriter implements TemplateWriter {
         }
 
         if (builder.length() != 0) {
-            builder.append(Space.space);
+            builder.append(Space.SPACE);
         }
         return builder;
     }

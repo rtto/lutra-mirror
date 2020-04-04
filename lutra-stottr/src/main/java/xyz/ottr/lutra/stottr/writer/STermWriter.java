@@ -110,9 +110,9 @@ public class STermWriter {
 
         String val = RDFTurtle.literal(literal.getValue());
         if (literal.getLanguageTag() != null) {
-            val += RDFTurtle.literalLang + literal.getLanguageTag();
+            val += RDFTurtle.literalLangSep + literal.getLanguageTag();
         } else if (literal.getDatatype() != null && !literal.getDatatype().equals(RDFTurtle.plainLiteralDatatype)) {
-            val += RDFTurtle.literalType + writeIRI(literal.getDatatype());
+            val += RDFTurtle.literalTypeSep + writeIRI(literal.getDatatype());
         }
         return val;
     }

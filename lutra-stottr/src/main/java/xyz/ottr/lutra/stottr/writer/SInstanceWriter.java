@@ -65,7 +65,7 @@ public class SInstanceWriter implements InstanceWriter {
 
         builder
             .append(SPrefixWriter.write(this.termWriter.getPrefixes()))
-            .append(Space.LINE2);
+            .append(Space.LINEBR2);
 
         this.instances.stream()
             .sorted(instanceSorter)
@@ -73,7 +73,7 @@ public class SInstanceWriter implements InstanceWriter {
                 builder
                     .append(writeInstance(instance))
                     .append(STOTTR.Statements.statementEnd)
-                    .append(Space.LINE));
+                    .append(Space.LINEBR));
 
         return builder.toString();
     }
