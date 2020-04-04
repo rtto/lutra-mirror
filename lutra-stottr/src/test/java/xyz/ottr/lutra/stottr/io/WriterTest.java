@@ -153,6 +153,7 @@ public class WriterTest {
             .parameter(Parameter.builder().term(new BlankNodeTerm("x")).nonBlank(true).build())
             .parameter(Parameter.builder().term(new BlankNodeTerm("y")).build())
             .parameter(Parameter.builder().term(new BlankNodeTerm("z")).defaultValue(LiteralTerm.createPlainLiteral("default")).build())
+            .isEmptyPattern(true)
             .build();
 
         var t2 = Template.builder()
@@ -160,6 +161,7 @@ public class WriterTest {
             .parameter(Parameter.builder().term(new BlankNodeTerm("x")).optional(true).nonBlank(true).build())
             .parameter(Parameter.builder().term(new BlankNodeTerm("y")).build())
             .parameter(Parameter.builder().term(new BlankNodeTerm("z")).build())
+            .isEmptyPattern(true)
             .build();
 
         List<Signature> list = List.of(b1, t1, b2, s1, s2, t2);

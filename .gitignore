@@ -117,3 +117,5 @@ lutra-stottr/src/main/antlr4/imports/Turtle\.g4
 lutra-cli/src/test/resources/primer/
 
 lutra-api/src/main/resources/tpl-library/
+
+lutra-cli/dependency-reduced-pom.xml
