@@ -38,8 +38,7 @@ import xyz.ottr.lutra.bottr.model.InstanceMap;
 import xyz.ottr.lutra.io.Files;
 import xyz.ottr.lutra.system.Result;
 import xyz.ottr.lutra.system.ResultStream;
-import xyz.ottr.lutra.wottr.io.RDFFileReader;
-
+import xyz.ottr.lutra.wottr.io.RDFReader;
 
 @RunWith(Parameterized.class)
 public class BInstanceMapParserTest {
@@ -71,7 +70,7 @@ public class BInstanceMapParserTest {
 
     private Result<List<InstanceMap>> getInstanceMaps(String file) {
         return ResultStream.innerOf(file)
-            .innerFlatMap(new RDFFileReader())
+            .innerFlatMap(RDFReader.fileReader())
             .innerFlatMap(new BInstanceMapParser(file))
             .aggregate()
             .map(stream -> stream.collect(Collectors.toList()));

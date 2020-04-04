@@ -29,8 +29,7 @@ import xyz.ottr.lutra.io.TemplateReader;
 import xyz.ottr.lutra.model.Template;
 import xyz.ottr.lutra.store.graph.DependencyGraph;
 import xyz.ottr.lutra.system.ResultConsumer;
-import xyz.ottr.lutra.wottr.io.RDFFileReader;
-import xyz.ottr.lutra.wottr.parser.WTemplateParser;
+import xyz.ottr.lutra.wottr.io.RDFReader;
 import xyz.ottr.lutra.wottr.writer.WTemplateWriter;
 
 public class PrototypeTest {
@@ -46,8 +45,8 @@ public class PrototypeTest {
 
     @BeforeClass    
     public static void load() {
-        legacyReader = new TemplateReader(new RDFFileReader(), new xyz.ottr.lutra.wottr.parser.WTemplateParser());
-        templateReader = new TemplateReader(new RDFFileReader(), new WTemplateParser());
+        legacyReader = new TemplateReader(RDFReader.fileReader(), new xyz.ottr.lutra.wottr.parser.WTemplateParser());
+        templateReader = new TemplateReader(RDFReader.fileReader(), new WTemplateParser());
         graph = new DependencyGraph(null);
     }
 
@@ -102,7 +101,7 @@ public class PrototypeTest {
         //long c = expanded.getStream().count();
         //System.out.println("Done expanding, got " + c + " instances.");
 
-        //InstanceReader instanceReader = new InstanceReader(new RDFFileReader(),
+        //InstanceReader instanceReader = new InstanceReader(RDFReader.fileReader(),
         //        new WInstanceParser());
 
 

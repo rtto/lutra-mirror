@@ -118,7 +118,7 @@ public class SPARQLGenerateEval {
         store.addOTTRBaseTemplates();
 
         // Read templates
-        TemplateReader tempReader = new TemplateReader(new RDFFileReader(), new WTemplateParser());
+        TemplateReader tempReader = new TemplateReader(RDFReader.fileReader(), new WTemplateParser());
         ResultStream<String> tempIRI = ResultStream.innerOf(this.testRoot.resolve("person.ttl").toString());
         MessageHandler errorMessages = tempReader.populateTemplateStore(store, tempIRI);
         assertFalse(Message.moreSevere(errorMessages.printMessages(), Message.ERROR)); // No errors when parsing

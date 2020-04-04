@@ -28,7 +28,7 @@ import xyz.ottr.lutra.io.Format;
 import xyz.ottr.lutra.io.InstanceReader;
 import xyz.ottr.lutra.io.TemplateReader;
 import xyz.ottr.lutra.system.Result;
-import xyz.ottr.lutra.wottr.io.RDFFileReader;
+import xyz.ottr.lutra.wottr.io.RDFReader;
 import xyz.ottr.lutra.wottr.parser.WInstanceParser;
 import xyz.ottr.lutra.wottr.parser.WTemplateParser;
 import xyz.ottr.lutra.wottr.writer.WInstanceWriter;
@@ -52,7 +52,7 @@ public class WottrFormat implements Format {
 
     @Override
     public Result<TemplateReader> getTemplateReader() {
-        return Result.of(new TemplateReader(new RDFFileReader(), new WTemplateParser()));
+        return Result.of(new TemplateReader(RDFReader.fileReader(), new WTemplateParser()));
     }
 
     @Override
@@ -62,7 +62,7 @@ public class WottrFormat implements Format {
 
     @Override
     public Result<InstanceReader> getInstanceReader() {
-        return Result.of(new InstanceReader(new RDFFileReader(), new WInstanceParser()));
+        return Result.of(new InstanceReader(RDFReader.fileReader(), new WInstanceParser()));
     }
 
     @Override

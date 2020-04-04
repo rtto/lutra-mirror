@@ -38,13 +38,13 @@ public class RDFFileReaderTest {
     private static final String nonExistent = "src/test/resources/thisFileDoesNotExist.ttl";
     private static final String faultyRDF = "src/test/resources/incorrect/faultyRDF.ttl";
     private static final String emptyFile = "src/test/resources/correct/emptyFile.ttl";
-    private static RDFFileReader reader;
+    private static RDFReader<String> reader;
 
     private static final Logger log = LoggerFactory.getLogger(RDFFileReaderTest.class);
     
     @BeforeClass    
     public static void load() {
-        reader = new RDFFileReader();
+        reader = RDFReader.fileReader();
     }
 
     @Test
