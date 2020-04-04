@@ -61,6 +61,7 @@ public enum OTTR  {
         public static final String Literal = RDFS.Literal.getURI();
         public static final String IRI = ns + "IRI";
         public static final String Bot = ns + "Bot";
+
     }
 
     public enum BaseTemplate {
@@ -113,6 +114,7 @@ public enum OTTR  {
         map.setNsPrefix("rdfs", RDFS.getURI());
         map.setNsPrefix("owl", OWL.getURI());
         map.setNsPrefix(OTTR.prefix, OTTR.ns);
+        // TODO consider: map.lock();
         return map;
     }
 }

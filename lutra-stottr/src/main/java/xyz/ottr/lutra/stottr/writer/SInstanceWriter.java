@@ -22,11 +22,14 @@ package xyz.ottr.lutra.stottr.writer;
  * #L%
  */
 
+import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 import org.apache.jena.shared.PrefixMapping;
-import xyz.ottr.lutra.OTTR;
+import xyz.ottr.lutra.Space;
 import xyz.ottr.lutra.model.Argument;
 import xyz.ottr.lutra.model.Instance;
 import xyz.ottr.lutra.stottr.STOTTR;
@@ -34,20 +37,20 @@ import xyz.ottr.lutra.writer.InstanceWriter;
 
 public class SInstanceWriter implements InstanceWriter {
 
+    protected static final Comparator<Instance> instanceSorter = Comparator.comparing(Instance::getIri)
+        .thenComparing(i -> Objects.toString(i.getListExpander(), ""), String::compareToIgnoreCase)
+        .thenComparing(i -> i.getArguments().toString(), String::compareToIgnoreCase);
+
     protected final List<Instance> instances;
     private final STermWriter termWriter;
-       
-    protected SInstanceWriter(STermWriter termWriter) {
+
+    SInstanceWriter(STermWriter termWriter) {
         this.instances = new LinkedList<>();
         this.termWriter = termWriter;
     }
 
     public SInstanceWriter(PrefixMapping prefixes) {
         this(new STermWriter(prefixes));
-    }
-
-    public SInstanceWriter() {
-        this(OTTR.getDefaultPrefixes());
     }
 
     @Override
@@ -62,50 +65,48 @@ public class SInstanceWriter implements InstanceWriter {
 
         builder
             .append(SPrefixWriter.write(this.termWriter.getPrefixes()))
-            .append("\n\n");
+            .append(Space.LINEBR2);
 
-        this.instances.forEach(instance ->
-            builder
-                .append(writeInstance(instance))
-                .append(STOTTR.Statements.statementEnd)
-                .append("\n"));
+        this.instances.stream()
+            .sorted(instanceSorter)
+            .forEach(instance ->
+                builder
+                    .append(writeInstance(instance))
+                    .append(STOTTR.Statements.statementEnd)
+                    .append(Space.LINEBR));
 
         return builder.toString();
     }
 
-    protected StringBuilder writeInstance(Instance instance) {
+    StringBuilder writeInstance(Instance instance) {
 
         StringBuilder builder = new StringBuilder();
 
         if (instance.hasListExpander()) {
             builder
-                .append(STOTTR.Expanders.map.getKey(instance.getListExpander()))
-                .append(" ")
-                .append(STOTTR.Expanders.expanderSep)
-                .append(" ");
+                .append(STOTTR.Expanders.map.get(instance.getListExpander()))
+                .append(STOTTR.Expanders.expanderSep);
         }
 
         builder.append(this.termWriter.writeIRI(instance.getIri()));
-        builder.append(STOTTR.Terms.insArgStart)
-            .append(writeArguments(instance.getArguments()))
-            .append(STOTTR.Terms.insArgEnd);
+        builder.append(STOTTR.Terms.insArgStart);
+        builder.append(instance.getArguments().stream()
+            .map(this::writeArgument)
+            .collect(Collectors.joining(STOTTR.Terms.insArgSep)));
+        builder.append(STOTTR.Terms.insArgEnd);
 
         return builder;
     }
 
-    private StringBuilder writeArguments(List<Argument> args) {
+    private StringBuilder writeArgument(Argument arg) {
 
         StringBuilder builder = new StringBuilder();
-        String sep = "";
 
-        for (Argument arg : args) {
-            builder.append(sep);
-            if (arg.isListExpander()) {
-                builder.append(STOTTR.Expanders.expander);
-            }
-            builder.append(this.termWriter.write(arg.getTerm()));
-            sep = STOTTR.Terms.insArgSep + " ";
+        if (arg.isListExpander()) {
+            builder.append(STOTTR.Expanders.expander);
         }
+        builder.append(this.termWriter.write(arg.getTerm()));
+
         return builder;
     }
 }

@@ -41,6 +41,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
+import xyz.ottr.lutra.OTTR;
 import xyz.ottr.lutra.TemplateManager;
 import xyz.ottr.lutra.api.StandardFormat;
 import xyz.ottr.lutra.io.InstanceReader;
@@ -154,7 +155,7 @@ public class PottrTest {
             .innerFlatMap(store::expandInstanceFetch);
 
         // Write expanded instances to model
-        SInstanceWriter insWriter = new SInstanceWriter();
+        SInstanceWriter insWriter = new SInstanceWriter(OTTR.getDefaultPrefixes());
         ResultConsumer<Instance> expansionErrors = new ResultConsumer<>(insWriter);
         expandedInInstances.forEach(expansionErrors);
 

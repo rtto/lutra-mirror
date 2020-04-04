@@ -1,10 +1,10 @@
-package xyz.ottr.lutra.stottr.writer;
+package xyz.ottr.lutra;
 
 /*-
  * #%L
- * lutra-stottr
+ * lutra-core
  * %%
- * Copyright (C) 2018 - 2019 University of Oslo
+ * Copyright (C) 2018 - 2020 University of Oslo
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -22,25 +22,10 @@ package xyz.ottr.lutra.stottr.writer;
  * #L%
  */
 
-import java.util.stream.Collectors;
-
-import xyz.ottr.lutra.Space;
-import xyz.ottr.lutra.stottr.STOTTR;
-
-class SPatternInstanceWriter extends SInstanceWriter {
-
-    SPatternInstanceWriter(STermWriter termWriter) {
-        super(termWriter);
-    }
-
-    @Override
-    public String write() {
-        return Space.INDENT
-            + this.instances.stream()
-                .sorted(instanceSorter)
-                .map(this::writeInstance)
-                .map(StringBuilder::toString)
-                .collect(Collectors.joining(STOTTR.Statements.bodyInsSep + Space.LINEBR + Space.INDENT));
-    }
-
+public enum Space {
+    ;
+    public static final String SPACE = " ";
+    public static final String INDENT = "    ";
+    public static final String LINEBR = System.lineSeparator();
+    public static final String LINEBR2 = System.lineSeparator().repeat(2);
 }
