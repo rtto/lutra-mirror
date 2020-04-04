@@ -23,8 +23,10 @@ package xyz.ottr.lutra.wottr.io;
  */
 
 import java.io.StringWriter;
+import java.nio.file.Paths;
 import java.util.Set;
 
+import org.apache.commons.validator.routines.UrlValidator;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
@@ -37,16 +39,30 @@ public enum Models {
 
     private static final Lang defaultLang = Lang.TURTLE;
 
-    public static Model readModel(String file) {
-        return readModel(file, FileUtils.guessLang(file, defaultLang.getLabel()));
+    // "file" is not amongst the default url schemes of UrlValidator and must be added:
+    private static final UrlValidator urlValidator = new UrlValidator(new String[]{"http", "https", "ftp", "file"});
+
+    public static Model readModel(String path) {
+        return readModel(path, FileUtils.guessLang(path, defaultLang.getLabel()));
     }
 
-    public static Model readModel(String file, Lang language) {
-        return readModel(file, language.getLabel());
+    public static Model readModel(String path, Lang language) {
+        return readModel(path, language.getLabel());
     }
 
-    private static Model readModel(String file, String format) {
-        return FileManager.get().loadModel(file, format);
+    private static Model readModel(String path, String format) {
+
+        String abspath = isURL(path)
+            ? path
+            : Paths.get(path).toAbsolutePath().toUri().toString();
+
+        return FileManager.get().loadModel(abspath, format);
+    }
+
+
+    // TODO replace with core.util.DataValidator once it is merged with develop
+    private static boolean isURL(String value) {
+        return urlValidator.isValid(value);
     }
 
     public static String writeModel(Model model) {
@@ -62,6 +78,7 @@ public enum Models {
         RDFDataMgr.write(out, model, language);
         return out.toString();
     }
+
 
     public static void trimPrefixes(Model model) {
         Set<String> namespaces = model.listNameSpaces().toSet();

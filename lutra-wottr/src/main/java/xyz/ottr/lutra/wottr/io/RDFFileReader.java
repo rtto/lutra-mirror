@@ -22,10 +22,6 @@ package xyz.ottr.lutra.wottr.io;
  * #L%
  */
 
-import java.nio.file.Paths;
-
-import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.validator.routines.UrlValidator;
 import org.apache.jena.atlas.web.HttpException;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.shared.JenaException;
@@ -40,7 +36,6 @@ public class RDFFileReader implements InputReader<String, Model> {
 
     private static final Logger log = LoggerFactory.getLogger(RDFFileReader.class);
     private final PrefixMapping prefixes; // Gathers prefixes parsed for later output
-    private static final UrlValidator urlValidator = new UrlValidator();
 
     public RDFFileReader() {
         this.prefixes = PrefixMapping.Factory.create();
@@ -52,11 +47,9 @@ public class RDFFileReader implements InputReader<String, Model> {
 
     public Result<Model> parse(String url) {
 
-        String path = isURL(url) ? url : FilenameUtils.separatorsToSystem(Paths.get(url).toAbsolutePath().toString());
-
         Result<Model> result;
         try {
-            Model model = Models.readModel(path);
+            Model model = Models.readModel(url);
             this.prefixes.setNsPrefixes(model);
             result = Result.ofNullable(model);
             log.info("Adding model " + model.hashCode() + " with URI " + url);
@@ -66,10 +59,6 @@ public class RDFFileReader implements InputReader<String, Model> {
             result = Result.error("Unable to parse model " + url + ": " + ex.getMessage());
         }
         return result;
-    }
-
-    public static boolean isURL(String value) {
-        return urlValidator.isValid(value);
     }
 
     public ResultStream<Model> apply(String url) {
