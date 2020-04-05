@@ -24,7 +24,6 @@ package xyz.ottr.lutra.wottr.util;
 
 import java.util.Collection;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.RDFNode;
@@ -34,9 +33,7 @@ import org.apache.jena.shared.PrefixMapping;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
 // TODO evolve this into a util class for checking conflicting prefixes?
-
 public enum PrefixMappings {
 
     ; // singleton enum

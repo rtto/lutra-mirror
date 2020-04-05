@@ -68,10 +68,6 @@ public enum RDFIO {
         };
     }
 
-    public static RDFWriter getWriter(Model model) {
-        return getWriter(model, DEFAULT_LANG);
-    }
-
     public static RDFWriter getWriter(Model model, Lang language) {
         return writerBuilder()
             .source(model)
@@ -80,7 +76,7 @@ public enum RDFIO {
     }
 
     public static String writeToString(Model model) {
-        return getWriter(model).asString();
+        return getWriter(model, DEFAULT_LANG).asString();
     }
 
     public static String writeToString(Model model, Lang language) {
