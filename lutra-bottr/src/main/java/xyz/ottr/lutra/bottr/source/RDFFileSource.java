@@ -32,7 +32,7 @@ import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.shared.PrefixMapping;
 import xyz.ottr.lutra.system.Result;
 import xyz.ottr.lutra.system.ResultStream;
-import xyz.ottr.lutra.wottr.io.RDFReader;
+import xyz.ottr.lutra.wottr.io.RDFIO;
 
 public class RDFFileSource extends AbstractSPARQLSource {
 
@@ -49,7 +49,7 @@ public class RDFFileSource extends AbstractSPARQLSource {
 
     private Result<Model> loadModels() {
         return ResultStream.innerOf(this.modelURIs)
-                .innerFlatMap(RDFReader.fileReader())
+                .innerFlatMap(RDFIO.fileReader())
                 .aggregate()
                 .map(stream -> stream.reduce(
                     ModelFactory.createDefaultModel(),

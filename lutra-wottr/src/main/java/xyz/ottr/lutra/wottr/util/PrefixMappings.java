@@ -34,6 +34,9 @@ import org.apache.jena.shared.PrefixMapping;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+
+// TODO evolve this into a util class for checking conflicting prefixes?
+
 public enum PrefixMappings {
 
     ; // singleton enum
@@ -125,7 +128,6 @@ public enum PrefixMappings {
     }
 
     public static void trim(Model model) {
-
         Set<String> namespaces = getAllURIsNamespaces(model);
         for (String prefixNamespace : model.getNsPrefixMap().values()) {
             if (!namespaces.contains(prefixNamespace)) {
@@ -144,13 +146,6 @@ public enum PrefixMappings {
             .mapWith(RDFNode::asResource)
             .mapWith(Resource::getNameSpace)
             .toSet();
-    }
-    
-    public static String toStringTurtleFormat(PrefixMapping mapping) {
-        return mapping.getNsPrefixMap()
-                .entrySet().stream()
-                .map(p -> "@prefix " + p.getKey() + ": <" + p.getValue() + "> . \n")
-                .collect(Collectors.joining());
     }
 
 }

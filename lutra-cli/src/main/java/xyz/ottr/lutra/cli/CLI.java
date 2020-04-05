@@ -40,7 +40,7 @@ import xyz.ottr.lutra.system.Message;
 import xyz.ottr.lutra.system.MessageHandler;
 import xyz.ottr.lutra.system.Result;
 import xyz.ottr.lutra.system.ResultStream;
-import xyz.ottr.lutra.wottr.io.RDFReader;
+import xyz.ottr.lutra.wottr.io.RDFIO;
 
 public class CLI {
 
@@ -225,7 +225,7 @@ public class CLI {
         if (!StringUtils.isNotBlank(this.settings.prefixes)) {
             return Message.Severity.least();
         }
-        Result<Model> userPrefixes = RDFReader.fileReader().parse(this.settings.prefixes);
+        Result<Model> userPrefixes = RDFIO.fileReader().parse(this.settings.prefixes);
         return this.messageHandler.use(userPrefixes, up -> this.templateManager.addPrefixes(up));
     }
 

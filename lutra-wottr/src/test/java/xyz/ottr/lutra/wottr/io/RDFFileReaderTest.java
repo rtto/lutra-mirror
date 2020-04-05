@@ -44,7 +44,7 @@ public class RDFFileReaderTest {
     
     @BeforeClass    
     public static void load() {
-        reader = RDFReader.fileReader();
+        reader = RDFIO.fileReader();
     }
 
     @Test
@@ -54,7 +54,7 @@ public class RDFFileReaderTest {
 
         assert aggr.isPresent();
 
-        log.debug(Models.writeModel(aggr.get().findFirst().get()));
+        log.debug(RDFIO.writeToString(aggr.get().findFirst().get()));
     }
 
     @Test

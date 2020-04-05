@@ -32,7 +32,7 @@ import org.junit.Test;
 import xyz.ottr.lutra.model.Instance;
 import xyz.ottr.lutra.system.Result;
 import xyz.ottr.lutra.system.ResultConsumer;
-import xyz.ottr.lutra.wottr.io.Models;
+import xyz.ottr.lutra.wottr.io.RDFIO;
 import xyz.ottr.lutra.wottr.writer.WInstanceWriter;
 
 
@@ -65,7 +65,7 @@ public class BInstanceReaderTest {
 
     private void printRDFOutput(String file) {
         Model model = getRDFModel(file);
-        String output = Models.writeModel(model);
+        String output = RDFIO.writeToString(model);
         //System.out.println(output);
     }
 

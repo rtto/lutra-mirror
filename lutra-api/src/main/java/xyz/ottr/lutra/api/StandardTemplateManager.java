@@ -39,7 +39,7 @@ import xyz.ottr.lutra.system.MessageHandler;
 import xyz.ottr.lutra.system.Result;
 import xyz.ottr.lutra.system.ResultConsumer;
 import xyz.ottr.lutra.system.ResultStream;
-import xyz.ottr.lutra.wottr.io.RDFReader;
+import xyz.ottr.lutra.wottr.io.RDFIO;
 import xyz.ottr.lutra.wottr.parser.WTemplateParser;
 
 @Getter
@@ -56,7 +56,7 @@ public final class StandardTemplateManager extends TemplateManager {
 
         this.standardLibrary = makeDefaultStore(getFormatManager());
         ResultConsumer<Signature> consumer = new ResultConsumer<>(this.standardLibrary);
-        var reader = ResultStream.innerFlatMapCompose(RDFReader.inputStreamReader(), new WTemplateParser());
+        var reader = ResultStream.innerFlatMapCompose(RDFIO.inputStreamReader(), new WTemplateParser());
 
         getLibraryPaths()
             .innerMap(this::getResourceAsStream)

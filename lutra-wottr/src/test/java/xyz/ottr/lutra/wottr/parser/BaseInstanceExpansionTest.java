@@ -32,7 +32,7 @@ import java.util.List;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
-import xyz.ottr.lutra.wottr.io.RDFReader;
+import xyz.ottr.lutra.wottr.io.RDFIO;
 
 @RunWith(Parameterized.class)
 public class BaseInstanceExpansionTest {
@@ -59,7 +59,7 @@ public class BaseInstanceExpansionTest {
     @Test
     public void shouldBeIsomorphic() {
 
-        var output = RDFReader.fileReader().parse(this.output).get();
+        var output = RDFIO.fileReader().parse(this.output).get();
 
         assertNotNull(output);
 

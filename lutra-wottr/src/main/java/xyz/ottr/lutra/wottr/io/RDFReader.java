@@ -22,14 +22,10 @@ package xyz.ottr.lutra.wottr.io;
  * #L%
  */
 
-import java.io.InputStream;
-
 import lombok.Getter;
 import org.apache.jena.atlas.web.HttpException;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
-import org.apache.jena.riot.RDFLanguages;
-import org.apache.jena.riot.RDFParser;
 import org.apache.jena.riot.RDFParserBuilder;
 import org.apache.jena.shared.JenaException;
 import org.apache.jena.shared.PrefixMapping;
@@ -47,8 +43,7 @@ public abstract class RDFReader<X> implements InputReader<X, Model> {
         this.prefixes = PrefixMapping.Factory.create();
 
         // set defaults here:
-        this.parserBuilder = RDFParser.create()
-            .lang(RDFLanguages.TURTLE);
+        this.parserBuilder = RDFIO.readerBuilder();
     }
 
     public ResultStream<Model> apply(X input) {
@@ -79,25 +74,5 @@ public abstract class RDFReader<X> implements InputReader<X, Model> {
     }
 
     abstract void setSource(X source);
-
-    public static RDFReader<String> fileReader() {
-        return new RDFReader<>() {
-
-            @Override
-            void setSource(String source) {
-                this.parserBuilder.source(source);
-            }
-        };
-    }
-
-    public static RDFReader<InputStream> inputStreamReader() {
-        return new RDFReader<>() {
-
-            @Override
-            void setSource(InputStream source) {
-                this.parserBuilder.source(source);
-            }
-        };
-    }
 
 }

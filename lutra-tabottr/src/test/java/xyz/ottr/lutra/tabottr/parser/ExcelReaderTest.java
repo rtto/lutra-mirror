@@ -33,7 +33,7 @@ import org.junit.Test;
 import xyz.ottr.lutra.model.Instance;
 import xyz.ottr.lutra.system.ResultConsumer;
 import xyz.ottr.lutra.system.ResultStream;
-import xyz.ottr.lutra.wottr.io.RDFReader;
+import xyz.ottr.lutra.wottr.io.RDFIO;
 import xyz.ottr.lutra.wottr.parser.WInstanceParser;
 import xyz.ottr.lutra.wottr.writer.WInstanceWriter;
 
@@ -57,7 +57,7 @@ public class ExcelReaderTest {
         Model excelModel = writeToModel(new ExcelReader().apply(excelFile));
         excelModel.setNsPrefix("ex", "http://example.org#");
 
-        Model rdfInput = RDFReader.fileReader().parse(rdfFile).get();
+        Model rdfInput = RDFIO.fileReader().parse(rdfFile).get();
         assertNotNull(rdfInput);
 
         Model rdfModel = writeToModel(new WInstanceParser().apply(rdfInput));

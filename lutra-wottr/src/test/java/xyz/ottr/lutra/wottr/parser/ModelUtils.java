@@ -33,8 +33,7 @@ import xyz.ottr.lutra.store.graph.DependencyGraph;
 import xyz.ottr.lutra.system.Assertions;
 import xyz.ottr.lutra.system.ResultConsumer;
 import xyz.ottr.lutra.system.ResultStream;
-import xyz.ottr.lutra.wottr.io.Models;
-import xyz.ottr.lutra.wottr.io.RDFReader;
+import xyz.ottr.lutra.wottr.io.RDFIO;
 import xyz.ottr.lutra.wottr.writer.WInstanceWriter;
 
 public enum ModelUtils {
@@ -53,8 +52,8 @@ public enum ModelUtils {
             actual.clearNsPrefixMap();
             expected.clearNsPrefixMap();
 
-            String rdfActual = Models.writeModel(actual);
-            String rdfExpected = Models.writeModel(expected);
+            String rdfActual = RDFIO.writeToString(actual);
+            String rdfExpected = RDFIO.writeToString(expected);
 
             Assert.assertThat(rdfActual, is(rdfExpected));
         }
@@ -67,7 +66,7 @@ public enum ModelUtils {
         TemplateStore store = new DependencyGraph(null);
         store.addOTTRBaseTemplates();
 
-        InstanceReader insReader = new InstanceReader(RDFReader.fileReader(), new WInstanceParser());
+        InstanceReader insReader = new InstanceReader(RDFIO.fileReader(), new WInstanceParser());
         ResultStream<Instance> expandedInInstances = insReader
             .apply(filename)
             .innerFlatMap(store::expandInstance);
