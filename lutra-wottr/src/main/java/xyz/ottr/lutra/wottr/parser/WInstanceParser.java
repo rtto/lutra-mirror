@@ -38,15 +38,12 @@ import xyz.ottr.lutra.model.ListExpander;
 import xyz.ottr.lutra.parser.ArgumentBuilder;
 import xyz.ottr.lutra.parser.InstanceBuilder;
 import xyz.ottr.lutra.parser.InstanceParser;
-import xyz.ottr.lutra.parser.TermParser;
 import xyz.ottr.lutra.system.Result;
 import xyz.ottr.lutra.system.ResultStream;
 import xyz.ottr.lutra.wottr.WOTTR;
 import xyz.ottr.lutra.writer.RDFNodeWriter;
 
 public class WInstanceParser implements InstanceParser<Model> {
-
-    private final TermParser termParser = new TermParser();
 
     @Override
     public ResultStream<Instance> apply(Model model) {
@@ -105,7 +102,7 @@ public class WInstanceParser implements InstanceParser<Model> {
         } else {
             // create a parser for values to simple arguments:
             Function<RDFNode, Result<Argument>> parser = value -> ArgumentBuilder.builder()
-                .term(termParser.term(value))
+                .term(WTermParser.toTerm(value))
                 .build();
 
             return values.flatMap(args -> parseArguments(args, parser));

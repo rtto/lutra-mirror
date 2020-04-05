@@ -33,7 +33,6 @@ import xyz.ottr.lutra.model.Parameter;
 import xyz.ottr.lutra.model.terms.Term;
 import xyz.ottr.lutra.model.types.Type;
 import xyz.ottr.lutra.parser.ParameterBuilder;
-import xyz.ottr.lutra.parser.TermParser;
 import xyz.ottr.lutra.system.Result;
 import xyz.ottr.lutra.wottr.WOTTR;
 import xyz.ottr.lutra.wottr.util.RDFNodes;
@@ -42,12 +41,10 @@ import xyz.ottr.lutra.writer.RDFNodeWriter;
 public class WParameterParser implements Function<RDFNode, Result<Parameter>> {
 
     private final Model model;
-    private final TermParser termParser;
     private final WTypeParser typeFactory;
 
     WParameterParser(Model model) {
         this.model = model;
-        this.termParser = new TermParser();
         this.typeFactory = new WTypeParser();
     }
 
@@ -72,7 +69,7 @@ public class WParameterParser implements Function<RDFNode, Result<Parameter>> {
 
     private Result<Term> parseTerm(Resource parameter) {
         return ModelSelector.getRequiredObject(this.model, parameter, WOTTR.variable)
-            .flatMap(this.termParser::term);
+            .flatMap(WTermParser::toTerm);
     }
 
     private Result<Type> parseType(Resource parameter) {
@@ -82,7 +79,7 @@ public class WParameterParser implements Function<RDFNode, Result<Parameter>> {
 
     private Result<Term> parseDefaultValue(Resource param) {
         return ModelSelector.getOptionalObject(this.model, param, WOTTR.defaultVal)
-            .flatMap(this.termParser::term);
+            .flatMap(WTermParser::toTerm);
     }
 
     private Set<RDFNode> parseModifiers(Resource parameter) {

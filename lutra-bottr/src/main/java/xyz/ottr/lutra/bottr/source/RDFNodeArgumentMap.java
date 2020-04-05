@@ -30,7 +30,9 @@ import xyz.ottr.lutra.model.terms.Term;
 import xyz.ottr.lutra.model.types.BasicType;
 import xyz.ottr.lutra.model.types.Type;
 import xyz.ottr.lutra.model.types.TypeRegistry;
+import xyz.ottr.lutra.parser.TermParser;
 import xyz.ottr.lutra.system.Result;
+import xyz.ottr.lutra.wottr.parser.WTermParser;
 
 public class RDFNodeArgumentMap extends ArgumentMap<RDFNode> {
 
@@ -60,18 +62,18 @@ public class RDFNodeArgumentMap extends ArgumentMap<RDFNode> {
     protected Result<Term> getBasicTerm(RDFNode value, BasicType type) {
 
         if (this.literalLangTag != null) {
-            return this.termParser.langLiteralTerm(toString(value), this.literalLangTag)
+            return TermParser.toLangLiteralTerm(toString(value), this.literalLangTag)
                 .map(t -> (Term)t);
         } else {
             Type valueType = Types.getIntrinsicType(value);
             return valueType.isCompatibleWith(type)
-                ? this.termParser.term(value)
-                : this.termParser.term(toString(value), type);
+                ? WTermParser.toTerm(value)
+                : super.toTerm(toString(value), type);
         }
     }
 
     @Override
     protected Result<Term> getListElementTerm(String value, BasicType type) {
-        return this.termParser.term(value, type);
+        return super.toTerm(value, type);
     }
 }

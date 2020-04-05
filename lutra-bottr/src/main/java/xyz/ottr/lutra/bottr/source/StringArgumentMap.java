@@ -30,6 +30,7 @@ import xyz.ottr.lutra.model.terms.Term;
 import xyz.ottr.lutra.model.types.BasicType;
 import xyz.ottr.lutra.model.types.Type;
 import xyz.ottr.lutra.model.types.TypeRegistry;
+import xyz.ottr.lutra.parser.TermParser;
 import xyz.ottr.lutra.system.Result;
 
 public class StringArgumentMap extends ArgumentMap<String> {
@@ -50,11 +51,12 @@ public class StringArgumentMap extends ArgumentMap<String> {
     }
 
     @Override
+    // TODO merge this with RDFNodeArgumentMap
     protected Result<Term> getBasicTerm(String value, BasicType type) {
         return Result.ofNullable(this.literalLangTag)
             .flatMapOrElse(
-                tag -> this.termParser.langLiteralTerm(toString(value), tag).map(t -> (Term)t),
-                this.termParser.term(toString(value), type));
+                tag -> TermParser.toLangLiteralTerm(toString(value), tag).map(t -> (Term)t),
+                super.toTerm(toString(value), type));
     }
 
     @Override

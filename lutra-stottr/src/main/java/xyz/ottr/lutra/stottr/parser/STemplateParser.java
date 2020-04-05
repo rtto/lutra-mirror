@@ -22,6 +22,7 @@ package xyz.ottr.lutra.stottr.parser;
  * #L%
  */
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -113,13 +114,15 @@ public class STemplateParser extends SParser<Signature> implements TemplateParse
 
         if (!signature.isPresent()) {
             return new HashMap<>();
-        } else {
-            return signature.get().getParameters().stream()
+        }
+
+        var map = signature.get().getParameters().stream()
                 .map(Parameter::getTerm)
                 .collect(Collectors.toMap(
                     term -> term.getIdentifier().toString(),
                     Function.identity()));
-        }
+
+        return Collections.unmodifiableMap(map);
     }
 
     private Result<Set<Instance>> parseInstances(stOTTRParser.TemplateContext ctx, SInstanceParser parser) {

@@ -30,7 +30,6 @@ import java.util.stream.Collectors;
 
 import org.antlr.v4.runtime.tree.TerminalNode;
 import org.apache.jena.vocabulary.XSD;
-import xyz.ottr.lutra.model.terms.BlankNodeTerm;
 import xyz.ottr.lutra.model.terms.IRITerm;
 import xyz.ottr.lutra.model.terms.ListTerm;
 import xyz.ottr.lutra.model.terms.Term;
@@ -48,7 +47,6 @@ public class STermParser extends SBaseParserVisitor<Term> {
     private static final Pattern angularPat = Pattern.compile("^<|>$");
 
     private final Map<String, String> prefixes;
-    private final Map<String, Term> blanks;
 
     // Maps labels to already parsed (blank node) variable terms
     private final Map<String, Term> variables;
@@ -60,32 +58,23 @@ public class STermParser extends SBaseParserVisitor<Term> {
     STermParser(Map<String, String> prefixes, Map<String, Term> variables) {
         this.prefixes = prefixes;
         this.variables = variables;
-        this.blanks = new HashMap<>();
     }
 
-    private Term makeBlank(String label) {
+    private Result<Term> toBlankNodeTerm(String label) {
 
-        // Use shallow clone to keep objects distinct but
-        // with same identifier
-        if (this.variables.containsKey(label)) {
-            return this.variables.get(label).shallowClone();
-        } else if (this.blanks.containsKey(label)) {
-            return this.blanks.get(label).shallowClone();
-        } else {
-            Term newBlank = new BlankNodeTerm();
-            this.blanks.put(label, newBlank);
-            return newBlank;
-        }
+        return this.variables.containsKey(label)
+            ? Result.of(this.variables.get(label).shallowClone())
+            : TermParser.toBlankNodeTerm(label).map(t -> (Term)t);
     }
 
     public Result<Term> visitNone(stOTTRParser.NoneContext ctx) {
-        return TermParser.noneTerm();
+        return TermParser.newNoneTerm();
     }
 
     public Result<Term> visitTerm(stOTTRParser.TermContext ctx) {
 
         if (ctx.Variable() != null) {
-            return Result.of(makeBlank(getVariableLabel(ctx.Variable())));
+            return toBlankNodeTerm(getVariableLabel(ctx.Variable())).map(t -> (Term)t); // return Result.of(makeBlank();
         }
 
         Result<Term> trm = visitChildren(ctx);
@@ -105,7 +94,7 @@ public class STermParser extends SBaseParserVisitor<Term> {
 
         if (ctx.BooleanLiteral() != null) {
             String litVal = ctx.BooleanLiteral().getSymbol().getText();
-            return TermParser.typedLiteralTerm(litVal, XSD.xboolean.getURI()).map(t -> (Term)t);
+            return TermParser.toTypedLiteralTerm(litVal, XSD.xboolean.getURI()).map(t -> (Term)t);
         }
         return visitChildren(ctx);
     }
@@ -141,7 +130,7 @@ public class STermParser extends SBaseParserVisitor<Term> {
 
         String val = valNode.getSymbol().getText();
 
-        return TermParser.typedLiteralTerm(val, type).map(t -> (Term)t);
+        return TermParser.toTypedLiteralTerm(val, type).map(t -> (Term)t);
     }
 
     public Result<Term> visitRdfLiteral(stOTTRParser.RdfLiteralContext ctx) {
@@ -155,7 +144,7 @@ public class STermParser extends SBaseParserVisitor<Term> {
         if (ctx.LANGTAG() != null) { // Language tag present
             String tag = ctx.LANGTAG().getSymbol().getText();
             tag = atPat.matcher(tag).replaceFirst(""); // Remove the @-prefix
-            return TermParser.langLiteralTerm(val, tag)
+            return TermParser.toLangLiteralTerm(val, tag)
                 .map(t -> (Term)t);
         }
 
@@ -169,11 +158,11 @@ public class STermParser extends SBaseParserVisitor<Term> {
             return datatype
                 .map(t -> (IRITerm)t)
                 .map(IRITerm::getIri)
-                .flatMap(iri -> TermParser.typedLiteralTerm(val, iri))
+                .flatMap(iri -> TermParser.toTypedLiteralTerm(val, iri))
                 .map(t -> (Term)t);
         }
 
-        return TermParser.plainLiteralTerm(val)
+        return TermParser.toPlainLiteralTerm(val)
             .map(t -> (Term)t);
     }
 
@@ -188,7 +177,7 @@ public class STermParser extends SBaseParserVisitor<Term> {
             // IRIs in Lutra are always full, so do not use surrounding '<','>'
             String iri = angularPat.matcher(iriBraces).replaceAll("");
 
-            return TermParser.term(iri);
+            return TermParser.toTerm(iri);
         }
     }
 
@@ -215,7 +204,7 @@ public class STermParser extends SBaseParserVisitor<Term> {
         String local = qname.substring(lastColon + 1);
         String iri = prefix + local;
 
-        return TermParser.term(iri);
+        return TermParser.toTerm(iri);
     }
 
     public Result<Term> visitBlankNode(stOTTRParser.BlankNodeContext ctx) {
@@ -225,11 +214,11 @@ public class STermParser extends SBaseParserVisitor<Term> {
         }
 
         String label = ctx.BLANK_NODE_LABEL().getSymbol().getText();
-        return Result.of(makeBlank(label));
+        return toBlankNodeTerm(label);
     }
 
     public Result<Term> visitAnon(stOTTRParser.AnonContext ctx) {
-        return TermParser.blankNodeTerm().map(t -> (Term)t);
+        return TermParser.newBlankNodeTerm().map(t -> (Term)t);
     }
 
 }

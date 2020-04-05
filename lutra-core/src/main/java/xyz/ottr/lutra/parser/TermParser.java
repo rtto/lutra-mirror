@@ -23,17 +23,9 @@ package xyz.ottr.lutra.parser;
  */
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.jena.graph.BlankNodeId;
-import org.apache.jena.rdf.model.Literal;
-import org.apache.jena.rdf.model.RDFList;
-import org.apache.jena.rdf.model.RDFNode;
-import org.apache.jena.rdf.model.Resource;
-import org.apache.jena.shared.PrefixMapping;
 import org.apache.jena.vocabulary.RDF;
 import xyz.ottr.lutra.OTTR;
 import xyz.ottr.lutra.model.terms.BlankNodeTerm;
@@ -42,20 +34,16 @@ import xyz.ottr.lutra.model.terms.ListTerm;
 import xyz.ottr.lutra.model.terms.LiteralTerm;
 import xyz.ottr.lutra.model.terms.NoneTerm;
 import xyz.ottr.lutra.model.terms.Term;
-import xyz.ottr.lutra.model.types.BasicType;
-import xyz.ottr.lutra.model.types.TypeRegistry;
-import xyz.ottr.lutra.system.Message;
 import xyz.ottr.lutra.system.Result;
 import xyz.ottr.lutra.util.DataValidator;
-import xyz.ottr.lutra.writer.RDFNodeWriter;
-
 
 public class TermParser {
 
     // TODO: Verify that this is correct. This only gives correct results if blank nodes across Jena models are unique.
-    private static final Map<RDFList, Result<ListTerm>> createdLists = new HashMap<>();
-    private static final Map<String, BlankNodeTerm> createdBlanks = new HashMap<>();
+    private static final Map<String, Result<BlankNodeTerm>> createdBlanks = new HashMap<>();
 
+
+    /*
     private final PrefixMapping prefixMapping;
 
     public TermParser() {
@@ -65,123 +53,63 @@ public class TermParser {
     public TermParser(PrefixMapping prefixMapping) {
         this.prefixMapping = prefixMapping;
     }
+     */
 
-    public static Result<Term> noneTerm() {
+    public static Result<Term> newNoneTerm() {
         return Result.of(new NoneTerm());
     }
 
-    public Result<Term> term(RDFNode node) {
-        if (node.isResource()) {
-            return term(node.asResource());
-        } else if (node.isLiteral()) {
-            return literalTerm(node.asLiteral()).map(tl -> (Term) tl);
-        } else {
-            return Result.error("Unable to parse RDFNode " + RDFNodeWriter.toString(node) + " to Term.");
-        }
-    }
+    public static Result<Term> toTerm(String iri) {
 
-    public Result<Term> term(Resource node) {
-
-        if (node.isURIResource()) {
-            return term(node.getURI());
-        } else if (node.canAs(RDFList.class)) {
-            return listTerm(node.as(RDFList.class)).map(tl -> (Term) tl);
-        } else if (node.isAnon()) {
-            return blankNodeTerm(node.getId().getBlankNodeId()).map(tl -> (Term) tl);
-        } else {
-            return Result.error("Unable to parse resource " + RDFNodeWriter.toString(node) + " to Term.");
-        }
-    }
-
-    public static Result<Term> term(String uri) {
-
-        if (uri.equals(OTTR.none)) {
-            return noneTerm();
-        } else if (uri.equals(RDF.nil.getURI())) {
+        if (iri.equals(OTTR.none)) {
+            return newNoneTerm();
+        } else if (iri.equals(RDF.nil.getURI())) {
             return Result.of(new ListTerm());
         } else {
-            return Result.of(new IRITerm(uri));
+            return Result.of(new IRITerm(iri));
         }
     }
 
-    public Result<Term> term(String value, BasicType type) {
-        if (type.isSubTypeOf(TypeRegistry.IRI)) {
-            return iriTerm(value).map(t -> (Term)t);
-        } else if (type.isProperSubTypeOf(TypeRegistry.LITERAL)) {
-            return typedLiteralTerm(value, type.getIri()).map(t -> (Term)t);
-        } else {
-            Result<LiteralTerm> result = plainLiteralTerm(value);
-            if (!type.equals(TypeRegistry.LITERAL)) {
-                result.addMessage(Message.warning("Unknown literal datatype " + RDFNodeWriter.toString(type.getIri())
-                    + ", defaulting to " + RDFNodeWriter.toString(TypeRegistry.LITERAL.getIri())));
-            }
-            return result.map(t -> (Term)t);
-        }
-    }
-
-    public Result<IRITerm> iriTerm(String value) {
+    public static Result<IRITerm> toIRITerm(String value) {
         return Result.of(value)
-            .map(this.prefixMapping::expandPrefix)
             .flatMap(DataValidator::asURI)
             .map(IRITerm::new);
     }
 
-    private Result<ListTerm> listTerm(RDFList list) {
-
-        if (createdLists.containsKey(list)) {
-            return createdLists.get(list);
-        } else {
-            List<Result<Term>> terms = list.asJavaList().stream()
-                .map(this::term)
-                .collect(Collectors.toList());
-            Result<List<Term>> aggTerms = Result.aggregate(terms);
-            Result<ListTerm> resTermList = aggTerms.map(ListTerm::new);
-            createdLists.put(list, resTermList);
-            return resTermList;
-        }
-    }
-
-    public static Result<LiteralTerm> literalTerm(Literal literal) {
-        return literalTerm(literal.getLexicalForm(), literal.getDatatypeURI(), literal.getLanguage());
-    }
-
-    public static Result<LiteralTerm> literalTerm(String value, String datatype, String language) {
+    public static Result<LiteralTerm> toLiteralTerm(String value, String datatype, String language) {
 
         if (StringUtils.isNotEmpty(language) && !RDF.langString.getURI().equals(datatype)) {
             return Result.error("Error creating literal. Cannot have a language tag: " + language
                 + " and the datatype: " + datatype);
         } else if (StringUtils.isNotEmpty(language)) {
-            return langLiteralTerm(value, language);
+            return toLangLiteralTerm(value, language);
         } else if (StringUtils.isNotEmpty(datatype)) {
-            return typedLiteralTerm(value, datatype);
+            return toTypedLiteralTerm(value, datatype);
         } else {
-            return plainLiteralTerm(value);
+            return toPlainLiteralTerm(value);
         }
     }
 
-    public static Result<LiteralTerm> typedLiteralTerm(String value, String datatype) {
+    public static Result<LiteralTerm> toTypedLiteralTerm(String value, String datatype) {
         return DataValidator.asURI(datatype)
             .map(iri -> LiteralTerm.createTypedLiteral(value, iri));
     }
 
-    public static Result<LiteralTerm> langLiteralTerm(String value, String languageTag) {
+    public static Result<LiteralTerm> toLangLiteralTerm(String value, String languageTag) {
         return DataValidator.asLanguageTagString(languageTag)
             .map(tag -> LiteralTerm.createLanguageTagLiteral(value, tag));
     }
 
-    public static Result<LiteralTerm> plainLiteralTerm(String value) {
+    public static Result<LiteralTerm> toPlainLiteralTerm(String value) {
         return Result.of(LiteralTerm.createPlainLiteral(value));
     }
 
-    public static Result<BlankNodeTerm> blankNodeTerm() {
+    public static Result<BlankNodeTerm> newBlankNodeTerm() {
         return Result.of(new BlankNodeTerm());
     }
 
-    public Result<BlankNodeTerm> blankNodeTerm(String value) {
-        return Result.of(createdBlanks.computeIfAbsent(value, _fresh -> new BlankNodeTerm()));
+    public static Result<BlankNodeTerm> toBlankNodeTerm(String value) {
+        return createdBlanks.computeIfAbsent(value, _fresh -> newBlankNodeTerm());
     }
 
-    public Result<BlankNodeTerm> blankNodeTerm(BlankNodeId blankNodeId) {
-        return blankNodeTerm(blankNodeId.getLabelString());
-    }
 }

@@ -37,22 +37,22 @@ import xyz.ottr.lutra.writer.RDFNodeWriter;
 
 public class TypeParser {
 
-    public static Result<Type> type(String... uris) {
-        return type(List.of(uris));
+    public static Result<Type> toType(String... uris) {
+        return toType(List.of(uris));
     }
 
-    public static Result<Type> type(List<String> uris) {
-        return type(uris.iterator());
+    public static Result<Type> toType(List<String> uris) {
+        return toType(uris.iterator());
     }
 
-    private static Result<Type> type(Iterator<String> uris) {
+    private static Result<Type> toType(Iterator<String> uris) {
 
         if (!uris.hasNext()) {
             return Result.error("Error parsing type. Expected uri(s) denoting a type, but got nothing.");
         }
 
         String first = uris.next();
-        Result<Type> rest = type(uris);
+        Result<Type> rest = toType(uris);
 
         switch (first) {
 

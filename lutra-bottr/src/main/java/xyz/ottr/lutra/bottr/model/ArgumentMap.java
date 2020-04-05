@@ -33,17 +33,24 @@ import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.shared.PrefixMapping;
 import xyz.ottr.lutra.bottr.util.ListParser;
 import xyz.ottr.lutra.model.terms.ListTerm;
+import xyz.ottr.lutra.model.terms.LiteralTerm;
 import xyz.ottr.lutra.model.terms.Term;
 import xyz.ottr.lutra.model.types.BasicType;
 import xyz.ottr.lutra.model.types.ComplexType;
 import xyz.ottr.lutra.model.types.ListType;
 import xyz.ottr.lutra.model.types.Type;
+import xyz.ottr.lutra.model.types.TypeRegistry;
 import xyz.ottr.lutra.parser.TermParser;
+import xyz.ottr.lutra.system.Message;
 import xyz.ottr.lutra.system.Result;
 import xyz.ottr.lutra.system.ResultStream;
+import xyz.ottr.lutra.wottr.parser.WTermParser;
+import xyz.ottr.lutra.writer.RDFNodeWriter;
 
 @Setter
 public abstract class ArgumentMap<V> implements Function<V, Result<Term>> {
+
+    private final PrefixMapping prefixMapping;
 
     protected Type type;
     protected String literalLangTag;
@@ -51,11 +58,8 @@ public abstract class ArgumentMap<V> implements Function<V, Result<Term>> {
     private TranslationTable translationTable;
     private TranslationSettings translationSettings;
 
-    protected final TermParser termParser;
-
     protected ArgumentMap(PrefixMapping prefixMapping) {
-        //this.prefixMapping = prefixMapping;
-        this.termParser = new TermParser(prefixMapping);
+        this.prefixMapping = prefixMapping;
         this.translationSettings = TranslationSettings.builder().build();
         this.translationTable = new TranslationTable();
     }
@@ -89,12 +93,12 @@ public abstract class ArgumentMap<V> implements Function<V, Result<Term>> {
         if (Objects.isNull(value)) {
             return Result.of(this.translationSettings.getNullValue());
         } else if (StringUtils.isNotEmpty(getBlankNodeLabel(value))) {
-            return this.termParser.blankNodeTerm(getBlankNodeLabel(value)).map(t -> (Term) t);
+            return TermParser.toBlankNodeTerm(getBlankNodeLabel(value)).map(t -> (Term) t);
         } else if (this.translationTable.containsKey(toRDFNode(value))) {
             var translatedRDF = this.translationTable.get(toRDFNode(value));
             return translatedRDF.isAnon()
-                    ? TermParser.blankNodeTerm().map(t -> (Term) t)
-                    : this.termParser.term(translatedRDF);
+                    ? TermParser.newBlankNodeTerm().map(t -> (Term) t)
+                    : WTermParser.toTerm(translatedRDF);
         } else if (type instanceof ListType) {
             return getListTerm(toString(value), (ComplexType)type);
         } else {
@@ -134,5 +138,20 @@ public abstract class ArgumentMap<V> implements Function<V, Result<Term>> {
             .aggregate()
             .map(stream -> stream.collect(Collectors.toList()))
             .map(ListTerm::new);
+    }
+
+    public Result<Term> toTerm(String value, BasicType type) {
+        if (type.isSubTypeOf(TypeRegistry.IRI)) {
+            return TermParser.toIRITerm(this.prefixMapping.expandPrefix(value)).map(t -> (Term)t);
+        } else if (type.isProperSubTypeOf(TypeRegistry.LITERAL)) {
+            return TermParser.toTypedLiteralTerm(value, type.getIri()).map(t -> (Term)t);
+        } else {
+            Result<LiteralTerm> result = TermParser.toPlainLiteralTerm(value);
+            if (!type.equals(TypeRegistry.LITERAL)) {
+                result.addMessage(Message.warning("Unknown literal datatype " + RDFNodeWriter.toString(type.getIri())
+                    + ", defaulting to " + RDFNodeWriter.toString(TypeRegistry.LITERAL.getIri())));
+            }
+            return result.map(t -> (Term)t);
+        }
     }
 }

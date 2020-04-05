@@ -39,7 +39,7 @@ public class WTypeParser implements Function<RDFNode, Result<Type>> {
 
         return node.canAs(RDFList.class)
             ? apply(node.as(RDFList.class))
-            : toURI(node).flatMap(TypeParser::type);
+            : toURI(node).flatMap(TypeParser::toType);
     }
 
     public Result<Type> apply(RDFList node) {
@@ -49,7 +49,7 @@ public class WTypeParser implements Function<RDFNode, Result<Type>> {
                 .collect(Collectors.toList());
 
         return Result.aggregate(uris)
-            .flatMap(TypeParser::type);
+            .flatMap(TypeParser::toType);
     }
 
     private Result<String> toURI(RDFNode node) {

@@ -41,8 +41,6 @@ import xyz.ottr.lutra.writer.RDFNodeWriter;
 
 public class WTripleInstanceParser implements InstanceParser<Model> {
 
-    private static final TermParser termParser = new TermParser();
-
     @Override
     public ResultStream<Instance> apply(Model model) {
         return ResultStream.of(model.listStatements()
@@ -69,13 +67,13 @@ public class WTripleInstanceParser implements InstanceParser<Model> {
     private static Result<Term> term(RDFNode node) {
 
         if (node.isURIResource()) {
-            return termParser.iriTerm(node.asResource().getURI())
+            return TermParser.toIRITerm(node.asResource().getURI())
                 .map(t -> (Term) t);
         } else if (node.isAnon()) {
-            return termParser.blankNodeTerm(node.asResource().getId().getBlankNodeId())
+            return WTermParser.toBlankNodeTerm(node.asResource().getId().getBlankNodeId())
                 .map(t -> (Term) t);
         } else if (node.isLiteral()) {
-            return termParser.literalTerm(node.asLiteral())
+            return WTermParser.toLiteralTerm(node.asLiteral())
                 .map(t -> (Term) t);
         } else {
             throw new IllegalArgumentException("Error converting RDFNode " + RDFNodeWriter.toString(node) + " to Term. ");

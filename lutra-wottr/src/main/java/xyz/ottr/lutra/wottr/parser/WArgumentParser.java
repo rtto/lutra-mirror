@@ -30,7 +30,6 @@ import org.apache.jena.rdf.model.Resource;
 import xyz.ottr.lutra.model.Argument;
 import xyz.ottr.lutra.model.terms.Term;
 import xyz.ottr.lutra.parser.ArgumentBuilder;
-import xyz.ottr.lutra.parser.TermParser;
 import xyz.ottr.lutra.system.Result;
 import xyz.ottr.lutra.wottr.WOTTR;
 import xyz.ottr.lutra.wottr.util.RDFNodes;
@@ -39,11 +38,9 @@ import xyz.ottr.lutra.writer.RDFNodeWriter;
 public class WArgumentParser implements Function<RDFNode, Result<Argument>> {
 
     private final Model model;
-    private final TermParser termParser;
 
     WArgumentParser(Model model) {
         this.model = model;
-        this.termParser = new TermParser();
     }
 
     public Result<Argument> apply(RDFNode argumentNode) {
@@ -58,7 +55,7 @@ public class WArgumentParser implements Function<RDFNode, Result<Argument>> {
 
     private Result<Term> parseArgumentValue(Resource argument) {
         return ModelSelector.getRequiredObject(this.model, argument, WOTTR.value)
-            .flatMap(this.termParser::term);
+            .flatMap(WTermParser::toTerm);
     }
 
     private Result<Boolean> parseListExpander(Resource argument) {
