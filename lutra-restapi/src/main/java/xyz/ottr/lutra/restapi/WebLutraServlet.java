@@ -173,9 +173,10 @@ public class WebLutraServlet extends HttpServlet {
                     case "mode":
                         cli.setMode(item.getString());
                         break;
-                    case "fetchMissing":
-                        cli.setFetchMissing("true".equalsIgnoreCase(item.getString()));
-                        break;
+                    // TODO disable fetching to protect tpl.ottr.xyz server
+                    //case "fetchMissing":
+                    //    cli.setFetchMissing("true".equalsIgnoreCase(item.getString()));
+                    //    break;
                     case "loadStdLib":
                         cli.setLoadTplLibrary("true".equalsIgnoreCase(item.getString()));
                         break;

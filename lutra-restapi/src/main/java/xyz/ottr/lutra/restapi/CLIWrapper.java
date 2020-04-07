@@ -128,7 +128,8 @@ public class CLIWrapper {
             + " --outputFormat " + this.outputFormat
             + (this.loadTplLibrary && StringUtils.isNotBlank(this.tplLibrary) ? " --library " + this.tplLibrary : "")
             + (!this.libraryFiles.isEmpty() ? " --library " + this.libraryDirectory.toAbsolutePath() : "")
-            + (this.fetchMissing ? " --fetchMissing" : "")
+            // TODO disable fetching to protect tpl.ottr.xyz server:
+            //  + (this.fetchMissing ? " --fetchMissing" : "")
             + " --stdout "
             + this.inputFiles.stream()
                 .map(File::getAbsolutePath)

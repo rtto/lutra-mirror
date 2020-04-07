@@ -148,9 +148,10 @@ o-pizza:NamedPizza(ex:PepperoniPizza, ottr:none, (ex:Tomato, ex:Cheese, ex:Peppe
                 <input type="button" class="clear" data-for="fileData" value="Clear files"/>
             </p>
 
-	    <b>Fetch templates by URI:</b>
+	    <!-- TODO disable fetching to protect tpl.ottr.xyz server:
+	        <b>Fetch templates by URI:</b>
             <input type="checkbox" name="fetchMissing" value="true" checked="checked"/>
-            <br/>
+            <br/>-->
         <b>Include standard library: <code>tpl.ottr.xyz</code>:</b>
             <input type="checkbox" name="loadStdLib" value="true" checked="checked"/><br/>
             <br/>
@@ -162,8 +163,7 @@ o-pizza:NamedPizza(ex:PepperoniPizza, ottr:none, (ex:Tomato, ex:Cheese, ex:Peppe
                 <option value="wottr">RDF (wOTTR)</option>
             </select>
             <p>
-                Select if templates should be fetched by their URI, and enter any additional
-                template definitions on the specified format.
+                Enter any additional templates on the specified format.
                 <input id="fileLibrary" type="file" name="fileLibrary" multiple/>
                 <input type="button" class="clear" data-for="fileLibrary" value="Clear files"/>
                 <input type="button" class="clear" data-for="txtLibrary" value="Clear textarea"/>
@@ -181,8 +181,8 @@ o-pizza:NamedPizza(ex:PepperoniPizza, ottr:none, (ex:Tomato, ex:Cheese, ex:Peppe
                 </optgroup>
                 <optgroup label="library">
                     <option value="lint">lint</option>
-                    <option value="expandLibrary">expand</option>
-                    <option value="formatLibrary">format</option>
+                    <!--option value="expandLibrary">expand</option-->
+                    <!--option value="formatLibrary">format</option-->
                 </optgroup>
             </select>
 
