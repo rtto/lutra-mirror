@@ -49,16 +49,27 @@ public class WInstanceParser implements InstanceParser<Model> {
     public ResultStream<Instance> apply(Model model) {
 
         List<Resource> instanceResources = ModelSelector.getSubjects(model, WOTTR.of);
-        ResultStream<Instance> instances = parseInstances(model, instanceResources);
 
-        // Get triples which are not part of any of the instances:
+        var instances = parseInstances(model, instanceResources);
+        var tripleInstances = parseTripleInstances(model, instanceResources);
+
+        return ResultStream.concat(instances, tripleInstances);
+    }
+
+    // Get triples which are not part of any of the instances.
+    private ResultStream<Instance> parseTripleInstances(Model model, List<Resource> instanceResources) {
+
         WTripleSerialiser tripleSerialiser = new WTripleSerialiser(model);
-        Model instanceModel = ModelFactory.createDefaultModel();
-        instanceResources.forEach(i -> instanceModel.add(tripleSerialiser.serialiseInstance(i)));
-        Model tripleModel = model.difference(instanceModel);
-        ResultStream<Instance> rdfInstances = new TripleInstanceParser().apply(tripleModel);
 
-        return ResultStream.concat(instances, rdfInstances);
+        Model instanceModel = ModelFactory.createDefaultModel();
+
+        instanceResources.stream()
+            .map(tripleSerialiser::serialiseInstance)
+            .forEach(instanceModel::add);
+
+        Model tripleModel = model.difference(instanceModel);
+
+        return new TripleInstanceParser().apply(tripleModel);
     }
 
     private ResultStream<Instance> parseInstances(Model model, List<Resource> templateInstances) {
