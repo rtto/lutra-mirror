@@ -23,31 +23,59 @@ package xyz.ottr.lutra.wottr.parser;
  */
 
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
 
-import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.apache.jena.rdf.model.Model;
 import org.junit.Test;
 import xyz.ottr.lutra.OTTR;
+import xyz.ottr.lutra.model.Instance;
 import xyz.ottr.lutra.system.Result;
 import xyz.ottr.lutra.wottr.io.Models;
 
 public class TripleSerialiserTest {
 
-    @Test
-    public void test1() {
+    private static final String ROOT = "src/test/resources/tripleserialiser/";
 
-        Model model = Models.readModel("src/test/resources/div/tripleserialiser/PizzaInstance.ttl");
+    private Map<String, List<Instance>> getInstanceGrouping(String filename) {
+
+        Model model = Models.readModel(ROOT + filename);
 
         WInstanceParser instanceParser = new WInstanceParser();
 
-        var triples = instanceParser.apply(model).getStream()
+        return instanceParser.apply(model).getStream()
             .map(Result::get)
-            .filter(i -> i.getIri().equals(OTTR.BaseURI.NullableTriple))
-            .collect(Collectors.toList());
+            .collect(Collectors.groupingBy(Instance::getIri));
+    }
 
-        assertThat(Collections.emptyList(), is(triples));
+    @Test
+    public void testPizzaInstance() {
+        var instances = getInstanceGrouping("PizzaInstance.ttl");
+
+        assertThat(instances.get(OTTR.BaseURI.NullableTriple), is(nullValue()));
+        assertThat(instances.get(OTTR.BaseURI.Triple), is(nullValue()));
+        assertThat(instances.get("http://tpl.ottr.xyz/pizza/0.1/NamedPizza").size(), is(1));
+    }
+
+    @Test
+    public void testPizzaInstance2() {
+        var instances = getInstanceGrouping("PizzaInstance2.ttl");
+
+        assertThat(instances.get(OTTR.BaseURI.NullableTriple).size(), is(3));
+        assertThat(instances.get(OTTR.BaseURI.Triple), is(nullValue()));
+        assertThat(instances.get("http://tpl.ottr.xyz/pizza/0.1/NamedPizza").size(), is(3));
+    }
+
+    @Test
+    public void testPizzaInstance3() {
+        var instances = getInstanceGrouping("PizzaInstance3.ttl");
+
+        assertThat(instances.get(OTTR.BaseURI.NullableTriple).size(), is(21));
+        assertThat(instances.get(OTTR.BaseURI.Triple), is(nullValue()));
+        assertThat(instances.get("http://tpl.ottr.xyz/pizza/0.1/NamedPizza").size(), is(3));
     }
 }

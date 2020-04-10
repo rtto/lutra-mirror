@@ -1,0 +1,30 @@
+@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix ottr:  <http://ns.ottr.xyz/0.4/> .
+@prefix ex:    <http://example.com/ns#> .
+
+
+[ ottr:arguments  ( [ ottr:value  <http://example.com/ns#Grandiosa> ]
+                    [ ottr:value  <http://example.com/ns#Norway> ]
+                    [ ottr:value  ( <http://example.com/ns#Tomato> <http://example.com/ns#Cheese> <http://example.com/ns#BellPepper> <http://example.com/ns#Ham> ) ]
+                  ) ;
+  ottr:of         <http://tpl.ottr.xyz/pizza/0.1/NamedPizza>
+] .
+
+[ ottr:arguments  ( [ ottr:value  <http://example.com/ns#Grandiosa> ]
+                    [ ottr:value  <http://example.com/ns#Norway> ]
+                    [ ottr:value  ( <http://example.com/ns#Tomato> <http://example.com/ns#Cheese> <http://example.com/ns#BellPepper> <http://example.com/ns#Ham> ) ]
+                  ) ;
+  ottr:of         <http://tpl.ottr.xyz/pizza/0.1/NamedPizza>
+] .
+
+[ ottr:arguments  ( [ ottr:value  <http://example.com/ns#Grandiosa> ]
+                    [ ottr:value  <http://example.com/ns#Norway> ]
+                    [ ottr:value  ( <http://example.com/ns#Tomato> <http://example.com/ns#Cheese> <http://example.com/ns#BellPepper> <http://example.com/ns#Ham> ) ]
+                  ) ;
+  ottr:of         <http://tpl.ottr.xyz/pizza/0.1/NamedPizza>
+] .
+
+
+ex:a1 ex:p1 ( ex:b ex:b2 ex:b3 ) . # each list makes 6 triples
+ex:a2 ex:p2 ( ex:c ex:c2 ex:c3 ) .
+ex:a3 ex:p3 ( ex:d ex:d2 ex:d3 ) .
