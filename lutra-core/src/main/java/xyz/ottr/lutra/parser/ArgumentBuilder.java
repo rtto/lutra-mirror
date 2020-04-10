@@ -23,9 +23,7 @@ package xyz.ottr.lutra.parser;
  */
 
 import lombok.Builder;
-import xyz.ottr.lutra.OTTR;
 import xyz.ottr.lutra.model.Argument;
-import xyz.ottr.lutra.model.terms.IRITerm;
 import xyz.ottr.lutra.model.terms.Term;
 import xyz.ottr.lutra.system.Message;
 import xyz.ottr.lutra.system.Result;
@@ -44,27 +42,11 @@ public enum ArgumentBuilder {
         builder.addResult(listExpander, Argument.ArgumentBuilder::listExpander);
 
         if (Result.allIsPresent(term)) {
-            var argument = builder.map(Argument.ArgumentBuilder::build);
-            validate(argument);
-            return argument;
+            return builder.map(Argument.ArgumentBuilder::build)
+                .flatMap(Argument::validate);
         } else {
             return Result.empty(builder);
         }
-    }
-
-    private static void validate(Result<Argument> argument) {
-        checkValue(argument);
-    }
-
-    // Warning if value is a URI in the ottr namespace.
-    private static void checkValue(Result<Argument> argument) {
-        argument.ifPresent(arg -> {
-            var term = arg.getTerm();
-            if (term instanceof IRITerm && ((IRITerm) term).getIri().startsWith(OTTR.namespace)) {
-                argument.addWarning("Suspicious argument value: " + term
-                    + ". The value is in the ottr namespace: " + OTTR.namespace);
-            }
-        });
     }
 
 }

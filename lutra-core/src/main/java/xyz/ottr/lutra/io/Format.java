@@ -35,19 +35,19 @@ public interface Format {
     enum ObjectType { template, instance }
     
     default Result<TemplateReader> getTemplateReader() {
-        return Result.error("Reading templates not supported for format " + getFormatName());
+        return Result.error("Unsupported format. Format " + getFormatName() + " does not support reading templates.");
     }
 
     default Result<TemplateWriter> getTemplateWriter() {
-        return Result.error("Writing templates not supported for format " + getFormatName());
+        return Result.error("Unsupported format. Format " + getFormatName() + " does not support writing templates.");
     }
 
     default Result<InstanceReader> getInstanceReader() {
-        return Result.error("Reading instances not supported for format " + getFormatName());
+        return Result.error("Unsupported format. Format " + getFormatName() + " does not support reading instances.");
     }
 
     default Result<InstanceWriter> getInstanceWriter() {
-        return Result.error("Writing instances not supported for format " + getFormatName());
+        return Result.error("Unsupported format. Format " + getFormatName() + " does not support writing instances.");
     }
     
     boolean supports(Operation op, ObjectType ot);

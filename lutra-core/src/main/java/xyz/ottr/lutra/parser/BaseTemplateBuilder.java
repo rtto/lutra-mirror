@@ -45,6 +45,8 @@ public enum BaseTemplateBuilder {
 
         return Result.allIsPresent(signature)
             ? builder.map(BaseTemplate.BaseTemplateBuilder::build)
+                .flatMap(BaseTemplate::validate)
+                .map(b -> (BaseTemplate)b)
             : Result.empty(builder);
     }
 }

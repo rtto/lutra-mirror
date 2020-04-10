@@ -32,12 +32,15 @@ import lombok.Getter;
 import lombok.NonNull;
 import org.apache.jena.shared.PrefixMapping;
 import xyz.ottr.lutra.OTTR;
+import xyz.ottr.lutra.model.terms.IRITerm;
 import xyz.ottr.lutra.model.terms.Term;
+import xyz.ottr.lutra.model.types.ListType;
+import xyz.ottr.lutra.system.Result;
 
 @Getter
 @EqualsAndHashCode
 @Builder(toBuilder = true)
-public class Argument implements HasGetTerm, HasApplySubstitution<Argument> {
+public class Argument implements ModelElement, HasGetTerm, HasApplySubstitution<Argument> {
 
     private final @NonNull Term term;
     private final boolean listExpander;
@@ -53,6 +56,7 @@ public class Argument implements HasGetTerm, HasApplySubstitution<Argument> {
         return toString(OTTR.getDefaultPrefixes());
     }
 
+    @Override
     public String toString(PrefixMapping prefixMapping) {
         StringBuilder str = new StringBuilder();
 
@@ -70,4 +74,25 @@ public class Argument implements HasGetTerm, HasApplySubstitution<Argument> {
             .term(this.term.apply(substitution))
             .build();
     }
+
+    @Override
+    public Result<Argument> validate() {
+
+        var result = Result.of(this);
+
+        // Warning if IRIs are in the OTTR namespace
+        if (this.term instanceof IRITerm && ((IRITerm) term).getIri().startsWith(OTTR.namespace)) {
+            result.addWarning("Suspicious argument value: " + term
+                    + ". The value is in the ottr namespace: " + OTTR.namespace);
+        }
+
+        // List expander arguments must be variables or lists
+        if (this.listExpander && !this.term.isVariable() && !(term.getType() instanceof ListType)) {
+            result.addError("Argument is marked for list expansion, "
+                + "but argument value " + term + " is not a list, but of type: " + term.getType());
+        }
+
+        return result;
+    }
+
 }
