@@ -41,8 +41,6 @@ public abstract class RDFReader<X> implements InputReader<X, Model> {
 
     RDFReader() {
         this.prefixes = PrefixMapping.Factory.create();
-
-        // set defaults here:
         this.parserBuilder = RDFIO.readerBuilder();
     }
 
