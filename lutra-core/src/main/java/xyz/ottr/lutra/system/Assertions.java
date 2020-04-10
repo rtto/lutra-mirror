@@ -30,7 +30,6 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public enum Assertions {
-
     ;
 
     // If size is < 0, it means *any* size > 0.
@@ -40,17 +39,14 @@ public enum Assertions {
             .filter(message -> severityFilter.test(message.getSeverity()))
             .collect(Collectors.toList());
 
-        if (size < 0) {
+        if (size == 0) {
+            assertThat(messages, is(Collections.EMPTY_LIST));
+        } else if (size < 0) {
             assertThat("Expected matching messages, but got none", messages.size() > 0, is(true));
         } else {
             assertThat(messages.size(), is(size));
         }
-
-        if (size == 0) {
-            assertThat(messages, is(Collections.EMPTY_LIST));
-        }
     }
-
 
     public static void noErrors(MessageHandler messageHandler) {
         assertSeverity(messageHandler, s -> s.isGreaterEqualThan(Message.Severity.ERROR), 0);
@@ -67,6 +63,5 @@ public enum Assertions {
     public static void atLeast(ResultConsumer consumer, Message.Severity severity) {
         atLeast(consumer.getMessageHandler(), severity);
     }
-
-
+    
 }

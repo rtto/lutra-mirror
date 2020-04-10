@@ -38,7 +38,7 @@ import xyz.ottr.lutra.system.MessageHandler;
 import xyz.ottr.lutra.system.Result;
 import xyz.ottr.lutra.system.ResultConsumer;
 import xyz.ottr.lutra.system.ResultStream;
-import xyz.ottr.lutra.wottr.io.RDFFileReader;
+import xyz.ottr.lutra.wottr.io.RDFIO;
 import xyz.ottr.lutra.wottr.writer.WInstanceWriter;
 
 public class BlankNodeTest {
@@ -60,13 +60,13 @@ public class BlankNodeTest {
         store.addOTTRBaseTemplates();
 
         // Read templates
-        TemplateReader tempReader = new TemplateReader(new RDFFileReader(), new WTemplateParser());
+        TemplateReader tempReader = new TemplateReader(RDFIO.fileReader(), new WTemplateParser());
         ResultStream<String> tempIRI = ResultStream.innerOf("src/test/resources/correct/definitions/core/Blank.ttl");
         MessageHandler errorHandler = tempReader.populateTemplateStore(store, tempIRI);
         Assertions.noErrors(errorHandler);
 
         // Read in-instances and expand
-        InstanceReader insReader = new InstanceReader(new RDFFileReader(), new WInstanceParser());
+        InstanceReader insReader = new InstanceReader(RDFIO.fileReader(), new WInstanceParser());
         ResultStream<Instance> expandedInInstances = insReader
             .apply("src/test/resources/correct/instances/blank1/in.ttl")
             .innerFlatMap(store::expandInstance);
@@ -80,7 +80,7 @@ public class BlankNodeTest {
         Model in = insWriter.writeToModel();
 
         // Read out-model
-        Result<Model> outRes = new RDFFileReader().parse("src/test/resources/correct/instances/blank1/out.ttl");
+        Result<Model> outRes = RDFIO.fileReader().parse("src/test/resources/correct/instances/blank1/out.ttl");
         if (!outRes.isPresent()) {
             log.error(outRes.toString());
         }

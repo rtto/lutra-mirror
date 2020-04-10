@@ -36,7 +36,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
-
 import xyz.ottr.lutra.io.Files;
 import xyz.ottr.lutra.io.InstanceReader;
 import xyz.ottr.lutra.io.TemplateReader;
@@ -49,7 +48,7 @@ import xyz.ottr.lutra.system.Message;
 import xyz.ottr.lutra.system.Result;
 import xyz.ottr.lutra.system.ResultConsumer;
 import xyz.ottr.lutra.system.ResultStream;
-import xyz.ottr.lutra.wottr.io.RDFFileReader;
+import xyz.ottr.lutra.wottr.io.RDFIO;
 
 
 @RunWith(Parameterized.class)
@@ -111,8 +110,8 @@ public class ShaclEquivalenceTest {
         this.filename = filename;
         this.isCorrect = isCorrect;
         
-        this.tempReader = new TemplateReader(new RDFFileReader(), new WTemplateParser());
-        this.insReader = new InstanceReader(new RDFFileReader(), new WInstanceParser());
+        this.tempReader = new TemplateReader(RDFIO.fileReader(), new WTemplateParser());
+        this.insReader = new InstanceReader(RDFIO.fileReader(), new WInstanceParser());
     }
     
     @Parameters(name = "{index}: {0} is {1}")

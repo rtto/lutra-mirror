@@ -22,7 +22,6 @@ package xyz.ottr.lutra.wottr.parser;
  * #L%
  */
 
-import static org.junit.Assume.assumeNotNull;
 import static org.junit.Assume.assumeTrue;
 
 import java.io.IOException;
@@ -33,12 +32,11 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.apache.jena.rdf.model.Model;
-import org.apache.jena.shared.JenaException;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
-import xyz.ottr.lutra.wottr.io.Models;
+import xyz.ottr.lutra.wottr.io.RDFIO;
 
 @RunWith(Parameterized.class)
 public class RDFtoOTTRtoRDFParserTest {
@@ -64,14 +62,12 @@ public class RDFtoOTTRtoRDFParserTest {
     public void test() {
 
         // Try parse file with Jena.
-        Model rdfModel = null;
-        try {
-            rdfModel = Models.readModel(this.filename);
-        } catch (JenaException ex) {
-            assumeNotNull(rdfModel, ex); // abort test if the model is not correctly parsed by Jena.
-        }
+        var rdfModel = RDFIO.fileReader().parse(this.filename);
+
+        assumeTrue(rdfModel.isPresent()); // abort test if the model is not correctly parsed by Jena.
+
         Model ottrModel = ModelUtils.getOTTRParsedRDFModel(this.filename);
 
-        ModelUtils.testIsomorphicModels(ottrModel, rdfModel);
+        ModelUtils.testIsomorphicModels(ottrModel, rdfModel.get());
     }
 }

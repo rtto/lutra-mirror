@@ -29,13 +29,10 @@ import java.util.function.Function;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.jena.rdf.model.Model;
-
 import picocli.CommandLine;
 import picocli.CommandLine.ParameterException;
-
 import xyz.ottr.lutra.TemplateManager;
 import xyz.ottr.lutra.api.StandardTemplateManager;
-//import xyz.ottr.lutra.StandardFormat;
 import xyz.ottr.lutra.io.Files;
 import xyz.ottr.lutra.io.Format;
 import xyz.ottr.lutra.model.Instance;
@@ -43,7 +40,7 @@ import xyz.ottr.lutra.system.Message;
 import xyz.ottr.lutra.system.MessageHandler;
 import xyz.ottr.lutra.system.Result;
 import xyz.ottr.lutra.system.ResultStream;
-import xyz.ottr.lutra.wottr.io.RDFFileReader;
+import xyz.ottr.lutra.wottr.io.RDFIO;
 
 public class CLI {
 
@@ -228,7 +225,7 @@ public class CLI {
         if (!StringUtils.isNotBlank(this.settings.prefixes)) {
             return Message.Severity.least();
         }
-        Result<Model> userPrefixes = new RDFFileReader().parse(this.settings.prefixes);
+        Result<Model> userPrefixes = RDFIO.fileReader().parse(this.settings.prefixes);
         return this.messageHandler.use(userPrefixes, up -> this.templateManager.addPrefixes(up));
     }
 

@@ -40,7 +40,8 @@ import xyz.ottr.lutra.model.Parameter;
 import xyz.ottr.lutra.model.Signature;
 import xyz.ottr.lutra.model.Template;
 import xyz.ottr.lutra.wottr.WOTTR;
-import xyz.ottr.lutra.wottr.io.Models;
+import xyz.ottr.lutra.wottr.io.RDFIO;
+import xyz.ottr.lutra.wottr.util.PrefixMappings;
 import xyz.ottr.lutra.writer.TemplateWriter;
 
 public class WTemplateWriter implements TemplateWriter {
@@ -83,13 +84,13 @@ public class WTemplateWriter implements TemplateWriter {
             }
         }
 
-        Models.trimPrefixes(model);
+        PrefixMappings.trim(model);
         this.models.put(template.getIri(), model);
     }
     
     @Override
     public String write(String iri) {
-        return Models.writeModel(this.models.get(iri));
+        return RDFIO.writeToString(this.models.get(iri));
     }
 
     private Resource createSignature(Model model, Signature template) {

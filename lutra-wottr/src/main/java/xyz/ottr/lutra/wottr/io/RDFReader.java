@@ -22,51 +22,55 @@ package xyz.ottr.lutra.wottr.io;
  * #L%
  */
 
-import java.io.InputStream;
-
+import lombok.Getter;
 import org.apache.jena.atlas.web.HttpException;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.riot.RDFParserBuilder;
 import org.apache.jena.shared.JenaException;
 import org.apache.jena.shared.PrefixMapping;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import xyz.ottr.lutra.io.InputReader;
 import xyz.ottr.lutra.system.Result;
 import xyz.ottr.lutra.system.ResultStream;
 
-public class RDFInputStreamReader implements InputReader<InputStream, Model> {
+@Getter
+public abstract class RDFReader<X> implements InputReader<X, Model> {
 
-    private static final Logger log = LoggerFactory.getLogger(RDFFileReader.class);
-    private final PrefixMapping prefixes; // Gathers prefixes parsed for later output
-    
-    public RDFInputStreamReader() {
+    private final PrefixMapping prefixes;
+    protected final RDFParserBuilder parserBuilder;
+
+    RDFReader() {
         this.prefixes = PrefixMapping.Factory.create();
+        this.parserBuilder = RDFIO.readerBuilder();
     }
 
-    public PrefixMapping getPrefixes() {
-        return this.prefixes;
+    public ResultStream<Model> apply(X input) {
+        return ResultStream.of(parse(input));
     }
 
-    public Result<Model> parse(InputStream input) {
-
-        Result<Model> result;
+    public Result<Model> parse(X source) {
         try {
-            Model model = ModelFactory.createDefaultModel().read(input, null, "TTL");
-            this.prefixes.setNsPrefixes(model);
-            result = Result.ofNullable(model);
-            log.info("Adding model " + model.hashCode() + " from input stream.");
+            return Result.of(parseToModel(source));
         } catch (JenaException | HttpException ex) {
             // TODO: Correct Message level?
             // TODO: Make messages for other exceptions(?)
-            result = Result.error("Unable to parse model from input stream "
-                    + input.toString() + ": " + ex.getMessage());
+            return Result.error("Error reading RDF input from "
+                + source.getClass().getSimpleName() + " " + source + ": "
+                + ex.getMessage());
         }
-        return result;
     }
 
-    public ResultStream<Model> apply(InputStream input) {
-        return ResultStream.of(parse(input));
+    private Model parseToModel(X source) {
+
+        setSource(source);
+        var model = ModelFactory.createDefaultModel();
+        this.parserBuilder.parse(model);
+
+        this.prefixes.setNsPrefixes(model);
+
+        return model;
     }
+
+    abstract void setSource(X source);
+
 }

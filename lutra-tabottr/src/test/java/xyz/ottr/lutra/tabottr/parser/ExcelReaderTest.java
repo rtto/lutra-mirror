@@ -22,6 +22,7 @@ package xyz.ottr.lutra.tabottr.parser;
  * #L%
  */
 
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.nio.file.Path;
@@ -32,7 +33,7 @@ import org.junit.Test;
 import xyz.ottr.lutra.model.Instance;
 import xyz.ottr.lutra.system.ResultConsumer;
 import xyz.ottr.lutra.system.ResultStream;
-import xyz.ottr.lutra.wottr.io.Models;
+import xyz.ottr.lutra.wottr.io.RDFIO;
 import xyz.ottr.lutra.wottr.parser.WInstanceParser;
 import xyz.ottr.lutra.wottr.writer.WInstanceWriter;
 
@@ -56,7 +57,10 @@ public class ExcelReaderTest {
         Model excelModel = writeToModel(new ExcelReader().apply(excelFile));
         excelModel.setNsPrefix("ex", "http://example.org#");
 
-        Model rdfModel = writeToModel(new WInstanceParser().apply(Models.readModel(rdfFile)));
+        Model rdfInput = RDFIO.fileReader().parse(rdfFile).get();
+        assertNotNull(rdfInput);
+
+        Model rdfModel = writeToModel(new WInstanceParser().apply(rdfInput));
 
         boolean isIsomorphic = excelModel.isIsomorphicWith(rdfModel);
         /*
