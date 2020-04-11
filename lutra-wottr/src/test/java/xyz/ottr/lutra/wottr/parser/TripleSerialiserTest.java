@@ -35,7 +35,7 @@ import org.junit.Test;
 import xyz.ottr.lutra.OTTR;
 import xyz.ottr.lutra.model.Instance;
 import xyz.ottr.lutra.system.Result;
-import xyz.ottr.lutra.wottr.io.Models;
+import xyz.ottr.lutra.wottr.io.RDFIO;
 
 public class TripleSerialiserTest {
 
@@ -43,7 +43,7 @@ public class TripleSerialiserTest {
 
     private Map<String, List<Instance>> getInstanceGrouping(String filename) {
 
-        Model model = Models.readModel(ROOT + filename);
+        Model model = RDFIO.fileReader().parse(ROOT + filename).get();
 
         WInstanceParser instanceParser = new WInstanceParser();
 

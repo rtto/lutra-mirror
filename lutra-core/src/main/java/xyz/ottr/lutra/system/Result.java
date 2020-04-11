@@ -407,9 +407,13 @@ public class Result<E> {
      * To retrieve only Message-s on this Result, use Result#getMessages().
      */
     public List<Message> getAllMessages() {
-        MessageHandler msgs = new MessageHandler();
-        msgs.add(this);
-        return msgs.getMessages();
+        return getMessageHandler().getMessages();
+    }
+
+    public MessageHandler getMessageHandler() {
+        var messageHandler = new MessageHandler();
+        messageHandler.add(this);
+        return messageHandler;
     }
 
     /**

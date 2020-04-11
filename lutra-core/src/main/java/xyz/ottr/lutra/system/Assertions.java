@@ -56,6 +56,10 @@ public enum Assertions {
         noErrors(consumer.getMessageHandler());
     }
 
+    public static void noErrors(Result result) {
+        noErrors(result.getMessageHandler());
+    }
+
     public static void atLeast(MessageHandler messageHandler, Message.Severity severity) {
         assertSeverity(messageHandler, s -> s.isGreaterEqualThan(severity), -1);
     }
@@ -63,5 +67,9 @@ public enum Assertions {
     public static void atLeast(ResultConsumer consumer, Message.Severity severity) {
         atLeast(consumer.getMessageHandler(), severity);
     }
-    
+
+    public static void atLeast(Result result, Message.Severity severity) {
+        atLeast(result.getMessageHandler(), severity);
+    }
+
 }
