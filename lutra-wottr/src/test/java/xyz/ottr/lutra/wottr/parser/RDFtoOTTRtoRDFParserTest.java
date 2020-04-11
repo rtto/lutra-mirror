@@ -36,6 +36,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
+import xyz.ottr.lutra.system.Message;
 import xyz.ottr.lutra.wottr.io.RDFIO;
 
 @RunWith(Parameterized.class)
@@ -64,7 +65,11 @@ public class RDFtoOTTRtoRDFParserTest {
         // Try parse file with Jena.
         var rdfModel = RDFIO.fileReader().parse(this.filename);
 
-        assumeTrue(rdfModel.isPresent()); // abort test if the model is not correctly parsed by Jena.
+        var errors = rdfModel.getAllMessages().stream()
+            .filter(message -> message.getSeverity().isGreaterEqualThan(Message.Severity.ERROR))
+            .collect(Collectors.toList());
+
+        assumeTrue(errors.isEmpty()); // abort test if the model is not correctly parsed.
 
         Model ottrModel = ModelUtils.getOTTRParsedRDFModel(this.filename);
 

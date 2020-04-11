@@ -26,6 +26,7 @@ import java.io.InputStream;
 
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.riot.Lang;
+import org.apache.jena.riot.RDFLanguages;
 import org.apache.jena.riot.RDFParser;
 import org.apache.jena.riot.RDFParserBuilder;
 import org.apache.jena.riot.RDFWriter;
@@ -54,7 +55,9 @@ public enum RDFIO {
         return new RDFReader<>() {
             @Override
             void setSource(String source) {
-                this.getParserBuilder().source(source);
+                this.getParserBuilder()
+                    .lang(RDFLanguages.filenameToLang(source, DEFAULT_LANG))
+                    .source(source);
             }
         };
     }
@@ -63,7 +66,8 @@ public enum RDFIO {
         return new RDFReader<>() {
             @Override
             void setSource(InputStream source) {
-                this.getParserBuilder().source(source);
+                this.getParserBuilder()
+                    .source(source);
             }
         };
     }
@@ -82,6 +86,5 @@ public enum RDFIO {
     public static String writeToString(Model model, Lang language) {
         return getWriter(model, language).asString();
     }
-
 
 }

@@ -22,14 +22,21 @@ package xyz.ottr.lutra.wottr.io;
  * #L%
  */
 
+import static org.apache.jena.riot.SysRIOT.fmtMessage;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import lombok.Getter;
-import org.apache.jena.atlas.web.HttpException;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.riot.RDFParserBuilder;
-import org.apache.jena.shared.JenaException;
+import org.apache.jena.riot.RiotParseException;
+import org.apache.jena.riot.system.ErrorHandler;
 import org.apache.jena.shared.PrefixMapping;
+import xyz.ottr.lutra.Space;
 import xyz.ottr.lutra.io.InputReader;
+import xyz.ottr.lutra.system.Message;
 import xyz.ottr.lutra.system.Result;
 import xyz.ottr.lutra.system.ResultStream;
 
@@ -49,28 +56,64 @@ public abstract class RDFReader<X> implements InputReader<X, Model> {
     }
 
     public Result<Model> parse(X source) {
-        try {
-            return Result.of(parseToModel(source));
-        } catch (JenaException | HttpException ex) {
-            // TODO: Correct Message level?
-            // TODO: Make messages for other exceptions(?)
-            return Result.error("Error reading RDF input from "
-                + source.getClass().getSimpleName() + " " + source + ": "
-                + ex.getMessage());
-        }
-    }
-
-    private Model parseToModel(X source) {
 
         setSource(source);
-        var model = ModelFactory.createDefaultModel();
-        this.parserBuilder.parse(model);
+        var errorHandler = new RDFReaderErrorHandler();
+        Model model = ModelFactory.createDefaultModel();
 
-        this.prefixes.setNsPrefixes(model);
+        List<Message> parsingMessages = new ArrayList<>();
 
-        return model;
+        try {
+            this.parserBuilder
+                .errorHandler(errorHandler)
+                .parse(model);
+
+            this.prefixes.setNsPrefixes(model);
+
+        } catch (RiotParseException ignored) {
+            // ignore RiotParseException as this is collected by the errorHandler.
+        } catch (RuntimeException ex) {
+            // must catch all other exceptions since not throwing RiotParseExceptions may cause others to be thrown.
+            parsingMessages.add(Message.error("Error parsing RDF source" + source.getClass().getSimpleName() + " "
+                + source + ". " + ex.getMessage()));
+        }
+
+        var result = Result.of(model);
+        result.addMessages(parsingMessages);
+        result.addMessages(errorHandler.messages);
+
+        return result;
     }
 
+
     abstract void setSource(X source);
+
+
+    /**
+     * Error handler for collecting more errors instead of just throwing first error as exception.
+     */
+    private class RDFReaderErrorHandler implements ErrorHandler {
+
+        private List<Message> messages = new ArrayList<>();
+
+        private void addMessage(Message.Severity severity, String message, long line, long col) {
+            this.messages.add(new Message(severity, fmtMessage(message, line, col) + Space.LINEBR));
+        }
+
+        @Override
+        public void warning(String message, long line, long col) {
+            addMessage(Message.Severity.WARNING, message, line, col);
+        }
+
+        @Override
+        public void error(String message, long line, long col) {
+            addMessage(Message.Severity.ERROR, message, line, col);
+        }
+
+        @Override
+        public void fatal(String message, long line, long col) {
+            addMessage(Message.Severity.FATAL, message, line, col);
+        }
+    }
 
 }
