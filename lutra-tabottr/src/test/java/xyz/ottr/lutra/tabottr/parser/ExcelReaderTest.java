@@ -22,6 +22,7 @@ package xyz.ottr.lutra.tabottr.parser;
  * #L%
  */
 
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.nio.file.Path;
@@ -30,11 +31,11 @@ import java.nio.file.Paths;
 import org.apache.jena.rdf.model.Model;
 import org.junit.Test;
 import xyz.ottr.lutra.model.Instance;
-import xyz.ottr.lutra.result.ResultConsumer;
-import xyz.ottr.lutra.result.ResultStream;
-import xyz.ottr.lutra.wottr.parser.v03.WInstanceParser;
-import xyz.ottr.lutra.wottr.util.ModelIO;
-import xyz.ottr.lutra.wottr.writer.v03.WInstanceWriter;
+import xyz.ottr.lutra.system.ResultConsumer;
+import xyz.ottr.lutra.system.ResultStream;
+import xyz.ottr.lutra.wottr.io.RDFIO;
+import xyz.ottr.lutra.wottr.parser.WInstanceParser;
+import xyz.ottr.lutra.wottr.writer.WInstanceWriter;
 
 public class ExcelReaderTest {
 
@@ -56,7 +57,10 @@ public class ExcelReaderTest {
         Model excelModel = writeToModel(new ExcelReader().apply(excelFile));
         excelModel.setNsPrefix("ex", "http://example.org#");
 
-        Model rdfModel = writeToModel(new WInstanceParser().apply(ModelIO.readModel(rdfFile)));
+        Model rdfInput = RDFIO.fileReader().parse(rdfFile).get();
+        assertNotNull(rdfInput);
+
+        Model rdfModel = writeToModel(new WInstanceParser().apply(rdfInput));
 
         boolean isIsomorphic = excelModel.isIsomorphicWith(rdfModel);
         /*
@@ -139,7 +143,11 @@ public class ExcelReaderTest {
         runAtomicTest("untypedLiterals");
     }
     
-    @Test public void testTypedUntyped() {
+    @Test public void testTypedText() {
         runAtomicTest("typedText");
+    }
+
+    @Test public void testTypedList() {
+        runAtomicTest("typedList");
     }
 }

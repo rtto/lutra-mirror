@@ -22,59 +22,37 @@ package xyz.ottr.lutra.wottr.io;
  * #L%
  */
 
-import java.util.stream.Stream;
-
-import org.apache.jena.rdf.model.Model;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import xyz.ottr.lutra.result.Result;
-import xyz.ottr.lutra.result.ResultStream;
-import xyz.ottr.lutra.wottr.util.ModelIO;
+import xyz.ottr.lutra.system.Assertions;
+import xyz.ottr.lutra.system.Message;
 
 public class RDFFileReaderTest {
-    
-    private static final String nonExistent = "src/test/resources/thisFileDoesNotExist.ttl";
-    private static final String faultyRDF = "src/test/resources/incorrect/faultyRDF.ttl";
-    private static final String emptyFile = "src/test/resources/correct/emptyFile.ttl";
-    private static RDFFileReader reader;
+
+    private static final String ROOT = "src/test/resources/";
 
     private static final Logger log = LoggerFactory.getLogger(RDFFileReaderTest.class);
-    
-    @BeforeClass    
-    public static void load() {
-        reader = new RDFFileReader();
+
+    @Test
+    public void parseEmptyFile() {
+        String file = "correct/emptyFile.ttl";
+        var result = RDFIO.fileReader().parse(ROOT + file);
+        Assertions.noErrors(result);
     }
 
     @Test
-    public void shouldParse() {
-        ResultStream<Model> emptyFileModelStream = reader.apply(emptyFile);
-        Result<Stream<Model>> aggr = emptyFileModelStream.aggregate();
-
-        assert aggr.isPresent();
-
-        log.debug(ModelIO.writeModel(aggr.get().findFirst().get()));
+    public void parseFaultyFile() {
+        String file = "incorrect/faultyRDF.ttl";
+        var result = RDFIO.fileReader().parse(ROOT + file);
+        Assertions.atLeast(result, Message.Severity.ERROR);
     }
 
     @Test
-    public void shouldParseButGiveEmptyResult() {
-
-        ResultStream<Model> nonExistentModelStream = reader.apply(nonExistent);
-        Result<Stream<Model>> nonExistsentAggr = nonExistentModelStream.aggregate();
-        assert !nonExistsentAggr.isPresent();
-        log.debug(nonExistsentAggr.getAllMessages().toString());
-
-        ResultStream<Model> faultyRDFModelStream = reader.apply(faultyRDF);
-        Result<Stream<Model>> faultyRDFModelAggr = faultyRDFModelStream.aggregate();
-        assert !faultyRDFModelAggr.isPresent();
-        log.debug(faultyRDFModelAggr.getAllMessages().toString());
+    public void parseMissingFile() {
+        String file = "blablabla--this-file-not-exist";
+        var result = RDFIO.fileReader().parse(ROOT + file);
+        Assertions.atLeast(result, Message.Severity.ERROR);
     }
 
-    @AfterClass
-    public static void clear() {
-        reader = null;
-    }
 }

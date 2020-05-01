@@ -22,43 +22,53 @@ package xyz.ottr.lutra.cli;
  * #L%
  */
 
-import static org.junit.Assert.assertEquals;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.not;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.function.Function;
 
 import org.apache.commons.lang3.StringUtils;
+import org.hamcrest.Matcher;
+import org.hamcrest.core.Is;
+import org.hamcrest.core.IsNot;
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
+
+import xyz.ottr.lutra.OTTR;
+import xyz.ottr.lutra.TemplateManager;
+import xyz.ottr.lutra.api.StandardFormat;
 import xyz.ottr.lutra.io.InstanceReader;
 import xyz.ottr.lutra.io.TemplateReader;
 import xyz.ottr.lutra.model.Instance;
-import xyz.ottr.lutra.result.Message;
-import xyz.ottr.lutra.result.ResultConsumer;
-import xyz.ottr.lutra.result.ResultStream;
-import xyz.ottr.lutra.store.DependencyGraph;
 import xyz.ottr.lutra.store.TemplateStore;
 import xyz.ottr.lutra.stottr.io.SFileReader;
 import xyz.ottr.lutra.stottr.parser.SInstanceParser;
 import xyz.ottr.lutra.stottr.parser.STemplateParser;
 import xyz.ottr.lutra.stottr.writer.SInstanceWriter;
+import xyz.ottr.lutra.system.Message;
+import xyz.ottr.lutra.system.ResultConsumer;
+import xyz.ottr.lutra.system.ResultStream;
 
 @RunWith(Parameterized.class)
 public class PottrTest {
 
-    private static final Path ROOT = Paths.get("src", "test", "resources", ".temp-deploy", "pOTTR", "0.1", "files");
+    private static final Path ROOT = Paths.get("src", "test", "resources", "primer", "files");
 
     private final String instancePath;
     private final String templatePath;
-    private final boolean expextedResults;
+    private final boolean expectedResults;
 
-    public PottrTest(String instance, String template, boolean expextedResults) {
+    public PottrTest(String instance, String template, boolean expectedResults) {
         this.instancePath = instance;
         this.templatePath = template;
-        this.expextedResults = expextedResults;
+        this.expectedResults = expectedResults;
     }
 
     @Parameterized.Parameters(name = "{index}: instance: {0}, template: {1}")
@@ -86,7 +96,7 @@ public class PottrTest {
 
 
     @Test public void test() {
-        runExpand(this.instancePath, this.templatePath, this.expextedResults);
+        runExpand(this.instancePath, this.templatePath, this.expectedResults);
     }
 
     private String resolve(String pathFromRoot) {
@@ -98,47 +108,57 @@ public class PottrTest {
         boolean testResults = true;
         TemplateStore store = getStore();
 
+        List<Message> messages = new ArrayList<>();
+
         if (StringUtils.isNotBlank(pathTemplates)) {
-            testResults &= testTemplates(store, pathTemplates);
+            messages.addAll(testTemplates(store, pathTemplates));
         }
         if (StringUtils.isNotBlank(fileInstance)) {
-            testResults &= testInstances(store, fileInstance);
+            messages.addAll(testInstances(store, fileInstance));
         }
-        assertEquals(expectedResults, testResults);
+
+        messages.removeIf(message -> message.getSeverity().isLessThan(Message.Severity.ERROR));
+
+        // create matcher based on expectedResults: is or is-not if expected is true or false.
+        Function<Object, Matcher> matcher = expectedResults
+            ? o -> Is.is(o)
+            : o -> Is.is(IsNot.not(o));
+
+        Assert.assertThat(messages, matcher.apply(Collections.emptyList()));
     }
 
     private TemplateStore getStore() {
-        TemplateStore store = new DependencyGraph(ReaderRegistryImpl.getReaderRegistry());
-        store.addOTTRBaseTemplates();
-        return store;
+        TemplateManager tmwf = new TemplateManager();
+        for (StandardFormat format : StandardFormat.values()) {
+            tmwf.registerFormat(format.format);
+        }
+        return tmwf.getTemplateStore();
     }
 
-    private boolean testTemplates(TemplateStore store, String path) {
+    private List<Message> testTemplates(TemplateStore store, String path) {
+
+        List<Message> messages = new ArrayList<>();
+
         TemplateReader reader = new TemplateReader(new SFileReader(), new STemplateParser());
-        reader.loadTemplatesFromFolder(store, resolve(path), new String[]{}, new String[]{});
+        messages.addAll(reader.loadTemplatesFromFolder(store, resolve(path), new String[]{}, new String[]{}).getMessages());
+
         store.fetchMissingDependencies();
+        messages.addAll(store.checkTemplates().getMessages());
 
-        List<Message> tplMsg = store.checkTemplates();
-
-        int maxError = tplMsg.stream()
-            .mapToInt(Message::getLevel)
-            .min()
-            .orElse(Message.INFO);
-
-        return !Message.moreSevere(maxError, Message.ERROR);
+        return messages;
     }
 
-    private boolean testInstances(TemplateStore store, String file) {
+    private List<Message> testInstances(TemplateStore store, String file) {
         InstanceReader insReader = new InstanceReader(new SFileReader(), new SInstanceParser());
         ResultStream<Instance> expandedInInstances = insReader
             .apply(resolve(file))
             .innerFlatMap(store::expandInstanceFetch);
 
         // Write expanded instances to model
-        SInstanceWriter insWriter = new SInstanceWriter(new HashMap<>());
+        SInstanceWriter insWriter = new SInstanceWriter(OTTR.getDefaultPrefixes());
         ResultConsumer<Instance> expansionErrors = new ResultConsumer<>(insWriter);
         expandedInInstances.forEach(expansionErrors);
 
-        return !Message.moreSevere(expansionErrors.getMessageHandler().printMessages(), Message.ERROR);
+        return expansionErrors.getMessageHandler().getMessages();
     }
 }

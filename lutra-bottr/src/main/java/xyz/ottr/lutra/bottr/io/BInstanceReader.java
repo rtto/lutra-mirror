@@ -24,17 +24,17 @@ package xyz.ottr.lutra.bottr.io;
 
 import xyz.ottr.lutra.bottr.model.InstanceMap;
 import xyz.ottr.lutra.bottr.parser.BInstanceMapParser;
-import xyz.ottr.lutra.io.InstanceParser;
 import xyz.ottr.lutra.model.Instance;
-import xyz.ottr.lutra.result.ResultStream;
-import xyz.ottr.lutra.wottr.io.RDFFileReader;
+import xyz.ottr.lutra.parser.InstanceParser;
+import xyz.ottr.lutra.system.ResultStream;
+import xyz.ottr.lutra.wottr.io.RDFIO;
 
 public class BInstanceReader implements InstanceParser<String> {
 
     @Override
     public ResultStream<Instance> apply(String file) {
         return ResultStream.innerOf(file)
-            .innerFlatMap(new RDFFileReader())
+            .innerFlatMap(RDFIO.fileReader())
             .innerFlatMap(new BInstanceMapParser(file))
             .innerFlatMap(InstanceMap::get);
     }

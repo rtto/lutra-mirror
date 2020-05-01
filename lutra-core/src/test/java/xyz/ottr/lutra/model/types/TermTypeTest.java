@@ -37,11 +37,11 @@ import xyz.ottr.lutra.OTTR;
 public class TermTypeTest {
 
     private BasicType byIRI(Resource iri) {
-        return TypeFactory.getType(iri);
+        return TypeRegistry.getType(iri);
     }
     
     private BasicType byIRI(String iri) {
-        return TypeFactory.getType(iri);
+        return TypeRegistry.getType(iri);
     }
 
     private BasicType owlOProp;
@@ -83,7 +83,7 @@ public class TermTypeTest {
 
     @Test
     public void test1() throws Exception {
-        Resource op = ResourceFactory.createResource(owlOProp.getIRI());
+        Resource op = ResourceFactory.createResource(owlOProp.getIri());
 
         for (Property p : new Property[]{OWL.disjointWith, RDFS.subClassOf, OTTR.unifiableWith}) {
 

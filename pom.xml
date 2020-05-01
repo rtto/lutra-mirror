@@ -4,7 +4,7 @@
 
 	<groupId>xyz.ottr.lutra</groupId>
 	<artifactId>lutra</artifactId>
-	<version>0.6.5</version>
+	<version>0.6.6</version>
 	<packaging>pom</packaging>
 	<modules>
 		<module>lutra-core</module>
@@ -14,7 +14,8 @@
         <module>lutra-bottr</module>
 		<module>lutra-cli</module>
         <module>lutra-restapi</module>
-	</modules>
+        <module>lutra-api</module>
+    </modules>
 
 
     <issueManagement>
@@ -200,6 +201,7 @@
                 </executions>
             </plugin>
 
+
             <plugin>
                 <groupId>com.github.spotbugs</groupId>
                 <artifactId>spotbugs-maven-plugin</artifactId>
@@ -219,6 +221,7 @@
                     </execution>
                 </executions>
             </plugin>
+
 
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -261,7 +264,7 @@
                     </bundledSignatures>
                     <excludes>
                         <!-- MessageHandler uses System.err: -->
-                        <exclude>**/xyz/ottr/lutra/result/MessageHandler.class</exclude>
+                        <exclude>**/xyz/ottr/lutra/system/MessageHandler.class</exclude>
 
                         <!-- CLI uses System.out: -->
                         <exclude>**/xyz/ottr/lutra/cli/CLI.class</exclude>
@@ -350,9 +353,9 @@
                 </plugin>
 
                 <plugin>
-                    <groupId>org.codehaus.mojo</groupId>
-                    <artifactId>findbugs-maven-plugin</artifactId>
-                    <version>3.0.5</version>
+                    <groupId>com.github.spotbugs</groupId>
+                    <artifactId>spotbugs</artifactId>
+                    <version>4.0.0</version>
                 </plugin>
 
             </plugins>
@@ -389,13 +392,6 @@
                         </reports>
                     </reportSet>
                 </reportSets>
-            </plugin>
-
-            <plugin>
-                <artifactId>findbugs-maven-plugin</artifactId>
-                <configuration>
-                    <xmlOutput>true</xmlOutput>
-                </configuration>
             </plugin>
 
         </plugins>
@@ -446,6 +442,11 @@
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>lutra-bottr</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>lutra-api</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
@@ -568,6 +569,13 @@
                 <groupId>junit</groupId>
                 <artifactId>junit</artifactId>
                 <version>4.12</version>
+            </dependency>
+
+            <!-- https://mvnrepository.com/artifact/org.hamcrest/hamcrest -->
+            <dependency>
+                <groupId>org.hamcrest</groupId>
+                <artifactId>hamcrest</artifactId>
+                <version>2.2</version>
             </dependency>
 
         </dependencies>

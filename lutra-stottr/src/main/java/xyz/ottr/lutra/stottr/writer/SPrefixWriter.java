@@ -1,7 +1,7 @@
 package xyz.ottr.lutra.stottr.writer;
 
 /*-
- * #%L
+ * #%L 
  * lutra-stottr
  * %%
  * Copyright (C) 2018 - 2019 University of Oslo
@@ -22,16 +22,26 @@ package xyz.ottr.lutra.stottr.writer;
  * #L%
  */
 
+import java.util.Comparator;
 import java.util.Map;
 import java.util.stream.Collectors;
+import org.apache.jena.shared.PrefixMapping;
+import xyz.ottr.lutra.RDFTurtle;
+import xyz.ottr.lutra.Space;
 
 public enum SPrefixWriter {
 
     ; // util enum
 
-    public static String write(Map<String, String> prefixes) {
-        return prefixes.keySet().stream()
-            .map(key -> "@prefix " + key + ": <" + prefixes.get(key) + "> .")
-            .collect(Collectors.joining("\n"));
+    public static String write(PrefixMapping prefixes) {
+        return prefixes.getNsPrefixMap().entrySet().stream()
+            .sorted(Comparator.comparing(Map.Entry::getValue))
+            .map(entry -> writePrefix(entry.getKey(), entry.getValue()))
+            .collect(Collectors.joining(Space.LINEBR));
     }
+
+    private static String writePrefix(String prefix, String namespace) {
+        return RDFTurtle.prefixInit + prefix + RDFTurtle.prefixSep + RDFTurtle.fullURI(namespace) + RDFTurtle.prefixEnd;
+    }
+
 }

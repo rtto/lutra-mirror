@@ -24,9 +24,8 @@ package xyz.ottr.lutra.bottr.source;
 
 import org.apache.jena.query.QueryExecution;
 import org.apache.jena.query.QueryExecutionFactory;
-
 import org.apache.jena.shared.PrefixMapping;
-import xyz.ottr.lutra.result.Result;
+import xyz.ottr.lutra.system.Result;
 
 public class SPARQLEndpointSource extends AbstractSPARQLSource {
     

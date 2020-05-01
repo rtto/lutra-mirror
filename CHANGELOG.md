@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 0.6.6
+
+### Added
+
+- Introduced api module 
+- Improved parsing for wOTTR and stOTTR using Builerpattern
+
+### Removed
+
+- Removed support for legacy format
+
+
 ## 0.6.5
 
 ### Bug fixes
@@ -27,7 +39,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 
-- Revert Core Type checking instances from 0.6.2, bugs found.
+- Revert Core Type checking instances from 0.6.2, bugs found
 
 ## 0.6.2
 

@@ -1,0 +1,10 @@
+@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix ottr:  <http://ns.ottr.xyz/0.4/> .
+
+
+[ ottr:arguments  ( [ ottr:value  <http://example.com/ns#Grandiosa> ]
+                    [ ottr:value  <http://example.com/ns#Norway> ]
+                    [ ottr:value  ( <http://example.com/ns#Tomato> <http://example.com/ns#Cheese> <http://example.com/ns#BellPepper> <http://example.com/ns#Ham> ) ]
+                  ) ;
+  ottr:of         <http://tpl.ottr.xyz/pizza/0.1/NamedPizza>
+] .

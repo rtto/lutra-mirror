@@ -22,89 +22,103 @@ package xyz.ottr.lutra.model;
  * #L%
  */
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
+
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NonNull;
+import lombok.Singular;
+
 import org.apache.jena.shared.PrefixMapping;
 
+import xyz.ottr.lutra.OTTR;
+import xyz.ottr.lutra.model.terms.ListTerm;
+import xyz.ottr.lutra.model.terms.Term;
 import xyz.ottr.lutra.model.types.TermType;
+import xyz.ottr.lutra.system.Result;
 
 @SuppressWarnings("PMD.UselessOverridingMethod")
-public class Template extends TemplateSignature {
+@Getter
+public class Template extends Signature {
 
-    //private Set<Instance> head;
-    private final Set<Instance> body;
-    
-    public Template(String iri, ParameterList params, Set<Instance> body) {
-        super(iri, params);
-        this.body = body;
-        setVariableFlagsAndTypes();
+    private final @NonNull Set<Instance> pattern;
+
+    private Template(String iri, List<Parameter> parameters, Set<Instance> instances) {
+        super(iri, parameters);
+        this.pattern = instances;
+        updatePatternVariables();
     }
 
-    public Template(TemplateSignature signature, Set<Instance> body) {
-        this(signature.getIRI(), signature.getParameters(), body);
-    }
+    /**
+     *
+     * @param iri
+     * @param parameters
+     * @param instances
+     * @param isEmptyPattern The isEmptyPattern flag is a safety precaution for avoiding inadvertently creating templates
+     *                       with empty patterns.
+     * @return
+     */
+    @Builder
+    public static Template create(String iri, @Singular List<Parameter> parameters, @Singular Set<Instance> instances,
+                                  boolean isEmptyPattern) {
 
-    public Set<Instance> getBody() {
-        return this.body;
-    }
-
-    private void setVariableFlagsAndTypes() {
-        if (getParameters() == null) {
-            return;
+        if (isEmptyPattern != instances.isEmpty()) {
+            var message = "Creating template with "
+                + (instances.isEmpty() ? "empty" : "non-empty")
+                + " pattern, but isEmptyPattern flag is " + isEmptyPattern
+                + ".";
+            throw new IllegalArgumentException(message);
         }
 
-        Map<Object, TermType> idTypes = new HashMap<>();
-        for (Term var : getParameters().asList()) {
-            var.setIsVariable(true);
-            idTypes.put(var.getIdentifier(), var.getType());
-        }
-
-        if (this.body != null) {
-            this.body.stream()
-                .forEach(instance ->
-                    setVariableFlagsAndTypes(instance.getArguments().asList(), idTypes));
-        }
+        return new Template(iri, parameters, instances);
     }
 
-    private void setVariableFlagsAndTypes(List<Term> terms, Map<Object, TermType> idTypes) {
-        terms.stream()
-            .forEach(term -> {
-                if (term instanceof TermList) {
-                    TermList tl = (TermList) term;
-                    setVariableFlagsAndTypes(tl.asList(), idTypes);
-                    tl.recomputeType();
-                } else if (idTypes.containsKey(term.getIdentifier())) {
-                    term.setIsVariable(true);
-                    term.setType(idTypes.get(term.getIdentifier()));
-                }
-            });
-    }
-        
+    /**
+     * Propagates type and variable setting of parameter terms to identical terms in instances, i.e.,
+     * turns instance terms into variables.
+     */
+    private void updatePatternVariables() {
+        // Collect parameter types
+        Map<Object, TermType> parameterTypes = getParameters().stream()
+            .map(Parameter::getTerm)
+            .collect(Collectors.toMap(Term::getIdentifier, Term::getType, (t1, t2) -> t1));
 
-    @Override
-    public String toString(PrefixMapping prefixes) {
-        String headStr = super.toString(prefixes);
-        headStr += " ::\n";
-        StringBuilder bodyStr = new StringBuilder();
-        for (Instance ins : getBody()) {
-            bodyStr.append("    " + ins.toString(prefixes));
-            bodyStr.append("\n");
-        }
-        return headStr + bodyStr.toString();
+        this.pattern.forEach(instance ->
+            setTermsToVariables(
+                instance.getArguments().stream()
+                    .map(Argument::getTerm)
+                    .collect(Collectors.toList()), parameterTypes));
+    }
+
+    private void setTermsToVariables(List<Term> terms, Map<Object, TermType> parameterTypes) {
+        terms.forEach(term -> {
+            if (term instanceof ListTerm) {
+                ListTerm tl = (ListTerm) term;
+                setTermsToVariables(tl.asList(), parameterTypes);
+                tl.recomputeType();
+            } else if (parameterTypes.containsKey(term.getIdentifier())) {
+                term.setVariable(true);
+                term.setType(parameterTypes.get(term.getIdentifier()));
+            }
+        });
     }
 
     @Override
     public String toString() {
-        String headStr = super.toString();
-        headStr += " ::\n";
-        StringBuilder bodyStr = new StringBuilder();
-        for (Instance ins : getBody()) {
-            bodyStr.append("    " + ins.toString());
-            bodyStr.append("\n");
-        }
-        return headStr + bodyStr.toString();
+        return toString(OTTR.getDefaultPrefixes());
+    }
+
+    @Override
+    public String toString(PrefixMapping prefixes) {
+        return super.toString(prefixes)
+            + " ::\n"
+            + this.pattern.stream()
+                .map(ins -> "\t" + ins.toString(prefixes))
+                .collect(Collectors.joining(",\n", "{", "}"))
+            + " .";
     }
 
     @Override
@@ -115,5 +129,18 @@ public class Template extends TemplateSignature {
     @Override
     public int hashCode() {
         return super.hashCode();
+    }
+
+    @Override
+    public Result<Template> validate() {
+
+        var result = super.validate()
+            .map(s -> (Template)s);
+
+        if (this.pattern.isEmpty()) {
+            result.addWarning("Template has an empty pattern.");
+        }
+
+        return result;
     }
 }

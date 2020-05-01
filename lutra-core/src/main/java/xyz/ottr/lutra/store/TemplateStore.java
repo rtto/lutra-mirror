@@ -22,26 +22,26 @@ package xyz.ottr.lutra.store;
  * #L%
  */
 
-import java.util.Collection;
+import java.util.Collection; 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 import xyz.ottr.lutra.OTTR;
-import xyz.ottr.lutra.io.ReaderRegistry;
+import xyz.ottr.lutra.io.FormatManager;
 import xyz.ottr.lutra.io.TemplateReader;
 import xyz.ottr.lutra.model.Instance;
+import xyz.ottr.lutra.model.Signature;
 import xyz.ottr.lutra.model.Template;
-import xyz.ottr.lutra.model.TemplateSignature;
-import xyz.ottr.lutra.result.Message;
-import xyz.ottr.lutra.result.MessageHandler;
-import xyz.ottr.lutra.result.Result;
-import xyz.ottr.lutra.result.ResultConsumer;
-import xyz.ottr.lutra.result.ResultStream;
+import xyz.ottr.lutra.system.MessageHandler;
+import xyz.ottr.lutra.system.Result;
+import xyz.ottr.lutra.system.ResultConsumer;
+import xyz.ottr.lutra.system.ResultStream;
 
-public interface TemplateStore extends Consumer<TemplateSignature> {
+public interface TemplateStore extends Consumer<Signature> {
 
     default void addOTTRBaseTemplates() {
         addTemplateSignature(OTTR.BaseTemplate.Triple);
@@ -58,14 +58,14 @@ public interface TemplateStore extends Consumer<TemplateSignature> {
      * (that is, without a definition) even if it infact is an
      * instance of Template.
      */
-    boolean addTemplateSignature(TemplateSignature templateSignature);
+    boolean addTemplateSignature(Signature signature);
 
     /**
      * If the argument object is instance of Template, then 
      * adds it as template (with addTemplate-method) to this store,
-     * otherwise adds it as TemplateSignature with addTemplateSignature-method.
+     * otherwise adds it as Signature with addTemplateSignature-method.
      */
-    default boolean addTemplateObject(TemplateSignature templateObj) {
+    default boolean addTemplateObject(Signature templateObj) {
         if (templateObj instanceof Template) {
             return addTemplate((Template) templateObj);
         } else {
@@ -99,7 +99,7 @@ public interface TemplateStore extends Consumer<TemplateSignature> {
 
     Result<Template> getTemplate(String iri);
 
-    Result<TemplateSignature> getTemplateSignature(String iri);
+    Result<Signature> getTemplateSignature(String iri);
 
     /**
      * Returns the set of IRIs of template objects contained in this store satifiying
@@ -152,7 +152,7 @@ public interface TemplateStore extends Consumer<TemplateSignature> {
      * - Use of lists and expansion modifiers
      * - Missing template 
      */
-    List<Message> checkTemplates();
+    MessageHandler checkTemplates();
 
     /**
      * Performs the same checks as #checkTemplates(), except "Missing templates".
@@ -160,7 +160,7 @@ public interface TemplateStore extends Consumer<TemplateSignature> {
      * (without having its dependencies loaded in the store) or to check templates
      * in an unfinished library where not all templates are (yet) defined.
      */
-    List<Message> checkTemplatesForErrorsOnly();
+    MessageHandler checkTemplatesForErrorsOnly();
 
     /**
      * Expands all nodes without losing information, that is, it does not expand
@@ -200,7 +200,7 @@ public interface TemplateStore extends Consumer<TemplateSignature> {
      * @return
      *          a ResultStream of signatures
      */ 
-    default ResultStream<TemplateSignature> getAllTemplateSignatures() {
+    default ResultStream<Signature> getAllTemplateSignatures() {
         return getTemplateSignatures(getTemplateSignatureIRIs());
     }
 
@@ -211,10 +211,10 @@ public interface TemplateStore extends Consumer<TemplateSignature> {
      * @return
      *          a ResultStream of templates
      */ 
-    default ResultStream<TemplateSignature> getAllTemplateObjects() {
+    default ResultStream<Signature> getAllTemplateObjects() {
         return ResultStream.concat(
             getAllTemplateSignatures(),
-            getAllTemplates().innerMap(tmp -> (TemplateSignature) tmp));
+            getAllTemplates().innerMap(tmp -> (Signature) tmp));
     }
 
     /**
@@ -241,7 +241,7 @@ public interface TemplateStore extends Consumer<TemplateSignature> {
      *          a ResultStream of signatures where missing signatures
      *          results in empty Result-objects
      */ 
-    default ResultStream<TemplateSignature> getTemplateSignatures(Set<String> iris) {
+    default ResultStream<Signature> getTemplateSignatures(Set<String> iris) {
         return new ResultStream<>(iris.stream().map(this::getTemplateSignature));
     }
 
@@ -265,11 +265,11 @@ public interface TemplateStore extends Consumer<TemplateSignature> {
      */
     default ResultStream<Instance> expandInstanceFetch(Instance instance) {
 
-        if (!containsTemplate(instance.getIRI())) {
+        if (!containsTemplate(instance.getIri())) {
             // Need to fetch missing template
-            MessageHandler messages = fetchMissingDependencies(List.of(instance.getIRI()));
+            MessageHandler messages = fetchMissingDependencies(List.of(instance.getIri()));
             Result<Instance> insWithMsgs = Result.of(instance);
-            messages.toSingleMessage("Fetch missing template: " + instance.getIRI())
+            messages.toSingleMessage("Fetch missing template: " + instance.getIri())
                 .ifPresent(insWithMsgs::addMessage);
             return insWithMsgs.mapToStream(this::expandInstance);
         }
@@ -297,12 +297,13 @@ public interface TemplateStore extends Consumer<TemplateSignature> {
     
     default MessageHandler fetchMissingDependencies(Collection<String> initMissing) {
 
+        Optional<TemplateStore> stdLib = getStandardLibrary();
         ResultConsumer<TemplateReader> messages = new ResultConsumer<>();
         
-        ReaderRegistry readerRegistry = getReaderRegistry();
-        if (readerRegistry == null) {
+        FormatManager formatManager = getFormatManager();
+        if (formatManager == null) {
             messages.accept(Result.error(
-                    "Attempted fetching missing templates, but has no ReaderRegistry provided."));
+                    "Attempted fetching missing templates, but has no formats registered."));
             return messages.getMessageHandler();
         }
 
@@ -314,8 +315,12 @@ public interface TemplateStore extends Consumer<TemplateSignature> {
 
         while (!missing.isEmpty()) {
             for (String toFetch : missing) {
-                messages.accept(readerRegistry.attemptAllReaders(reader -> reader.populateTemplateStore(this, toFetch)));
-                if (!getTemplate(toFetch).isPresent()) { // Check if fetched and added to store
+                if (stdLib.isPresent() && stdLib.get().containsTemplate(toFetch)) {
+                    stdLib.get().getTemplate(toFetch).ifPresent(this::addTemplate);
+                } else {
+                    messages.accept(formatManager.attemptAllFormats(reader -> reader.populateTemplateStore(this, toFetch)));
+                }
+                if (!containsTemplate(toFetch)) { // Check if fetched and added to store
                     failed.add(toFetch);
                 }
             }
@@ -324,6 +329,10 @@ public interface TemplateStore extends Consumer<TemplateSignature> {
         }
         return messages.getMessageHandler();
     }
+    
+    Optional<TemplateStore> getStandardLibrary();
+    
+    void registerStandardLibrary(TemplateStore standardLibrary);
 
-    ReaderRegistry getReaderRegistry();
+    FormatManager getFormatManager();
 }

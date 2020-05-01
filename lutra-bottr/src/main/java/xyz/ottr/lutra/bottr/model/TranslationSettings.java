@@ -25,7 +25,7 @@ package xyz.ottr.lutra.bottr.model;
 import lombok.Builder;
 import lombok.Getter;
 import xyz.ottr.lutra.bottr.util.TermFactory;
-import xyz.ottr.lutra.model.Term;
+import xyz.ottr.lutra.model.terms.Term;
 
 @Getter
 @Builder

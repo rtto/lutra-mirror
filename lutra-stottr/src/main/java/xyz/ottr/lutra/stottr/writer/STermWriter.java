@@ -22,43 +22,50 @@ package xyz.ottr.lutra.stottr.writer;
  * #L%
  */
 
-import java.util.Collections;
+import java.util.Collection;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import xyz.ottr.lutra.model.BlankNodeTerm;
-import xyz.ottr.lutra.model.IRITerm;
-import xyz.ottr.lutra.model.LiteralTerm;
-import xyz.ottr.lutra.model.NoneTerm;
-import xyz.ottr.lutra.model.Term;
-import xyz.ottr.lutra.model.TermList;
+import org.apache.jena.shared.PrefixMapping;
+import xyz.ottr.lutra.RDFTurtle;
+import xyz.ottr.lutra.model.terms.BlankNodeTerm;
+import xyz.ottr.lutra.model.terms.IRITerm;
+import xyz.ottr.lutra.model.terms.ListTerm;
+import xyz.ottr.lutra.model.terms.LiteralTerm;
+import xyz.ottr.lutra.model.terms.NoneTerm;
+import xyz.ottr.lutra.model.terms.Term;
 import xyz.ottr.lutra.stottr.STOTTR;
-import xyz.ottr.lutra.wottr.vocabulary.v04.WOTTR;
+import xyz.ottr.lutra.wottr.WOTTR;
 
 public class STermWriter {
 
-    private final Map<String, String> prefixes;
-    private final Set<String> usedPrefixes;
-    private final Set<Term> variables;
+    private final PrefixMapping prefixes;
+    private final Set<String> usedPrefixNS;
+    private final Collection<Term> variables;
 
-    public STermWriter(Map<String, String> prefixes, Set<Term> variables) {
+    STermWriter(PrefixMapping prefixes, Collection<Term> variables) {
         this.prefixes = prefixes;
         this.variables = variables;
-        this.usedPrefixes = new HashSet<>();
+        this.usedPrefixNS = new HashSet<>();
     }
 
-    public STermWriter(Map<String, String> prefixes) {
+    STermWriter(PrefixMapping prefixes) {
         this(prefixes, new HashSet<>());
     }
 
-    public Map<String, String> getPrefixes() {
-        return Collections.unmodifiableMap(this.prefixes);
+    public PrefixMapping getPrefixes() {
+        return this.prefixes;
     }
 
-    public Set<String> getUsedPrefixes() {
-        return Collections.unmodifiableSet(this.usedPrefixes);
+    /**
+     * Get the prefixes which this was initialised with, but trimmed to those used until method call.
+     */
+    PrefixMapping getUsedPrefixes() {
+        PrefixMapping used = PrefixMapping.Factory.create();
+        this.usedPrefixNS.forEach(ns -> used.setNsPrefix(this.prefixes.getNsURIPrefix(ns), ns));
+        used.lock();
+        return used;
     }
 
     public String write(Term term) {
@@ -66,55 +73,60 @@ public class STermWriter {
         if (term instanceof NoneTerm) {
             return STOTTR.Terms.none;
         } else if (term instanceof IRITerm) {
-            return writeIRI(((IRITerm) term).getIRI());
+            return writeIRI((IRITerm) term);
         } else if (term instanceof LiteralTerm) {
             return writeLiteral((LiteralTerm) term);
         } else if (term instanceof BlankNodeTerm) {
             return writeBlank((BlankNodeTerm) term);
-        } else if (term instanceof TermList) {
-            return writeList((TermList) term);
+        } else if (term instanceof ListTerm) {
+            return writeList((ListTerm) term);
         } else {
-            return null; // TODO: Maybe use Result?
+            throw new IllegalArgumentException("Unknown term of class " + term.getClass().getName());
         }
     }
 
-    public String writeIRI(String iri) {
+    private String writeIRI(IRITerm iri) {
+        return writeIRI(iri.getIri());
+    }
+
+    String writeIRI(String iri) {
 
         if (iri.equals(WOTTR.none.getURI())) {
             return STOTTR.Terms.none;
         }
 
-        // Shorten to qname if possible
-        for (Map.Entry<String, String> nsln : this.prefixes.entrySet()) {
-            if (iri.startsWith(nsln.getValue())) {
-                String suffix = iri.substring(nsln.getValue().length());
-                this.usedPrefixes.add(nsln.getKey());
-                return nsln.getKey() + ":" + suffix;
-            }
+        String qname = this.prefixes.qnameFor(iri);
+
+        if (qname != null) {
+            String prefix = qname.split(RDFTurtle.qnameSep)[0];
+            this.usedPrefixNS.add(this.prefixes.getNsPrefixURI(prefix));
+            return qname;
         }
-        return "<" + iri + ">";
+
+        return RDFTurtle.fullURI(iri);
     }
 
-    public String writeLiteral(LiteralTerm literal) {
+    private String writeLiteral(LiteralTerm literal) {
 
-        String val = "\"" + literal.getPureValue() + "\"";
-        if (literal.getDatatype() != null) {
-            val += "^^" + writeIRI(literal.getDatatype());
-        } else if (literal.getLangTag() != null) {
-            val += "@" + literal.getLangTag();
+        String val = RDFTurtle.literal(literal.getValue());
+        if (literal.getLanguageTag() != null) {
+            val += RDFTurtle.literalLangSep + literal.getLanguageTag();
+        } else if (literal.getDatatype() != null && !literal.getDatatype().equals(RDFTurtle.plainLiteralDatatype)) {
+            val += RDFTurtle.literalTypeSep + writeIRI(literal.getDatatype());
         }
         return val;
     }
     
-    public String writeBlank(BlankNodeTerm blank) {
+    private String writeBlank(BlankNodeTerm blank) {
+
         String label = blank.getLabel();
         String prefix = this.variables.contains(blank)
             ? STOTTR.Terms.variablePrefix
-            : "_:";
+            : STOTTR.Terms.blankPrefix;
         return prefix + label;
     }
 
-    public String writeList(TermList list) {
+    private String writeList(ListTerm list) {
         return list.asList()
             .stream()
             .map(this::write)

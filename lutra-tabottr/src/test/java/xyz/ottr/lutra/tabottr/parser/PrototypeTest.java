@@ -30,13 +30,13 @@ import java.nio.file.Paths;
 import java.util.List;
 
 import org.junit.Test;
-
-import xyz.ottr.lutra.io.InstanceParser;
 import xyz.ottr.lutra.model.Instance;
-import xyz.ottr.lutra.result.Message;
-import xyz.ottr.lutra.result.Result;
-import xyz.ottr.lutra.result.ResultConsumer;
-import xyz.ottr.lutra.result.ResultStream;
+import xyz.ottr.lutra.parser.InstanceParser;
+import xyz.ottr.lutra.system.Assertions;
+import xyz.ottr.lutra.system.Message;
+import xyz.ottr.lutra.system.Result;
+import xyz.ottr.lutra.system.ResultConsumer;
+import xyz.ottr.lutra.system.ResultStream;
 import xyz.ottr.lutra.tabottr.model.Table;
 
 public class PrototypeTest {
@@ -63,7 +63,7 @@ public class PrototypeTest {
         ResultStream<Instance> instances = parser.apply(ROOT.resolve(filename).toString());
         ResultConsumer<Instance> consumer = new ResultConsumer<>();
         instances.forEach(consumer);
-        assertFalse(Message.moreSevere(consumer.getMessageHandler().printMessages(), Message.ERROR));
+        Assertions.noErrors(consumer);
     }
 
     @Test
@@ -72,7 +72,7 @@ public class PrototypeTest {
         Result<List<Table>> tables = ExcelReader.parseTables(filename);
         ResultConsumer<List<Table>> consumer = new ResultConsumer<>();
         consumer.accept(tables);
-        assertFalse(Message.moreSevere(consumer.getMessageHandler().printMessages(), Message.ERROR));
+        Assertions.noErrors(consumer);
     }
 
     @Test
@@ -83,6 +83,6 @@ public class PrototypeTest {
         ResultStream<Instance> instances = parser.apply(filename);
         ResultConsumer<Instance> consumer = new ResultConsumer<>();
         instances.forEach(consumer);
-        assertTrue(Message.moreSevere(consumer.getMessageHandler().printMessages(), Message.ERROR));
+        Assertions.atLeast(consumer, Message.Severity.ERROR);
     }
 }

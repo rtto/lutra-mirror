@@ -30,10 +30,9 @@ import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.RDFList;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
-
 import org.apache.jena.shared.PrefixMapping;
 import xyz.ottr.lutra.OTTR;
-import xyz.ottr.lutra.result.Result;
+import xyz.ottr.lutra.system.Result;
 
 public enum RDFNodes {
 
@@ -42,13 +41,10 @@ public enum RDFNodes {
     private static final PrefixMapping defaultPrefixes = OTTR.getDefaultPrefixes();
 
     public static <X extends RDFNode> Result<X> cast(RDFNode node, Class<X> type) {
-
-        if (node.canAs(type)) {
-            return Result.of(node.as(type));
-        } else {
-            return Result.error("Expected instance of " + type.getSimpleName()
+        return node.canAs(type)
+            ? Result.of(node.as(type))
+            : Result.error("Expected instance of " + type.getSimpleName()
                 + ", but found " + node.getClass().getSimpleName() + ": " + RDFNodes.toString(node));
-        }
     }
 
     public static Result<Resource> castURIResource(RDFNode node) {
@@ -83,11 +79,9 @@ public enum RDFNodes {
     }
 
     public static String toString(Model model, Node node) {
-        if (node.isVariable()) {
-            return node.toString();
-        } else {
-            return toString(model, node.toString());
-        }
+        return node.isVariable()
+            ? node.toString()
+            : toString(model, node.toString());
     }
 
     public static String toString(Model model, String nodeString) {
