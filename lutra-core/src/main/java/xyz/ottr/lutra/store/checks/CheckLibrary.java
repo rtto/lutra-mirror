@@ -41,7 +41,7 @@ public enum CheckLibrary {
             .and(Query.instanceIRI("Ins", "Temp2"))
             .and(Query.isUndefined("Temp2")),
         tup -> Message.error(
-            "Undefined template in " + tup.get("Temp") + ". The template " + tup.get("Temp")
+            "Undefined template used in " + tup.get("Temp") + ". The template"
                 + " depends on an undefined signature or template " + tup.get("Temp2"))
     );
 
@@ -83,9 +83,9 @@ public enum CheckLibrary {
             .and(Query.isNonBlank("Params2", "Index2")),
         tup -> Message.error(
             "Inconsistent non-blank parameter flags in template " + tup.get("Temp1")
-                + ". The template " + tup.get("Temp1") + " contains a parameter "
-                + tup.get("Val") + " which is not non-blank," + " but is argument "
-                + "(index " + tup.getAsEndUserIndex("Index2") + ")"
+                + ". The template contains a parameter "
+                + tup.get("Val") + " which is not non-blank," + " but the parameter is used as argument "
+                + "(arg no. " + tup.getAsEndUserIndex("Index2") + ")"
                 + " to an instance of template " + tup.get("Temp2")
                 + " where the corresponding parameter " + tup.get("Params2") + " is non-blank.")
     );
@@ -96,7 +96,7 @@ public enum CheckLibrary {
             .and(Query.dependsTransitive("Temp", "Temp")),
         tup -> Message.error(
             "Cyclic dependency in template " + tup.get("Temp") + "."
-                + "The template " + tup.get("Temp") + " has a cyclic dependency.")
+                + " The template has a cyclic dependency.")
     );
 
 
@@ -111,8 +111,8 @@ public enum CheckLibrary {
                         .and(Query.hasOccurenceAt("Arg", "Lvl", "Val")))),
         tup -> Message.warning(
             "Unused parameter in template " + tup.get("Temp") + ". "
-                + "The template " + tup.get("Temp") + " has a parameter " + tup.get("Val")
-                + " (index " + tup.getAsEndUserIndex("Index") + ")"
+                + "The template has a parameter " + tup.get("Val")
+                + " (arg no. " + tup.getAsEndUserIndex("Index") + ")"
                 + " which does not occur in the pattern of the template.")
     );
 
@@ -134,11 +134,12 @@ public enum CheckLibrary {
             .and(Query.not(Query.isSubTypeOf("Type1", "Type2")) // not(A) and not(B) = not(A or B)
                 .and(Query.not(Query.isSubTypeOf("Type2", "Type1")))),
         tup -> Message.error(
-            "Type error in template " + tup.get("Temp") + ", conflicting parameter types. "
-                + "Template " + tup.get("Temp") + " contains an argument "
-                + tup.get("Val") + " to different parameters with incompatible types: "
-                + " instance " + tup.get("Ins1") + " (index " + tup.get("Index1") + " with parameter type " + tup.get("Type1")
-                + " instance " + tup.get("Ins2") + " (index " + tup.get("Index2") + " with parameter type " + tup.get("Type2"))
+            "Type error in template " + tup.get("Temp") + ": incompatible parameter types. "
+                + " The template contains an argument " + tup.get("Val") + " to different parameters with incompatible types: "
+                + " instance " + tup.get("Ins1")
+                + " (arg no. " + tup.getAsEndUserIndex("Index1") + ") with parameter type " + tup.get("Type1")
+                + " instance " + tup.get("Ins2")
+                + " (arg no. " + tup.getAsEndUserIndex("Index2") + ") with parameter type " + tup.get("Type2"))
     );
 
     /* Type checking: intrinsic and inferred types incompatible */
@@ -151,11 +152,11 @@ public enum CheckLibrary {
             .and(Query.usedAsType("Ins", "Index", "Lvl", "UsedAs"))
             .and(Query.not(Query.isCompatibleWith("Intrinsic", "UsedAs"))),
         tup -> Message.error(
-            "Type error in template " + tup.get("Temp") + ", conflict between intrinsic and inferred types."
-                + "The template " + tup.get("Temp") + " contains a value "
-                + tup.get("Val") + " which has the intrinsic type " + tup.get("Intrinsic")
-                + " and is argument to a parameter with the type " + tup.get("UsedAs")
-                + " in instance " + tup.get("Ins") + "(index " + tup.get("Index") + ".")
+            "Type error in template " + tup.get("Temp") + ": incompatible argument and parameter type."
+                + " The template contains a value "
+                + tup.get("Val") + " which has the type " + tup.get("Intrinsic")
+                + " and which is used as argument to a parameter with the incompatible type " + tup.get("UsedAs")
+                + " in instance " + tup.get("Ins") + " (arg no. " + tup.getAsEndUserIndex("Index") + ").")
     );
 
     public static final List<Check> failsOnMissingInformationChecks = List.of(

@@ -37,7 +37,7 @@ public class BlankNodeTerm extends AbstractTerm<String> {
     }
 
     public BlankNodeTerm() {
-        this("_blank" + generateNewID());
+        this("blank" + generateNewID());
     }
 
     private static long generateNewID() {
