@@ -119,3 +119,5 @@ lutra-cli/src/test/resources/primer/
 lutra-api/src/main/resources/tpl-library/
 
 lutra-cli/dependency-reduced-pom.xml
+
+lutra-cli/src/test/resources/issues/235/output.ttl
