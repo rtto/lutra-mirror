@@ -454,6 +454,11 @@
                 <artifactId>lutra-cli</artifactId>
                 <version>${project.version}</version>
             </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>lutra-docttr</artifactId>
+                <version>${project.version}</version>
+            </dependency>
 
 
             <dependency>

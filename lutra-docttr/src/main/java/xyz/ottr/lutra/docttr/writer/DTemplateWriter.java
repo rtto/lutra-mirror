@@ -30,6 +30,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.jena.shared.PrefixMapping;
 import xyz.ottr.lutra.OTTR;
 
 import xyz.ottr.lutra.model.Signature;
@@ -45,10 +46,10 @@ public class DTemplateWriter implements TemplateWriter {
     private final WTemplateWriter wottrWriter;
     //private final RDFVizler vizler;
 
-    public DTemplateWriter() {
+    public DTemplateWriter(PrefixMapping prefixMapping) {
 
         this.signatures = new HashMap<>();
-        this.stottrWriter = new STemplateWriter(OTTR.getDefaultPrefixes());
+        this.stottrWriter = new STemplateWriter(prefixMapping);
         this.wottrWriter = new WTemplateWriter();
 
         //this.vizler = new RDFVizler();
