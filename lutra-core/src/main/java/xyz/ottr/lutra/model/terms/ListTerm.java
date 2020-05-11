@@ -103,10 +103,7 @@ public class ListTerm extends AbstractTerm<Long> {
 
     @Override
     public Term apply(Substitution substitution) {
-        // TODO is it correct to create a new list?
-        return this.toBuilder()
-            .terms(substitution.apply(this.terms))
-            .build();
+        return new ListTerm(substitution.apply(this.terms), this.variable);
     }
 
     @Override

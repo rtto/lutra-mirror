@@ -22,13 +22,17 @@ package xyz.ottr.lutra.model;
  * #L%
  */
 
+import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.util.List;
+import java.util.Map;
 
+import org.junit.Assert;
 import org.junit.Test;
+import xyz.ottr.lutra.model.terms.BlankNodeTerm;
 import xyz.ottr.lutra.model.terms.ListTerm;
 import xyz.ottr.lutra.model.terms.NoneTerm;
 import xyz.ottr.lutra.model.terms.ObjectTerm;
@@ -88,6 +92,26 @@ public class SubstitutionTest {
 
         assertEquals(exp.get(0), exp.get(1)); 
         assertEquals(exp.get(1), exp.get(2));
+    }
+
+    @Test
+    public void listSubstitutionBlanks() {
+
+        BlankNodeTerm b1 = new BlankNodeTerm();
+        BlankNodeTerm b2 = new BlankNodeTerm();
+        BlankNodeTerm b3 = new BlankNodeTerm();
+        BlankNodeTerm b4 = new BlankNodeTerm();
+
+        Substitution subst = new Substitution(Map.of(
+            b1, b3,
+            b2, b4));
+
+        ListTerm input = new ListTerm(b1, b2);
+        ListTerm expectedOutput = new ListTerm(b3, b4);
+
+        ListTerm actualOutput = (ListTerm) input.apply(subst);
+
+        Assert.assertThat(actualOutput.asList(), is(expectedOutput.asList()));
     }
 
     @Test
