@@ -1,0 +1,39 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>xyz.ottr.lutra</groupId>
+        <artifactId>lutra</artifactId>
+        <version>0.6.7-SNAPSHOT</version>
+    </parent>
+    <artifactId>lutra-docttr</artifactId>
+
+    <dependencies>
+
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>lutra-core</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>lutra-wottr</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>lutra-stottr</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.j2html</groupId>
+            <artifactId>j2html</artifactId>
+        </dependency>
+
+        <!--dependency>
+            <groupId>xyz.dyreriket.rdfvizler</groupId>
+            <artifactId>rdfvizler-core</artifactId>
+        </dependency-->
+
+    </dependencies>
+</project>

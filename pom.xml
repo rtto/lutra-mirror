@@ -15,6 +15,7 @@
 		<module>lutra-cli</module>
         <module>lutra-restapi</module>
         <module>lutra-api</module>
+        <module>lutra-docttr</module>
     </modules>
 
 
@@ -454,6 +455,11 @@
                 <artifactId>lutra-cli</artifactId>
                 <version>${project.version}</version>
             </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>lutra-docttr</artifactId>
+                <version>${project.version}</version>
+            </dependency>
 
 
             <dependency>
@@ -546,7 +552,16 @@
 				<artifactId>h2</artifactId>
 				<version>1.4.199</version>
 			</dependency>
-			
+
+
+            <!-- docttr -->
+            <!-- https://mvnrepository.com/artifact/com.j2html/j2html -->
+            <dependency>
+                <groupId>com.j2html</groupId>
+                <artifactId>j2html</artifactId>
+                <version>1.4.0</version>
+            </dependency>
+
 
             <!-- CLI -->
             <!-- https://mvnrepository.com/artifact/info.picocli/picocli -->
