@@ -103,7 +103,10 @@ public class ListTerm extends AbstractTerm<Long> {
 
     @Override
     public Term apply(Substitution substitution) {
-        return new ListTerm(substitution.apply(this.terms), this.variable);
+        return this.toBuilder()
+            .clearTerms()
+            .terms(substitution.apply(this.terms))
+            .build();
     }
 
     @Override
