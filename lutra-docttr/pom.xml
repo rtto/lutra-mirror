@@ -12,7 +12,17 @@
 
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>lutra-api</artifactId>
+            <artifactId>lutra-core</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>lutra-wottr</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>lutra-stottr</artifactId>
         </dependency>
 
         <dependency>
@@ -20,10 +30,10 @@
             <artifactId>j2html</artifactId>
         </dependency>
 
-        <dependency>
+        <!--dependency>
             <groupId>xyz.dyreriket.rdfvizler</groupId>
             <artifactId>rdfvizler-core</artifactId>
-        </dependency>
+        </dependency-->
 
     </dependencies>
 </project>

@@ -1,4 +1,4 @@
-package xyz.ottr.lutra.io;
+package xyz.ottr.lutra.docttr.writer;
 
 /*-
  * #%L
@@ -26,14 +26,19 @@ import static j2html.TagCreator.*;
 
 import j2html.tags.ContainerTag;
 
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.apache.jena.shared.PrefixMapping;
 import xyz.ottr.lutra.OTTR;
 
+import xyz.ottr.lutra.model.Instance;
 import xyz.ottr.lutra.model.Signature;
+import xyz.ottr.lutra.model.Template;
 import xyz.ottr.lutra.stottr.writer.STemplateWriter;
 import xyz.ottr.lutra.wottr.writer.WTemplateWriter;
 import xyz.ottr.lutra.writer.TemplateWriter;
@@ -44,13 +49,22 @@ public class DTemplateWriter implements TemplateWriter {
 
     private final STemplateWriter stottrWriter;
     private final WTemplateWriter wottrWriter;
+
+    private PrefixMapping prefixMapping;
+
     //private final RDFVizler vizler;
+
+    public DTemplateWriter() {
+        this(OTTR.getDefaultPrefixes());
+    }
 
     public DTemplateWriter(PrefixMapping prefixMapping) {
 
+        this.prefixMapping  = prefixMapping;
+
         this.signatures = new HashMap<>();
         this.stottrWriter = new STemplateWriter(prefixMapping);
-        this.wottrWriter = new WTemplateWriter();
+        this.wottrWriter = new WTemplateWriter(prefixMapping);
 
         //this.vizler = new RDFVizler();
         //this.vizler.setRulesPath("src/main/resources/ottr-1.jrule");
@@ -74,7 +88,6 @@ public class DTemplateWriter implements TemplateWriter {
         return document(write(this.signatures.get(iri)));
     }
 
-
     private ContainerTag write(Signature signature) {
 
         String signatureIRI = signature.getIri();
@@ -82,6 +95,14 @@ public class DTemplateWriter implements TemplateWriter {
         String heading = signature.getClass().getSimpleName() + ": " + signatureIRI;
         String stottr = this.stottrWriter.write(signatureIRI);
         String wottr = this.wottrWriter.write(signatureIRI);
+
+        List<String> dependencies = Collections.EMPTY_LIST;
+        if (signature instanceof Template) {
+            dependencies = ((Template) signature).getPattern().stream()
+                .map(Instance::getIri)
+                .sorted()
+                .collect(Collectors.toList());
+        }
 
         //String svgVisualisation = getVisualisation(signature);
 
@@ -91,16 +112,31 @@ public class DTemplateWriter implements TemplateWriter {
                 link().withRel("stylesheet").withHref("/css/main.css")
             ).withLang("en"),
             body(
+
                 h1(heading),
                 div(
-                    h2("stOTTR Serialisation"),
-                    pre(stottr),
-                    h2("Pattern"),
-                    h3("Visualisation"),
+
+                    iff(!dependencies.isEmpty(),
+                    div(
+                        h3("Direct dependencies"),
+                        ul(each(dependencies, dep ->
+                            li(a(this.prefixMapping.shortForm(dep)).withHref(dep)))
+                        )
+                    )),
+
+                    div(
+                        h2("stOTTR Serialisation"),
+                        pre(stottr)),
+
+                    //h2("Pattern"),
+
+                    //h3("Visualisation"),
                     //rawHtml(svgVisualisation),
-                    h2("wOTTR Serialisation"),
-                    pre(wottr)
-                ).withId("main")
+
+                    div(
+                        h2("wOTTR Serialisation"),
+                        pre(wottr))
+                )
             )
         );
 
