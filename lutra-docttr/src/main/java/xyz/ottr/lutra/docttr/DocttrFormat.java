@@ -22,6 +22,9 @@ package xyz.ottr.lutra.docttr;
  * #L%
  */
 
+import java.util.Collection;
+import java.util.Set;
+
 import org.apache.jena.shared.PrefixMapping;
 import xyz.ottr.lutra.docttr.writer.DTemplateWriter;
 import xyz.ottr.lutra.io.Format;
@@ -30,7 +33,8 @@ import xyz.ottr.lutra.writer.TemplateWriter;
 
 public class DocttrFormat implements Format {
 
-    public static final String name = "docttr";
+    private static final String name = "docttr";
+    private static final Collection<Support> support = Set.of(Support.TemplateWriter);
 
     private PrefixMapping prefixes;
 
@@ -48,9 +52,10 @@ public class DocttrFormat implements Format {
     }
 
     @Override
-    public boolean supports(Operation op, ObjectType ot) {
-        return true;
+    public Collection<Support> getSupport() {
+        return support;
     }
+
 
     @Override
     public String getDefaultFileSuffix() {

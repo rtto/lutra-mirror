@@ -22,6 +22,9 @@ package xyz.ottr.lutra.stottr;
  * #L%
  */
 
+import java.util.Collection;
+import java.util.Set;
+
 import org.apache.jena.shared.PrefixMapping;
 
 import xyz.ottr.lutra.OTTR;
@@ -38,7 +41,14 @@ import xyz.ottr.lutra.writer.InstanceWriter;
 import xyz.ottr.lutra.writer.TemplateWriter;
 
 public class StottrFormat implements Format {
-    
+
+    private static final String name = "stOTTR";
+    private static final Collection<Support> support = Set.of(
+        Support.TemplateReader,
+        Support.TemplateWriter,
+        Support.InstanceReader,
+        Support.InstanceWriter);
+
     private PrefixMapping prefixes;
 
     public StottrFormat() {
@@ -70,8 +80,8 @@ public class StottrFormat implements Format {
     }
 
     @Override
-    public boolean supports(Operation op, ObjectType ot) {
-        return true;
+    public Collection<Support> getSupport() {
+        return support;
     }
 
     @Override
@@ -81,7 +91,7 @@ public class StottrFormat implements Format {
 
     @Override
     public String getFormatName() {
-        return "STOTTR";
+        return name;
     }
 
     @Override

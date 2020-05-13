@@ -1,5 +1,8 @@
 package xyz.ottr.lutra.tabottr;
 
+import java.util.Collection;
+import java.util.Set;
+
 import org.apache.jena.shared.PrefixMapping;
 
 /*-
@@ -30,6 +33,9 @@ import xyz.ottr.lutra.system.Result;
 import xyz.ottr.lutra.tabottr.parser.ExcelReader;
 
 public class TabottrFormat implements Format {
+
+    private static final String name = "tabOTTR";
+    private static final Collection<Support> support = Set.of(Support.InstanceReader);
     
     private final InstanceReader instanceReader;
     
@@ -43,18 +49,13 @@ public class TabottrFormat implements Format {
     }
 
     @Override
-    public boolean supports(Operation op, ObjectType ot) {
-        return op == Operation.read && ot == ObjectType.instance; 
-    }
-
-    @Override
-    public String getDefaultFileSuffix() {
-        return ".xlsx";
+    public Collection<Support> getSupport() {
+        return support;
     }
 
     @Override
     public String getFormatName() {
-        return "TabOTTR";
+        return name;
     }
 
     @Override

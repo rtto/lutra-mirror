@@ -1,5 +1,8 @@
 package xyz.ottr.lutra.bottr;
 
+import java.util.Collection;
+import java.util.Set;
+
 import org.apache.jena.shared.PrefixMapping;
 
 /*-
@@ -30,9 +33,12 @@ import xyz.ottr.lutra.io.InstanceReader;
 import xyz.ottr.lutra.system.Result;
 
 public class BottrFormat implements Format {
-    
+
+    private static final String name = "bOTTR";
+    private static final Collection support = Set.of(Support.InstanceReader);
+
     private final InstanceReader instanceReader;
-    
+
     public BottrFormat() {
         this.instanceReader = new InstanceReader(new BInstanceReader());
     }
@@ -43,18 +49,13 @@ public class BottrFormat implements Format {
     }
 
     @Override
-    public boolean supports(Operation op, ObjectType ot) {
-        return op == Operation.read && ot == ObjectType.instance;
-    }
-
-    @Override
-    public String getDefaultFileSuffix() {
-        return ".ttl"; // TODO: Is this correct?
+    public Collection<Support> getSupport() {
+        return support;
     }
 
     @Override
     public String getFormatName() {
-        return "BOTTR";
+        return name;
     }
 
     @Override
