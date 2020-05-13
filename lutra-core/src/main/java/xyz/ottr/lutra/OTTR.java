@@ -64,6 +64,7 @@ public enum OTTR  {
 
     }
 
+    @SuppressWarnings("PMD.UnnecessaryFullyQualifiedName")
     public enum BaseTemplate {
         ;
         public static final Signature Triple;
