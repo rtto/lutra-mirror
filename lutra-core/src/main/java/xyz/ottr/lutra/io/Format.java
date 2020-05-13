@@ -76,44 +76,30 @@ public interface Format {
 
     Collection<Support> getSupport();
 
+    /**
+     * Gets the default file suffix for this Format (e.g. ".ttl" for RDF-files).
+     */
     default String getDefaultFileSuffix() {
         throw new UnsupportedOperationException(errorMessage("write operations"));
     }
     
     /**
-     * Gets the default file suffix for this Format (e.g. ".ttl" for RDF-files).
-     */
-    String getDefaultFileSuffix();
-    
-    /**
      * Gets the name of this Format. Used in Messages and for lookup.
      */
     String getFormatName();
-    
-    /**
-     * @see #supports(Operation, ObjectType)
-     */
+
     default boolean supportsTemplateWriter() {
         return getSupport().contains(Support.TemplateWriter);
     }
 
-    /**
-     * @see #supports(Operation, ObjectType)
-     */
     default boolean supportsTemplateReader() {
         return getSupport().contains(Support.TemplateReader);
     }
 
-    /**
-     * @see #supports(Operation, ObjectType)
-     */
     default boolean supportsInstanceWriter() {
         return getSupport().contains(Support.InstanceWriter);
     }
-
-    /**
-     * @see #supports(Operation, ObjectType)
-     */
+    
     default boolean supportsInstanceReader() {
         return getSupport().contains(Support.InstanceReader);
     }
