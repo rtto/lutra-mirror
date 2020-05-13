@@ -42,18 +42,34 @@ public interface Format {
         return "Unsupported format operation. The format " + getFormatName() + " does not support " + operation + ".";
     }
 
+    /**
+     * Gets a Result containing this Format's TemplateReader, if reading templates
+     * is supported, and an empty Result with an error Message otherwise.
+     */
     default Result<TemplateReader> getTemplateReader() {
         return Result.error(errorMessage("reading templates"));
     }
 
+    /**
+     * Gets a Result containing this Format's TemplateWriter, if writing templates
+     * is supported, and an empty Result with an error Message otherwise.
+     */
     default Result<TemplateWriter> getTemplateWriter() {
         return Result.error(errorMessage("writing templates"));
     }
 
+    /**
+     * Gets a Result containing this Format's InstanceReader, if reading instances
+     * is supported, and an empty Result with an error Message otherwise.
+     */
     default Result<InstanceReader> getInstanceReader() {
         return Result.error(errorMessage("reading instances"));
     }
 
+    /**
+     * Gets a Result containing this Format's InstanceWriter, if writing instances
+     * is supported, and an empty Result with an error Message otherwise.
+     */
     default Result<InstanceWriter> getInstanceWriter() {
         return Result.error(errorMessage("writing instances"));
     }
@@ -64,23 +80,57 @@ public interface Format {
         throw new UnsupportedOperationException(errorMessage("write operations"));
     }
     
+    /**
+     * Gets the default file suffix for this Format (e.g. ".ttl" for RDF-files).
+     */
+    String getDefaultFileSuffix();
+    
+    /**
+     * Gets the name of this Format. Used in Messages and for lookup.
+     */
     String getFormatName();
     
+    /**
+     * @see #supports(Operation, ObjectType)
+     */
     default boolean supportsTemplateWriter() {
         return getSupport().contains(Support.TemplateWriter);
     }
 
+    /**
+     * @see #supports(Operation, ObjectType)
+     */
     default boolean supportsTemplateReader() {
         return getSupport().contains(Support.TemplateReader);
     }
 
+    /**
+     * @see #supports(Operation, ObjectType)
+     */
     default boolean supportsInstanceWriter() {
         return getSupport().contains(Support.InstanceWriter);
     }
 
+    /**
+     * @see #supports(Operation, ObjectType)
+     */
     default boolean supportsInstanceReader() {
         return getSupport().contains(Support.InstanceReader);
     }
 
+    /**
+     * Sets the prefixes used for writing operations. If
+     * this Format does not support any writing operations
+     * this method should do nothing.
+     * 
+     * OBS: The TemplateManager assumes that the Format keeps
+     * the reference to the argument, and does not make a copy
+     * of the PrefixMapping, as more prefixes might be added to
+     * the map at a later stage.
+     * 
+     * @param prefixes
+     *      A PrefixMapping containing prefixes that should be used
+     *      for writing operations.
+     */
     void setPrefixMapping(PrefixMapping prefixes);
 }

@@ -216,7 +216,7 @@ public class CLI {
                 ? null
                 : this.templateManager.getFormat(this.settings.libraryFormat.toString());
 
-        return this.templateManager.parseLibraryInto(libraryFormat, this.settings.library)
+        return this.templateManager.readLibrary(libraryFormat, this.settings.library)
             .printMessages();
     }
 
@@ -230,7 +230,7 @@ public class CLI {
 
     public ResultStream<Instance> parseInstances() {
         Format inFormat = this.templateManager.getFormat(this.settings.inputFormat.toString());
-        return this.templateManager.parseInstances(inFormat, this.settings.inputs);
+        return this.templateManager.readInstances(inFormat, this.settings.inputs);
     }
 
     public ResultStream<Instance> parseAndExpandInstances() {
