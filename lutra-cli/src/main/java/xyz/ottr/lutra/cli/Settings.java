@@ -155,12 +155,18 @@ public class Settings {
                        + "default: ${DEFAULT-VALUE})"})
     public Mode mode = Mode.expand;
 
-    @Option(names = {"--deepTrace"},
+    @Option(names = {"--debugFullTrace"},
         description = {"This enables tracing such that printed messages get a stack trace "
                        + "giving more information on the location of the concerned objects. "
                        + "NB! Enabling this flag will deteriorate performance.%n"
                        + "default: ${DEFAULT-VALUE})"})
-    public boolean deepTrace = false;
+    public boolean debugFullTrace = false;
+
+    @Option(names = {"--debugStackTrace"},
+        description = {"This enables printing a regular java stack trace for error messages."
+            + "Enabling this flag will not deteriorate performance.%n"
+            + "default: ${DEFAULT-VALUE})"})
+    public boolean debugStackTrace = true;
     
     /* The following classes restrict the selections of FormatName to supported formats. */
     private static class InstanceInputFormat extends ArrayList<String> {

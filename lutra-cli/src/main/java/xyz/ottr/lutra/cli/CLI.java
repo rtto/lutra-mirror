@@ -194,7 +194,8 @@ public class CLI {
     private Message.Severity initTemplateManager() {
 
         // Transfer relevant settings
-        this.templateManager.setDeepTrace(this.settings.deepTrace);
+        this.templateManager.setFullTrace(this.settings.debugFullTrace);
+        this.templateManager.setStackTrace(this.settings.debugStackTrace);
         this.templateManager.setHaltOn(this.settings.haltOn);
         this.templateManager.setFetchMissingDependencies(this.settings.fetchMissingDependencies);
         this.templateManager.setExtensions(this.settings.extensions);
