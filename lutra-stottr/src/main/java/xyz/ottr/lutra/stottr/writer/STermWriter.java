@@ -26,7 +26,6 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
-
 import org.apache.jena.shared.PrefixMapping;
 import xyz.ottr.lutra.RDFTurtle;
 import xyz.ottr.lutra.model.terms.BlankNodeTerm;

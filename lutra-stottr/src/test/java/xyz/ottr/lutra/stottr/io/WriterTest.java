@@ -26,7 +26,6 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
 import java.util.List;
-
 import org.apache.jena.shared.PrefixMapping;
 import org.apache.jena.vocabulary.OWL;
 import org.apache.jena.vocabulary.XSD;

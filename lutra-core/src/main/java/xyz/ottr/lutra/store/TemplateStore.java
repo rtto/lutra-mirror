@@ -22,14 +22,13 @@ package xyz.ottr.lutra.store;
  * #L%
  */
 
-import java.util.Collection; 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
-
 import xyz.ottr.lutra.OTTR;
 import xyz.ottr.lutra.io.FormatManager;
 import xyz.ottr.lutra.io.TemplateReader;

@@ -23,12 +23,10 @@ package xyz.ottr.lutra.bottr;
  */
 
 import java.util.List;
-
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.Resource;
-
 import xyz.ottr.lutra.wottr.WOTTR;
 
 public class BOTTR extends WOTTR {

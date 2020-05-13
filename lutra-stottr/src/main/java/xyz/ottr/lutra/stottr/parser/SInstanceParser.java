@@ -25,7 +25,6 @@ package xyz.ottr.lutra.stottr.parser;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.tree.TerminalNode;
 import xyz.ottr.lutra.model.Argument;

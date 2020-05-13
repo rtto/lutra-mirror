@@ -22,6 +22,8 @@ package xyz.ottr.lutra.wottr;
  * #L%
  */
 
+import java.util.Collection;
+import java.util.Set;
 import org.apache.jena.shared.PrefixMapping;
 import xyz.ottr.lutra.io.Format;
 import xyz.ottr.lutra.io.InstanceReader;
@@ -37,7 +39,12 @@ import xyz.ottr.lutra.writer.TemplateWriter;
 
 public class WottrFormat implements Format {
 
-    public static final String name = "wOTTR";
+    private static final String name = "wOTTR";
+    private static final Collection<Support> support = Set.of(
+        Support.TemplateReader,
+        Support.TemplateWriter,
+        Support.InstanceReader,
+        Support.InstanceWriter);
 
     private PrefixMapping prefixes;
 
@@ -70,8 +77,8 @@ public class WottrFormat implements Format {
     }
 
     @Override
-    public boolean supports(Format.Operation op, Format.ObjectType ot) {
-        return true;
+    public Collection<Support> getSupport() {
+        return support;
     }
 
     @Override

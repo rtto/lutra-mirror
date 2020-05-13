@@ -34,7 +34,7 @@ public class SPARQLEndpointSourceTest {
 
     @Test
     public void prototypeTest() {
-        String endpoint = "https://query.wikidata.org/bigdata/namespace/wdq/sparql";
+        String endpoint = "http://dbpedia.org/sparql";
         Source<RDFNode> source = new SPARQLEndpointSource(endpoint);
         
         ResultStream<?> result = source.execute("SELECT ?s ?p ?o WHERE { ?s ?p ?o } LIMIT 13");

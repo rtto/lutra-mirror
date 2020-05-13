@@ -27,7 +27,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
-
 import org.apache.jena.shared.PrefixMapping;
 import xyz.ottr.lutra.Space;
 import xyz.ottr.lutra.model.BaseTemplate;

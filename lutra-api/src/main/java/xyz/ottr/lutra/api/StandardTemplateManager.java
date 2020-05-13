@@ -27,11 +27,8 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.LinkedList;
 import java.util.List;
-
 import lombok.Getter;
-
 import org.apache.commons.io.IOUtils;
-
 import xyz.ottr.lutra.TemplateManager;
 import xyz.ottr.lutra.model.Signature;
 import xyz.ottr.lutra.store.TemplateStore;
@@ -44,18 +41,19 @@ import xyz.ottr.lutra.wottr.parser.WTemplateParser;
 
 @Getter
 public final class StandardTemplateManager extends TemplateManager {
-    
-    private static final String templatesListFile = "tpl-library/templates-list.txt";
-    private TemplateStore standardLibrary;
-    
+
+    private static final String standardLibFolder = "tpl-library";
+    private static final String templatesListFile = "templates-list.txt";
+
+
     public StandardTemplateManager() {
         this.loadFormats();
     }
 
     public MessageHandler loadStandardTemplateLibrary() {
 
-        this.standardLibrary = makeDefaultStore(getFormatManager());
-        ResultConsumer<Signature> consumer = new ResultConsumer<>(this.standardLibrary);
+        var standardLibrary = makeDefaultStore(getFormatManager());
+        ResultConsumer<Signature> consumer = new ResultConsumer<>(standardLibrary);
         var reader = ResultStream.innerFlatMapCompose(RDFIO.inputStreamReader(), new WTemplateParser());
 
         getLibraryPaths()
@@ -86,7 +84,7 @@ public final class StandardTemplateManager extends TemplateManager {
     } 
     
     private InputStream getResourceAsStream(String path) {
-        return this.getClass().getClassLoader().getResourceAsStream(path);
+        return this.getClass().getClassLoader().getResourceAsStream(standardLibFolder + "/" + path);
     }
 
     private void loadFormats() {
@@ -96,6 +94,6 @@ public final class StandardTemplateManager extends TemplateManager {
     }
 
     public TemplateStore getStandardLibrary() {
-        return this.standardLibrary;
+        return getTemplateStore().getStandardLibrary().get();
     }
 }

@@ -26,7 +26,6 @@ import java.io.PrintStream;
 import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.function.Function;
-
 import org.apache.commons.lang3.StringUtils;
 import org.apache.jena.rdf.model.Model;
 import picocli.CommandLine;

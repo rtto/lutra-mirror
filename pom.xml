@@ -4,7 +4,7 @@
 
 	<groupId>xyz.ottr.lutra</groupId>
 	<artifactId>lutra</artifactId>
-	<version>0.6.6</version>
+	<version>0.6.7</version>
 	<packaging>pom</packaging>
 	<modules>
 		<module>lutra-core</module>
@@ -15,6 +15,7 @@
 		<module>lutra-cli</module>
         <module>lutra-restapi</module>
         <module>lutra-api</module>
+        <module>lutra-docttr</module>
     </modules>
 
 
@@ -85,7 +86,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
-                <version>3.1.2</version>
+                <version>3.2.0</version>
                 <configuration>
                     <archive>
                         <manifest>
@@ -99,7 +100,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-source-plugin</artifactId>
-                <version>3.1.0</version>
+                <version>3.2.1</version>
                 <executions>
                     <execution>
                         <goals>
@@ -177,7 +178,7 @@
                     <dependency>
                         <groupId>com.puppycrawl.tools</groupId>
                         <artifactId>checkstyle</artifactId>
-                        <version>8.22</version>
+                        <version>8.29</version>
                     </dependency>
                 </dependencies>
             </plugin>
@@ -300,7 +301,7 @@
                 </plugin>
                 <plugin>
                     <artifactId>maven-surefire-plugin</artifactId>
-                    <version>2.22.1</version>
+                    <version>2.22.2</version>
                 </plugin>
                 <plugin>
                     <artifactId>maven-war-plugin</artifactId>
@@ -331,13 +332,13 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-shade-plugin</artifactId>
-                    <version>3.2.1</version>
+                    <version>3.2.3</version>
                 </plugin>
 
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-pmd-plugin</artifactId>
-                    <version>3.12.0</version>
+                    <version>3.13.0</version>
                 </plugin>
 
                 <plugin>
@@ -454,6 +455,11 @@
                 <artifactId>lutra-cli</artifactId>
                 <version>${project.version}</version>
             </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>lutra-docttr</artifactId>
+                <version>${project.version}</version>
+            </dependency>
 
 
             <dependency>
@@ -516,13 +522,13 @@
             <dependency>
                 <groupId>org.apache.poi</groupId>
                 <artifactId>poi</artifactId>
-                <version>4.1.0</version>
+                <version>4.1.2</version>
             </dependency>
 
             <dependency>
                 <groupId>org.apache.poi</groupId>
                 <artifactId>poi-ooxml</artifactId>
-                <version>4.1.0</version>
+                <version>4.1.2</version>
             </dependency>
 
 
@@ -544,9 +550,18 @@
 			<dependency>
 				<groupId>com.h2database</groupId>
 				<artifactId>h2</artifactId>
-				<version>1.4.199</version>
+				<version>1.4.200</version>
 			</dependency>
-			
+
+
+            <!-- docttr -->
+            <!-- https://mvnrepository.com/artifact/com.j2html/j2html -->
+            <dependency>
+                <groupId>com.j2html</groupId>
+                <artifactId>j2html</artifactId>
+                <version>1.4.0</version>
+            </dependency>
+
 
             <!-- CLI -->
             <!-- https://mvnrepository.com/artifact/info.picocli/picocli -->
@@ -568,7 +583,7 @@
             <dependency>
                 <groupId>junit</groupId>
                 <artifactId>junit</artifactId>
-                <version>4.12</version>
+                <version>4.13</version>
             </dependency>
 
             <!-- https://mvnrepository.com/artifact/org.hamcrest/hamcrest -->

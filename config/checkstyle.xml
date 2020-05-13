@@ -23,9 +23,14 @@
     <property name="fileExtensions" value="java, properties, xml"/>
     <!-- Checks for whitespace                               -->
     <!-- See http://checkstyle.sf.net/config_whitespace.html -->
-        <module name="FileTabCharacter">
-            <property name="eachLine" value="true"/>
-        </module>
+    <module name="FileTabCharacter">
+        <property name="eachLine" value="true"/>
+    </module>
+
+    <module name="LineLength">
+        <property name="max" value="140"/>
+        <property name="ignorePattern" value="^package.*|^import.*|a href|href|http://|https://|ftp://"/>
+    </module>
 
     <module name="TreeWalker">
         <module name="OuterTypeFilename"/>
@@ -40,10 +45,7 @@
             <property name="allowNonPrintableEscapes" value="true"/>
         </module>
 	<!-- Lutra: We allow longer lines -->
-        <module name="LineLength">
-            <property name="max" value="140"/>
-            <property name="ignorePattern" value="^package.*|^import.*|a href|href|http://|https://|ftp://"/>
-        </module>
+
         <module name="AvoidStarImport"/>
         <module name="OneTopLevelClass"/>
         <module name="NoLineWrap"/>

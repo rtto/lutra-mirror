@@ -23,7 +23,6 @@ package xyz.ottr.lutra.parser;
  */
 
 import java.util.function.Function;
-
 import xyz.ottr.lutra.model.Instance;
 import xyz.ottr.lutra.system.ResultStream;
 

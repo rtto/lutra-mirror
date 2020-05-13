@@ -22,13 +22,9 @@ package xyz.ottr.lutra.tabottr.parser;
  * #L%
  */
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
-
 import org.junit.Test;
 import xyz.ottr.lutra.model.Instance;
 import xyz.ottr.lutra.parser.InstanceParser;

@@ -33,7 +33,6 @@ import java.util.function.BiPredicate;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
 import xyz.ottr.lutra.model.Argument;
 import xyz.ottr.lutra.model.HasGetTerm;
 import xyz.ottr.lutra.model.Instance;

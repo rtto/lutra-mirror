@@ -24,7 +24,6 @@ package xyz.ottr.lutra.parser;
 
 import java.util.Map;
 import java.util.function.Function;
-
 import xyz.ottr.lutra.model.Signature;
 import xyz.ottr.lutra.system.ResultStream;
 

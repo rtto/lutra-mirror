@@ -31,9 +31,7 @@ import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
-
 import org.apache.jena.shared.PrefixMapping;
-
 import xyz.ottr.lutra.io.Format;
 import xyz.ottr.lutra.io.FormatManager;
 import xyz.ottr.lutra.io.InstanceReader;

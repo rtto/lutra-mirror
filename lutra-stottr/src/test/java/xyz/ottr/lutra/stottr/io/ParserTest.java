@@ -29,7 +29,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-
 import org.apache.jena.vocabulary.XSD;
 import org.junit.Test;
 import xyz.ottr.lutra.model.Argument;

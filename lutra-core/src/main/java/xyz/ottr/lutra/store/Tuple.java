@@ -24,7 +24,6 @@ package xyz.ottr.lutra.store;
 
 import java.util.HashMap;
 import java.util.Map;
-
 import lombok.EqualsAndHashCode;
 
 @EqualsAndHashCode

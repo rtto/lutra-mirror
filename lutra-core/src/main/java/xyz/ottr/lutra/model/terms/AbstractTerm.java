@@ -23,7 +23,6 @@ package xyz.ottr.lutra.model.terms;
  */
 
 import java.util.Objects;
-
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;

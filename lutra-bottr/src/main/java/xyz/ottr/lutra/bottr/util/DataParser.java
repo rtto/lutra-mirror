@@ -23,7 +23,6 @@ package xyz.ottr.lutra.bottr.util;
  */
 
 import java.util.Locale;
-
 import org.apache.commons.lang3.LocaleUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.jena.ext.xerces.util.URI;

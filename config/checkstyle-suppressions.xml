@@ -6,4 +6,6 @@
  
 <suppressions>
 
+    <suppress checks="AvoidStarImport" files=".*DTemplateWriter\.java"/>
+
 </suppressions>

@@ -27,7 +27,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
-
 import org.apache.jena.shared.PrefixMapping;
 import xyz.ottr.lutra.Space;
 import xyz.ottr.lutra.model.Argument;

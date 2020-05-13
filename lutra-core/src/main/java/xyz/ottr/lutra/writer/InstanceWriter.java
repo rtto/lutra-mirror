@@ -24,7 +24,6 @@ package xyz.ottr.lutra.writer;
 
 import java.util.Set;
 import java.util.function.Consumer;
-
 import xyz.ottr.lutra.model.Instance;
 
 public interface InstanceWriter extends Consumer<Instance> {

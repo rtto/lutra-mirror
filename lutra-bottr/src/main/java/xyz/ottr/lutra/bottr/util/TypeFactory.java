@@ -23,7 +23,6 @@ package xyz.ottr.lutra.bottr.util;
  */
 
 import java.util.Optional;
-
 import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;

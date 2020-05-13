@@ -30,7 +30,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.stream.Collectors;
-
 import org.apache.jena.rdf.model.Model;
 import org.junit.Test;
 import org.junit.runner.RunWith;

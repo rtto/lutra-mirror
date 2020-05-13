@@ -27,7 +27,6 @@ import org.apache.jena.vocabulary.OWL;
 import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.RDFS;
 import org.apache.jena.vocabulary.XSD;
-
 import xyz.ottr.lutra.model.Parameter;
 import xyz.ottr.lutra.model.Signature;
 import xyz.ottr.lutra.model.terms.BlankNodeTerm;
@@ -64,6 +63,7 @@ public enum OTTR  {
 
     }
 
+    @SuppressWarnings("PMD.UnnecessaryFullyQualifiedName")
     public enum BaseTemplate {
         ;
         public static final Signature Triple;

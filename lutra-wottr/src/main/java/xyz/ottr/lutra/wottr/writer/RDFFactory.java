@@ -25,7 +25,6 @@ package xyz.ottr.lutra.wottr.writer;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-
 import org.apache.jena.datatypes.TypeMapper;
 import org.apache.jena.rdf.model.AnonId;
 import org.apache.jena.rdf.model.Literal;

@@ -27,7 +27,6 @@ import static org.hamcrest.CoreMatchers.is;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
-
 import org.junit.Assert;
 import org.junit.Test;
 

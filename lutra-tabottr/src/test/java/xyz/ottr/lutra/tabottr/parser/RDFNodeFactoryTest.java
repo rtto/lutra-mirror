@@ -38,7 +38,6 @@ import org.apache.jena.vocabulary.XSD;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-
 import xyz.ottr.lutra.tabottr.TabOTTR;
 import xyz.ottr.lutra.wottr.WOTTR;
 

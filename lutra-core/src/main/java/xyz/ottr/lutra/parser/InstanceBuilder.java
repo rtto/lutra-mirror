@@ -23,7 +23,6 @@ package xyz.ottr.lutra.parser;
  */
 
 import java.util.List;
-
 import lombok.Builder;
 import xyz.ottr.lutra.model.Argument;
 import xyz.ottr.lutra.model.Instance;

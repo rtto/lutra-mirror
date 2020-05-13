@@ -27,7 +27,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-
 import lombok.Builder;
 import lombok.Singular;
 import org.apache.jena.shared.PrefixMapping;
@@ -103,8 +102,8 @@ public class ListTerm extends AbstractTerm<Long> {
 
     @Override
     public Term apply(Substitution substitution) {
-        // TODO is it correct to create a new list?
         return this.toBuilder()
+            .clearTerms()
             .terms(substitution.apply(this.terms))
             .build();
     }

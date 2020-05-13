@@ -26,7 +26,6 @@ import static org.apache.jena.riot.SysRIOT.fmtMessage;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import lombok.Getter;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;

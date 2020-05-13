@@ -31,7 +31,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
 import org.apache.commons.collections4.iterators.PermutationIterator;
 import org.apache.commons.math3.util.CombinatoricsUtils;
 import xyz.ottr.lutra.model.HasApplySubstitution;

@@ -31,7 +31,6 @@ import org.apache.jena.vocabulary.RDFS;
 import org.apache.jena.vocabulary.XSD;
 import org.junit.Before;
 import org.junit.Test;
-
 import xyz.ottr.lutra.OTTR;
 
 public class TermTypeTest {

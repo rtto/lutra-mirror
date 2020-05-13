@@ -27,7 +27,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-
 import org.apache.jena.shared.PrefixMapping;
 import xyz.ottr.lutra.model.Argument;
 import xyz.ottr.lutra.model.terms.Term;
