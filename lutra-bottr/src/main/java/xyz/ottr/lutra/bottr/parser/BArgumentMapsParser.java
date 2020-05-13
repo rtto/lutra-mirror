@@ -24,7 +24,6 @@ package xyz.ottr.lutra.bottr.parser;
 
 import java.util.function.Function;
 import java.util.stream.Collectors;
-
 import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.RDFList;

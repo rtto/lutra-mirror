@@ -23,7 +23,6 @@ package xyz.ottr.lutra.stottr.writer;
  */
 
 import java.util.stream.Collectors;
-
 import xyz.ottr.lutra.Space;
 import xyz.ottr.lutra.stottr.STOTTR;
 

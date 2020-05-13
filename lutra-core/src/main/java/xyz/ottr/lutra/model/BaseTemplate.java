@@ -23,7 +23,6 @@ package xyz.ottr.lutra.model;
  */
 
 import java.util.List;
-
 import lombok.Builder;
 import lombok.Singular;
 

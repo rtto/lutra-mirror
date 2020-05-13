@@ -23,7 +23,6 @@ package xyz.ottr.lutra.stottr.io;
  */
 
 import java.io.IOException;
-
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 import xyz.ottr.lutra.io.InputReader;

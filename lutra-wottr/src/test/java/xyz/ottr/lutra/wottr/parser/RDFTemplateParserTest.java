@@ -35,7 +35,6 @@ import org.junit.Test;
 import xyz.ottr.lutra.model.Signature;
 import xyz.ottr.lutra.system.ResultStream;
 import xyz.ottr.lutra.wottr.WOTTR;
-import xyz.ottr.lutra.wottr.parser.WTemplateParser;
 
 public class RDFTemplateParserTest {
 

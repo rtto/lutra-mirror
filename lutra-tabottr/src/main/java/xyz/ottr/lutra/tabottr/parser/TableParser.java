@@ -24,7 +24,6 @@ package xyz.ottr.lutra.tabottr.parser;
 
 import java.util.List;
 import java.util.stream.Collectors;
-
 import org.apache.jena.shared.PrefixMapping;
 import xyz.ottr.lutra.model.Instance;
 import xyz.ottr.lutra.system.Result;

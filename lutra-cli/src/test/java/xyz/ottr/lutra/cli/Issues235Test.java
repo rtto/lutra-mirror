@@ -22,8 +22,6 @@ package xyz.ottr.lutra.cli;
  * #L%
  */
 
-import static org.junit.Assert.assertTrue;
-
 import org.apache.jena.rdf.model.Model;
 import org.junit.Test;
 import xyz.ottr.lutra.wottr.io.RDFIO;

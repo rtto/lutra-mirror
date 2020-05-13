@@ -24,9 +24,7 @@ package xyz.ottr.lutra.bottr.model;
 
 import java.util.HashMap;
 import java.util.Map;
-
 import lombok.AllArgsConstructor;
-
 import org.apache.jena.rdf.model.RDFNode;
 
 @AllArgsConstructor

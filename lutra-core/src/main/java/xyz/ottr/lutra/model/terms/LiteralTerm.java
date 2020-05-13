@@ -24,7 +24,6 @@ package xyz.ottr.lutra.model.terms;
 
 import java.util.Objects;
 import java.util.Optional;
-
 import lombok.Getter;
 import lombok.NonNull;
 import xyz.ottr.lutra.RDFTurtle;

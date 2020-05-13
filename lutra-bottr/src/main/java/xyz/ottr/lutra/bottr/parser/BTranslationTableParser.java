@@ -24,7 +24,6 @@ package xyz.ottr.lutra.bottr.parser;
 
 import java.util.AbstractMap;
 import java.util.stream.Collectors;
-
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 import xyz.ottr.lutra.bottr.BOTTR;

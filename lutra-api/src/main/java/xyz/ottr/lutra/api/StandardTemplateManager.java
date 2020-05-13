@@ -27,11 +27,8 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.LinkedList;
 import java.util.List;
-
 import lombok.Getter;
-
 import org.apache.commons.io.IOUtils;
-
 import xyz.ottr.lutra.TemplateManager;
 import xyz.ottr.lutra.model.Signature;
 import xyz.ottr.lutra.store.TemplateStore;

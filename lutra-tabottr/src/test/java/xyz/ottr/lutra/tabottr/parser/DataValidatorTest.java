@@ -25,7 +25,6 @@ package xyz.ottr.lutra.tabottr.parser;
 import static org.junit.Assert.assertTrue;
 
 import java.util.function.Predicate;
-
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -23,7 +23,6 @@ package xyz.ottr.lutra.wottr;
  */
 
 import java.util.List;
-
 import org.apache.commons.collections4.BidiMap;
 import org.apache.commons.collections4.bidimap.DualHashBidiMap;
 import org.apache.commons.collections4.bidimap.UnmodifiableBidiMap;

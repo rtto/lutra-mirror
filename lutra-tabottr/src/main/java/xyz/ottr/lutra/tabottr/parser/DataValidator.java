@@ -23,10 +23,8 @@ package xyz.ottr.lutra.tabottr.parser;
  */
 
 import java.util.Objects;
-
 import org.apache.commons.validator.routines.UrlValidator;
 import org.apache.jena.rdf.model.Model;
-
 import xyz.ottr.lutra.tabottr.TabOTTR;
 
 public class DataValidator {

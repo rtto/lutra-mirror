@@ -25,17 +25,14 @@ package xyz.ottr.lutra.docttr.writer;
 import static j2html.TagCreator.*;
 
 import j2html.tags.ContainerTag;
-
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
-
 import org.apache.jena.shared.PrefixMapping;
 import xyz.ottr.lutra.OTTR;
-
 import xyz.ottr.lutra.model.Instance;
 import xyz.ottr.lutra.model.Signature;
 import xyz.ottr.lutra.model.Template;

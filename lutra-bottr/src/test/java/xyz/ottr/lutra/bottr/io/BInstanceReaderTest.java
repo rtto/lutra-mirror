@@ -25,7 +25,6 @@ package xyz.ottr.lutra.bottr.io;
 import static org.hamcrest.CoreMatchers.is;
 
 import java.util.stream.Stream;
-
 import org.apache.jena.rdf.model.Model;
 import org.junit.Assert;
 import org.junit.Test;

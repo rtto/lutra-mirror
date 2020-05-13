@@ -24,7 +24,6 @@ package xyz.ottr.lutra.store.checks;
 
 import java.util.function.Function;
 import java.util.stream.Stream;
-
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import xyz.ottr.lutra.store.Query;

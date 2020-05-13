@@ -23,7 +23,6 @@ package xyz.ottr.lutra.io;
  */
 
 import java.util.function.Function;
-
 import xyz.ottr.lutra.system.ResultStream;
 
 public interface InputReader<T, R> extends Function<T, ResultStream<R>> {

@@ -23,7 +23,6 @@ package xyz.ottr.lutra.store.checks;
  */
 
 import java.util.List;
-
 import org.apache.commons.collections4.ListUtils;
 import xyz.ottr.lutra.store.Query;
 import xyz.ottr.lutra.system.Message;

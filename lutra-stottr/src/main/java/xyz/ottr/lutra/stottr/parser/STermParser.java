@@ -27,7 +27,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-
 import org.antlr.v4.runtime.tree.TerminalNode;
 import org.apache.jena.vocabulary.XSD;
 import xyz.ottr.lutra.model.terms.BlankNodeTerm;

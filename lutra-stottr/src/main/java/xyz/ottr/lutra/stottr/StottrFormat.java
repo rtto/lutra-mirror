@@ -24,9 +24,7 @@ package xyz.ottr.lutra.stottr;
 
 import java.util.Collection;
 import java.util.Set;
-
 import org.apache.jena.shared.PrefixMapping;
-
 import xyz.ottr.lutra.OTTR;
 import xyz.ottr.lutra.io.Format;
 import xyz.ottr.lutra.io.InstanceReader;

@@ -27,7 +27,6 @@ import static org.junit.Assert.assertTrue;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
-
 import org.apache.jena.rdf.model.Model;
 import org.junit.Test;
 import xyz.ottr.lutra.model.Instance;

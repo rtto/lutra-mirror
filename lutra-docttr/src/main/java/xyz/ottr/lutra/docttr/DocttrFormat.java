@@ -24,7 +24,6 @@ package xyz.ottr.lutra.docttr;
 
 import java.util.Collection;
 import java.util.Set;
-
 import org.apache.jena.shared.PrefixMapping;
 import xyz.ottr.lutra.docttr.writer.DTemplateWriter;
 import xyz.ottr.lutra.io.Format;

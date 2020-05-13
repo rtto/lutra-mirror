@@ -24,7 +24,6 @@ package xyz.ottr.lutra.wottr.util;
 
 import java.util.Collection;
 import java.util.stream.Collectors;
-
 import org.apache.jena.graph.Node;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.RDFList;

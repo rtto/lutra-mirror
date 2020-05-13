@@ -25,7 +25,6 @@ package xyz.ottr.lutra.store.graph;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-
 import lombok.Getter;
 import lombok.Setter;
 import xyz.ottr.lutra.model.BaseTemplate;

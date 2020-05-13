@@ -25,7 +25,6 @@ package xyz.ottr.lutra.stottr.parser;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Pattern;
-
 import org.antlr.v4.runtime.tree.TerminalNode;
 import xyz.ottr.lutra.stottr.antlr.stOTTRBaseVisitor;
 import xyz.ottr.lutra.stottr.antlr.stOTTRParser;

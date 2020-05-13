@@ -24,7 +24,6 @@ package xyz.ottr.lutra.system;
 
 import java.util.Arrays;
 import java.util.stream.Collectors;
-
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import org.slf4j.Logger;

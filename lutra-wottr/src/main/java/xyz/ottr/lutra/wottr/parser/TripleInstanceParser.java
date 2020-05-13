@@ -24,7 +24,6 @@ package xyz.ottr.lutra.wottr.parser;
 
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Statement;

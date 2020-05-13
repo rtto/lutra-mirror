@@ -28,7 +28,6 @@ import static xyz.ottr.lutra.model.terms.ObjectTerm.cons;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
-
 import org.junit.Assert;
 import org.junit.Test;
 import xyz.ottr.lutra.model.terms.ListTerm;
