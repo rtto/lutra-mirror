@@ -24,6 +24,7 @@ package xyz.ottr.lutra.store;
 
 import java.util.Collection; 
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -33,9 +34,16 @@ import java.util.function.Predicate;
 import xyz.ottr.lutra.OTTR;
 import xyz.ottr.lutra.io.FormatManager;
 import xyz.ottr.lutra.io.TemplateReader;
+import xyz.ottr.lutra.model.Argument;
 import xyz.ottr.lutra.model.Instance;
+import xyz.ottr.lutra.model.Parameter;
 import xyz.ottr.lutra.model.Signature;
 import xyz.ottr.lutra.model.Template;
+import xyz.ottr.lutra.model.terms.BlankNodeTerm;
+import xyz.ottr.lutra.model.terms.IRITerm;
+import xyz.ottr.lutra.model.terms.Term;
+import xyz.ottr.lutra.model.types.TermType;
+import xyz.ottr.lutra.model.types.TypeRegistry;
 import xyz.ottr.lutra.system.MessageHandler;
 import xyz.ottr.lutra.system.Result;
 import xyz.ottr.lutra.system.ResultConsumer;
@@ -253,6 +261,11 @@ public interface TemplateStore extends Consumer<Signature> {
     ResultStream<Instance> expandInstance(Instance instance);
 
     /**
+     * Same as #expandInstance but does not perform any checks (such as type checking, etc.)
+     */
+    ResultStream<Instance> expandInstanceWithoutChecks(Instance instance);
+
+    /**
      * Expands the argument template instance according to the definitions in this
      * store, but fetches misisng templates, and returns empty Result-instances if the instance is using
      * a template wrongly (e.g.~wrong number of arguments or wrong types, optionals).
@@ -340,6 +353,7 @@ public interface TemplateStore extends Consumer<Signature> {
 
         Result<Signature> sigRes = getTemplateSignature(iri);
         if (!sigRes.isPresent()) {
+            // Mapping function will never be called, only used to get correct type
             return ResultStream.of(sigRes.map(ignore -> (Instance) null));
         }
 
@@ -362,6 +376,7 @@ public interface TemplateStore extends Consumer<Signature> {
             index++;
         }
         Instance ins = Instance.builder().iri(iri).arguments(args).build();
-        return expandInstanceWithoutChecks(ins); // TODO: Lift this DependencyGraph method up to this interface
+
+        return expandInstanceWithoutChecks(ins); 
     }
 }

@@ -167,8 +167,6 @@ public class DependencyGraph implements TemplateStore {
         return true;
     }
 
-
-
     @Override
     public boolean addTemplate(Template template) {
         addTemplateSignature(template);
@@ -542,15 +540,17 @@ public class DependencyGraph implements TemplateStore {
      * writer.
      */
     private ResultStream<Instance> expandInstances(Set<Instance> instances,
-            Predicate<DependencyEdge> shouldExpand) {
+            Predicate<DependencyEdge> shouldExpand, boolean performChecks) {
 
         Set<Result<DependencyEdge>> finalExpansion = new HashSet<>();
         Set<Result<DependencyEdge>> toExpandRes = toResultDependencies(instances);
         
         // Check arguments (number of arguments and types)
-        toExpandRes = toExpandRes.stream()
-            .map(ins -> ins.flatMap(this::checkArguments))
-            .collect(Collectors.toSet());
+        if (performChecks) {
+            toExpandRes = toExpandRes.stream()
+                   .map(ins -> ins.flatMap(this::checkArguments))
+                   .collect(Collectors.toSet());
+        }
 
         while (!toExpandRes.isEmpty()) {
 
@@ -610,7 +610,14 @@ public class DependencyGraph implements TemplateStore {
     public ResultStream<Instance> expandInstance(Instance instance) {
         Set<Instance> instanceSet = new HashSet<>();
         instanceSet.add(instance);
-        return expandInstances(instanceSet, e -> true);
+        return expandInstances(instanceSet, e -> true, true);
+    }
+
+    @Override
+    public ResultStream<Instance> expandInstanceWithoutChecks(Instance instance) {
+        Set<Instance> instanceSet = new HashSet<>();
+        instanceSet.add(instance);
+        return expandInstances(instanceSet, e -> true, false);
     }
 
     /**
