@@ -313,6 +313,16 @@ public abstract class QueryEngine<S extends TemplateStore> {
     public abstract Stream<Tuple> hasListExpander(Tuple tuple, String arguments, String index);
 
     /**
+     * @param tuple
+     *      a Map representing a tuple from variables to values
+     * @param term
+     *      a variable name denoting a term
+     * @return
+     *      a Stream of tuples binding term to a term if term is a variable.
+     */
+    public abstract Stream<Tuple> isVariable(Tuple tuple, String term);
+
+    /**
      * Constructs a stream of maps (representing tuples) mapping the variable instance to
      * instances with a Cross expansion modifier, according to this store.
      *

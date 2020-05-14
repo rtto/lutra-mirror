@@ -301,6 +301,15 @@ public class DependencyGraphEngine extends QueryEngine<DependencyGraph> {
     }
 
     @Override
+    public Stream<Tuple> isVariable(Tuple tuple, String term) {
+        Term boundTerm = tuple.getAs(Term.class, term);
+
+        return boundTerm.isVariable()
+            ? Stream.of(tuple)
+            : Stream.empty();
+    }
+
+    @Override
     public Stream<Tuple> body(Tuple tuple, String template, String body) {
 
         Result<TemplateNode> resBoundTemplate = this.store.checkIsTemplate(tuple.getAs(String.class, template));

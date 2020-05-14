@@ -115,6 +115,21 @@ public enum CheckLibrary {
                 + " which does not occur in the pattern of the template.")
     );
 
+    /* Undefined parameter */
+    private static final Check undefinedParameter = new Check(
+        Query.template("Temp")
+            .and(Query.bodyInstance("Temp", "Ins")
+                .and(Query.argumentIndex("Ins", "Index2", "Arg"))
+                .and(Query.isVariable("Arg"))
+                .and(Query.hasOccurenceAt("Arg", "Lvl", "Val")))
+            .and(Query.not(Query.parameterIndex("Temp", "Index", "Val"))),
+        tup -> Message.error(
+            "Undefined parameter in template " + tup.get("Temp") + ". "
+                + "The template pattern contains the variable " + tup.get("Val")
+                + " (used in the instance " + tup.get("Ins") + ")"
+                + ", but this does not occur in the template's parameter list.")
+    );
+
     /* Type checking: consistent use of terms */
     // As our type hierarchy is tree shaped, if any pair of types a term is used as
     // is compatible (one subtype of the other) there must exist a least type subtype
@@ -167,6 +182,7 @@ public enum CheckLibrary {
         wrongNumberOfArguments,
         cyclicDependency,
         unusedParameter,
+        undefinedParameter,
         conflictingParameterTypes,
         conflictingIntrinsicInferredTypes
     );

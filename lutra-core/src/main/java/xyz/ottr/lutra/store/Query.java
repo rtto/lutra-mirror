@@ -150,6 +150,10 @@ public class Query {
         return new Query((qe, m) -> qe.hasListExpander(m, params, index));
     }
 
+    public static Query isVariable(String argument) {
+        return new Query((qe, m) -> qe.isVariable(m, argument));
+    }
+
     public static Query hasCrossModifier(String instance) {
         return new Query((qe, m) -> qe.hasCrossModifier(m, instance));
     }
