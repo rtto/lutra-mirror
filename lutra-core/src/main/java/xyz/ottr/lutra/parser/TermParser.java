@@ -43,18 +43,6 @@ public class TermParser {
     private static final Map<String, Result<BlankNodeTerm>> createdBlanks = new HashMap<>();
 
 
-    /*
-    private final PrefixMapping prefixMapping;
-
-    public TermParser() {
-        this(PrefixMapping.Factory.create());
-    }
-
-    public TermParser(PrefixMapping prefixMapping) {
-        this.prefixMapping = prefixMapping;
-    }
-     */
-
     public static Result<Term> newNoneTerm() {
         return Result.of(new NoneTerm());
     }

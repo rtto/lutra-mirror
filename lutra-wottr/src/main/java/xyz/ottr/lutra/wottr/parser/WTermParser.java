@@ -50,7 +50,7 @@ public class WTermParser {
         } else if (node.isLiteral()) {
             return toLiteralTerm(node.asLiteral()).map(tl -> (Term) tl);
         } else {
-            return Result.error("Unable to parse RDFNode " + RDFNodeWriter.toString(node) + " to Term.");
+            return toError(node);
         }
     }
 
@@ -63,8 +63,13 @@ public class WTermParser {
         } else if (node.isAnon()) {
             return toBlankNodeTerm(node.getId().getBlankNodeId()).map(tl -> (Term) tl);
         } else {
-            return Result.error("Unable to parse resource " + RDFNodeWriter.toString(node) + " to Term.");
+            return toError(node);
         }
+    }
+
+    private static Result toError(RDFNode node) {
+        return Result.error("Unable to parse " + node.getClass().getSimpleName() + " "
+            + RDFNodeWriter.toString(node) + " to Term.");
     }
 
     private static Result<ListTerm> toListTerm(RDFList list) {

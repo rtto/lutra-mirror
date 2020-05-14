@@ -275,6 +275,7 @@ public class ResultStream<E> {
      * results of the original stream were present, inside one Result containing all
      * the original Results messages.
      */
+    // TODO implement this as a Collector?
     public Result<Stream<E>> aggregate() {
         
         List<E> unpacked = new LinkedList<>();
