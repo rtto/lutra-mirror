@@ -12,7 +12,7 @@
     <artifactId>lutra-restapi</artifactId>
     <packaging>war</packaging>
 
-    <name>lutra-restapi</name>
+    <name>${project.groupId}:${project.artifactId}</name>
 
     <dependencies>
 

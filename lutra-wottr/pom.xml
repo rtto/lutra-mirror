@@ -10,6 +10,8 @@
     <artifactId>lutra-wottr</artifactId>
     <packaging>jar</packaging>
 
+    <name>${project.groupId}:${project.artifactId}</name>
+
     <properties>
         <url.wottrspec>https://dev.spec.ottr.xyz/wOTTR/</url.wottrspec>
         <local.wottrspec>${project.basedir}/src/test/resources/spec</local.wottrspec>

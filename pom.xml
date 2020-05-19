@@ -18,11 +18,11 @@
         <module>lutra-docttr</module>
     </modules>
 
-
-    <issueManagement>
-        <url>/issues</url>
-        <system>GitLab Issues</system>
-    </issueManagement>
+    <name>${project.groupId}:${project.artifactId}</name>
+    <description>
+        Lutra is the reference implementation of the OTTR framework, http://ottr.xyz.
+    </description>
+    <url>https://gitlab.com/ottr/lutra/lutra</url>
 
     <licenses>
         <license>
@@ -32,22 +32,36 @@
         </license>
     </licenses>
 
+    <developers>
+        <developer>
+            <name>Martin G. Skjæveland</name>
+            <email>m.g.skjaveland@gmail.com</email>
+            <organizationUrl>https://gitlab.com/m.g.skjaeveland</organizationUrl>
+        </developer>
+        <developer>
+            <name>Leif Harald Karlsen</name>
+            <organizationUrl>https://gitlab.com/leifhka</organizationUrl>
+        </developer>
+    </developers>
+
     <scm>
-        <url>https://gitlab.com/ottr/lutra/lutra</url>
+        <url>https://gitlab.com/ottr/lutra/lutra.git</url>
         <connection>scm:git:https://gitlab.com/ottr/lutra/lutra.git</connection>
         <developerConnection>scm:git:https://gitlab.com/ottr/lutra/lutra.git</developerConnection>
     </scm>
 
-    <developers>
-        <developer>
-            <name>Martin G. Skjæveland</name>
-        </developer>
-        <developer>
-            <name>Leif Harald Karlsen</name>
-        </developer>
-    </developers>
+    <distributionManagement>
+        <snapshotRepository>
+            <id>ossrh</id>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+        </snapshotRepository>
+        <repository>
+            <id>ossrh</id>
+            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+        </repository>
+    </distributionManagement>
 
-	<properties>
+    <properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
         <maven.compiler.target>11</maven.compiler.target>
@@ -69,6 +83,49 @@
             </plugin>
 
             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>2.2.1</version>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <goals>
+                            <goal>jar-no-fork</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>2.9.1</version>
+                <executions>
+                    <execution>
+                        <id>attach-javadocs</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-gpg-plugin</artifactId>
+                <version>1.5</version>
+                <executions>
+                    <execution>
+                        <id>sign-artifacts</id>
+                        <phase>deploy</phase>
+                        <goals>
+                            <goal>sign</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
                 <groupId>external.atlassian.jgitflow</groupId>
                 <artifactId>jgitflow-maven-plugin</artifactId>
                 <version>1.0-m5.1</version>
@@ -80,6 +137,19 @@
                     <enableSshAgent>true</enableSshAgent>
                     <noDeploy>true</noDeploy>
                     <scmCommentPrefix>[jgitflow] </scmCommentPrefix>
+                </configuration>
+            </plugin>
+
+
+            <plugin>
+                <groupId>org.sonatype.plugins</groupId>
+                <artifactId>nexus-staging-maven-plugin</artifactId>
+                <version>1.6.7</version>
+                <extensions>true</extensions>
+                <configuration>
+                    <serverId>ossrh</serverId>
+                    <nexusUrl>https://oss.sonatype.org/</nexusUrl>
+                    <autoReleaseAfterClose>true</autoReleaseAfterClose>
                 </configuration>
             </plugin>
 
