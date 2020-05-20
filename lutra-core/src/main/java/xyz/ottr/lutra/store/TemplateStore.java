@@ -24,7 +24,6 @@ package xyz.ottr.lutra.store;
 
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -33,16 +32,9 @@ import java.util.function.Predicate;
 import xyz.ottr.lutra.OTTR;
 import xyz.ottr.lutra.io.FormatManager;
 import xyz.ottr.lutra.io.TemplateReader;
-import xyz.ottr.lutra.model.Argument;
 import xyz.ottr.lutra.model.Instance;
-import xyz.ottr.lutra.model.Parameter;
 import xyz.ottr.lutra.model.Signature;
 import xyz.ottr.lutra.model.Template;
-import xyz.ottr.lutra.model.terms.BlankNodeTerm;
-import xyz.ottr.lutra.model.terms.IRITerm;
-import xyz.ottr.lutra.model.terms.Term;
-import xyz.ottr.lutra.model.types.TermType;
-import xyz.ottr.lutra.model.types.TypeRegistry;
 import xyz.ottr.lutra.system.MessageHandler;
 import xyz.ottr.lutra.system.Result;
 import xyz.ottr.lutra.system.ResultConsumer;
@@ -348,34 +340,4 @@ public interface TemplateStore extends Consumer<Signature> {
 
     FormatManager getFormatManager();
 
-    default ResultStream<Instance> expandForDocumentation(String iri) {
-
-        Result<Signature> sigRes = getTemplateSignature(iri);
-        if (!sigRes.isPresent()) {
-            // Mapping function will never be called, only used to get correct type
-            return ResultStream.of(sigRes.map(ignore -> (Instance) null));
-        }
-
-        Signature sig = sigRes.get();
-
-        List<Argument> args = new LinkedList<>();
-        int index = 1;
-        for (Parameter param : sig.getParameters()) {
-            TermType type = param.getTerm().getType();
-            Term term;
-            if (type.isSubTypeOf(TypeRegistry.IRI) && param.isNonBlank()) {
-                // Might end up as a predicate in a triple, thus make a (non-blank)
-                // IRI as to not violate the non-blank predicate requirement of RDF
-                term = new IRITerm("example.com/arg" + index);
-            } else {
-                term = new BlankNodeTerm("arg" + index);
-            }
-            Argument arg = Argument.builder().term(term).build();
-            args.add(arg);
-            index++;
-        }
-        Instance ins = Instance.builder().iri(iri).arguments(args).build();
-
-        return expandInstanceWithoutChecks(ins); 
-    }
 }

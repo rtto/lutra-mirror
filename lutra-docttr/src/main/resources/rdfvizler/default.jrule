@@ -1,0 +1,97 @@
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix owl:   <http://www.w3.org/2002/07/owl#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+@prefix rvz:  <http://rdfvizler.dyreriket.xyz/vocabulary/core#> .
+@prefix rvz-a: <http://rdfvizler.dyreriket.xyz/vocabulary/attribute#> .
+@prefix rvz-n: <http://rdfvizler.dyreriket.xyz/vocabulary/attribute-default-node#> .
+@prefix rvz-e: <http://rdfvizler.dyreriket.xyz/vocabulary/attribute-default-edge#> .
+@prefix :      <urn:temp#>
+
+
+// Set some defaults
+[init:
+->
+   (:graph rdf:type rvz:RootGraph)
+   (:graph rdf:type rvz:DiGraph)
+   (:graph rvz-a:rankdir "LR")
+   (:graph rvz-a:nodesep "0.3")
+   (:graph rvz-a:ranksep "0.3")
+   (:graph rvz-a:center "true")
+   (:graph rvz-a:overlap "false")
+   (:graph rvz-a:splines "true")
+   // node defaults
+   (:graph rvz-n:shape "box")
+   (:graph rvz-n:fontname "Arial")
+   (:graph rvz-n:fontsize "10px")
+   (:graph rvz-n:height "0")
+   (:graph rvz-n:width "0")
+   // edge defaults
+   (:graph rvz-e:fontname "Arial")
+   (:graph rvz-e:fontsize "10px")
+]
+
+// Add nodes and edges for (almost) all triples.
+[Triples2Dot:
+  (?xs ?xp ?xo)
+  namespace(?xp, ?ns)
+  // need this to terminate: do not include rule produced triples
+  notEqual(?ns, "urn:temp#")
+  notEqual(?ns, "http://rdfvizler.dyreriket.xyz/vocabulary/core#")
+  notEqual(?ns, "http://rdfvizler.dyreriket.xyz/vocabulary/attribute#")
+  notEqual(?ns, "http://rdfvizler.dyreriket.xyz/vocabulary/attribute-default-node#")
+  notEqual(?ns, "http://rdfvizler.dyreriket.xyz/vocabulary/attribute-default-edge#")
+  // do not include type relationships
+  notEqual(?xp, rdf:type)
+  // literals cannot be subjects, so we just skolemise everything to get a usable ID:
+  makeSkolem(?s, ?xs)
+  makeSkolem(?p, ?xs, ?xp, ?xo)
+  makeSkolem(?o, ?xo)
+  shortvalue(?xp, ?pname)
+->
+  (?s rvz:hasID ?xs)
+  (?o rvz:hasID ?xo)
+  (:graph rvz:hasEdge ?p)
+  (:graph rvz:hasNode ?s)
+  (:graph rvz:hasNode ?o)
+  (?p rvz:hasSource ?s)
+  (?p rvz:hasTarget ?o)
+  (?p rvz-a:label ?pname)
+]
+
+// style URIs
+[URIs:
+  (:graph rvz:hasNode ?node) (?node rvz:hasID ?id)
+  notBNode(?id) notLiteral(?id)
+  typedvalue(?id, ?name)
+->
+  (?node rvz-a:label ?name)
+  (?node rvz-a:style "filled")
+  (?node rvz-a:fillcolor "lightskyblue")
+  (?node rvz-a:URL ?id)
+]
+
+// style blank nodes
+[Blanks:
+  (:graph rvz:hasNode ?node) (?node rvz:hasID ?id)
+  isBNode(?id)
+  typedvalue(?id, ?name)
+->
+  (?node rvz-a:label ?name)
+  (?node rvz-a:style "filled,dashed")
+  (?node rvz-a:fillcolor "gray90")
+  (?node rvz-a:height ".3")
+  (?node rvz-a:width ".3")
+]
+
+// style literals
+[Literals:
+  (:graph rvz:hasNode ?node) (?node rvz:hasID ?id)
+  isLiteral(?id)
+  typedvalue(?id, ?name)
+->
+  (?node rvz-a:label ?name)
+  (?node rvz-a:style "rounded,filled")
+  (?node rvz-a:fillcolor "lemonchiffon")
+  (?node rvz-a:fontname "Times")
+]

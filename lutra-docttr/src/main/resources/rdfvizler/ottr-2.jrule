@@ -1,17 +1,15 @@
-@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#>.
-@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#>.
-@prefix owl:   <http://www.w3.org/2002/07/owl#>.
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix owl:   <http://www.w3.org/2002/07/owl#> .
 @prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
-
-@prefix ottr:  <http://ns.ottr.xyz/0.4/>
-
-@prefix rvz:   <http://rdfvizler.dyreriket.xyz/vocabulary/core#> .
+@prefix rvz:  <http://rdfvizler.dyreriket.xyz/vocabulary/core#> .
 @prefix rvz-a: <http://rdfvizler.dyreriket.xyz/vocabulary/attribute#> .
 @prefix rvz-n: <http://rdfvizler.dyreriket.xyz/vocabulary/attribute-default-node#> .
 @prefix rvz-e: <http://rdfvizler.dyreriket.xyz/vocabulary/attribute-default-edge#> .
-
 @prefix :      <urn:temp#>
 
+
+// Set some defaults
 [init:
 ->
    (:graph rdf:type rvz:RootGraph)
@@ -33,6 +31,7 @@
    (:graph rvz-e:fontsize "10px")
 ]
 
+// Add nodes and edges for (almost) all triples.
 [Triples2Dot:
   (?xs ?xp ?xo)
   namespace(?xp, ?ns)
@@ -40,15 +39,13 @@
   notEqual(?ns, "urn:temp#")
   notEqual(?ns, "http://rdfvizler.dyreriket.xyz/vocabulary/core#")
   notEqual(?ns, "http://rdfvizler.dyreriket.xyz/vocabulary/attribute#")
-  notEqual(?ns, "http://rdfvizler.dyreriket.xyz/vocabulary/attribute/default/node#")
-  notEqual(?ns, "http://rdfvizler.dyreriket.xyz/vocabulary/attribute/default/edge#")
-  // do not include type and list relationships
+  notEqual(?ns, "http://rdfvizler.dyreriket.xyz/vocabulary/attribute-default-node#")
+  notEqual(?ns, "http://rdfvizler.dyreriket.xyz/vocabulary/attribute-default-edge#")
+  // do not include type relationships
   notEqual(?xp, rdf:type)
   notEqual(?xp, rdf:first)
   notEqual(?xp, rdf:rest)
-  // do not include ottr vocab
-  notEqual(?ns, "http://ns.ottr.xyz/0.4/")
-  // literals cannot be subjects, so we skolemise everything:
+  // literals cannot be subjects, so we just skolemise everything to get a usable ID:
   makeSkolem(?s, ?xs)
   makeSkolem(?p, ?xs, ?xp, ?xo)
   makeSkolem(?o, ?xo)
@@ -64,6 +61,7 @@
   (?p rvz-a:label ?pname)
 ]
 
+// style URIs
 [URIs:
   (:graph rvz:hasNode ?node) (?node rvz:hasID ?id)
   notBNode(?id) notLiteral(?id)
@@ -75,6 +73,7 @@
   (?node rvz-a:URL ?id)
 ]
 
+// style blank nodes
 [Blanks:
   (:graph rvz:hasNode ?node) (?node rvz:hasID ?id)
   isBNode(?id)
@@ -87,6 +86,7 @@
   (?node rvz-a:width ".3")
 ]
 
+// style literals
 [Literals:
   (:graph rvz:hasNode ?node) (?node rvz:hasID ?id)
   isLiteral(?id)
@@ -98,15 +98,27 @@
   (?node rvz-a:fontname "Times")
 ]
 
-[TemplateVariable:
-  (:graph rvz:hasNode ?node) (?node rvz:hasID ?rdfnode)
-  (?x ?ottr ?rdfnode)
-  namespace(?ottr, ?ottrns)
-  equal(?ottrns, "http://ns.ottr.xyz/0.4/")
+// style parameters
+[InstanceArgumentURI:
+  (:graph rvz:hasNode ?node) (?node rvz:hasID ?id)
+  notBNode(?id), notLiteral(?id)
+  namespace(?id, ?ns)
+  equal(?ns, "http://example.ottr.xyz/argument/")
 ->
   (?node rvz-a:color "red")
   (?node rvz-a:penwidth "2")
 ]
+[InstanceArgumentBNode:
+  (:graph rvz:hasNode ?node) (?node rvz:hasID ?id)
+  isBNode(?id)
+  beginsWith(?id, "argument")
+->
+  (?node rvz-a:color "red")
+  (?node rvz-a:penwidth "2")
+]
+
+
+
 
 
 ### transitive closure of lists, in two steps
@@ -138,6 +150,7 @@
 ->
   (:graph rvz:hasEdge ?p)
   (?p rvz:hasSource ?node)
+  (?node rvz-a:label "[ rdf:List ]")
   (?p rvz:hasTarget ?list)
   (?p rvz-a:arrowhead "odiamond")
 ]

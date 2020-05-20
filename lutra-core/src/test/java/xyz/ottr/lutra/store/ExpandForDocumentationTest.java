@@ -42,14 +42,14 @@ import xyz.ottr.lutra.system.ResultConsumer;
 
 public class ExpandForDocumentationTest {
 
-    private void expandAndCheck(String toExpand, Set<Signature> templates, int shouldHaveSize) {
+    private void expandAndCheck(Signature toExpand, Set<Signature> templates, int shouldHaveSize) {
         
         DependencyGraph graph = new DependencyGraph(null);
         templates.forEach(graph);
 
         Set<Instance> expanded = new HashSet<>();
         ResultConsumer<Instance> consumer = new ResultConsumer<>(expanded::add);
-        graph.expandForDocumentation(toExpand)
+        graph.expandInstanceWithoutChecks(toExpand.getExampleInstance())
             .forEach(consumer);
 
         Assertions.noErrors(consumer);
@@ -83,6 +83,6 @@ public class ExpandForDocumentationTest {
                 .build())
             .build();
 
-        expandAndCheck("temp", Set.of(base, temp), 1);
+        expandAndCheck(temp, Set.of(base, temp), 1);
     }
 }

@@ -32,6 +32,7 @@ import picocli.CommandLine;
 import picocli.CommandLine.ParameterException;
 import xyz.ottr.lutra.TemplateManager;
 import xyz.ottr.lutra.api.StandardTemplateManager;
+import xyz.ottr.lutra.docttr.writer.DTemplateWriter;
 import xyz.ottr.lutra.io.Files;
 import xyz.ottr.lutra.io.Format;
 import xyz.ottr.lutra.model.Instance;
@@ -103,6 +104,7 @@ public class CLI {
         } else if (this.settings.library == null
             && (this.settings.mode == Settings.Mode.expandLibrary
                 || this.settings.mode == Settings.Mode.formatLibrary
+                || this.settings.mode == Settings.Mode.docttrLibrary
                 || this.settings.mode == Settings.Mode.lint)) {
 
             this.messageHandler.printMessage(Message.error("Must provide a library. "
@@ -138,16 +140,19 @@ public class CLI {
 
         switch (this.settings.mode) {
             case expand:
-                executeExpand();
+                writeInstances(parseAndExpandInstances());
                 break;
             case expandLibrary:
-                executeExpandLibrary();
+                this.messageHandler.use(this.templateManager.expandStore(), this::writeTemplates);
                 break;
             case formatLibrary:
-                executeFormatLibrary();
+                writeTemplates(this.templateManager);
+                break;
+            case docttrLibrary:
+                docttrTemplates(this.templateManager);
                 break;
             case format:
-                executeFormat();
+                writeInstances(parseInstances());
                 break;
             case lint:
                 break;
@@ -155,22 +160,6 @@ public class CLI {
                 Message err = Message.error("The mode " + this.settings.mode + " is not yet supported.");
                 this.messageHandler.printMessage(err);
         }
-    }
-
-    private void executeExpand() {
-        writeInstances(parseAndExpandInstances());
-    }
-
-    private void executeFormat() {
-        writeInstances(parseInstances());
-    }
-
-    private void executeExpandLibrary() {
-        this.messageHandler.use(this.templateManager.expandStore(), this::writeTemplates);
-    }
-
-    private void executeFormatLibrary() {
-        writeTemplates(this.templateManager);
     }
 
     private Message.Severity checkLibrary() {
@@ -248,6 +237,16 @@ public class CLI {
     private void writeTemplates(TemplateManager templateManager) {
         Format outFormat = this.templateManager.getFormat(this.settings.outputFormat.toString());
         templateManager.writeTemplates(outFormat, makeTemplateWriter(outFormat.getDefaultFileSuffix()));
+    }
+
+    private void docttrTemplates(TemplateManager templateManager) {
+        DTemplateWriter docttr = new DTemplateWriter(templateManager.getTemplateStore(), templateManager.getPrefixes());
+
+        if (StringUtils.isNotBlank(this.settings.dotExecutablePath)) {
+            docttr.setDotPath(this.settings.dotExecutablePath);
+        }
+
+        templateManager.writeTemplates(docttr, makeTemplateWriter(docttr.getDefaultFileSuffix()));
     }
 
     private Function<String, Optional<Message>> makeInstanceWriter(String suffix) {

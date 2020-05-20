@@ -24,7 +24,6 @@ package xyz.ottr.lutra.api;
 
 import java.util.Locale;
 import xyz.ottr.lutra.bottr.BottrFormat;
-import xyz.ottr.lutra.docttr.DocttrFormat;
 import xyz.ottr.lutra.io.Format;
 import xyz.ottr.lutra.stottr.StottrFormat;
 import xyz.ottr.lutra.tabottr.TabottrFormat;
@@ -37,8 +36,7 @@ public enum StandardFormat {
     wottr(new WottrFormat()),
     stottr(new StottrFormat()),
     tabottr(new TabottrFormat()),
-    bottr(new BottrFormat()),
-    docttr(new DocttrFormat());
+    bottr(new BottrFormat());
 
     public final Format format;
 

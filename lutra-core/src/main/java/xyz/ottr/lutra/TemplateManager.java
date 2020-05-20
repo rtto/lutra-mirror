@@ -150,7 +150,7 @@ public class TemplateManager {
     /**
      * Sets file extension of files to ignore as input to template library.
      * 
-     * @param ext
+     * @param ignore
      *     An Array of Strings denoting file extensions to ignore as input when parsing
      *     a Template library.
      */
@@ -177,7 +177,7 @@ public class TemplateManager {
      * will subsequently be used for parsing operations when no
      * Format is specified, together will all other registered Formats.
      * 
-     * @param format
+     * @param formats
      *      The Collection of Formats to register to this' FormatManager.
      * @see FormatManager#attemptAllFormats(Function)
      */

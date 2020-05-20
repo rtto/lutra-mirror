@@ -147,7 +147,7 @@ public class Settings {
     public Message.Severity haltOn = Message.Severity.ERROR;
 
 
-    public enum Mode { expand, expandLibrary, format, formatLibrary, lint }
+    public enum Mode { expand, expandLibrary, format, formatLibrary, lint, docttrLibrary }
 
     @Option(names = {"-m", "--mode"},
         description = {"The mode of operation to be applied to input.%n"
@@ -161,6 +161,11 @@ public class Settings {
                        + "NB! Enabling this flag will deteriorate performance.%n"
                        + "default: ${DEFAULT-VALUE})"})
     public boolean deepTrace = false;
+
+
+    @Option(names = {"--dotPath"},
+        description = {"Path to dot executable used for visualisations in docttr."})
+    public String dotExecutablePath;
     
     /* The following classes restrict the selections of FormatName to supported formats. */
     private static class InstanceInputFormat extends ArrayList<String> {

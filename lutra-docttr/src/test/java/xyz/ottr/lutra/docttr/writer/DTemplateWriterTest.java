@@ -23,7 +23,10 @@ package xyz.ottr.lutra.docttr.writer;
  */
 
 import org.junit.Test;
+import xyz.ottr.lutra.OTTR;
 import xyz.ottr.lutra.io.Files;
+import xyz.ottr.lutra.io.FormatManager;
+import xyz.ottr.lutra.store.graph.DependencyGraph;
 import xyz.ottr.lutra.wottr.io.RDFIO;
 import xyz.ottr.lutra.wottr.parser.WTemplateParser;
 
@@ -36,7 +39,7 @@ public class DTemplateWriterTest {
 
         var templateIRI = "http://tpl.ottr.xyz/pizza/0.1/NamedPizza";
 
-        var docttrWriter = new DTemplateWriter();
+        var docttrWriter = new DTemplateWriter(new DependencyGraph(new FormatManager()), OTTR.getDefaultPrefixes());
 
         RDFIO.fileReader().parse(templateIRI)      // Read the RDF file at the templateIRI to a Model
             .mapToStream(new WTemplateParser())    // Parse the Model to a Template
