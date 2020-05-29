@@ -147,7 +147,7 @@ public class Settings {
     public Message.Severity haltOn = Message.Severity.ERROR;
 
 
-    public enum Mode { expand, expandLibrary, format, formatLibrary, lint }
+    public enum Mode { expand, expandLibrary, format, formatLibrary, lint, checkSyntax }
 
     @Option(names = {"-m", "--mode"},
         description = {"The mode of operation to be applied to input.%n"

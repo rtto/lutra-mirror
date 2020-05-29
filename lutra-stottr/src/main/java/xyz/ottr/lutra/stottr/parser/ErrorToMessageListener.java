@@ -33,8 +33,12 @@ public class ErrorToMessageListener extends BaseErrorListener {
 
     private final MessageHandler messageHandler;
 
-    ErrorToMessageListener() {
-        this.messageHandler = new MessageHandler();
+    public ErrorToMessageListener(MessageHandler messageHandler) {
+        this.messageHandler = messageHandler;
+    }
+
+    public ErrorToMessageListener() {
+        this(new MessageHandler());
     }
     
     @Override
@@ -45,7 +49,7 @@ public class ErrorToMessageListener extends BaseErrorListener {
         this.messageHandler.add(Result.empty(Message.error(err)));
     }
 
-    MessageHandler getMessageHandler() {
+    public MessageHandler getMessageHandler() {
         return this.messageHandler;
     }
 }

@@ -22,7 +22,9 @@ package xyz.ottr.lutra.cli;
  * #L%
  */
 
+import java.io.IOException;
 import java.io.PrintStream;
+import java.nio.file.Paths;
 import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.function.Function;
@@ -31,10 +33,12 @@ import org.apache.jena.rdf.model.Model;
 import picocli.CommandLine;
 import picocli.CommandLine.ParameterException;
 import xyz.ottr.lutra.TemplateManager;
+import xyz.ottr.lutra.api.StandardFormat;
 import xyz.ottr.lutra.api.StandardTemplateManager;
 import xyz.ottr.lutra.io.Files;
 import xyz.ottr.lutra.io.Format;
 import xyz.ottr.lutra.model.Instance;
+import xyz.ottr.lutra.stottr.util.SSyntaxChecker;
 import xyz.ottr.lutra.system.Message;
 import xyz.ottr.lutra.system.MessageHandler;
 import xyz.ottr.lutra.system.Result;
@@ -45,14 +49,12 @@ public class CLI {
 
     private final Settings settings;
     private final PrintStream outStream;
-    //private final PrintStream errStream;
     private final MessageHandler messageHandler;
     private final StandardTemplateManager templateManager;
 
     public CLI(PrintStream outStream, PrintStream errStream) {
         this.settings = new Settings();
         this.outStream = outStream;
-        //this.errStream = errStream;
         this.messageHandler = new MessageHandler(errStream);
         this.templateManager = new StandardTemplateManager();
     }
@@ -95,8 +97,8 @@ public class CLI {
 
         if (this.settings.inputs.isEmpty()
             && (this.settings.mode == Settings.Mode.expand
-                || this.settings.mode == Settings.Mode.format)) {
-
+                || this.settings.mode == Settings.Mode.format
+                || this.settings.mode == Settings.Mode.checkSyntax)) {
             this.messageHandler.printMessage(Message.error("Must provide one or more input files. "
                 + "For help on usage, use the --help option."));
             return false;
@@ -117,7 +119,7 @@ public class CLI {
     /// MAIN EXECUTION                                       ///
     ////////////////////////////////////////////////////////////
 
-    private void execute() {
+    private void initLibrary() {
 
         if (initTemplateManager().isGreaterEqualThan(this.settings.haltOn)) {
             return;
@@ -131,29 +133,55 @@ public class CLI {
         if (checkLibrary().isGreaterEqualThan(this.settings.haltOn)) {
             return;
         }
-        executeMode();
     }
 
-    private void executeMode() {
+    private void execute() {
 
-        switch (this.settings.mode) {
-            case expand:
-                executeExpand();
-                break;
-            case expandLibrary:
-                executeExpandLibrary();
-                break;
-            case formatLibrary:
-                executeFormatLibrary();
-                break;
-            case format:
-                executeFormat();
-                break;
-            case lint:
-                break;
-            default:
-                Message err = Message.error("The mode " + this.settings.mode + " is not yet supported.");
-                this.messageHandler.printMessage(err);
+        if (this.settings.mode == Settings.Mode.checkSyntax) {
+            executeCheckSyntax();
+        } else {
+
+            initLibrary();
+
+            switch (this.settings.mode) {
+                case expand:
+                    executeExpand();
+                    break;
+                case expandLibrary:
+                    executeExpandLibrary();
+                    break;
+                case formatLibrary:
+                    executeFormatLibrary();
+                    break;
+                case format:
+                    executeFormat();
+                    break;
+                case lint:
+                    break;
+                default:
+                    Message err = Message.error("The mode " + this.settings.mode + " is not yet supported.");
+                    this.messageHandler.printMessage(err);
+            }
+        }
+    }
+
+    private void executeCheckSyntax() {
+
+        if (this.settings.inputFormat == StandardFormat.stottr) {
+
+            for (String file : this.settings.inputs) {
+                this.outStream.println("Checking file: " + file);
+                var checker = new SSyntaxChecker(this.messageHandler);
+                try {
+                    checker.checkFile(Paths.get(file));
+                    this.messageHandler.printMessages();
+                } catch (IOException e) {
+                    this.outStream.println("Error checking file.");
+                    e.printStackTrace(this.outStream);
+                }
+            }
+        } else {
+            this.outStream.println("Unsupported format " + this.settings.inputFormat);
         }
     }
 
