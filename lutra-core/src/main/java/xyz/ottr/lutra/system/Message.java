@@ -26,12 +26,13 @@ import java.util.Arrays;
 import java.util.stream.Collectors;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.Setter;
 import org.slf4j.Logger;
 
 @EqualsAndHashCode
 public class Message {
 
-    private static final boolean debug = true;
+    @Setter private static boolean printStackTrace = true;
 
     public enum Severity {
         // the order of enums defines the result of compareTo method.
@@ -72,7 +73,7 @@ public class Message {
     public Message(Severity severity, String message) {
         this.severity = severity;
         this.message = message;
-        this.stackTrace = debug
+        this.stackTrace = printStackTrace
             ? Thread.currentThread().getStackTrace()
             : null;
     }
@@ -111,7 +112,7 @@ public class Message {
 
         String output = "[" + this.severity.name() + "] " + this.message;
 
-        if (debug) {
+        if (printStackTrace) {
             output += printStackTrace();
         }
 

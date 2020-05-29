@@ -31,6 +31,7 @@ import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import lombok.Getter;
 import org.apache.jena.shared.PrefixMapping;
 import xyz.ottr.lutra.io.Format;
 import xyz.ottr.lutra.io.FormatManager;
@@ -48,25 +49,25 @@ import xyz.ottr.lutra.system.Trace;
 import xyz.ottr.lutra.writer.InstanceWriter;
 import xyz.ottr.lutra.writer.TemplateWriter;
 
-
 public class TemplateManager {
 
     private final Settings settings;
-    private final PrefixMapping prefixes;
-    private final FormatManager formatManager;
-    private final TemplateStore store;
+    @Getter private final PrefixMapping prefixes;
+    @Getter private final FormatManager formatManager;
+    @Getter private final TemplateStore templateStore;
     
-    private TemplateManager(Settings settings, PrefixMapping prefixes, FormatManager formatManager, TemplateStore store) {
-        this.store = store;
+    private TemplateManager(Settings settings, PrefixMapping prefixes, FormatManager formatManager, TemplateStore templateStore) {
+        this.templateStore = templateStore;
         this.formatManager = formatManager;
         this.settings = settings;
         this.prefixes = prefixes;
         Trace.setDeepTrace(this.settings.deepTrace);
+        Message.setPrintStackTrace(this.settings.stackTrace);
     }
 
-    private TemplateManager(FormatManager formatManager, TemplateStore store) {
+    private TemplateManager(FormatManager formatManager, TemplateStore templateStore) {
         this(new Settings(), PrefixMapping.Factory.create().setNsPrefixes(OTTR.getDefaultPrefixes()),
-            formatManager, store);
+            formatManager, templateStore);
     }
     
     /**
@@ -110,9 +111,14 @@ public class TemplateManager {
      * @param enable
      *      True enables deep trace, false disables deep trace.
      */
-    public void setDeepTrace(boolean enable) {
+    public void setFullTrace(boolean enable) {
         this.settings.deepTrace = enable;
-        Trace.setDeepTrace(this.settings.deepTrace);
+        Trace.setDeepTrace(enable);
+    }
+
+    public void setStackTrace(boolean enable) {
+        this.settings.stackTrace = enable;
+        Message.setPrintStackTrace(enable);
     }
     
     /**
@@ -128,9 +134,7 @@ public class TemplateManager {
     }
 
     /**
-     * Halt on messages with a severity equal to or below the argument,
-     * as described by Message's levels (Message#INFO, Message#WARNING,
-     * Message#ERROR, Message#FATAL).
+     * Halt on messages with a severity equal to or below the argument.
      */
     public void setHaltOn(Message.Severity severity) {
         this.settings.haltOn = severity;
@@ -150,7 +154,7 @@ public class TemplateManager {
     /**
      * Sets file extension of files to ignore as input to template library.
      * 
-     * @param ext
+     * @param ignore
      *     An Array of Strings denoting file extensions to ignore as input when parsing
      *     a Template library.
      */
@@ -177,7 +181,7 @@ public class TemplateManager {
      * will subsequently be used for parsing operations when no
      * Format is specified, together will all other registered Formats.
      * 
-     * @param format
+     * @param formats
      *      The Collection of Formats to register to this' FormatManager.
      * @see FormatManager#attemptAllFormats(Function)
      */
@@ -195,10 +199,6 @@ public class TemplateManager {
      */
     public Format getFormat(String formatName) {
         return this.formatManager.getFormat(formatName);
-    }
-
-    public FormatManager getFormatManager() {
-        return this.formatManager;
     }
     
     /**
@@ -224,7 +224,7 @@ public class TemplateManager {
      *      This' TemplateStore used for all Template-related operations..
      */
     public TemplateStore getTemplateStore() {
-        return this.store;
+        return this.templateStore;
     }
     
     /**
@@ -300,9 +300,9 @@ public class TemplateManager {
 
             Function<TemplateReader, MessageHandler> readerFunction =
                 Files.isDirectory(Paths.get(lib))
-                    ? reader -> reader.loadTemplatesFromFolder(this.store, lib,
+                    ? reader -> reader.loadTemplatesFromFolder(this.templateStore, lib,
                     this.settings.extensions, this.settings.ignoreExtensions)
-                    : reader -> reader.loadTemplatesFromFile(this.store, lib);
+                    : reader -> reader.loadTemplatesFromFile(this.templateStore, lib);
 
             Result<TemplateReader> reader;
             // check if libraryFormat is set or not
@@ -310,7 +310,7 @@ public class TemplateManager {
                 reader = format.getTemplateReader();
                 reader.map(readerFunction).map(messages::combine);
             } else {
-                reader = this.store.getFormatManager().attemptAllFormats(readerFunction);
+                reader = this.templateStore.getFormatManager().attemptAllFormats(readerFunction);
             }
             messages.add(reader);
             reader.ifPresent(r -> this.prefixes.setNsPrefixes(r.getPrefixes()));
@@ -325,7 +325,7 @@ public class TemplateManager {
 
         MessageHandler messages = new MessageHandler();
         if (this.settings.fetchMissingDependencies) {
-            messages.combine(this.store.fetchMissingDependencies());
+            messages.combine(this.templateStore.fetchMissingDependencies());
         }
         return messages;
     }
@@ -377,9 +377,9 @@ public class TemplateManager {
      */
     public Function<Instance, ResultStream<Instance>> makeExpander() {
         if (this.settings.fetchMissingDependencies) {
-            return this.store::expandInstanceFetch;
+            return this.templateStore::expandInstanceFetch;
         } else {
-            return this.store::expandInstance;
+            return this.templateStore::expandInstance;
         }
     }
     
@@ -393,7 +393,7 @@ public class TemplateManager {
      *      missing definitions).
      */
     public Result<TemplateManager> expandStore() {
-        return this.store.expandAll().map(expanded ->
+        return this.templateStore.expandAll().map(expanded ->
             new TemplateManager(this.settings, this.prefixes, this.formatManager, expanded)
         );
     }
@@ -407,7 +407,7 @@ public class TemplateManager {
      * @see TemplateStore#checkTemplates()
      */
     public MessageHandler checkTemplates() {
-        return this.store.checkTemplates();
+        return this.templateStore.checkTemplates();
     }
     
     /**
@@ -460,7 +460,7 @@ public class TemplateManager {
 
         Result<TemplateWriter> writerRes = format.getTemplateWriter();
 
-        return writeObjects(this.store.getAllTemplateObjects(), writerRes, (writer, msgs) -> {
+        return writeObjects(this.templateStore.getAllTemplateObjects(), writerRes, (writer, msgs) -> {
             for (String iri : writer.getIRIs()) {
                 stringConsumer.apply(iri, writer.write(iri)).ifPresent(msgs::add);
             }
@@ -485,12 +485,11 @@ public class TemplateManager {
         return msgs;
     }
 
-
-
     static class Settings {
 
-        public boolean deepTrace = false;
-        public boolean fetchMissingDependencies = false;
+        public boolean deepTrace;
+        public boolean stackTrace;
+        public boolean fetchMissingDependencies;
         public Message.Severity haltOn = Message.Severity.ERROR;
 
         public String[] extensions = { };
