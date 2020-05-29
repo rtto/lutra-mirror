@@ -32,6 +32,7 @@ public class SyntaxCheckerTest {
     public void test() {
 
         CLIRunner.run(" "
+            + " --debugStackTrace "
             + " --mode checkSyntax "
             + " --inputFormat stottr"
             + " " + ROOT + "templates/NamedPizza.ttl");

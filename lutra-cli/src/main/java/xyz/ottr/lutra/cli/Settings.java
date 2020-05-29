@@ -166,7 +166,7 @@ public class Settings {
         description = {"This enables printing a regular java stack trace for error messages."
             + "Enabling this flag will not deteriorate performance.%n"
             + "default: ${DEFAULT-VALUE})"})
-    public boolean debugStackTrace = true;
+    public boolean debugStackTrace = false;
     
     /* The following classes restrict the selections of FormatName to supported formats. */
     private static class InstanceInputFormat extends ArrayList<String> {

@@ -119,9 +119,18 @@ public class CLI {
     /// MAIN EXECUTION                                       ///
     ////////////////////////////////////////////////////////////
 
+    private void initTemplateManager() {
+        this.templateManager.setFullTrace(this.settings.debugFullTrace);
+        this.templateManager.setStackTrace(this.settings.debugStackTrace);
+        this.templateManager.setHaltOn(this.settings.haltOn);
+        this.templateManager.setFetchMissingDependencies(this.settings.fetchMissingDependencies);
+        this.templateManager.setExtensions(this.settings.extensions);
+        this.templateManager.setIgnoreExtensions(this.settings.ignoreExtensions);
+    }
+
     private void initLibrary() {
 
-        if (initTemplateManager().isGreaterEqualThan(this.settings.haltOn)) {
+        if (initStandardLibrary().isGreaterEqualThan(this.settings.haltOn)) {
             return;
         }
         if (parseLibrary().isGreaterEqualThan(this.settings.haltOn)) {
@@ -136,6 +145,8 @@ public class CLI {
     }
 
     private void execute() {
+
+        initTemplateManager();
 
         if (this.settings.mode == Settings.Mode.checkSyntax) {
             executeCheckSyntax();
@@ -219,16 +230,8 @@ public class CLI {
     /// Parsing and writing                                  ///
     ////////////////////////////////////////////////////////////
 
-    private Message.Severity initTemplateManager() {
 
-        // Transfer relevant settings
-        this.templateManager.setFullTrace(this.settings.debugFullTrace);
-        this.templateManager.setStackTrace(this.settings.debugStackTrace);
-        this.templateManager.setHaltOn(this.settings.haltOn);
-        this.templateManager.setFetchMissingDependencies(this.settings.fetchMissingDependencies);
-        this.templateManager.setExtensions(this.settings.extensions);
-        this.templateManager.setIgnoreExtensions(this.settings.ignoreExtensions);
-
+    private Message.Severity initStandardLibrary() {
         // Load standard library
         var msgs = this.templateManager.loadStandardTemplateLibrary();
         this.messageHandler.combine(msgs); // Use this.messageHandler's settings
