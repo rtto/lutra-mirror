@@ -38,7 +38,6 @@ class SPatternInstanceWriter extends SInstanceWriter {
             + this.instances.stream()
                 .sorted(instanceSorter)
                 .map(this::writeInstance)
-                .map(StringBuilder::toString)
                 .collect(Collectors.joining(STOTTR.Statements.bodyInsSep + Space.LINEBR + Space.INDENT));
     }
 

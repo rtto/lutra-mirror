@@ -35,6 +35,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -50,6 +51,7 @@ import xyz.ottr.lutra.OTTR;
 import xyz.ottr.lutra.io.Format;
 import xyz.ottr.lutra.model.Instance;
 import xyz.ottr.lutra.model.Signature;
+import xyz.ottr.lutra.model.Substitution;
 import xyz.ottr.lutra.model.Template;
 import xyz.ottr.lutra.store.TemplateStore;
 import xyz.ottr.lutra.stottr.writer.SInstanceWriter;
@@ -148,6 +150,9 @@ public class DTemplateWriter implements TemplateWriter, Format {
                 div(
                     writeDependencies(signature),
                     writeStottrSerialisation(signature),
+
+                    div(new ExpansionTree(signature.asInstance()).write()),
+
                     writePattern(signature),
                     writeWtottrSerialisation(signature)
                 ),
@@ -164,7 +169,7 @@ public class DTemplateWriter implements TemplateWriter, Format {
     private ContainerTag writeHead(Signature signature) {
         return head(
             title(getHeading(signature)),
-            link().withRel("stylesheet").withHref("/css/main.css")
+            link().withRel("stylesheet").withHref("https://ottr.xyz/inc/style.css")
         ).withLang("en");
     }
 
@@ -194,7 +199,7 @@ public class DTemplateWriter implements TemplateWriter, Format {
     private ContainerTag writeStottrSerialisation(Signature signature) {
         return div(
             h2("stOTTR Serialisation"),
-            pre(this.stemplateWriter.write(signature.getIri())));
+            pre(this.stemplateWriter.writeSignature(signature, false)));
     }
 
     private ContainerTag writeWtottrSerialisation(Signature signature) {
@@ -238,7 +243,7 @@ public class DTemplateWriter implements TemplateWriter, Format {
     private String printSInstance(Instance instance) {
         var writer = new SInstanceWriter(this.prefixMapping);
         writer.accept(instance);
-        return writer.write();
+        return writer.writeInstance(instance);
     }
 
     private Model getWInstanceModel(Instance instance) {
@@ -268,6 +273,54 @@ public class DTemplateWriter implements TemplateWriter, Format {
 
     private InputStream getResourceAsStream(String path) {
         return this.getClass().getClassLoader().getResourceAsStream(path);
+    }
+
+    private class ExpansionTree {
+
+        private final Instance root;
+        private List<ExpansionTree> children;
+
+        ExpansionTree(Instance root) {
+            this.root = root;
+            this.children = new LinkedList<>();
+            buildTree();
+        }
+
+        private void buildTree() {
+
+            var signatureIRI = this.root.getIri();
+            var signature = templateStore.getTemplateSignature(signatureIRI).get();
+
+            if (templateStore.containsTemplate(signatureIRI)) {
+
+                // TODO: create a substitution from a Map directly to avoid validation
+                var substitution = Substitution.resultOf(this.root.getArguments(), signature.getParameters()).get();
+                for (var child : templateStore.getTemplate(signatureIRI).get().getPattern()) {
+                    children.add(new ExpansionTree(child.apply(substitution)));
+                }
+            }
+        }
+
+        ContainerTag write() {
+            var list = ul();
+            addChildren(list);
+            return list;
+        }
+
+        private void addChildren(ContainerTag list) {
+
+            list.with(li(span(printSInstance(this.root)).withClass("caret")));
+            if (!this.children.isEmpty()) {
+                var newLevel = ul().withClass("nested");
+                list.with(newLevel);
+
+                for (var child : this.children) {
+                    child.addChildren(newLevel);
+                }
+            }
+        }
+
+
     }
 
 }

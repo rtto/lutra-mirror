@@ -95,6 +95,15 @@ public class Signature implements ModelElement {
         return result;
     }
 
+    public Instance asInstance() {
+
+        var builder = Instance.builder().iri(this.getIri());
+        for (Parameter param : this.getParameters()) {
+            builder.argument(Argument.builder().term(param.getTerm()).build());
+        }
+        return builder.build();
+    }
+
     public Instance getExampleInstance() {
 
         var builder = Instance.builder().iri(this.getIri());

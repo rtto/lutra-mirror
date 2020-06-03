@@ -77,7 +77,7 @@ public class SInstanceWriter implements InstanceWriter {
         return builder.toString();
     }
 
-    StringBuilder writeInstance(Instance instance) {
+    public String writeInstance(Instance instance) {
 
         StringBuilder builder = new StringBuilder();
 
@@ -94,7 +94,7 @@ public class SInstanceWriter implements InstanceWriter {
             .collect(Collectors.joining(STOTTR.Terms.insArgSep)));
         builder.append(STOTTR.Terms.insArgEnd);
 
-        return builder;
+        return builder.toString();
     }
 
     private StringBuilder writeArgument(Argument arg) {
