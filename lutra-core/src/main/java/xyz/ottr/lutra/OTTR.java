@@ -119,4 +119,16 @@ public enum OTTR  {
         // TODO consider: map.lock();
         return map;
     }
+
+    public static PrefixMapping getStandardLibraryPrefixes() {
+        PrefixMapping map = PrefixMapping.Factory.create();
+        map.withDefaultMappings(getDefaultPrefixes());
+        map.setNsPrefix("o-rdf", "http://tpl.ottr.xyz/rdf/0.1/");
+        map.setNsPrefix("o-rdfs", "http://tpl.ottr.xyz/rdfs/0.1/");
+        map.setNsPrefix("o-owl-ax", "http://tpl.ottr.xyz/owl/axiom/0.1/");
+        map.setNsPrefix("o-owl-re", "http://tpl.ottr.xyz/owl/restriction/0.1/");
+        map.setNsPrefix("o-pizza", "http://tpl.ottr.xyz/pizza/0.1/");
+        map.lock();
+        return map;
+    }
 }
