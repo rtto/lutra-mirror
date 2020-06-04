@@ -153,6 +153,8 @@ public class DTemplateWriter implements TemplateWriter, Format {
 
                     div(new ExpansionTree(signature.asInstance()).write()),
 
+
+                    div(h3("Prefixes"), writePrefixes()),
                     writePattern(signature),
                     writeWtottrSerialisation(signature)
                 ),
@@ -171,6 +173,18 @@ public class DTemplateWriter implements TemplateWriter, Format {
             title(getHeading(signature)),
             link().withRel("stylesheet").withHref("https://ottr.xyz/inc/style.css")
         ).withLang("en");
+    }
+
+    private ContainerTag writePrefixes() {
+
+        var list = dl();
+        this.prefixMapping.getNsPrefixMap().entrySet().stream()
+            .sorted(Map.Entry.comparingByValue())
+            .forEach(entry -> {
+                list.with(dt(entry.getKey()));
+                list.with(dd(entry.getValue()));
+                });
+        return list;
     }
 
     private ContainerTag writeDependencies(Signature signature) {
