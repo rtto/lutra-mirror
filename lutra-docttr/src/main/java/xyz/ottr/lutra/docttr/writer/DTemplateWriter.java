@@ -65,6 +65,8 @@ import xyz.ottr.lutra.writer.TemplateWriter;
 
 public class DTemplateWriter implements TemplateWriter, Format {
 
+    private static final String ROOT_resources = "/treeview/";
+
     private static final String name = "docttr";
     private static final Collection<Support> support = Set.of(Support.TemplateWriter);
 
@@ -158,7 +160,8 @@ public class DTemplateWriter implements TemplateWriter, Format {
                     writePattern(signature),
                     writeWtottrSerialisation(signature)
                 ),
-                writeFooter()
+                writeFooter(),
+                writeScripts()
             )
         );
     }
@@ -170,9 +173,15 @@ public class DTemplateWriter implements TemplateWriter, Format {
 
     private ContainerTag writeHead(Signature signature) {
         return head(
+            meta().withCharset("UTF-8"),
             title(getHeading(signature)),
-            link().withRel("stylesheet").withHref("https://ottr.xyz/inc/style.css")
+            link().withRel("stylesheet").withHref("https://ottr.xyz/inc/style.css"),
+            styleWithInlineFile(ROOT_resources + "treeview.css")
         ).withLang("en");
+    }
+
+    private ContainerTag writeScripts() {
+        return scriptWithInlineFile(ROOT_resources + "treeview.js");
     }
 
     private ContainerTag writePrefixes() {
@@ -183,7 +192,7 @@ public class DTemplateWriter implements TemplateWriter, Format {
             .forEach(entry -> {
                 list.with(dt(entry.getKey()));
                 list.with(dd(entry.getValue()));
-                });
+            });
         return list;
     }
 
@@ -316,25 +325,18 @@ public class DTemplateWriter implements TemplateWriter, Format {
         }
 
         ContainerTag write() {
-            var list = ul();
-            addChildren(list);
-            return list;
+            return ul(addChildren()).withClass("treeview");
         }
 
-        private void addChildren(ContainerTag list) {
-
-            list.with(li(span(printSInstance(this.root)).withClass("caret")));
-            if (!this.children.isEmpty()) {
-                var newLevel = ul().withClass("nested");
-                list.with(newLevel);
-
-                for (var child : this.children) {
-                    child.addChildren(newLevel);
-                }
-            }
+        private ContainerTag addChildren() {
+            return this.children.isEmpty()
+                ? li(span(printSInstance(this.root)).withClass("terminal"))
+                : li(
+                    span(printSInstance(this.root)).withClass("caret"),
+                    ul(each(this.children, ExpansionTree::addChildren))
+                        .withClass("nested")
+                );
         }
-
-
     }
 
 }

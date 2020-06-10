@@ -26,11 +26,14 @@ import org.junit.Test;
 
 public class DocttrTest {
 
-    private static final String ROOT = "src/test/resources/docttr/";
+
+    private static final String ROOT = "src/test/resources/";
+    private static final String IN = ROOT + "templates/pizza/";
+    private static final String OUT = ROOT + "docttr/";
 
     @Test
     public void test1() {
-        runCLI("--mode docttrLibrary -f -l " + ROOT + " -o " + ROOT);
+        runCLI("--mode docttrLibrary -f -l " + IN + " -o " + OUT);
     }
 
     private void runCLI(String cmd) {
