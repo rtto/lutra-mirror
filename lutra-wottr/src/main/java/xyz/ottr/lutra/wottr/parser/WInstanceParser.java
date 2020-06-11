@@ -40,7 +40,7 @@ import xyz.ottr.lutra.parser.InstanceParser;
 import xyz.ottr.lutra.system.Result;
 import xyz.ottr.lutra.system.ResultStream;
 import xyz.ottr.lutra.wottr.WOTTR;
-import xyz.ottr.lutra.wottr.util.RDFNodes;
+import xyz.ottr.lutra.writer.RDFNodeWriter;
 
 public class WInstanceParser implements InstanceParser<Model> {
 
@@ -68,7 +68,7 @@ public class WInstanceParser implements InstanceParser<Model> {
 
         Model tripleModel = model.difference(instanceModel);
 
-        return new TripleInstanceParser().apply(tripleModel);
+        return new WTripleInstanceParser().apply(tripleModel);
     }
 
     private ResultStream<Instance> parseInstances(Model model, List<Resource> templateInstances) {
@@ -94,7 +94,8 @@ public class WInstanceParser implements InstanceParser<Model> {
         return ModelSelector.getOptionalResourceObject(model, instance, WOTTR.modifier)
             .flatMap(r -> WOTTR.listExpanders.keySet().contains(r)
                 ? Result.ofNullable(WOTTR.listExpanders.get(r))
-                : Result.error("Unknown listExpander " + RDFNodes.toString(r) + " in instance " + RDFNodes.toString(instance) + "."));
+                : Result.error("Unknown listExpander " + RDFNodeWriter.toString(r)
+                    + " in instance " + RDFNodeWriter.toString(instance) + "."));
     }
 
     private Result<List<Argument>> parseArgumentList(Model model, Resource instance) {
@@ -104,14 +105,15 @@ public class WInstanceParser implements InstanceParser<Model> {
         Result<RDFList> values = ModelSelector.getRequiredListObject(model, instance, WOTTR.values);
 
         if (arguments.isPresent() == values.isPresent()) { // true if both exist or both are missing
-            return Result.error("An instance must have either one " + RDFNodes.toString(WOTTR.arguments)
-                + " or one " + RDFNodes.toString(WOTTR.values) + ".");
+            return Result.error("An instance must have either one " + RDFNodeWriter.toString(WOTTR.arguments)
+                + " or one " + RDFNodeWriter.toString(WOTTR.values) + ".");
         } else if (arguments.isPresent()) {
             return arguments.flatMap(args -> parseArguments(args, new WArgumentParser(model)));
         } else {
             // create a parser for values to simple arguments:
-            var parser = new TermSerializer()
-                .andThen(termResult -> ArgumentBuilder.builder().term(termResult).build());
+            Function<RDFNode, Result<Argument>> parser = value -> ArgumentBuilder.builder()
+                .term(WTermParser.toTerm(value))
+                .build();
 
             return values.flatMap(args -> parseArguments(args, parser));
         }

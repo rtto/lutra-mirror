@@ -32,7 +32,6 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import xyz.ottr.lutra.OTTR;
 import xyz.ottr.lutra.model.Argument;
 import xyz.ottr.lutra.model.Instance;
 import xyz.ottr.lutra.model.Parameter;
@@ -275,10 +274,10 @@ public class CheckLibraryTest {
         DependencyGraph store = new DependencyGraph(null);
 
         Term varBase1 = new IRITerm("ex.com/var1");
-        varBase1.setType(TypeRegistry.getType(OTTR.TypeURI.IRI));
+        varBase1.setType(TypeRegistry.IRI);
         Term varBase2 = new IRITerm("ex.com/var2");
-        varBase2.setType(TypeRegistry.getType(OWL.ObjectProperty));
-        Term varBase3 = LiteralTerm.createTypedLiteral("7", TypeRegistry.getType(XSD.integer).getIri());
+        varBase2.setType(TypeRegistry.asType(OWL.ObjectProperty));
+        Term varBase3 = LiteralTerm.createTypedLiteral("7", TypeRegistry.asType(XSD.integer).getIri());
 
         store.addTemplateSignature(
             Signature.superbuilder()
@@ -287,11 +286,11 @@ public class CheckLibraryTest {
                 .build());
 
         Term varC1 = new IRITerm("ex.com/iri");
-        varC1.setType(TypeRegistry.getType(OTTR.TypeURI.IRI));
-        Term varC2 = LiteralTerm.createTypedLiteral("1", TypeRegistry.getType(XSD.integer).getIri());
+        varC1.setType(TypeRegistry.IRI);
+        Term varC2 = LiteralTerm.createTypedLiteral("1", TypeRegistry.asType(XSD.integer).getIri());
 
         Term varC1b = new IRITerm("ex.com/iri");
-        Term varC2b = LiteralTerm.createTypedLiteral("1", TypeRegistry.getType(XSD.integer).getIri());
+        Term varC2b = LiteralTerm.createTypedLiteral("1", TypeRegistry.asType(XSD.integer).getIri());
 
         Term constC1 = new IRITerm("ex.com/nicepropiri");
         Term constC2 = new IRITerm("ex.com/niceonlyprop");
@@ -322,10 +321,10 @@ public class CheckLibraryTest {
         DependencyGraph store = new DependencyGraph(null);
 
         Term classVar = new IRITerm("ex.com/classVar");
-        classVar.setType(TypeRegistry.getType(OWL.Class));
+        classVar.setType(TypeRegistry.asType(OWL.Class));
         Term objpropVar = new IRITerm("ex.com/objpropVar");
-        objpropVar.setType(TypeRegistry.getType(OWL.ObjectProperty));
-        Term intVar = LiteralTerm.createTypedLiteral("7", TypeRegistry.getType(XSD.integer).getIri());
+        objpropVar.setType(TypeRegistry.asType(OWL.ObjectProperty));
+        Term intVar = LiteralTerm.createTypedLiteral("7", TypeRegistry.asType(XSD.integer).getIri());
 
         store.addTemplateSignature(
             Signature.superbuilder()
@@ -334,12 +333,12 @@ public class CheckLibraryTest {
                 .build());
 
         Term classVar2 = new IRITerm("ex.com/class");
-        classVar2.setType(TypeRegistry.getType(OWL.Class));
-        Term intVar2 = LiteralTerm.createTypedLiteral("1", TypeRegistry.getType(XSD.integer).getIri());
+        classVar2.setType(TypeRegistry.asType(OWL.Class));
+        Term intVar2 = LiteralTerm.createTypedLiteral("1", TypeRegistry.asType(XSD.integer).getIri());
 
         Term classVar2b = new IRITerm("ex.com/class");
-        Term intVar21b = LiteralTerm.createTypedLiteral("1", TypeRegistry.getType(XSD.integer).getIri());
-        Term intVar22b = LiteralTerm.createTypedLiteral("1", TypeRegistry.getType(XSD.integer).getIri());
+        Term intVar21b = LiteralTerm.createTypedLiteral("1", TypeRegistry.asType(XSD.integer).getIri());
+        Term intVar22b = LiteralTerm.createTypedLiteral("1", TypeRegistry.asType(XSD.integer).getIri());
 
         Term propClass1 = new IRITerm("ex.com/nicepropclass");
         Term propClass2 = new IRITerm("ex.com/nicepropclass");
@@ -371,10 +370,10 @@ public class CheckLibraryTest {
         DependencyGraph store = new DependencyGraph(null);
 
         Term varBase1 = new IRITerm("ex.com/var1");
-        varBase1.setType(TypeRegistry.getType(OWL.Class));
+        varBase1.setType(TypeRegistry.asType(OWL.Class));
         Term varBase2 = new IRITerm("ex.com/var2");
-        varBase2.setType(TypeRegistry.getType(OWL.ObjectProperty));
-        Term varBase3 = LiteralTerm.createTypedLiteral("7", TypeRegistry.getType(XSD.integer).getIri());
+        varBase2.setType(TypeRegistry.asType(OWL.ObjectProperty));
+        Term varBase3 = LiteralTerm.createTypedLiteral("7", TypeRegistry.asType(XSD.integer).getIri());
 
         store.addTemplateSignature(
             Signature.superbuilder()
@@ -383,11 +382,11 @@ public class CheckLibraryTest {
                 .build());
 
         Term var1 = new IRITerm("ex.com/iri");
-        var1.setType(TypeRegistry.getType(OTTR.TypeURI.IRI));
-        Term var2 = LiteralTerm.createTypedLiteral("1", TypeRegistry.getType(XSD.integer).getIri());
+        var1.setType(TypeRegistry.IRI);
+        Term var2 = LiteralTerm.createTypedLiteral("1", TypeRegistry.asType(XSD.integer).getIri());
 
         Term var1b = new IRITerm("ex.com/iri");
-        Term var2b = LiteralTerm.createTypedLiteral("1", TypeRegistry.getType(XSD.integer).getIri());
+        Term var2b = LiteralTerm.createTypedLiteral("1", TypeRegistry.asType(XSD.integer).getIri());
 
         Term cons1 = new IRITerm("ex.com/prop1");
 
@@ -413,7 +412,7 @@ public class CheckLibraryTest {
         DependencyGraph store = new DependencyGraph(null);
 
         Term varBase = new BlankNodeTerm("_:classes");
-        varBase.setType(new NEListType(TypeRegistry.getType(OWL.Class)));
+        varBase.setType(new NEListType(TypeRegistry.asType(OWL.Class)));
 
         store.addTemplateSignature(
             Signature.superbuilder()
@@ -422,7 +421,7 @@ public class CheckLibraryTest {
                 .build());
 
         Term var = new BlankNodeTerm("_:class");
-        var.setType(TypeRegistry.getType(OWL.Class));
+        var.setType(TypeRegistry.asType(OWL.Class));
 
         Term cons = new BlankNodeTerm("_:b");
 
@@ -449,7 +448,7 @@ public class CheckLibraryTest {
         DependencyGraph store = new DependencyGraph(null);
 
         Term varBase = new BlankNodeTerm("_:classes");
-        varBase.setType(new NEListType(TypeRegistry.getType(OWL.Class)));
+        varBase.setType(new NEListType(TypeRegistry.asType(OWL.Class)));
 
         store.addTemplateSignature(
             Signature.superbuilder()
@@ -458,9 +457,9 @@ public class CheckLibraryTest {
                 .build());
 
         Term varClass = new BlankNodeTerm("_:class");
-        varClass.setType(TypeRegistry.getType(OWL.Class));
+        varClass.setType(TypeRegistry.asType(OWL.Class));
 
-        Term one = LiteralTerm.createTypedLiteral("1", TypeRegistry.getType(XSD.integer).getIri());
+        Term one = LiteralTerm.createTypedLiteral("1", TypeRegistry.asType(XSD.integer).getIri());
 
         store.addTemplate(
             Template.builder().iri("testCorrect1")
@@ -482,7 +481,7 @@ public class CheckLibraryTest {
         DependencyGraph store = new DependencyGraph(null);
 
         Term varBase = new BlankNodeTerm("_:classes");
-        varBase.setType(new NEListType(new NEListType(TypeRegistry.getType(OWL.Class))));
+        varBase.setType(new NEListType(new NEListType(TypeRegistry.asType(OWL.Class))));
 
         store.addTemplateSignature(
             Signature.superbuilder()
@@ -491,9 +490,9 @@ public class CheckLibraryTest {
                 .build());
 
         Term varClass = new BlankNodeTerm("_:class");
-        varClass.setType(TypeRegistry.getType(OWL.Class));
+        varClass.setType(TypeRegistry.asType(OWL.Class));
 
-        Term one = LiteralTerm.createTypedLiteral("1", TypeRegistry.getType(XSD.integer).getIri());
+        Term one = LiteralTerm.createTypedLiteral("1", TypeRegistry.asType(XSD.integer).getIri());
 
         store.addTemplate(
             Template.builder().iri("testCorrect1")

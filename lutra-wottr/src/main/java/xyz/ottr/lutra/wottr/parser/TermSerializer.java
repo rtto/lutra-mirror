@@ -42,7 +42,7 @@ import xyz.ottr.lutra.model.terms.NoneTerm;
 import xyz.ottr.lutra.model.terms.Term;
 import xyz.ottr.lutra.system.Result;
 import xyz.ottr.lutra.wottr.WOTTR;
-import xyz.ottr.lutra.wottr.util.RDFNodes;
+import xyz.ottr.lutra.writer.RDFNodeWriter;
 
 public class TermSerializer implements Function<RDFNode, Result<Term>> {
 
@@ -61,7 +61,7 @@ public class TermSerializer implements Function<RDFNode, Result<Term>> {
         } else if (node.isLiteral()) {
             return toLiteralTerm(node.asLiteral()).map(tl -> (Term) tl);
         } else {
-            return Result.error("Unable to parse RDFNode " + RDFNodes.toString(node) + " to Term.");
+            return Result.error("Unable to parse RDFNode " + RDFNodeWriter.toString(node) + " to Term.");
         }
     }
 
@@ -74,7 +74,7 @@ public class TermSerializer implements Function<RDFNode, Result<Term>> {
         } else if (node.isAnon()) {
             return toBlankNodeTerm(node.getId().getBlankNodeId()).map(tl -> (Term) tl);
         } else {
-            return Result.error("Unable to parse resource " + RDFNodes.toString(node) + " to Term.");
+            return Result.error("Unable to parse resource " + RDFNodeWriter.toString(node) + " to Term.");
         }
     }
 

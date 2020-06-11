@@ -22,75 +22,29 @@ package xyz.ottr.lutra.wottr.util;
  * #L%
  */
 
-import java.util.Collection;
-import java.util.stream.Collectors;
-import org.apache.jena.graph.Node;
-import org.apache.jena.rdf.model.Model;
-import org.apache.jena.rdf.model.RDFList;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
-import org.apache.jena.shared.PrefixMapping;
-import xyz.ottr.lutra.OTTR;
 import xyz.ottr.lutra.system.Result;
+import xyz.ottr.lutra.writer.RDFNodeWriter;
 
 public enum RDFNodes {
 
     ; // singleton enum
 
-    private static final PrefixMapping defaultPrefixes = OTTR.getDefaultPrefixes();
-
     public static <X extends RDFNode> Result<X> cast(RDFNode node, Class<X> type) {
         return node.canAs(type)
             ? Result.of(node.as(type))
             : Result.error("Expected instance of " + type.getSimpleName()
-                + ", but found " + node.getClass().getSimpleName() + ": " + RDFNodes.toString(node));
+                + ", but found " + node.getClass().getSimpleName() + ": " + RDFNodeWriter.toString(node));
     }
 
     public static Result<Resource> castURIResource(RDFNode node) {
         Result<Resource> resource = cast(node, Resource.class);
         if (resource.isPresent() && !resource.get().isURIResource()) {
-            return Result.error("Expected instance of URIResource, but got " +  RDFNodes.toString(resource.get()) + ".");
+            return Result.error("Expected instance of URIResource, but got " +  RDFNodeWriter.toString(resource.get()) + ".");
         } else {
             return resource;
         }
-    }
-
-    public static String toString(Collection<? extends RDFNode> nodes) {
-        return nodes.stream()
-            .map(RDFNodes::toString)
-            .collect(Collectors.joining(", ", "[", "]"));
-    }
-
-    public static String toString(Model model, Collection<? extends RDFNode> nodes) {
-        return nodes.stream()
-            .map(node -> toString(model, node))
-            .collect(Collectors.joining(", ", "[", "]"));
-    }
-
-    public static String toString(Model model, RDFNode node) {
-        return node.canAs(RDFList.class)
-            ? toString(model, node.as(RDFList.class).asJavaList())
-            : toString(model, node.asNode());
-    }
-
-    public static String toString(RDFNode node) {
-        return toString(node.getModel(), node.asNode());
-    }
-
-    public static String toString(Model model, Node node) {
-        return node.isVariable()
-            ? node.toString()
-            : toString(model, node.toString());
-    }
-
-    public static String toString(Model model, String nodeString) {
-        return (model == null)
-            ? toString(nodeString)
-            : model.shortForm(nodeString);
-    }
-
-    public static String toString(String nodeString) {
-        return defaultPrefixes.shortForm(nodeString);
     }
 
 }

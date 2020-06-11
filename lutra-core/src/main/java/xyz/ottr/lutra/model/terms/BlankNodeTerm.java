@@ -24,7 +24,6 @@ package xyz.ottr.lutra.model.terms;
 
 import java.util.Optional;
 import xyz.ottr.lutra.model.Substitution;
-import xyz.ottr.lutra.model.types.LUBType;
 import xyz.ottr.lutra.model.types.TypeRegistry;
 
 public class BlankNodeTerm extends AbstractTerm<String> {
@@ -32,7 +31,7 @@ public class BlankNodeTerm extends AbstractTerm<String> {
     private static long newID = 0L;
 
     public BlankNodeTerm(String label) {
-        super(label, new LUBType(TypeRegistry.TOP)); // TODO make constant
+        super(label, TypeRegistry.LUB_TOP);
     }
 
     public BlankNodeTerm() {

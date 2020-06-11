@@ -33,25 +33,24 @@ import xyz.ottr.lutra.model.terms.Term;
 import xyz.ottr.lutra.parser.ArgumentBuilder;
 import xyz.ottr.lutra.parser.InstanceBuilder;
 import xyz.ottr.lutra.parser.InstanceParser;
+import xyz.ottr.lutra.parser.TermParser;
 import xyz.ottr.lutra.system.Result;
 import xyz.ottr.lutra.system.ResultStream;
-import xyz.ottr.lutra.wottr.util.RDFNodes;
+import xyz.ottr.lutra.writer.RDFNodeWriter;
 
-public class TripleInstanceParser implements InstanceParser<Model> {
-
-    private static final TermSerializer termSerializer = new TermSerializer();
+public class WTripleInstanceParser implements InstanceParser<Model> {
 
     @Override
     public ResultStream<Instance> apply(Model model) {
         return ResultStream.of(model.listStatements()
-                .mapWith(TripleInstanceParser::createTripleInstance)
+                .mapWith(WTripleInstanceParser::instance)
         );
     }
 
-    private static Result<Instance> createTripleInstance(Statement stmt) {
+    private static Result<Instance> instance(Statement stmt) {
 
         var arguments = Stream.of(stmt.getSubject(), stmt.getPredicate(), stmt.getObject())
-            .map(TripleInstanceParser::createTerm)
+            .map(WTripleInstanceParser::term)
             .map(t -> ArgumentBuilder.builder().term(t).build())
             .collect(Collectors.toList());
 
@@ -64,19 +63,19 @@ public class TripleInstanceParser implements InstanceParser<Model> {
     /**
      * Make sure that we do not create any term lists.
      */
-    private static Result<Term> createTerm(RDFNode node) {
+    private static Result<Term> term(RDFNode node) {
 
         if (node.isURIResource()) {
-            return termSerializer.toTerm(node.asResource().getURI())
+            return TermParser.toIRITerm(node.asResource().getURI())
                 .map(t -> (Term) t);
         } else if (node.isAnon()) {
-            return termSerializer.toBlankNodeTerm(node.asResource().getId().getBlankNodeId())
+            return WTermParser.toBlankNodeTerm(node.asResource().getId().getBlankNodeId())
                 .map(t -> (Term) t);
         } else if (node.isLiteral()) {
-            return termSerializer.toLiteralTerm(node.asLiteral())
+            return WTermParser.toLiteralTerm(node.asLiteral())
                 .map(t -> (Term) t);
         } else {
-            throw new IllegalArgumentException("Error converting RDFNode " + RDFNodes.toString(node) + " to Term. ");
+            throw new IllegalArgumentException("Error converting RDFNode " + RDFNodeWriter.toString(node) + " to Term. ");
         }
     }
 

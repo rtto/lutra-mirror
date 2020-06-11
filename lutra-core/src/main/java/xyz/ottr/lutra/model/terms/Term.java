@@ -25,7 +25,7 @@ package xyz.ottr.lutra.model.terms;
 import java.util.Optional;
 import org.apache.jena.shared.PrefixMapping;
 import xyz.ottr.lutra.model.HasApplySubstitution;
-import xyz.ottr.lutra.model.types.TermType;
+import xyz.ottr.lutra.model.types.Type;
 
 public interface Term extends HasApplySubstitution<Term> {
 
@@ -35,15 +35,15 @@ public interface Term extends HasApplySubstitution<Term> {
 
     boolean isVariable();
 
-    void setType(TermType term);
+    void setType(Type term);
 
-    TermType getType();
+    Type getType();
 
     /**
-     * Returns the TermType that the variable Term has as default if no type is given, and is only based on the
+     * Returns the Type that the variable Term has as default if no type is given, and is only based on the
      * Term itself, and therefore not usage.
      */
-    default TermType getVariableType() {
+    default Type getVariableType() {
         // The default type of a variable is the same as for a constant term, except that we remove
         // any surrounding LUB. E.g. an IRI variable has default type IRI.
         return getType().removeLUB();

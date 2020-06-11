@@ -125,8 +125,8 @@ public class WriterTest {
     public void testSignatures1() {
         var b1 = BaseTemplate.builder()
             .iri("http://base.org/base2")
-            .parameter(Parameter.builder().term(new BlankNodeTerm("x")).type(TypeRegistry.getType(OWL.Class)).nonBlank(true).build())
-            .parameter(Parameter.builder().term(new BlankNodeTerm("y")).type(TypeRegistry.getType(OWL.Class)).build())
+            .parameter(Parameter.builder().term(new BlankNodeTerm("x")).type(TypeRegistry.asType(OWL.Class)).nonBlank(true).build())
+            .parameter(Parameter.builder().term(new BlankNodeTerm("y")).type(TypeRegistry.asType(OWL.Class)).build())
             .build();
 
         var b2 = BaseTemplate.builder()

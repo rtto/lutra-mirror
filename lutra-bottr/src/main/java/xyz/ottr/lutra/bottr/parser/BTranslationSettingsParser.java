@@ -28,19 +28,16 @@ import org.apache.jena.rdf.model.Resource;
 import xyz.ottr.lutra.bottr.BOTTR;
 import xyz.ottr.lutra.bottr.model.TranslationSettings;
 import xyz.ottr.lutra.bottr.util.CachedResourceWrapperParser;
-import xyz.ottr.lutra.bottr.util.DataParser;
-import xyz.ottr.lutra.bottr.util.TermFactory;
 import xyz.ottr.lutra.model.terms.Term;
 import xyz.ottr.lutra.system.Result;
+import xyz.ottr.lutra.util.DataValidator;
 import xyz.ottr.lutra.wottr.parser.ModelSelector;
+import xyz.ottr.lutra.wottr.parser.WTermParser;
 
 public class BTranslationSettingsParser extends CachedResourceWrapperParser<TranslationSettings> {
 
-    private final TermFactory termFactory;
-
-    public BTranslationSettingsParser(Resource resource) {
+    BTranslationSettingsParser(Resource resource) {
         super(resource);
-        this.termFactory = new TermFactory(this.model);
     }
 
     @Override
@@ -60,7 +57,7 @@ public class BTranslationSettingsParser extends CachedResourceWrapperParser<Tran
 
     private Result<Term> getNullValue() {
         return ModelSelector.getOptionalObject(this.model, this.resource, BOTTR.nullValue)
-            .flatMap(this.termFactory::createTerm);
+            .flatMap(WTermParser::toTerm);
     }
 
     private Result<String> getOptionalString(Property property) {
@@ -70,6 +67,6 @@ public class BTranslationSettingsParser extends CachedResourceWrapperParser<Tran
 
     private Result<Character> getOptionalChar(Property property) {
         return getOptionalString(property)
-            .flatMap(DataParser::asChar);
+            .flatMap(DataValidator::asChar);
     }
 }

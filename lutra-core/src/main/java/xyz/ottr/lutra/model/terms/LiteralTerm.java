@@ -27,7 +27,7 @@ import java.util.Optional;
 import lombok.Getter;
 import lombok.NonNull;
 import xyz.ottr.lutra.RDFTurtle;
-import xyz.ottr.lutra.model.types.TermType;
+import xyz.ottr.lutra.model.types.Type;
 import xyz.ottr.lutra.model.types.TypeRegistry;
 
 @Getter
@@ -51,8 +51,8 @@ public class LiteralTerm extends AbstractTerm<String> {
                 : RDFTurtle.literalTypeSep + datatype);
     }
 
-    private static TermType getIntrinsicType(String datatype) {
-        return Objects.requireNonNullElse(TypeRegistry.getType(datatype), TypeRegistry.LITERAL);
+    private static Type getIntrinsicType(String datatype) {
+        return Objects.requireNonNullElse(TypeRegistry.asType(datatype), TypeRegistry.LITERAL);
     }
 
     public static LiteralTerm createLanguageTagLiteral(String value, @NonNull String languageTag) {

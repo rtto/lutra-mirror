@@ -39,7 +39,7 @@ public class LUBType extends ComplexType {
     }
 
     @Override
-    public boolean isSubTypeOf(TermType other) {
+    public boolean isSubTypeOf(Type other) {
 
         return other instanceof LUBType
             // For other LUB-types, LUB<P> is only subtype of itself
@@ -50,12 +50,12 @@ public class LUBType extends ComplexType {
     }
 
     @Override
-    public boolean isCompatibleWith(TermType other) {
+    public boolean isCompatibleWith(Type other) {
         return isSubTypeOf(other) || other.isSubTypeOf(this.inner);
     }
 
     @Override
-    public TermType removeLUB() {
+    public Type removeLUB() {
         return getInner();
     }
 
