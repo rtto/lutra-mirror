@@ -28,7 +28,7 @@ import xyz.ottr.lutra.OTTR;
 
 @Getter
 @EqualsAndHashCode
-public class BasicType implements TermType {
+public class BasicType implements Type {
 
     private final String iri;
 
@@ -37,7 +37,7 @@ public class BasicType implements TermType {
     }
 
     @Override
-    public boolean isSubTypeOf(TermType supertype) {
+    public boolean isSubTypeOf(Type supertype) {
         if (this.equals(TypeRegistry.BOT)) {
             return true;
         }
@@ -46,12 +46,12 @@ public class BasicType implements TermType {
     }
 
     @Override
-    public boolean isCompatibleWith(TermType other) {
+    public boolean isCompatibleWith(Type other) {
         return isSubTypeOf(other);
     }
 
     @Override
-    public TermType removeLUB() {
+    public Type removeLUB() {
         return this;
     }
 

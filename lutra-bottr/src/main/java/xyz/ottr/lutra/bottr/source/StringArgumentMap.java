@@ -26,18 +26,18 @@ import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.ResourceFactory;
 import org.apache.jena.shared.PrefixMapping;
 import xyz.ottr.lutra.bottr.model.ArgumentMap;
-import xyz.ottr.lutra.bottr.util.TermFactory;
 import xyz.ottr.lutra.model.terms.Term;
 import xyz.ottr.lutra.model.types.BasicType;
-import xyz.ottr.lutra.model.types.TermType;
+import xyz.ottr.lutra.model.types.Type;
 import xyz.ottr.lutra.model.types.TypeRegistry;
+import xyz.ottr.lutra.parser.TermParser;
 import xyz.ottr.lutra.system.Result;
 
 public class StringArgumentMap extends ArgumentMap<String> {
 
-    private static final TermType DEFAULT_TYPE = TypeRegistry.LITERAL;
+    private static final Type DEFAULT_TYPE = TypeRegistry.LITERAL;
 
-    public StringArgumentMap(PrefixMapping prefixes, TermType type) {
+    public StringArgumentMap(PrefixMapping prefixes, Type type) {
         super(prefixes, type);
     }
 
@@ -51,11 +51,12 @@ public class StringArgumentMap extends ArgumentMap<String> {
     }
 
     @Override
+    // TODO merge this with RDFNodeArgumentMap
     protected Result<Term> getBasicTerm(String value, BasicType type) {
         return Result.ofNullable(this.literalLangTag)
             .flatMapOrElse(
-                tag -> TermFactory.createLangLiteral(toString(value), tag).map(t -> (Term)t),
-                this.termFactory.createTermByType(toString(value), type));
+                tag -> TermParser.toLangLiteralTerm(toString(value), tag).map(t -> (Term)t),
+                super.toTerm(toString(value), type));
     }
 
     @Override

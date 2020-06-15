@@ -29,17 +29,14 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import org.antlr.v4.runtime.tree.TerminalNode;
 import org.apache.jena.vocabulary.XSD;
-import xyz.ottr.lutra.model.terms.BlankNodeTerm;
 import xyz.ottr.lutra.model.terms.IRITerm;
 import xyz.ottr.lutra.model.terms.ListTerm;
-import xyz.ottr.lutra.model.terms.LiteralTerm;
-import xyz.ottr.lutra.model.terms.NoneTerm;
 import xyz.ottr.lutra.model.terms.Term;
+import xyz.ottr.lutra.parser.TermParser;
 import xyz.ottr.lutra.stottr.STOTTR;
 import xyz.ottr.lutra.stottr.antlr.stOTTRParser;
 import xyz.ottr.lutra.system.Message;
 import xyz.ottr.lutra.system.Result;
-import xyz.ottr.lutra.wottr.WOTTR;
 
 public class STermParser extends SBaseParserVisitor<Term> {
 
@@ -49,7 +46,6 @@ public class STermParser extends SBaseParserVisitor<Term> {
     private static final Pattern angularPat = Pattern.compile("^<|>$");
 
     private final Map<String, String> prefixes;
-    private final Map<String, Term> blanks;
 
     // Maps labels to already parsed (blank node) variable terms
     private final Map<String, Term> variables;
@@ -61,52 +57,43 @@ public class STermParser extends SBaseParserVisitor<Term> {
     STermParser(Map<String, String> prefixes, Map<String, Term> variables) {
         this.prefixes = prefixes;
         this.variables = variables;
-        this.blanks = new HashMap<>();
     }
 
-    private Term makeBlank(String label) {
+    private Result<Term> toBlankNodeTerm(String label) {
 
-        // Use shallow clone to keep objects distinct but
-        // with same identifier
-        if (this.variables.containsKey(label)) {
-            return this.variables.get(label).shallowClone();
-        } else if (this.blanks.containsKey(label)) {
-            return this.blanks.get(label).shallowClone();
-        } else {
-            Term newBlank = new BlankNodeTerm();
-            this.blanks.put(label, newBlank);
-            return newBlank;
-        }
+        return this.variables.containsKey(label)
+            ? Result.of(this.variables.get(label).shallowClone())
+            : TermParser.toBlankNodeTerm(label).map(t -> (Term)t);
     }
 
     public Result<Term> visitNone(stOTTRParser.NoneContext ctx) {
-        return Result.of(new NoneTerm());
+        return TermParser.newNoneTerm();
     }
 
     public Result<Term> visitTerm(stOTTRParser.TermContext ctx) {
 
         if (ctx.Variable() != null) {
-            return Result.of(makeBlank(getVariableLabel(ctx.Variable())));
+            return toBlankNodeTerm(getVariableLabel(ctx.Variable())).map(t -> (Term)t); // return Result.of(makeBlank();
         }
 
         Result<Term> trm = visitChildren(ctx);
-        return trm != null 
+        return trm != null
             ? trm
             : Result.empty(Message.error("Expected term but found " + ctx.getText()
-                    + SParserUtils.getLineAndColumnString(ctx)));
+            + SParserUtils.getLineAndColumnString(ctx)));
     }
 
     String getVariableLabel(TerminalNode var) {
         String label = var.getSymbol().getText();
         // Need to remove variablePrefix to get label
-        return  label.substring(STOTTR.Terms.variablePrefix.length());
+        return label.substring(STOTTR.Terms.variablePrefix.length());
     }
 
     public Result<Term> visitLiteral(stOTTRParser.LiteralContext ctx) {
 
         if (ctx.BooleanLiteral() != null) {
             String litVal = ctx.BooleanLiteral().getSymbol().getText();
-            return Result.of(LiteralTerm.createTypedLiteral(litVal, XSD.xboolean.getURI()));
+            return TermParser.toTypedLiteralTerm(litVal, XSD.xboolean.getURI()).map(t -> (Term)t);
         }
         return visitChildren(ctx);
     }
@@ -133,13 +120,16 @@ public class STermParser extends SBaseParserVisitor<Term> {
         } else if (ctx.DECIMAL() != null) {
             type = XSD.decimal.getURI();
             valNode = ctx.DECIMAL();
-        } else { // ctx.DOUBLE() != null
+        } else if (ctx.DOUBLE() != null) {
             type = XSD.xdouble.getURI();
             valNode = ctx.DOUBLE();
+        } else {
+            throw new UnsupportedOperationException("Error stOTTR parser. Unsupported numeric literal context.");
         }
 
         String val = valNode.getSymbol().getText();
-        return Result.of(LiteralTerm.createTypedLiteral(val, type));
+
+        return TermParser.toTypedLiteralTerm(val, type).map(t -> (Term)t);
     }
 
     public Result<Term> visitRdfLiteral(stOTTRParser.RdfLiteralContext ctx) {
@@ -153,16 +143,26 @@ public class STermParser extends SBaseParserVisitor<Term> {
         if (ctx.LANGTAG() != null) { // Language tag present
             String tag = ctx.LANGTAG().getSymbol().getText();
             tag = atPat.matcher(tag).replaceFirst(""); // Remove the @-prefix
-            return Result.of(LiteralTerm.createLanguageTagLiteral(val, tag));
+            return TermParser.toLangLiteralTerm(val, tag)
+                .map(t -> (Term)t);
         }
 
-        if (ctx.iri() != null) { // Explicit type present
-            Result<Term> iriTermRes = visitIri(ctx.iri());
-            return iriTermRes.flatMap(iri ->
-                Result.of(LiteralTerm.createTypedLiteral(val, ((IRITerm) iri).getIri())));
+        if (ctx.iri() != null) { // Datatype present
+            Result<Term> datatype = visitIri(ctx.iri());
+
+            if (datatype.isPresent() && !(datatype.get() instanceof IRITerm)) {
+                return Result.error("Erroneous literal datatype. Expected IRI, but found " + datatype.get());
+            }
+
+            return datatype
+                .map(t -> (IRITerm)t)
+                .map(IRITerm::getIri)
+                .flatMap(iri -> TermParser.toTypedLiteralTerm(val, iri))
+                .map(t -> (Term)t);
         }
 
-        return Result.of(LiteralTerm.createPlainLiteral(val));
+        return TermParser.toPlainLiteralTerm(val)
+            .map(t -> (Term)t);
     }
 
     public Result<Term> visitIri(stOTTRParser.IriContext ctx) {
@@ -174,15 +174,15 @@ public class STermParser extends SBaseParserVisitor<Term> {
         } else {
             String iriBraces = ctx.IRIREF().getSymbol().getText();
             // IRIs in Lutra are always full, so do not use surrounding '<','>'
-            String iri = angularPat.matcher(iriBraces).replaceAll(""); 
-            if (iri.equals(WOTTR.none.getURI())) {
-                return Result.of(new NoneTerm());
-            }
-            return Result.of(new IRITerm(iri));
+            String iri = angularPat.matcher(iriBraces).replaceAll("");
+
+            return TermParser.toTerm(iri);
         }
     }
 
     public Result<Term> visitPrefixedName(stOTTRParser.PrefixedNameContext ctx) {
+
+        // TODO can we simplify this by using Jena's PrefixMapping instead?
 
         String qname;
         TerminalNode onlyNS = ctx.PNAME_NS();
@@ -196,16 +196,14 @@ public class STermParser extends SBaseParserVisitor<Term> {
         String prefix = this.prefixes.get(prefixName);
 
         if (prefix == null) { // Prefix not found
-            return Result.empty(Message.error("Unrecognized prefix " + prefixName
-                    + " in qname " + qname + SParserUtils.getLineAndColumnString(ctx)));
+            return Result.error("Unrecognized prefix " + prefixName
+                + " in qname " + qname + SParserUtils.getLineAndColumnString(ctx));
         }
 
         String local = qname.substring(lastColon + 1);
         String iri = prefix + local;
-        if (iri.equals(WOTTR.none.getURI())) {
-            return Result.of(new NoneTerm());
-        }
-        return Result.of(new IRITerm(iri));
+
+        return TermParser.toTerm(iri);
     }
 
     public Result<Term> visitBlankNode(stOTTRParser.BlankNodeContext ctx) {
@@ -215,11 +213,12 @@ public class STermParser extends SBaseParserVisitor<Term> {
         }
 
         String label = ctx.BLANK_NODE_LABEL().getSymbol().getText();
-        return Result.of(makeBlank(label));
+        return toBlankNodeTerm(label);
     }
 
     public Result<Term> visitAnon(stOTTRParser.AnonContext ctx) {
-        return Result.of(new BlankNodeTerm());
+        return TermParser.newBlankNodeTerm().map(t -> (Term)t);
     }
 
 }
+

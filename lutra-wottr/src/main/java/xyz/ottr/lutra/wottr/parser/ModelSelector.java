@@ -35,6 +35,7 @@ import org.apache.jena.rdf.model.StmtIterator;
 import org.apache.jena.vocabulary.RDF;
 import xyz.ottr.lutra.system.Result;
 import xyz.ottr.lutra.wottr.util.RDFNodes;
+import xyz.ottr.lutra.writer.RDFNodeWriter;
 
 public enum ModelSelector {
 
@@ -63,7 +64,6 @@ public enum ModelSelector {
     }
 
     public static List<Result<Resource>> getResourceObjects(Model model, Resource subject, Property property) {
-
         return model.listStatements(subject, property, (RDFNode) null)
             .mapWith(Statement::getObject)
             .mapWith(o -> RDFNodes.cast(o, Resource.class))
@@ -138,8 +138,8 @@ public enum ModelSelector {
 
     private static Result getErrorResult(Model model, Resource subject, Property predicate, String error) {
         return Result.error(
-            "Error getting property value for " + RDFNodes.toString(model, predicate)
-                + " for subject '" + RDFNodes.toString(model, subject) + "'. " + error);
+            "Error getting property value for " + RDFNodeWriter.toString(model, predicate)
+                + " for subject '" + RDFNodeWriter.toString(model, subject) + "'. " + error);
     }
 
 }

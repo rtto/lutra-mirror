@@ -45,7 +45,7 @@ public class WOTTR {
 
     // Individuals
     public static final Resource triple = getResource(OTTR.BaseURI.Triple);
-    public static final Resource none = getResource(ns + "none");
+    public static final Resource none = getResource(OTTR.none);
     public static final Resource optional = getResource(ns + "optional");
     public static final Resource nonBlank = getResource(ns + "nonBlank");
 

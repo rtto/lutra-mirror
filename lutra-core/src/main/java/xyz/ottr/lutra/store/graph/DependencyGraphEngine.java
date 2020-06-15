@@ -43,7 +43,7 @@ import xyz.ottr.lutra.model.Template;
 import xyz.ottr.lutra.model.terms.ListTerm;
 import xyz.ottr.lutra.model.terms.Term;
 import xyz.ottr.lutra.model.types.ComplexType;
-import xyz.ottr.lutra.model.types.TermType;
+import xyz.ottr.lutra.model.types.Type;
 import xyz.ottr.lutra.store.QueryEngine;
 import xyz.ottr.lutra.store.TemplateStore;
 import xyz.ottr.lutra.store.Tuple;
@@ -100,7 +100,7 @@ public class DependencyGraphEngine extends QueryEngine<DependencyGraph> {
     @Override
     public Stream<Tuple> index(Tuple tuple, String params, String index, String val) {
 
-        // TODO: Make index(t, ps, i, v) be false for none in place of v
+        // TODO: Make index(t, ps, i, v) be false for noneTerm in place of v
 
         List<HasGetTerm> terms = tuple.getAs(List.class, params);
 
@@ -197,10 +197,10 @@ public class DependencyGraphEngine extends QueryEngine<DependencyGraph> {
     public Stream<Tuple> type(Tuple tuple, String term, String type) {
 
         Term boundTerm = tuple.getAs(Term.class, term);
-        TermType actType = boundTerm.getType();
+        Type actType = boundTerm.getType();
 
         if (tuple.hasBound(type)) {
-            TermType boundType = tuple.getAs(TermType.class, type);
+            Type boundType = tuple.getAs(Type.class, type);
             return boundType.equals(actType) ? Stream.of(tuple) : Stream.empty();
         }
         return Stream.of(tuple.bind(type, actType));
@@ -208,7 +208,7 @@ public class DependencyGraphEngine extends QueryEngine<DependencyGraph> {
 
     @Override
     public Stream<Tuple> innerTypeAt(Tuple tuple, String type, String level, String inner) {
-        TermType boundType = tuple.getAs(TermType.class, type);
+        Type boundType = tuple.getAs(Type.class, type);
 
         if (tuple.hasBound(level)) {
             int boundLvl = tuple.getAs(Integer.class, level);
@@ -217,9 +217,9 @@ public class DependencyGraphEngine extends QueryEngine<DependencyGraph> {
         return bindInnerTypes(tuple, boundType, level, inner, 0);
     }
 
-    private Stream<Tuple> bindInnerTypeAt(Tuple tuple, TermType type, int level, String inner) {
+    private Stream<Tuple> bindInnerTypeAt(Tuple tuple, Type type, int level, String inner) {
 
-        TermType toFind = type;
+        Type toFind = type;
 
         for (int i = 0; i < level; i++) {
             if (!(toFind instanceof ComplexType)) {
@@ -229,13 +229,13 @@ public class DependencyGraphEngine extends QueryEngine<DependencyGraph> {
         }
 
         if (tuple.hasBound(inner)) {
-            return tuple.getAs(TermType.class, inner).equals(toFind)
+            return tuple.getAs(Type.class, inner).equals(toFind)
                 ? Stream.of(tuple) : Stream.empty();
         }
         return Stream.of(tuple.bind(inner, toFind));
     }
             
-    private Stream<Tuple> bindInnerTypes(Tuple tuple, TermType type, String level, String inner, int current) {
+    private Stream<Tuple> bindInnerTypes(Tuple tuple, Type type, String level, String inner, int current) {
 
         Stream<Tuple> stream = Stream.of(tuple.bind(level, current).bind(inner, type));
 
