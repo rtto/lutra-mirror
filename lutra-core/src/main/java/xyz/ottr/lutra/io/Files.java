@@ -30,6 +30,7 @@ import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Stream;
@@ -40,6 +41,7 @@ import org.apache.commons.io.filefilter.IOFileFilter;
 import org.apache.commons.io.filefilter.NotFileFilter;
 import org.apache.commons.io.filefilter.PrefixFileFilter;
 import org.apache.commons.io.filefilter.SuffixFileFilter;
+import org.apache.commons.lang3.StringUtils;
 import xyz.ottr.lutra.system.Message;
 import xyz.ottr.lutra.system.Result;
 import xyz.ottr.lutra.system.ResultStream;
@@ -84,11 +86,16 @@ public enum Files {
     
     public static String iriToDirectory(String pathStr) {
         Path folder = Paths.get(pathStr).getParent();
-        return folder == null ? null : folder.toString();
+        return Objects.toString(folder, null);
     }
 
     public static String iriToPath(String iriStr) throws URISyntaxException {
-        return new URI(iriStr).getPath();
+
+        var uri = new URI(iriStr);
+
+        return uri.getHost()
+            + (StringUtils.isNotBlank(uri.getPath()) ? "/" + uri.getPath() : "")
+            + (StringUtils.isNotBlank(uri.getFragment()) ? "/" + uri.getFragment() : "");
     }
 
     public static Message checkFolderReadable(String folder) throws SecurityException {
