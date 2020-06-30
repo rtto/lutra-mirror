@@ -1,4 +1,4 @@
-package xyz.ottr.lutra.bottr.util;
+package xyz.ottr.lutra.util;
 
 /*-
  * #%L
@@ -24,36 +24,58 @@ package xyz.ottr.lutra.bottr.util;
 
 import java.util.Locale;
 import org.apache.commons.lang3.LocaleUtils;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.validator.routines.UrlValidator;
 import org.apache.jena.ext.xerces.util.URI;
+import xyz.ottr.lutra.system.Message;
 import xyz.ottr.lutra.system.Result;
 
-// TODO suggest to move this to core.parser or core.util
+public class DataValidator {
 
-public enum DataParser {
+    private static final String[] DEFAULT_SCHEMES = { "http", "https", "ftp", "file" };
+    private static final UrlValidator validator = new UrlValidator(DEFAULT_SCHEMES);
 
-    ; // singleton enum utility class
+    public static Result<String> asURL(String value) {
+        return isURL(value)
+            ? Result.of(value)
+            : Result.error("Invalid URL. Value " + value + " is not a valid URL.");
+    }
 
-    public static Result<URI> asURI(String value) {
+    public static boolean isURL(String value) {
+        return validator.isValid(value);
+    }
+
+    public static Result<String> asURI(String value) {
+
+        var result = Result.of(value);
         try {
-            return Result.of(new URI(value));
+            new URI(value);
         } catch (URI.MalformedURIException ex) {
-            return getError(value, "valid IRI", ex.getMessage());
+            result.addMessage(Message.warning("Suspicious IRI. " + value + ". " + ex.getMessage() + "."));
         }
+        return result;
     }
 
     public static Result<String> asLanguageTagString(String value) {
 
-        Locale locale = new Locale.Builder().setLanguageTag(value).build();
-        return LocaleUtils.isAvailableLocale(locale)
-            ? Result.of(value)
-            : getError(value, "language tag");
+        var result = Result.of(value);
+        Locale locale = Locale.forLanguageTag(value.replace("-", "_"));
+        if (!LocaleUtils.isAvailableLocale(locale)) {
+            result.addMessage(Message.warning("Invalid language tag. Value " + value + " is not a valid language tag."));
+        }
+        return result;
+    }
+
+    public static boolean isChar(String value) {
+        return value.length() == 1;
     }
 
     public static Result<Character> asChar(String value) {
-        return value.length() == 1
-            ? Result.of(value.charAt(0))
-            : getError(value, "character");
+
+        var result = Result.of(value.charAt(0));
+        if (isChar(value)) {
+            result.addMessage(Message.error("Invalid character. Value " + value + " is not a character."));
+        }
+        return result;
     }
 
     /*
@@ -83,20 +105,5 @@ public enum DataParser {
         }
     }
     */
-
-    private static Result getError(Object value, String valueType) {
-        return getError(value, valueType, null);
-    }
-
-    private static Result getError(Object value, String valueType, String message) {
-        String errorMessage = "Value " + value + " is not a " + valueType;
-        if (StringUtils.isNotEmpty(message)) {
-            errorMessage += ": " + message;
-        }
-        errorMessage += ".";
-        return Result.error(errorMessage);
-    }
-
-
 
 }

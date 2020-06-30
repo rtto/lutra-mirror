@@ -24,14 +24,14 @@ package xyz.ottr.lutra.bottr.model;
 
 import lombok.Builder;
 import lombok.Getter;
-import xyz.ottr.lutra.bottr.util.TermFactory;
+import xyz.ottr.lutra.model.terms.NoneTerm;
 import xyz.ottr.lutra.model.terms.Term;
 
 @Getter
 @Builder
 public class TranslationSettings {
 
-    @Builder.Default private final Term nullValue = TermFactory.createNone().get();
+    @Builder.Default private final Term nullValue = new NoneTerm();
 
     @Builder.Default private final String labelledBlankPrefix = "_:";
 

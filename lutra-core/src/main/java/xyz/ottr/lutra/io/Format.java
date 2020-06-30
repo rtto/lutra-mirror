@@ -99,7 +99,7 @@ public interface Format {
     default boolean supportsInstanceWriter() {
         return getSupport().contains(Support.InstanceWriter);
     }
-    
+
     default boolean supportsInstanceReader() {
         return getSupport().contains(Support.InstanceReader);
     }

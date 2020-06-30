@@ -61,9 +61,9 @@ import xyz.ottr.lutra.stottr.writer.SInstanceWriter;
 import xyz.ottr.lutra.stottr.writer.STemplateWriter;
 import xyz.ottr.lutra.system.Result;
 import xyz.ottr.lutra.wottr.io.RDFIO;
-import xyz.ottr.lutra.wottr.util.RDFNodes;
 import xyz.ottr.lutra.wottr.writer.WInstanceWriter;
 import xyz.ottr.lutra.wottr.writer.WTemplateWriter;
+import xyz.ottr.lutra.writer.RDFNodeWriter;
 import xyz.ottr.lutra.writer.TemplateWriter;
 
 public class DTemplateWriter implements TemplateWriter, Format {
@@ -174,7 +174,7 @@ public class DTemplateWriter implements TemplateWriter, Format {
 
 
     private String getHeading(Signature signature) {
-        return signature.getClass().getSimpleName() + ": " + RDFNodes.toString(this.prefixMapping, signature.getIri());
+        return signature.getClass().getSimpleName() + ": " + RDFNodeWriter.toString(this.prefixMapping, signature.getIri());
     }
 
     private ContainerTag writeHead(Signature signature) {

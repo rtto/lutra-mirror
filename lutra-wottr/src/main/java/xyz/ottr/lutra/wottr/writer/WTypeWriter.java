@@ -27,22 +27,21 @@ import org.apache.jena.rdf.model.RDFList;
 import org.apache.jena.rdf.model.Resource;
 import xyz.ottr.lutra.model.types.BasicType;
 import xyz.ottr.lutra.model.types.ComplexType;
-import xyz.ottr.lutra.model.types.TermType;
+import xyz.ottr.lutra.model.types.Type;
 
-public enum TypeFactory {
+enum WTypeWriter {
 
     ; // singleton enum
 
-    public static Resource createRDFType(Model model, TermType type) {
-
+    public static Resource type(Model model, Type type) {
         return type instanceof BasicType
             ? model.createResource(((BasicType) type).getIri())
-            : createComplexRDFType(model, type);
+            : complexType(model, type);
     }
 
-    private static RDFList createComplexRDFType(Model model, TermType type) {
+    private static RDFList complexType(Model model, Type type) {
         if (type instanceof ComplexType) {
-            RDFList rest = createComplexRDFType(model, ((ComplexType) type).getInner());
+            RDFList rest = complexType(model, ((ComplexType) type).getInner());
             return rest.cons(model.createResource(((ComplexType) type).getOuterIRI()));
         } else {
             RDFList nil = model.createList();

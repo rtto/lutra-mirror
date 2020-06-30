@@ -32,21 +32,21 @@ package xyz.ottr.lutra.model.types;
  * but may be gotten from the TypeRegistry.
  * @author martige leifhka
  */
-public interface TermType {
+public interface Type {
 
-    boolean isSubTypeOf(TermType other);
+    boolean isSubTypeOf(Type other);
 
-    default boolean isProperSubTypeOf(TermType other) {
+    default boolean isProperSubTypeOf(Type other) {
         return isSubTypeOf(other) && !this.equals(other);
     }
 
-    boolean isCompatibleWith(TermType other);
+    boolean isCompatibleWith(Type other);
 
-    default boolean isIncompatibleWith(TermType other) {
+    default boolean isIncompatibleWith(Type other) {
         return !isCompatibleWith(other);
     }
 
-    TermType removeLUB();
+    Type removeLUB();
     
     String toString();
 }

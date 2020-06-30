@@ -28,7 +28,7 @@ import xyz.ottr.lutra.OTTR;
 @EqualsAndHashCode(callSuper = true)
 public class ListType extends ComplexType {
 
-    public ListType(TermType inner) {
+    public ListType(Type inner) {
         super(inner);
     }
 
@@ -38,21 +38,21 @@ public class ListType extends ComplexType {
     }
 
     @Override
-    public boolean isSubTypeOf(TermType other) {
+    public boolean isSubTypeOf(Type other) {
         return other.equals(TypeRegistry.TOP)
             || other instanceof ListType
                 && this.inner.isSubTypeOf(((ListType) other).getInner());
     }
 
     @Override
-    public boolean isCompatibleWith(TermType other) {
+    public boolean isCompatibleWith(Type other) {
         return other.equals(TypeRegistry.TOP)
             || other instanceof ListType
             && this.inner.isCompatibleWith(((ListType) other).getInner());
     }
 
     @Override
-    public TermType removeLUB() {
+    public Type removeLUB() {
         return new ListType(getInner().removeLUB());
     }
     

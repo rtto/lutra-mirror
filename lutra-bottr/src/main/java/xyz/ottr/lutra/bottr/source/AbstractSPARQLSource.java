@@ -48,10 +48,6 @@ import xyz.ottr.lutra.system.ResultStream;
 
 public abstract class AbstractSPARQLSource implements Source<RDFNode> {
 
-    // Used for ASK queries, disabled for now.
-    //private static final Result<LiteralTerm> TRUE = TermSerializer.createTypedLiteral("true", XSDDatatype.XSDboolean.getURI());
-    //private static final Result<LiteralTerm> FALSE = TermSerializer.createTypedLiteral("false", XSDDatatype.XSDboolean.getURI());
-
     protected abstract Result<QueryExecution> getQueryExecution(String query);
 
     private final PrefixMapping prefixes;

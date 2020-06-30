@@ -28,7 +28,7 @@ import xyz.ottr.lutra.OTTR;
 @EqualsAndHashCode(callSuper = true)
 public class NEListType extends ListType {
 
-    public NEListType(TermType inner) {
+    public NEListType(Type inner) {
         super(inner);
     }
 
@@ -38,21 +38,21 @@ public class NEListType extends ListType {
     }
 
     @Override
-    public boolean isSubTypeOf(TermType other) {
+    public boolean isSubTypeOf(Type other) {
         return super.isSubTypeOf(other)
             || other instanceof NEListType
                && getInner().isSubTypeOf(((NEListType) other).getInner());
     }
 
     @Override
-    public boolean isCompatibleWith(TermType other) {
+    public boolean isCompatibleWith(Type other) {
         return super.isCompatibleWith(other)
             || other instanceof NEListType
                 && getInner().isCompatibleWith(((NEListType) other).getInner());
     }
 
     @Override
-    public TermType removeLUB() {
+    public Type removeLUB() {
         return new NEListType(getInner().removeLUB());
     }
 

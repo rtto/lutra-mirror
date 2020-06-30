@@ -1,10 +1,10 @@
-package xyz.ottr.lutra.model.types;
+package xyz.ottr.lutra.cli;
 
 /*-
  * #%L
- * lutra-core
+ * xyz.ottr.lutra:lutra-cli
  * %%
- * Copyright (C) 2018 - 2019 University of Oslo
+ * Copyright (C) 2018 - 2020 University of Oslo
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -22,27 +22,19 @@ package xyz.ottr.lutra.model.types;
  * #L%
  */
 
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
+import org.junit.Test;
 
-@Getter
-@EqualsAndHashCode
-public abstract class ComplexType implements Type {
+public class SyntaxCheckerTest {
 
-    protected final Type inner;
+    private static final String ROOT = "src/test/resources/";
 
-    protected ComplexType(Type inner) {
-        this.inner = inner;
-    }
+    @Test
+    public void test() {
 
-    /**
-     * @return the IRI of the (outer) term.
-     */
-    public abstract String getOuterIRI();
-
-    public BasicType getInnermost() {
-        return this.inner instanceof ComplexType
-            ? ((ComplexType) this.inner).getInnermost()
-            : (BasicType) this.inner;
+        CLIRunner.run(" "
+            + " --debugStackTrace "
+            + " --mode checkSyntax "
+            + " --inputFormat stottr"
+            + " " + ROOT + "templates/NamedPizza.ttl");
     }
 }

@@ -42,6 +42,8 @@ public enum OTTR  {
     
     public static final String prefix = "ottr";
     public static final String namespace = ns;
+
+    public static final String none = ns + "none";
     
     public enum BaseURI {
         ;
@@ -55,7 +57,7 @@ public enum OTTR  {
         public static final String subTypeOf = ns + "subTypeOf";
         
         public static final String NEList = ns + "NEList";
-        public static final String List = RDF.List.getURI();
+        public static final String List = RDF.uri + "List";
         public static final String LUB = ns + "LUB";
 
         public static final String Top = RDFS.Resource.getURI();
@@ -73,9 +75,9 @@ public enum OTTR  {
 
         static {
             Term sub = new BlankNodeTerm("_:s");
-            sub.setType(TypeRegistry.getType(OTTR.TypeURI.IRI));
+            sub.setType(TypeRegistry.IRI);
             Term pred = new BlankNodeTerm("_:p");
-            pred.setType(TypeRegistry.getType(OTTR.TypeURI.IRI));
+            pred.setType(TypeRegistry.IRI);
             Term obj = new BlankNodeTerm("_:o");
             obj.setType(obj.getVariableType());
 
@@ -89,9 +91,9 @@ public enum OTTR  {
 
         static {
             Term sub = new BlankNodeTerm("_:s");
-            sub.setType(TypeRegistry.getType(OTTR.TypeURI.IRI));
+            sub.setType(TypeRegistry.IRI);
             Term pred = new BlankNodeTerm("_:p");
-            pred.setType(TypeRegistry.getType(OTTR.TypeURI.IRI));
+            pred.setType(TypeRegistry.IRI);
             Term obj = new BlankNodeTerm("_:o");
             obj.setType(obj.getVariableType());
 

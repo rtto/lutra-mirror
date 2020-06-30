@@ -37,7 +37,7 @@ import xyz.ottr.lutra.model.terms.IRITerm;
 import xyz.ottr.lutra.model.terms.ListTerm;
 import xyz.ottr.lutra.model.terms.Term;
 import xyz.ottr.lutra.model.types.ListType;
-import xyz.ottr.lutra.model.types.TermType;
+import xyz.ottr.lutra.model.types.Type;
 import xyz.ottr.lutra.model.types.TypeRegistry;
 import xyz.ottr.lutra.system.Result;
 
@@ -119,7 +119,7 @@ public class Signature implements ModelElement {
         return builder.build();
     }
 
-    private Term getExampleTerm(TermType type, String name, int index) {
+    private Term getExampleTerm(Type type, String name, int index) {
 
         if (type.isSubTypeOf(TypeRegistry.IRI)) {
             return new IRITerm(OTTR.ns_example_arg + name + index);

@@ -24,7 +24,7 @@ package xyz.ottr.lutra.system;
 
 import java.io.PrintStream;
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -46,8 +46,8 @@ public class MessageHandler {
 
     public MessageHandler(PrintStream printStream) {
         this.printStream = printStream;
-        this.traces = new HashSet<>();
-        this.printedMsgs = new HashSet<>();
+        this.traces = new LinkedHashSet<>();
+        this.printedMsgs = new LinkedHashSet<>();
     }
 
     public MessageHandler() {
