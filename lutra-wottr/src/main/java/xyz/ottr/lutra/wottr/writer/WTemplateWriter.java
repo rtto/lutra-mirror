@@ -72,19 +72,27 @@ public class WTemplateWriter implements TemplateWriter {
 
     @Override
     public void accept(Signature template) {
-        Model model = ModelFactory.createDefaultModel();
-        model.setNsPrefixes(this.prefixes);
-        
-        Resource signatureNode = createSignature(model, template);
-        if (template instanceof Template) {
-            for (Instance instance : ((Template) template).getPattern()) {
-                Resource instanceNode = this.instanceWriter.createInstanceNode(model, instance);
-                model.add(signatureNode, WOTTR.pattern, instanceNode);
-            }
+        var iri = template.getIri();
+        if (!this.models.containsKey(iri)) {
+            this.models.put(template.getIri(), getModel(template));
         }
+    }
 
-        PrefixMappings.trim(model);
-        this.models.put(template.getIri(), model);
+    public Model getModel(Signature signature) {
+        return this.models.computeIfAbsent(signature.getIri(), ignore -> {
+            Model model = ModelFactory.createDefaultModel();
+            model.setNsPrefixes(this.prefixes);
+
+            Resource signatureNode = createSignature(model, signature);
+            if (signature instanceof Template) {
+                for (Instance instance : ((Template) signature).getPattern()) {
+                    Resource instanceNode = this.instanceWriter.createInstanceNode(model, instance);
+                    model.add(signatureNode, WOTTR.pattern, instanceNode);
+                }
+            }
+            PrefixMappings.trim(model);
+            return model;
+        });
     }
     
     @Override

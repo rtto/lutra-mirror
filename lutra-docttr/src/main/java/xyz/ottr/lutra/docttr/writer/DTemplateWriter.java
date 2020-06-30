@@ -35,14 +35,17 @@ import java.time.format.DateTimeFormatter;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.Stack;
 import java.util.TreeMap;
 import lombok.Setter;
 import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.shared.PrefixMapping;
 import xyz.dyreriket.rdfvizler.DotProcess;
 import xyz.dyreriket.rdfvizler.RDF2DotParser;
@@ -84,6 +87,7 @@ public class DTemplateWriter implements TemplateWriter, Format {
 
     private final RDFVizler vizler;
     private static final String vizlerRules = "rdfvizler/ottr-2.jrule";
+    private static final String dependenciesRules = "rdfvizler/dependencies.jrule";
 
     public DTemplateWriter(TemplateStore templateStore, PrefixMapping prefixMapping) {
 
@@ -153,6 +157,8 @@ public class DTemplateWriter implements TemplateWriter, Format {
                     writeDependencies(signature),
                     writeStottrSerialisation(signature),
 
+                    rawHtml(getVisualisation(getAllModels(signature), dependenciesRules)),
+
                     div(new ExpansionTree(signature.asInstance()).write()),
 
 
@@ -196,7 +202,7 @@ public class DTemplateWriter implements TemplateWriter, Format {
         return list;
     }
 
-    private ContainerTag writeDependencies(Signature signature) {
+    private Map<String, List<Instance>> getDependencyMap(Signature signature) {
 
         Map<String, List<Instance>> dependencyMap = Collections.EMPTY_MAP;
         if (signature instanceof Template) {
@@ -204,8 +210,12 @@ public class DTemplateWriter implements TemplateWriter, Format {
                 .stream()
                 .collect(groupingBy(Instance::getIri));
         }
-        dependencyMap = new TreeMap(dependencyMap); // sort keys
+        return new TreeMap(dependencyMap); // sort keys
+    }
 
+    private ContainerTag writeDependencies(Signature signature) {
+
+        var dependencyMap = getDependencyMap(signature); // sort keys
         return
             iff(!dependencyMap.isEmpty(),
                 div(
@@ -217,6 +227,28 @@ public class DTemplateWriter implements TemplateWriter, Format {
                         )
                     )
                 )));
+    }
+
+    private Model getAllModels(Signature signature) {
+
+        var visit = new Stack<Signature>();
+        var visited = new HashSet<Signature>();
+
+        var templateWriter = new WTemplateWriter(this.prefixMapping);
+        var allModel = ModelFactory.createDefaultModel();
+
+        visit.add(signature);
+
+        while (!visit.isEmpty()) {
+            var current = visit.pop();
+            if (!visited.contains(current)) {
+                visited.add(current);
+                templateWriter.accept(current);
+                allModel.add(templateWriter.getModel(current));
+                getDependencyMap(current).keySet().forEach(iri -> this.templateStore.getTemplate(iri).ifPresent(visit::push));
+            }
+        }
+        return allModel;
     }
 
     private ContainerTag writeStottrSerialisation(Signature signature) {
@@ -242,7 +274,7 @@ public class DTemplateWriter implements TemplateWriter, Format {
             h3("Example instance"),
             pre(printSInstance(exampleInstance)),
             h3("Visualisation of the expansion of the example instance"),
-            rawHtml(getVisualisation(exampleExpansion)),
+            rawHtml(getVisualisation(exampleExpansion, vizlerRules)),
             h3("The RDF graph of the expansion of the example instance"),
             pre(RDFIO.writeToString(exampleExpansion)),
             h3("Example instance in wOTTR"),
@@ -276,10 +308,12 @@ public class DTemplateWriter implements TemplateWriter, Format {
     }
 
 
-    private String getVisualisation(Model pattern) {
+
+
+    private String getVisualisation(Model pattern, String rulePath) {
         try {
 
-            var rules = this.vizler.getRules(getResourceAsStream(vizlerRules));
+            var rules = this.vizler.getRules(getResourceAsStream(rulePath));
             Model dotModel = this.vizler.getRDFDotModel(pattern, rules);
             String dot = new RDF2DotParser(dotModel).toDot();
             String svg = this.vizler.getDotImage(dot, DotProcess.ImageOutputFormat.svg);
