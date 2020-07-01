@@ -27,7 +27,6 @@ import static java.util.stream.Collectors.groupingBy;
 
 import j2html.tags.ContainerTag;
 import j2html.tags.DomContent;
-import java.io.IOException;
 import java.io.InputStream;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
@@ -47,7 +46,6 @@ import lombok.Setter;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.shared.PrefixMapping;
-import xyz.dyreriket.rdfvizler.DotProcess;
 import xyz.dyreriket.rdfvizler.RDF2DotParser;
 import xyz.dyreriket.rdfvizler.RDFVizler;
 import xyz.ottr.lutra.OTTR;
@@ -103,10 +101,6 @@ public class DTemplateWriter implements TemplateWriter, Format {
         this.wtemplateWriter = new WTemplateWriter(this.prefixMapping);
 
         this.vizler = new RDFVizler();
-    }
-
-    public void setDotPath(String path) {
-        this.vizler.setDotExecutable(path);
     }
 
     @Override
@@ -307,25 +301,12 @@ public class DTemplateWriter implements TemplateWriter, Format {
         return writer.writeToModel();
     }
 
-
-
-
     private String getVisualisation(Model pattern, String rulePath) {
-        try {
 
-            var rules = this.vizler.getRules(getResourceAsStream(rulePath));
-            Model dotModel = this.vizler.getRDFDotModel(pattern, rules);
-            String dot = new RDF2DotParser(dotModel).toDot();
-            String svg = this.vizler.getDotImage(dot, DotProcess.ImageOutputFormat.svg);
-
-            // remove doctype from svg image, so that the svg can be inserted inline.
-            svg = svg.replace("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n"
-                + "<!DOCTYPE svg PUBLIC \"-//W3C//DTD SVG 1.1//EN\"\n"
-                + " \"http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd\">","");
-            return svg;
-        } catch (IOException e) {
-            return pre(e.getLocalizedMessage()).render();
-        }
+        var rules = this.vizler.getRules(getResourceAsStream(rulePath));
+        Model dotModel = this.vizler.getRDFDotModel(pattern, rules);
+        String dot = new RDF2DotParser(dotModel).toDot();
+        return this.vizler.getDotImage(dot, "SVG");
     }
 
     private InputStream getResourceAsStream(String path) {

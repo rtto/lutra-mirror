@@ -167,9 +167,6 @@ public class Settings {
             + "Enabling this flag will not deteriorate performance.%n"
             + "default: ${DEFAULT-VALUE})"})
     public boolean debugStackTrace = false;
-    @Option(names = {"--dotPath"},
-        description = {"Path to dot executable used for visualisations in docttr."})
-    public String dotExecutablePath;
     
     /* The following classes restrict the selections of FormatName to supported formats. */
     private static class InstanceInputFormat extends ArrayList<String> {

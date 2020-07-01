@@ -290,11 +290,6 @@ public class CLI {
 
     private void docttrTemplates(TemplateManager templateManager) {
         DTemplateWriter docttr = new DTemplateWriter(templateManager.getTemplateStore(), templateManager.getPrefixes());
-
-        if (StringUtils.isNotBlank(this.settings.dotExecutablePath)) {
-            docttr.setDotPath(this.settings.dotExecutablePath);
-        }
-
         templateManager.writeTemplates(docttr, makeTemplateWriter(docttr.getDefaultFileSuffix()));
     }
 
