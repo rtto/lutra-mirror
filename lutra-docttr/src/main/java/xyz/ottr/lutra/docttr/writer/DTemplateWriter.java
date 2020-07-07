@@ -31,17 +31,20 @@ import java.io.InputStream;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
 import java.util.TreeMap;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import lombok.Setter;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
@@ -59,11 +62,14 @@ import xyz.ottr.lutra.stottr.writer.SInstanceWriter;
 import xyz.ottr.lutra.stottr.writer.STemplateWriter;
 import xyz.ottr.lutra.system.Result;
 import xyz.ottr.lutra.wottr.io.RDFIO;
+import xyz.ottr.lutra.wottr.util.PrefixMappings;
 import xyz.ottr.lutra.wottr.writer.WInstanceWriter;
 import xyz.ottr.lutra.wottr.writer.WTemplateWriter;
 import xyz.ottr.lutra.writer.RDFNodeWriter;
 import xyz.ottr.lutra.writer.TemplateWriter;
 
+
+// TODO docttr is not a format. make it take a (collection of) signatures?
 public class DTemplateWriter implements TemplateWriter, Format {
 
     private static final String ROOT_resources = "/treeview/";
@@ -73,9 +79,6 @@ public class DTemplateWriter implements TemplateWriter, Format {
 
     private final Map<String, Signature> signatures;
 
-    private final STemplateWriter stemplateWriter;
-    private final WTemplateWriter wtemplateWriter;
-
     private final TemplateStore templateStore;
 
     @Setter private PrefixMapping prefixMapping;
@@ -83,6 +86,8 @@ public class DTemplateWriter implements TemplateWriter, Format {
     private final DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss z", Locale.ENGLISH)
         .withZone(ZoneOffset.UTC);
 
+
+    // TODO replace with graphviz lib
     private final RDFVizler vizler;
     private static final String vizlerRules = "rdfvizler/ottr-2.jrule";
     private static final String dependenciesRules = "rdfvizler/dependencies.jrule";
@@ -97,9 +102,6 @@ public class DTemplateWriter implements TemplateWriter, Format {
 
         this.signatures = new HashMap<>();
 
-        this.stemplateWriter = new STemplateWriter(this.prefixMapping);
-        this.wtemplateWriter = new WTemplateWriter(this.prefixMapping);
-
         this.vizler = new RDFVizler();
     }
 
@@ -112,7 +114,6 @@ public class DTemplateWriter implements TemplateWriter, Format {
     public Collection<Support> getSupport() {
         return support;
     }
-
 
     @Override
     public String getDefaultFileSuffix() {
@@ -132,14 +133,13 @@ public class DTemplateWriter implements TemplateWriter, Format {
     @Override
     public void accept(Signature signature) {
         this.signatures.put(signature.getIri(), signature);
-        this.stemplateWriter.accept(signature);
-        this.wtemplateWriter.accept(signature);
     }
 
     @Override
     public String write(String iri) {
         return document(write(this.signatures.get(iri)));
     }
+
 
     private ContainerTag write(Signature signature) {
 
@@ -148,21 +148,107 @@ public class DTemplateWriter implements TemplateWriter, Format {
             body(
                 h1(getHeading(signature)),
                 div(
-                    writeDependencies(signature),
-                    writeStottrSerialisation(signature),
+                    div(
+                        p(
+                            text("URI: "),
+                            code(a(signature.getIri()).withHref(signature.getIri()))
+                        ),
+                        writeStottrSerialisation(signature)
+                    ),
 
-                    rawHtml(getVisualisation(getAllModels(signature), dependenciesRules)),
-
-                    div(new ExpansionTree(signature.asInstance()).write()),
-
-
-                    div(h3("Prefixes"), writePrefixes()),
                     writePattern(signature),
-                    writeWtottrSerialisation(signature)
-                ),
+                    writeDependencies(signature),
+                    writeSerialisations(signature),
+
+                    h2("Prefixes"),
+                    info("Prefixes are removed from all listings on this page for readability, "
+                        + "but are listed here in RDF Turtle format."),
+                    writePrefixes()
+                    ),
                 writeFooter(),
                 writeScripts()
             )
+        );
+    }
+
+    private ContainerTag writePattern(Signature signature) {
+
+        var exampleInstance = signature.getExampleInstance();
+        var exampleExpansion = this.getExampleExpansion(exampleInstance);
+        var wexampleInstance = this.getWInstanceModel(exampleInstance);
+
+        return div(
+            h2(text("Pattern")),
+            info("The pattern of the template is illustrated by expanding a generated instance. "
+                + "Below the generated instance is shown in different serialisations,"
+                + " and its expansion is presented in different formats."),
+            h4("Generated instance"),
+            p("stOTTR"),
+            pre(printSInstance(exampleInstance)),
+            p("RDF/wOTTR"),
+            pre(removePrefixes(RDFIO.writeToString(PrefixMappings.trim(wexampleInstance)))),
+            h4("Interactive expansion"),
+            info("Click each instance to expand it."),
+            div(writeInteractiveExpansion(exampleInstance)),
+            h4("Visualisation of expanded RDF graph"),
+            info("Each resource node is linked to its IRI."),
+            div(rawHtml(getVisualisation(exampleExpansion, vizlerRules))),
+            h4("Expanded RDF graph"),
+            pre(removePrefixes(RDFIO.writeToString(PrefixMappings.trim(exampleExpansion))))
+        );
+    }
+
+
+    public ContainerTag writeInteractiveExpansion(Instance exampleInstance) {
+
+        Function<Instance, List<Instance>> builder = instance -> {
+            var signature = this.templateStore.getTemplateSignature(instance.getIri()).get();
+            // TODO: create a substitution from a Map directly to avoid validation
+            var substitution = Substitution.resultOf(instance.getArguments(), signature.getParameters()).get();
+            return this.templateStore.getTemplate(instance.getIri()).get().getPattern().stream()
+                .map(is -> is.apply(substitution))
+                .collect(Collectors.toList());
+        };
+
+        var expansionTree = new Tree<>(exampleInstance, builder);
+
+        var toListElement = new Tree.Action<Instance, ContainerTag>() {
+            @Override
+            public ContainerTag perform(Tree<Instance> tree) {
+
+                var instance = code(printSInstance(tree.getRoot()));
+                var children = tree.getChildren();
+                children.sort(Comparator.comparing(a -> a.getRoot().getIri()));
+
+                return tree.hasChildren()
+                    ? li(instance.withClasses("template", "click"), ul(each(children, this::perform)))
+                    : li(instance.withClass("baseTemplate"));
+            }
+        };
+
+        return ul()
+            .with(expansionTree.apply(toListElement))
+            .withClass("treeview");
+    }
+
+    private DomContent writeDependencies(Signature signature) {
+        return div(
+            h2("Dependencies"),
+            writeDirectDependencies(signature),
+            h4("Dependency graph"),
+            info("The graph shows all the templates that this template depends on. Each node is linked to the template IRI."),
+            rawHtml(getVisualisation(getAllModels(signature), dependenciesRules))
+        );
+    }
+
+    private DomContent writeSerialisations(Signature signature) {
+        return div(
+            h2("Serialisations"),
+            div(
+                h4("stOTTR"),
+                writeStottrSerialisation(signature),
+                h4("RDF/wOTTR"),
+                writeWtottrSerialisation(signature))
         );
     }
 
@@ -172,30 +258,39 @@ public class DTemplateWriter implements TemplateWriter, Format {
     }
 
     private ContainerTag writeHead(Signature signature) {
-        return head(
-            meta().withCharset("UTF-8"),
-            title(getHeading(signature)),
-            link().withRel("stylesheet").withHref("https://ottr.xyz/inc/style.css"),
-            styleWithInlineFile(ROOT_resources + "treeview.css")
-        ).withLang("en");
+        return DFramesWriter.getHead()
+            .with(
+                title(getHeading(signature)),
+                styleWithInlineFile(ROOT_resources + "treeview.css")
+            );
     }
 
-    private ContainerTag writeScripts() {
-        return scriptWithInlineFile(ROOT_resources + "treeview.js");
+    private DomContent writeScripts() {
+
+        return join(
+            // TODO put in js file
+            scriptWithInlineFile(ROOT_resources + "treeview.js"),
+            // TODO is this needed with new graphviz lib? if it is, then move to js file.
+            // remove width and height to make svg scalable.
+            script(rawHtml(
+                "var svgs = document.getElementsByTagName('svg');"
+                    + "for (var svg of svgs) { "
+                    + "svg.removeAttribute('width'); "
+                    + "svg.removeAttribute('height'); "
+                    + "svg.style.maxWidth = '1000px'; "
+                    + "}"
+            ))
+        );
     }
 
     private ContainerTag writePrefixes() {
-
-        var list = dl();
-        this.prefixMapping.getNsPrefixMap().entrySet().stream()
+        return pre(this.prefixMapping.getNsPrefixMap().entrySet().stream()
             .sorted(Map.Entry.comparingByValue())
-            .forEach(entry -> {
-                list.with(dt(entry.getKey()));
-                list.with(dd(entry.getValue()));
-            });
-        return list;
+            .map(e -> "@prefix " + String.format(Locale.ENGLISH, "%-12s", e.getKey() + ":") + " <" + e.getValue() + "> .")
+            .collect(Collectors.joining("\n")));
     }
 
+    // TODO use new rependency map
     private Map<String, List<Instance>> getDependencyMap(Signature signature) {
 
         Map<String, List<Instance>> dependencyMap = Collections.EMPTY_MAP;
@@ -207,14 +302,17 @@ public class DTemplateWriter implements TemplateWriter, Format {
         return new TreeMap(dependencyMap); // sort keys
     }
 
-    private ContainerTag writeDependencies(Signature signature) {
+    // TODO use new rependency map
+    private ContainerTag writeDirectDependencies(Signature signature) {
 
         var dependencyMap = getDependencyMap(signature); // sort keys
         return
             iff(!dependencyMap.isEmpty(),
                 div(
-                h3("Direct dependencies"),
-                ul(each(dependencyMap, (key, value) ->
+                h4("Direct dependencies"),
+                    info("The direct dependencies are the templates directly instantiated by this template. "
+                        + "The number in parenthesis is the number of instances of each template."),
+                    ul(each(dependencyMap, (key, value) ->
                         li(a(this.prefixMapping.shortForm(key)).withHref(key),
                             text(" "),
                             span("(" + value.size() + ")")
@@ -223,6 +321,8 @@ public class DTemplateWriter implements TemplateWriter, Format {
                 )));
     }
 
+
+    // TODO delete this when graphviz library is in place
     private Model getAllModels(Signature signature) {
 
         var visit = new Stack<Signature>();
@@ -246,38 +346,28 @@ public class DTemplateWriter implements TemplateWriter, Format {
     }
 
     private ContainerTag writeStottrSerialisation(Signature signature) {
-        return div(
-            h2("stOTTR Serialisation"),
-            pre(this.stemplateWriter.writeSignature(signature, false)));
+        var writer = new STemplateWriter(this.prefixMapping);
+        writer.accept(signature);
+        return pre(writer.writeSignature(signature, false));
     }
 
     private ContainerTag writeWtottrSerialisation(Signature signature) {
-        return div(
-            h2("wOTTR Serialisation"),
-            pre(this.wtemplateWriter.write(signature.getIri())));
+        var writer = new WTemplateWriter(this.prefixMapping);
+        writer.accept(signature);
+        return pre(removePrefixes(writer.write(signature.getIri())));
     }
 
-    private ContainerTag writePattern(Signature signature) {
-
-        var exampleInstance = signature.getExampleInstance();
-        var exampleExpansion = this.getExampleExpansion(exampleInstance);
-        var wexampleInstance = this.getWInstanceModel(exampleInstance);
-
-        return div(
-            h2("Pattern"),
-            h3("Example instance"),
-            pre(printSInstance(exampleInstance)),
-            h3("Visualisation of the expansion of the example instance"),
-            rawHtml(getVisualisation(exampleExpansion, vizlerRules)),
-            h3("The RDF graph of the expansion of the example instance"),
-            pre(RDFIO.writeToString(exampleExpansion)),
-            h3("Example instance in wOTTR"),
-            pre(RDFIO.writeToString(wexampleInstance))
-        );
+    private DomContent info(String description) {
+        return p(rawHtml("&#128712; "), text(description))
+            .withClass("info");
     }
 
     private DomContent writeFooter() {
         return div(
+            p(text("This is the documentation page for an OTTR template. "
+                + "For more information about Reasonable Ontology Templates (OTTR), visit "),
+            a("ottr.xyz").withHref("http://ottr.xyz"),
+            text(".")),
             p(text("Generated: "), text(this.dtf.format(ZonedDateTime.now()))))
             .withClass("footer");
     }
@@ -301,6 +391,8 @@ public class DTemplateWriter implements TemplateWriter, Format {
         return writer.writeToModel();
     }
 
+
+    // Move to own class
     private String getVisualisation(Model pattern, String rulePath) {
 
         var rules = this.vizler.getRules(getResourceAsStream(rulePath));
@@ -309,49 +401,14 @@ public class DTemplateWriter implements TemplateWriter, Format {
         return this.vizler.getDotImage(dot, "SVG");
     }
 
-    private InputStream getResourceAsStream(String path) {
-        return this.getClass().getClassLoader().getResourceAsStream(path);
+    private String removePrefixes(String turtleRDFModel) {
+        return Arrays.asList(turtleRDFModel.split("\\n")).stream()
+            .filter(s -> !s.startsWith("@prefix "))
+            .collect(Collectors.joining("\n"));
     }
 
-    private class ExpansionTree {
-
-        private final Instance root;
-        private List<ExpansionTree> children;
-
-        ExpansionTree(Instance root) {
-            this.root = root;
-            this.children = new LinkedList<>();
-            buildTree();
-        }
-
-        private void buildTree() {
-
-            var signatureIRI = this.root.getIri();
-            var signature = templateStore.getTemplateSignature(signatureIRI).get();
-
-            if (templateStore.containsTemplate(signatureIRI)) {
-
-                // TODO: create a substitution from a Map directly to avoid validation
-                var substitution = Substitution.resultOf(this.root.getArguments(), signature.getParameters()).get();
-                for (var child : templateStore.getTemplate(signatureIRI).get().getPattern()) {
-                    children.add(new ExpansionTree(child.apply(substitution)));
-                }
-            }
-        }
-
-        ContainerTag write() {
-            return ul(addChildren()).withClass("treeview");
-        }
-
-        private ContainerTag addChildren() {
-            return this.children.isEmpty()
-                ? li(span(printSInstance(this.root)).withClass("terminal"))
-                : li(
-                    span(printSInstance(this.root)).withClass("caret"),
-                    ul(each(this.children, ExpansionTree::addChildren))
-                        .withClass("nested")
-                );
-        }
+    private InputStream getResourceAsStream(String path) {
+        return this.getClass().getClassLoader().getResourceAsStream(path);
     }
 
 }

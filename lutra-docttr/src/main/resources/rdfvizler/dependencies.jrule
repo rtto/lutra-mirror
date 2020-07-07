@@ -60,6 +60,12 @@
   (?x rvz-a:label ?name)
 ]
 
+[URI:
+  (:graph rvz:hasNode ?x)
+->
+  (?x rvz-a:URL ?x)
+]
+
 [dependency:
   (?source ottr:pattern ?instance)
   (?instance ottr:of ?target)

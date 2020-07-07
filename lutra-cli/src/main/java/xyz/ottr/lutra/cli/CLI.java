@@ -35,6 +35,7 @@ import picocli.CommandLine.ParameterException;
 import xyz.ottr.lutra.TemplateManager;
 import xyz.ottr.lutra.api.StandardFormat;
 import xyz.ottr.lutra.api.StandardTemplateManager;
+import xyz.ottr.lutra.docttr.writer.DFramesWriter;
 import xyz.ottr.lutra.docttr.writer.DTemplateWriter;
 import xyz.ottr.lutra.io.Files;
 import xyz.ottr.lutra.io.Format;
@@ -291,6 +292,11 @@ public class CLI {
     private void docttrTemplates(TemplateManager templateManager) {
         DTemplateWriter docttr = new DTemplateWriter(templateManager.getTemplateStore(), templateManager.getPrefixes());
         templateManager.writeTemplates(docttr, makeTemplateWriter(docttr.getDefaultFileSuffix()));
+
+        var framesWriter = new DFramesWriter(templateManager.getPrefixes());
+        Files.writeFile(framesWriter.writeFramesMenu(
+            templateManager.getTemplateStore().getTemplateIRIs()), this.settings.out + "/menu", ".html");
+        Files.writeFile(framesWriter.writeFramesIndex(), this.settings.out + "/index", ".html");
     }
 
     private Function<String, Optional<Message>> makeInstanceWriter(String suffix) {
@@ -299,7 +305,7 @@ public class CLI {
                 this.outStream.println(str);
             }
             if (this.settings.out != null) {
-                return Files.writeInstancesTo(str, suffix, this.settings.out);
+                return Files.writeFile(str, this.settings.out, suffix);
             }
             return Optional.empty();
         };
@@ -311,7 +317,7 @@ public class CLI {
                 this.outStream.println(str);
             }
             if (this.settings.out != null) {
-                return Files.writeTemplatesTo(iri, str, suffix, this.settings.out);
+                return Files.writeTemplatesTo(iri, str, this.settings.out, suffix);
             }
             return Optional.empty();
         };

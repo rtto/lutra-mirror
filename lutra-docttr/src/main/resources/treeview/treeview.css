@@ -2,40 +2,47 @@
   list-style-type: none;
   margin: 0;
   padding: 0;
-  font-family:courier,arial,helvetica;
-  font-size:14px;
-  color:#1d3557;
-  background: #f1faee;
+  font-size: 12px;
 }
 
-.caret {
+.treeview ul {
+  display: none;
+  list-style-type: none;
+}
+
+ul.active {
+  display: block;
+}
+
+.template, .baseTemplate {
   cursor: pointer;
   -webkit-user-select: none; /* Safari 3.1+ */
   -moz-user-select: none; /* Firefox 2+ */
   -ms-user-select: none; /* IE 10+ */
   user-select: none;
+  background-color: transparent;
 }
 
-.terminal {
+.template {
+  cursor: pointer;
+}
+
+.baseTemplate {
   cursor: default;
-  -webkit-user-select: none; /* Safari 3.1+ */
-  -moz-user-select: none; /* Firefox 2+ */
-  -ms-user-select: none; /* IE 10+ */
-  user-select: none;
 }
 
-.terminal::before {
-  content: "\25B7";
-  color: #457b9d;
+.template::before, .baseTemplate::before {
+  color: #a04000;
   display: inline-block;
-  margin-right: 6px;
+  margin-right: 3px;
 }
 
-.caret::before {
+.baseTemplate::before {
+  content: "\2022";
+}
+
+.template::before {
   content: "\25B6";
-  color: #e63946;
-  display: inline-block;
-  margin-right: 6px;
 }
 
 .caret-down::before {
@@ -44,11 +51,3 @@
   transform: rotate(90deg);  
 }
 
-.nested {
-  display: none;
-  list-style-type: none;
-}
-
-.active {
-  display: block;
-}
