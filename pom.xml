@@ -632,6 +632,12 @@
                 <version>1.4.0</version>
             </dependency>
 
+            <dependency>
+                <groupId>guru.nidi</groupId>
+                <artifactId>graphviz-java</artifactId>
+                <version>0.16.3</version>
+            </dependency>
+
 
             <!-- CLI -->
             <!-- https://mvnrepository.com/artifact/info.picocli/picocli -->

@@ -27,47 +27,36 @@ import static java.util.stream.Collectors.groupingBy;
 
 import j2html.tags.ContainerTag;
 import j2html.tags.DomContent;
-import java.io.InputStream;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
-import java.util.Stack;
 import java.util.TreeMap;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.Setter;
 import org.apache.jena.rdf.model.Model;
-import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.shared.PrefixMapping;
-import xyz.dyreriket.rdfvizler.RDF2DotParser;
-import xyz.dyreriket.rdfvizler.RDFVizler;
 import xyz.ottr.lutra.OTTR;
+import xyz.ottr.lutra.RDFTurtle;
+import xyz.ottr.lutra.Space;
 import xyz.ottr.lutra.io.Format;
 import xyz.ottr.lutra.model.Instance;
 import xyz.ottr.lutra.model.Signature;
 import xyz.ottr.lutra.model.Substitution;
 import xyz.ottr.lutra.model.Template;
 import xyz.ottr.lutra.store.TemplateStore;
-import xyz.ottr.lutra.stottr.writer.SInstanceWriter;
-import xyz.ottr.lutra.stottr.writer.STemplateWriter;
 import xyz.ottr.lutra.system.Result;
-import xyz.ottr.lutra.wottr.io.RDFIO;
-import xyz.ottr.lutra.wottr.util.PrefixMappings;
 import xyz.ottr.lutra.wottr.writer.WInstanceWriter;
-import xyz.ottr.lutra.wottr.writer.WTemplateWriter;
 import xyz.ottr.lutra.writer.RDFNodeWriter;
 import xyz.ottr.lutra.writer.TemplateWriter;
-
 
 // TODO docttr is not a format. make it take a (collection of) signatures?
 public class DTemplateWriter implements TemplateWriter, Format {
@@ -80,17 +69,13 @@ public class DTemplateWriter implements TemplateWriter, Format {
     private final Map<String, Signature> signatures;
 
     private final TemplateStore templateStore;
+    private final SerialisationWriter serialisationWriter;
+    private final DependencyGraphVisualiser dependencyGraphVisualiser;
 
     @Setter private PrefixMapping prefixMapping;
 
     private final DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss z", Locale.ENGLISH)
         .withZone(ZoneOffset.UTC);
-
-
-    // TODO replace with graphviz lib
-    private final RDFVizler vizler;
-    private static final String vizlerRules = "rdfvizler/ottr-2.jrule";
-    private static final String dependenciesRules = "rdfvizler/dependencies.jrule";
 
     public DTemplateWriter(TemplateStore templateStore, PrefixMapping prefixMapping) {
 
@@ -102,7 +87,8 @@ public class DTemplateWriter implements TemplateWriter, Format {
 
         this.signatures = new HashMap<>();
 
-        this.vizler = new RDFVizler();
+        this.serialisationWriter = new SerialisationWriter(this.prefixMapping);
+        this.dependencyGraphVisualiser = new DependencyGraphVisualiser(this.prefixMapping);
     }
 
     @Override
@@ -153,7 +139,7 @@ public class DTemplateWriter implements TemplateWriter, Format {
                             text("URI: "),
                             code(a(signature.getIri()).withHref(signature.getIri()))
                         ),
-                        writeStottrSerialisation(signature)
+                        pre(this.serialisationWriter.writeStottr(signature))
                     ),
 
                     writePattern(signature),
@@ -175,7 +161,11 @@ public class DTemplateWriter implements TemplateWriter, Format {
 
         var exampleInstance = signature.getExampleInstance();
         var exampleExpansion = this.getExampleExpansion(exampleInstance);
-        var wexampleInstance = this.getWInstanceModel(exampleInstance);
+        var wexampleInstance = this.serialisationWriter.writeWottrModel(exampleInstance);
+
+        var expansionViz = new TripleInstanceGraphVisualiser(this.prefixMapping);
+        this.templateStore.expandInstanceWithoutChecks(exampleInstance)
+            .innerForEach(expansionViz);
 
         return div(
             h2(text("Pattern")),
@@ -184,23 +174,24 @@ public class DTemplateWriter implements TemplateWriter, Format {
                 + " and its expansion is presented in different formats."),
             h4("Generated instance"),
             p("stOTTR"),
-            pre(printSInstance(exampleInstance)),
+            pre(this.serialisationWriter.writeStottr(exampleInstance)),
             p("RDF/wOTTR"),
-            pre(removePrefixes(RDFIO.writeToString(PrefixMappings.trim(wexampleInstance)))),
+            pre(this.serialisationWriter.writeRDF(wexampleInstance)),
             h4("Interactive expansion"),
             info("Click each instance to expand it."),
             div(writeInteractiveExpansion(exampleInstance)),
             h4("Visualisation of expanded RDF graph"),
             info("Each resource node is linked to its IRI."),
-            div(rawHtml(getVisualisation(exampleExpansion, vizlerRules))),
+            div(rawHtml(expansionViz.draw(exampleInstance.getArguments()))),
             h4("Expanded RDF graph"),
-            pre(removePrefixes(RDFIO.writeToString(PrefixMappings.trim(exampleExpansion))))
+            pre(this.serialisationWriter.writeRDF(exampleExpansion))
         );
     }
 
 
-    public ContainerTag writeInteractiveExpansion(Instance exampleInstance) {
+    private ContainerTag writeInteractiveExpansion(Instance exampleInstance) {
 
+        // Build expansion tree
         Function<Instance, List<Instance>> builder = instance -> {
             var signature = this.templateStore.getTemplateSignature(instance.getIri()).get();
             // TODO: create a substitution from a Map directly to avoid validation
@@ -209,14 +200,14 @@ public class DTemplateWriter implements TemplateWriter, Format {
                 .map(is -> is.apply(substitution))
                 .collect(Collectors.toList());
         };
-
         var expansionTree = new Tree<>(exampleInstance, builder);
 
+        // Function to convert expansion tree to html list
         var toListElement = new Tree.Action<Instance, ContainerTag>() {
             @Override
             public ContainerTag perform(Tree<Instance> tree) {
 
-                var instance = code(printSInstance(tree.getRoot()));
+                var instance = code(DTemplateWriter.this.serialisationWriter.writeStottr(tree.getRoot()));
                 var children = tree.getChildren();
                 children.sort(Comparator.comparing(a -> a.getRoot().getIri()));
 
@@ -232,13 +223,25 @@ public class DTemplateWriter implements TemplateWriter, Format {
     }
 
     private DomContent writeDependencies(Signature signature) {
+
+        var tree = getDependencyTree(signature);
+
         return div(
             h2("Dependencies"),
             writeDirectDependencies(signature),
             h4("Dependency graph"),
             info("The graph shows all the templates that this template depends on. Each node is linked to the template IRI."),
-            rawHtml(getVisualisation(getAllModels(signature), dependenciesRules))
+            rawHtml(this.dependencyGraphVisualiser.drawTree(tree))
         );
+    }
+
+    private Tree<String> getDependencyTree(Signature signature) {
+        Function<String, List<String>> builder = iri ->
+            this.templateStore.getTemplate(iri)
+                .map(t -> t.getPattern().stream().map(Instance::getIri).sorted().collect(Collectors.toList()))
+                .orElse(Collections.emptyList());
+
+        return new Tree<>(signature.getIri(), builder);
     }
 
     private DomContent writeSerialisations(Signature signature) {
@@ -246,9 +249,9 @@ public class DTemplateWriter implements TemplateWriter, Format {
             h2("Serialisations"),
             div(
                 h4("stOTTR"),
-                writeStottrSerialisation(signature),
+                pre(this.serialisationWriter.writeStottr(signature)),
                 h4("RDF/wOTTR"),
-                writeWtottrSerialisation(signature))
+                pre(this.serialisationWriter.writeWottr(signature)))
         );
     }
 
@@ -266,28 +269,16 @@ public class DTemplateWriter implements TemplateWriter, Format {
     }
 
     private DomContent writeScripts() {
-
-        return join(
-            // TODO put in js file
-            scriptWithInlineFile(ROOT_resources + "treeview.js"),
-            // TODO is this needed with new graphviz lib? if it is, then move to js file.
-            // remove width and height to make svg scalable.
-            script(rawHtml(
-                "var svgs = document.getElementsByTagName('svg');"
-                    + "for (var svg of svgs) { "
-                    + "svg.removeAttribute('width'); "
-                    + "svg.removeAttribute('height'); "
-                    + "svg.style.maxWidth = '1000px'; "
-                    + "}"
-            ))
-        );
+        return scriptWithInlineFile(ROOT_resources + "treeview.js");
     }
 
     private ContainerTag writePrefixes() {
         return pre(this.prefixMapping.getNsPrefixMap().entrySet().stream()
             .sorted(Map.Entry.comparingByValue())
-            .map(e -> "@prefix " + String.format(Locale.ENGLISH, "%-12s", e.getKey() + ":") + " <" + e.getValue() + "> .")
-            .collect(Collectors.joining("\n")));
+            .map(e -> RDFTurtle.prefixInit
+                + String.format(Locale.ENGLISH, "%-12s", e.getKey() + ":")
+                + RDFTurtle.fullURI(e.getValue()) + ".")
+            .collect(Collectors.joining(Space.LINEBR)));
     }
 
     // TODO use new rependency map
@@ -321,42 +312,6 @@ public class DTemplateWriter implements TemplateWriter, Format {
                 )));
     }
 
-
-    // TODO delete this when graphviz library is in place
-    private Model getAllModels(Signature signature) {
-
-        var visit = new Stack<Signature>();
-        var visited = new HashSet<Signature>();
-
-        var templateWriter = new WTemplateWriter(this.prefixMapping);
-        var allModel = ModelFactory.createDefaultModel();
-
-        visit.add(signature);
-
-        while (!visit.isEmpty()) {
-            var current = visit.pop();
-            if (!visited.contains(current)) {
-                visited.add(current);
-                templateWriter.accept(current);
-                allModel.add(templateWriter.getModel(current));
-                getDependencyMap(current).keySet().forEach(iri -> this.templateStore.getTemplate(iri).ifPresent(visit::push));
-            }
-        }
-        return allModel;
-    }
-
-    private ContainerTag writeStottrSerialisation(Signature signature) {
-        var writer = new STemplateWriter(this.prefixMapping);
-        writer.accept(signature);
-        return pre(writer.writeSignature(signature, false));
-    }
-
-    private ContainerTag writeWtottrSerialisation(Signature signature) {
-        var writer = new WTemplateWriter(this.prefixMapping);
-        writer.accept(signature);
-        return pre(removePrefixes(writer.write(signature.getIri())));
-    }
-
     private DomContent info(String description) {
         return p(rawHtml("&#128712; "), text(description))
             .withClass("info");
@@ -377,38 +332,6 @@ public class DTemplateWriter implements TemplateWriter, Format {
         this.templateStore.expandInstanceWithoutChecks(instance)
             .innerForEach(instanceWriter);
         return instanceWriter.writeToModel();
-    }
-
-    private String printSInstance(Instance instance) {
-        var writer = new SInstanceWriter(this.prefixMapping);
-        writer.accept(instance);
-        return writer.writeInstance(instance);
-    }
-
-    private Model getWInstanceModel(Instance instance) {
-        var writer = new WInstanceWriter(this.prefixMapping);
-        writer.accept(instance);
-        return writer.writeToModel();
-    }
-
-
-    // Move to own class
-    private String getVisualisation(Model pattern, String rulePath) {
-
-        var rules = this.vizler.getRules(getResourceAsStream(rulePath));
-        Model dotModel = this.vizler.getRDFDotModel(pattern, rules);
-        String dot = new RDF2DotParser(dotModel).toDot();
-        return this.vizler.getDotImage(dot, "SVG");
-    }
-
-    private String removePrefixes(String turtleRDFModel) {
-        return Arrays.asList(turtleRDFModel.split("\\n")).stream()
-            .filter(s -> !s.startsWith("@prefix "))
-            .collect(Collectors.joining("\n"));
-    }
-
-    private InputStream getResourceAsStream(String path) {
-        return this.getClass().getClassLoader().getResourceAsStream(path);
     }
 
 }

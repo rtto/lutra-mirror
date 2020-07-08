@@ -23,14 +23,18 @@ package xyz.ottr.lutra.docttr.writer;
  */
 
 import java.util.List;
+import java.util.Objects;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import lombok.Getter;
+import xyz.ottr.lutra.Space;
 
 // TODO this is a generic class which should be either
 //  1. placed elsewhere,
 //  2. replaced by standard API,
-//  3. functionality moved into TemplateStore 
+//  3. functionality moved into TemplateStore
 
 @Getter
 public class Tree<T> {
@@ -59,12 +63,27 @@ public class Tree<T> {
                 .collect(Collectors.toList()));
     }
 
+    public void preorderForEach(Consumer<Tree<T>> consumer) {
+        consumer.accept(this);
+        this.children.forEach(c -> c.preorderForEach(consumer));
+    }
+
+    public String toString() {
+        return toString("  ");
+    }
+
+    private String toString(String indent) {
+        return indent
+            + Objects.toString(root, "null")
+            + this.children.stream().map(c -> c.toString(indent + indent)).collect(Collectors.joining(Space.LINEBR));
+    }
+
     public boolean hasChildren() {
         return !this.children.isEmpty();
     }
 
 
-    /*
+
     // https://stackoverflow.com/questions/26158082/how-to-convert-a-tree-structure-to-a-stream-of-nodes-in-java/37484430
     public Stream<Tree<T>> preorderStream() {
         return Stream.concat(Stream.of(this), this.getChildren().stream().flatMap(Tree::preorderStream));
@@ -73,7 +92,7 @@ public class Tree<T> {
     public Stream<Tree<T>> postorderStream() {
         return Stream.concat(this.getChildren().stream().flatMap(Tree::postorderStream), Stream.of(this));
     }
-    */
+
 
     public <O> O apply(Action<T,O> action) {
         return action.perform(this);
