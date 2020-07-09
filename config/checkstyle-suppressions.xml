@@ -7,6 +7,9 @@
 <suppressions>
 
     <suppress checks="AvoidStarImport" files=".*DTemplateWriter\.java"/>
-    <suppress checks="AvoidStarImport" files=".*DFramesWriter\.java"/>
+    <suppress checks="AvoidStarImport" files=".*DFramesIndexWriter\.java"/>
+    <suppress checks="AvoidStarImport" files=".*DFramesMenuWriter\.java"/>
+    <suppress checks="AvoidStarImport" files=".*DNoFramesIndexWriter\.java"/>
+    <suppress checks="AvoidStarImport" files=".*DWriter\.java"/>
 
 </suppressions>

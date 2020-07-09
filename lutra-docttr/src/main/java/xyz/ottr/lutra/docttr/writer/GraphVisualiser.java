@@ -22,10 +22,9 @@ package xyz.ottr.lutra.docttr.writer;
  * #L%
  */
 
-import static guru.nidi.graphviz.model.Factory.graph;
-
 import guru.nidi.graphviz.engine.Format;
 import guru.nidi.graphviz.engine.Graphviz;
+import guru.nidi.graphviz.model.Factory;
 import guru.nidi.graphviz.model.MutableGraph;
 import org.apache.jena.shared.PrefixMapping;
 import xyz.ottr.lutra.writer.RDFNodeWriter;
@@ -39,7 +38,7 @@ public abstract class GraphVisualiser {
     }
 
     protected MutableGraph getGraph() {
-        return graph()
+        return Factory.graph()
             .directed()
             .strict()
             // graph attr
@@ -60,11 +59,11 @@ public abstract class GraphVisualiser {
             .toMutable();
     }
 
-    protected String shortenURI(String uri) {
+    String shortenURI(String uri) {
         return RDFNodeWriter.toString(this.prefixMapping, uri);
     }
 
-    protected String renderSVG(MutableGraph graph) {
+    String renderSVG(MutableGraph graph) {
         return Graphviz.fromGraph(graph).render(Format.SVG).toString();
     }
 

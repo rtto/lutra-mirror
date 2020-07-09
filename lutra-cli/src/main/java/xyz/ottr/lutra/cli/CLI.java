@@ -35,7 +35,9 @@ import picocli.CommandLine.ParameterException;
 import xyz.ottr.lutra.TemplateManager;
 import xyz.ottr.lutra.api.StandardFormat;
 import xyz.ottr.lutra.api.StandardTemplateManager;
-import xyz.ottr.lutra.docttr.writer.DFramesWriter;
+import xyz.ottr.lutra.docttr.writer.DFramesIndexWriter;
+import xyz.ottr.lutra.docttr.writer.DFramesMenuWriter;
+import xyz.ottr.lutra.docttr.writer.DNoFramesIndexWriter;
 import xyz.ottr.lutra.docttr.writer.DTemplateWriter;
 import xyz.ottr.lutra.io.Files;
 import xyz.ottr.lutra.io.Format;
@@ -290,13 +292,12 @@ public class CLI {
     }
 
     private void docttrTemplates(TemplateManager templateManager) {
-        DTemplateWriter docttr = new DTemplateWriter(templateManager.getTemplateStore(), templateManager.getPrefixes());
+        DTemplateWriter docttr = new DTemplateWriter(templateManager);
         templateManager.writeTemplates(docttr, makeTemplateWriter(docttr.getDefaultFileSuffix()));
 
-        var framesWriter = new DFramesWriter(templateManager.getPrefixes());
-        Files.writeFile(framesWriter.writeFramesMenu(
-            templateManager.getTemplateStore().getTemplateIRIs()), this.settings.out + "/menu", ".html");
-        Files.writeFile(framesWriter.writeFramesIndex(), this.settings.out + "/index", ".html");
+        Files.writeFile(new DNoFramesIndexWriter(templateManager).write(), this.settings.out + "/index-noframes", ".html");
+        Files.writeFile(new DFramesMenuWriter(templateManager).write(), this.settings.out + "/menu", ".html");
+        Files.writeFile(new DFramesIndexWriter(templateManager).write(), this.settings.out + "/index", ".html");
     }
 
     private Function<String, Optional<Message>> makeInstanceWriter(String suffix) {

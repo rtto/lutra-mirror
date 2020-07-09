@@ -22,14 +22,11 @@ package xyz.ottr.lutra.docttr.writer;
  * #L%
  */
 
-import static guru.nidi.graphviz.model.Factory.graph;
-import static guru.nidi.graphviz.model.Factory.mutNode;
-import static guru.nidi.graphviz.model.Factory.to;
-
 import guru.nidi.graphviz.attribute.Font;
 import guru.nidi.graphviz.attribute.Label;
 import guru.nidi.graphviz.attribute.Rank;
 import guru.nidi.graphviz.attribute.Style;
+import guru.nidi.graphviz.model.Factory;
 import guru.nidi.graphviz.model.MutableGraph;
 import guru.nidi.graphviz.model.MutableNode;
 import java.util.ArrayList;
@@ -115,7 +112,7 @@ public class TripleInstanceGraphVisualiser extends GraphVisualiser implements Te
                 var object = getNode(triple.get(2));
                 var predicate = Label.html(getLabel((IRITerm)triple.get(1)));
 
-                graph.add(subject.addLink(to(object).with(predicate)));
+                graph.add(subject.addLink(Factory.to(object).with(predicate)));
             });
         return graph;
     }
@@ -161,7 +158,7 @@ public class TripleInstanceGraphVisualiser extends GraphVisualiser implements Te
 
     @Override
     public MutableNode perform(BlankNodeTerm term) {
-        return mutNode(term.toString())
+        return Factory.mutNode(term.toString())
             .add("label", getTypedLabel(getTypesForLabel(term), ""))
             .add(Style.FILLED)
             .add("fillcolor", "gray90")
@@ -171,7 +168,7 @@ public class TripleInstanceGraphVisualiser extends GraphVisualiser implements Te
 
     @Override
     public MutableNode perform(IRITerm term) {
-        return mutNode(term.toString())
+        return Factory.mutNode(term.toString())
             .add("label", getTypedLabel(getTypesForLabel(term), getLabel(term)))
             .add("URL", term.getIri())
             .add(Style.FILLED)
@@ -180,7 +177,7 @@ public class TripleInstanceGraphVisualiser extends GraphVisualiser implements Te
 
     @Override
     public MutableNode perform(ListTerm term) {
-        var root = mutNode(term.toString())
+        var root = Factory.mutNode(term.toString())
             .add("label", Label.html("<i>rdf:List</i>"))
             .add(Style.FILLED)
             .add("fillcolor", "gray90");
@@ -188,7 +185,7 @@ public class TripleInstanceGraphVisualiser extends GraphVisualiser implements Te
         var listItems = term.asList();
         for (int i = 0; i < listItems.size(); i += 1) {
             root.addLink(
-                to(getNode(listItems.get(i)))
+                Factory.to(getNode(listItems.get(i)))
                     .with("label", i + 1)
                     .with("arrowhead", "odiamond")
             );
@@ -198,7 +195,7 @@ public class TripleInstanceGraphVisualiser extends GraphVisualiser implements Te
 
     @Override
     public MutableNode perform(LiteralTerm term) {
-        return mutNode(term.toString())
+        return Factory.mutNode(term.toString())
             // TODO label.html support for language
             .add("label", shortenURI(term.getDatatype()) + Space.LINEBR + term.getValue())
             .add(Style.FILLED, Style.ROUNDED)

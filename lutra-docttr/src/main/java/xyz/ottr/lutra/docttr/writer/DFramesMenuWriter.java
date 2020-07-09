@@ -25,40 +25,35 @@ package xyz.ottr.lutra.docttr.writer;
 import static j2html.TagCreator.*;
 
 import j2html.tags.ContainerTag;
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.nio.charset.StandardCharsets;
-import java.util.Collection;
 import java.util.stream.Collectors;
-import lombok.SneakyThrows;
-import org.apache.commons.io.IOUtils;
 import org.apache.jena.rdf.model.ResourceFactory;
-import org.apache.jena.shared.PrefixMapping;
-import xyz.ottr.lutra.io.Files;
+import xyz.ottr.lutra.TemplateManager;
 
-public class DFramesWriter {
+public class DFramesMenuWriter extends DWriter {
 
-    private static final String framesIndex = "frames/index.html";
-
-    private final PrefixMapping prefixes;
-
-    public DFramesWriter(PrefixMapping prefixes) {
-        this.prefixes = prefixes;
+    public DFramesMenuWriter(TemplateManager manager) {
+        super(manager);
     }
 
-    @SneakyThrows(IOException.class)
-    public String writeFramesIndex() {
-        return IOUtils.toString(getClass().getClassLoader().getResourceAsStream(framesIndex), StandardCharsets.UTF_8);
+    public String write() {
+        return document(html(
+            getHead("OTTR template library frames menu"),
+            body(
+                a("index")
+                    .withHref("./index-noframes.html") // TODO make this variable
+                    .withTarget("main-frame")
+                    .withStyle("float: right; padding: 5px;"),
+                div(getSignatureList()))));
     }
 
-    @SneakyThrows(URISyntaxException.class)
-    public String writeFramesMenu(Collection<String> signatures) {
+    protected ContainerTag getSignatureList() {
 
         var list = ul();
         var sublist = ul();
         var namespace = "";
 
-        var signatureList = signatures.stream().sorted().collect(Collectors.toList());
+        var signatureList = this.manager.getTemplateStore().getTemplateIRIs()
+            .stream().sorted().collect(Collectors.toList());
 
         for (String iri : signatureList) {
 
@@ -70,27 +65,15 @@ public class DFramesWriter {
                 list.with(li(b(ns), sublist));
             }
 
-
             var item = li(
                 a(this.prefixes.shortForm(iri))
-                    .withHref("./" + Files.iriToPath(iri) + ".html")
-                    .withTarget("main-frame")
+                    .withHref(toLocalPath(iri))
+                    .withTarget("main-frame") // TODO make this variable
             );
             sublist.with(item);
-
         }
-
-        return document(html(
-            getHead(),
-            body(div(list))));
+        return list;
     }
 
-    public static ContainerTag getHead() {
-        return head(
-            meta().withCharset("UTF-8"),
-            link().withRel("stylesheet").withHref("https://ottr.xyz/inc/style.css"),
-            style("div { max-width: 1200px; } p, li, pre { max-width: 100%; } p.info { color: #888; font-size: 9pt; padding: 3px; } ")
-        ).withLang("en");
-    }
 
 }

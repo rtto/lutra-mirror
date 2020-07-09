@@ -1,0 +1,93 @@
+@import url("https://ottr.xyz/inc/style.css");
+
+div {
+    max-width: 1200px;
+}
+
+p, li, pre {
+    max-width: 100%;
+}
+
+.info {
+    max-width: 800px;
+    color: #888;
+    font-size: 9pt;
+    padding: 1px;
+}
+
+.button {
+  cursor: pointer;
+  border-bottom: 1px #ccc dashed;
+}
+
+img.logo {
+    float: right;
+    margin: 20px;
+}
+
+.treeview {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
+
+p.treeviewbuttons {
+    color: #555;
+    font-size: 10pt;
+    font-family: Arial; sans-serif;
+}
+
+p.treeviewbuttons .button {
+    margin-right: 5px;
+}
+
+.treeview ul {
+  display: none;
+  list-style-type: none;
+}
+
+.treeview ul.active {
+  display: block;
+}
+
+.treeview li {
+  font-family: Arial; sans-serif;
+}
+
+.non-leaf, .leaf {
+  -webkit-user-select: none; /* Safari 3.1+ */
+  -moz-user-select: none; /* Firefox 2+ */
+  -ms-user-select: none; /* IE 10+ */
+  user-select: none;
+  background-color: transparent;
+}
+
+.non-leaf {
+  cursor: pointer;
+}
+
+.leaf {
+  cursor: default;
+}
+
+.non-leaf::before, .leaf::before {
+  ##color: #a04000;
+  display: inline-block;
+  margin-right: 5px;
+  font-size: 90%;
+}
+
+.non-leaf::before {
+  content: "\25B6";
+}
+
+.leaf::before {
+  content: "\2022";
+}
+
+.caret-down::before {
+  -ms-transform: rotate(90deg); /* IE 9 */
+  -webkit-transform: rotate(90deg); /* Safari */
+  transform: rotate(90deg);  
+}
+

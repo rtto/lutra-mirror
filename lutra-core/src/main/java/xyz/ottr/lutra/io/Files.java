@@ -94,7 +94,7 @@ public enum Files {
         var uri = new URI(iriStr);
 
         return uri.getHost()
-            + (StringUtils.isNotBlank(uri.getPath()) ? "/" + uri.getPath() : "")
+            + (StringUtils.isNotBlank(uri.getPath()) ? uri.getPath() : "")
             + (StringUtils.isNotBlank(uri.getFragment()) ? "/" + uri.getFragment() : "");
     }
 

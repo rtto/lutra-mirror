@@ -22,12 +22,13 @@ package xyz.ottr.lutra.docttr.writer;
  * #L%
  */
 
-import static guru.nidi.graphviz.model.Factory.node;
-
 import guru.nidi.graphviz.attribute.Rank;
+import guru.nidi.graphviz.model.Factory;
 import guru.nidi.graphviz.model.MutableGraph;
-import guru.nidi.graphviz.model.Node;
+import guru.nidi.graphviz.model.MutableNode;
 import org.apache.jena.shared.PrefixMapping;
+import xyz.ottr.lutra.OTTR;
+import xyz.ottr.lutra.store.TemplateStore;
 
 public class DependencyGraphVisualiser extends GraphVisualiser {
 
@@ -35,21 +36,52 @@ public class DependencyGraphVisualiser extends GraphVisualiser {
         super(prefixMapping);
     }
 
-    public String drawTree(Tree<String> tree) {
-        MutableGraph graph = getGraph()
+    protected MutableGraph getGraph() {
+        MutableGraph graph = super.getGraph()
             .graphAttrs().add(Rank.dir(Rank.RankDir.TOP_TO_BOTTOM));
 
-        tree.preorderStream()
-            .distinct()
-            .forEach(signature -> signature.getChildren().stream()
-                .forEach(child -> graph.add(uriNode(signature.getRoot()).link(uriNode(child.getRoot())))));
+        return graph;
+    }
+
+    public String drawGraph(TemplateStore store) {
+
+        var graph = getGraph();
+
+        store.getTemplateIRIs().stream()
+            .forEach(iri -> store.getDependencies(iri).ifPresent(
+                deps -> deps.stream()
+                .forEach(child ->
+                    graph.add(uriNode(iri, null)
+                        .addLink(uriNode(child, null))))));
 
         return renderSVG(graph);
     }
 
-    private Node uriNode(String uri) {
-        return node(shortenURI(uri))
-            .with("URL", uri);
+    public String drawTree(Tree<String> tree) {
+
+        var graph = getGraph();
+
+        tree.preorderStream()
+            .distinct()
+            .forEach(signature -> signature.getChildren().stream()
+                .forEach(child -> graph.add(
+                    uriNode(signature.getRoot(), tree.getRoot())
+                        .addLink(uriNode(child.getRoot(), tree.getRoot())))));
+
+        return renderSVG(graph);
+    }
+
+
+    /*
+    Get node with url relative to root. Root can be null, in which the path becomes the standard
+
+     */
+    private MutableNode uriNode(String uri, String root) {
+        var node = Factory.mutNode(shortenURI(uri));
+        if (!uri.equals(OTTR.BaseURI.Triple) && !uri.equals(OTTR.BaseURI.NullableTriple)) {
+            node.add("URL", DNoFramesIndexWriter.toLocalPath(uri, root));
+        }
+        return node;
     }
 
 }

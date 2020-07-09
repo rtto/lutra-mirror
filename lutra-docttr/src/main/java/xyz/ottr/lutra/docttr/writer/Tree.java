@@ -28,7 +28,9 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.Setter;
 import xyz.ottr.lutra.Space;
 
 // TODO this is a generic class which should be either
@@ -39,28 +41,29 @@ import xyz.ottr.lutra.Space;
 @Getter
 public class Tree<T> {
 
+    @Setter(AccessLevel.PRIVATE) private Tree<T> parent;
     private final T root;
     private final List<Tree<T>> children;
 
-    private Tree(T root, List<Tree<T>> children) {
+    private Tree(Tree<T> parent, T root, List<Tree<T>> children) {
+        this.parent = parent;
         this.root = root;
         this.children = children;
     }
 
-    public Tree(T root, Function<T, List<T>> buildFunction) {
-        this(root,
+    private Tree(Tree<T> parent, T root, Function<T, List<T>> buildFunction) {
+        this(parent,
+            root,
             buildFunction.apply(root).stream()
-            //.sorted()
-            .map(t -> new Tree<>(t, buildFunction))
-            .collect(Collectors.toList()));
+                .map(t -> new Tree<>(t, buildFunction))
+                .collect(Collectors.toList()));
+        // update parent pointer
+        var that = this;
+        this.children.forEach(c -> c.setParent(that));
     }
 
-    public <O> Tree<O> map(Function<Tree<T>, O> applyFunction) {
-        return new Tree<>(
-            applyFunction.apply(this),
-            this.children.stream()
-                .map(c -> c.map(applyFunction))
-                .collect(Collectors.toList()));
+    public Tree(T root, Function<T, List<T>> buildFunction) {
+        this(null, root, buildFunction);
     }
 
     public void preorderForEach(Consumer<Tree<T>> consumer) {
@@ -75,14 +78,29 @@ public class Tree<T> {
     private String toString(String indent) {
         return indent
             + Objects.toString(root, "null")
-            + this.children.stream().map(c -> c.toString(indent + indent)).collect(Collectors.joining(Space.LINEBR));
+            + Space.LINEBR
+            + " | " + this.children.stream().map(c -> c.toString(indent + indent)).collect(Collectors.joining(Space.LINEBR));
     }
 
     public boolean hasChildren() {
         return !this.children.isEmpty();
     }
 
+    public boolean isRoot() {
+        return this.parent == null;
+    }
 
+    public boolean isLeaf() {
+        return !hasChildren();
+    }
+
+    public int getMaxDepth() {
+        return isLeaf() ? 0 : 1 + this.children.stream().mapToInt(Tree::getMaxDepth).max().getAsInt();
+    }
+
+    public int getMinDepth() {
+        return isLeaf() ? 0 : 1 + this.children.stream().mapToInt(Tree::getMinDepth).min().getAsInt();
+    }
 
     // https://stackoverflow.com/questions/26158082/how-to-convert-a-tree-structure-to-a-stream-of-nodes-in-java/37484430
     public Stream<Tree<T>> preorderStream() {
@@ -93,13 +111,12 @@ public class Tree<T> {
         return Stream.concat(this.getChildren().stream().flatMap(Tree::postorderStream), Stream.of(this));
     }
 
-
     public <O> O apply(Action<T,O> action) {
         return action.perform(this);
     }
 
     @FunctionalInterface
-    interface Action<T, O> {
+    public interface Action<T, O> {
         O perform(Tree<T> tree);
     }
 }

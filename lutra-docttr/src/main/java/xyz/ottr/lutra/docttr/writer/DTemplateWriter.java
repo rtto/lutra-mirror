@@ -27,68 +27,49 @@ import static java.util.stream.Collectors.groupingBy;
 
 import j2html.tags.ContainerTag;
 import j2html.tags.DomContent;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeMap;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import lombok.Setter;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.shared.PrefixMapping;
 import xyz.ottr.lutra.OTTR;
-import xyz.ottr.lutra.RDFTurtle;
-import xyz.ottr.lutra.Space;
+import xyz.ottr.lutra.TemplateManager;
 import xyz.ottr.lutra.io.Format;
 import xyz.ottr.lutra.model.Instance;
 import xyz.ottr.lutra.model.Signature;
 import xyz.ottr.lutra.model.Substitution;
-import xyz.ottr.lutra.model.Template;
-import xyz.ottr.lutra.store.TemplateStore;
 import xyz.ottr.lutra.system.Result;
 import xyz.ottr.lutra.wottr.writer.WInstanceWriter;
 import xyz.ottr.lutra.writer.RDFNodeWriter;
 import xyz.ottr.lutra.writer.TemplateWriter;
 
 // TODO docttr is not a format. make it take a (collection of) signatures?
-public class DTemplateWriter implements TemplateWriter, Format {
-
-    private static final String ROOT_resources = "/treeview/";
+public class DTemplateWriter extends DWriter implements TemplateWriter, Format {
 
     private static final String name = "docttr";
     private static final Collection<Support> support = Set.of(Support.TemplateWriter);
 
     private final Map<String, Signature> signatures;
 
-    private final TemplateStore templateStore;
     private final SerialisationWriter serialisationWriter;
     private final DependencyGraphVisualiser dependencyGraphVisualiser;
 
-    @Setter private PrefixMapping prefixMapping;
+    public DTemplateWriter(TemplateManager manager) {
+        super(manager);
 
-    private final DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss z", Locale.ENGLISH)
-        .withZone(ZoneOffset.UTC);
-
-    public DTemplateWriter(TemplateStore templateStore, PrefixMapping prefixMapping) {
-
-        this.prefixMapping = prefixMapping;
-        this.prefixMapping.withDefaultMappings(OTTR.getStandardLibraryPrefixes());
-        this.prefixMapping.setNsPrefix("x", OTTR.ns_example_arg);
-
-        this.templateStore = templateStore;
+        this.prefixes.withDefaultMappings(OTTR.getStandardLibraryPrefixes());
+        this.prefixes.setNsPrefix("x", OTTR.ns_example_arg);
 
         this.signatures = new HashMap<>();
 
-        this.serialisationWriter = new SerialisationWriter(this.prefixMapping);
-        this.dependencyGraphVisualiser = new DependencyGraphVisualiser(this.prefixMapping);
+        this.serialisationWriter = new SerialisationWriter(this.prefixes);
+        this.dependencyGraphVisualiser = new DependencyGraphVisualiser(this.prefixes);
     }
 
     @Override
@@ -112,6 +93,11 @@ public class DTemplateWriter implements TemplateWriter, Format {
     }
 
     @Override
+    public void setPrefixMapping(PrefixMapping prefixes) {
+        // noop
+    }
+
+    @Override
     public Set<String> getIRIs() {
         return this.signatures.keySet();
     }
@@ -126,13 +112,12 @@ public class DTemplateWriter implements TemplateWriter, Format {
         return document(write(this.signatures.get(iri)));
     }
 
-
     private ContainerTag write(Signature signature) {
 
         return html(
-            writeHead(signature),
+            getHead(signature),
             body(
-                h1(getHeading(signature)),
+                h1(getTitle(signature)),
                 div(
                     div(
                         p(
@@ -146,12 +131,9 @@ public class DTemplateWriter implements TemplateWriter, Format {
                     writeDependencies(signature),
                     writeSerialisations(signature),
 
-                    h2("Prefixes"),
-                    info("Prefixes are removed from all listings on this page for readability, "
-                        + "but are listed here in RDF Turtle format."),
-                    writePrefixes()
+                    getPrefixDiv(this.prefixes)
                     ),
-                writeFooter(),
+                getFooterDiv(),
                 writeScripts()
             )
         );
@@ -163,13 +145,13 @@ public class DTemplateWriter implements TemplateWriter, Format {
         var exampleExpansion = this.getExampleExpansion(exampleInstance);
         var wexampleInstance = this.serialisationWriter.writeWottrModel(exampleInstance);
 
-        var expansionViz = new TripleInstanceGraphVisualiser(this.prefixMapping);
-        this.templateStore.expandInstanceWithoutChecks(exampleInstance)
+        var expansionViz = new TripleInstanceGraphVisualiser(this.prefixes);
+        this.store.expandInstanceWithoutChecks(exampleInstance)
             .innerForEach(expansionViz);
 
         return div(
             h2(text("Pattern")),
-            info("The pattern of the template is illustrated by expanding a generated instance. "
+            getInfoP("The pattern of the template is illustrated by expanding a generated instance. "
                 + "Below the generated instance is shown in different serialisations,"
                 + " and its expansion is presented in different formats."),
             h4("Generated instance"),
@@ -178,48 +160,46 @@ public class DTemplateWriter implements TemplateWriter, Format {
             p("RDF/wOTTR"),
             pre(this.serialisationWriter.writeRDF(wexampleInstance)),
             h4("Interactive expansion"),
-            info("Click each instance to expand it."),
+            getInfoP("Click the list to expand/contract one list element. "
+                + "Click 'expand/contact all' to expand/contract all elements. "
+                + "Note that the interactive expansion is not correct for instances that are marked by list expanders."),
             div(writeInteractiveExpansion(exampleInstance)),
             h4("Visualisation of expanded RDF graph"),
-            info("Each resource node is linked to its IRI."),
+            getInfoP("Each resource node is linked to its IRI."),
             div(rawHtml(expansionViz.draw(exampleInstance.getArguments()))),
             h4("Expanded RDF graph"),
             pre(this.serialisationWriter.writeRDF(exampleExpansion))
         );
     }
 
-
     private ContainerTag writeInteractiveExpansion(Instance exampleInstance) {
 
         // Build expansion tree
         Function<Instance, List<Instance>> builder = instance -> {
-            var signature = this.templateStore.getTemplateSignature(instance.getIri()).get();
+            var signature = this.store.getTemplateSignature(instance.getIri()).get();
             // TODO: create a substitution from a Map directly to avoid validation
             var substitution = Substitution.resultOf(instance.getArguments(), signature.getParameters()).get();
-            return this.templateStore.getTemplate(instance.getIri()).get().getPattern().stream()
+            return this.store.getTemplate(instance.getIri()).get().getPattern().stream()
                 .map(is -> is.apply(substitution))
                 .collect(Collectors.toList());
         };
         var expansionTree = new Tree<>(exampleInstance, builder);
 
-        // Function to convert expansion tree to html list
-        var toListElement = new Tree.Action<Instance, ContainerTag>() {
+        // Convert expansion tree to html list
+        var stOTTRInstanceTreeViewWriter = new TreeViewWriter<Instance>() {
             @Override
-            public ContainerTag perform(Tree<Instance> tree) {
+            protected ContainerTag writeRoot(Tree<Instance> root) {
+                return code(DTemplateWriter.this.serialisationWriter.writeStottr(root.getRoot()));
+            }
 
-                var instance = code(DTemplateWriter.this.serialisationWriter.writeStottr(tree.getRoot()));
-                var children = tree.getChildren();
+            @Override
+            protected Collection<Tree<Instance>> prepareChildren(List<Tree<Instance>> children) {
                 children.sort(Comparator.comparing(a -> a.getRoot().getIri()));
-
-                return tree.hasChildren()
-                    ? li(instance.withClasses("template", "click"), ul(each(children, this::perform)))
-                    : li(instance.withClass("baseTemplate"));
+                return children;
             }
         };
 
-        return ul()
-            .with(expansionTree.apply(toListElement))
-            .withClass("treeview");
+        return stOTTRInstanceTreeViewWriter.write(expansionTree);
     }
 
     private DomContent writeDependencies(Signature signature) {
@@ -228,17 +208,53 @@ public class DTemplateWriter implements TemplateWriter, Format {
 
         return div(
             h2("Dependencies"),
-            writeDirectDependencies(signature),
             h4("Dependency graph"),
-            info("The graph shows all the templates that this template depends on. Each node is linked to the template IRI."),
-            rawHtml(this.dependencyGraphVisualiser.drawTree(tree))
+            getInfoP("The graph shows all the templates that this template depends on. "
+                + "Each node is linked to its documentation page."),
+            rawHtml(this.dependencyGraphVisualiser.drawTree(tree)),
+            h4("List of dependencies"),
+            getInfoP("The number in parenthesis is the number of instances of each template."),
+            writeDependenciesList(tree)
         );
+    }
+
+    private ContainerTag writeDependenciesList(Tree<String> dependencies) {
+
+        var depTreeViewWriter = new TreeViewWriter<String>() {
+            @Override
+            protected ContainerTag writeRoot(Tree<String> root) {
+                var iri = span(RDFNodeWriter.toString(prefixes, root.getRoot()));
+                if (!root.isRoot()) {
+                    var count = root.getParent().getChildren().stream()
+                        .filter(c -> c.getRoot().equals(root.getRoot()))
+                        .count();
+                    iri.with(span(" (" + count + ")"));
+                }
+                return iri;
+            }
+
+            @Override
+            protected Collection<Tree<String>> prepareChildren(List<Tree<String>> children) {
+                // group by iri so we can pick only one.
+                var map = children.stream()
+                    .collect(groupingBy(Tree::getRoot));
+
+                return map.keySet().stream()
+                    .map(iri -> map.get(iri).get(0))
+                    .sorted(Comparator.comparing(Tree::getRoot))
+                    .collect(Collectors.toList());
+            }
+        };
+
+        return depTreeViewWriter.write(dependencies);
     }
 
     private Tree<String> getDependencyTree(Signature signature) {
         Function<String, List<String>> builder = iri ->
-            this.templateStore.getTemplate(iri)
-                .map(t -> t.getPattern().stream().map(Instance::getIri).sorted().collect(Collectors.toList()))
+            this.store.getTemplate(iri)
+                .map(t -> t.getPattern().stream()
+                    .map(Instance::getIri)
+                    .sorted().collect(Collectors.toList()))
                 .orElse(Collections.emptyList());
 
         return new Tree<>(signature.getIri(), builder);
@@ -255,81 +271,22 @@ public class DTemplateWriter implements TemplateWriter, Format {
         );
     }
 
-
-    private String getHeading(Signature signature) {
-        return signature.getClass().getSimpleName() + ": " + RDFNodeWriter.toString(this.prefixMapping, signature.getIri());
+    private String getTitle(Signature signature) {
+        return signature.getClass().getSimpleName()
+            + ": " + RDFNodeWriter.toString(this.prefixes, signature.getIri());
     }
 
-    private ContainerTag writeHead(Signature signature) {
-        return DFramesWriter.getHead()
-            .with(
-                title(getHeading(signature)),
-                styleWithInlineFile(ROOT_resources + "treeview.css")
-            );
+    private ContainerTag getHead(Signature signature) {
+        return getHead(getTitle(signature));
     }
 
     private DomContent writeScripts() {
-        return scriptWithInlineFile(ROOT_resources + "treeview.js");
-    }
-
-    private ContainerTag writePrefixes() {
-        return pre(this.prefixMapping.getNsPrefixMap().entrySet().stream()
-            .sorted(Map.Entry.comparingByValue())
-            .map(e -> RDFTurtle.prefixInit
-                + String.format(Locale.ENGLISH, "%-12s", e.getKey() + ":")
-                + RDFTurtle.fullURI(e.getValue()) + ".")
-            .collect(Collectors.joining(Space.LINEBR)));
-    }
-
-    // TODO use new rependency map
-    private Map<String, List<Instance>> getDependencyMap(Signature signature) {
-
-        Map<String, List<Instance>> dependencyMap = Collections.EMPTY_MAP;
-        if (signature instanceof Template) {
-            dependencyMap = ((Template) signature).getPattern()
-                .stream()
-                .collect(groupingBy(Instance::getIri));
-        }
-        return new TreeMap(dependencyMap); // sort keys
-    }
-
-    // TODO use new rependency map
-    private ContainerTag writeDirectDependencies(Signature signature) {
-
-        var dependencyMap = getDependencyMap(signature); // sort keys
-        return
-            iff(!dependencyMap.isEmpty(),
-                div(
-                h4("Direct dependencies"),
-                    info("The direct dependencies are the templates directly instantiated by this template. "
-                        + "The number in parenthesis is the number of instances of each template."),
-                    ul(each(dependencyMap, (key, value) ->
-                        li(a(this.prefixMapping.shortForm(key)).withHref(key),
-                            text(" "),
-                            span("(" + value.size() + ")")
-                        )
-                    )
-                )));
-    }
-
-    private DomContent info(String description) {
-        return p(rawHtml("&#128712; "), text(description))
-            .withClass("info");
-    }
-
-    private DomContent writeFooter() {
-        return div(
-            p(text("This is the documentation page for an OTTR template. "
-                + "For more information about Reasonable Ontology Templates (OTTR), visit "),
-            a("ottr.xyz").withHref("http://ottr.xyz"),
-            text(".")),
-            p(text("Generated: "), text(this.dtf.format(ZonedDateTime.now()))))
-            .withClass("footer");
+        return scriptWithInlineFile("/docttr.js");
     }
 
     private Model getExampleExpansion(Instance instance) {
-        WInstanceWriter instanceWriter = new WInstanceWriter(this.prefixMapping);
-        this.templateStore.expandInstanceWithoutChecks(instance)
+        WInstanceWriter instanceWriter = new WInstanceWriter(this.prefixes);
+        this.store.expandInstanceWithoutChecks(instance)
             .innerForEach(instanceWriter);
         return instanceWriter.writeToModel();
     }
