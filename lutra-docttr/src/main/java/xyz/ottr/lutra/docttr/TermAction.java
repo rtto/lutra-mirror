@@ -1,4 +1,4 @@
-package xyz.ottr.lutra.docttr.writer;
+package xyz.ottr.lutra.docttr;
 
 /*-
  * #%L
@@ -29,7 +29,11 @@ import xyz.ottr.lutra.model.terms.LiteralTerm;
 import xyz.ottr.lutra.model.terms.NoneTerm;
 import xyz.ottr.lutra.model.terms.Term;
 
-interface TermAction<O> {
+
+// TODO promote this to core?
+
+// Functional visitor pattern for Terms.
+public interface TermAction<O> {
 
     default O perform(Term term) {
         if (term instanceof BlankNodeTerm) {

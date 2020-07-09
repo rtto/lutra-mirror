@@ -1,4 +1,4 @@
-package xyz.ottr.lutra.docttr.writer;
+package xyz.ottr.lutra.docttr;
 
 /*-
  * #%L
@@ -30,11 +30,12 @@ import java.util.stream.Collectors;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.ResourceFactory;
 import xyz.ottr.lutra.TemplateManager;
+import xyz.ottr.lutra.docttr.visualisation.DependencyGraphVisualiser;
 import xyz.ottr.lutra.writer.RDFNodeWriter;
 
-public class DNoFramesIndexWriter extends DFramesMenuWriter {
+public class HTMLIndexWriter extends HTMLMenuWriter {
 
-    public DNoFramesIndexWriter(TemplateManager manager) {
+    public HTMLIndexWriter(TemplateManager manager) {
         super(manager);
     }
 

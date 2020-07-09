@@ -1,4 +1,4 @@
-package xyz.ottr.lutra.docttr.writer;
+package xyz.ottr.lutra.docttr.visualisation;
 
 /*-
  * #%L
@@ -28,6 +28,8 @@ import guru.nidi.graphviz.model.MutableGraph;
 import guru.nidi.graphviz.model.MutableNode;
 import org.apache.jena.shared.PrefixMapping;
 import xyz.ottr.lutra.OTTR;
+import xyz.ottr.lutra.docttr.HTMLIndexWriter;
+import xyz.ottr.lutra.docttr.Tree;
 import xyz.ottr.lutra.store.TemplateStore;
 
 public class DependencyGraphVisualiser extends GraphVisualiser {
@@ -80,7 +82,7 @@ public class DependencyGraphVisualiser extends GraphVisualiser {
     private MutableNode uriNode(String uri, String root) {
         var node = Factory.mutNode(shortenURI(uri));
         if (!uri.equals(OTTR.BaseURI.Triple) && !uri.equals(OTTR.BaseURI.NullableTriple)) {
-            node.add("URL", DNoFramesIndexWriter.toLocalPath(uri, root));
+            node.add("URL", HTMLIndexWriter.toLocalPath(uri, root));
         }
         return node;
     }

@@ -1,4 +1,4 @@
-package xyz.ottr.lutra.docttr.writer;
+package xyz.ottr.lutra.docttr;
 
 /*-
  * #%L
@@ -42,7 +42,7 @@ import xyz.ottr.lutra.TemplateManager;
 import xyz.ottr.lutra.io.Files;
 import xyz.ottr.lutra.store.TemplateStore;
 
-public abstract class DWriter {
+public abstract class HTMLDocWriter {
 
     protected final TemplateManager manager;
     protected final PrefixMapping prefixes;
@@ -52,7 +52,7 @@ public abstract class DWriter {
         .ofPattern("yyyy/MM/dd HH:mm:ss z", Locale.ENGLISH)
         .withZone(ZoneOffset.UTC);
 
-    DWriter(TemplateManager manager) {
+    HTMLDocWriter(TemplateManager manager) {
         this.manager = manager;
         this.prefixes = manager.getPrefixes();
         this.store = manager.getTemplateStore();

@@ -1,4 +1,4 @@
-package xyz.ottr.lutra.docttr.writer;
+package xyz.ottr.lutra.docttr;
 
 /*-
  * #%L
@@ -29,9 +29,9 @@ import java.util.stream.Collectors;
 import org.apache.jena.rdf.model.ResourceFactory;
 import xyz.ottr.lutra.TemplateManager;
 
-public class DFramesMenuWriter extends DWriter {
+public class HTMLMenuWriter extends HTMLDocWriter {
 
-    public DFramesMenuWriter(TemplateManager manager) {
+    public HTMLMenuWriter(TemplateManager manager) {
         super(manager);
     }
 

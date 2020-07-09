@@ -1,4 +1,4 @@
-package xyz.ottr.lutra.docttr.writer;
+package xyz.ottr.lutra.docttr.visualisation;
 
 /*-
  * #%L
@@ -39,6 +39,7 @@ import org.apache.jena.shared.PrefixMapping;
 import org.apache.jena.vocabulary.RDF;
 import xyz.ottr.lutra.OTTR;
 import xyz.ottr.lutra.Space;
+import xyz.ottr.lutra.docttr.TermAction;
 import xyz.ottr.lutra.model.Argument;
 import xyz.ottr.lutra.model.Instance;
 import xyz.ottr.lutra.model.terms.BlankNodeTerm;

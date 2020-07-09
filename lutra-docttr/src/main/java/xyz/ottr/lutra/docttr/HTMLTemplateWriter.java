@@ -1,4 +1,4 @@
-package xyz.ottr.lutra.docttr.writer;
+package xyz.ottr.lutra.docttr;
 
 /*-
  * #%L
@@ -40,6 +40,8 @@ import org.apache.jena.rdf.model.Model;
 import org.apache.jena.shared.PrefixMapping;
 import xyz.ottr.lutra.OTTR;
 import xyz.ottr.lutra.TemplateManager;
+import xyz.ottr.lutra.docttr.visualisation.DependencyGraphVisualiser;
+import xyz.ottr.lutra.docttr.visualisation.TripleInstanceGraphVisualiser;
 import xyz.ottr.lutra.io.Format;
 import xyz.ottr.lutra.model.Instance;
 import xyz.ottr.lutra.model.Signature;
@@ -50,7 +52,7 @@ import xyz.ottr.lutra.writer.RDFNodeWriter;
 import xyz.ottr.lutra.writer.TemplateWriter;
 
 // TODO docttr is not a format. make it take a (collection of) signatures?
-public class DTemplateWriter extends DWriter implements TemplateWriter, Format {
+public class HTMLTemplateWriter extends HTMLDocWriter implements TemplateWriter, Format {
 
     private static final String name = "docttr";
     private static final Collection<Support> support = Set.of(Support.TemplateWriter);
@@ -60,7 +62,7 @@ public class DTemplateWriter extends DWriter implements TemplateWriter, Format {
     private final SerialisationWriter serialisationWriter;
     private final DependencyGraphVisualiser dependencyGraphVisualiser;
 
-    public DTemplateWriter(TemplateManager manager) {
+    public HTMLTemplateWriter(TemplateManager manager) {
         super(manager);
 
         this.prefixes.withDefaultMappings(OTTR.getStandardLibraryPrefixes());
@@ -189,7 +191,7 @@ public class DTemplateWriter extends DWriter implements TemplateWriter, Format {
         var stOTTRInstanceTreeViewWriter = new TreeViewWriter<Instance>() {
             @Override
             protected ContainerTag writeRoot(Tree<Instance> root) {
-                return code(DTemplateWriter.this.serialisationWriter.writeStottr(root.getRoot()));
+                return code(HTMLTemplateWriter.this.serialisationWriter.writeStottr(root.getRoot()));
             }
 
             @Override

@@ -1,4 +1,4 @@
-package xyz.ottr.lutra.docttr.writer;
+package xyz.ottr.lutra.docttr;
 
 /*-
  * #%L
@@ -28,11 +28,11 @@ import lombok.SneakyThrows;
 import org.apache.commons.io.IOUtils;
 import xyz.ottr.lutra.TemplateManager;
 
-public class DFramesIndexWriter extends DWriter {
+public class HTMLFramesetWriter extends HTMLDocWriter {
 
     private static final String framesIndex = "index.html";
 
-    public DFramesIndexWriter(TemplateManager manager) {
+    public HTMLFramesetWriter(TemplateManager manager) {
         super(manager);
     }
 
