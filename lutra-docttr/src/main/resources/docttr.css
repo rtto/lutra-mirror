@@ -4,8 +4,12 @@ div {
     max-width: 1200px;
 }
 
-p, li, pre {
+p, li, pre, svg {
     max-width: 100%;
+}
+
+code, p code, li code {
+    background-color: transparent;
 }
 
 .info {
@@ -59,7 +63,6 @@ p.treeviewbuttons .button {
   -moz-user-select: none; /* Firefox 2+ */
   -ms-user-select: none; /* IE 10+ */
   user-select: none;
-  background-color: transparent;
 }
 
 .non-leaf {
@@ -71,7 +74,6 @@ p.treeviewbuttons .button {
 }
 
 .non-leaf::before, .leaf::before {
-  ##color: #a04000;
   display: inline-block;
   margin-right: 5px;
   font-size: 90%;

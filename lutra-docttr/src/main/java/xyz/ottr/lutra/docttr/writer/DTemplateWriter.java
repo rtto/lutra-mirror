@@ -159,16 +159,16 @@ public class DTemplateWriter extends DWriter implements TemplateWriter, Format {
             pre(this.serialisationWriter.writeStottr(exampleInstance)),
             p("RDF/wOTTR"),
             pre(this.serialisationWriter.writeRDF(wexampleInstance)),
-            h4("Interactive expansion"),
-            getInfoP("Click the list to expand/contract one list element. "
-                + "Click 'expand/contact all' to expand/contract all elements. "
-                + "Note that the interactive expansion is not correct for instances that are marked by list expanders."),
-            div(writeInteractiveExpansion(exampleInstance)),
             h4("Visualisation of expanded RDF graph"),
             getInfoP("Each resource node is linked to its IRI."),
             div(rawHtml(expansionViz.draw(exampleInstance.getArguments()))),
             h4("Expanded RDF graph"),
-            pre(this.serialisationWriter.writeRDF(exampleExpansion))
+            pre(this.serialisationWriter.writeRDF(exampleExpansion)),
+            h4("Interactive expansion"),
+            getInfoP("Click the list to expand/contract one list element. "
+                + "Click 'expand/contact all' to expand/contract all elements. "
+                + "Note that the interactive expansion is not correct for instances that are marked by list expanders."),
+            div(writeInteractiveExpansion(exampleInstance))
         );
     }
 

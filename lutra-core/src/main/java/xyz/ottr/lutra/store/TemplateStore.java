@@ -43,8 +43,7 @@ import xyz.ottr.lutra.system.ResultStream;
 public interface TemplateStore extends Consumer<Signature> {
 
     default void addOTTRBaseTemplates() {
-        addTemplateSignature(OTTR.BaseTemplate.Triple);
-        addTemplateSignature(OTTR.BaseTemplate.NullableTriple);
+        OTTR.BaseTemplate.ALL.forEach(this::addTemplateSignature);
     }
 
     /**
@@ -114,9 +113,12 @@ public interface TemplateStore extends Consumer<Signature> {
         return getIRIs(iri ->
             containsSignature(iri)
                 || containsBase(iri)
-                && !iri.equals(OTTR.BaseURI.Triple)
-                && !iri.equals(OTTR.BaseURI.NullableTriple)
+                && !OTTR.BaseURI.ALL.contains(iri)
         );
+    }
+
+    default Set<String> getAllTemplateObjectIRIs() {
+        return getIRIs(iri -> !OTTR.BaseURI.ALL.contains(iri));
     }
 
     /**

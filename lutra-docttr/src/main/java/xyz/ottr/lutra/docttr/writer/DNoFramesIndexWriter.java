@@ -56,7 +56,8 @@ public class DNoFramesIndexWriter extends DFramesMenuWriter {
                 h2("List of templates"),
                 getInfoP("These are the templates in this library, grouped by their namespace."),
                 div(getSignatureList())),
-                getPrefixDiv(this.prefixes)
+                getPrefixDiv(this.prefixes),
+                getFooterDiv()
             ));
     }
 
@@ -64,7 +65,7 @@ public class DNoFramesIndexWriter extends DFramesMenuWriter {
 
         var list = ul();
 
-        var templateIRIs = this.store.getTemplateIRIs();
+        var templateIRIs = this.store.getAllTemplateObjectIRIs();
 
         list.with(li(
             "Number of templates: " + templateIRIs.size()));

@@ -68,9 +68,11 @@ public abstract class DWriter {
 
     protected DomContent getFooterDiv() {
         return div(
-            p(text("This is the documentation page for an OTTR template. "
+            p(text("This is a generated documentation page for an OTTR template library. "
                     + "For more information about Reasonable Ontology Templates (OTTR), visit "),
-                a("ottr.xyz").withHref("http://ottr.xyz"),
+                a("ottr.xyz")
+                    .withHref("http://ottr.xyz")
+                    .withTarget("_blank"),
                 text(".")),
             p(text("Generated: "), text(this.dtf.format(ZonedDateTime.now()))))
             .withClass("footer");

@@ -22,6 +22,7 @@ package xyz.ottr.lutra;
  * #L%
  */
 
+import java.util.Set;
 import org.apache.jena.shared.PrefixMapping;
 import org.apache.jena.vocabulary.OWL;
 import org.apache.jena.vocabulary.RDF;
@@ -49,6 +50,8 @@ public enum OTTR  {
         ;
         public static final String Triple = ns + "Triple";
         public static final String NullableTriple = ns + "NullableTriple";
+
+        public static final Set<String> ALL = Set.of(Triple, NullableTriple);
     }
 
     public enum TypeURI {
@@ -73,36 +76,31 @@ public enum OTTR  {
         public static final Signature Triple;
         public static final Signature NullableTriple;
 
+        public static final Set<Signature> ALL;
+
         static {
             Term sub = new BlankNodeTerm("_:s");
             sub.setType(TypeRegistry.IRI);
             Term pred = new BlankNodeTerm("_:p");
             pred.setType(TypeRegistry.IRI);
             Term obj = new BlankNodeTerm("_:o");
-            obj.setType(obj.getVariableType());
+            obj.setType(TypeRegistry.TOP);
 
             Triple = xyz.ottr.lutra.model.BaseTemplate.builder()
                 .iri(OTTR.BaseURI.Triple)
-                .parameter(Parameter.builder().term(sub).build())
-                .parameter(Parameter.builder().term(pred).nonBlank(true).build())
-                .parameter(Parameter.builder().term(obj).build())
+                .parameter(Parameter.builder().term(sub.shallowClone()).build())
+                .parameter(Parameter.builder().term(pred.shallowClone()).nonBlank(true).build())
+                .parameter(Parameter.builder().term(obj.shallowClone()).build())
                 .build();
-        }
-
-        static {
-            Term sub = new BlankNodeTerm("_:s");
-            sub.setType(TypeRegistry.IRI);
-            Term pred = new BlankNodeTerm("_:p");
-            pred.setType(TypeRegistry.IRI);
-            Term obj = new BlankNodeTerm("_:o");
-            obj.setType(obj.getVariableType());
 
             NullableTriple = xyz.ottr.lutra.model.BaseTemplate.builder()
                 .iri(OTTR.BaseURI.NullableTriple)
-                .parameter(Parameter.builder().term(sub).optional(true).build())
-                .parameter(Parameter.builder().term(pred).optional(true).nonBlank(true).build())
-                .parameter(Parameter.builder().term(obj).optional(true).build())
+                .parameter(Parameter.builder().term(sub.shallowClone()).optional(true).build())
+                .parameter(Parameter.builder().term(pred.shallowClone()).optional(true).nonBlank(true).build())
+                .parameter(Parameter.builder().term(obj.shallowClone()).optional(true).build())
                 .build();
+
+            ALL = Set.of(Triple, NullableTriple);
         }
     }
     

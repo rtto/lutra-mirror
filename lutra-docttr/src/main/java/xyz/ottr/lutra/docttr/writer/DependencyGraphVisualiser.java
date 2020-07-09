@@ -38,7 +38,8 @@ public class DependencyGraphVisualiser extends GraphVisualiser {
 
     protected MutableGraph getGraph() {
         MutableGraph graph = super.getGraph()
-            .graphAttrs().add(Rank.dir(Rank.RankDir.TOP_TO_BOTTOM));
+            .graphAttrs()
+            .add(Rank.dir(Rank.RankDir.LEFT_TO_RIGHT));
 
         return graph;
     }

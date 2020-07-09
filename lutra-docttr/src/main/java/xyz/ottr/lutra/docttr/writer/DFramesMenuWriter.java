@@ -52,7 +52,7 @@ public class DFramesMenuWriter extends DWriter {
         var sublist = ul();
         var namespace = "";
 
-        var signatureList = this.manager.getTemplateStore().getTemplateIRIs()
+        var signatureList = this.manager.getTemplateStore().getAllTemplateObjectIRIs()
             .stream().sorted().collect(Collectors.toList());
 
         for (String iri : signatureList) {
