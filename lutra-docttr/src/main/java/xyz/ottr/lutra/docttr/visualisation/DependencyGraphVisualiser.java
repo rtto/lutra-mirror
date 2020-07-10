@@ -26,10 +26,8 @@ import guru.nidi.graphviz.attribute.Rank;
 import guru.nidi.graphviz.model.Factory;
 import guru.nidi.graphviz.model.MutableGraph;
 import guru.nidi.graphviz.model.MutableNode;
-import java.nio.file.Path;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.Objects;
 import java.util.Set;
 import java.util.Stack;
 import org.apache.jena.shared.PrefixMapping;
@@ -67,7 +65,7 @@ public class DependencyGraphVisualiser extends GraphVisualiser {
                     deps -> deps
                         .forEach(child -> {
                             visit.add(child);
-                            graph.add(uriNode(iri, root).addLink(uriNode(child, root)));
+                            graph.add(uriNode(iri, root, 0).addLink(uriNode(child, root, 0)));
                         })
                 );
             }
@@ -80,14 +78,14 @@ public class DependencyGraphVisualiser extends GraphVisualiser {
 
         var graph = getGraph();
 
-        var rootFolder = Objects.toString(Path.of(tree.getRoot()).getParent(), null);
+        var rootFolder = tree.getRoot();
 
         tree.preorderStream()
             .distinct()
             .forEach(signature -> signature.getChildren()
                 .forEach(child -> graph.add(
-                    uriNode(signature.getRoot(), rootFolder)
-                        .addLink(uriNode(child.getRoot(), rootFolder)))));
+                    uriNode(signature.getRoot(), rootFolder, 1)
+                        .addLink(uriNode(child.getRoot(), rootFolder, 1)))));
 
         return renderSVG(graph);
     }
@@ -96,10 +94,10 @@ public class DependencyGraphVisualiser extends GraphVisualiser {
     /*
         Get node with url relative to root.
     */
-    private MutableNode uriNode(String uri, String root) {
+    private MutableNode uriNode(String uri, String root, int parents) {
         var node = Factory.mutNode(shortenURI(uri));
         if (!OTTR.BaseURI.ALL.contains(uri)) {
-            node.add("URL", DocttrManager.toLocalFilePath(uri, root));
+            node.add("URL", DocttrManager.toLocalFilePath(uri, root, parents));
         }
         return node;
     }

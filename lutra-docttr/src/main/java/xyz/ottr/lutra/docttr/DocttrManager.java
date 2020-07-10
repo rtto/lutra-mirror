@@ -22,6 +22,7 @@ package xyz.ottr.lutra.docttr;
  * #L%
  */
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -152,24 +153,48 @@ public class DocttrManager {
     }
 
     @SneakyThrows(URISyntaxException.class)
-    private static String toLocalPath(String iri) {
+    public static String toLocalPath(String iri) {
         return Files.iriToPath(iri);
     }
 
-    static String toLocalPath(String iri, String relativeTo) {
+    /**
+     * Create a local path from iri relative to the relativeTo input. Both iri and relativeTo must be IRIs.
+     * Use the parents int to move the relativeTo to a parent. This can be necessary if relativeTo is a file.
+     * @param iri
+     * @param relativeTo
+     * @param parents number of parent skips to move relativeTo.
+     * @return
+     */
+    @SuppressFBWarnings("NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE")
+    static String toLocalPath(String iri, String relativeTo, int parents) {
 
         if (relativeTo == null) {
             return toLocalPath(iri);
         }
-        return Path.of(relativeTo).relativize(Path.of(iri)).toString();
+
+        var relativePath = Path.of(toLocalPath(relativeTo));
+        while (parents > 0 && relativePath.getParent() != null) {
+            parents -= 1;
+            relativePath = relativePath.getParent();
+        }
+
+        return relativePath.relativize(Path.of(toLocalPath(iri))).toString();
     }
 
-    static String toLocalFilePath(String iri) {
-        return toLocalPath(iri) + HTML_EXT;
+    static String toLocalPath(String iri, String relativeTo) {
+        return toLocalPath(iri, relativeTo, 0);
+    }
+
+    public static String toLocalFilePath(String iri, String relativeTo, int parents) {
+        return toLocalPath(iri, relativeTo, parents) + HTML_EXT;
     }
 
     public static String toLocalFilePath(String iri, String relativeTo) {
-        return toLocalPath(iri, relativeTo) + HTML_EXT;
+        return toLocalFilePath(iri, relativeTo, 0);
+    }
+
+    private static String toLocalFilePath(String iri) {
+        return toLocalPath(iri) + HTML_EXT;
     }
 
     // TODO Align this with core's Files
