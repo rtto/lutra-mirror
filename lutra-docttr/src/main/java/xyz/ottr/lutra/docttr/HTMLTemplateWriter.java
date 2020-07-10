@@ -28,28 +28,36 @@ import static java.util.stream.Collectors.joining;
 
 import j2html.tags.ContainerTag;
 import j2html.tags.DomContent;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.TreeMap;
+import java.util.TreeSet;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.ResourceFactory;
 import org.apache.jena.shared.PrefixMapping;
 import xyz.ottr.lutra.OTTR;
 import xyz.ottr.lutra.Space;
 import xyz.ottr.lutra.docttr.visualisation.DependencyGraphVisualiser;
 import xyz.ottr.lutra.docttr.visualisation.TripleInstanceGraphVisualiser;
+import xyz.ottr.lutra.model.Argument;
 import xyz.ottr.lutra.model.Instance;
 import xyz.ottr.lutra.model.Signature;
 import xyz.ottr.lutra.model.Substitution;
+import xyz.ottr.lutra.model.terms.IRITerm;
 import xyz.ottr.lutra.store.TemplateStore;
 import xyz.ottr.lutra.system.Message;
 import xyz.ottr.lutra.system.Result;
 import xyz.ottr.lutra.wottr.writer.WInstanceWriter;
 import xyz.ottr.lutra.writer.RDFNodeWriter;
 
-// TODO docttr is not a format. make it take a (collection of) signatures?
 public class HTMLTemplateWriter {
 
     private final PrefixMapping prefixMapping;
@@ -95,6 +103,9 @@ public class HTMLTemplateWriter {
 
     private ContainerTag getHTML(Signature signature) {
 
+        var exampleInstance = signature.getExampleInstance();
+        var expansionTree = getExpansionTree(exampleInstance);
+
         return html(
             getHead(signature),
             body(
@@ -107,11 +118,13 @@ public class HTMLTemplateWriter {
                             text("URI: "),
                             code(a(signature.getIri()).withHref(signature.getIri()))
                         ),
+                        h4("stOTTR serialisation"),
                         pre(this.serialisationWriter.writeStottr(signature))
                     ),
 
-                    writePattern(signature),
+                    writePattern(expansionTree),
                     writeDependencies(signature),
+                    writeMetrics(expansionTree),
                     writeSerialisations(signature),
 
                     HTMLFactory.getPrefixDiv(this.prefixMapping)
@@ -122,9 +135,9 @@ public class HTMLTemplateWriter {
         );
     }
 
-    private ContainerTag writePattern(Signature signature) {
+    private ContainerTag writePattern(Tree<Instance> exampleInstanceTree) {
 
-        var exampleInstance = signature.getExampleInstance();
+        var exampleInstance = exampleInstanceTree.getRoot();
         var exampleExpansion = this.getExampleExpansion(exampleInstance);
         var wexampleInstance = this.serialisationWriter.writeWottrModel(exampleInstance);
 
@@ -138,9 +151,9 @@ public class HTMLTemplateWriter {
                 + "Below the generated instance is shown in different serialisations,"
                 + " and its expansion is presented in different formats."),
             h4("Generated instance"),
-            p("stOTTR"),
+            b("stOTTR").withClass("heading"),
             pre(this.serialisationWriter.writeStottr(exampleInstance)),
-            p("RDF/wOTTR"),
+            b("RDF/wOTTR").withClass("heading"),
             pre(this.serialisationWriter.writeRDF(wexampleInstance)),
             h4("Visualisation of expanded RDF graph"),
             HTMLFactory.getInfoP("Each resource node is linked to its IRI."),
@@ -151,22 +164,11 @@ public class HTMLTemplateWriter {
             HTMLFactory.getInfoP("Click the list to expand/contract one list element. "
                 + "Click 'expand/contact all' to expand/contract all elements. "
                 + "Note that the interactive expansion is not correct for instances that are marked by list expanders."),
-            div(writeInteractiveExpansion(exampleInstance))
+            div(writeInteractiveExpansion(exampleInstanceTree))
         );
     }
 
-    private ContainerTag writeInteractiveExpansion(Instance exampleInstance) {
-
-        // Build expansion tree
-        Function<Instance, List<Instance>> builder = instance -> {
-            var signature = this.store.getTemplateSignature(instance.getIri()).get();
-            // TODO: create a substitution from a Map directly to avoid validation
-            var substitution = Substitution.resultOf(instance.getArguments(), signature.getParameters()).get();
-            return this.store.getTemplate(instance.getIri()).get().getPattern().stream()
-                .map(is -> is.apply(substitution))
-                .collect(Collectors.toList());
-        };
-        var expansionTree = new Tree<>(exampleInstance, builder);
+    private ContainerTag writeInteractiveExpansion(Tree<Instance> expansionTree) {
 
         // Convert expansion tree to html list
         var stOTTRInstanceTreeViewWriter = new TreeViewWriter<Instance>() {
@@ -185,6 +187,19 @@ public class HTMLTemplateWriter {
         return stOTTRInstanceTreeViewWriter.write(expansionTree);
     }
 
+    private Tree<Instance> getExpansionTree(Instance exampleInstance) {
+        // Build expansion tree
+        Function<Instance, List<Instance>> builder = instance -> {
+            var signature = this.store.getTemplateSignature(instance.getIri()).get();
+            // TODO: create a substitution from a Map directly to avoid validation
+            var substitution = Substitution.resultOf(instance.getArguments(), signature.getParameters()).get();
+            return this.store.getTemplate(instance.getIri()).get().getPattern().stream()
+                .map(is -> is.apply(substitution))
+                .collect(Collectors.toList());
+        };
+        return new Tree<>(exampleInstance, builder);
+    }
+
     private DomContent writeDependencies(Signature signature) {
 
         var tree = getDependencyTree(signature);
@@ -197,8 +212,28 @@ public class HTMLTemplateWriter {
             rawHtml(this.dependencyGraphVisualiser.drawTree(tree)),
             h4("List of dependencies"),
             HTMLFactory.getInfoP("The number in parenthesis is the number of instances of each template."),
-            writeDependenciesList(tree)
+            writeDependenciesList(tree),
+            h4("Depending templates"),
+            HTMLFactory.getInfoP("The templates in this library that depend on this template."),
+            writeDependingTemplates(signature)
         );
+    }
+
+    private ContainerTag writeDependingTemplates(Signature signature) {
+        var dependingTemplates = new TreeSet<String>();
+
+        this.store.getAllTemplates()
+            .innerFilter(
+                template -> template.getPattern().stream()
+                    .map(Instance::getIri)
+                    .anyMatch(iri -> iri.equals(signature.getIri())))
+            .innerForEach(template -> dependingTemplates.add(template.getIri()));
+
+        if (dependingTemplates.isEmpty()) {
+            return p("None found.");
+        }
+
+        return ul(each(dependingTemplates, iri -> li(getRelativeA(iri, signature.getIri()))));
     }
 
     private ContainerTag writeDependenciesList(Tree<String> dependencies) {
@@ -243,6 +278,103 @@ public class HTMLTemplateWriter {
         return new Tree<>(signature.getIri(), builder);
     }
 
+    private ContainerTag writeMetrics(Tree<Instance> exampleInstanceTree) {
+
+        var direct = exampleInstanceTree.getChildren().stream()
+            .map(Tree::getRoot)
+            .collect(Collectors.toList());
+
+        var transitive = exampleInstanceTree.preorderStream()
+            .map(Tree::getRoot)
+            .collect(Collectors.toList());
+
+        return div(
+            h2("Metrics"),
+            HTMLFactory.getInfoP("Dependency graph metrics. "
+                + "Depth is the number of steps to a leaf node in the dependency graph. "
+                + "Branching is the number of outgoing edges from a node."),
+            ul(
+                li("Max. dependency depth: " + exampleInstanceTree.getMaxDepth()),
+                li("Min. dependency depth: " + exampleInstanceTree.getMinDepth()),
+                li("Max. branching: " + exampleInstanceTree.getMaxChildren()),
+                li("Min. branching: " + exampleInstanceTree.getMinChildren())
+            ),
+            h4("Templates used"),
+            table(tr(
+                td(b("Direct dependencies").withClass("heading"),
+                    getInstanceMetricsList(exampleInstanceTree.getRoot().getIri(), direct)
+                ),
+                td(
+                    b("Complete expansion").withClass("heading"),
+                    getInstanceMetricsList(exampleInstanceTree.getRoot().getIri(), transitive)
+                ))),
+            h4("Vocabulary introduced"),
+            table(tr(
+                td(b("Direct dependencies").withClass("heading"),
+                    getVocabularyMetricsList(direct)
+                ),
+                td(
+                    b("Complete expansion").withClass("heading"),
+                    getVocabularyMetricsList(transitive)
+                )))
+        );
+    }
+
+    private ContainerTag getInstanceMetricsList(String rootIRI, List<Instance> instances) {
+
+        var list = ul();
+
+        list.with(li("Number of instances: " + instances.size()));
+
+        {
+            var signatureMap = instances.stream()
+                .collect(Collectors.collectingAndThen(groupingBy(Instance::getIri), TreeMap::new));
+
+            list.with(
+                li(text("Templates used: (" + signatureMap.keySet().size() + " templates)"),
+                    ul(
+                        each(signatureMap, (k, v) -> li(getRelativeA(k, rootIRI), text(" (" + v.size() + ")")))
+                    )
+                ));
+        }
+
+        return list;
+    }
+
+    public Map<String, List<Resource>> getVocabularyMap(List<Instance> instances) {
+        return instances.stream()
+            .map(Instance::getArguments)
+            .reduce(new ArrayList<>(), (a, b) -> {
+                a.addAll(b);
+                return a;
+            })
+            .stream()
+            .map(Argument::getTerm)
+            .filter(term -> term instanceof IRITerm)
+            .map(term -> ((IRITerm) term).getIri())
+            .filter(iri -> !iri.startsWith(OTTR.ns_example_arg))
+            .distinct()
+            .sorted()
+            .map(ResourceFactory::createResource)
+            .map(Resource::asResource)
+            .collect(groupingBy(Resource::getNameSpace));
+    }
+
+    private ContainerTag getVocabularyMetricsList(List<Instance> instances) {
+
+        var list = ul();
+        var vocabularyElements = getVocabularyMap(instances);
+
+        list.with(
+            li(text("Namespaces introduced: (" + vocabularyElements.size() + ")"),
+                ul(each(vocabularyElements.keySet(), ns ->
+                    li(b(Objects.toString(this.prefixMapping.getNsURIPrefix(ns), "")).withClass("heading"),
+                        text(": "), code(ns), ul(
+                            each(vocabularyElements.get(ns), iri -> li(getA(iri.getURI())))))))));
+        return list;
+
+    }
+
     private DomContent writeSerialisations(Signature signature) {
         return div(
             h2("Serialisations"),
@@ -261,6 +393,27 @@ public class HTMLTemplateWriter {
 
     private DomContent writeScripts() {
         return scriptWithInlineFile("/docttr.js");
+    }
+
+    private DomContent getA(String iri) {
+        var a = a(this.shortenIRI(iri));
+        if (!OTTR.BaseURI.ALL.contains(iri)) {
+            a.withHref(iri);
+        }
+        return a;
+    }
+
+    private DomContent getRelativeA(String iri, String rootIRI) {
+
+        var a = a(this.shortenIRI(iri));
+        if (!OTTR.BaseURI.ALL.contains(iri)) {
+            a.withHref(DocttrManager.toLocalFilePath(iri, rootIRI, 1));
+        }
+        return a;
+    }
+
+    private String shortenIRI(String iri) {
+        return RDFNodeWriter.toString(this.prefixMapping, iri);
     }
 
     private Model getExampleExpansion(Instance instance) {

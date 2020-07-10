@@ -88,6 +88,12 @@ public class Tree<T> {
         return !this.children.isEmpty();
     }
 
+
+
+    public int numberOfChildren() {
+        return this.children.size();
+    }
+
     public boolean isRoot() {
         return this.parent == null;
     }
@@ -102,6 +108,18 @@ public class Tree<T> {
 
     public int getMinDepth() {
         return isLeaf() ? 0 : 1 + this.children.stream().mapToInt(Tree::getMinDepth).min().orElse(0);
+    }
+
+    private Stream<Tree<T>> streamNonLeafChildren() {
+        return this.children.stream().filter(t -> !t.isLeaf());
+    }
+
+    public int getMaxChildren() {
+        return Math.max(numberOfChildren(), streamNonLeafChildren().mapToInt(Tree::numberOfChildren).max().orElse(Integer.MIN_VALUE));
+    }
+
+    public int getMinChildren() {
+        return Math.min(numberOfChildren(), streamNonLeafChildren().mapToInt(Tree::numberOfChildren).min().orElse(Integer.MAX_VALUE));
     }
 
     // https://stackoverflow.com/questions/26158082/how-to-convert-a-tree-structure-to-a-stream-of-nodes-in-java/37484430

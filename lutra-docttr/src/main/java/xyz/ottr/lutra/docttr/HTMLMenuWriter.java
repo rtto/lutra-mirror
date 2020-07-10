@@ -47,6 +47,7 @@ public class HTMLMenuWriter {
                 a("index")
                     .withHref(DocttrManager.FILENAME_FRONTPAGE)
                     .withTarget("main-frame")
+                    .withClass("button")
                     .withStyle("float: right; padding: 5px;"),
                 div(getSignatureList(root, iris)))));
     }

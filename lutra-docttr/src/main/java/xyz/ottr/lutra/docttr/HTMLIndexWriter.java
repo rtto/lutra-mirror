@@ -84,7 +84,7 @@ public class HTMLIndexWriter extends HTMLMenuWriter {
                 join("Template domains: " + domains.size(),
                     ul(each(domains, iri -> li(
                         a(code(iri)).withTarget("_top")
-                            .withHref(Path.of(DocttrManager.toLocalPath(iri, root), DocttrManager.FILENAME_FRAMESET).toString()))
+                            .withHref(Path.of(DocttrManager.toLocalPath(iri, root, 0), DocttrManager.FILENAME_FRAMESET).toString()))
                     )))
             ));
         }
@@ -112,7 +112,7 @@ public class HTMLIndexWriter extends HTMLMenuWriter {
             list.with(li(
                 join("Root templates: " + rootTemplates.size(),
                     ul(each(rootTemplates, iri -> li(
-                        a(code(RDFNodeWriter.toString(this.prefixMapping, iri))).withHref(DocttrManager.toLocalFilePath(iri, root))
+                        a(RDFNodeWriter.toString(this.prefixMapping, iri)).withHref(DocttrManager.toLocalFilePath(iri, root))
                     ))))
             ));
         }
