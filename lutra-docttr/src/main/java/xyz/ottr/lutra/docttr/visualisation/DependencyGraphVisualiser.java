@@ -26,9 +26,15 @@ import guru.nidi.graphviz.attribute.Rank;
 import guru.nidi.graphviz.model.Factory;
 import guru.nidi.graphviz.model.MutableGraph;
 import guru.nidi.graphviz.model.MutableNode;
+import java.nio.file.Path;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.Set;
+import java.util.Stack;
 import org.apache.jena.shared.PrefixMapping;
 import xyz.ottr.lutra.OTTR;
-import xyz.ottr.lutra.docttr.HTMLIndexWriter;
+import xyz.ottr.lutra.docttr.DocttrManager;
 import xyz.ottr.lutra.docttr.Tree;
 import xyz.ottr.lutra.store.TemplateStore;
 
@@ -39,23 +45,33 @@ public class DependencyGraphVisualiser extends GraphVisualiser {
     }
 
     protected MutableGraph getGraph() {
-        MutableGraph graph = super.getGraph()
+        return super.getGraph()
             .graphAttrs()
             .add(Rank.dir(Rank.RankDir.LEFT_TO_RIGHT));
-
-        return graph;
     }
 
-    public String drawGraph(TemplateStore store) {
+    // transitively draw all dependencies from iris
+    public String drawGraph(String root, Collection<String> iris, TemplateStore store) {
 
         var graph = getGraph();
 
-        store.getTemplateIRIs().stream()
-            .forEach(iri -> store.getDependencies(iri).ifPresent(
-                deps -> deps.stream()
-                .forEach(child ->
-                    graph.add(uriNode(iri, null)
-                        .addLink(uriNode(child, null))))));
+        Stack<String> visit = new Stack<>();
+        visit.addAll(iris);
+        Set<String> visited = new HashSet<>();
+
+        while (!visit.isEmpty()) {
+            var iri = visit.pop();
+            if (!visited.contains(iri)) {
+                visited.add(iri);
+                store.getDependencies(iri).ifPresent(
+                    deps -> deps
+                        .forEach(child -> {
+                            visit.add(child);
+                            graph.add(uriNode(iri, root).addLink(uriNode(child, root)));
+                        })
+                );
+            }
+        }
 
         return renderSVG(graph);
     }
@@ -64,25 +80,26 @@ public class DependencyGraphVisualiser extends GraphVisualiser {
 
         var graph = getGraph();
 
+        var rootFolder = Objects.toString(Path.of(tree.getRoot()).getParent(), null);
+
         tree.preorderStream()
             .distinct()
-            .forEach(signature -> signature.getChildren().stream()
+            .forEach(signature -> signature.getChildren()
                 .forEach(child -> graph.add(
-                    uriNode(signature.getRoot(), tree.getRoot())
-                        .addLink(uriNode(child.getRoot(), tree.getRoot())))));
+                    uriNode(signature.getRoot(), rootFolder)
+                        .addLink(uriNode(child.getRoot(), rootFolder)))));
 
         return renderSVG(graph);
     }
 
 
     /*
-    Get node with url relative to root. Root can be null, in which the path becomes the standard
-
-     */
+        Get node with url relative to root.
+    */
     private MutableNode uriNode(String uri, String root) {
         var node = Factory.mutNode(shortenURI(uri));
-        if (!uri.equals(OTTR.BaseURI.Triple) && !uri.equals(OTTR.BaseURI.NullableTriple)) {
-            node.add("URL", HTMLIndexWriter.toLocalPath(uri, root));
+        if (!OTTR.BaseURI.ALL.contains(uri)) {
+            node.add("URL", DocttrManager.toLocalFilePath(uri, root));
         }
         return node;
     }

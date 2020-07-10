@@ -19,6 +19,10 @@ code, p code, li code {
     padding: 1px;
 }
 
+.error {
+    color: red;
+}
+
 .button {
   cursor: pointer;
   border-bottom: 1px #ccc dashed;

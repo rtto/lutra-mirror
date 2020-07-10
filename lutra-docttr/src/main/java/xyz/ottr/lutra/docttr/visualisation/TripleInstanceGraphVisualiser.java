@@ -66,7 +66,7 @@ public class TripleInstanceGraphVisualiser extends GraphVisualiser implements Te
         RDF.type.toString());
 
     protected void accept(Collection<Instance> instances) {
-        instances.forEach(this::accept);
+        instances.forEach(this);
     }
 
     @Override
@@ -95,7 +95,7 @@ public class TripleInstanceGraphVisualiser extends GraphVisualiser implements Te
     }
 
     // get an instance's list of argument terms
-    private Function<Instance, List<Term>> toTripleFunction = instance ->
+    private final Function<Instance, List<Term>> toTripleFunction = instance ->
         instance.getArguments().stream()
             .map(Argument::getTerm)
             .collect(Collectors.toList());
@@ -106,7 +106,7 @@ public class TripleInstanceGraphVisualiser extends GraphVisualiser implements Te
             .graphAttrs().add(Rank.dir(Rank.RankDir.LEFT_TO_RIGHT));
 
         this.instances.stream()
-            .map(toTripleFunction)
+            .map(this.toTripleFunction)
             .filter(triple -> !this.excludePredicates.contains(((IRITerm)triple.get(1)).getIri()))
             .forEach(triple -> {
                 var subject = getNode(triple.get(0));
@@ -147,7 +147,7 @@ public class TripleInstanceGraphVisualiser extends GraphVisualiser implements Te
 
     protected String getTypesForLabel(Term term) {
         return this.instances.stream()
-            .map(toTripleFunction)
+            .map(this.toTripleFunction)
             .filter(triple -> triple.get(0).equals(term))
             .filter(triple -> ((IRITerm)triple.get(1)).getIri().equals(RDF.type.getURI()))
             .map(triple -> triple.get(2))

@@ -58,8 +58,7 @@ public class Tree<T> {
                 .map(t -> new Tree<>(t, buildFunction))
                 .collect(Collectors.toList()));
         // update parent pointer
-        var that = this;
-        this.children.forEach(c -> c.setParent(that));
+        this.children.forEach(child -> child.setParent(this));
     }
 
     public Tree(T root, Function<T, List<T>> buildFunction) {
@@ -68,7 +67,7 @@ public class Tree<T> {
 
     public void preorderForEach(Consumer<Tree<T>> consumer) {
         consumer.accept(this);
-        this.children.forEach(c -> c.preorderForEach(consumer));
+        this.children.forEach(child -> child.preorderForEach(consumer));
     }
 
     public String toString() {
@@ -77,9 +76,12 @@ public class Tree<T> {
 
     private String toString(String indent) {
         return indent
-            + Objects.toString(root, "null")
+            + Objects.toString(this.root, "null")
             + Space.LINEBR
-            + " | " + this.children.stream().map(c -> c.toString(indent + indent)).collect(Collectors.joining(Space.LINEBR));
+            + " | "
+            + this.children.stream()
+                .map(child -> child.toString(indent + indent))
+                .collect(Collectors.joining(Space.LINEBR));
     }
 
     public boolean hasChildren() {
@@ -95,20 +97,20 @@ public class Tree<T> {
     }
 
     public int getMaxDepth() {
-        return isLeaf() ? 0 : 1 + this.children.stream().mapToInt(Tree::getMaxDepth).max().getAsInt();
+        return isLeaf() ? 0 : 1 + this.children.stream().mapToInt(Tree::getMaxDepth).max().orElse(0);
     }
 
     public int getMinDepth() {
-        return isLeaf() ? 0 : 1 + this.children.stream().mapToInt(Tree::getMinDepth).min().getAsInt();
+        return isLeaf() ? 0 : 1 + this.children.stream().mapToInt(Tree::getMinDepth).min().orElse(0);
     }
 
     // https://stackoverflow.com/questions/26158082/how-to-convert-a-tree-structure-to-a-stream-of-nodes-in-java/37484430
     public Stream<Tree<T>> preorderStream() {
-        return Stream.concat(Stream.of(this), this.getChildren().stream().flatMap(Tree::preorderStream));
+        return Stream.concat(Stream.of(this), this.children.stream().flatMap(Tree::preorderStream));
     }
 
     public Stream<Tree<T>> postorderStream() {
-        return Stream.concat(this.getChildren().stream().flatMap(Tree::postorderStream), Stream.of(this));
+        return Stream.concat(this.children.stream().flatMap(Tree::postorderStream), Stream.of(this));
     }
 
     public <O> O apply(Action<T,O> action) {

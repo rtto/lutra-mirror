@@ -24,102 +24,83 @@ package xyz.ottr.lutra.docttr;
 
 import static j2html.TagCreator.*;
 import static java.util.stream.Collectors.groupingBy;
+import static java.util.stream.Collectors.joining;
 
 import j2html.tags.ContainerTag;
 import j2html.tags.DomContent;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.shared.PrefixMapping;
 import xyz.ottr.lutra.OTTR;
-import xyz.ottr.lutra.TemplateManager;
+import xyz.ottr.lutra.Space;
 import xyz.ottr.lutra.docttr.visualisation.DependencyGraphVisualiser;
 import xyz.ottr.lutra.docttr.visualisation.TripleInstanceGraphVisualiser;
-import xyz.ottr.lutra.io.Format;
 import xyz.ottr.lutra.model.Instance;
 import xyz.ottr.lutra.model.Signature;
 import xyz.ottr.lutra.model.Substitution;
+import xyz.ottr.lutra.store.TemplateStore;
+import xyz.ottr.lutra.system.Message;
 import xyz.ottr.lutra.system.Result;
 import xyz.ottr.lutra.wottr.writer.WInstanceWriter;
 import xyz.ottr.lutra.writer.RDFNodeWriter;
-import xyz.ottr.lutra.writer.TemplateWriter;
 
 // TODO docttr is not a format. make it take a (collection of) signatures?
-public class HTMLTemplateWriter extends HTMLDocWriter implements TemplateWriter, Format {
+public class HTMLTemplateWriter {
 
-    private static final String name = "docttr";
-    private static final Collection<Support> support = Set.of(Support.TemplateWriter);
-
-    private final Map<String, Signature> signatures;
+    private final PrefixMapping prefixMapping;
+    private final TemplateStore store;
 
     private final SerialisationWriter serialisationWriter;
     private final DependencyGraphVisualiser dependencyGraphVisualiser;
 
-    public HTMLTemplateWriter(TemplateManager manager) {
-        super(manager);
+    public HTMLTemplateWriter(PrefixMapping prefixMapping, TemplateStore store) {
+        this.prefixMapping = prefixMapping;
+        this.prefixMapping.withDefaultMappings(OTTR.getStandardLibraryPrefixes());
+        this.prefixMapping.setNsPrefix("x", OTTR.ns_example_arg);
 
-        this.prefixes.withDefaultMappings(OTTR.getStandardLibraryPrefixes());
-        this.prefixes.setNsPrefix("x", OTTR.ns_example_arg);
+        this.store = store;
 
-        this.signatures = new HashMap<>();
-
-        this.serialisationWriter = new SerialisationWriter(this.prefixes);
-        this.dependencyGraphVisualiser = new DependencyGraphVisualiser(this.prefixes);
+        this.serialisationWriter = new SerialisationWriter(this.prefixMapping);
+        this.dependencyGraphVisualiser = new DependencyGraphVisualiser(this.prefixMapping);
     }
 
-    @Override
-    public Result<TemplateWriter> getTemplateWriter() {
-        return Result.of(this);
+    public String write(String iri, Result<Signature> result) {
+        return result
+            .map(signature -> document(getHTML(signature)))
+            .orElse(getErrorPage(iri, result));
     }
 
-    @Override
-    public Collection<Support> getSupport() {
-        return support;
+    private String getErrorPage(String iri, Result<Signature> result) {
+
+        var messages = result.getAllMessages().stream()
+            .map(Message::toString)
+            .collect(joining(Space.LINEBR2));
+
+        return document(
+            html(
+                HTMLFactory.getHead("Error: " + iri),
+                body(
+                    h1(join("Error: ", code(iri))),
+                    p("Processing " + iri + " gave an error."),
+                    pre(messages)
+                )
+            )
+        );
     }
 
-    @Override
-    public String getDefaultFileSuffix() {
-        return ".html";
-    }
-
-    @Override
-    public String getFormatName() {
-        return name;
-    }
-
-    @Override
-    public void setPrefixMapping(PrefixMapping prefixes) {
-        // noop
-    }
-
-    @Override
-    public Set<String> getIRIs() {
-        return this.signatures.keySet();
-    }
-
-    @Override
-    public void accept(Signature signature) {
-        this.signatures.put(signature.getIri(), signature);
-    }
-
-    @Override
-    public String write(String iri) {
-        return document(write(this.signatures.get(iri)));
-    }
-
-    private ContainerTag write(Signature signature) {
+    private ContainerTag getHTML(Signature signature) {
 
         return html(
             getHead(signature),
             body(
-                h1(getTitle(signature)),
+                h1(join(
+                    signature.getClass().getSimpleName() + ": ",
+                    code(RDFNodeWriter.toString(this.prefixMapping, signature.getIri())))),
                 div(
                     div(
                         p(
@@ -133,9 +114,9 @@ public class HTMLTemplateWriter extends HTMLDocWriter implements TemplateWriter,
                     writeDependencies(signature),
                     writeSerialisations(signature),
 
-                    getPrefixDiv(this.prefixes)
+                    HTMLFactory.getPrefixDiv(this.prefixMapping)
                     ),
-                getFooterDiv(),
+                HTMLFactory.getFooterDiv(),
                 writeScripts()
             )
         );
@@ -147,13 +128,13 @@ public class HTMLTemplateWriter extends HTMLDocWriter implements TemplateWriter,
         var exampleExpansion = this.getExampleExpansion(exampleInstance);
         var wexampleInstance = this.serialisationWriter.writeWottrModel(exampleInstance);
 
-        var expansionViz = new TripleInstanceGraphVisualiser(this.prefixes);
+        var expansionViz = new TripleInstanceGraphVisualiser(this.prefixMapping);
         this.store.expandInstanceWithoutChecks(exampleInstance)
             .innerForEach(expansionViz);
 
         return div(
             h2(text("Pattern")),
-            getInfoP("The pattern of the template is illustrated by expanding a generated instance. "
+            HTMLFactory.getInfoP("The pattern of the template is illustrated by expanding a generated instance. "
                 + "Below the generated instance is shown in different serialisations,"
                 + " and its expansion is presented in different formats."),
             h4("Generated instance"),
@@ -162,12 +143,12 @@ public class HTMLTemplateWriter extends HTMLDocWriter implements TemplateWriter,
             p("RDF/wOTTR"),
             pre(this.serialisationWriter.writeRDF(wexampleInstance)),
             h4("Visualisation of expanded RDF graph"),
-            getInfoP("Each resource node is linked to its IRI."),
+            HTMLFactory.getInfoP("Each resource node is linked to its IRI."),
             div(rawHtml(expansionViz.draw(exampleInstance.getArguments()))),
             h4("Expanded RDF graph"),
             pre(this.serialisationWriter.writeRDF(exampleExpansion)),
             h4("Interactive expansion"),
-            getInfoP("Click the list to expand/contract one list element. "
+            HTMLFactory.getInfoP("Click the list to expand/contract one list element. "
                 + "Click 'expand/contact all' to expand/contract all elements. "
                 + "Note that the interactive expansion is not correct for instances that are marked by list expanders."),
             div(writeInteractiveExpansion(exampleInstance))
@@ -211,11 +192,11 @@ public class HTMLTemplateWriter extends HTMLDocWriter implements TemplateWriter,
         return div(
             h2("Dependencies"),
             h4("Dependency graph"),
-            getInfoP("The graph shows all the templates that this template depends on. "
+            HTMLFactory.getInfoP("The graph shows all the templates that this template depends on. "
                 + "Each node is linked to its documentation page."),
             rawHtml(this.dependencyGraphVisualiser.drawTree(tree)),
             h4("List of dependencies"),
-            getInfoP("The number in parenthesis is the number of instances of each template."),
+            HTMLFactory.getInfoP("The number in parenthesis is the number of instances of each template."),
             writeDependenciesList(tree)
         );
     }
@@ -225,10 +206,10 @@ public class HTMLTemplateWriter extends HTMLDocWriter implements TemplateWriter,
         var depTreeViewWriter = new TreeViewWriter<String>() {
             @Override
             protected ContainerTag writeRoot(Tree<String> root) {
-                var iri = span(RDFNodeWriter.toString(prefixes, root.getRoot()));
+                var iri = span(RDFNodeWriter.toString(HTMLTemplateWriter.this.prefixMapping, root.getRoot()));
                 if (!root.isRoot()) {
                     var count = root.getParent().getChildren().stream()
-                        .filter(c -> c.getRoot().equals(root.getRoot()))
+                        .filter(child -> child.getRoot().equals(root.getRoot()))
                         .count();
                     iri.with(span(" (" + count + ")"));
                 }
@@ -273,13 +254,9 @@ public class HTMLTemplateWriter extends HTMLDocWriter implements TemplateWriter,
         );
     }
 
-    private String getTitle(Signature signature) {
-        return signature.getClass().getSimpleName()
-            + ": " + RDFNodeWriter.toString(this.prefixes, signature.getIri());
-    }
-
     private ContainerTag getHead(Signature signature) {
-        return getHead(getTitle(signature));
+        return HTMLFactory.getHead(signature.getClass().getSimpleName()
+            + ": " + RDFNodeWriter.toString(this.prefixMapping, signature.getIri()));
     }
 
     private DomContent writeScripts() {
@@ -287,7 +264,7 @@ public class HTMLTemplateWriter extends HTMLDocWriter implements TemplateWriter,
     }
 
     private Model getExampleExpansion(Instance instance) {
-        WInstanceWriter instanceWriter = new WInstanceWriter(this.prefixes);
+        WInstanceWriter instanceWriter = new WInstanceWriter(this.prefixMapping);
         this.store.expandInstanceWithoutChecks(instance)
             .innerForEach(instanceWriter);
         return instanceWriter.writeToModel();

@@ -26,15 +26,10 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import lombok.SneakyThrows;
 import org.apache.commons.io.IOUtils;
-import xyz.ottr.lutra.TemplateManager;
 
-public class HTMLFramesetWriter extends HTMLDocWriter {
+public class HTMLFramesetWriter {
 
     private static final String framesIndex = "index.html";
-
-    public HTMLFramesetWriter(TemplateManager manager) {
-        super(manager);
-    }
 
     @SneakyThrows(IOException.class)
     public String write() {

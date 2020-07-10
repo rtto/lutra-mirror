@@ -7,6 +7,6 @@
 <suppressions>
 
     <!-- all HTMLWriters make heavy use of static imports for j2html -->
-    <suppress checks="AvoidStarImport" files=".*docttr/HTML.*Writer\.java"/>
+    <suppress checks="AvoidStarImport" files=".*docttr/HTML.*\.java"/>
 
 </suppressions>

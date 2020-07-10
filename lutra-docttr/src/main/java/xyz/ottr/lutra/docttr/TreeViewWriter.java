@@ -49,7 +49,7 @@ public abstract class TreeViewWriter<T> implements Tree.Action<T, ContainerTag> 
 
     ContainerTag write(Tree<T> tree) {
         return ul()
-            .with(tree.apply(this::perform))
+            .with(tree.apply(this))
             .withClass("treeview");
     }
 

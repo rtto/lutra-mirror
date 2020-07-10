@@ -24,6 +24,7 @@ package xyz.ottr.lutra.cli;
 
 import java.io.IOException;
 import java.io.PrintStream;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Optional;
 import java.util.function.BiFunction;
@@ -35,10 +36,7 @@ import picocli.CommandLine.ParameterException;
 import xyz.ottr.lutra.TemplateManager;
 import xyz.ottr.lutra.api.StandardFormat;
 import xyz.ottr.lutra.api.StandardTemplateManager;
-import xyz.ottr.lutra.docttr.HTMLFramesetWriter;
-import xyz.ottr.lutra.docttr.HTMLIndexWriter;
-import xyz.ottr.lutra.docttr.HTMLMenuWriter;
-import xyz.ottr.lutra.docttr.HTMLTemplateWriter;
+import xyz.ottr.lutra.docttr.DocttrManager;
 import xyz.ottr.lutra.io.Files;
 import xyz.ottr.lutra.io.Format;
 import xyz.ottr.lutra.model.Instance;
@@ -292,12 +290,8 @@ public class CLI {
     }
 
     private void docttrTemplates(TemplateManager templateManager) {
-        HTMLTemplateWriter docttr = new HTMLTemplateWriter(templateManager);
-        templateManager.writeTemplates(docttr, makeTemplateWriter(docttr.getDefaultFileSuffix()));
-
-        Files.writeFile(new HTMLIndexWriter(templateManager).write(), this.settings.out + "/index-noframes", ".html");
-        Files.writeFile(new HTMLMenuWriter(templateManager).write(), this.settings.out + "/menu", ".html");
-        Files.writeFile(new HTMLFramesetWriter(templateManager).write(), this.settings.out + "/index", ".html");
+        var docttr = new DocttrManager(templateManager);
+        docttr.write(Path.of(this.settings.out));
     }
 
     private Function<String, Optional<Message>> makeInstanceWriter(String suffix) {

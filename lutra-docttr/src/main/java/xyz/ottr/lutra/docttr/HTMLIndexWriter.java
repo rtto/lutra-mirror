@@ -25,83 +25,101 @@ package xyz.ottr.lutra.docttr;
 import static j2html.TagCreator.*;
 
 import j2html.tags.ContainerTag;
+import java.nio.file.Path;
 import java.util.HashSet;
+import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
-import org.apache.jena.rdf.model.Resource;
-import org.apache.jena.rdf.model.ResourceFactory;
-import xyz.ottr.lutra.TemplateManager;
+import org.apache.jena.shared.PrefixMapping;
 import xyz.ottr.lutra.docttr.visualisation.DependencyGraphVisualiser;
+import xyz.ottr.lutra.model.Signature;
+import xyz.ottr.lutra.store.TemplateStore;
+import xyz.ottr.lutra.system.Result;
 import xyz.ottr.lutra.writer.RDFNodeWriter;
 
 public class HTMLIndexWriter extends HTMLMenuWriter {
 
-    public HTMLIndexWriter(TemplateManager manager) {
-        super(manager);
+    private final TemplateStore store;
+
+    public HTMLIndexWriter(PrefixMapping prefixMapping, TemplateStore store) {
+        super(prefixMapping);
+        this.store = store;
     }
 
-    @Override
-    public String write() {
+    public String write(String root, Map<String, Result<Signature>> iris) {
 
-        var graphViz = new DependencyGraphVisualiser(this.prefixes);
+        var graphViz = new DependencyGraphVisualiser(this.prefixMapping);
 
         return document(html(
-            getHead("OTTR template library"),
+            HTMLFactory.getHead("OTTR template library " + Objects.toString(root, "")),
             body(
                 img().withClass("logo").withSrc("https://ottr.xyz/logo/lOTTR.jpg"),
-                h1("OTTR template library"),
+                iffElse(root != null,
+                    h1(join("Library: ", code(root))),
+                    h1(join("OTTR template library "))
+                ),
                 h2("Metrics"),
-                writeMetrics(),
+                writeMetrics(root, iris),
                 h2("Dependency graph"),
-                getInfoP("Each node is linked to its documentation page."),
-                rawHtml(graphViz.drawGraph(this.store)),
+                HTMLFactory.getInfoP("Each node is linked to its documentation page."),
+                rawHtml(graphViz.drawGraph(root, iris.keySet(), this.store)),
                 h2("List of templates"),
-                getInfoP("These are the templates in this library, grouped by their namespace."),
-                div(getSignatureList())),
-                getPrefixDiv(this.prefixes),
-                getFooterDiv()
+                HTMLFactory.getInfoP("These are the templates in this library, grouped by their namespace."),
+                div(getSignatureList(root, iris))),
+                HTMLFactory.getPrefixDiv(this.prefixMapping),
+                HTMLFactory.getFooterDiv()
             ));
     }
 
-    private ContainerTag writeMetrics() {
+    private ContainerTag writeMetrics(String root, Map<String, Result<Signature>> iris) {
 
         var list = ul();
 
-        var templateIRIs = this.store.getAllTemplateObjectIRIs();
-
         list.with(li(
-            "Number of templates: " + templateIRIs.size()));
+            "Number of templates: " + iris.size()));
 
-        var namespaces = templateIRIs.stream()
-            .map(ResourceFactory::createResource)
-            .map(Resource::getNameSpace)
-            .distinct()
-            .sorted()
-            .collect(Collectors.toList());
+        {
+            var domains = DocttrManager.getDomains(iris.keySet());
+            list.with(li(
+                join("Template domains: " + domains.size(),
+                    ul(each(domains, iri -> li(
+                        a(code(iri)).withTarget("_top")
+                            .withHref(Path.of(DocttrManager.toLocalPath(iri, root), DocttrManager.FILENAME_FRAMESET).toString()))
+                    )))
+            ));
+        }
 
-        list.with(li(
-            join("Template namespaces: " + namespaces.size(),
-            ul(each(namespaces, ns -> li(code(ns)))))
-        ));
+        {
+            var namespaces = DocttrManager.getNamespaces(iris.keySet());
+            list.with(li(
+                join("Template namespaces: " + namespaces.size(),
+                    ul(each(namespaces, iri -> li(
+                        a(code(iri)).withTarget("_top")
+                            .withHref(Path.of(DocttrManager.toLocalPath(iri, root), DocttrManager.FILENAME_FRAMESET).toString()))
+                    )))
+            ));
+        }
 
+        {
+            var nonRootTemplates = new HashSet<>();
+            iris.keySet().forEach(iri -> this.store.getDependencies(iri).ifPresent(nonRootTemplates::addAll));
 
-        var nonRootTemplates = new HashSet<>();
-        templateIRIs.forEach(iri -> this.store.getDependencies(iri).ifPresent(nonRootTemplates::addAll));
+            var rootTemplates = iris.keySet().stream()
+                .filter(iri -> !nonRootTemplates.contains(iri))
+                .sorted()
+                .collect(Collectors.toList());
 
-        var rootTemplates = templateIRIs.stream()
-            .filter(iri -> !nonRootTemplates.contains(iri))
-            .sorted()
-            .collect(Collectors.toList());
-
-        list.with(li(
-            join("Root templates: " + rootTemplates.size(),
-                ul(each(rootTemplates, iri -> li(
-                    a(code(RDFNodeWriter.toString(this.prefixes, iri))).withHref(toLocalPath(iri))
-                ))))
-        ));
+            list.with(li(
+                join("Root templates: " + rootTemplates.size(),
+                    ul(each(rootTemplates, iri -> li(
+                        a(code(RDFNodeWriter.toString(this.prefixMapping, iri))).withHref(DocttrManager.toLocalFilePath(iri, root))
+                    ))))
+            ));
+        }
 
 
         /*
-        var leafTemplates = templateIRIs.stream()
+        var leafTemplates = iris.stream()
             .filter(iri -> {
                 var deps = store.getDependencies(iri);
                 return !deps.isPresent() || deps.get().isEmpty();

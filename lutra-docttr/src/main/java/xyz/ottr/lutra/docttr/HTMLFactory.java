@@ -26,39 +26,24 @@ import static j2html.TagCreator.*;
 
 import j2html.tags.ContainerTag;
 import j2html.tags.DomContent;
-import java.net.URISyntaxException;
-import java.nio.file.Path;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Collectors;
-import lombok.SneakyThrows;
 import org.apache.jena.shared.PrefixMapping;
 import xyz.ottr.lutra.RDFTurtle;
 import xyz.ottr.lutra.Space;
-import xyz.ottr.lutra.TemplateManager;
-import xyz.ottr.lutra.io.Files;
-import xyz.ottr.lutra.store.TemplateStore;
 
-public abstract class HTMLDocWriter {
+public enum HTMLFactory {
+    ;
 
-    protected final TemplateManager manager;
-    protected final PrefixMapping prefixes;
-    protected final TemplateStore store;
-
-    private final DateTimeFormatter dtf = DateTimeFormatter
+    private static final DateTimeFormatter dtf = DateTimeFormatter
         .ofPattern("yyyy/MM/dd HH:mm:ss z", Locale.ENGLISH)
         .withZone(ZoneOffset.UTC);
 
-    HTMLDocWriter(TemplateManager manager) {
-        this.manager = manager;
-        this.prefixes = manager.getPrefixes();
-        this.store = manager.getTemplateStore();
-    }
-
-    protected ContainerTag getHead(String title) {
+    static ContainerTag getHead(String title) {
         return head(
             meta().withCharset("UTF-8"),
             link().withRel("stylesheet").withHref("https://ottr.xyz/inc/docttr.css"),
@@ -66,7 +51,7 @@ public abstract class HTMLDocWriter {
             .withLang("en");
     }
 
-    protected DomContent getFooterDiv() {
+    static DomContent getFooterDiv() {
         return div(
             p(text("This is a generated documentation page for an OTTR template library. "
                     + "For more information about Reasonable Ontology Templates (OTTR), visit "),
@@ -74,16 +59,16 @@ public abstract class HTMLDocWriter {
                     .withHref("http://ottr.xyz")
                     .withTarget("_blank"),
                 text(".")),
-            p(text("Generated: "), text(this.dtf.format(ZonedDateTime.now()))))
+            p(text("Generated: "), text(dtf.format(ZonedDateTime.now()))))
             .withClass("footer");
     }
 
-    protected DomContent getInfoP(String description) {
+    static DomContent getInfoP(String description) {
         return p(rawHtml("&#128712; "), text(description))
             .withClass("info");
     }
 
-    protected ContainerTag getPrefixDiv(PrefixMapping prefixMapping) {
+    static ContainerTag getPrefixDiv(PrefixMapping prefixMapping) {
         return div(
             h2("Prefixes"),
             getInfoP("Prefixes are removed from all listings on this page for readability, "
@@ -95,32 +80,6 @@ public abstract class HTMLDocWriter {
                 + RDFTurtle.fullURI(e.getValue()) + ".")
             .collect(Collectors.joining(Space.LINEBR)))
             );
-    }
-
-    @SneakyThrows(URISyntaxException.class)
-    public static String toLocalPath(String iri) {
-        return Files.iriToPath(iri) + ".html";
-    }
-
-    public static String toLocalPath(String iri, String relativeTo) {
-
-        if (relativeTo == null) {
-            return toLocalPath(iri);
-        }
-
-        var iriPath = Path.of(toLocalPath(iri));
-        var relativeToPath = Path.of(toLocalPath(relativeTo));
-
-        // excessive null checks here to avoid NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE
-        if (relativeToPath == null) {
-            return iriPath.toString();
-        }
-        relativeToPath = relativeToPath.getParent();
-        if (relativeToPath == null) {
-            return iriPath.toString();
-        }
-        return relativeToPath.relativize(iriPath).toString();
-
     }
 
 }

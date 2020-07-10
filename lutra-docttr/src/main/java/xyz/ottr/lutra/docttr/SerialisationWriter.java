@@ -69,14 +69,14 @@ class SerialisationWriter {
         return writer.writeToModel();
     }
 
-    String writeRDF(Model graph) {
+    static String writeRDF(Model graph) {
         return removePrefixes(RDFIO.writeToString(PrefixMappings.trim(graph)));
     }
 
-    private String removePrefixes(String turtleRDFModel) {
-        return Arrays.asList(turtleRDFModel.split(Space.LINEBR)).stream()
+    private static String removePrefixes(String turtleRDFModel) {
+        return Arrays.stream(turtleRDFModel.split(Space.LINEBR))
             .filter(s -> !s.startsWith(RDFTurtle.prefixInit))
-            .collect(Collectors.joining("\n"));
+            .collect(Collectors.joining(Space.LINEBR));
     }
 
 }

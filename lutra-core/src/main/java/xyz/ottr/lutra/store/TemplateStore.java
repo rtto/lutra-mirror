@@ -99,6 +99,8 @@ public interface TemplateStore extends Consumer<Signature> {
 
     Result<Signature> getTemplateSignature(String iri);
 
+    Result<Signature> getTemplateObject(String iri);
+
     /**
      * Returns the set of IRIs of template objects contained in this store satifiying
      * the argument predicate.

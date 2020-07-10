@@ -63,7 +63,7 @@ public abstract class GraphVisualiser {
         return RDFNodeWriter.toString(this.prefixMapping, uri);
     }
 
-    String renderSVG(MutableGraph graph) {
+    static String renderSVG(MutableGraph graph) {
         return Graphviz.fromGraph(graph).render(Format.SVG).toString();
     }
 
