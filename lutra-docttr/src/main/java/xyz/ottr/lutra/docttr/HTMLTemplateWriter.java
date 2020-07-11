@@ -208,6 +208,7 @@ public class HTMLTemplateWriter {
             h2("Dependencies"),
             h4("Dependency graph"),
             HTMLFactory.getInfoP("The graph shows all the templates that this template depends on. "
+                + "The colour of the node indicates its namespace. "
                 + "Each node is linked to its documentation page."),
             rawHtml(this.dependencyGraphVisualiser.drawTree(tree)),
             h4("List of dependencies"),

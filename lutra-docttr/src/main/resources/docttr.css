@@ -33,6 +33,13 @@ b.heading {
     padding: 1px;
 }
 
+span.colourbox {
+    display: inline-block;
+    margin: 0px 10px 0px 10px;
+    width: 12px; height: 12px;
+    border: 1px #ccc solid;
+}
+
 .error {
     color: red;
 }

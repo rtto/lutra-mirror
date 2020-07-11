@@ -25,6 +25,7 @@ package xyz.ottr.lutra.docttr;
 import static j2html.TagCreator.*;
 
 import j2html.tags.ContainerTag;
+import java.nio.file.Path;
 import java.util.Map;
 import java.util.stream.Collectors;
 import org.apache.jena.rdf.model.ResourceFactory;
@@ -46,7 +47,7 @@ public class HTMLMenuWriter {
             body(
                 a("index")
                     .withHref(DocttrManager.FILENAME_FRONTPAGE)
-                    .withTarget("main-frame")
+                    .withTarget(DocttrManager.FRAMENAME_MAIN)
                     .withClass("button")
                     .withStyle("float: right; padding: 5px;"),
                 div(getSignatureList(root, iris)))));
@@ -69,13 +70,18 @@ public class HTMLMenuWriter {
             if (!ns.equals(namespace)) {
                 namespace = ns;
                 sublist = ul();
-                list.with(li(b(ns), sublist));
+                list.with(li(
+                    a(b(ns))
+                        .withHref(Path.of(DocttrManager.toLocalPath(ns, root), DocttrManager.FILENAME_FRONTPAGE).toString())
+                        .withTarget(DocttrManager.FRAMENAME_MAIN),
+                    HTMLFactory.getColourBoxNS(ns),
+                    sublist));
             }
 
             var item = li(
                 a(this.prefixMapping.shortForm(iri))
                     .withHref(DocttrManager.toLocalFilePath(iri, root))
-                    .withTarget("main-frame") // TODO make this variable
+                    .withTarget(DocttrManager.FRAMENAME_MAIN)
             ).withCondClass(signatures.get(iri).isEmpty(), "error"); // mark as error if Result is empty
             sublist.with(item);
         }

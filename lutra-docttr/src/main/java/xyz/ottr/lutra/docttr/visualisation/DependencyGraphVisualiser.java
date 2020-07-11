@@ -23,6 +23,7 @@ package xyz.ottr.lutra.docttr.visualisation;
  */
 
 import guru.nidi.graphviz.attribute.Rank;
+import guru.nidi.graphviz.attribute.Style;
 import guru.nidi.graphviz.model.Factory;
 import guru.nidi.graphviz.model.MutableGraph;
 import guru.nidi.graphviz.model.MutableNode;
@@ -33,6 +34,7 @@ import java.util.Stack;
 import org.apache.jena.shared.PrefixMapping;
 import xyz.ottr.lutra.OTTR;
 import xyz.ottr.lutra.docttr.DocttrManager;
+import xyz.ottr.lutra.docttr.NamespaceColours;
 import xyz.ottr.lutra.docttr.Tree;
 import xyz.ottr.lutra.store.TemplateStore;
 
@@ -95,7 +97,9 @@ public class DependencyGraphVisualiser extends GraphVisualiser {
         Get node with url relative to root.
     */
     private MutableNode uriNode(String uri, String root, int parents) {
-        var node = Factory.mutNode(shortenURI(uri));
+        var node = Factory.mutNode(shortenURI(uri))
+            .add(Style.FILLED)
+            .add("fillcolor", NamespaceColours.getColourByIRI(uri));
         if (!OTTR.BaseURI.ALL.contains(uri)) {
             node.add("URL", DocttrManager.toLocalFilePath(uri, root, parents));
         }

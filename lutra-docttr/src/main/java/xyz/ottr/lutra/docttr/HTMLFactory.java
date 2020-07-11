@@ -10,12 +10,12 @@ package xyz.ottr.lutra.docttr;
  * it under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation, either version 2.1 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Lesser Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Lesser Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/lgpl-2.1.html>.
@@ -74,12 +74,25 @@ public enum HTMLFactory {
             getInfoP("Prefixes are removed from all listings on this page for readability, "
                 + "but are listed here in RDF Turtle format."),
             pre(prefixMapping.getNsPrefixMap().entrySet().stream()
-            .sorted(Map.Entry.comparingByValue())
-            .map(e -> RDFTurtle.prefixInit
-                + String.format(Locale.ENGLISH, "%-12s", e.getKey() + ":")
-                + RDFTurtle.fullURI(e.getValue()) + ".")
-            .collect(Collectors.joining(Space.LINEBR)))
-            );
+                .sorted(Map.Entry.comparingByValue())
+                .map(e -> RDFTurtle.prefixInit
+                    + String.format(Locale.ENGLISH, "%-12s", e.getKey() + ":")
+                    + RDFTurtle.fullURI(e.getValue()) + ".")
+                .collect(Collectors.joining(Space.LINEBR)))
+        );
+    }
+
+    static ContainerTag getColourBox(String color) {
+        return span().withClass("colourbox")
+            .withStyle("background-color: " + color + ";");
+    }
+
+    static ContainerTag getColourBoxNS(String iri) {
+        return getColourBox(NamespaceColours.getColourByNamespace(iri));
+    }
+
+    static ContainerTag getColourBoxURI(String iri) {
+        return getColourBox(NamespaceColours.getColourByIRI(iri));
     }
 
 }

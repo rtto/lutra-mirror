@@ -56,12 +56,12 @@ public class HTMLIndexWriter extends HTMLMenuWriter {
                 img().withClass("logo").withSrc("https://ottr.xyz/logo/lOTTR.jpg"),
                 iffElse(root != null,
                     h1(join("Library: ", code(root))),
-                    h1(join("OTTR template library "))
+                    h1(join("OTTR template library"))
                 ),
                 h2("Metrics"),
                 writeMetrics(root, iris),
                 h2("Dependency graph"),
-                HTMLFactory.getInfoP("Each node is linked to its documentation page."),
+                HTMLFactory.getInfoP("Each template is linked to its documentation page. The colour of the node indicates its namespace. "),
                 rawHtml(graphViz.drawGraph(root, iris.keySet(), this.store)),
                 h2("List of templates"),
                 HTMLFactory.getInfoP("These are the templates in this library, grouped by their namespace."),
@@ -75,29 +75,32 @@ public class HTMLIndexWriter extends HTMLMenuWriter {
 
         var list = ul();
 
-        list.with(li(
-            "Number of templates: " + iris.size()));
+        list.with(li("Number of templates: " + iris.size()));
 
         {
             var domains = DocttrManager.getDomains(iris.keySet());
             list.with(li(
                 join("Template domains: " + domains.size(),
-                    ul(each(domains, iri -> li(
-                        a(code(iri)).withTarget("_top")
-                            .withHref(Path.of(DocttrManager.toLocalPath(iri, root, 0), DocttrManager.FILENAME_FRAMESET).toString()))
-                    )))
-            ));
+                    ul(each(domains, iri ->
+                        li(
+                            a(code(iri)).withTarget("_top")
+                                .withHref(Path.of(DocttrManager.toLocalPath(iri, root), DocttrManager.FILENAME_FRAMESET).toString())
+                        )
+                    )))));
         }
 
         {
             var namespaces = DocttrManager.getNamespaces(iris.keySet());
             list.with(li(
                 join("Template namespaces: " + namespaces.size(),
-                    ul(each(namespaces, iri -> li(
-                        a(code(iri)).withTarget("_top")
-                            .withHref(Path.of(DocttrManager.toLocalPath(iri, root), DocttrManager.FILENAME_FRAMESET).toString()))
-                    )))
-            ));
+                    ul(each(namespaces, iri ->
+                        li(
+                            a(code(iri))
+                                .withTarget("_top")
+                                .withHref(Path.of(DocttrManager.toLocalPath(iri, root), DocttrManager.FILENAME_FRAMESET).toString()),
+                            HTMLFactory.getColourBoxNS(iri)
+                        )
+                    )))));
         }
 
         {
@@ -112,28 +115,29 @@ public class HTMLIndexWriter extends HTMLMenuWriter {
             list.with(li(
                 join("Root templates: " + rootTemplates.size(),
                     ul(each(rootTemplates, iri -> li(
-                        a(RDFNodeWriter.toString(this.prefixMapping, iri)).withHref(DocttrManager.toLocalFilePath(iri, root))
-                    ))))
-            ));
+                        a(RDFNodeWriter.toString(this.prefixMapping, iri)).withHref(DocttrManager.toLocalFilePath(iri, root)),
+                        HTMLFactory.getColourBoxURI(iri)
+                    ))))));
         }
-
-
-        /*
-        var leafTemplates = iris.stream()
-            .filter(iri -> {
-                var deps = store.getDependencies(iri);
-                return !deps.isPresent() || deps.get().isEmpty();
-            }).collect(Collectors.toList());
-
-        list.with(li(
-            join("Number of leaf templates: " + leafTemplates.size(),
-                ul(each(leafTemplates, iri -> li(
-                    a(code(RDFNodeWriter.toString(this.prefixes, iri))).withHref(toLocalPath(iri))
-                ))))
-        ));
-         */
 
         return list;
     }
+
+    /*
+
+    private ContainerTag writeVocabularyUse(String root, Map<String, Result<Signature>> iris) {
+
+
+        iris.values().stream()
+            .filter(Result::isPresent)
+            .map(Result::get)
+            .filter(signature -> signature instanceof Template)
+            .map(template -> ((Template) template).getPattern())
+            .collect(Coll)
+
+
+    }
+
+     */
 
 }
