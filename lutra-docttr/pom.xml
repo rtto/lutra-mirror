@@ -32,10 +32,10 @@
             <artifactId>j2html</artifactId>
         </dependency>
 
-        <!--dependency>
-            <groupId>xyz.dyreriket.rdfvizler</groupId>
-            <artifactId>rdfvizler-core</artifactId>
-        </dependency-->
+        <dependency>
+            <groupId>guru.nidi</groupId>
+            <artifactId>graphviz-java</artifactId>
+        </dependency>
 
     </dependencies>
 </project>

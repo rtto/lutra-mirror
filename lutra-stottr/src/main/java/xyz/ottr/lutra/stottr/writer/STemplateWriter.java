@@ -67,7 +67,7 @@ public class STemplateWriter implements TemplateWriter {
             + Space.LINEBR2
             + this.templates.values().stream()
                 .sorted(signatureComparator)
-                .map(signature -> write(signature, false))
+                .map(signature -> writeSignature(signature, false))
                 .collect(Collectors.joining(Space.LINEBR2));
     }
 
@@ -76,10 +76,10 @@ public class STemplateWriter implements TemplateWriter {
         Signature template = this.templates.get(iri);
         return template == null
             ? null
-            : write(template, true);
+            : writeSignature(template, true);
     }
 
-    private String write(Signature signature, boolean includePrefixes) {
+    public String writeSignature(Signature signature, boolean includePrefixes) {
 
         var parameterVariables = signature.getParameters().stream()
             .map(Parameter::getTerm)

@@ -24,6 +24,7 @@ package xyz.ottr.lutra.cli;
 
 import java.io.IOException;
 import java.io.PrintStream;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Optional;
 import java.util.function.BiFunction;
@@ -35,6 +36,7 @@ import picocli.CommandLine.ParameterException;
 import xyz.ottr.lutra.TemplateManager;
 import xyz.ottr.lutra.api.StandardFormat;
 import xyz.ottr.lutra.api.StandardTemplateManager;
+import xyz.ottr.lutra.docttr.DocttrManager;
 import xyz.ottr.lutra.io.Files;
 import xyz.ottr.lutra.io.Format;
 import xyz.ottr.lutra.model.Instance;
@@ -105,6 +107,7 @@ public class CLI {
         } else if (this.settings.library == null
             && (this.settings.mode == Settings.Mode.expandLibrary
                 || this.settings.mode == Settings.Mode.formatLibrary
+                || this.settings.mode == Settings.Mode.docttrLibrary
                 || this.settings.mode == Settings.Mode.lint)) {
 
             this.messageHandler.printMessage(Message.error("Must provide a library. "
@@ -167,12 +170,16 @@ public class CLI {
                 case format:
                     executeFormat();
                     break;
+                case docttrLibrary:
+                    docttrTemplates(this.templateManager);
+                    break;
                 case lint:
                     break;
                 default:
                     Message err = Message.error("The mode " + this.settings.mode + " is not yet supported.");
                     this.messageHandler.printMessage(err);
             }
+
         }
     }
 
@@ -282,13 +289,18 @@ public class CLI {
         templateManager.writeTemplates(outFormat, makeTemplateWriter(outFormat.getDefaultFileSuffix()));
     }
 
+    private void docttrTemplates(TemplateManager templateManager) {
+        var docttr = new DocttrManager(templateManager);
+        docttr.write(Path.of(this.settings.out));
+    }
+
     private Function<String, Optional<Message>> makeInstanceWriter(String suffix) {
         return str -> {
             if (shouldPrintOutput()) {
                 this.outStream.println(str);
             }
             if (this.settings.out != null) {
-                return Files.writeInstancesTo(str, suffix, this.settings.out);
+                return Files.writeFile(str, this.settings.out, suffix);
             }
             return Optional.empty();
         };
@@ -300,7 +312,7 @@ public class CLI {
                 this.outStream.println(str);
             }
             if (this.settings.out != null) {
-                return Files.writeTemplatesTo(iri, str, suffix, this.settings.out);
+                return Files.writeTemplatesTo(iri, str, this.settings.out, suffix);
             }
             return Optional.empty();
         };

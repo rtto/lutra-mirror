@@ -69,6 +69,7 @@ public class Instance implements ModelElement, HasApplySubstitution<Instance>  {
     @Override
     public Instance apply(Substitution substitution) {
         return this.toBuilder()
+            .clearArguments()
             .arguments(substitution.apply(this.arguments))
             .build();
     }

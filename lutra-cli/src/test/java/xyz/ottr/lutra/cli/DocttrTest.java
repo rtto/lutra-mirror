@@ -1,8 +1,8 @@
-package xyz.ottr.lutra.stottr.writer;
+package xyz.ottr.lutra.cli;
 
 /*-
  * #%L
- * lutra-stottr
+ * lutra-cli
  * %%
  * Copyright (C) 2018 - 2019 University of Oslo
  * %%
@@ -22,23 +22,21 @@ package xyz.ottr.lutra.stottr.writer;
  * #L%
  */
 
-import java.util.stream.Collectors;
-import xyz.ottr.lutra.Space;
-import xyz.ottr.lutra.stottr.STOTTR;
+import org.junit.Test;
 
-class SPatternInstanceWriter extends SInstanceWriter {
+public class DocttrTest {
 
-    SPatternInstanceWriter(STermWriter termWriter) {
-        super(termWriter);
+
+    private static final String ROOT = "src/test/resources/";
+    private static final String IN = ROOT + "templates/pizza/";
+    private static final String OUT = ROOT + "docttr/";
+
+    @Test
+    public void test1() {
+        runCLI("--mode docttrLibrary -f -l " + IN + " -o " + OUT);
     }
 
-    @Override
-    public String write() {
-        return Space.INDENT
-            + this.instances.stream()
-                .sorted(instanceSorter)
-                .map(this::writeInstance)
-                .collect(Collectors.joining(STOTTR.Statements.bodyInsSep + Space.LINEBR + Space.INDENT));
+    private void runCLI(String cmd) {
+        CLI.main(cmd.split(" "));
     }
-
 }

@@ -59,10 +59,10 @@ public enum Files {
     private static final Function<String, IOFileFilter> extFilter = string -> FileFilterUtils.suffixFileFilter(string,
             IOCase.INSENSITIVE);
 
-    public static Optional<Message> writeInstancesTo(String output, String suffix, String filePath) {
+    public static Optional<Message> writeFile(String content, String filePath, String suffix) {
 
         try {
-            java.nio.file.Files.write(Paths.get(filePath + suffix), output.getBytes(Charset.forName("UTF-8")));
+            java.nio.file.Files.write(Paths.get(filePath + suffix), content.getBytes(Charset.forName("UTF-8")));
         } catch (IOException ex) {
             Message err = Message.error("Error writing output: " + ex.getMessage());
             return Optional.of(err);
@@ -70,13 +70,13 @@ public enum Files {
         return Optional.empty();
     }
 
-    public static Optional<Message> writeTemplatesTo(String iri, String output, String suffix, String folder) {
+    public static Optional<Message> writeTemplatesTo(String iri, String content, String folder, String suffix) {
 
         try {
             // TODO: cli-arg to decide extension
             String iriPath = Files.iriToPath(iri);
             java.nio.file.Files.createDirectories(Paths.get(folder, Files.iriToDirectory(iriPath)));
-            java.nio.file.Files.write(Paths.get(folder, iriPath + suffix), output.getBytes(Charset.forName("UTF-8")));
+            java.nio.file.Files.write(Paths.get(folder, iriPath + suffix), content.getBytes(Charset.forName("UTF-8")));
         } catch (IOException | URISyntaxException ex) {
             Message err = Message.error("Error when writing output -- " + ex.getMessage());
             return Optional.of(err);
@@ -94,7 +94,7 @@ public enum Files {
         var uri = new URI(iriStr);
 
         return uri.getHost()
-            + (StringUtils.isNotBlank(uri.getPath()) ? "/" + uri.getPath() : "")
+            + (StringUtils.isNotBlank(uri.getPath()) ? uri.getPath() : "")
             + (StringUtils.isNotBlank(uri.getFragment()) ? "/" + uri.getFragment() : "");
     }
 

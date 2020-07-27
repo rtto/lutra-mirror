@@ -1,0 +1,86 @@
+@import url("https://ottr.xyz/inc/style.css");
+
+body {
+  padding-bottom: 50px;
+}
+
+div {
+    max-width: 1200px;
+}
+
+p, li, pre, svg {
+    max-width: 100%;
+}
+
+code, p code, li code {
+    background-color: transparent;
+}
+
+table, tr, td {
+    font-size: 100%;
+    border: 0;
+    vertical-align: top;
+}
+
+b.heading {
+    color: #333;
+    font-family: Arial, sans-serif;
+    font-size: 100%;
+    margin-top: 3px;
+    margin-bottom: 3px;
+}
+
+.info {
+    max-width: 800px;
+    color: #888;
+    font-size: 9pt;
+    padding: 1px;
+}
+
+span.colourbox {
+    display: inline-block;
+    margin: 0px 10px 0px 10px;
+    width: 12px; height: 12px;
+    border: 1px #ccc solid;
+}
+
+.error {
+    color: red;
+}
+
+.button {
+  cursor: pointer;
+  border-bottom: 1px #ccc dashed;
+}
+
+img.logo {
+    float: right;
+    margin: 20px;
+}
+
+details > details {
+  margin-left: 25px;
+}
+
+details span.leaf {
+  margin-left: 40px;
+  display: list-item;
+  list-style-type: circle;
+}
+
+details ul {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+p.treeviewbuttons {
+    color: #555;
+    font-size: 10pt;
+    font-family: Arial; sans-serif;
+}
+
+p.treeviewbuttons .button {
+    margin-right: 5px;
+}
+
+

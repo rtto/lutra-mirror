@@ -1,10 +1,10 @@
-package xyz.ottr.lutra.stottr.writer;
+package xyz.ottr.lutra.docttr;
 
 /*-
  * #%L
- * lutra-stottr
+ * xyz.ottr.lutra:lutra-docttr
  * %%
- * Copyright (C) 2018 - 2019 University of Oslo
+ * Copyright (C) 2018 - 2020 University of Oslo
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -22,23 +22,21 @@ package xyz.ottr.lutra.stottr.writer;
  * #L%
  */
 
-import java.util.stream.Collectors;
-import xyz.ottr.lutra.Space;
-import xyz.ottr.lutra.stottr.STOTTR;
+import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.ResourceFactory;
 
-class SPatternInstanceWriter extends SInstanceWriter {
+public class NamespaceColours extends Colours {
 
-    SPatternInstanceWriter(STermWriter termWriter) {
-        super(termWriter);
+    public static String getColourByNamespace(String ns) {
+        return Colours.getColour(ns);
     }
 
-    @Override
-    public String write() {
-        return Space.INDENT
-            + this.instances.stream()
-                .sorted(instanceSorter)
-                .map(this::writeInstance)
-                .collect(Collectors.joining(STOTTR.Statements.bodyInsSep + Space.LINEBR + Space.INDENT));
+    public static String getColourByResource(Resource resource) {
+        return getColourByNamespace(resource.getNameSpace());
+    }
+
+    public static String getColourByIRI(String iri) {
+        return getColourByResource(ResourceFactory.createResource(iri));
     }
 
 }
