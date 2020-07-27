@@ -50,12 +50,15 @@ public class HTMLMenuWriter {
                     .withTarget(DocttrManager.FRAMENAME_MAIN)
                     .withClass("button")
                     .withStyle("float: right; padding: 5px;"),
-                div(getSignatureList(root, iris)))));
+                div(getSignatureList(root, iris)))
+                    .withStyle("margin: 20px;"),
+            HTMLFactory.getScripts()
+        ));
     }
 
     ContainerTag getSignatureList(String root, Map<String, Result<Signature>> signatures) {
 
-        var list = ul();
+        var list = div().withClasses("treeview", "toggle-all", "expand-all");
         var sublist = ul();
         var namespace = "";
 
@@ -70,12 +73,14 @@ public class HTMLMenuWriter {
             if (!ns.equals(namespace)) {
                 namespace = ns;
                 sublist = ul();
-                list.with(li(
-                    a(b(ns))
-                        .withHref(Path.of(DocttrManager.toLocalPath(ns, root), DocttrManager.FILENAME_FRONTPAGE).toString())
-                        .withTarget(DocttrManager.FRAMENAME_MAIN),
-                    HTMLFactory.getColourBoxNS(ns),
-                    sublist));
+                list.with(
+                    details(
+                        summary(a(b(ns))
+                                .withHref(Path.of(DocttrManager.toLocalPath(ns, root), DocttrManager.FILENAME_FRONTPAGE).toString())
+                                .withTarget(DocttrManager.FRAMENAME_MAIN),
+                            HTMLFactory.getColourBoxNS(ns)),
+                        sublist)
+                );
             }
 
             var item = li(

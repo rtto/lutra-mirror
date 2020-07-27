@@ -67,7 +67,8 @@ public class HTMLIndexWriter extends HTMLMenuWriter {
                 HTMLFactory.getInfoP("These are the templates in this library, grouped by their namespace."),
                 div(getSignatureList(root, iris))),
                 HTMLFactory.getPrefixDiv(this.prefixMapping),
-                HTMLFactory.getFooterDiv()
+                HTMLFactory.getFooterDiv(),
+                HTMLFactory.getScripts()
             ));
     }
 

@@ -130,7 +130,7 @@ public class HTMLTemplateWriter {
                     HTMLFactory.getPrefixDiv(this.prefixMapping)
                     ),
                 HTMLFactory.getFooterDiv(),
-                writeScripts()
+                HTMLFactory.getScripts()
             )
         );
     }
@@ -390,10 +390,6 @@ public class HTMLTemplateWriter {
     private ContainerTag getHead(Signature signature) {
         return HTMLFactory.getHead(signature.getClass().getSimpleName()
             + ": " + RDFNodeWriter.toString(this.prefixMapping, signature.getIri()));
-    }
-
-    private DomContent writeScripts() {
-        return scriptWithInlineFile("/docttr.js");
     }
 
     private DomContent getA(String iri) {

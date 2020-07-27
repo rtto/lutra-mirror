@@ -46,7 +46,8 @@ public enum HTMLFactory {
     static ContainerTag getHead(String title) {
         return head(
             meta().withCharset("UTF-8"),
-            link().withRel("stylesheet").withHref("https://ottr.xyz/inc/docttr.css"),
+            //link().withRel("stylesheet").withHref("https://ottr.xyz/inc/docttr.css"),
+            styleWithInlineFile("/docttr.css"),
             title(title))
             .withLang("en");
     }
@@ -61,6 +62,10 @@ public enum HTMLFactory {
                 text(".")),
             p(text("Generated: "), text(dtf.format(ZonedDateTime.now()))))
             .withClass("footer");
+    }
+
+    static DomContent getScripts() {
+        return scriptWithInlineFile("/docttr.js");
     }
 
     static DomContent getInfoP(String description) {

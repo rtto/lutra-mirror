@@ -22,9 +22,11 @@ package xyz.ottr.lutra.docttr;
  * #L%
  */
 
+import static j2html.TagCreator.details;
+import static j2html.TagCreator.div;
 import static j2html.TagCreator.each;
-import static j2html.TagCreator.li;
-import static j2html.TagCreator.ul;
+import static j2html.TagCreator.span;
+import static j2html.TagCreator.summary;
 
 import j2html.tags.ContainerTag;
 import java.util.Collection;
@@ -43,15 +45,13 @@ public abstract class TreeViewWriter<T> implements Tree.Action<T, ContainerTag> 
         var children = prepareChildren(tree.getChildren());
 
         return tree.hasChildren()
-            ? li(instance.withClasses("non-leaf", "click"), ul(each(children, this::perform)))
-            : li(instance.withClass("leaf"));
+            ? details(summary(instance), each(children, this::perform))
+            : span(instance).withClass("leaf");
     }
 
     ContainerTag write(Tree<T> tree) {
-        return ul()
-            .with(tree.apply(this))
-            .withClass("treeview");
+        return div(tree.apply(this))
+            .withClasses("treeview", "toggle-all", "click-first");
     }
-
 
 }
