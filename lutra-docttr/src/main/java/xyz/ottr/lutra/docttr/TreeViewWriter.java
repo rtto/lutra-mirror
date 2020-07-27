@@ -22,11 +22,7 @@ package xyz.ottr.lutra.docttr;
  * #L%
  */
 
-import static j2html.TagCreator.details;
-import static j2html.TagCreator.div;
-import static j2html.TagCreator.each;
-import static j2html.TagCreator.span;
-import static j2html.TagCreator.summary;
+import static j2html.TagCreator.*;
 
 import j2html.tags.ContainerTag;
 import java.util.Collection;
