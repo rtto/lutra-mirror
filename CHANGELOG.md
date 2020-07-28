@@ -9,13 +9,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Bump all github reported dependencies
+- Improved docttr.
+
+### Bug fixes
+
+- Include hostname and URI fragment in output folder hierarchy, #206 
+
+### Dependencies
+
+- Bump all github reported dependencies, except jena 3.15.
+- Replaced RDFVizler dependency with guru.nidi.graphviz-java 
 
 ## 0.6.7
 
 ### Added
 
 - Introduced docttr documentation format for templates. In prototypical state.
+
+### Dependencies
 
 - Bump all github reported dependencies
 
