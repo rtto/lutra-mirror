@@ -43,8 +43,7 @@ import xyz.ottr.lutra.system.ResultStream;
 public interface TemplateStore extends Consumer<Signature> {
 
     default void addOTTRBaseTemplates() {
-        addTemplateSignature(OTTR.BaseTemplate.Triple);
-        addTemplateSignature(OTTR.BaseTemplate.NullableTriple);
+        OTTR.BaseTemplate.ALL.forEach(this::addTemplateSignature);
     }
 
     /**
@@ -100,6 +99,8 @@ public interface TemplateStore extends Consumer<Signature> {
 
     Result<Signature> getTemplateSignature(String iri);
 
+    Result<Signature> getTemplateObject(String iri);
+
     /**
      * Returns the set of IRIs of template objects contained in this store satifiying
      * the argument predicate.
@@ -114,9 +115,12 @@ public interface TemplateStore extends Consumer<Signature> {
         return getIRIs(iri ->
             containsSignature(iri)
                 || containsBase(iri)
-                && !iri.equals(OTTR.BaseURI.Triple)
-                && !iri.equals(OTTR.BaseURI.NullableTriple)
+                && !OTTR.BaseURI.ALL.contains(iri)
         );
+    }
+
+    default Set<String> getAllTemplateObjectIRIs() {
+        return getIRIs(iri -> !OTTR.BaseURI.ALL.contains(iri));
     }
 
     /**
@@ -252,6 +256,11 @@ public interface TemplateStore extends Consumer<Signature> {
     ResultStream<Instance> expandInstance(Instance instance);
 
     /**
+     * Same as #expandInstance but does not perform any checks (such as type checking, etc.)
+     */
+    ResultStream<Instance> expandInstanceWithoutChecks(Instance instance);
+
+    /**
      * Expands the argument template instance according to the definitions in this
      * store, but fetches misisng templates, and returns empty Result-instances if the instance is using
      * a template wrongly (e.g.~wrong number of arguments or wrong types, optionals).
@@ -334,4 +343,5 @@ public interface TemplateStore extends Consumer<Signature> {
     void registerStandardLibrary(TemplateStore standardLibrary);
 
     FormatManager getFormatManager();
+
 }

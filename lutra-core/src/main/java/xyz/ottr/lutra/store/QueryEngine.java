@@ -35,7 +35,7 @@ import org.apache.commons.collections4.iterators.PermutationIterator;
 import org.apache.commons.math3.util.CombinatoricsUtils;
 import xyz.ottr.lutra.model.HasApplySubstitution;
 import xyz.ottr.lutra.model.Substitution;
-import xyz.ottr.lutra.model.types.TermType;
+import xyz.ottr.lutra.model.types.Type;
 
 public abstract class QueryEngine<S extends TemplateStore> {
 
@@ -202,9 +202,9 @@ public abstract class QueryEngine<S extends TemplateStore> {
      * @param tuple
      *      a Map representing a tuple from variables to values
      * @param type
-     *      a variable name denoting a TermType 
+     *      a variable name denoting a Type
      * @param inner
-     *      a variable name denoting the inner TermType of type
+     *      a variable name denoting the inner Type of type
      * @return
      *      a Stream of tuples binding inner to the inner type of type denoted by type
      */
@@ -226,8 +226,8 @@ public abstract class QueryEngine<S extends TemplateStore> {
      *      a Stream of tuples binding type1 to a subtype of type2
      */
     public Stream<Tuple> isSubTypeOf(Tuple tuple, String type1, String type2) {
-        TermType boundType1 = tuple.getAs(TermType.class, type1);
-        TermType boundType2 = tuple.getAs(TermType.class, type2);
+        Type boundType1 = tuple.getAs(Type.class, type1);
+        Type boundType2 = tuple.getAs(Type.class, type2);
 
         return boundType1.isSubTypeOf(boundType2)
             ? Stream.of(tuple)
@@ -250,8 +250,8 @@ public abstract class QueryEngine<S extends TemplateStore> {
      *      a Stream of tuples binding type1 to a compatible type of type2
      */
     public Stream<Tuple> isCompatibleWith(Tuple tuple, String type1, String type2) {
-        TermType boundType1 = tuple.getAs(TermType.class, type1);
-        TermType boundType2 = tuple.getAs(TermType.class, type2);
+        Type boundType1 = tuple.getAs(Type.class, type1);
+        Type boundType2 = tuple.getAs(Type.class, type2);
 
         return boundType1.isCompatibleWith(boundType2)
             ? Stream.of(tuple)
@@ -311,6 +311,16 @@ public abstract class QueryEngine<S extends TemplateStore> {
      *      in the corresponding parameter list.
      */
     public abstract Stream<Tuple> hasListExpander(Tuple tuple, String arguments, String index);
+
+    /**
+     * @param tuple
+     *      a Map representing a tuple from variables to values
+     * @param term
+     *      a variable name denoting a term
+     * @return
+     *      a Stream of tuples binding term to a term if term is a variable.
+     */
+    public abstract Stream<Tuple> isVariable(Tuple tuple, String term);
 
     /**
      * Constructs a stream of maps (representing tuples) mapping the variable instance to

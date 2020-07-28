@@ -4,7 +4,7 @@
     <parent>
         <artifactId>lutra</artifactId>
         <groupId>xyz.ottr.lutra</groupId>
-        <version>0.6.7</version>
+        <version>0.6.8</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
@@ -12,7 +12,7 @@
     <artifactId>lutra-restapi</artifactId>
     <packaging>war</packaging>
 
-    <name>lutra-restapi</name>
+    <name>${project.groupId}:${project.artifactId}</name>
 
     <dependencies>
 
@@ -41,7 +41,7 @@
         <dependency>
             <groupId>org.eclipse.jgit</groupId>
             <artifactId>org.eclipse.jgit</artifactId>
-            <version>5.0.2.201807311906-r</version>
+            <version>5.8.1.202007141445-r</version>
         </dependency>
 
         <dependency>

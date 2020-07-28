@@ -34,13 +34,13 @@ import xyz.ottr.lutra.bottr.model.ArgumentMaps;
 import xyz.ottr.lutra.bottr.model.Source;
 import xyz.ottr.lutra.bottr.model.TranslationSettings;
 import xyz.ottr.lutra.bottr.model.TranslationTable;
-import xyz.ottr.lutra.bottr.util.DataParser;
-import xyz.ottr.lutra.model.types.TermType;
+import xyz.ottr.lutra.model.types.Type;
 import xyz.ottr.lutra.system.Message;
 import xyz.ottr.lutra.system.Result;
 import xyz.ottr.lutra.system.ResultStream;
+import xyz.ottr.lutra.util.DataValidator;
 import xyz.ottr.lutra.wottr.parser.ModelSelector;
-import xyz.ottr.lutra.wottr.parser.TermTypeSerialiser;
+import xyz.ottr.lutra.wottr.parser.WTypeParser;
 import xyz.ottr.lutra.wottr.util.RDFNodes;
 
 class BArgumentMapsParser implements Function<RDFList, Result<ArgumentMaps>> {
@@ -74,7 +74,7 @@ class BArgumentMapsParser implements Function<RDFList, Result<ArgumentMaps>> {
 
             Result<ArgumentMap> argumentMap = Result.of(BArgumentMapsParser.this.source.createArgumentMap(BArgumentMapsParser.this.model));
 
-            Result<TermType> type = getType(map);
+            Result<Type> type = getType(map);
             Result<String> langTag = getLanguageTag(map);
 
             if (type.isPresent() && langTag.isPresent()) {
@@ -89,15 +89,15 @@ class BArgumentMapsParser implements Function<RDFList, Result<ArgumentMaps>> {
             return argumentMap;
         }
 
-        private Result<TermType> getType(Resource map) {
+        private Result<Type> getType(Resource map) {
             return ModelSelector.getOptionalResourceObject(BArgumentMapsParser.this.model, map, BOTTR.type)
-                .flatMap(new TermTypeSerialiser());
+                .flatMap(new WTypeParser());
         }
 
         private Result<String> getLanguageTag(Resource map) {
             return ModelSelector.getOptionalLiteralObject(BArgumentMapsParser.this.model, map, BOTTR.languageTag)
                 .map(Literal::getLexicalForm)
-                .flatMap(DataParser::asLanguageTagString);
+                .flatMap(DataValidator::asLanguageTagString);
         }
 
         private Result<TranslationSettings> getTranslationSettings(Resource map) {

@@ -48,20 +48,14 @@ public class WTemplateWriter implements TemplateWriter {
     private final Map<String, Model> models; // TODO: Decide on representation
     private final WInstanceWriter instanceWriter;
     private final PrefixMapping prefixes;
-    private final RDFFactory rdfFactory;
 
     public WTemplateWriter() {
         this(PrefixMapping.Factory.create());
     }
 
     public WTemplateWriter(PrefixMapping prefixes) {
-        this(prefixes, new RDFFactory());
-    }
-
-    WTemplateWriter(PrefixMapping prefixes, RDFFactory rdfFactory) {
         this.models = new HashMap<>();
-        this.rdfFactory = rdfFactory;
-        this.instanceWriter = new WInstanceWriter(prefixes, rdfFactory);
+        this.instanceWriter = new WInstanceWriter(prefixes);
         this.prefixes = prefixes;
     }
 
@@ -72,19 +66,27 @@ public class WTemplateWriter implements TemplateWriter {
 
     @Override
     public void accept(Signature template) {
-        Model model = ModelFactory.createDefaultModel();
-        model.setNsPrefixes(this.prefixes);
-        
-        Resource signatureNode = createSignature(model, template);
-        if (template instanceof Template) {
-            for (Instance instance : ((Template) template).getPattern()) {
-                Resource instanceNode = this.instanceWriter.createInstanceNode(model, instance);
-                model.add(signatureNode, WOTTR.pattern, instanceNode);
-            }
+        var iri = template.getIri();
+        if (!this.models.containsKey(iri)) {
+            this.models.put(template.getIri(), getModel(template));
         }
+    }
 
-        PrefixMappings.trim(model);
-        this.models.put(template.getIri(), model);
+    public Model getModel(Signature signature) {
+        return this.models.computeIfAbsent(signature.getIri(), ignore -> {
+            Model model = ModelFactory.createDefaultModel();
+            model.setNsPrefixes(this.prefixes);
+
+            Resource signatureNode = createSignature(model, signature);
+            if (signature instanceof Template) {
+                for (Instance instance : ((Template) signature).getPattern()) {
+                    Resource instanceNode = this.instanceWriter.createInstanceNode(model, instance);
+                    model.add(signatureNode, WOTTR.pattern, instanceNode);
+                }
+            }
+            PrefixMappings.trim(model);
+            return model;
+        });
     }
     
     @Override
@@ -123,8 +125,8 @@ public class WTemplateWriter implements TemplateWriter {
 
         Resource paramNode = model.createResource();
 
-        RDFNode variable = this.rdfFactory.createRDFNode(model, param.getTerm());
-        Resource type = TypeFactory.createRDFType(model, param.getTerm().getType());
+        RDFNode variable = WTermWriter.term(model, param.getTerm());
+        Resource type = WTypeWriter.type(model, param.getTerm().getType());
 
         model.add(paramNode, WOTTR.variable, variable);
         model.add(paramNode, WOTTR.type, type);
@@ -136,11 +138,10 @@ public class WTemplateWriter implements TemplateWriter {
             model.add(paramNode, WOTTR.modifier, WOTTR.nonBlank);
         }
         if (param.hasDefaultValue()) {
-            RDFNode def = this.rdfFactory.createRDFNode(model, param.getDefaultValue());
+            RDFNode def = WTermWriter.term(model, param.getDefaultValue());
             model.add(paramNode, WOTTR.defaultVal, def);
         }
         return paramNode;
     }
-
 
 }

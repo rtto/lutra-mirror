@@ -35,7 +35,7 @@ import xyz.ottr.lutra.model.Signature;
 import xyz.ottr.lutra.model.Template;
 import xyz.ottr.lutra.model.types.BasicType;
 import xyz.ottr.lutra.model.types.ComplexType;
-import xyz.ottr.lutra.model.types.TermType;
+import xyz.ottr.lutra.model.types.Type;
 import xyz.ottr.lutra.stottr.STOTTR;
 import xyz.ottr.lutra.writer.TemplateWriter;
 
@@ -67,7 +67,7 @@ public class STemplateWriter implements TemplateWriter {
             + Space.LINEBR2
             + this.templates.values().stream()
                 .sorted(signatureComparator)
-                .map(signature -> write(signature, false))
+                .map(signature -> writeSignature(signature, false))
                 .collect(Collectors.joining(Space.LINEBR2));
     }
 
@@ -76,10 +76,10 @@ public class STemplateWriter implements TemplateWriter {
         Signature template = this.templates.get(iri);
         return template == null
             ? null
-            : write(template, true);
+            : writeSignature(template, true);
     }
 
-    private String write(Signature signature, boolean includePrefixes) {
+    public String writeSignature(Signature signature, boolean includePrefixes) {
 
         var parameterVariables = signature.getParameters().stream()
             .map(Parameter::getTerm)
@@ -176,7 +176,7 @@ public class STemplateWriter implements TemplateWriter {
         return builder;
     }
 
-    private StringBuilder writeType(TermType type, STermWriter termWriter) {
+    private StringBuilder writeType(Type type, STermWriter termWriter) {
         return type instanceof BasicType
             ? new StringBuilder(termWriter.writeIRI(((BasicType) type).getIri()))
             : writeComplexType((ComplexType)type, termWriter);
@@ -185,7 +185,7 @@ public class STemplateWriter implements TemplateWriter {
     private StringBuilder writeComplexType(ComplexType type, STermWriter termWriter) {
 
         String typeStr = STOTTR.Types.map.get(type.getClass());
-        TermType innerType = type.getInner();
+        Type innerType = type.getInner();
 
         StringBuilder builder = new StringBuilder();
 

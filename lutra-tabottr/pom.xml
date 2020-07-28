@@ -4,11 +4,12 @@
     <parent>
         <groupId>xyz.ottr.lutra</groupId>
         <artifactId>lutra</artifactId>
-        <version>0.6.7</version>
+        <version>0.6.8</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <artifactId>lutra-tabottr</artifactId>
-    <name>lutra-tabottr</name>
+
+    <name>${project.groupId}:${project.artifactId}</name>
     <packaging>jar</packaging>
 
     <dependencies>

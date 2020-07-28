@@ -33,7 +33,6 @@ import org.apache.jena.shared.PrefixMapping;
 import xyz.ottr.lutra.OTTR;
 import xyz.ottr.lutra.model.terms.IRITerm;
 import xyz.ottr.lutra.model.terms.Term;
-import xyz.ottr.lutra.model.types.ListType;
 import xyz.ottr.lutra.system.Result;
 
 @Getter
@@ -83,12 +82,6 @@ public class Argument implements ModelElement, HasGetTerm, HasApplySubstitution<
         if (this.term instanceof IRITerm && ((IRITerm) term).getIri().startsWith(OTTR.namespace)) {
             result.addWarning("Suspicious argument value: " + term
                     + ". The value is in the ottr namespace: " + OTTR.namespace);
-        }
-
-        // List expander arguments must be variables or lists
-        if (this.listExpander && !this.term.isVariable() && !(term.getType() instanceof ListType)) {
-            result.addError("Argument is marked for list expansion, "
-                + "but argument value " + term + " is not a list, but of type: " + term.getType());
         }
 
         return result;

@@ -5,11 +5,28 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 0.6.8
+
+### Added
+
+- Improved docttr.
+
+### Bug fixes
+
+- Include hostname and URI fragment in output folder hierarchy, #206 
+
+### Dependencies
+
+- Bump all github reported dependencies, except jena 3.15.
+- Replaced RDFVizler dependency with guru.nidi.graphviz-java 
+
 ## 0.6.7
 
 ### Added
 
 - Introduced docttr documentation format for templates. In prototypical state.
+
+### Dependencies
 
 - Bump all github reported dependencies
 

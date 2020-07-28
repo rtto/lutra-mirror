@@ -123,13 +123,14 @@ public enum PrefixMappings {
         }
     }
 
-    public static void trim(Model model) {
+    public static Model trim(Model model) {
         Set<String> namespaces = getAllURIsNamespaces(model);
         for (String prefixNamespace : model.getNsPrefixMap().values()) {
             if (!namespaces.contains(prefixNamespace)) {
                 model.removeNsPrefix(model.getNsURIPrefix(prefixNamespace));
             }
         }
+        return model;
     }
 
     // TODO This might be too heavy for big data, should be possible to disable.

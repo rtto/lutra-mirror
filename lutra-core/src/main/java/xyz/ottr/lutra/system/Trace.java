@@ -8,6 +8,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import lombok.Setter;
 
 /*-
  * #%L 
@@ -62,14 +63,10 @@ public class Trace {
         toIdentifier = fun;
     }
 
-    public static void setDeepTrace(boolean on) {
-        deepTrace = on;
-    }
-
     private final Optional<String> identifier;
     private final Set<Trace> trace;
     private final Collection<Message> messages;
-    private static boolean deepTrace = false;
+    @Setter private static boolean deepTrace;
    
     protected Trace(Optional<?> value) {
         this.identifier = value.map(o -> (Object) o).flatMap(toIdentifier);

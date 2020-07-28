@@ -35,7 +35,7 @@ import xyz.ottr.lutra.wottr.parser.ModelSelector;
 
 public class BTranslationTableParser extends CachedResourceWrapperParser<TranslationTable> {
 
-    public BTranslationTableParser(Resource resource) {
+    BTranslationTableParser(Resource resource) {
         super(resource);
     }
 

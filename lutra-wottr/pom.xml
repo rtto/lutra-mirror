@@ -2,13 +2,15 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>xyz.ottr.lutra</groupId>
-        <version>0.6.7</version>
+        <version>0.6.8</version>
         <artifactId>lutra</artifactId>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
     <artifactId>lutra-wottr</artifactId>
     <packaging>jar</packaging>
+
+    <name>${project.groupId}:${project.artifactId}</name>
 
     <properties>
         <url.wottrspec>https://dev.spec.ottr.xyz/wOTTR/</url.wottrspec>

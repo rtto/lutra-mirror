@@ -27,12 +27,14 @@ import xyz.ottr.lutra.model.types.BasicType;
 import xyz.ottr.lutra.model.types.LUBType;
 import xyz.ottr.lutra.model.types.ListType;
 import xyz.ottr.lutra.model.types.NEListType;
-import xyz.ottr.lutra.model.types.TermType;
+import xyz.ottr.lutra.model.types.Type;
 import xyz.ottr.lutra.model.types.TypeRegistry;
 import xyz.ottr.lutra.stottr.antlr.stOTTRParser;
 import xyz.ottr.lutra.system.Result;
 
-public class STypeParser extends SBaseParserVisitor<TermType> {
+public class STypeParser extends SBaseParserVisitor<Type> {
+
+    // TODO does it make sense to use core's TypeParser?
 
     private final STermParser termParser;
 
@@ -40,27 +42,27 @@ public class STypeParser extends SBaseParserVisitor<TermType> {
         this.termParser = termParser;
     }
 
-    public Result<TermType> visitType(stOTTRParser.TypeContext ctx) {
+    public Result<Type> visitType(stOTTRParser.TypeContext ctx) {
         return visitChildren(ctx);
     }
 
-    public Result<TermType> visitListType(stOTTRParser.ListTypeContext ctx) {
-        Result<TermType> innerRes = visitType(ctx.type());
+    public Result<Type> visitListType(stOTTRParser.ListTypeContext ctx) {
+        Result<Type> innerRes = visitType(ctx.type());
         return innerRes.flatMap(inner -> Result.of(new ListType(inner)));
     }
     
-    public Result<TermType> visitNeListType(stOTTRParser.NeListTypeContext ctx) {
-        Result<TermType> innerRes = visitType(ctx.type());
+    public Result<Type> visitNeListType(stOTTRParser.NeListTypeContext ctx) {
+        Result<Type> innerRes = visitType(ctx.type());
         return innerRes.flatMap(inner -> Result.of(new NEListType(inner)));
     }
     
-    public Result<TermType> visitLubType(stOTTRParser.LubTypeContext ctx) {
-        Result<TermType> innerRes = visitBasicType(ctx.basicType());
+    public Result<Type> visitLubType(stOTTRParser.LubTypeContext ctx) {
+        Result<Type> innerRes = visitBasicType(ctx.basicType());
         return innerRes.flatMap(inner -> Result.of(new LUBType((BasicType) inner)));
     }
     
-    public Result<TermType> visitBasicType(stOTTRParser.BasicTypeContext ctx) {
+    public Result<Type> visitBasicType(stOTTRParser.BasicTypeContext ctx) {
         Result<String> iriRes = this.termParser.visit(ctx).map(term -> ((IRITerm) term).getIri());
-        return iriRes.map(TypeRegistry::getType);
+        return iriRes.map(TypeRegistry::asType);
     }
 }

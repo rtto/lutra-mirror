@@ -34,7 +34,7 @@ import lombok.NonNull;
 import org.apache.jena.shared.PrefixMapping;
 import xyz.ottr.lutra.OTTR;
 import xyz.ottr.lutra.model.terms.Term;
-import xyz.ottr.lutra.model.types.TermType;
+import xyz.ottr.lutra.model.types.Type;
 import xyz.ottr.lutra.system.Result;
 
 @Getter
@@ -47,7 +47,7 @@ public class Parameter implements ModelElement, HasGetTerm {
     private final Term defaultValue;
 
     @Builder
-    public static Parameter create(@NonNull Term term, TermType type, boolean nonBlank, boolean optional, Term defaultValue) {
+    public static Parameter create(@NonNull Term term, Type type, boolean nonBlank, boolean optional, Term defaultValue) {
         term.setVariable(true);
         term.setType(Objects.requireNonNullElse(type, term.getVariableType()));
 

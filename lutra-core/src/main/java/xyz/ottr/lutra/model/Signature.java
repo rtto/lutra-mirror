@@ -32,6 +32,13 @@ import lombok.NonNull;
 import lombok.Singular;
 import org.apache.jena.shared.PrefixMapping;
 import xyz.ottr.lutra.OTTR;
+import xyz.ottr.lutra.model.terms.BlankNodeTerm;
+import xyz.ottr.lutra.model.terms.IRITerm;
+import xyz.ottr.lutra.model.terms.ListTerm;
+import xyz.ottr.lutra.model.terms.Term;
+import xyz.ottr.lutra.model.types.ListType;
+import xyz.ottr.lutra.model.types.Type;
+import xyz.ottr.lutra.model.types.TypeRegistry;
 import xyz.ottr.lutra.system.Result;
 
 @Getter
@@ -87,4 +94,44 @@ public class Signature implements ModelElement {
 
         return result;
     }
+
+    public Instance asInstance() {
+
+        var builder = Instance.builder().iri(this.getIri());
+        for (Parameter param : this.getParameters()) {
+            builder.argument(Argument.builder().term(param.getTerm()).build());
+        }
+        return builder.build();
+    }
+
+    public Instance getExampleInstance() {
+
+        var builder = Instance.builder().iri(this.getIri());
+
+        int index = 1;
+        for (Parameter param : this.getParameters()) {
+            builder.argument(
+                Argument.builder()
+                    .term(getExampleTerm(param.getTerm().getType(), "argument", index))
+                    .build());
+            index += 1;
+        }
+        return builder.build();
+    }
+
+    private Term getExampleTerm(Type type, String name, int index) {
+
+        if (type.isSubTypeOf(TypeRegistry.IRI)) {
+            return new IRITerm(OTTR.ns_example_arg + name + index);
+        } else if (type instanceof ListType) {
+            var list = (ListType) type;
+            return new ListTerm(
+                getExampleTerm(list.getInner(), name + index + "-", 1),
+                getExampleTerm(list.getInner(), name + index + "-", 2),
+                getExampleTerm(list.getInner(), name + index + "-", 3));
+        } else {
+            return new BlankNodeTerm(name + index);
+        }
+    }
+
 }

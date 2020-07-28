@@ -38,6 +38,8 @@ import org.apache.jena.reasoner.ReasonerRegistry;
 import org.apache.jena.util.FileUtils;
 import org.apache.jena.vocabulary.RDF;
 import xyz.ottr.lutra.OTTR;
+import xyz.ottr.lutra.system.Result;
+import xyz.ottr.lutra.writer.RDFNodeWriter;
 
 public enum TypeRegistry {
     ;
@@ -49,15 +51,27 @@ public enum TypeRegistry {
         init(OTTR.Files.StdTypes);
     }
 
-    // TODO: Move these elsewhere. and add other common types too, like LUB<TOP>
-    public static final BasicType TOP = getType(OTTR.TypeURI.Top);
-    public static final BasicType BOT = getType(OTTR.TypeURI.Bot);
-    public static final BasicType IRI = getType(OTTR.TypeURI.IRI);
-    public static final BasicType LITERAL = getType(OTTR.TypeURI.Literal);
+    // TODO: Move these elsewhere?
+    public static final BasicType TOP = asType(OTTR.TypeURI.Top);
+    public static final BasicType BOT = asType(OTTR.TypeURI.Bot);
+    public static final BasicType IRI = asType(OTTR.TypeURI.IRI);
+    public static final BasicType LITERAL = asType(OTTR.TypeURI.Literal);
 
     public static final ComplexType LUB_TOP = new LUBType(TOP);
     public static final ComplexType LUB_IRI = new LUBType(IRI);
 
+
+    public static Result<Type> get(String uri) {
+        var type = asType(uri);
+
+        return type != null
+            ? Result.of(type)
+            : Result.error("Unrecognized type: " + RDFNodeWriter.toString(uri) + ". No such type registered.");
+    }
+
+    public static boolean isSubTypeOf(BasicType subType, BasicType superType) {
+        return subType.equals(superType) || superTypes.get(subType).contains(superType);
+    }
 
     private static void init(String modelFile) {
         InputStream filename = TypeRegistry.class.getClassLoader().getResourceAsStream(modelFile);
@@ -72,9 +86,10 @@ public enum TypeRegistry {
 
     private static void initTypes(Model model) {
         iris = model.listResourcesWithProperty(RDF.type, model.createResource(OTTR.TypeURI.Type))
-            .toSet().stream()
-            .map(Resource::getURI)
-            .map(BasicType::new)
+            .mapWith(Resource::getURI)
+            .mapWith(BasicType::new)
+            .toSet()
+            .stream()
             .collect(Collectors.toMap(BasicType::getIri, Function.identity()));
     }
 
@@ -87,32 +102,19 @@ public enum TypeRegistry {
         Property subTypeOf = model.createProperty(OTTR.TypeURI.subTypeOf);
         model.listStatements(null, subTypeOf, (RDFNode) null)
             .forEachRemaining(stmt ->  {
-                BasicType subType = getType(stmt.getSubject().asResource());
-                BasicType superType = getType(stmt.getObject().asResource());
+                BasicType subType = asType(stmt.getSubject().asResource());
+                BasicType superType = asType(stmt.getObject().asResource());
                 superTypes.get(subType).add(superType);
             });
     }
 
-    public static boolean isSubTypeOf(BasicType subType, BasicType superType) {
-        return subType.equals(superType) || superTypes.get(subType).contains(superType);
+    // TODO make these private or package-private, instead use get()
+
+    public static BasicType asType(Resource resource)  {
+        return asType(resource.getURI());
     }
 
-    /**
-     * Get a term type by its Resource.
-     * @param resource the Resource of the term type to get
-     * @return the matching termtype, or null if no such termtype
-     */
-    // TODO: rename to toType since getType could be taken to mean getting the type *of* the resource.
-    public static BasicType getType(Resource resource)  {
-        return getType(resource.getURI());
-    }
-
-    /**
-     * Get a term type by its IRI.
-     * @param iri the iri of the term type to get
-     * @return the matching termtype, or null if no such termtype
-     */
-    public static BasicType getType(String iri)  {
+    public static BasicType asType(String iri)  {
         return iris.get(iri);
     }
 

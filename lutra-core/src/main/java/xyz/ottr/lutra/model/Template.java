@@ -34,7 +34,7 @@ import org.apache.jena.shared.PrefixMapping;
 import xyz.ottr.lutra.OTTR;
 import xyz.ottr.lutra.model.terms.ListTerm;
 import xyz.ottr.lutra.model.terms.Term;
-import xyz.ottr.lutra.model.types.TermType;
+import xyz.ottr.lutra.model.types.Type;
 import xyz.ottr.lutra.system.Result;
 
 @SuppressWarnings("PMD.UselessOverridingMethod")
@@ -79,7 +79,7 @@ public class Template extends Signature {
      */
     private void updatePatternVariables() {
         // Collect parameter types
-        Map<Object, TermType> parameterTypes = getParameters().stream()
+        Map<Object, Type> parameterTypes = getParameters().stream()
             .map(Parameter::getTerm)
             .collect(Collectors.toMap(Term::getIdentifier, Term::getType, (t1, t2) -> t1));
 
@@ -90,7 +90,7 @@ public class Template extends Signature {
                     .collect(Collectors.toList()), parameterTypes));
     }
 
-    private void setTermsToVariables(List<Term> terms, Map<Object, TermType> parameterTypes) {
+    private void setTermsToVariables(List<Term> terms, Map<Object, Type> parameterTypes) {
         terms.forEach(term -> {
             if (term instanceof ListTerm) {
                 ListTerm tl = (ListTerm) term;

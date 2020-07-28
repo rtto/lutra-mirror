@@ -166,8 +166,6 @@ public class DependencyGraph implements TemplateStore {
         return true;
     }
 
-
-
     @Override
     public boolean addTemplate(Template template) {
         addTemplateSignature(template);
@@ -454,27 +452,11 @@ public class DependencyGraph implements TemplateStore {
 
     @Override
     public Result<Template> getTemplate(String iri) {
-
-        Result<TemplateNode> resTemplate = checkIsTemplate(iri);
-        Set<Instance> instances = new HashSet<>();
-
-        resTemplate.ifPresent(template -> {
-            for (DependencyEdge d : this.dependencies.get(template)) {
-                instances.add(Instance.builder()
-                    .iri(d.to.getIri())
-                    .arguments(d.argumentList)
-                    .listExpander(d.listExpander)
-                    .build());
-            }
-        });
-        return resTemplate.map(template ->
-            Template.builder()
-                .iri(template.getIri())
-                .parameters(template.getParameters())
-                .instances(instances)
-                .isEmptyPattern(instances.isEmpty())
-                .build());
+        // TODO BUG? there is no check if the iri is of type template.
+        // Will this return signatures and base templates as templates with no pattern?
+        return checkIsTemplate(iri).map(this::buildTemplate);
     }
+
 
     @Override
     public Result<Signature> getTemplateSignature(String iri) {
@@ -485,14 +467,56 @@ public class DependencyGraph implements TemplateStore {
 
         return resTemplate.map(template ->
             template.isBase()
-                ? BaseTemplate.builder()
-                    .iri(template.getIri())
-                    .parameters(template.getParameters())
-                    .build()
-                : Signature.superbuilder()
-                    .iri(template.getIri())
-                    .parameters(template.getParameters())
-                    .build());
+                ? buildBaseTemplate(template)
+                : buildSignature(template));
+    }
+
+    @Override
+    public Result<Signature> getTemplateObject(String iri) {
+
+        Result<TemplateNode> resTemplate = checkIsTemplate(iri);
+        return resTemplate.map(template -> {
+            if (template.isDefinition()) {
+                return buildTemplate(template);
+            } else if (template.isBase()) {
+                return buildBaseTemplate(template);
+            } else {
+                return buildSignature(template);
+            }
+        });
+    }
+
+
+    private Signature buildSignature(TemplateNode templateNode) {
+        return Signature.superbuilder()
+            .iri(templateNode.getIri())
+            .parameters(templateNode.getParameters())
+            .build();
+    }
+
+    private BaseTemplate buildBaseTemplate(TemplateNode templateNode) {
+        return BaseTemplate.builder()
+            .iri(templateNode.getIri())
+            .parameters(templateNode.getParameters())
+            .build();
+    }
+
+    private Template buildTemplate(TemplateNode templateNode) {
+
+        var instances = this.dependencies.get(templateNode).stream()
+            .map(dependencyEdge -> Instance.builder()
+                .iri(dependencyEdge.to.getIri())
+                .arguments(dependencyEdge.argumentList)
+                .listExpander(dependencyEdge.listExpander)
+                .build())
+            .collect(Collectors.toList());
+
+        return Template.builder()
+            .iri(templateNode.getIri())
+            .parameters(templateNode.getParameters())
+            .instances(instances)
+            .isEmptyPattern(instances.isEmpty())
+            .build();
     }
 
     @Override
@@ -541,15 +565,17 @@ public class DependencyGraph implements TemplateStore {
      * writer.
      */
     private ResultStream<Instance> expandInstances(Set<Instance> instances,
-            Predicate<DependencyEdge> shouldExpand) {
+            Predicate<DependencyEdge> shouldExpand, boolean performChecks) {
 
         Set<Result<DependencyEdge>> finalExpansion = new HashSet<>();
         Set<Result<DependencyEdge>> toExpandRes = toResultDependencies(instances);
         
         // Check arguments (number of arguments and types)
-        toExpandRes = toExpandRes.stream()
-            .map(ins -> ins.flatMap(this::checkArguments))
-            .collect(Collectors.toSet());
+        if (performChecks) {
+            toExpandRes = toExpandRes.stream()
+                   .map(ins -> ins.flatMap(this::checkArguments))
+                   .collect(Collectors.toSet());
+        }
 
         while (!toExpandRes.isEmpty()) {
 
@@ -609,7 +635,14 @@ public class DependencyGraph implements TemplateStore {
     public ResultStream<Instance> expandInstance(Instance instance) {
         Set<Instance> instanceSet = new HashSet<>();
         instanceSet.add(instance);
-        return expandInstances(instanceSet, e -> true);
+        return expandInstances(instanceSet, e -> true, true);
+    }
+
+    @Override
+    public ResultStream<Instance> expandInstanceWithoutChecks(Instance instance) {
+        Set<Instance> instanceSet = new HashSet<>();
+        instanceSet.add(instance);
+        return expandInstances(instanceSet, e -> true, false);
     }
 
     /**

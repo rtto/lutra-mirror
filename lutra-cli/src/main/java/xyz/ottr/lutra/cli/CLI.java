@@ -22,7 +22,10 @@ package xyz.ottr.lutra.cli;
  * #L%
  */
 
+import java.io.IOException;
 import java.io.PrintStream;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.function.Function;
@@ -31,10 +34,13 @@ import org.apache.jena.rdf.model.Model;
 import picocli.CommandLine;
 import picocli.CommandLine.ParameterException;
 import xyz.ottr.lutra.TemplateManager;
+import xyz.ottr.lutra.api.StandardFormat;
 import xyz.ottr.lutra.api.StandardTemplateManager;
+import xyz.ottr.lutra.docttr.DocttrManager;
 import xyz.ottr.lutra.io.Files;
 import xyz.ottr.lutra.io.Format;
 import xyz.ottr.lutra.model.Instance;
+import xyz.ottr.lutra.stottr.util.SSyntaxChecker;
 import xyz.ottr.lutra.system.Message;
 import xyz.ottr.lutra.system.MessageHandler;
 import xyz.ottr.lutra.system.Result;
@@ -45,14 +51,12 @@ public class CLI {
 
     private final Settings settings;
     private final PrintStream outStream;
-    //private final PrintStream errStream;
     private final MessageHandler messageHandler;
     private final StandardTemplateManager templateManager;
 
     public CLI(PrintStream outStream, PrintStream errStream) {
         this.settings = new Settings();
         this.outStream = outStream;
-        //this.errStream = errStream;
         this.messageHandler = new MessageHandler(errStream);
         this.templateManager = new StandardTemplateManager();
     }
@@ -95,14 +99,15 @@ public class CLI {
 
         if (this.settings.inputs.isEmpty()
             && (this.settings.mode == Settings.Mode.expand
-                || this.settings.mode == Settings.Mode.format)) {
-
+                || this.settings.mode == Settings.Mode.format
+                || this.settings.mode == Settings.Mode.checkSyntax)) {
             this.messageHandler.printMessage(Message.error("Must provide one or more input files. "
                 + "For help on usage, use the --help option."));
             return false;
         } else if (this.settings.library == null
             && (this.settings.mode == Settings.Mode.expandLibrary
                 || this.settings.mode == Settings.Mode.formatLibrary
+                || this.settings.mode == Settings.Mode.docttrLibrary
                 || this.settings.mode == Settings.Mode.lint)) {
 
             this.messageHandler.printMessage(Message.error("Must provide a library. "
@@ -117,9 +122,18 @@ public class CLI {
     /// MAIN EXECUTION                                       ///
     ////////////////////////////////////////////////////////////
 
-    private void execute() {
+    private void initTemplateManager() {
+        this.templateManager.setFullTrace(this.settings.debugFullTrace);
+        this.templateManager.setStackTrace(this.settings.debugStackTrace);
+        this.templateManager.setHaltOn(this.settings.haltOn);
+        this.templateManager.setFetchMissingDependencies(this.settings.fetchMissingDependencies);
+        this.templateManager.setExtensions(this.settings.extensions);
+        this.templateManager.setIgnoreExtensions(this.settings.ignoreExtensions);
+    }
 
-        if (initTemplateManager().isGreaterEqualThan(this.settings.haltOn)) {
+    private void initLibrary() {
+
+        if (initStandardLibrary().isGreaterEqualThan(this.settings.haltOn)) {
             return;
         }
         if (parseLibrary().isGreaterEqualThan(this.settings.haltOn)) {
@@ -131,29 +145,61 @@ public class CLI {
         if (checkLibrary().isGreaterEqualThan(this.settings.haltOn)) {
             return;
         }
-        executeMode();
     }
 
-    private void executeMode() {
+    private void execute() {
 
-        switch (this.settings.mode) {
-            case expand:
-                executeExpand();
-                break;
-            case expandLibrary:
-                executeExpandLibrary();
-                break;
-            case formatLibrary:
-                executeFormatLibrary();
-                break;
-            case format:
-                executeFormat();
-                break;
-            case lint:
-                break;
-            default:
-                Message err = Message.error("The mode " + this.settings.mode + " is not yet supported.");
-                this.messageHandler.printMessage(err);
+        initTemplateManager();
+
+        if (this.settings.mode == Settings.Mode.checkSyntax) {
+            executeCheckSyntax();
+        } else {
+
+            initLibrary();
+
+            switch (this.settings.mode) {
+                case expand:
+                    executeExpand();
+                    break;
+                case expandLibrary:
+                    executeExpandLibrary();
+                    break;
+                case formatLibrary:
+                    executeFormatLibrary();
+                    break;
+                case format:
+                    executeFormat();
+                    break;
+                case docttrLibrary:
+                    docttrTemplates(this.templateManager);
+                    break;
+                case lint:
+                    break;
+                default:
+                    Message err = Message.error("The mode " + this.settings.mode + " is not yet supported.");
+                    this.messageHandler.printMessage(err);
+            }
+
+        }
+    }
+
+    private void executeCheckSyntax() {
+
+        if (this.settings.inputFormat == StandardFormat.stottr) {
+
+            for (String file : this.settings.inputs) {
+                this.outStream.println("Checking file: " + file);
+                var checker = new SSyntaxChecker(this.messageHandler);
+                try {
+                    checker.checkFile(Paths.get(file));
+                    this.messageHandler.printMessages();
+                } catch (IOException e) {
+                    this.outStream.println("Error checking file.");
+                    e.printStackTrace(this.outStream);
+                }
+            }
+        } else {
+            this.outStream.println("Unsupported format " + this.settings.inputFormat);
         }
     }
 
@@ -191,15 +237,8 @@ public class CLI {
     /// Parsing and writing                                  ///
     ////////////////////////////////////////////////////////////
 
-    private Message.Severity initTemplateManager() {
 
-        // Transfer relevant settings
-        this.templateManager.setDeepTrace(this.settings.deepTrace);
-        this.templateManager.setHaltOn(this.settings.haltOn);
-        this.templateManager.setFetchMissingDependencies(this.settings.fetchMissingDependencies);
-        this.templateManager.setExtensions(this.settings.extensions);
-        this.templateManager.setIgnoreExtensions(this.settings.ignoreExtensions);
-
+    private Message.Severity initStandardLibrary() {
         // Load standard library
         var msgs = this.templateManager.loadStandardTemplateLibrary();
         this.messageHandler.combine(msgs); // Use this.messageHandler's settings
@@ -216,7 +255,7 @@ public class CLI {
                 ? null
                 : this.templateManager.getFormat(this.settings.libraryFormat.toString());
 
-        return this.templateManager.parseLibraryInto(libraryFormat, this.settings.library)
+        return this.templateManager.readLibrary(libraryFormat, this.settings.library)
             .printMessages();
     }
 
@@ -230,7 +269,7 @@ public class CLI {
 
     public ResultStream<Instance> parseInstances() {
         Format inFormat = this.templateManager.getFormat(this.settings.inputFormat.toString());
-        return this.templateManager.parseInstances(inFormat, this.settings.inputs);
+        return this.templateManager.readInstances(inFormat, this.settings.inputs);
     }
 
     public ResultStream<Instance> parseAndExpandInstances() {
@@ -250,13 +289,18 @@ public class CLI {
         templateManager.writeTemplates(outFormat, makeTemplateWriter(outFormat.getDefaultFileSuffix()));
     }
 
+    private void docttrTemplates(TemplateManager templateManager) {
+        var docttr = new DocttrManager(templateManager);
+        docttr.write(Path.of(this.settings.out));
+    }
+
     private Function<String, Optional<Message>> makeInstanceWriter(String suffix) {
         return str -> {
             if (shouldPrintOutput()) {
                 this.outStream.println(str);
             }
             if (this.settings.out != null) {
-                return Files.writeInstancesTo(str, suffix, this.settings.out);
+                return Files.writeFile(str, this.settings.out, suffix);
             }
             return Optional.empty();
         };
@@ -268,7 +312,7 @@ public class CLI {
                 this.outStream.println(str);
             }
             if (this.settings.out != null) {
-                return Files.writeTemplatesTo(iri, str, suffix, this.settings.out);
+                return Files.writeTemplatesTo(iri, str, this.settings.out, suffix);
             }
             return Optional.empty();
         };
