@@ -248,7 +248,7 @@
                     <dependency>
                         <groupId>com.puppycrawl.tools</groupId>
                         <artifactId>checkstyle</artifactId>
-                        <version>8.32</version>
+                        <version>8.35</version>
                     </dependency>
                 </dependencies>
             </plugin>
@@ -276,7 +276,7 @@
             <plugin>
                 <groupId>com.github.spotbugs</groupId>
                 <artifactId>spotbugs-maven-plugin</artifactId>
-                <version>4.0.0</version>
+                <version>4.0.4</version>
                 <configuration>
                     <effort>Max</effort>
                     <threshold>Low</threshold>
@@ -321,7 +321,7 @@
             <plugin>
                 <groupId>de.thetaphi</groupId>
                 <artifactId>forbiddenapis</artifactId>
-                <version>3.0</version>
+                <version>3.0.1</version>
                 <configuration>
                     <failOnUnsupportedJava>false</failOnUnsupportedJava>
                     <bundledSignatures>
@@ -375,7 +375,7 @@
                 </plugin>
                 <plugin>
                     <artifactId>maven-war-plugin</artifactId>
-                    <version>3.2.3</version>
+                    <version>3.3.1</version>
                 </plugin>
                 <plugin>
                     <artifactId>maven-install-plugin</artifactId>
@@ -402,7 +402,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-shade-plugin</artifactId>
-                    <version>3.2.3</version>
+                    <version>3.2.4</version>
                 </plugin>
 
                 <plugin>
@@ -414,7 +414,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-project-info-reports-plugin</artifactId>
-                    <version>3.0.0</version>
+                    <version>3.1.0</version>
                 </plugin>
 
                 <plugin>
@@ -426,7 +426,7 @@
                 <plugin>
                     <groupId>com.github.spotbugs</groupId>
                     <artifactId>spotbugs</artifactId>
-                    <version>4.0.3</version>
+                    <version>4.0.6</version>
                 </plugin>
 
             </plugins>
@@ -564,7 +564,7 @@
             <dependency>
                 <groupId>commons-io</groupId>
                 <artifactId>commons-io</artifactId>
-                <version>2.6</version>
+                <version>2.7</version>
             </dependency>
             <dependency>
                 <groupId>commons-validator</groupId>
