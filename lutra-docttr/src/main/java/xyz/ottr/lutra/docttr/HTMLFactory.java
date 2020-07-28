@@ -47,7 +47,7 @@ public enum HTMLFactory {
         return head(
             meta().withCharset("UTF-8"),
             //link().withRel("stylesheet").withHref("https://ottr.xyz/inc/docttr.css"),
-            styleWithInlineFile("/docttr.css"),
+            styleWithInlineFile_min("/docttr.css"),
             title(title))
             .withLang("en");
     }
@@ -65,7 +65,7 @@ public enum HTMLFactory {
     }
 
     static DomContent getScripts() {
-        return scriptWithInlineFile("/docttr.js");
+        return scriptWithInlineFile_min("/docttr.js");
     }
 
     static DomContent getInfoP(String description) {

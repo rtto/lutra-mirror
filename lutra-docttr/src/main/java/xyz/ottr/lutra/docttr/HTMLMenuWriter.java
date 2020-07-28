@@ -50,7 +50,9 @@ public class HTMLMenuWriter {
                     .withTarget(DocttrManager.FRAMENAME_MAIN)
                     .withClass("button")
                     .withStyle("float: right; padding: 5px;"),
-                div(getSignatureList(root, iris)))
+                div(
+                    h3("Contents"),
+                    getSignatureList(root, iris)))
                     .withStyle("margin: 20px;"),
             HTMLFactory.getScripts()
         ));
