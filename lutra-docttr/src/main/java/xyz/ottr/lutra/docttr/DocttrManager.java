@@ -29,6 +29,8 @@ import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -72,6 +74,8 @@ public class DocttrManager {
                     this.templateStore::getTemplateObject));
     }
 
+
+
     public void write(Path outputFolder) {
 
         var signatures = getSignatureMap();
@@ -82,14 +86,12 @@ public class DocttrManager {
         // write frame page for all templates
         writeFrames(signatures, outputFolder, null);
 
-        // write frame pages for all namespaces
-        for (String domain : getDomains(signatures.keySet())) {
-            writeFrames(filter(signatures, domain), outputFolder, domain);
-        }
+        var pathTrees = getNamespaceTrees(signatures.keySet());
 
-        // write frame pages for all namespaces
-        for (String namespace : getNamespaces(signatures.keySet())) {
-            writeFrames(filter(signatures, namespace), outputFolder, namespace);
+        for (Tree<String> pathTree : pathTrees.values()) {
+            pathTree.preorderStream()
+                .filter(tree -> !tree.isLeaf())
+                .forEach(tree -> writeFrames(filter(signatures, tree.getRoot()), outputFolder, tree.getRoot()));
         }
     }
 
@@ -150,6 +152,45 @@ public class DocttrManager {
             var content = templateWriter.write(iri, signatureResult);
             writeFile(content, outputFolder.resolve(toLocalFilePath(iri)));
         });
+    }
+
+    static Map<String, Tree<String>> getNamespaceTrees(Collection<String> iris) {
+
+        // map containing root nodes only
+        var rootMap = new HashMap<String, Tree<String>>();
+
+        // map for all nodes, for easy access
+        var pathMap = new HashMap<String, Tree<String>>();
+
+        for (String iri : iris) {
+
+            String parentPath = "";
+            String currentPath = parentPath;
+
+            String[] iriParts = iri.split("(?<=([^/:]/)|#)");  // split on single / only
+
+            for (String pathPart : iriParts) {
+
+                currentPath += pathPart;
+
+                if (!pathMap.containsKey(currentPath)) {
+                    var parentTree = parentPath.isEmpty()
+                        ? null
+                        : pathMap.get(parentPath);
+
+                    var currentTree = new Tree(parentTree, currentPath, new LinkedList<>());
+                    pathMap.put(currentPath, currentTree);
+
+                    if (parentTree != null) {
+                        parentTree.addChild(currentTree);
+                    } else {
+                        rootMap.putIfAbsent(currentPath, currentTree);
+                    }
+                }
+                parentPath = currentPath;
+            }
+        }
+        return rootMap;
     }
 
     @SneakyThrows(URISyntaxException.class)

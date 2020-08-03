@@ -26,6 +26,9 @@ import static j2html.TagCreator.*;
 
 import j2html.tags.ContainerTag;
 import java.nio.file.Path;
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import org.apache.jena.rdf.model.ResourceFactory;
@@ -53,47 +56,68 @@ public class HTMLMenuWriter {
                 div(
                     h3("Contents"),
                     getSignatureList(root, iris)))
-                    .withStyle("margin: 20px;"),
+                .withStyle("margin: 20px;"),
             HTMLFactory.getScripts()
         ));
     }
 
-    ContainerTag getSignatureList(String root, Map<String, Result<Signature>> signatures) {
+    ContainerTag getSignatureList(String rootPath, Map<String, Result<Signature>> signatures) {
 
-        var list = div().withClasses("treeview", "toggle-all", "expand-all");
-        var sublist = ul();
-        var namespace = "";
+        // map namespace to signatures in the namespace
+        var namespaceMap = signatures.keySet().stream()
+            .collect(Collectors.groupingBy(iri -> ResourceFactory.createResource(iri).getNameSpace()));
 
-        var keys = signatures.keySet().stream()
-            .sorted()
-            .collect(Collectors.toList());
+        // Convert expansion tree to html list
+        var indexTreeViewWriter = new StringTreeViewWriter(namespaceMap, rootPath, signatures);
 
-        for (String iri : keys) {
+        var nsTreeMap = DocttrManager.getNamespaceTrees(signatures.keySet());
 
-            // create heading and new sublist if new namespace
-            var ns = ResourceFactory.createResource(iri).getNameSpace();
-            if (!ns.equals(namespace)) {
-                namespace = ns;
-                sublist = ul();
-                list.with(
-                    details(
-                        summary(a(b(ns))
-                                .withHref(Path.of(DocttrManager.toLocalPath(ns, root), DocttrManager.FILENAME_FRONTPAGE).toString())
-                                .withTarget(DocttrManager.FRAMENAME_MAIN),
-                            HTMLFactory.getColourBoxNS(ns)),
-                        sublist)
-                );
-            }
-
-            var item = li(
-                a(this.prefixMapping.shortForm(iri))
-                    .withHref(DocttrManager.toLocalFilePath(iri, root))
-                    .withTarget(DocttrManager.FRAMENAME_MAIN)
-            ).withCondClass(signatures.get(iri).isEmpty(), "error"); // mark as error if Result is empty
-            sublist.with(item);
-        }
-        return list;
+        return div(each(nsTreeMap.keySet(), path -> indexTreeViewWriter.write(nsTreeMap.get(path))));
     }
 
 
+    private static class StringTreeViewWriter extends TreeViewWriter<String> {
+        private final Map<String, List<String>> namespaceMap;
+        private final String rootPath;
+        private final Map<String, Result<Signature>> signatures;
+
+        StringTreeViewWriter(Map<String, List<String>> namespaceMap, String rootPath, Map<String, Result<Signature>> signatures) {
+
+            this.namespaceMap = namespaceMap;
+            this.rootPath = rootPath;
+            this.signatures = signatures;
+        }
+
+        @Override
+        protected ContainerTag writeRoot(Tree<String> root) {
+            var uri = root.getRoot();
+
+            var shortName = uri;
+            if (root.getParent() != null) {
+                shortName = shortName.replaceFirst(root.getParent().getRoot(), "");
+            }
+
+            var link = a(shortName).withTarget(DocttrManager.FRAMENAME_MAIN);
+            var container = span().withTitle(uri);
+
+            if (namespaceMap.keySet().contains(uri)) {
+                link.withHref(Path.of(DocttrManager.toLocalPath(uri, rootPath), DocttrManager.FILENAME_FRONTPAGE).toString());
+                container.with(link, HTMLFactory.getColourBoxNS(uri));
+            } else if (signatures.containsKey(uri)) {
+                link.withHref(DocttrManager.toLocalFilePath(uri, rootPath));
+                container.with(link)
+                    .withCondClass(signatures.get(uri).isEmpty(), "error");
+            } else {
+                link.withHref(Path.of(DocttrManager.toLocalPath(uri, rootPath), DocttrManager.FILENAME_FRONTPAGE).toString());
+                container.with(link);
+            }
+            return container;
+        }
+
+        @Override
+        protected Collection<Tree<String>> prepareChildren(List<Tree<String>> children) {
+            children.sort(Comparator.comparing(a -> a.getRoot()));
+            return children;
+        }
+    }
 }

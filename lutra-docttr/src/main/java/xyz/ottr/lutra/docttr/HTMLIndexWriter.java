@@ -55,7 +55,7 @@ public class HTMLIndexWriter extends HTMLMenuWriter {
             body(
                 img().withClass("logo").withSrc("https://ottr.xyz/logo/lOTTR.jpg"),
                 iffElse(root != null,
-                    h1(join("Library: ", code(root))),
+                    h1(code(root)),
                     h1(join("OTTR template library"))
                 ),
                 h2("Metrics"),
@@ -84,8 +84,8 @@ public class HTMLIndexWriter extends HTMLMenuWriter {
                 join("Template domains: " + domains.size(),
                     ul(each(domains, iri ->
                         li(
-                            a(code(iri)).withTarget("_top")
-                                .withHref(Path.of(DocttrManager.toLocalPath(iri, root), DocttrManager.FILENAME_FRAMESET).toString())
+                            a(code(iri))
+                                .withHref(Path.of(DocttrManager.toLocalPath(iri, root), DocttrManager.FILENAME_FRONTPAGE).toString())
                         )
                     )))));
         }
@@ -97,8 +97,7 @@ public class HTMLIndexWriter extends HTMLMenuWriter {
                     ul(each(namespaces, iri ->
                         li(
                             a(code(iri))
-                                .withTarget("_top")
-                                .withHref(Path.of(DocttrManager.toLocalPath(iri, root), DocttrManager.FILENAME_FRAMESET).toString()),
+                                .withHref(Path.of(DocttrManager.toLocalPath(iri, root), DocttrManager.FILENAME_FRONTPAGE).toString()),
                             HTMLFactory.getColourBoxNS(iri)
                         )
                     )))));
