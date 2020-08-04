@@ -55,6 +55,12 @@ public class HTMLMenuWriter {
                     .withStyle("float: right; padding: 5px;"),
                 div(
                     h3("Contents"),
+                    HTMLFactory.getInfoP("Signatures are organised according to their namespace. "
+                        + "Click arrow to expand list. "
+                        + "Click text to display page in right window. "
+                        + "Items in the list with a colour box represent a namespace. "
+                        + "A package is a set of templates constructed for a particular purpose, "
+                            + "often as part of a specific project."),
                     getSignatureList(root, iris)))
                 .withStyle("margin: 20px;"),
             HTMLFactory.getScripts()
@@ -63,33 +69,46 @@ public class HTMLMenuWriter {
 
     ContainerTag getSignatureList(String rootPath, Map<String, Result<Signature>> signatures) {
 
-        // map namespace to signatures in the namespace
-        var namespaceMap = signatures.keySet().stream()
-            .collect(Collectors.groupingBy(iri -> ResourceFactory.createResource(iri).getNameSpace()));
+        var nsPackages = DocttrManager.filter(signatures, DocttrManager.NS_TPL_PACKAGE);
+        var nsNonPackages = signatures.entrySet().stream()
+            .filter(x -> !nsPackages.keySet().contains(x.getKey()))
+            .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 
-        // Convert expansion tree to html list
-        var indexTreeViewWriter = new StringTreeViewWriter(namespaceMap, rootPath, signatures);
-
-        var nsTreeMap = DocttrManager.getNamespaceTrees(signatures.keySet());
-
-        return div(each(nsTreeMap.keySet(), path -> indexTreeViewWriter.write(nsTreeMap.get(path))));
+        return div(getTreeList(rootPath, nsNonPackages),
+                iff(!nsPackages.isEmpty(),
+                    div(
+                        h4("Packages"),
+                        getTreeList(rootPath, nsPackages)))
+        );
     }
 
+    private ContainerTag getTreeList(String rootPath, Map<String, Result<Signature>> signatures) {
+
+        var indexTreeViewWriter = new StringTreeViewWriter(rootPath, signatures);
+        var nsTreeMap = DocttrManager.getNamespaceTrees(signatures.keySet());
+        return div(
+            each(DocttrManager.getNamespaceTrees(signatures.keySet()).keySet(), path -> indexTreeViewWriter.write(nsTreeMap.get(path))));
+    }
+
+    // Inner class for formatting path tree
 
     private static class StringTreeViewWriter extends TreeViewWriter<String> {
-        private final Map<String, List<String>> namespaceMap;
         private final String rootPath;
         private final Map<String, Result<Signature>> signatures;
 
-        StringTreeViewWriter(Map<String, List<String>> namespaceMap, String rootPath, Map<String, Result<Signature>> signatures) {
-
-            this.namespaceMap = namespaceMap;
+        StringTreeViewWriter(String rootPath, Map<String, Result<Signature>> signatures) {
             this.rootPath = rootPath;
             this.signatures = signatures;
         }
 
         @Override
         protected ContainerTag writeRoot(Tree<String> root) {
+
+            // get namespaces for adding colourboxes
+            var namespaces = signatures.keySet().stream()
+                .map(iri -> ResourceFactory.createResource(iri).getNameSpace())
+                .collect(Collectors.toSet());
+
             var uri = root.getRoot();
 
             var shortName = uri;
@@ -97,19 +116,16 @@ public class HTMLMenuWriter {
                 shortName = shortName.replaceFirst(root.getParent().getRoot(), "");
             }
 
-            var link = a(shortName).withTarget(DocttrManager.FRAMENAME_MAIN);
             var container = span().withTitle(uri);
+            var link = a(shortName).withTarget(DocttrManager.FRAMENAME_MAIN);
 
-            if (namespaceMap.keySet().contains(uri)) {
-                link.withHref(Path.of(DocttrManager.toLocalPath(uri, rootPath), DocttrManager.FILENAME_FRONTPAGE).toString());
-                container.with(link, HTMLFactory.getColourBoxNS(uri));
-            } else if (signatures.containsKey(uri)) {
+            if (signatures.containsKey(uri)) {
                 link.withHref(DocttrManager.toLocalFilePath(uri, rootPath));
                 container.with(link)
                     .withCondClass(signatures.get(uri).isEmpty(), "error");
             } else {
                 link.withHref(Path.of(DocttrManager.toLocalPath(uri, rootPath), DocttrManager.FILENAME_FRONTPAGE).toString());
-                container.with(link);
+                container.with(link, iff(namespaces.contains(uri), HTMLFactory.getColourBoxNS(uri)));
             }
             return container;
         }

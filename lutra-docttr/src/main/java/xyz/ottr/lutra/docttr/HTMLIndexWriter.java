@@ -64,7 +64,10 @@ public class HTMLIndexWriter extends HTMLMenuWriter {
                 HTMLFactory.getInfoP("Each template is linked to its documentation page. The colour of the node indicates its namespace. "),
                 rawHtml(graphViz.drawGraph(root, iris.keySet(), this.store)),
                 h2("List of templates"),
-                HTMLFactory.getInfoP("These are the templates in this library, grouped by their namespace."),
+                HTMLFactory.getInfoP(join(
+                    text("These are the templates in this library"),
+                    iff(root != null, join(text(" those IRI starts with "), code(root))),
+                    text(", grouped by their namespace."))),
                 div(getSignatureList(root, iris))),
                 HTMLFactory.getPrefixDiv(this.prefixMapping),
                 HTMLFactory.getFooterDiv(),

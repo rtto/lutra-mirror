@@ -69,7 +69,11 @@ public enum HTMLFactory {
     }
 
     static DomContent getInfoP(String description) {
-        return p(rawHtml("&#128712; "), text(description))
+        return getInfoP(text(description));
+    }
+
+    static DomContent getInfoP(DomContent description) {
+        return p(rawHtml("&#128712; "), description)
             .withClass("info");
     }
 

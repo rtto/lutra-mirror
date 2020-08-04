@@ -49,6 +49,9 @@ import xyz.ottr.lutra.system.Result;
 
 public class DocttrManager {
 
+    public static final String NS_TPL = "http://tpl.ottr.xyz";
+    public static final String NS_TPL_PACKAGE = "http://tpl.ottr.xyz/p/";
+
     public static final String HTML_EXT = ".html";
 
     public static final String FILENAME_MENU = "menu.html";
@@ -95,7 +98,7 @@ public class DocttrManager {
         }
     }
 
-    private static <V> Map<String, V> filter(Map<String, V> map, String uriStart) {
+    public static <V> Map<String, V> filter(Map<String, V> map, String uriStart) {
         return map.keySet().stream()
             .filter(key -> key.startsWith(uriStart))
             .collect(Collectors.toMap(Function.identity(), map::get));
