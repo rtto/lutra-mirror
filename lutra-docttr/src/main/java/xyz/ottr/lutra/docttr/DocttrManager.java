@@ -50,7 +50,8 @@ import xyz.ottr.lutra.system.Result;
 public class DocttrManager {
 
     public static final String NS_TPL = "http://tpl.ottr.xyz";
-    public static final String NS_TPL_PACKAGE = "http://tpl.ottr.xyz/p/";
+    public static final String NS_TPL_PACKAGE = NS_TPL + "/p/";
+    public static final String NS_DOCTTR = NS_TPL_PACKAGE + "docttr/0.1/";
 
     public static final String HTML_EXT = ".html";
 

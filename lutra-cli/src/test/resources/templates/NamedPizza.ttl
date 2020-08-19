@@ -6,10 +6,22 @@
 @prefix o-owl-re: <http://tpl.ottr.xyz/owl/restriction/0.1/> .
 @prefix pz:    <http://www.co-ode.org/ontologies/pizza/pizza.owl#> .
 @prefix o-owl-ax: <http://tpl.ottr.xyz/owl/axiom/0.1/> .
+@prefix o-docttr: <http://tpl.ottr.xyz/p/docttr/0.1/> .
 
 @prefix var: <http://tpl.ottr.xyz/pizza/0.1/NamedPizza?something#else?what?> .
 
 o-pizza:NamedPizza  a    ottr:Template ;
+        ottr:annotation [
+            ottr:of o-docttr:Deprecated ;
+            ottr:values (
+                o-pizza:NamedPizzaX
+                "Explanation"
+                (<http://url1> <http://url2>)
+                "2020-09-18"
+                (<http://person1>)
+                ("comment")
+            )
+        ];
         ottr:parameters  ( [ ottr:type      owl:Class ;
                              ottr:variable  var:var0
                            ]

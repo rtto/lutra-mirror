@@ -52,6 +52,8 @@ import xyz.ottr.lutra.model.Instance;
 import xyz.ottr.lutra.model.Signature;
 import xyz.ottr.lutra.model.Substitution;
 import xyz.ottr.lutra.model.terms.IRITerm;
+import xyz.ottr.lutra.model.terms.ListTerm;
+import xyz.ottr.lutra.model.terms.LiteralTerm;
 import xyz.ottr.lutra.store.TemplateStore;
 import xyz.ottr.lutra.system.Message;
 import xyz.ottr.lutra.system.Result;
@@ -121,18 +123,73 @@ public class HTMLTemplateWriter {
                         h4("stOTTR serialisation"),
                         pre(this.serialisationWriter.writeStottr(signature))
                     ),
-
+                    writeAnnotations(signature),
                     writePattern(expansionTree),
                     writeDependencies(signature),
                     writeMetrics(expansionTree),
                     writeSerialisations(signature),
 
                     HTMLFactory.getPrefixDiv(this.prefixMapping)
-                    ),
+                ),
                 HTMLFactory.getFooterDiv(),
                 HTMLFactory.getScripts()
             )
         );
+    }
+
+    private ContainerTag writeAnnotations(Signature signature) {
+
+        var annotations = signature.getAnnotations();
+
+        var deprecated = annotations.stream()
+            .filter(i -> i.getIri().equals(DocttrManager.NS_DOCTTR + "Deprecated"))
+            .findAny();
+
+        return div(
+            h2("Metadata"),
+            iff(deprecated, this::writeDeprecation),
+            ul(each(signature.getAnnotations(), annotation -> li(annotation.toString(this.prefixMapping))))
+        );
+    }
+
+    private ContainerTag writeDeprecation(Instance deprecated) {
+
+        var args = deprecated.getArguments();
+
+        // TODO visitor for terms. get string value.
+        var explanation = ((LiteralTerm)args.get(1).getTerm()).getValue();
+        var seeAlso = ((ListTerm)args.get(2).getTerm()).asList().stream()
+            .map(term -> (IRITerm)term)
+            .map(IRITerm::getIri)
+            .collect(Collectors.toList());
+        var when = ((LiteralTerm)args.get(3).getTerm()).getValue();
+        var who = ((ListTerm)args.get(4).getTerm()).asList().stream()
+            .map(term -> (IRITerm)term)
+            .map(IRITerm::getIri)
+            .collect(Collectors.toList());
+        var comments = ((ListTerm)args.get(5).getTerm()).asList().stream()
+            .map(term -> (LiteralTerm)term)
+            .map(LiteralTerm::getValue)
+            .collect(Collectors.toList());
+
+        return
+            div(
+                b("This template is deprecated"),
+                p(explanation),
+                iff(!seeAlso.isEmpty(),
+                    iffElse(seeAlso.size() == 1,
+                        p(seeAlso.get(0)),
+                        ul(each(seeAlso, link -> li(a(link).withHref(link))))
+                    )
+                ),
+                // TODO make this a "Says who?" button, inspired by "oh yeah?" by timbl.
+                p(
+                    text("The when, who and comments for this fact: "),
+                    span(when),
+                    span(who.stream().collect(joining(", "))),
+                    span(comments.stream().collect(joining("  ")))
+                )
+            ).withStyle("border: 1px solid red");
     }
 
     private ContainerTag writePattern(Tree<Instance> exampleInstanceTree) {
