@@ -24,6 +24,7 @@ package xyz.ottr.lutra;
 
 public enum Space {
     ;
+    public static final String EMPTY = "";
     public static final String SPACE = " ";
     public static final String INDENT = "    ";
     public static final String LINEBR = System.lineSeparator();

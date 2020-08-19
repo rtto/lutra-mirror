@@ -117,6 +117,7 @@ public class STemplateWriter implements TemplateWriter {
             .map(parameter -> writeParameter(parameter, termWriter))
             .collect(Collectors.joining(STOTTR.Parameters.paramSep)));
         builder.append(STOTTR.Parameters.sigParamsEnd);
+        builder.append(this.writeAnnotations(signature, termWriter));
         return builder;
     }
 
@@ -135,7 +136,6 @@ public class STemplateWriter implements TemplateWriter {
         builder.append(writeSignature(template, termWriter));
         builder.append(STOTTR.Statements.signatureSep);
         builder.append(STOTTR.Statements.bodyStart);
-        builder.append(Space.LINEBR);
         builder.append(writePattern(template, termWriter));
         builder.append(Space.LINEBR);
         builder.append(STOTTR.Statements.bodyEnd);
@@ -197,14 +197,27 @@ public class STemplateWriter implements TemplateWriter {
 
     private String writePattern(Template template, STermWriter termWriter) {
 
-        SInstanceWriter instanceWriter = new SPatternInstanceWriter(termWriter);
+        SInstanceWriter instanceWriter = new SInstanceWriter(termWriter);
         var pattern = template.getPattern();
 
         if (pattern.isEmpty()) {
-            return Space.INDENT + STOTTR.Statements.commentStart + "Empty pattern";
+            return Space.LINEBR + Space.INDENT + STOTTR.Statements.commentStart + "Empty pattern";
         } else {
-            pattern.forEach(instanceWriter);
-            return instanceWriter.write();
+            return pattern.stream()
+                .sorted(instanceWriter.instanceSorter)
+                .map(instanceWriter::writeInstance)
+                .collect(Collectors.joining(STOTTR.Statements.bodyInsSep, Space.LINEBR + Space.INDENT, Space.EMPTY));
         }
+    }
+
+    private String writeAnnotations(Signature signature, STermWriter termWriter) {
+
+        SInstanceWriter instanceWriter = new SInstanceWriter(termWriter);
+
+        return signature.getAnnotations().stream()
+                .sorted(instanceWriter.instanceSorter)
+                .map(instanceWriter::writeInstance)
+                .map(i -> Space.LINEBR + Space.INDENT + STOTTR.Statements.annotationStart +  i)
+                .collect(Collectors.joining(STOTTR.Statements.bodyInsSep));
     }
 }

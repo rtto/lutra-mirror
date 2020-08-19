@@ -181,6 +181,19 @@ public class ParserTest {
     }
 
     @Test
+    public void testSignature2() {
+        testSignatureParsing("<http://example.com#T1> [ ?s ] @@<http://example.com#T2>(true) :: BASE .");
+    }
+
+    @Test
+    public void testSignature3() {
+        testSignatureParsing("<http://example.com#T1> [ ?s ] "
+            + "@@<http://example.com#T2>(true), "
+            + "@@<http://example.com#T2>(true)"
+            + " :: BASE .");
+    }
+
+    @Test
     public void testTemplate1() {
 
         String template = "@prefix rdf:    <http://www.w3.org/1999/02/22-rdf-syntax-ns#> . "

@@ -28,6 +28,7 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.RDFList;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
@@ -87,12 +88,14 @@ public class WTemplateParser implements TemplateParser<Model> {
         var result = SignatureBuilder.builder()
             .iri(this.parseSignatureIRI(signature))
             .parameters(this.parseParameters(model, signature))
+            .annotations(this.parseInstances(model, signature, WOTTR.annotation))
             .build();
 
+        /*
         if (model.contains(signature, WOTTR.annotation, (RDFNode) null)) {
             result.addWarning("The signature " + RDFNodeWriter.toString(signature) + " contains an  "
                 + RDFNodeWriter.toString(WOTTR.annotation) + ", but this is not yet supported.");
-        }
+        }*/
 
         return result;
     }
@@ -100,7 +103,7 @@ public class WTemplateParser implements TemplateParser<Model> {
     private Result<Signature> parseTemplate(Model model, Resource template) {
         return TemplateBuilder.builder()
             .signature(this.parseSignature(model, template))
-            .instances(this.parsePattern(model, template))
+            .instances(this.parseInstances(model, template, WOTTR.pattern))
             .build()
             .map(t -> (Signature)t); // TODO is there a better way?! <? extends Signature> ?
     }
@@ -138,9 +141,9 @@ public class WTemplateParser implements TemplateParser<Model> {
         return Result.aggregate(parameters);
     }
 
-    private Result<Set<Instance>> parsePattern(Model model, Resource template) {
+    private Result<Set<Instance>> parseInstances(Model model, Resource template, Property instanceProperty) {
 
-        var instances = ResultStream.innerOf(model.listObjectsOfProperty(template, WOTTR.pattern))
+        var instances = ResultStream.innerOf(model.listObjectsOfProperty(template, instanceProperty))
             .mapFlatMap(node -> RDFNodes.cast(node, Resource.class))
             .mapFlatMap(ins -> this.instanceParser.parseInstance(model, ins))
             .collect(Collectors.toSet());
