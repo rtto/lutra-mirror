@@ -80,6 +80,8 @@ public class STOTTR {
         public static final String bodyInsSep = ",";
         public static final String baseBody = "BASE";
         public static final String signatureSep = " :: ";
+        public static final String annotationStart = "@@";
+        public static final String annotationSep = ",";
         public static final String statementEnd = " .";
     }
 

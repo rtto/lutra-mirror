@@ -162,6 +162,7 @@ public class DependencyGraph implements TemplateStore {
         log.info("Adding signature " + signature.getIri());
         TemplateNode node = addTemplateNode(signature.getIri());
         node.setParameters(signature.getParameters());
+        node.setAnnotations(signature.getAnnotations());
         node.setType(TemplateNode.getTemplateNodeType(signature));
         return true;
     }
@@ -491,6 +492,7 @@ public class DependencyGraph implements TemplateStore {
         return Signature.superbuilder()
             .iri(templateNode.getIri())
             .parameters(templateNode.getParameters())
+            .annotations(templateNode.getAnnotations())
             .build();
     }
 
@@ -498,6 +500,7 @@ public class DependencyGraph implements TemplateStore {
         return BaseTemplate.builder()
             .iri(templateNode.getIri())
             .parameters(templateNode.getParameters())
+            .annotations(templateNode.getAnnotations())
             .build();
     }
 
@@ -514,6 +517,7 @@ public class DependencyGraph implements TemplateStore {
         return Template.builder()
             .iri(templateNode.getIri())
             .parameters(templateNode.getParameters())
+            .annotations(templateNode.getAnnotations())
             .instances(instances)
             .isEmptyPattern(instances.isEmpty())
             .build();

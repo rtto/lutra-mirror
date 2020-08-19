@@ -67,9 +67,13 @@ public class STemplateParser extends SParser<Signature> implements TemplateParse
     }
 
     public Result<Signature> visitSignature(stOTTRParser.SignatureContext ctx) {
+
+        SInstanceParser instanceParser = new SInstanceParser(getPrefixes(), Map.of());
+
         return SignatureBuilder.builder()
             .iri(parseIRI(ctx))
             .parameters(parseParameters(ctx))
+            .annotations(parseAnnotations(ctx, instanceParser))
             .build();
     }
 
@@ -89,7 +93,7 @@ public class STemplateParser extends SParser<Signature> implements TemplateParse
 
         return TemplateBuilder.builder()
             .signature(signature)
-            .instances(parseInstances(ctx, instanceParser))
+            .instances(parsePattern(ctx, instanceParser))
             .build()
             .map(t -> (Signature)t);
     }
@@ -124,14 +128,27 @@ public class STemplateParser extends SParser<Signature> implements TemplateParse
         return Collections.unmodifiableMap(map);
     }
 
-    private Result<Set<Instance>> parseInstances(stOTTRParser.TemplateContext ctx, SInstanceParser parser) {
 
-        Set<Result<Instance>> resBody = ctx.patternList()
-            .instance()
+    private Result<Set<Instance>> parsePattern(stOTTRParser.TemplateContext ctx, SInstanceParser parser) {
+        return parseInstances(ctx.patternList().instance(), parser);
+    }
+
+    private Result<Set<Instance>> parseAnnotations(stOTTRParser.SignatureContext ctx, SInstanceParser parser) {
+
+        if (ctx.annotationList() == null) {
+            return Result.empty();
+        }
+
+        return ctx.annotationList()
+            .annotation()
             .stream()
-            .map(parser::visitInstance)
-            .collect(Collectors.toSet());
+            .map(stOTTRParser.AnnotationContext::instance)
+            .collect(Collectors.collectingAndThen(Collectors.toList(), list -> parseInstances(list, parser)));
+    }
 
-        return Result.aggregate(resBody);
+    private Result<Set<Instance>> parseInstances(List<stOTTRParser.InstanceContext> ctxs, SInstanceParser parser) {
+        return ctxs.stream()
+            .map(parser::visitInstance)
+            .collect(Collectors.collectingAndThen(Collectors.toSet(), Result::aggregate));
     }
 }

@@ -22,12 +22,14 @@ package xyz.ottr.lutra.wottr.writer;
  * #L%
  */
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.RDFList;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
@@ -78,11 +80,9 @@ public class WTemplateWriter implements TemplateWriter {
             model.setNsPrefixes(this.prefixes);
 
             Resource signatureNode = createSignature(model, signature);
+
             if (signature instanceof Template) {
-                for (Instance instance : ((Template) signature).getPattern()) {
-                    Resource instanceNode = this.instanceWriter.createInstanceNode(model, instance);
-                    model.add(signatureNode, WOTTR.pattern, instanceNode);
-                }
+                addInstances(((Template) signature).getPattern(), signatureNode, WOTTR.pattern, model);
             }
             PrefixMappings.trim(model);
             return model;
@@ -94,21 +94,22 @@ public class WTemplateWriter implements TemplateWriter {
         return RDFIO.writeToString(this.models.get(iri));
     }
 
-    private Resource createSignature(Model model, Signature template) {
+    private Resource createSignature(Model model, Signature signature) {
 
         Resource templateType;
-        if (template instanceof Template) {
+        if (signature instanceof Template) {
             templateType = WOTTR.Template;
-        } else if (template instanceof BaseTemplate) {
+        } else if (signature instanceof BaseTemplate) {
             templateType = WOTTR.BaseTemplate;
         } else {
             templateType = WOTTR.Signature;
         }
 
-        Resource templateIRI = model.createResource(template.getIri());
-        model.add(templateIRI, RDF.type, templateType);
-        addParameters(template.getParameters(), templateIRI, model);
-        return templateIRI;
+        Resource signatureNode = model.createResource(signature.getIri());
+        model.add(signatureNode, RDF.type, templateType);
+        addParameters(signature.getParameters(), signatureNode, model);
+        addInstances(signature.getAnnotations(), signatureNode, WOTTR.annotation, model);
+        return signatureNode;
     }
 
     private void addParameters(List<Parameter> parameters, Resource iri, Model model) {
@@ -142,6 +143,13 @@ public class WTemplateWriter implements TemplateWriter {
             model.add(paramNode, WOTTR.defaultVal, def);
         }
         return paramNode;
+    }
+
+    private void addInstances(Collection<Instance> instances, Resource signature, Property property, Model model) {
+        for (Instance instance : instances) {
+            Resource instanceNode = this.instanceWriter.createInstanceNode(model, instance);
+            model.add(signature, property, instanceNode);
+        }
     }
 
 }

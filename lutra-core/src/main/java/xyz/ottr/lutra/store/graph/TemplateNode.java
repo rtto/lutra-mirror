@@ -25,9 +25,11 @@ package xyz.ottr.lutra.store.graph;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import lombok.Getter;
 import lombok.Setter;
 import xyz.ottr.lutra.model.BaseTemplate;
+import xyz.ottr.lutra.model.Instance;
 import xyz.ottr.lutra.model.Parameter;
 import xyz.ottr.lutra.model.Signature;
 import xyz.ottr.lutra.model.Template;
@@ -55,6 +57,7 @@ public class TemplateNode {
 
     private final String iri;
     private List<Parameter> parameters;
+    private Set<Instance> annotations;
     private Type type;
 
     TemplateNode(String iri, Type type) {

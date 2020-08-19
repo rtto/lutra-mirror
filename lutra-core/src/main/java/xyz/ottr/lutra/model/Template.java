@@ -43,8 +43,8 @@ public class Template extends Signature {
 
     private final @NonNull Set<Instance> pattern;
 
-    private Template(String iri, List<Parameter> parameters, Set<Instance> instances) {
-        super(iri, parameters);
+    private Template(String iri, List<Parameter> parameters, Set<Instance> annotations, Set<Instance> instances) {
+        super(iri, parameters, annotations);
         this.pattern = instances;
         updatePatternVariables();
     }
@@ -59,8 +59,8 @@ public class Template extends Signature {
      * @return
      */
     @Builder
-    public static Template create(String iri, @Singular List<Parameter> parameters, @Singular Set<Instance> instances,
-                                  boolean isEmptyPattern) {
+    public static Template create(String iri, @Singular List<Parameter> parameters, @Singular Set<Instance> annotations,
+                                  @Singular Set<Instance> instances, boolean isEmptyPattern) {
 
         if (isEmptyPattern != instances.isEmpty()) {
             var message = "Creating template with "
@@ -70,7 +70,7 @@ public class Template extends Signature {
             throw new IllegalArgumentException(message);
         }
 
-        return new Template(iri, parameters, instances);
+        return new Template(iri, parameters, annotations, instances);
     }
 
     /**
