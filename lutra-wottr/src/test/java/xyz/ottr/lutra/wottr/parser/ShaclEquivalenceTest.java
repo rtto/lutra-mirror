@@ -57,9 +57,6 @@ public class ShaclEquivalenceTest {
     private static final String incorrect = FilenameUtils.separatorsToSystem("src/test/resources/spec/tests/incorrect/");
 
     private static final Set<String> unsupportedTests = Stream.of(
-            correct + "basetemplate03.ttl", // Annotations
-            correct + "signature10.ttl", // Annotations
-            correct + "signature11.ttl", // Annotations
             incorrect + "basic01a.ttl", // Prefixes 
             incorrect + "basic01b.ttl", // Prefixes 
             incorrect + "basic01c.ttl", // Prefixes 
@@ -69,8 +66,7 @@ public class ShaclEquivalenceTest {
             incorrect + "basic03.ttl",  // Prefixes
             incorrect + "basic04.ttl",  // Prefixes
             incorrect + "instance10.ttl", // Instance checking on types
-            incorrect + "signature06.ttl", // TODO: Fix somehow
-            incorrect + "signature12.ttl" // Annotation
+            incorrect + "signature06.ttl" // TODO: Fix somehow
         ).collect(Collectors.toSet());
     
     private static final Set<String> instanceTests = Stream.of(
@@ -96,7 +92,7 @@ public class ShaclEquivalenceTest {
             incorrect + "instance09.ttl", 
             incorrect + "instance10.ttl", 
             incorrect + "instance11.ttl", 
-            incorrect + "instance12.ttl" 
+            incorrect + "instance12.ttl"
         ).collect(Collectors.toSet());
     
     private final TemplateReader tempReader;
