@@ -27,13 +27,13 @@ import static org.hamcrest.CoreMatchers.is;
 import java.util.stream.Stream;
 import org.apache.jena.rdf.model.Model;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 import xyz.ottr.lutra.model.Instance;
 import xyz.ottr.lutra.system.Result;
 import xyz.ottr.lutra.system.ResultConsumer;
 import xyz.ottr.lutra.wottr.io.RDFIO;
 import xyz.ottr.lutra.wottr.writer.WInstanceWriter;
-
 
 public class BInstanceReaderTest {
 
@@ -82,6 +82,7 @@ public class BInstanceReaderTest {
         printRDFOutput(file);
     }
 
+    @Ignore
     @Test
     public void testCSVSourceMap() {
         String file = ROOT + "maps/instanceMapH2Source.ttl";
