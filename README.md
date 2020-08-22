@@ -1,3 +1,5 @@
+[![Gitter](https://badges.gitter.im/ottr-talk/community.svg)](https://gitter.im/ottr-talk/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
+
 [![codebeat badge](https://codebeat.co/badges/6bafc41c-75e1-4bb3-8e6e-9cddbc36f297)](https://codebeat.co/projects/github-com-rtto-lutra-mirror-develop)[![CodeFactor](https://www.codefactor.io/repository/github/rtto/lutra-mirror/badge)](https://www.codefactor.io/repository/github/rtto/lutra-mirror)
 [![Total alerts](https://img.shields.io/lgtm/alerts/g/rtto/lutra-mirror.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/rtto/lutra-mirror/alerts/)
 [![Language grade: Java](https://img.shields.io/lgtm/grade/java/g/rtto/lutra-mirror.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/rtto/lutra-mirror/context:java)
