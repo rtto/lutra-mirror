@@ -235,8 +235,8 @@
                     </sourceDirectories>
                     <encoding>UTF-8</encoding>
                     <configLocation>config/checkstyle.xml</configLocation>
-                    <suppressionsLocation>config/checkstyle-suppressions.xml</suppressionsLocation>
-                    <suppressionsFileExpression>checkstyle.suppressions.file</suppressionsFileExpression>
+                    <!--suppressionsLocation>config/checkstyle-suppressions.xml</suppressionsLocation>
+                    <suppressionsFileExpression>checkstyle.suppressions.file</suppressionsFileExpression-->
                     <includeTestSourceDirectory>true</includeTestSourceDirectory>
                     <consoleOutput>true</consoleOutput>
                     <linkXRef>false</linkXRef>
