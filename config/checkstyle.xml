@@ -222,6 +222,14 @@
 	  <property name="format" value="(TODO)|(FIXME)"/>
 	</module>
 
+        <module name="DescendantToken">
+            <property name="severity" value="warning"/>
+            <property name="tokens" value="METHOD_CALL"/>
+            <property name="limitedTokens" value="METHOD_DEF"/>
+            <property name="maximumNumber" value="0"/>
+            <property name="maximumMessage" value="Consider using lambdas"/>
+        </module>
+
 	<!-- Lutra: Disabling JavaDoc checks for now -->
         <!--module name="JavadocTagContinuationIndentation"/>
         <module name="NonEmptyAtclauseDescription"/>
