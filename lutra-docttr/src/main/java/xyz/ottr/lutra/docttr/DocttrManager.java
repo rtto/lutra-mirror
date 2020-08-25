@@ -24,6 +24,7 @@ package xyz.ottr.lutra.docttr;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
@@ -64,9 +65,10 @@ public class DocttrManager {
     //private final TemplateManager manager;
     private final PrefixMapping prefixMapping;
     private final TemplateStore templateStore;
+    private final PrintStream outStream;
 
-    public DocttrManager(TemplateManager manager) {
-        //this.manager = manager;
+    public DocttrManager(PrintStream outStream, TemplateManager manager) {
+        this.outStream = outStream;
         this.prefixMapping = manager.getPrefixes();
         this.templateStore = manager.getTemplateStore();
     }
@@ -146,6 +148,8 @@ public class DocttrManager {
 
         writeFile(new HTMLFramesetWriter().write(),
             folder.resolve(FILENAME_FRAMESET));
+
+        this.outStream.println("Wrote index files to " + folder.toString());
     }
 
     private void writeTemplates(Map<String, Result<Signature>> signatures, Path outputFolder) {
@@ -154,7 +158,9 @@ public class DocttrManager {
 
         signatures.forEach((iri, signatureResult) -> {
             var content = templateWriter.write(iri, signatureResult);
-            writeFile(content, outputFolder.resolve(toLocalFilePath(iri)));
+            var file = outputFolder.resolve(toLocalFilePath(iri));
+            writeFile(content, file);
+            this.outStream.println("Wrote " + iri + " to " + file.toString());
         });
     }
 
