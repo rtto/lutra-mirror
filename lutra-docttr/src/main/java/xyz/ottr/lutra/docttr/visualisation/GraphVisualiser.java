@@ -22,10 +22,15 @@ package xyz.ottr.lutra.docttr.visualisation;
  * #L%
  */
 
+import static j2html.TagCreator.*;
+
+import guru.nidi.graphviz.attribute.Rank;
+import guru.nidi.graphviz.engine.Engine;
 import guru.nidi.graphviz.engine.Format;
 import guru.nidi.graphviz.engine.Graphviz;
 import guru.nidi.graphviz.model.Factory;
 import guru.nidi.graphviz.model.MutableGraph;
+import j2html.tags.DomContent;
 import org.apache.jena.shared.PrefixMapping;
 import xyz.ottr.lutra.writer.RDFNodeWriter;
 
@@ -64,7 +69,35 @@ public abstract class GraphVisualiser {
     }
 
     static String renderSVG(MutableGraph graph) {
-        return Graphviz.fromGraph(graph).render(Format.SVG).toString();
+        return renderSVG(Engine.DOT, graph);
+    }
+
+    static String renderSVG(Engine engine, MutableGraph graph) {
+        return Graphviz.fromGraph(graph).engine(engine).render(Format.SVG).toString();
+    }
+
+    static DomContent renderAllEngines(MutableGraph graph) {
+        return div(
+            details(
+                summary("Hierarchical horizontal layout (dot)"),
+                div(rawHtml(renderSVG(Engine.DOT, graph)))
+            ).attr("open", "open"),
+            details(
+                summary(text("Hierarchical vertical layout (dot)")),
+                div(rawHtml(renderSVG(Engine.DOT, graph.graphAttrs().add("rankdir", Rank.RankDir.TOP_TO_BOTTOM))))),
+            details(
+                summary("Spring model layout (neato)"),
+                div(rawHtml(renderSVG(Engine.NEATO, graph)))),
+            details(
+                summary("Spring model layout (fdp)"),
+                div(rawHtml(renderSVG(Engine.FDP, graph)))),
+            details(
+                summary("Radial layout (twopi)"),
+                div(rawHtml(renderSVG(Engine.TWOPI, graph)))),
+            details(
+                summary("Circular layout (circo)"),
+                div(rawHtml(renderSVG(Engine.CIRCO, graph))))
+        );
     }
 
 }

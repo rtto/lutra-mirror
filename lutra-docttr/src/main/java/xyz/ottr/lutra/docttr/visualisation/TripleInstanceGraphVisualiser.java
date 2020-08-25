@@ -22,6 +22,7 @@ package xyz.ottr.lutra.docttr.visualisation;
  * #L%
  */
 
+import guru.nidi.graphviz.attribute.Arrow;
 import guru.nidi.graphviz.attribute.Font;
 import guru.nidi.graphviz.attribute.Label;
 import guru.nidi.graphviz.attribute.Rank;
@@ -29,6 +30,7 @@ import guru.nidi.graphviz.attribute.Style;
 import guru.nidi.graphviz.model.Factory;
 import guru.nidi.graphviz.model.MutableGraph;
 import guru.nidi.graphviz.model.MutableNode;
+import j2html.tags.DomContent;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -37,6 +39,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.apache.jena.shared.PrefixMapping;
 import org.apache.jena.vocabulary.RDF;
+import org.apache.jena.vocabulary.RDFS;
 import xyz.ottr.lutra.OTTR;
 import xyz.ottr.lutra.Space;
 import xyz.ottr.lutra.docttr.TermAction;
@@ -81,11 +84,11 @@ public class TripleInstanceGraphVisualiser extends GraphVisualiser implements Te
         }
     }
 
-    public String draw() {
-        return renderSVG(getGraph());
+    public DomContent draw() {
+        return renderAllEngines(getGraph());
     }
 
-    public String draw(List<Argument> arguments) {
+    public DomContent draw(List<Argument> arguments) {
 
         arguments.stream()
             .map(Argument::getTerm)
@@ -109,11 +112,20 @@ public class TripleInstanceGraphVisualiser extends GraphVisualiser implements Te
             .map(this.toTripleFunction)
             .filter(triple -> !this.excludePredicates.contains(((IRITerm)triple.get(1)).getIri()))
             .forEach(triple -> {
+
+                var predicateIRI = (IRITerm)triple.get(1);
+
                 var subject = getNode(triple.get(0));
                 var object = getNode(triple.get(2));
-                var predicate = Label.html(getLabel((IRITerm)triple.get(1)));
+                var predicate = Label.html(getLabel(predicateIRI));
 
-                graph.add(subject.addLink(Factory.to(object).with(predicate)));
+                var link = Factory.to(object).with(predicate);
+
+                if (predicateIRI.getIri().equals(RDFS.subClassOf.getURI())) {
+                    link = link.with(Arrow.EMPTY);
+                }
+
+                graph.add(subject.addLink(link));
             });
         return graph;
     }

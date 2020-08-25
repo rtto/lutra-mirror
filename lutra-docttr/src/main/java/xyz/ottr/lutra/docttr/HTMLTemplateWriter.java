@@ -148,7 +148,7 @@ public class HTMLTemplateWriter {
         return div(
             h2("Metadata"),
             iff(deprecated, this::writeDeprecation),
-            ul(each(signature.getAnnotations(), annotation -> li(annotation.toString(this.prefixMapping))))
+            ul(each(signature.getAnnotations(), annotation -> li(text(annotation.toString(this.prefixMapping)))))
         );
     }
 
@@ -213,8 +213,9 @@ public class HTMLTemplateWriter {
             b("RDF/wOTTR").withClass("heading"),
             pre(this.serialisationWriter.writeRDF(wexampleInstance)),
             h4("Visualisation of expanded RDF graph"),
-            HTMLFactory.getInfoP("Each resource node is linked to its IRI."),
-            div(rawHtml(expansionViz.draw(exampleInstance.getArguments()))),
+            HTMLFactory.getInfoP("Each resource node is linked to its IRI. Type relationships are not visualised,"
+                + " rather each node contains its type."),
+            expansionViz.draw(exampleInstance.getArguments()),
             h4("Expanded RDF graph"),
             pre(this.serialisationWriter.writeRDF(exampleExpansion)),
             h4("Interactive expansion"),
@@ -267,7 +268,7 @@ public class HTMLTemplateWriter {
             HTMLFactory.getInfoP("The graph shows all the templates that this template depends on. "
                 + "The colour of the node indicates its namespace. "
                 + "Each node is linked to its documentation page."),
-            rawHtml(this.dependencyGraphVisualiser.drawTree(tree)),
+            this.dependencyGraphVisualiser.drawTree(tree),
             h4("List of dependencies"),
             HTMLFactory.getInfoP("The number in parenthesis is the number of instances of each template."),
             writeDependenciesList(tree),

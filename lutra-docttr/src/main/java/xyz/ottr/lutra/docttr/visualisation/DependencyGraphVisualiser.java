@@ -27,6 +27,7 @@ import guru.nidi.graphviz.attribute.Style;
 import guru.nidi.graphviz.model.Factory;
 import guru.nidi.graphviz.model.MutableGraph;
 import guru.nidi.graphviz.model.MutableNode;
+import j2html.tags.DomContent;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
@@ -51,7 +52,7 @@ public class DependencyGraphVisualiser extends GraphVisualiser {
     }
 
     // transitively draw all dependencies from iris
-    public String drawGraph(String root, Collection<String> iris, TemplateStore store) {
+    public DomContent drawGraph(String root, Collection<String> iris, TemplateStore store) {
 
         var graph = getGraph();
 
@@ -73,10 +74,10 @@ public class DependencyGraphVisualiser extends GraphVisualiser {
             }
         }
 
-        return renderSVG(graph);
+        return renderAllEngines(graph);
     }
 
-    public String drawTree(Tree<String> tree) {
+    public DomContent drawTree(Tree<String> tree) {
 
         var graph = getGraph();
 
@@ -89,14 +90,14 @@ public class DependencyGraphVisualiser extends GraphVisualiser {
                     uriNode(signature.getRoot(), rootFolder, 1)
                         .addLink(uriNode(child.getRoot(), rootFolder, 1)))));
 
-        return renderSVG(graph);
+        return renderAllEngines(graph);
     }
-
 
     /*
         Get node with url relative to root.
     */
-    private MutableNode uriNode(String uri, String root, int parents) {
+    protected MutableNode uriNode(String uri, String root, int parents) {
+
         var node = Factory.mutNode(shortenURI(uri))
             .add(Style.FILLED)
             .add("fillcolor", NamespaceColours.getColourByIRI(uri));

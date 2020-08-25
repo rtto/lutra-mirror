@@ -32,6 +32,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 import org.apache.jena.shared.PrefixMapping;
 import xyz.ottr.lutra.docttr.visualisation.DependencyGraphVisualiser;
+import xyz.ottr.lutra.docttr.visualisation.ModuleDependencyGraphVisualiser;
 import xyz.ottr.lutra.model.Signature;
 import xyz.ottr.lutra.store.TemplateStore;
 import xyz.ottr.lutra.system.Result;
@@ -48,7 +49,8 @@ public class HTMLIndexWriter extends HTMLMenuWriter {
 
     public String write(String root, Map<String, Result<Signature>> iris) {
 
-        var graphViz = new DependencyGraphVisualiser(this.prefixMapping);
+        var iriDepViz = new DependencyGraphVisualiser(this.prefixMapping);
+        var modDepViz = new ModuleDependencyGraphVisualiser(this.prefixMapping);
 
         return document(html(
             HTMLFactory.getHead("OTTR template library " + Objects.toString(root, "")),
@@ -60,9 +62,16 @@ public class HTMLIndexWriter extends HTMLMenuWriter {
                 ),
                 h2("Metrics"),
                 writeMetrics(root, iris),
-                h2("Dependency graph"),
-                HTMLFactory.getInfoP("Each template is linked to its documentation page. The colour of the node indicates its namespace. "),
-                rawHtml(graphViz.drawGraph(root, iris.keySet(), this.store)),
+                h2("Dependencies"),
+                HTMLFactory.getInfoP("Each graph is visualised using different layouts."
+                    + "Each node is linked to its documentation page. "
+                    + "The colour of the node indicates its namespace. "),
+                h3("Modules and packages"),
+                HTMLFactory.getInfoP("Dependencies between modules and packages."),
+                modDepViz.drawGraph(root, iris.keySet(), this.store),
+                h3("Templates"),
+                HTMLFactory.getInfoP("Dependencies between templates."),
+                iriDepViz.drawGraph(root, iris.keySet(), this.store),
                 h2("List of templates"),
                 HTMLFactory.getInfoP(join(
                     text("These are the templates in this library"),

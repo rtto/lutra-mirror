@@ -211,7 +211,7 @@ public class DocttrManager {
      * @return
      */
     @SuppressFBWarnings("NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE")
-    static String toLocalPath(String iri, String relativeTo, int parents) {
+    public static String toLocalPath(String iri, String relativeTo, int parents) {
 
         if (relativeTo == null) {
             return toLocalPath(iri);
