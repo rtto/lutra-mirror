@@ -24,6 +24,7 @@ package xyz.ottr.lutra.stottr.writer;
 
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -113,9 +114,7 @@ public class STemplateWriter implements TemplateWriter {
         StringBuilder builder = new StringBuilder();
         builder.append(termWriter.writeIRI(signature.getIri()));
         builder.append(STOTTR.Parameters.sigParamsStart);
-        builder.append(signature.getParameters().stream()
-            .map(parameter -> writeParameter(parameter, termWriter))
-            .collect(Collectors.joining(STOTTR.Parameters.paramSep)));
+        builder.append(this.writeParameters(signature, termWriter));
         builder.append(STOTTR.Parameters.sigParamsEnd);
         builder.append(this.writeAnnotations(signature, termWriter));
         return builder;
@@ -139,6 +138,16 @@ public class STemplateWriter implements TemplateWriter {
         builder.append(writePattern(template, termWriter));
         builder.append(Space.LINEBR);
         builder.append(STOTTR.Statements.bodyEnd);
+        return builder;
+    }
+
+    private StringBuilder writeParameters(Signature signature, STermWriter termWriter) {
+
+        StringBuilder builder = new StringBuilder();
+        builder.append(signature.getParameters().stream()
+            .map(parameter -> writeParameter(parameter, termWriter))
+            .map(p -> Space.LINEBR + Space.INDENT + p)
+            .collect(Collectors.joining(STOTTR.Parameters.paramSep, Space.EMPTY, Space.LINEBR)));
         return builder;
     }
 
