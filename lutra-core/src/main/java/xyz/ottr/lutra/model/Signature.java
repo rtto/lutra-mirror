@@ -130,8 +130,7 @@ public class Signature implements ModelElement {
             var list = (ListType) type;
             return new ListTerm(
                 getExampleTerm(list.getInner(), name + index + "-", 1),
-                getExampleTerm(list.getInner(), name + index + "-", 2),
-                getExampleTerm(list.getInner(), name + index + "-", 3));
+                getExampleTerm(list.getInner(), name + index + "-", 2));
         } else {
             return new BlankNodeTerm(name + index);
         }

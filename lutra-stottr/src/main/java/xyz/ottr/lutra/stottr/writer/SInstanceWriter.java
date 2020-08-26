@@ -43,7 +43,7 @@ public class SInstanceWriter implements InstanceWriter {
     protected final List<Instance> instances;
     private final STermWriter termWriter;
 
-    SInstanceWriter(STermWriter termWriter) {
+    protected SInstanceWriter(STermWriter termWriter) {
         this.instances = new LinkedList<>();
         this.termWriter = termWriter;
     }
@@ -97,7 +97,7 @@ public class SInstanceWriter implements InstanceWriter {
         return builder.toString();
     }
 
-    private StringBuilder writeArgument(Argument arg) {
+    protected StringBuilder writeArgument(Argument arg) {
 
         StringBuilder builder = new StringBuilder();
 

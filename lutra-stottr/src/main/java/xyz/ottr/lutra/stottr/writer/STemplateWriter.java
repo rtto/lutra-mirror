@@ -215,18 +215,19 @@ public class STemplateWriter implements TemplateWriter {
             return pattern.stream()
                 .sorted(instanceWriter.instanceSorter)
                 .map(instanceWriter::writeInstance)
-                .collect(Collectors.joining(STOTTR.Statements.bodyInsSep, Space.LINEBR + Space.INDENT, Space.EMPTY));
+                .map(i -> Space.LINEBR + Space.INDENT + i)
+                .collect(Collectors.joining(STOTTR.Statements.bodyInsSep));
         }
     }
 
     private String writeAnnotations(Signature signature, STermWriter termWriter) {
 
-        SInstanceWriter instanceWriter = new SInstanceWriter(termWriter);
+        SInstanceWriter instanceWriter = new SAnnotationInstanceWriter(termWriter);
 
         return signature.getAnnotations().stream()
                 .sorted(instanceWriter.instanceSorter)
                 .map(instanceWriter::writeInstance)
-                .map(i -> Space.LINEBR + Space.INDENT + STOTTR.Statements.annotationStart +  i)
-                .collect(Collectors.joining(STOTTR.Statements.bodyInsSep));
+                .map(i -> Space.LINEBR + STOTTR.Statements.annotationStart +  i)
+                .collect(Collectors.joining(STOTTR.Statements.bodyInsSep, Space.EMPTY, Space.LINEBR));
     }
 }
