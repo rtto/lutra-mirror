@@ -52,11 +52,10 @@ import xyz.ottr.lutra.model.Instance;
 import xyz.ottr.lutra.model.Signature;
 import xyz.ottr.lutra.model.Substitution;
 import xyz.ottr.lutra.model.terms.IRITerm;
-import xyz.ottr.lutra.model.terms.ListTerm;
-import xyz.ottr.lutra.model.terms.LiteralTerm;
 import xyz.ottr.lutra.store.TemplateStore;
 import xyz.ottr.lutra.system.Message;
 import xyz.ottr.lutra.system.Result;
+import xyz.ottr.lutra.system.ResultStream;
 import xyz.ottr.lutra.wottr.writer.WInstanceWriter;
 import xyz.ottr.lutra.writer.RDFNodeWriter;
 
@@ -119,9 +118,7 @@ public class HTMLTemplateWriter {
                         p(
                             text("URI: "),
                             code(a(signature.getIri()).withHref(signature.getIri()))
-                        ),
-                        h4("stOTTR serialisation"),
-                        pre(this.serialisationWriter.writeStottr(signature))
+                        )
                     ),
                     writeAnnotations(signature),
                     writePattern(expansionTree),
@@ -141,63 +138,36 @@ public class HTMLTemplateWriter {
 
         var annotations = signature.getAnnotations();
 
-        var deprecated = annotations.stream()
-            .filter(i -> i.getIri().equals(DocttrManager.NS_DOCTTR + "Deprecated"))
-            .findAny();
+        WInstanceWriter instanceWriter = new WInstanceWriter(this.prefixMapping);
 
-        return div(
-            h2("Metadata"),
-            iff(deprecated, this::writeDeprecation),
-            ul(each(signature.getAnnotations(), annotation -> li(text(annotation.toString(this.prefixMapping)))))
-        );
-    }
+        ResultStream.innerOf(annotations)
+            .innerFlatMap(this.store::expandInstanceFetch)
+            .innerForEach(instanceWriter);
 
-    private ContainerTag writeDeprecation(Instance deprecated) {
+        Model metaData = instanceWriter.writeToModel();
+        metaData.setNsPrefixes(this.prefixMapping);
 
-        var args = deprecated.getArguments();
-
-        // TODO visitor for terms. get string value.
-        var explanation = ((LiteralTerm)args.get(1).getTerm()).getValue();
-        var seeAlso = ((ListTerm)args.get(2).getTerm()).asList().stream()
-            .map(term -> (IRITerm)term)
-            .map(IRITerm::getIri)
-            .collect(Collectors.toList());
-        var when = ((LiteralTerm)args.get(3).getTerm()).getValue();
-        var who = ((ListTerm)args.get(4).getTerm()).asList().stream()
-            .map(term -> (IRITerm)term)
-            .map(IRITerm::getIri)
-            .collect(Collectors.toList());
-        var comments = ((ListTerm)args.get(5).getTerm()).asList().stream()
-            .map(term -> (LiteralTerm)term)
-            .map(LiteralTerm::getValue)
-            .collect(Collectors.toList());
+        var modelLister = new ModelListRenderer(metaData);
 
         return
-            div(
-                b("This template is deprecated"),
-                p(explanation),
-                iff(!seeAlso.isEmpty(),
-                    iffElse(seeAlso.size() == 1,
-                        p(seeAlso.get(0)),
-                        ul(each(seeAlso, link -> li(a(link).withHref(link))))
-                    )
-                ),
-                // TODO make this a "Says who?" button, inspired by "oh yeah?" by timbl.
-                p(
-                    text("The when, who and comments for this fact: "),
-                    span(when),
-                    span(who.stream().collect(joining(", "))),
-                    span(comments.stream().collect(joining("  ")))
+            iff(!metaData.isEmpty(),
+                div(
+                    h2("Metadata"),
+                    HTMLFactory.getInfoP("This section contains the data represented by the signature's annotation instances."),
+                    modelLister.drawList(signature.getIri()),
+                    details(
+                        summary("Metadata as RDF graph"),
+                        pre(this.serialisationWriter.writeRDF(metaData))
+                    ) //, ul(each(annotations, a -> li(a.toString(this.prefixMapping))))
                 )
-            ).withStyle("border: 1px solid red");
+            );
     }
 
     private ContainerTag writePattern(Tree<Instance> exampleInstanceTree) {
 
         var exampleInstance = exampleInstanceTree.getRoot();
-        var exampleExpansion = this.getExampleExpansion(exampleInstance);
+        var exampleExpansion = this.getExpansion(exampleInstance);
         var wexampleInstance = this.serialisationWriter.writeWottrModel(exampleInstance);
-
         var expansionViz = new TripleInstanceGraphVisualiser(this.prefixMapping);
         this.store.expandInstanceWithoutChecks(exampleInstance)
             .innerForEach(expansionViz);
@@ -471,7 +441,7 @@ public class HTMLTemplateWriter {
         return RDFNodeWriter.toString(this.prefixMapping, iri);
     }
 
-    private Model getExampleExpansion(Instance instance) {
+    private Model getExpansion(Instance instance) {
         WInstanceWriter instanceWriter = new WInstanceWriter(this.prefixMapping);
         this.store.expandInstanceWithoutChecks(instance)
             .innerForEach(instanceWriter);

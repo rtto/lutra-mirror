@@ -9,6 +9,7 @@
     <!-- all HTMLWriters make heavy use of static imports for j2html -->
     <suppress checks="AvoidStarImport" files=".*docttr/HTML.*\.java"/>
     <suppress checks="AvoidStarImport" files=".*docttr/TreeViewWriter\.java"/>
+    <suppress checks="AvoidStarImport" files=".*docttr/ModelListRenderer.java"/>
     <suppress checks="AvoidStarImport" files=".*docttr/visualisation/GraphVisualiser\.java"/>
 
 </suppressions>
