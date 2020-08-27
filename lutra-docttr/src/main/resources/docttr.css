@@ -87,4 +87,19 @@ p.treeviewbuttons .button {
     margin-right: 5px;
 }
 
+div#ToC {
+  position:fixed;
+  top:0;
+  right:0;
+  padding: 10px;
+  font-size: 80%;
+  background-color: rgba(255, 255, 255, 0.7);
+}
+
+div#ToC ul {
+  margin: 0;
+  padding-left: 10px;
+  margin-top: 3px;
+}
+
 

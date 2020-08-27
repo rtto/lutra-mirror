@@ -129,7 +129,8 @@ public class HTMLTemplateWriter {
                     HTMLFactory.getPrefixDiv(this.prefixMapping)
                 ),
                 HTMLFactory.getFooterDiv(),
-                HTMLFactory.getScripts()
+                HTMLFactory.getScripts(),
+                scriptWithInlineFile_min("/toc.js")
             )
         );
     }
