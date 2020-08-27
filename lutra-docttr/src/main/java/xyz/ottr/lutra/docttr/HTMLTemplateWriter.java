@@ -67,6 +67,8 @@ public class HTMLTemplateWriter {
     private final SerialisationWriter serialisationWriter;
     private final DependencyGraphVisualiser dependencyGraphVisualiser;
 
+    private ContainerTag tocList;
+
     public HTMLTemplateWriter(PrefixMapping prefixMapping, TemplateStore store) {
         this.prefixMapping = prefixMapping;
         this.prefixMapping.withDefaultMappings(OTTR.getStandardLibraryPrefixes());
@@ -104,12 +106,16 @@ public class HTMLTemplateWriter {
 
     private ContainerTag getHTML(Signature signature) {
 
+        this.tocList = ul(li(a("top").withHref("#top")));
+
         var exampleInstance = signature.getExampleInstance();
         var expansionTree = getExpansionTree(exampleInstance);
 
         return html(
             getHead(signature),
             body(
+                span().withId("top"),
+                div(b("Contents"), tocList).withId("ToC"),
                 h1(join(
                     signature.getClass().getSimpleName() + ": ",
                     code(RDFNodeWriter.toString(this.prefixMapping, signature.getIri())))),
@@ -126,13 +132,18 @@ public class HTMLTemplateWriter {
                     writeMetrics(expansionTree),
                     writeSerialisations(signature),
 
+                    getTOCHeading("Prefixes"),
                     HTMLFactory.getPrefixDiv(this.prefixMapping)
                 ),
                 HTMLFactory.getFooterDiv(),
-                HTMLFactory.getScripts(),
-                scriptWithInlineFile_min("/toc.js")
+                HTMLFactory.getScripts()
             )
         );
+    }
+
+    private ContainerTag getTOCHeading(String heading) {
+        tocList.with(li(a(heading).withHref("#" + heading)));
+        return h2(heading).withId(heading);
     }
 
     private ContainerTag writeAnnotations(Signature signature) {
@@ -153,7 +164,7 @@ public class HTMLTemplateWriter {
         return
             iff(!metaData.isEmpty(),
                 div(
-                    h2("Metadata"),
+                    getTOCHeading("Metadata"),
                     HTMLFactory.getInfoP("This section contains the data represented by the signature's annotation instances."),
                     modelLister.drawList(signature.getIri()),
                     details(
@@ -174,7 +185,7 @@ public class HTMLTemplateWriter {
             .innerForEach(expansionViz);
 
         return div(
-            h2(text("Pattern")),
+            getTOCHeading("Pattern"),
             HTMLFactory.getInfoP("The pattern of the template is illustrated by expanding a generated instance. "
                 + "Below the generated instance is shown in different serialisations,"
                 + " and its expansion is presented in different formats."),
@@ -234,7 +245,7 @@ public class HTMLTemplateWriter {
         var tree = getDependencyTree(signature);
 
         return div(
-            h2("Dependencies"),
+            getTOCHeading("Dependencies"),
             h4("Dependency graph"),
             HTMLFactory.getInfoP("The graph shows all the templates that this template depends on. "
                 + "The colour of the node indicates its namespace. "
@@ -319,7 +330,7 @@ public class HTMLTemplateWriter {
             .collect(Collectors.toList());
 
         return div(
-            h2("Metrics"),
+            getTOCHeading("Metrics"),
             HTMLFactory.getInfoP("Dependency graph metrics. "
                 + "Depth is the number of steps to a leaf node in the dependency graph. "
                 + "Branching is the number of outgoing edges from a node."),
@@ -407,7 +418,7 @@ public class HTMLTemplateWriter {
 
     private DomContent writeSerialisations(Signature signature) {
         return div(
-            h2("Serialisations"),
+            getTOCHeading("Serialisations"),
             div(
                 h4("stOTTR"),
                 pre(this.serialisationWriter.writeStottr(signature)),

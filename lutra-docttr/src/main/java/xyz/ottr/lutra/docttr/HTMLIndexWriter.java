@@ -78,6 +78,7 @@ public class HTMLIndexWriter extends HTMLMenuWriter {
                     iff(root != null, join(text(" those IRI starts with "), code(root))),
                     text(", grouped by their namespace."))),
                 div(getSignatureList(root, iris))),
+                h2("Prefixes"),
                 HTMLFactory.getPrefixDiv(this.prefixMapping),
                 HTMLFactory.getFooterDiv(),
                 HTMLFactory.getScripts()
