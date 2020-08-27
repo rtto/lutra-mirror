@@ -24,7 +24,6 @@ package xyz.ottr.lutra.stottr.writer;
 
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -100,7 +99,7 @@ public class STemplateWriter implements TemplateWriter {
 
         builder.append(STOTTR.Statements.statementEnd);
 
-        // Write used prefixes at start of String
+        // Write prefixes at start of String
         if (includePrefixes) {
             builder.insert(0, SPrefixWriter.write(termWriter.getUsedPrefixes()) + Space.LINEBR2);
         }
@@ -113,9 +112,7 @@ public class STemplateWriter implements TemplateWriter {
 
         StringBuilder builder = new StringBuilder();
         builder.append(termWriter.writeIRI(signature.getIri()));
-        builder.append(STOTTR.Parameters.sigParamsStart);
         builder.append(this.writeParameters(signature, termWriter));
-        builder.append(STOTTR.Parameters.sigParamsEnd);
         builder.append(this.writeAnnotations(signature, termWriter));
         return builder;
     }
@@ -147,7 +144,10 @@ public class STemplateWriter implements TemplateWriter {
         builder.append(signature.getParameters().stream()
             .map(parameter -> writeParameter(parameter, termWriter))
             .map(p -> Space.LINEBR + Space.INDENT + p)
-            .collect(Collectors.joining(STOTTR.Parameters.paramSep, Space.EMPTY, Space.LINEBR)));
+            .collect(Collectors.joining(
+                STOTTR.Parameters.paramSep,
+                STOTTR.Parameters.sigParamsStart,
+                Space.LINEBR + STOTTR.Parameters.sigParamsEnd)));
         return builder;
     }
 
@@ -224,10 +224,16 @@ public class STemplateWriter implements TemplateWriter {
 
         SInstanceWriter instanceWriter = new SAnnotationInstanceWriter(termWriter);
 
-        return signature.getAnnotations().stream()
+        var annotations = signature.getAnnotations().stream()
                 .sorted(instanceWriter.instanceSorter)
                 .map(instanceWriter::writeInstance)
                 .map(i -> Space.LINEBR + STOTTR.Statements.annotationStart +  i)
-                .collect(Collectors.joining(STOTTR.Statements.bodyInsSep, Space.EMPTY, Space.LINEBR));
+                .collect(Collectors.joining(STOTTR.Statements.bodyInsSep));
+
+        if (!annotations.isEmpty()) {
+            annotations += Space.LINEBR;
+        }
+
+        return annotations;
     }
 }

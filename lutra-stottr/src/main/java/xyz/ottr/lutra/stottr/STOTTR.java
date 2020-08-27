@@ -51,6 +51,7 @@ public class STOTTR {
         public static final String insArgStart = "(";
         public static final String insArgEnd = ")";
         public static final String insArgSep = ", ";
+        public static final String annoArgSep = ",";
     }
 
     public enum Types {
@@ -108,7 +109,7 @@ public class STOTTR {
         ;
         public static final String sigParamsStart = "[";
         public static final String sigParamsEnd = "]";
-        public static final String paramSep = ", ";
+        public static final String paramSep = ",";
         public static final String optional = "?";
         public static final String nonBlank = "!";
         public static final String defaultValSep = "=";

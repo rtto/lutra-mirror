@@ -88,13 +88,15 @@ public class SInstanceWriter implements InstanceWriter {
         }
 
         builder.append(this.termWriter.writeIRI(instance.getIri()));
-        builder.append(STOTTR.Terms.insArgStart);
-        builder.append(instance.getArguments().stream()
-            .map(this::writeArgument)
-            .collect(Collectors.joining(STOTTR.Terms.insArgSep)));
-        builder.append(STOTTR.Terms.insArgEnd);
+        builder.append(this.writeArguments(instance.getArguments()));
 
         return builder.toString();
+    }
+
+    protected String writeArguments(List<Argument> args) {
+        return args.stream()
+            .map(this::writeArgument)
+            .collect(Collectors.joining(STOTTR.Terms.insArgSep, STOTTR.Terms.insArgStart, STOTTR.Terms.insArgEnd));
     }
 
     protected StringBuilder writeArgument(Argument arg) {

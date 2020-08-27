@@ -22,13 +22,22 @@ package xyz.ottr.lutra.stottr.writer;
  * #L%
  */
 
+import java.util.List;
+import java.util.stream.Collectors;
 import xyz.ottr.lutra.Space;
 import xyz.ottr.lutra.model.Argument;
+import xyz.ottr.lutra.stottr.STOTTR;
 
 public class SAnnotationInstanceWriter extends SInstanceWriter {
 
     protected SAnnotationInstanceWriter(STermWriter termWriter) {
         super(termWriter);
+    }
+
+    protected String writeArguments(List<Argument> args) {
+        return args.stream()
+            .map(this::writeArgument)
+            .collect(Collectors.joining(STOTTR.Terms.annoArgSep, STOTTR.Terms.insArgStart, STOTTR.Terms.insArgEnd));
     }
 
     protected StringBuilder writeArgument(Argument arg) {
