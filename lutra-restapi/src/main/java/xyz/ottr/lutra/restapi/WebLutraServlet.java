@@ -50,13 +50,17 @@ public class WebLutraServlet extends HttpServlet {
 
     private static final long serialVersionUID = -7342968018534639139L;
 
-    private static final List<String> originWhitelist = List.of(
+    private static final List<String> originWhitelist = Arrays.asList(
+        "https://primer.ottr.xyz",
+        "https://dev.primer.ottr.xyz",
         "https://weblutra.ottr.xyz",
         "https://ottr.xyz",
         "https://www.ottr.xyz",
         "https://spec.ottr.xyz",
         "https://dev.spec.ottr.xyz",
         // http too:
+        "http://primer.ottr.xyz",
+        "http://dev.primer.ottr.xyz",
         "http://weblutra.ottr.xyz",
         "http://ottr.xyz",
         "http://www.ottr.xyz",

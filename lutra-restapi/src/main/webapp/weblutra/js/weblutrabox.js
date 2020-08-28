@@ -162,8 +162,8 @@ $(function() {
 			+ htmlToggleButton($(this).attr("id"), "Output")
 			+ popup("Format", "outputFormat", ["wottr", "stottr"])
 			+ popup("Action", "mode", ["expand", "format", "lint" /*, "expandLibrary", "formatLibrary" */ ])
-			+ popup("Fetch templates", "fetchMissing", ["true", "false"])
-		    	+ popup("Load tpl.ottr.xyz", "loadStdLib", ["true", "false"])
+			//+ popup("Fetch templates", "fetchMissing", ["true", "false"])
+		    //+ popup("Load tpl.ottr.xyz", "loadStdLib", ["true", "false"])
 			+ "<span class='lutra-send'> Run &#9654; </span>"
 			+ "</div>"
 		)
