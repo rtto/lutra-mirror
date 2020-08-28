@@ -28,6 +28,7 @@ import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
+import java.util.ArrayList;
 import java.util.List;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServlet;
@@ -50,23 +51,17 @@ public class WebLutraServlet extends HttpServlet {
 
     private static final long serialVersionUID = -7342968018534639139L;
 
-    private static final List<String> originWhitelist = Arrays.asList(
-        "https://primer.ottr.xyz",
-        "https://dev.primer.ottr.xyz",
-        "https://weblutra.ottr.xyz",
-        "https://ottr.xyz",
-        "https://www.ottr.xyz",
-        "https://spec.ottr.xyz",
-        "https://dev.spec.ottr.xyz",
-        // http too:
-        "http://primer.ottr.xyz",
-        "http://dev.primer.ottr.xyz",
-        "http://weblutra.ottr.xyz",
-        "http://ottr.xyz",
-        "http://www.ottr.xyz",
-        "http://spec.ottr.xyz",
-        "http://dev.spec.ottr.xyz"
-    );
+    private static final List<String> originWhitelist;
+
+    static {
+        var domains = new ArrayList<String>();
+        List.of("", "weblutra.", "www.", "spec.", "primer.", "dev.spec.").stream()
+            .forEach(sub -> {
+                domains.add("http://" + sub + "ottr.xyz");
+                domains.add("https://" + sub + "ottr.xyz");
+            });
+        originWhitelist = domains;
+    }
     
     private static final String repoLibrary = "https://gitlab.com/ottr/templates.git";
 
