@@ -143,13 +143,14 @@ $(function() {
 	    }
 	);
 
+
 	// Add menu to library
 	$(me).children("div." + conLibraryCls).find("textarea").each(
 	    function(){
 		$(this).attr("name", conLibraryCls)
 		    .before("<div class='menu'>"
 			    + htmlToggleButton($(this).attr("id"), "Library")
-			    + popup("Format", "libraryFormat", ["stottr", "wottr"])
+			    + popup("Format", "libraryFormat", ["stottr" /*, "wottr"*/ ])
 			    + "</div>"
 			   )}
 	);
