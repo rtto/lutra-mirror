@@ -37,6 +37,7 @@ import xyz.ottr.lutra.writer.RDFNodeWriter;
 public abstract class GraphVisualiser {
 
     private final PrefixMapping prefixMapping;
+    private static final int TOTALMEMORY = 100000000;
 
     GraphVisualiser(PrefixMapping prefixMapping) {
         this.prefixMapping = prefixMapping;
@@ -73,7 +74,7 @@ public abstract class GraphVisualiser {
     }
 
     static String renderSVG(Engine engine, MutableGraph graph) {
-        return Graphviz.fromGraph(graph).engine(engine).render(Format.SVG).toString();
+        return Graphviz.fromGraph(graph).totalMemory(TOTALMEMORY).engine(engine).render(Format.SVG).toString();
     }
 
     static DomContent renderAllEngines(MutableGraph graph) {
