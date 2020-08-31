@@ -142,10 +142,10 @@ public class ModelListRenderer {
             var backward = propertyMap.get(p).stream().filter(s -> s.isInverse()).collect(Collectors.toList());
 
             if (!forward.isEmpty()) {
-                list.with(dt(print(p)), dd(print(forward)));
+                list.with(dt(print(p)).withClass(p.getLocalName()), dd(print(forward)));
             }
             if (!backward.isEmpty()) {
-                list.with(dt(text("inverse of "), print(p)), dd(print(backward)));
+                list.with(dt(text("inverse of "), print(p)).withClass("inv-" + p.getLocalName()), dd(print(backward)));
             }
         });
 
