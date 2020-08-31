@@ -41,7 +41,7 @@
                         </goals>
                         <configuration>
                             <unpack>true</unpack>
-                            <url>http://primer.ottr.xyz/master.zip</url>
+                            <url>https://primer.ottr.xyz/master.zip</url>
                             <outputFileName>master.zip</outputFileName>
                             <outputDirectory>${project.basedir}/src/test/resources/primer</outputDirectory>
                             <!--md5>MD5 SUM HERE</md5 -->

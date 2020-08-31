@@ -143,13 +143,14 @@ $(function() {
 	    }
 	);
 
+
 	// Add menu to library
 	$(me).children("div." + conLibraryCls).find("textarea").each(
 	    function(){
 		$(this).attr("name", conLibraryCls)
 		    .before("<div class='menu'>"
 			    + htmlToggleButton($(this).attr("id"), "Library")
-			    + popup("Format", "libraryFormat", ["stottr", "wottr"])
+			    + popup("Format", "libraryFormat", ["stottr" /*, "wottr"*/ ])
 			    + "</div>"
 			   )}
 	);
@@ -162,8 +163,8 @@ $(function() {
 			+ htmlToggleButton($(this).attr("id"), "Output")
 			+ popup("Format", "outputFormat", ["wottr", "stottr"])
 			+ popup("Action", "mode", ["expand", "format", "lint" /*, "expandLibrary", "formatLibrary" */ ])
-			+ popup("Fetch templates", "fetchMissing", ["true", "false"])
-		    	+ popup("Load tpl.ottr.xyz", "loadStdLib", ["true", "false"])
+			//+ popup("Fetch templates", "fetchMissing", ["true", "false"])
+		    //+ popup("Load tpl.ottr.xyz", "loadStdLib", ["true", "false"])
 			+ "<span class='lutra-send'> Run &#9654; </span>"
 			+ "</div>"
 		)

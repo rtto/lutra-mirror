@@ -22,23 +22,18 @@ package xyz.ottr.lutra.restapi;
  * #L%
  */
 
-import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.nio.file.Files;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
+import java.util.ArrayList;
 import java.util.List;
-import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
-import org.apache.commons.lang3.ObjectUtils;
-import org.eclipse.jgit.api.Git;
-import org.eclipse.jgit.api.errors.GitAPIException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import xyz.ottr.lutra.bottr.BOTTR;
@@ -50,26 +45,26 @@ public class WebLutraServlet extends HttpServlet {
 
     private static final long serialVersionUID = -7342968018534639139L;
 
-    private static final List<String> originWhitelist = List.of(
-        "https://weblutra.ottr.xyz",
-        "https://ottr.xyz",
-        "https://www.ottr.xyz",
-        "https://spec.ottr.xyz",
-        "https://dev.spec.ottr.xyz",
-        // http too:
-        "http://weblutra.ottr.xyz",
-        "http://ottr.xyz",
-        "http://www.ottr.xyz",
-        "http://spec.ottr.xyz",
-        "http://dev.spec.ottr.xyz"
-    );
-    
+    private static final List<String> originWhitelist;
+
+    static {
+        var domains = new ArrayList<String>();
+        List.of("", "weblutra.", "www.", "spec.", "primer.", "dev.spec.").stream()
+            .forEach(sub -> {
+                domains.add("http://" + sub + "ottr.xyz");
+                domains.add("https://" + sub + "ottr.xyz");
+            });
+        originWhitelist = domains;
+    }
+
+    /*
     private static final String repoLibrary = "https://gitlab.com/ottr/templates.git";
 
     private static final String attrLibraryRepo = "libraryRepo";
     private static final String attrLastPullTime = "lastPullTime";
 
     private static final long pullInterval = 1000 * 60 * 10; // update repo every 10 mins
+    */
 
     private static final long MAX_FILE_SIZE = 100 * 1024;
     private static final long MAX_REQUEST_SIZE = 5 * MAX_FILE_SIZE;
@@ -78,6 +73,7 @@ public class WebLutraServlet extends HttpServlet {
         BOTTR.Settings.setRDFSourceQueryLimit(200);
     }
 
+    /*
     private void updateLibrary() throws IOException, GitAPIException {
 
         ServletContext context = getServletContext();
@@ -105,7 +101,7 @@ public class WebLutraServlet extends HttpServlet {
             Git git = Git.open(repo);
             git.pull();
         }
-    }
+    }*/
 
     private ServletFileUpload initServletFileUpload() {
         DiskFileItemFactory factory = new DiskFileItemFactory();
@@ -133,10 +129,6 @@ public class WebLutraServlet extends HttpServlet {
     private void doIt(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
         CLIWrapper cli = new CLIWrapper();
-
-        updateLibrary();
-        File repo = (File) getServletContext().getAttribute(attrLibraryRepo);
-        cli.setTplLibrary(repo.getAbsolutePath());
 
         ServletFileUpload uploader = initServletFileUpload();
         List<FileItem> fileItems = uploader.parseRequest(request);
@@ -173,23 +165,22 @@ public class WebLutraServlet extends HttpServlet {
                     case "mode":
                         cli.setMode(item.getString());
                         break;
-                    case "fetchMissing":
-                        cli.setFetchMissing("true".equalsIgnoreCase(item.getString()));
-                        break;
-                    case "loadStdLib":
-                        cli.setLoadTplLibrary("true".equalsIgnoreCase(item.getString()));
-                        break;
+                    // TODO disable fetching to protect tpl.ottr.xyz server
+                    //case "fetchMissing":
+                    //    cli.setFetchMissing("true".equalsIgnoreCase(item.getString()));
+                    //    break;
+                    //case "loadStdLib":
+                    //    cli.setLoadTplLibrary("true".equalsIgnoreCase(item.getString()));
+                    //    break;
                     case "inputFormat":
                         cli.setInputFormat(item.getString());
                         break;
                     case "outputFormat":
                         cli.setOutputFormat(item.getString());
                         break;
-                    /* Cannot set library format as this may set the wrong format for the tpl library.
                     case "libraryFormat":
                         cli.setLibraryFormat(item.getString());
                         break;
-                    */
                     default:
                         break;
                 }
