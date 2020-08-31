@@ -107,4 +107,10 @@ div#ToC ul li {
   font-family: Arial, sans-serif;
 }
 
+div#metadata dt.deprecated,
+div#metadata dt.inv-previousVersion {
+    border-left: 10px solid red;
+    padding-left: 5px;
+}
+
 

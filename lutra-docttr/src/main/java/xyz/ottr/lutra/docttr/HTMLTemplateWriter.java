@@ -133,7 +133,7 @@ public class HTMLTemplateWriter {
                     writeSerialisations(signature),
 
                     getTOCHeading("Prefixes"),
-                    HTMLFactory.getPrefixDiv(this.prefixMapping)
+                    HTMLFactory.getPrefixDiv(this.prefixMapping).withId("prefixes")
                 ),
                 HTMLFactory.getFooterDiv(),
                 HTMLFactory.getScripts()
@@ -171,7 +171,7 @@ public class HTMLTemplateWriter {
                         summary("Metadata as RDF graph"),
                         pre(this.serialisationWriter.writeRDF(metaData))
                     ) //, ul(each(annotations, a -> li(a.toString(this.prefixMapping))))
-                )
+                ).withId("metadata")
             );
     }
 
@@ -205,7 +205,7 @@ public class HTMLTemplateWriter {
                 + "Click 'expand/contact all' to expand/contract all elements. "
                 + "Note that the interactive expansion is not correct for instances that are marked by list expanders."),
             div(writeInteractiveExpansion(exampleInstanceTree))
-        );
+        ).withId("pattern");
     }
 
     private ContainerTag writeInteractiveExpansion(Tree<Instance> expansionTree) {
@@ -257,7 +257,7 @@ public class HTMLTemplateWriter {
             h4("Depending templates"),
             HTMLFactory.getInfoP("The templates in this library that depend on this template."),
             writeDependingTemplates(signature)
-        );
+        ).withId("dependencies");
     }
 
     private ContainerTag writeDependingTemplates(Signature signature) {
@@ -358,7 +358,7 @@ public class HTMLTemplateWriter {
                     b("Complete expansion").withClass("heading"),
                     getVocabularyMetricsList(transitive)
                 )))
-        );
+        ).withId("metrics");
     }
 
     private ContainerTag getInstanceMetricsList(String rootIRI, List<Instance> instances) {
@@ -424,7 +424,7 @@ public class HTMLTemplateWriter {
                 pre(this.serialisationWriter.writeStottr(signature)),
                 h4("RDF/wOTTR"),
                 pre(this.serialisationWriter.writeWottr(signature)))
-        );
+        ).withId("serialisations");
     }
 
     private ContainerTag getHead(Signature signature) {
