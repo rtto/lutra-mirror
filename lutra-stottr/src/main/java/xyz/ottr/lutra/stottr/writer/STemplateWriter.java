@@ -99,7 +99,7 @@ public class STemplateWriter implements TemplateWriter {
 
         builder.append(STOTTR.Statements.statementEnd);
 
-        // Write used prefixes at start of String
+        // Write prefixes at start of String
         if (includePrefixes) {
             builder.insert(0, SPrefixWriter.write(termWriter.getUsedPrefixes()) + Space.LINEBR2);
         }
@@ -112,11 +112,8 @@ public class STemplateWriter implements TemplateWriter {
 
         StringBuilder builder = new StringBuilder();
         builder.append(termWriter.writeIRI(signature.getIri()));
-        builder.append(STOTTR.Parameters.sigParamsStart);
-        builder.append(signature.getParameters().stream()
-            .map(parameter -> writeParameter(parameter, termWriter))
-            .collect(Collectors.joining(STOTTR.Parameters.paramSep)));
-        builder.append(STOTTR.Parameters.sigParamsEnd);
+        builder.append(this.writeParameters(signature, termWriter));
+        builder.append(this.writeAnnotations(signature, termWriter));
         return builder;
     }
 
@@ -135,10 +132,22 @@ public class STemplateWriter implements TemplateWriter {
         builder.append(writeSignature(template, termWriter));
         builder.append(STOTTR.Statements.signatureSep);
         builder.append(STOTTR.Statements.bodyStart);
-        builder.append(Space.LINEBR);
         builder.append(writePattern(template, termWriter));
         builder.append(Space.LINEBR);
         builder.append(STOTTR.Statements.bodyEnd);
+        return builder;
+    }
+
+    private StringBuilder writeParameters(Signature signature, STermWriter termWriter) {
+
+        StringBuilder builder = new StringBuilder();
+        builder.append(signature.getParameters().stream()
+            .map(parameter -> writeParameter(parameter, termWriter))
+            .map(p -> Space.LINEBR + Space.INDENT + p)
+            .collect(Collectors.joining(
+                STOTTR.Parameters.paramSep,
+                STOTTR.Parameters.sigParamsStart,
+                Space.LINEBR + STOTTR.Parameters.sigParamsEnd)));
         return builder;
     }
 
@@ -197,14 +206,34 @@ public class STemplateWriter implements TemplateWriter {
 
     private String writePattern(Template template, STermWriter termWriter) {
 
-        SInstanceWriter instanceWriter = new SPatternInstanceWriter(termWriter);
+        SInstanceWriter instanceWriter = new SInstanceWriter(termWriter);
         var pattern = template.getPattern();
 
         if (pattern.isEmpty()) {
-            return Space.INDENT + STOTTR.Statements.commentStart + "Empty pattern";
+            return Space.LINEBR + Space.INDENT + STOTTR.Statements.commentStart + "Empty pattern";
         } else {
-            pattern.forEach(instanceWriter);
-            return instanceWriter.write();
+            return pattern.stream()
+                .sorted(instanceWriter.instanceSorter)
+                .map(instanceWriter::writeInstance)
+                .map(i -> Space.LINEBR + Space.INDENT + i)
+                .collect(Collectors.joining(STOTTR.Statements.bodyInsSep));
         }
+    }
+
+    private String writeAnnotations(Signature signature, STermWriter termWriter) {
+
+        SInstanceWriter instanceWriter = new SAnnotationInstanceWriter(termWriter);
+
+        var annotations = signature.getAnnotations().stream()
+                .sorted(instanceWriter.instanceSorter)
+                .map(instanceWriter::writeInstance)
+                .map(i -> Space.LINEBR + STOTTR.Statements.annotationStart +  i)
+                .collect(Collectors.joining(STOTTR.Statements.bodyInsSep));
+
+        if (!annotations.isEmpty()) {
+            annotations += Space.LINEBR;
+        }
+
+        return annotations;
     }
 }

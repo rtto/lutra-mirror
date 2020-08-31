@@ -290,7 +290,7 @@ public class CLI {
     }
 
     private void docttrTemplates(TemplateManager templateManager) {
-        var docttr = new DocttrManager(templateManager);
+        var docttr = new DocttrManager(this.outStream, templateManager);
         docttr.write(Path.of(this.settings.out));
     }
 

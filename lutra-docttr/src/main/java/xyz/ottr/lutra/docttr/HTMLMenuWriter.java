@@ -26,6 +26,9 @@ import static j2html.TagCreator.*;
 
 import j2html.tags.ContainerTag;
 import java.nio.file.Path;
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import org.apache.jena.rdf.model.ResourceFactory;
@@ -52,48 +55,85 @@ public class HTMLMenuWriter {
                     .withStyle("float: right; padding: 5px;"),
                 div(
                     h3("Contents"),
+                    HTMLFactory.getInfoP("Signatures are organised according to their namespace. "
+                        + "Click arrow to expand list. "
+                        + "Click text to display page in right window. "
+                        + "Items in the list with a colour box represent a namespace. "
+                        + "A package is a set of templates constructed for a particular purpose, "
+                            + "often as part of a specific project."),
                     getSignatureList(root, iris)))
-                    .withStyle("margin: 20px;"),
+                .withStyle("margin: 20px;"),
             HTMLFactory.getScripts()
         ));
     }
 
-    ContainerTag getSignatureList(String root, Map<String, Result<Signature>> signatures) {
+    ContainerTag getSignatureList(String rootPath, Map<String, Result<Signature>> signatures) {
 
-        var list = div().withClasses("treeview", "toggle-all", "expand-all");
-        var sublist = ul();
-        var namespace = "";
+        var nsPackages = DocttrManager.filter(signatures, DocttrManager.NS_TPL_PACKAGE);
+        var nsNonPackages = signatures.entrySet().stream()
+            .filter(x -> !nsPackages.keySet().contains(x.getKey()))
+            .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 
-        var keys = signatures.keySet().stream()
-            .sorted()
-            .collect(Collectors.toList());
-
-        for (String iri : keys) {
-
-            // create heading and new sublist if new namespace
-            var ns = ResourceFactory.createResource(iri).getNameSpace();
-            if (!ns.equals(namespace)) {
-                namespace = ns;
-                sublist = ul();
-                list.with(
-                    details(
-                        summary(a(b(ns))
-                                .withHref(Path.of(DocttrManager.toLocalPath(ns, root), DocttrManager.FILENAME_FRONTPAGE).toString())
-                                .withTarget(DocttrManager.FRAMENAME_MAIN),
-                            HTMLFactory.getColourBoxNS(ns)),
-                        sublist)
-                );
-            }
-
-            var item = li(
-                a(this.prefixMapping.shortForm(iri))
-                    .withHref(DocttrManager.toLocalFilePath(iri, root))
-                    .withTarget(DocttrManager.FRAMENAME_MAIN)
-            ).withCondClass(signatures.get(iri).isEmpty(), "error"); // mark as error if Result is empty
-            sublist.with(item);
-        }
-        return list;
+        return div(getTreeList(rootPath, nsNonPackages),
+                iff(!nsPackages.isEmpty(),
+                    div(
+                        h4("Packages"),
+                        getTreeList(rootPath, nsPackages)))
+        );
     }
 
+    private ContainerTag getTreeList(String rootPath, Map<String, Result<Signature>> signatures) {
 
+        var indexTreeViewWriter = new StringTreeViewWriter(rootPath, signatures);
+        var nsTreeMap = DocttrManager.getNamespaceTrees(signatures.keySet());
+        return div(
+            each(DocttrManager.getNamespaceTrees(signatures.keySet()).keySet(), path -> indexTreeViewWriter.write(nsTreeMap.get(path))));
+    }
+
+    // Inner class for formatting path tree
+
+    private static class StringTreeViewWriter extends TreeViewWriter<String> {
+        private final String rootPath;
+        private final Map<String, Result<Signature>> signatures;
+
+        StringTreeViewWriter(String rootPath, Map<String, Result<Signature>> signatures) {
+            this.rootPath = rootPath;
+            this.signatures = signatures;
+        }
+
+        @Override
+        protected ContainerTag writeRoot(Tree<String> root) {
+
+            // get namespaces for adding colourboxes
+            var namespaces = signatures.keySet().stream()
+                .map(iri -> ResourceFactory.createResource(iri).getNameSpace())
+                .collect(Collectors.toSet());
+
+            var uri = root.getRoot();
+
+            var shortName = uri;
+            if (root.getParent() != null) {
+                shortName = shortName.replaceFirst(root.getParent().getRoot(), "");
+            }
+
+            var container = span().withTitle(uri);
+            var link = a(shortName).withTarget(DocttrManager.FRAMENAME_MAIN);
+
+            if (signatures.containsKey(uri)) {
+                link.withHref(DocttrManager.toLocalFilePath(uri, rootPath));
+                container.with(link)
+                    .withCondClass(signatures.get(uri).isEmpty(), "error");
+            } else {
+                link.withHref(Path.of(DocttrManager.toLocalPath(uri, rootPath), DocttrManager.FILENAME_FRONTPAGE).toString());
+                container.with(link, iff(namespaces.contains(uri), HTMLFactory.getColourBoxNS(uri)));
+            }
+            return container;
+        }
+
+        @Override
+        protected Collection<Tree<String>> prepareChildren(List<Tree<String>> children) {
+            children.sort(Comparator.comparing(a -> a.getRoot()));
+            return children;
+        }
+    }
 }

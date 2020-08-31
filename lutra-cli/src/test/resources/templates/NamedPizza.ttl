@@ -7,48 +7,52 @@
 @prefix pz:    <http://www.co-ode.org/ontologies/pizza/pizza.owl#> .
 @prefix o-owl-ax: <http://tpl.ottr.xyz/owl/axiom/0.1/> .
 
-@prefix var: <http://tpl.ottr.xyz/pizza/0.1/NamedPizza?something#else?what?> .
-
 o-pizza:NamedPizza  a    ottr:Template ;
+
+ottr:annotation     [ ottr:values ( o-pizza:NamedPizza rdf:type owl:Class ) ;
+                           ottr:of         ottr:Triple
+                         ] ;
+
+
         ottr:parameters  ( [ ottr:type      owl:Class ;
-                             ottr:variable  var:var0
+                             ottr:variable  _:b0
                            ]
                            [ ottr:modifier  ottr:optional ;
                              ottr:type      owl:NamedIndividual ;
-                             ottr:variable  var:var1
+                             ottr:variable  _:b1
                            ]
                            [ ottr:type      ( ottr:NEList ottr:IRI ) ;
-                             ottr:variable  var:var2
+                             ottr:variable  _:b2
                            ]
                          ) ;
-        ottr:pattern     [ ottr:arguments  ( [ ottr:value  var:var0 ]
+        ottr:pattern     [ ottr:arguments  ( [ ottr:value  _:b0 ]
                                              [ ottr:value  pz:hasTopping ]
-                                             [ ottr:value  var:var3 ]
+                                             [ ottr:value  _:b3 ]
                                            ) ;
                            ottr:of         o-owl-ax:SubObjectAllValuesFrom
                          ] ;
-        ottr:pattern     [ ottr:arguments  ( [ ottr:value  var:var0 ]
+        ottr:pattern     [ ottr:arguments  ( [ ottr:value  _:b0 ]
                                              [ ottr:value  pz:NamedPizza ]
                                            ) ;
                            ottr:of         o-owl-ax:SubClassOf
                          ] ;
-        ottr:pattern     [ ottr:arguments  ( [ ottr:value  var:var3 ]
-                                             [ ottr:value  var:var2 ]
+        ottr:pattern     [ ottr:arguments  ( [ ottr:value  _:b3 ]
+                                             [ ottr:value  _:b2 ]
                                            ) ;
                            ottr:of         o-owl-re:ObjectUnionOf
                          ] ;
-        ottr:pattern     [ ottr:arguments  ( [ ottr:value  var:var0 ]
+        ottr:pattern     [ ottr:arguments  ( [ ottr:value  _:b0 ]
                                              [ ottr:value  pz:hasTopping ]
                                              [ ottr:modifier  ottr:listExpand ;
-                                               ottr:value     var:var2
+                                               ottr:value     _:b2
                                              ]
                                            ) ;
                            ottr:modifier   ottr:cross ;
                            ottr:of         o-owl-ax:SubObjectSomeValuesFrom
                          ] ;
-        ottr:pattern     [ ottr:arguments  ( [ ottr:value  var:var0 ]
+        ottr:pattern     [ ottr:arguments  ( [ ottr:value  _:b0 ]
                                              [ ottr:value  pz:hasCountryOfOrigin ]
-                                             [ ottr:value  var:var1 ]
+                                             [ ottr:value  _:b1 ]
                                            ) ;
                            ottr:of         o-owl-ax:SubObjectHasValue
                          ] ;
