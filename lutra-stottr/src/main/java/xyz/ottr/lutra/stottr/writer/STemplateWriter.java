@@ -108,7 +108,7 @@ public class STemplateWriter implements TemplateWriter {
     }
 
 
-    private StringBuilder writeSignature(Signature signature, STermWriter termWriter) {
+    protected StringBuilder writeSignature(Signature signature, STermWriter termWriter) {
 
         StringBuilder builder = new StringBuilder();
         builder.append(termWriter.writeIRI(signature.getIri()));
@@ -138,7 +138,7 @@ public class STemplateWriter implements TemplateWriter {
         return builder;
     }
 
-    private StringBuilder writeParameters(Signature signature, STermWriter termWriter) {
+    protected StringBuilder writeParameters(Signature signature, STermWriter termWriter) {
 
         StringBuilder builder = new StringBuilder();
         builder.append(signature.getParameters().stream()
@@ -220,7 +220,7 @@ public class STemplateWriter implements TemplateWriter {
         }
     }
 
-    private String writeAnnotations(Signature signature, STermWriter termWriter) {
+    protected String writeAnnotations(Signature signature, STermWriter termWriter) {
 
         SInstanceWriter instanceWriter = new SAnnotationInstanceWriter(termWriter);
 

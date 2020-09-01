@@ -127,7 +127,8 @@ public class HTMLTemplateWriter {
                         )
                     ),
                     writeAnnotations(signature),
-                    writePattern(expansionTree),
+                    writeParameters(signature),
+                    writePattern(signature, expansionTree),
                     writeDependencies(signature),
                     writeMetrics(expansionTree),
                     writeSerialisations(signature),
@@ -159,23 +160,65 @@ public class HTMLTemplateWriter {
         Model metaData = instanceWriter.writeToModel();
         metaData.setNsPrefixes(this.prefixMapping);
 
-        var modelLister = new ModelListRenderer(metaData);
+        var container = div().withId("metadata");
 
-        return
-            iff(!metaData.isEmpty(),
-                div(
-                    getTOCHeading("Metadata"),
-                    HTMLFactory.getInfoP("This section contains the data represented by the signature's annotation instances."),
-                    modelLister.drawList(signature.getIri()),
-                    details(
-                        summary("Metadata as RDF graph"),
-                        pre(this.serialisationWriter.writeRDF(metaData))
-                    ) //, ul(each(annotations, a -> li(a.toString(this.prefixMapping))))
-                ).withId("metadata")
+        if (!metaData.isEmpty()) {
+
+            var modelLister = new ModelListRenderer(metaData);
+
+            container.with(
+                getTOCHeading("Metadata"),
+                HTMLFactory.getInfoP("This section contains the data represented by the signature's annotation instances."),
+                modelLister.drawList(signature.getIri()),
+                details(
+                    summary("Metadata as RDF graph"),
+                    pre(this.serialisationWriter.writeRDF(metaData))
+                ) //, ul(each(annotations, a -> li(a.toString(this.prefixMapping))))
             );
+        }
+        return container;
     }
 
-    private ContainerTag writePattern(Tree<Instance> exampleInstanceTree) {
+    private ContainerTag writeParameters(Signature signature) {
+
+        var table = table(
+            tr(
+                th("Index"),
+                th("Name"),
+                th("Type"),
+                th("Optional"),
+                th("Blanks allowed"),
+                th("Default value")
+            ));
+
+        var parameters = signature.getParameters();
+
+        for (int index = 0; index < parameters.size(); index += 1) {
+            var p = parameters.get(index);
+            table.with(tr(
+                td(Integer.toString(index + 1)),
+                td(text(this.prefixMapping.shortForm(p.getTerm().getIdentifier().toString()))),
+                td(this.prefixMapping.shortForm(p.getTerm().getType().toString())),
+                td(p.isOptional() ? "yes" : "no"),
+                td(p.isNonBlank() ? "no" : "yes"),
+                td(p.hasDefaultValue()
+                    ? this.prefixMapping.shortForm(p.getDefaultValue().getIdentifier().toString())
+                    : "no")
+                )
+            );
+        }
+
+        return div(
+            getTOCHeading("Parameters"),
+            HTMLFactory.getInfoP("The parameters defined by the signature are listed here. "
+                + "Unfortunately parameter names are not informative; fixing it is a planned future feature. "
+                + "An optional parameter will accept the value ottr:none as an argument. "
+                + "A parameter which allows blanks will accept a blank node as argument value. "),
+            table
+        ).withId("parameters");
+    }
+
+    private ContainerTag writePattern(Signature signature, Tree<Instance> exampleInstanceTree) {
 
         var exampleInstance = exampleInstanceTree.getRoot();
         var exampleExpansion = this.getExpansion(exampleInstance);
@@ -186,6 +229,9 @@ public class HTMLTemplateWriter {
 
         return div(
             getTOCHeading("Pattern"),
+            h4("stOTTR"),
+            HTMLFactory.getInfoP("stOTTR serialisation of the template without annotation instances."),
+            pre(this.serialisationWriter.writeStottr(signature)),
             HTMLFactory.getInfoP("The pattern of the template is illustrated by expanding a generated instance. "
                 + "Below the generated instance is shown in different serialisations,"
                 + " and its expansion is presented in different formats."),

@@ -31,6 +31,7 @@ import xyz.ottr.lutra.Space;
 import xyz.ottr.lutra.model.Instance;
 import xyz.ottr.lutra.model.Signature;
 import xyz.ottr.lutra.stottr.writer.SInstanceWriter;
+import xyz.ottr.lutra.stottr.writer.STemplatePatternWriter;
 import xyz.ottr.lutra.stottr.writer.STemplateWriter;
 import xyz.ottr.lutra.wottr.io.RDFIO;
 import xyz.ottr.lutra.wottr.util.PrefixMappings;
@@ -55,6 +56,12 @@ class SerialisationWriter {
         var writer = new SInstanceWriter(this.prefixMapping);
         writer.accept(instance);
         return writer.writeInstance(instance);
+    }
+
+    String writeStottrPattern(Signature signature) {
+        var writer = new STemplatePatternWriter(this.prefixMapping);
+        writer.accept(signature);
+        return writer.writeSignature(signature, false);
     }
 
     String writeWottr(Signature signature) {

@@ -61,8 +61,8 @@ public class HTMLMenuWriter {
                         + "Items in the list with a colour box represent a namespace. "
                         + "A package is a set of templates constructed for a particular purpose, "
                             + "often as part of a specific project."),
-                    getSignatureList(root, iris))).withClass("menulist")
-                .withStyle("margin: 20px;"),
+                    getSignatureList(root, iris)).withClass("menulist")
+            ).withStyle("margin: 20px;"),
             HTMLFactory.getScripts()
         ));
     }

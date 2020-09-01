@@ -22,6 +22,11 @@ table, tr, td {
     vertical-align: top;
 }
 
+th {
+    border: 0;
+    border-bottom: 1px solid #ccc;
+}
+
 summary {
     font-family: Arial, sans-serif;
     font-size: 100%;
@@ -108,9 +113,7 @@ div#ToC ul li {
 }
 
 div#metadata dt.deprecated,
-div#metadata dt.inv-previousVersion {
+div#metadata dt.inv-hasPreviousVersion {
     border-left: 10px solid red;
     padding-left: 5px;
 }
-
-
