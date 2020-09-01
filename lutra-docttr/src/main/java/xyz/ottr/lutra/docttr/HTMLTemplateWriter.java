@@ -231,7 +231,7 @@ public class HTMLTemplateWriter {
             getTOCHeading("Pattern"),
             h4("stOTTR"),
             HTMLFactory.getInfoP("stOTTR serialisation of the template without annotation instances."),
-            pre(this.serialisationWriter.writeStottr(signature)),
+            pre(this.serialisationWriter.writeStottrPattern(signature)),
             HTMLFactory.getInfoP("The pattern of the template is illustrated by expanding a generated instance. "
                 + "Below the generated instance is shown in different serialisations,"
                 + " and its expansion is presented in different formats."),
