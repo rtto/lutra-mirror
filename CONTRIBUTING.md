@@ -26,9 +26,11 @@ following branch types:
 
 - master
 - develop
-- release/*
-- feature/*
-- hotfix/*
+- release/[version number]
+- feature/[descriptive name]
+- hotfix/[descriptive name]
+
+The basic rule is that contributions are put in a branch named `feature/[descriptive name]` created from the `develop` branch, where `[descriptive name]` is a high-level description of the contribution. 
 
 We tag each release with `v` + its version number, e.g., `v0.5.0`.
 
@@ -37,7 +39,7 @@ We tag each release with `v` + its version number, e.g., `v0.5.0`.
 - Use the present tense ("Add feature" not "Added feature")
 - Use the imperative mood ("Move cursor to..." not "Moves cursor to...")
 - Limit the first line to 72 characters or less
-- Reference issues and pull requests liberally after the first line
+- Reference whenever possible issues and pull requests liberally after the first line
 - When only changing documentation, include [ci skip] in the commit title
 
 (Taken from https://github.com/atom/atom/blob/master/CONTRIBUTING.md#git-commit-messages)
