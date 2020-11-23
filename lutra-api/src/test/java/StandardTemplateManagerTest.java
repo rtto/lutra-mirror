@@ -36,4 +36,18 @@ public class StandardTemplateManagerTest {
         assertFalse(manager.getStandardLibrary().getTemplateIRIs().isEmpty());
         assertTrue(manager.getTemplateStore().getTemplateIRIs().isEmpty());
     }
+
+    @Test
+    public void doNotLoadPackageTemplates() {
+        var manager = new StandardTemplateManager();
+        manager.loadStandardTemplateLibrary();
+
+        // check that there are templates at all
+        assertFalse(manager.getStandardLibrary().getTemplateIRIs().isEmpty());
+
+        // check that none of these templates has an IRI starting with the package path
+        assertTrue(manager.getStandardLibrary().getTemplateIRIs().stream().noneMatch((String s) -> {
+            return s.startsWith("http://tpl.ottr.xyz/p/");
+        }));
+    }
 }

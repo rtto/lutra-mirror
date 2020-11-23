@@ -30,6 +30,7 @@ import java.util.List;
 import lombok.Getter;
 import org.apache.commons.io.IOUtils;
 import xyz.ottr.lutra.TemplateManager;
+import xyz.ottr.lutra.docttr.DocttrManager;
 import xyz.ottr.lutra.model.Signature;
 import xyz.ottr.lutra.store.TemplateStore;
 import xyz.ottr.lutra.system.MessageHandler;
@@ -59,13 +60,18 @@ public final class StandardTemplateManager extends TemplateManager {
         getLibraryPaths()
             .innerMap(this::getResourceAsStream)
             .innerFlatMap(reader)
+            .innerFilter(StandardTemplateManager::isNonPackageTemplate)
             .forEach(consumer);
 
         super.getTemplateStore().registerStandardLibrary(standardLibrary);
 
         return consumer.getMessageHandler();
     }
-    
+
+    private static boolean isNonPackageTemplate(Signature template) {
+        return !template.getIri().startsWith(DocttrManager.NS_TPL_PACKAGE);
+    }
+
     public ResultStream<String> getLibraryPaths() {
 
         var templatesList = getResourceAsStream(templatesListFile);
