@@ -39,10 +39,14 @@ public enum OTTR  {
 
     private static final String ns = "http://ns.ottr.xyz/0.4/";
 
-    public static final String ns_example_arg = "http://example.ottr.xyz/argument/";
-    
     public static final String prefix = "ottr";
     public static final String namespace = ns;
+
+    public static final String ns_example_arg = "http://example.ottr.xyz/argument/";
+
+    public static final String ns_library = "http://tpl.ottr.xyz";
+    public static final String ns_library_package_prefix = "p/";
+    public static final String ns_library_package = ns_library + "/" + ns_library_package_prefix;
 
     public static final String none = ns + "none";
     

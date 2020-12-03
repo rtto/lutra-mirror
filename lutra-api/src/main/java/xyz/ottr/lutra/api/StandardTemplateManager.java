@@ -29,6 +29,7 @@ import java.util.LinkedList;
 import java.util.List;
 import lombok.Getter;
 import org.apache.commons.io.IOUtils;
+import xyz.ottr.lutra.OTTR;
 import xyz.ottr.lutra.TemplateManager;
 import xyz.ottr.lutra.model.Signature;
 import xyz.ottr.lutra.store.TemplateStore;
@@ -57,6 +58,7 @@ public final class StandardTemplateManager extends TemplateManager {
         var reader = ResultStream.innerFlatMapCompose(RDFIO.inputStreamReader(), new WTemplateParser());
 
         getLibraryPaths()
+            .innerFilter(path -> !path.startsWith(OTTR.ns_library_package_prefix))
             .innerMap(this::getResourceAsStream)
             .innerFlatMap(reader)
             .forEach(consumer);
@@ -65,12 +67,12 @@ public final class StandardTemplateManager extends TemplateManager {
 
         return consumer.getMessageHandler();
     }
-    
+
     public ResultStream<String> getLibraryPaths() {
 
         var templatesList = getResourceAsStream(templatesListFile);
         if (templatesList == null) {
-            return ResultStream.of(Result.error("File containing list of templates not found in standard library."));
+            return ResultStream.of(Result.error("Failed to read index file of all templates in the standard library."));
         }
 
         List<String> paths = new LinkedList<>();
