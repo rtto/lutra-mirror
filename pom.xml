@@ -68,7 +68,7 @@
         <maven.compiler.target>${java.version}</maven.compiler.target>
         <maven.javadoc.skip>true</maven.javadoc.skip>
 
-        <jena.version>3.14.0</jena.version>
+        <jena.version>3.17.0</jena.version>
         <antlr4-maven-plugin-version>4.8-1</antlr4-maven-plugin-version>
     </properties>
 
@@ -233,7 +233,7 @@
                     <dependency>
                         <groupId>com.puppycrawl.tools</groupId>
                         <artifactId>checkstyle</artifactId>
-                        <version>8.35</version>
+                        <version>8.38</version>
                     </dependency>
                 </dependencies>
             </plugin>
@@ -349,7 +349,7 @@
                 <!-- see http://maven.apache.org/ref/current/maven-core/default-bindings.html#Plugin_bindings_for_war_packaging -->
                 <plugin>
                     <artifactId>maven-resources-plugin</artifactId>
-                    <version>3.1.0</version>
+                    <version>3.2.0</version>
                 </plugin>
                 <plugin>
                     <artifactId>maven-compiler-plugin</artifactId>
@@ -400,7 +400,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-project-info-reports-plugin</artifactId>
-                    <version>3.1.0</version>
+                    <version>3.1.1</version>
                 </plugin>
 
                 <plugin>
@@ -412,7 +412,7 @@
                 <plugin>
                     <groupId>com.github.spotbugs</groupId>
                     <artifactId>spotbugs</artifactId>
-                    <version>4.0.6</version>
+                    <version>4.2.0</version>
                 </plugin>
 
                 <plugin>
@@ -505,7 +505,7 @@
             <dependency>
                 <groupId>com.google.code.findbugs</groupId>
                 <artifactId>annotations</artifactId>
-                <version>3.0.0</version>
+                <version>3.0.1u2</version>
             </dependency>
 
             <!-- Apache commons -->
@@ -527,12 +527,12 @@
             <dependency>
                 <groupId>commons-validator</groupId>
                 <artifactId>commons-validator</artifactId>
-                <version>1.6</version>
+                <version>1.7</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-lang3</artifactId>
-                <version>3.10</version>
+                <version>3.11</version>
             </dependency>
 
 
@@ -604,7 +604,7 @@
             <dependency>
                 <groupId>guru.nidi</groupId>
                 <artifactId>graphviz-java</artifactId>
-                <version>0.16.3</version>
+                <version>0.18.0</version>
             </dependency>
 
 
@@ -613,7 +613,7 @@
             <dependency>
                 <groupId>info.picocli</groupId>
                 <artifactId>picocli</artifactId>
-                <version>4.3.2</version>
+                <version>4.5.2</version>
             </dependency>
 
 
@@ -628,7 +628,7 @@
             <dependency>
                 <groupId>junit</groupId>
                 <artifactId>junit</artifactId>
-                <version>4.13</version>
+                <version>4.13.1</version>
             </dependency>
 
             <!-- https://mvnrepository.com/artifact/org.hamcrest/hamcrest -->
