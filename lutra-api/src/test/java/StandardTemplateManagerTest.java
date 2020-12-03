@@ -24,6 +24,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
+import xyz.ottr.lutra.OTTR;
 import xyz.ottr.lutra.api.StandardTemplateManager;
 
 public class StandardTemplateManagerTest {
@@ -46,8 +47,7 @@ public class StandardTemplateManagerTest {
         assertFalse(manager.getStandardLibrary().getTemplateIRIs().isEmpty());
 
         // check that none of these templates has an IRI starting with the package path
-        assertTrue(manager.getStandardLibrary().getTemplateIRIs().stream().noneMatch((String s) -> {
-            return s.startsWith("http://tpl.ottr.xyz/p/");
-        }));
+        assertTrue(manager.getStandardLibrary().getTemplateIRIs().stream()
+            .noneMatch((String s) -> s.startsWith(OTTR.ns_library_package)));
     }
 }

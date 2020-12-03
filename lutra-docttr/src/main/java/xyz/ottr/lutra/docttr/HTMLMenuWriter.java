@@ -33,6 +33,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import org.apache.jena.rdf.model.ResourceFactory;
 import org.apache.jena.shared.PrefixMapping;
+import xyz.ottr.lutra.OTTR;
 import xyz.ottr.lutra.model.Signature;
 import xyz.ottr.lutra.system.Result;
 
@@ -69,7 +70,7 @@ public class HTMLMenuWriter {
 
     ContainerTag getSignatureList(String rootPath, Map<String, Result<Signature>> signatures) {
 
-        var nsPackages = DocttrManager.filter(signatures, DocttrManager.NS_TPL_PACKAGE);
+        var nsPackages = DocttrManager.filter(signatures, OTTR.ns_library_package);
         var nsNonPackages = signatures.entrySet().stream()
             .filter(x -> !nsPackages.keySet().contains(x.getKey()))
             .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));

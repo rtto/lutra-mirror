@@ -42,6 +42,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.ResourceFactory;
 import org.apache.jena.shared.PrefixMapping;
+import xyz.ottr.lutra.OTTR;
 import xyz.ottr.lutra.TemplateManager;
 import xyz.ottr.lutra.io.Files;
 import xyz.ottr.lutra.model.Signature;
@@ -50,11 +51,9 @@ import xyz.ottr.lutra.system.Result;
 
 public class DocttrManager {
 
-    public static final String NS_TPL = "http://tpl.ottr.xyz";
-    public static final String NS_TPL_PACKAGE = NS_TPL + "/p/";
-    public static final String NS_DOCTTR = NS_TPL_PACKAGE + "docttr/0.1/";
+    public static final String NS_DOCTTR = OTTR.ns_library_package + "docttr/0.1/";
 
-    public static final String HTML_EXT = ".html";
+    private static final String HTML_EXT = ".html";
 
     public static final String FILENAME_MENU = "menu.html";
     public static final String FILENAME_FRONTPAGE = "frontpage.html";
