@@ -57,14 +57,6 @@ public class ShaclEquivalenceTest {
     private static final String incorrect = FilenameUtils.separatorsToSystem("src/test/resources/spec/tests/incorrect/");
 
     private static final Set<String> unsupportedTests = Stream.of(
-            incorrect + "basic01a.ttl", // Prefixes 
-            incorrect + "basic01b.ttl", // Prefixes 
-            incorrect + "basic01c.ttl", // Prefixes 
-            incorrect + "basic01d.ttl", // Prefixes 
-            incorrect + "basic01e.ttl", // Prefixes 
-            incorrect + "basic02.ttl",  // Prefixes
-            incorrect + "basic03.ttl",  // Prefixes
-            incorrect + "basic04.ttl",  // Prefixes
             incorrect + "instance10.ttl", // Instance checking on types
             incorrect + "signature06.ttl" // TODO: Fix somehow
         ).collect(Collectors.toSet());
@@ -75,15 +67,7 @@ public class ShaclEquivalenceTest {
             correct + "instance01.ttl", 
             correct + "instance02.ttl", 
             correct + "instance08.ttl", 
-            incorrect + "argument01.ttl", 
-            incorrect + "basic01a.ttl", 
-            incorrect + "basic01b.ttl", 
-            incorrect + "basic01c.ttl", 
-            incorrect + "basic01d.ttl", 
-            incorrect + "basic01e.ttl", 
-            incorrect + "basic02.ttl", 
-            incorrect + "basic03.ttl", 
-            incorrect + "basic04.ttl", 
+            incorrect + "argument01.ttl",
             incorrect + "instance03.ttl", 
             incorrect + "instance04.ttl", 
             incorrect + "instance05.ttl", 
