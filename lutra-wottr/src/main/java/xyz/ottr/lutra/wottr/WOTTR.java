@@ -35,7 +35,6 @@ import xyz.ottr.lutra.model.ListExpander;
 public class WOTTR {
 
     public static final String ns = OTTR.namespace;
-    public static final String prefix = "ottr";
    
     // Classes
     public static final Resource Template = getResource(ns + "Template");
@@ -53,6 +52,12 @@ public class WOTTR {
     public static final Resource zipMin = getResource(ns + "zipMin");
     public static final Resource zipMax = getResource(ns + "zipMax");
     public static final Resource cross = getResource(ns + "cross");
+
+    public static final Resource incomplete = getResource(ns + "incomplete");
+    public static final Resource draft = getResource(ns + "draft");
+    public static final Resource candidate = getResource(ns + "candidate");
+    public static final Resource recommendation = getResource(ns + "recommendation");
+    public static final Resource deprecated = getResource(ns + "deprecated");
 
     // Properties
     public static final Property parameters = getProperty(ns + "parameters");
