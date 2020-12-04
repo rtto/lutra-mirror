@@ -55,6 +55,7 @@ import xyz.ottr.lutra.model.terms.IRITerm;
 import xyz.ottr.lutra.store.TemplateStore;
 import xyz.ottr.lutra.system.Message;
 import xyz.ottr.lutra.system.Result;
+import xyz.ottr.lutra.system.ResultStream;
 import xyz.ottr.lutra.wottr.writer.WInstanceWriter;
 import xyz.ottr.lutra.writer.RDFNodeWriter;
 
@@ -65,6 +66,8 @@ public class HTMLTemplateWriter {
 
     private final SerialisationWriter serialisationWriter;
     private final DependencyGraphVisualiser dependencyGraphVisualiser;
+
+    private ContainerTag tocList;
 
     public HTMLTemplateWriter(PrefixMapping prefixMapping, TemplateStore store) {
         this.prefixMapping = prefixMapping;
@@ -103,12 +106,16 @@ public class HTMLTemplateWriter {
 
     private ContainerTag getHTML(Signature signature) {
 
+        this.tocList = ul(li(a("top").withHref("#top")));
+
         var exampleInstance = signature.getExampleInstance();
         var expansionTree = getExpansionTree(exampleInstance);
 
         return html(
             getHead(signature),
             body(
+                span().withId("top"),
+                div(b("Contents"), tocList).withId("ToC"),
                 h1(join(
                     signature.getClass().getSimpleName() + ": ",
                     code(RDFNodeWriter.toString(this.prefixMapping, signature.getIri())))),
@@ -117,36 +124,114 @@ public class HTMLTemplateWriter {
                         p(
                             text("URI: "),
                             code(a(signature.getIri()).withHref(signature.getIri()))
-                        ),
-                        h4("stOTTR serialisation"),
-                        pre(this.serialisationWriter.writeStottr(signature))
+                        )
                     ),
-
-                    writePattern(expansionTree),
+                    writeAnnotations(signature),
+                    writeParameters(signature),
+                    writePattern(signature, expansionTree),
                     writeDependencies(signature),
                     writeMetrics(expansionTree),
                     writeSerialisations(signature),
 
-                    HTMLFactory.getPrefixDiv(this.prefixMapping)
-                    ),
+                    getTOCHeading("Prefixes"),
+                    HTMLFactory.getPrefixDiv(this.prefixMapping).withId("prefixes")
+                ),
                 HTMLFactory.getFooterDiv(),
                 HTMLFactory.getScripts()
             )
         );
     }
 
-    private ContainerTag writePattern(Tree<Instance> exampleInstanceTree) {
+    private ContainerTag getTOCHeading(String heading) {
+        tocList.with(li(a(heading).withHref("#" + heading)));
+        return h2(heading).withId(heading);
+    }
+
+    private ContainerTag writeAnnotations(Signature signature) {
+
+        var annotations = signature.getAnnotations();
+
+        WInstanceWriter instanceWriter = new WInstanceWriter(this.prefixMapping);
+
+        ResultStream.innerOf(annotations)
+            .innerFlatMap(this.store::expandInstanceFetch)
+            .innerForEach(instanceWriter);
+
+        Model metaData = instanceWriter.writeToModel();
+        metaData.setNsPrefixes(this.prefixMapping);
+
+        var container = div().withId("metadata");
+
+        if (!metaData.isEmpty()) {
+
+            var modelLister = new ModelListRenderer(metaData);
+
+            container.with(
+                getTOCHeading("Metadata"),
+                HTMLFactory.getInfoP("This section contains the data represented by the signature's annotation instances."),
+                modelLister.drawList(signature.getIri()),
+                details(
+                    summary("Metadata as RDF graph"),
+                    pre(this.serialisationWriter.writeRDF(metaData))
+                ) //, ul(each(annotations, a -> li(a.toString(this.prefixMapping))))
+            );
+        }
+        return container;
+    }
+
+    private ContainerTag writeParameters(Signature signature) {
+
+        var table = table(
+            tr(
+                th("Index"),
+                th("Name"),
+                th("Type"),
+                th("Optional"),
+                th("Blanks allowed"),
+                th("Default value")
+            ));
+
+        var parameters = signature.getParameters();
+
+        for (int index = 0; index < parameters.size(); index += 1) {
+            var p = parameters.get(index);
+            table.with(tr(
+                td(Integer.toString(index + 1)),
+                td(text(this.prefixMapping.shortForm(p.getTerm().getIdentifier().toString()))),
+                td(this.prefixMapping.shortForm(p.getTerm().getType().toString())),
+                td(p.isOptional() ? "yes" : "no"),
+                td(p.isNonBlank() ? "no" : "yes"),
+                td(p.hasDefaultValue()
+                    ? this.prefixMapping.shortForm(p.getDefaultValue().getIdentifier().toString())
+                    : "no")
+                )
+            );
+        }
+
+        return div(
+            getTOCHeading("Parameters"),
+            HTMLFactory.getInfoP("The parameters defined by the signature are listed here. "
+                + "Unfortunately parameter names are not informative; fixing it is a planned future feature. "
+                + "An optional parameter will accept the value ottr:none as an argument. "
+                + "A parameter which allows blanks will accept a blank node as argument value. "),
+            table
+        ).withId("parameters");
+    }
+
+    private ContainerTag writePattern(Signature signature, Tree<Instance> exampleInstanceTree) {
 
         var exampleInstance = exampleInstanceTree.getRoot();
-        var exampleExpansion = this.getExampleExpansion(exampleInstance);
+        var exampleExpansion = this.getExpansion(exampleInstance);
         var wexampleInstance = this.serialisationWriter.writeWottrModel(exampleInstance);
-
         var expansionViz = new TripleInstanceGraphVisualiser(this.prefixMapping);
         this.store.expandInstanceWithoutChecks(exampleInstance)
             .innerForEach(expansionViz);
 
         return div(
-            h2(text("Pattern")),
+            getTOCHeading("Pattern"),
+            h4("stOTTR"),
+            HTMLFactory.getInfoP("stOTTR serialisation of the template without annotation instances."),
+            pre(this.serialisationWriter.writeStottrPattern(signature)),
             HTMLFactory.getInfoP("The pattern of the template is illustrated by expanding a generated instance. "
                 + "Below the generated instance is shown in different serialisations,"
                 + " and its expansion is presented in different formats."),
@@ -156,8 +241,9 @@ public class HTMLTemplateWriter {
             b("RDF/wOTTR").withClass("heading"),
             pre(this.serialisationWriter.writeRDF(wexampleInstance)),
             h4("Visualisation of expanded RDF graph"),
-            HTMLFactory.getInfoP("Each resource node is linked to its IRI."),
-            div(rawHtml(expansionViz.draw(exampleInstance.getArguments()))),
+            HTMLFactory.getInfoP("Each resource node is linked to its IRI. Type relationships are not visualised,"
+                + " rather each node contains its type."),
+            expansionViz.draw(exampleInstance.getArguments()),
             h4("Expanded RDF graph"),
             pre(this.serialisationWriter.writeRDF(exampleExpansion)),
             h4("Interactive expansion"),
@@ -165,7 +251,7 @@ public class HTMLTemplateWriter {
                 + "Click 'expand/contact all' to expand/contract all elements. "
                 + "Note that the interactive expansion is not correct for instances that are marked by list expanders."),
             div(writeInteractiveExpansion(exampleInstanceTree))
-        );
+        ).withId("pattern");
     }
 
     private ContainerTag writeInteractiveExpansion(Tree<Instance> expansionTree) {
@@ -205,19 +291,19 @@ public class HTMLTemplateWriter {
         var tree = getDependencyTree(signature);
 
         return div(
-            h2("Dependencies"),
+            getTOCHeading("Dependencies"),
             h4("Dependency graph"),
             HTMLFactory.getInfoP("The graph shows all the templates that this template depends on. "
                 + "The colour of the node indicates its namespace. "
                 + "Each node is linked to its documentation page."),
-            rawHtml(this.dependencyGraphVisualiser.drawTree(tree)),
+            this.dependencyGraphVisualiser.drawTree(tree),
             h4("List of dependencies"),
             HTMLFactory.getInfoP("The number in parenthesis is the number of instances of each template."),
             writeDependenciesList(tree),
             h4("Depending templates"),
             HTMLFactory.getInfoP("The templates in this library that depend on this template."),
             writeDependingTemplates(signature)
-        );
+        ).withId("dependencies");
     }
 
     private ContainerTag writeDependingTemplates(Signature signature) {
@@ -290,7 +376,7 @@ public class HTMLTemplateWriter {
             .collect(Collectors.toList());
 
         return div(
-            h2("Metrics"),
+            getTOCHeading("Metrics"),
             HTMLFactory.getInfoP("Dependency graph metrics. "
                 + "Depth is the number of steps to a leaf node in the dependency graph. "
                 + "Branching is the number of outgoing edges from a node."),
@@ -318,7 +404,7 @@ public class HTMLTemplateWriter {
                     b("Complete expansion").withClass("heading"),
                     getVocabularyMetricsList(transitive)
                 )))
-        );
+        ).withId("metrics");
     }
 
     private ContainerTag getInstanceMetricsList(String rootIRI, List<Instance> instances) {
@@ -378,13 +464,13 @@ public class HTMLTemplateWriter {
 
     private DomContent writeSerialisations(Signature signature) {
         return div(
-            h2("Serialisations"),
+            getTOCHeading("Serialisations"),
             div(
                 h4("stOTTR"),
                 pre(this.serialisationWriter.writeStottr(signature)),
                 h4("RDF/wOTTR"),
                 pre(this.serialisationWriter.writeWottr(signature)))
-        );
+        ).withId("serialisations");
     }
 
     private ContainerTag getHead(Signature signature) {
@@ -413,7 +499,7 @@ public class HTMLTemplateWriter {
         return RDFNodeWriter.toString(this.prefixMapping, iri);
     }
 
-    private Model getExampleExpansion(Instance instance) {
+    private Model getExpansion(Instance instance) {
         WInstanceWriter instanceWriter = new WInstanceWriter(this.prefixMapping);
         this.store.expandInstanceWithoutChecks(instance)
             .innerForEach(instanceWriter);

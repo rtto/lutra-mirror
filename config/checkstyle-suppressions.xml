@@ -2,12 +2,14 @@
  
 <!DOCTYPE suppressions PUBLIC
      "-//Puppy Crawl//DTD Suppressions 1.0//EN"
-     "http://www.puppycrawl.com/dtds/suppressions_1_0.dtd">
+     "https://checkstyle.org/dtds/suppressions_1_0.dtd">
  
 <suppressions>
 
     <!-- all HTMLWriters make heavy use of static imports for j2html -->
-    <suppress checks="AvoidStarImport" files=".*docttr/HTML.*\.java"/>
-    <suppress checks="AvoidStarImport" files=".*docttr/TreeViewWriter\.java"/>
+    <suppress checks="AvoidStarImport" files=".*docttr[/\\]HTML.*\.java"/>
+    <suppress checks="AvoidStarImport" files=".*docttr[/\\]TreeViewWriter\.java"/>
+    <suppress checks="AvoidStarImport" files=".*docttr[/\\]ModelListRenderer\.java"/>
+    <suppress checks="AvoidStarImport" files=".*docttr[/\\]visualisation[/\\]GraphVisualiser\.java"/>
 
 </suppressions>

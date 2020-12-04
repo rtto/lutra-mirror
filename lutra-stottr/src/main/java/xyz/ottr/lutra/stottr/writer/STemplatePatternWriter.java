@@ -1,10 +1,10 @@
-package xyz.ottr.lutra;
+package xyz.ottr.lutra.stottr.writer;
 
 /*-
  * #%L
- * lutra-core
+ * lutra-stottr
  * %%
- * Copyright (C) 2018 - 2020 University of Oslo
+ * Copyright (C) 2018 - 2019 University of Oslo
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -22,11 +22,21 @@ package xyz.ottr.lutra;
  * #L%
  */
 
-public enum Space {
-    ;
-    public static final String EMPTY = "";
-    public static final String SPACE = " ";
-    public static final String INDENT = "    ";
-    public static final String LINEBR = System.lineSeparator();
-    public static final String LINEBR2 = System.lineSeparator().repeat(2);
+import org.apache.jena.shared.PrefixMapping;
+import xyz.ottr.lutra.model.Signature;
+
+public class STemplatePatternWriter extends STemplateWriter {
+
+    public STemplatePatternWriter(PrefixMapping prefixes) {
+        super(prefixes);
+    }
+
+    protected StringBuilder writeSignature(Signature signature, STermWriter termWriter) {
+
+        StringBuilder builder = new StringBuilder();
+        builder.append(termWriter.writeIRI(signature.getIri()));
+        builder.append(this.writeParameters(signature, termWriter));
+        return builder;
+    }
+
 }

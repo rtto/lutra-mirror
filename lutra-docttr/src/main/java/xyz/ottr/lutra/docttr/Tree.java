@@ -43,14 +43,15 @@ public class Tree<T> {
 
     @Setter(AccessLevel.PRIVATE) private Tree<T> parent;
     private final T root;
-    private final List<Tree<T>> children;
+    private List<Tree<T>> children;
 
-    private Tree(Tree<T> parent, T root, List<Tree<T>> children) {
+    public Tree(Tree<T> parent, T root, List<Tree<T>> children) {
         this.parent = parent;
         this.root = root;
         this.children = children;
     }
 
+    // TODO, move build function stuff outside?
     private Tree(Tree<T> parent, T root, Function<T, List<T>> buildFunction) {
         this(parent,
             root,
@@ -63,6 +64,10 @@ public class Tree<T> {
 
     public Tree(T root, Function<T, List<T>> buildFunction) {
         this(null, root, buildFunction);
+    }
+
+    public void addChild(Tree<T> child) {
+        children.add(child);
     }
 
     public void preorderForEach(Consumer<Tree<T>> consumer) {

@@ -24,11 +24,14 @@ package xyz.ottr.lutra.docttr;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -39,6 +42,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.ResourceFactory;
 import org.apache.jena.shared.PrefixMapping;
+import xyz.ottr.lutra.OTTR;
 import xyz.ottr.lutra.TemplateManager;
 import xyz.ottr.lutra.io.Files;
 import xyz.ottr.lutra.model.Signature;
@@ -47,7 +51,9 @@ import xyz.ottr.lutra.system.Result;
 
 public class DocttrManager {
 
-    public static final String HTML_EXT = ".html";
+    public static final String NS_DOCTTR = OTTR.ns_library_package + "docttr/0.1/";
+
+    private static final String HTML_EXT = ".html";
 
     public static final String FILENAME_MENU = "menu.html";
     public static final String FILENAME_FRONTPAGE = "frontpage.html";
@@ -58,9 +64,10 @@ public class DocttrManager {
     //private final TemplateManager manager;
     private final PrefixMapping prefixMapping;
     private final TemplateStore templateStore;
+    private final PrintStream outStream;
 
-    public DocttrManager(TemplateManager manager) {
-        //this.manager = manager;
+    public DocttrManager(PrintStream outStream, TemplateManager manager) {
+        this.outStream = outStream;
         this.prefixMapping = manager.getPrefixes();
         this.templateStore = manager.getTemplateStore();
     }
@@ -72,6 +79,8 @@ public class DocttrManager {
                     this.templateStore::getTemplateObject));
     }
 
+
+
     public void write(Path outputFolder) {
 
         var signatures = getSignatureMap();
@@ -82,18 +91,16 @@ public class DocttrManager {
         // write frame page for all templates
         writeFrames(signatures, outputFolder, null);
 
-        // write frame pages for all namespaces
-        for (String domain : getDomains(signatures.keySet())) {
-            writeFrames(filter(signatures, domain), outputFolder, domain);
-        }
+        var pathTrees = getNamespaceTrees(signatures.keySet());
 
-        // write frame pages for all namespaces
-        for (String namespace : getNamespaces(signatures.keySet())) {
-            writeFrames(filter(signatures, namespace), outputFolder, namespace);
+        for (Tree<String> pathTree : pathTrees.values()) {
+            pathTree.preorderStream()
+                .filter(tree -> !tree.isLeaf())
+                .forEach(tree -> writeFrames(filter(signatures, tree.getRoot()), outputFolder, tree.getRoot()));
         }
     }
 
-    private static <V> Map<String, V> filter(Map<String, V> map, String uriStart) {
+    public static <V> Map<String, V> filter(Map<String, V> map, String uriStart) {
         return map.keySet().stream()
             .filter(key -> key.startsWith(uriStart))
             .collect(Collectors.toMap(Function.identity(), map::get));
@@ -140,6 +147,8 @@ public class DocttrManager {
 
         writeFile(new HTMLFramesetWriter().write(),
             folder.resolve(FILENAME_FRAMESET));
+
+        this.outStream.println("Wrote index files to " + folder.toString());
     }
 
     private void writeTemplates(Map<String, Result<Signature>> signatures, Path outputFolder) {
@@ -148,8 +157,49 @@ public class DocttrManager {
 
         signatures.forEach((iri, signatureResult) -> {
             var content = templateWriter.write(iri, signatureResult);
-            writeFile(content, outputFolder.resolve(toLocalFilePath(iri)));
+            var file = outputFolder.resolve(toLocalFilePath(iri));
+            writeFile(content, file);
+            this.outStream.println("Wrote " + iri + " to " + file.toString());
         });
+    }
+
+    static Map<String, Tree<String>> getNamespaceTrees(Collection<String> iris) {
+
+        // map containing root nodes only
+        var rootMap = new HashMap<String, Tree<String>>();
+
+        // map for all nodes, for easy access
+        var pathMap = new HashMap<String, Tree<String>>();
+
+        for (String iri : iris) {
+
+            String parentPath = "";
+            String currentPath = parentPath;
+
+            String[] iriParts = iri.split("(?<=([^/:]/)|#)");  // split on single / only
+
+            for (String pathPart : iriParts) {
+
+                currentPath += pathPart;
+
+                if (!pathMap.containsKey(currentPath)) {
+                    var parentTree = parentPath.isEmpty()
+                        ? null
+                        : pathMap.get(parentPath);
+
+                    var currentTree = new Tree(parentTree, currentPath, new LinkedList<>());
+                    pathMap.put(currentPath, currentTree);
+
+                    if (parentTree != null) {
+                        parentTree.addChild(currentTree);
+                    } else {
+                        rootMap.putIfAbsent(currentPath, currentTree);
+                    }
+                }
+                parentPath = currentPath;
+            }
+        }
+        return rootMap;
     }
 
     @SneakyThrows(URISyntaxException.class)
@@ -166,7 +216,7 @@ public class DocttrManager {
      * @return
      */
     @SuppressFBWarnings("NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE")
-    static String toLocalPath(String iri, String relativeTo, int parents) {
+    public static String toLocalPath(String iri, String relativeTo, int parents) {
 
         if (relativeTo == null) {
             return toLocalPath(iri);

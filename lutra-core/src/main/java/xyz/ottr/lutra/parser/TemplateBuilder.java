@@ -42,9 +42,12 @@ public enum TemplateBuilder {
             + "a (possibly empty) set of instances."));
 
         var builder = Result.of(Template.builder());
+
+        // Must copy signature fields. @SuperBuilder does not work when annotating static methods
         builder.addResult(signature, (bldr, sign) -> {
             bldr.iri(sign.getIri());
             bldr.parameters(sign.getParameters());
+            bldr.annotations(sign.getAnnotations());
         });
         builder.addResult(instances, (bldr, insts) -> {
             bldr.instances(insts);

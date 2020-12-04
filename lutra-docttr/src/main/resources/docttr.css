@@ -22,6 +22,16 @@ table, tr, td {
     vertical-align: top;
 }
 
+th {
+    border: 0;
+    border-bottom: 1px solid #ccc;
+}
+
+summary {
+    font-family: Arial, sans-serif;
+    font-size: 100%;
+}
+
 b.heading {
     color: #333;
     font-family: Arial, sans-serif;
@@ -82,4 +92,28 @@ p.treeviewbuttons .button {
     margin-right: 5px;
 }
 
+div#ToC {
+  position:fixed;
+  top:0;
+  right:0;
+  padding: 10px;
+  font-size: 80%;
+  font-family: Arial, sans-serif;
+  background-color: rgba(255, 255, 255, 0.7);
+}
 
+div#ToC ul {
+  margin: 0;
+  padding-left: 10px;
+  margin-top: 3px;
+}
+
+div#ToC ul li {
+  font-family: Arial, sans-serif;
+}
+
+div#metadata dt.deprecated,
+div#metadata dt.inv-hasPreviousVersion {
+    border-left: 10px solid red;
+    padding-left: 5px;
+}

@@ -10,12 +10,12 @@ package xyz.ottr.lutra.stottr.io;
  * it under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation, either version 2.1 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Lesser Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Lesser Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/lgpl-2.1.html>.
@@ -48,6 +48,8 @@ import xyz.ottr.lutra.stottr.writer.STemplateWriter;
 
 public class WriterTest {
 
+    private static final String BR = System.lineSeparator();
+
     private PrefixMapping createPrefixes() {
         var prefixes = PrefixMapping.Factory.create();
         prefixes.withDefaultMappings(OTTR.getDefaultPrefixes());
@@ -55,68 +57,70 @@ public class WriterTest {
         return prefixes;
     }
 
+
+
+    private Instance i1 = Instance.builder()
+        .iri("http://base.org/T1")
+        .arguments(Argument.listOf(
+            LiteralTerm.createTypedLiteral("true", XSD.xboolean.getURI()),
+            new NoneTerm(),
+            new IRITerm("http://www.w3.org/1999/02/22-rdf-syntax-ns#type"),
+            new IRITerm("http://some.uri/with#part"),
+            LiteralTerm.createLanguageTagLiteral("hello", "no"))
+        ).build();
+
+    private Instance i2 = Instance.builder()
+        .iri("http://base2.org/T2")
+        .arguments(Argument.listOf(
+            new BlankNodeTerm("myLabel"),
+            LiteralTerm.createPlainLiteral("one"),
+            LiteralTerm.createPlainLiteral("two"),
+            LiteralTerm.createPlainLiteral("three"))
+        ).build();
+
+    private Instance i3 = Instance.builder()
+        .iri("http://base.org/T1")
+        .arguments(Argument.listOf(
+            LiteralTerm.createPlainLiteral("1"),
+            LiteralTerm.createPlainLiteral("2"),
+            LiteralTerm.createPlainLiteral("3"))
+        ).build();
+
+    private Instance i4 = Instance.builder()
+        .iri("http://base.org/T1")
+        .listExpander(ListExpander.cross)
+        .arguments(Argument.listOf(
+            LiteralTerm.createPlainLiteral("1"),
+            LiteralTerm.createPlainLiteral("1"),
+            LiteralTerm.createPlainLiteral("1"))
+        ).build();
+
+    private Instance i5 = Instance.builder()
+        .iri("http://base.org/T1")
+        .arguments(Argument.listOf(
+            LiteralTerm.createPlainLiteral("1"),
+            LiteralTerm.createPlainLiteral("1"),
+            LiteralTerm.createPlainLiteral("1"))
+        ).build();
+
     @Test
     public void testInstances1() {
-
-        var i1 = Instance.builder()
-            .iri("http://base.org/T1")
-            .arguments(Argument.listOf(
-                LiteralTerm.createTypedLiteral("true", XSD.xboolean.getURI()),
-                new NoneTerm(),
-                new IRITerm("http://www.w3.org/1999/02/22-rdf-syntax-ns#type"),
-                new IRITerm("http://some.uri/with#part"),
-                LiteralTerm.createLanguageTagLiteral("hello", "no"))
-            ).build();
-
-        var i2 = Instance.builder()
-            .iri("http://base2.org/T2")
-            .arguments(Argument.listOf(
-                new BlankNodeTerm("myLabel"),
-                LiteralTerm.createPlainLiteral("one"),
-                LiteralTerm.createPlainLiteral("two"),
-                LiteralTerm.createPlainLiteral("three"))
-            ).build();
-
-        var i3 = Instance.builder()
-            .iri("http://base.org/T1")
-            .arguments(Argument.listOf(
-                LiteralTerm.createPlainLiteral("1"),
-                LiteralTerm.createPlainLiteral("2"),
-                LiteralTerm.createPlainLiteral("3"))
-            ).build();
-
-        var i4 = Instance.builder()
-            .iri("http://base.org/T1")
-            .listExpander(ListExpander.cross)
-            .arguments(Argument.listOf(
-                LiteralTerm.createPlainLiteral("1"),
-                LiteralTerm.createPlainLiteral("1"),
-                LiteralTerm.createPlainLiteral("1"))
-            ).build();
-
-        var i5 = Instance.builder()
-            .iri("http://base.org/T1")
-            .arguments(Argument.listOf(
-                LiteralTerm.createPlainLiteral("1"),
-                LiteralTerm.createPlainLiteral("1"),
-                LiteralTerm.createPlainLiteral("1"))
-            ).build();
 
         var instances = List.of(i1, i2, i3, i4, i5);
 
         var output =
-            "@prefix my: <http://base.org/> ." + System.lineSeparator()
-            + "@prefix ottr: <http://ns.ottr.xyz/0.4/> ." + System.lineSeparator()
-            + "@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> ." + System.lineSeparator()
-            + "@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> ." + System.lineSeparator()
-            + "@prefix xsd: <http://www.w3.org/2001/XMLSchema#> ." + System.lineSeparator()
-            + "@prefix owl: <http://www.w3.org/2002/07/owl#> ." + System.lineSeparator()
-            + System.lineSeparator()
-            + "my:T1(\"1\", \"1\", \"1\") ." + System.lineSeparator()
-            + "my:T1(\"1\", \"2\", \"3\") ." + System.lineSeparator()
-            + "my:T1(\"true\"^^xsd:boolean, none, rdf:type, <http://some.uri/with#part>, \"hello\"@no) ." + System.lineSeparator()
-            + "cross | my:T1(\"1\", \"1\", \"1\") ." + System.lineSeparator()
-            + "<http://base2.org/T2>(_:myLabel, \"one\", \"two\", \"three\") ."  + System.lineSeparator();
+            "@prefix my: <http://base.org/> ." + BR
+                + "@prefix ottr: <http://ns.ottr.xyz/0.4/> ." + BR
+                + "@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> ." + BR
+                + "@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> ." + BR
+                + "@prefix xsd: <http://www.w3.org/2001/XMLSchema#> ." + BR
+                + "@prefix owl: <http://www.w3.org/2002/07/owl#> ." + BR
+                + BR
+                + "my:T1(\"1\", \"1\", \"1\") ." + BR
+                + "my:T1(\"1\", \"2\", \"3\") ." + BR
+                + "my:T1(\"true\"^^xsd:boolean, none, rdf:type, <http://some.uri/with#part>, \"hello\"@no) ." + BR
+                + "cross | my:T1(\"1\", \"1\", \"1\") ." + BR
+                + "<http://base2.org/T2>(_:myLabel, \"one\", \"two\", \"three\") ."  + BR;
 
         testWriteInstances(instances, output);
     }
@@ -163,30 +167,105 @@ public class WriterTest {
             .isEmptyPattern(true)
             .build();
 
-        List<Signature> list = List.of(b1, t1, b2, s1, s2, t2);
+        var t3 = Template.builder()
+            .iri("http://aaaexample.org/temp3")
+            .parameter(Parameter.builder().term(new BlankNodeTerm("x")).optional(true).nonBlank(true).build())
+            .parameter(Parameter.builder().term(new BlankNodeTerm("y")).build())
+            .parameter(Parameter.builder().term(new BlankNodeTerm("z")).build())
+            .instance(i4)
+            .instance(i5)
+            .build();
+
+        var t4 = Template.builder()
+            .iri("http://aaaexample.org/temp4")
+            .parameter(Parameter.builder().term(new BlankNodeTerm("x")).optional(true).nonBlank(true).build())
+            .parameter(Parameter.builder().term(new BlankNodeTerm("y")).build())
+            .parameter(Parameter.builder().term(new BlankNodeTerm("z")).build())
+            .annotation(i1)
+            .annotation(i2)
+            .annotation(i3)
+            .instance(i4)
+            .instance(i5)
+            .build();
+
+        List<Signature> list = List.of(b1, t1, b2, s1, s2, t2, t3, t4);
 
 
-        var output = "@prefix my: <http://base.org/> ." + System.lineSeparator()
-            + "@prefix ottr: <http://ns.ottr.xyz/0.4/> ." + System.lineSeparator()
-            + "@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> ." + System.lineSeparator()
-            + "@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> ." + System.lineSeparator()
-            + "@prefix xsd: <http://www.w3.org/2001/XMLSchema#> ." + System.lineSeparator()
-            + "@prefix owl: <http://www.w3.org/2002/07/owl#> ." + System.lineSeparator()
-            + System.lineSeparator()
-            + "my:base1[! rdfs:Resource ?x, rdfs:Resource ?y] :: BASE ." + System.lineSeparator()
-            + System.lineSeparator()
-            + "my:base2[! owl:Class ?x, owl:Class ?y] :: BASE ." + System.lineSeparator()
-            + System.lineSeparator()
-            + "<http://aaa.org/sig2>[! rdfs:Resource ?x, rdfs:Resource ?y] ." + System.lineSeparator()
-            + System.lineSeparator()
-            + "my:sig1[! rdfs:Resource ?x, rdfs:Resource ?y] ." + System.lineSeparator()
-            + System.lineSeparator()
-            + "<http://aaaexample.org/temp2>[!? rdfs:Resource ?x, rdfs:Resource ?y, rdfs:Resource ?z] :: {" + System.lineSeparator()
-            + "    # Empty pattern" + System.lineSeparator()
-            + "} ." + System.lineSeparator()
-            + "" + System.lineSeparator()
-            + "<http://example.org/temp1>[! rdfs:Resource ?x, rdfs:Resource ?y, rdfs:Resource ?z=\"default\"] :: {" + System.lineSeparator()
-            + "    # Empty pattern" + System.lineSeparator()
+        var output = "@prefix my: <http://base.org/> ." + BR
+            + "@prefix ottr: <http://ns.ottr.xyz/0.4/> ." + BR
+            + "@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> ." + BR
+            + "@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> ." + BR
+            + "@prefix xsd: <http://www.w3.org/2001/XMLSchema#> ." + BR
+            + "@prefix owl: <http://www.w3.org/2002/07/owl#> ." + BR
+            + BR
+            + "my:base1[" + BR
+            + "    ! rdfs:Resource ?x," + BR
+            + "    rdfs:Resource ?y" + BR
+            + "] :: BASE ." + BR
+            + BR
+            + "my:base2[" + BR
+            + "    ! owl:Class ?x," + BR
+            + "    owl:Class ?y" + BR
+            + "] :: BASE ." + BR
+            + BR
+            + "<http://aaa.org/sig2>[" + BR
+            + "    ! rdfs:Resource ?x," + BR
+            + "    rdfs:Resource ?y" + BR
+            + "] ." + BR
+            + BR
+            + "my:sig1[" + BR
+            + "    ! rdfs:Resource ?x," + BR
+            + "    rdfs:Resource ?y" + BR
+            + "] ." + BR
+            + BR
+            + "<http://aaaexample.org/temp2>[" + BR
+            + "    !? rdfs:Resource ?x," + BR
+            + "    rdfs:Resource ?y," + BR
+            + "    rdfs:Resource ?z" + BR
+            + "] :: {" + BR
+            + "    # Empty pattern" + BR
+            + "} ." + BR
+            + "" + BR
+            + "<http://aaaexample.org/temp3>[" + BR
+            + "    !? rdfs:Resource ?x," + BR
+            + "    rdfs:Resource ?y," + BR
+            + "    rdfs:Resource ?z" + BR
+            + "] :: {" + BR
+            + "    my:T1(\"1\", \"1\", \"1\")," + BR
+            + "    cross | my:T1(\"1\", \"1\", \"1\")" + BR
+            + "} ." + BR
+            + "" + BR
+            + "<http://aaaexample.org/temp4>[" + BR
+            + "    !? rdfs:Resource ?x," + BR
+            + "    rdfs:Resource ?y," + BR
+            + "    rdfs:Resource ?z" + BR
+            + "]" + BR
+            + "@@my:T1(" + BR
+            + "    \"1\"," + BR
+            + "    \"2\"," + BR
+            + "    \"3\")," + BR
+            + "@@my:T1(" + BR
+            + "    \"true\"^^xsd:boolean," + BR
+            + "    none," + BR
+            + "    rdf:type," + BR
+            + "    <http://some.uri/with#part>," + BR
+            + "    \"hello\"@no)," + BR
+            + "@@<http://base2.org/T2>(" + BR
+            + "    _:myLabel," + BR
+            + "    \"one\"," + BR
+            + "    \"two\"," + BR
+            + "    \"three\")" + BR
+            + " :: {" + BR
+            + "    my:T1(\"1\", \"1\", \"1\")," + BR
+            + "    cross | my:T1(\"1\", \"1\", \"1\")" + BR
+            + "} ." + BR
+            + "" + BR
+            + "<http://example.org/temp1>[" + BR
+            + "    ! rdfs:Resource ?x," + BR
+            + "    rdfs:Resource ?y," + BR
+            + "    rdfs:Resource ?z=\"default\"" + BR
+            + "] :: {" + BR
+            + "    # Empty pattern" + BR
             + "} .";
 
         testWriteSignatures(list, output);

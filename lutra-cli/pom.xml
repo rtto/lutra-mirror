@@ -2,7 +2,7 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>xyz.ottr.lutra</groupId>
-        <version>0.6.8</version>
+        <version>0.6.9</version>
         <artifactId>lutra</artifactId>
         <relativePath>../pom.xml</relativePath>
     </parent>
@@ -41,7 +41,7 @@
                         </goals>
                         <configuration>
                             <unpack>true</unpack>
-                            <url>http://primer.ottr.xyz/master.zip</url>
+                            <url>https://primer.ottr.xyz/master.zip</url>
                             <outputFileName>master.zip</outputFileName>
                             <outputDirectory>${project.basedir}/src/test/resources/primer</outputDirectory>
                             <!--md5>MD5 SUM HERE</md5 -->

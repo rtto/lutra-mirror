@@ -69,13 +69,16 @@ public enum HTMLFactory {
     }
 
     static DomContent getInfoP(String description) {
-        return p(rawHtml("&#128712; "), text(description))
+        return getInfoP(text(description));
+    }
+
+    static DomContent getInfoP(DomContent description) {
+        return p(rawHtml("&#128712; "), description)
             .withClass("info");
     }
 
     static ContainerTag getPrefixDiv(PrefixMapping prefixMapping) {
         return div(
-            h2("Prefixes"),
             getInfoP("Prefixes are removed from all listings on this page for readability, "
                 + "but are listed here in RDF Turtle format."),
             pre(prefixMapping.getNsPrefixMap().entrySet().stream()

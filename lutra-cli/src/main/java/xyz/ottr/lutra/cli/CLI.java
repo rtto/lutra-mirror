@@ -221,7 +221,7 @@ public class CLI {
 
     private Message.Severity checkLibrary() {
         MessageHandler msgs = this.templateManager.checkTemplates();
-        Message.Severity severity = this.settings.quiet ? msgs.getMostSevere() : msgs.printMessages();
+        Message.Severity severity = this.settings.quiet ? msgs.getMostSevere() : printMessages(msgs);
 
         if (this.settings.mode == Settings.Mode.lint
             && !this.settings.quiet
@@ -237,12 +237,18 @@ public class CLI {
     /// Parsing and writing                                  ///
     ////////////////////////////////////////////////////////////
 
+    // TODO this is a hack to make sure that messages are written to this.outStream. Should refactor MessageHandler.
+    private Message.Severity printMessages(MessageHandler handler) {
+        var temp = new MessageHandler(this.outStream);
+        temp.combine(handler); // Use this.messageHandler's settings
+        return temp.printMessages();
+    }
+
 
     private Message.Severity initStandardLibrary() {
         // Load standard library
         var msgs = this.templateManager.loadStandardTemplateLibrary();
-        this.messageHandler.combine(msgs); // Use this.messageHandler's settings
-        return this.messageHandler.printMessages();
+        return printMessages(msgs);
     }
 
     private Message.Severity parseLibrary() {
@@ -255,8 +261,7 @@ public class CLI {
                 ? null
                 : this.templateManager.getFormat(this.settings.libraryFormat.toString());
 
-        return this.templateManager.readLibrary(libraryFormat, this.settings.library)
-            .printMessages();
+        return printMessages(this.templateManager.readLibrary(libraryFormat, this.settings.library));
     }
 
     private Message.Severity parsePrefixes() {
@@ -279,18 +284,19 @@ public class CLI {
     private void writeInstances(ResultStream<Instance> ins) {
 
         Format outFormat = this.templateManager.getFormat(this.settings.outputFormat.toString());
-        this.templateManager
-            .writeInstances(ins, outFormat, makeInstanceWriter(outFormat.getDefaultFileSuffix()))
-            .printMessages();
+        var msgs = this.templateManager
+            .writeInstances(ins, outFormat, makeInstanceWriter(outFormat.getDefaultFileSuffix()));
+        printMessages(msgs);
     }
 
     private void writeTemplates(TemplateManager templateManager) {
         Format outFormat = this.templateManager.getFormat(this.settings.outputFormat.toString());
-        templateManager.writeTemplates(outFormat, makeTemplateWriter(outFormat.getDefaultFileSuffix()));
+        var msgs = templateManager.writeTemplates(outFormat, makeTemplateWriter(outFormat.getDefaultFileSuffix()));
+        printMessages(msgs);
     }
 
     private void docttrTemplates(TemplateManager templateManager) {
-        var docttr = new DocttrManager(templateManager);
+        var docttr = new DocttrManager(this.outStream, templateManager);
         docttr.write(Path.of(this.settings.out));
     }
 

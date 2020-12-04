@@ -31,7 +31,6 @@ import lombok.Getter;
 import lombok.NonNull;
 import org.apache.jena.shared.PrefixMapping;
 import xyz.ottr.lutra.OTTR;
-import xyz.ottr.lutra.model.terms.IRITerm;
 import xyz.ottr.lutra.model.terms.Term;
 import xyz.ottr.lutra.system.Result;
 
@@ -75,16 +74,7 @@ public class Argument implements ModelElement, HasGetTerm, HasApplySubstitution<
 
     @Override
     public Result<Argument> validate() {
-
-        var result = Result.of(this);
-
-        // Warning if IRIs are in the OTTR namespace
-        if (this.term instanceof IRITerm && ((IRITerm) term).getIri().startsWith(OTTR.namespace)) {
-            result.addWarning("Suspicious argument value: " + term
-                    + ". The value is in the ottr namespace: " + OTTR.namespace);
-        }
-
-        return result;
+        return Result.of(this);
     }
 
 }

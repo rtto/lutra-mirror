@@ -110,7 +110,7 @@ class WTripleSerialiser {
         triples.addAll(listStatements(argument));
 
         listStatements(argument, WOTTR.value).forEachRemaining(statement -> {
-            if (statement.getObject().asResource().canAs(RDFList.class)) {
+            if (statement.getObject().canAs(RDFList.class)) {
                 triples.addAll(serialiseList(statement.getObject().asResource(), true));
             }
         });

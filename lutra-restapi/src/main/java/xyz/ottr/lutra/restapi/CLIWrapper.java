@@ -54,7 +54,7 @@ public class CLIWrapper {
     private @NonNull String outputFormat;
     private boolean fetchMissing;
     private boolean loadTplLibrary;
-    //private String libraryFormat;
+    private String libraryFormat;
 
     private Path inputDirectory;
     private Path libraryDirectory;
@@ -126,9 +126,13 @@ public class CLIWrapper {
             "--mode " + this.mode
             + (StringUtils.isNotEmpty(this.inputFormat) ? " --inputFormat " + this.inputFormat : "")
             + " --outputFormat " + this.outputFormat
-            + (this.loadTplLibrary && StringUtils.isNotBlank(this.tplLibrary) ? " --library " + this.tplLibrary : "")
+            // + (this.loadTplLibrary && StringUtils.isNotBlank(this.tplLibrary) ? " --library " + this.tplLibrary : "")
+            + (StringUtils.isNotEmpty(this.libraryFormat) ? " --libraryFormat " + this.libraryFormat : "")
             + (!this.libraryFiles.isEmpty() ? " --library " + this.libraryDirectory.toAbsolutePath() : "")
-            + (this.fetchMissing ? " --fetchMissing" : "")
+            // TODO disable fetching to protect tpl.ottr.xyz server:
+            //  + (this.fetchMissing ? " --fetchMissing" : ""
+            + " -e txt"
+            + " --fetchMissing"  // must be enabled to use already loaded standard library.
             + " --stdout "
             + this.inputFiles.stream()
                 .map(File::getAbsolutePath)
