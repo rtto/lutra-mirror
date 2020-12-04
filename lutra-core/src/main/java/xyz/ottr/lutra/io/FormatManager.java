@@ -86,7 +86,7 @@ public class FormatManager {
      * retrieved based on name, and attempted used for parsing
      * operations where no Format is specified.
      * 
-     * @param format
+     * @param formats
      *      Collection of Formats to register.
      */
     public void register(Collection<Format> formats) {
@@ -120,7 +120,7 @@ public class FormatManager {
      * Attempts to apply argument reader function to registered Format's 
      * TemplateReader in turn for those Formats supporting TemplateReader. The argument
      * Function should return a MessageHandler containing at least one Message
-     * of severity {@link Message#ERROR} or higher if the attempt failed
+     * of severity {@link Message.Severity#ERROR} or higher if the attempt failed
      * (this is default behavior for all TemplateReaders).
      * When a Format succeeds (i.e. a MessageHandler with no errors is returned
      * from the function application), the method returns with the TemplateReader
@@ -129,7 +129,7 @@ public class FormatManager {
      * 
      * @param readerFunction
      *      A Function that takes a TemplateReader and attempts to use it in some computation,
-     *      and returns a MessageHandler with a Message of severity {@link Message#ERROR}
+     *      and returns a MessageHandler with a Message of severity {@link Message.Severity#ERROR}
      *      or higher if the attempt failed.
      * @return
      *      A Result either containing the TemplateReader that succeeded, or an empty
