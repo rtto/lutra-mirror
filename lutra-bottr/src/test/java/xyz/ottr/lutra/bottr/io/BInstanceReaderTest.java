@@ -69,6 +69,7 @@ public class BInstanceReaderTest {
     }
 
     @Test
+    @Ignore("Uses external SPARQL endpoint. Problematic to rely on outside sources for unit tests.")
     public void testSPARQLMap() {
         String file = ROOT + "maps/instanceMapSPARQL.ttl";
         testNumberOfInstances(file, 13L);
