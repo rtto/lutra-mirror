@@ -539,6 +539,14 @@
                 <version>3.11</version>
             </dependency>
 
+            <!-- https://mvnrepository.com/artifact/org.codehaus.plexus/plexus-utils -->
+            <!-- Fix https://gitlab.com/ottr/lutra/lutra/-/security/vulnerabilities/5291104 -->
+            <dependency>
+                <groupId>org.codehaus.plexus</groupId>
+                <artifactId>plexus-utils</artifactId>
+                <version>3.3.0</version>
+            </dependency>
+
 
             <!-- JENA -->
             <dependency>
