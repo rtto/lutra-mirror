@@ -68,7 +68,7 @@
         <maven.compiler.target>${java.version}</maven.compiler.target>
 
         <jena.version>3.17.0</jena.version>
-        <antlr4-maven-plugin-version>4.9</antlr4-maven-plugin-version>
+        <antlr4-maven-plugin-version>4.9.1</antlr4-maven-plugin-version>
     </properties>
 
     <build>
