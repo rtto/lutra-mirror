@@ -30,9 +30,9 @@ import xyz.ottr.lutra.system.ResultStream;
  * ({@link xyz.ottr.lutra.parser.TemplateParser} or 
  * {@link xyz.ottr.lutra.parser.InstanceParser}) to translate 
  * some pointer to an input (e.g. a filename or URL) to an 
- * output consumable by a reader. An <code>InputReader<T, R></code> 
- * can be paired with a parser, e.g. a <code>InstanceParser<R, O></code>
- * in order to produce a reader, e.g. <code>InstanceReader<T, O></code>.
+ * output consumable by a reader. An <code>InputReader&lt;T, R&gt;</code> 
+ * can be paired with a parser, e.g. a <code>InstanceParser&lt;R, O&gt;</code>
+ * in order to produce a reader, e.g. <code>InstanceReader&lt;T, O&gt;</code>.
  * Thus, for any parser consuming something of type <code>R</code> one 
  * needs to make an <code>InputReader</code> with output of type <code>R</code>.
  * 

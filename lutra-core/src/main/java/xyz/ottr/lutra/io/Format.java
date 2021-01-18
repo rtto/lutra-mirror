@@ -35,7 +35,7 @@ import xyz.ottr.lutra.writer.TemplateWriter;
  * convenience methods for creating readers ({@link TemplateReader}, 
  * {@link InstanceReader}) and writers ({@link xyz.ottr.lutra.writer.TemplateWriter}, 
  * {@link xyz.ottr.lutra.writer.InstanceWriter}) for the format.
- * A <code>Format</code> is typically retrieved from a {@link FormatManager.
+ * A <code>Format</code> is typically retrieved from a {@link FormatManager}.
  */
 public interface Format {
 
