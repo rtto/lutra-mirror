@@ -25,6 +25,7 @@ package xyz.ottr.lutra.store;
 import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
 import java.util.stream.Stream;
+import xyz.ottr.lutra.model.terms.NoneTerm;
 
 public class Query {
 
@@ -212,6 +213,10 @@ public class Query {
 
     public static Query notEquals(String elem1, String elem2) {
         return new Query((qe, m) -> m.get(elem1).equals(m.get(elem2)) ? Stream.empty() : Stream.of(m));
+    }
+
+    public static Query isNotNone(String elem) {
+        return new Query((qe, m) -> m.get(elem).equals(new NoneTerm()) ? Stream.empty() : Stream.of(m));
     }
 
     public static Query isDependencyOf(String instance, String template) {
