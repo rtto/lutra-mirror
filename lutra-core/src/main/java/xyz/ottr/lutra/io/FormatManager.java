@@ -138,6 +138,11 @@ public class FormatManager {
      */
     public Result<TemplateReader> attemptAllFormats(Function<TemplateReader, MessageHandler> readerFunction) {
         
+        // Return warning if no formats are registered
+        if (this.formats.isEmpty()) {
+            return Result.warning("No formats registered to FormatManager");
+        }
+    
         Result<TemplateReader> unsuccessful = Result.empty(); // Return in case of no succeed
         for (Format format : this.formats.values()) {
             if (!format.supportsTemplateReader()) {
