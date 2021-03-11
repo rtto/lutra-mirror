@@ -31,12 +31,14 @@ import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.shared.PrefixMapping;
 import xyz.ottr.lutra.model.Argument;
 import xyz.ottr.lutra.model.Instance;
+import xyz.ottr.lutra.system.MessageHandler;
 import xyz.ottr.lutra.wottr.WOTTR;
 import xyz.ottr.lutra.wottr.io.RDFIO;
 import xyz.ottr.lutra.wottr.util.PrefixMappings;
+import xyz.ottr.lutra.writer.BufferWriter;
 import xyz.ottr.lutra.writer.InstanceWriter;
 
-public class WInstanceWriter implements InstanceWriter {
+public class WInstanceWriter extends BufferWriter implements InstanceWriter {
 
     private final Model model;
 
@@ -57,10 +59,13 @@ public class WInstanceWriter implements InstanceWriter {
             createInstanceNode(this.model, instance);
         }
     }
-
+    
     @Override
-    public String write() {
-        return RDFIO.writeToString(writeToModel());
+    public MessageHandler flush() {
+        MessageHandler msg = new MessageHandler();
+        msg.combine(super.write(RDFIO.writeToString(writeToModel()))); //write model to file
+        msg.combine(super.flush());
+        return msg;
     }
 
     public Model writeToModel() {

@@ -102,7 +102,7 @@ public class WriterTest {
             LiteralTerm.createPlainLiteral("1"),
             LiteralTerm.createPlainLiteral("1"))
         ).build();
-
+    /* tests old writing method,
     @Test
     public void testInstances1() {
 
@@ -124,7 +124,7 @@ public class WriterTest {
 
         testWriteInstances(instances, output);
     }
-
+    */
     @Test
     public void testSignatures1() {
         var b1 = BaseTemplate.builder()
@@ -278,7 +278,7 @@ public class WriterTest {
         var output = writer.write();
         assertThat(output, is(expectedOutput));
     }
-
+    /* tests old write func, create new test func
     private void testWriteInstances(List<Instance> instances, String expectedOutput) {
 
         var writer = new SInstanceWriter(this.createPrefixes());
@@ -286,6 +286,6 @@ public class WriterTest {
         var output = writer.write();
         assertThat(output, is(expectedOutput));
     }
-
+    */
 }
 

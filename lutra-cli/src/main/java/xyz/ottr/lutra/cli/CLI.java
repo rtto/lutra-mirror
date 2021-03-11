@@ -28,7 +28,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Optional;
 import java.util.function.BiFunction;
-import java.util.function.Function;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.jena.rdf.model.Model;
 import picocli.CommandLine;
@@ -284,8 +283,10 @@ public class CLI {
     private void writeInstances(ResultStream<Instance> ins) {
 
         Format outFormat = this.templateManager.getFormat(this.settings.outputFormat.toString());
-        var msgs = this.templateManager
-            .writeInstances(ins, outFormat, makeInstanceWriter(outFormat.getDefaultFileSuffix()));
+        //if filePath is not specified set it to null, else concat file suffix
+        String filePath = (this.settings.out != null) ? this.settings.out + (String) outFormat.getDefaultFileSuffix() : null; 
+        PrintStream consoleStream = shouldPrintOutput() ? this.outStream : null;
+        var msgs = this.templateManager.writeInstances(ins, outFormat, filePath, consoleStream);
         printMessages(msgs);
     }
 
@@ -299,7 +300,8 @@ public class CLI {
         var docttr = new DocttrManager(this.outStream, templateManager);
         docttr.write(Path.of(this.settings.out));
     }
-
+    
+    /*
     private Function<String, Optional<Message>> makeInstanceWriter(String suffix) {
         return str -> {
             if (shouldPrintOutput()) {
@@ -310,7 +312,7 @@ public class CLI {
             }
             return Optional.empty();
         };
-    }
+    }*/
 
     private BiFunction<String, String, Optional<Message>> makeTemplateWriter(String suffix) {
         return (iri, str) -> {

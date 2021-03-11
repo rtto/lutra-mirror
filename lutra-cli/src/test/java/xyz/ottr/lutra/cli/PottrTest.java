@@ -151,8 +151,11 @@ public class PottrTest {
 
         // Write expanded instances to model
         SInstanceWriter insWriter = new SInstanceWriter(OTTR.getDefaultPrefixes());
+        insWriter.init("temp_pottrTests", null);
         ResultConsumer<Instance> expansionErrors = new ResultConsumer<>(insWriter);
         expandedInInstances.forEach(expansionErrors);
+        insWriter.flush();
+        insWriter.close();
 
         return expansionErrors.getMessageHandler().getMessages();
     }

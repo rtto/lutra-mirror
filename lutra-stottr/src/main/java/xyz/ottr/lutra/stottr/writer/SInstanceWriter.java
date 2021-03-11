@@ -23,7 +23,7 @@ package xyz.ottr.lutra.stottr.writer;
  */
 
 import java.util.Comparator;
-import java.util.LinkedList;
+//import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -32,19 +32,21 @@ import xyz.ottr.lutra.Space;
 import xyz.ottr.lutra.model.Argument;
 import xyz.ottr.lutra.model.Instance;
 import xyz.ottr.lutra.stottr.STOTTR;
+import xyz.ottr.lutra.writer.BufferWriter;
 import xyz.ottr.lutra.writer.InstanceWriter;
 
-public class SInstanceWriter implements InstanceWriter {
+public class SInstanceWriter extends BufferWriter implements InstanceWriter {
 
     protected static final Comparator<Instance> instanceSorter = Comparator.comparing(Instance::getIri)
         .thenComparing(i -> Objects.toString(i.getListExpander(), ""), String::compareToIgnoreCase)
         .thenComparing(i -> i.getArguments().toString(), String::compareToIgnoreCase);
 
-    protected final List<Instance> instances;
+    private boolean prefixWriteFlag = true; //flag to ensure prefixes are written only once
+    //protected final List<Instance> instances;
     private final STermWriter termWriter;
 
     protected SInstanceWriter(STermWriter termWriter) {
-        this.instances = new LinkedList<>();
+        //this.instances = new LinkedList<>();
         this.termWriter = termWriter;
     }
 
@@ -54,28 +56,23 @@ public class SInstanceWriter implements InstanceWriter {
 
     @Override
     public void accept(Instance instance) {
-        this.instances.add(instance);
-    }
-
-    @Override
-    public String write() {
-
+        //this.instances.add(instance);
         StringBuilder builder = new StringBuilder();
-
+        
+        if (prefixWriteFlag) { //only add prefix on first accept call
+            builder
+                .append(SPrefixWriter.write(this.termWriter.getPrefixes()))
+                .append(Space.LINEBR2);
+            prefixWriteFlag = false;
+        }
+        
         builder
-            .append(SPrefixWriter.write(this.termWriter.getPrefixes()))
-            .append(Space.LINEBR2);
+            .append(writeInstance(instance))
+            .append(STOTTR.Statements.statementEnd)
+            .append(Space.LINEBR);
 
-        this.instances.stream()
-            .sorted(instanceSorter)
-            .forEach(instance ->
-                builder
-                    .append(writeInstance(instance))
-                    .append(STOTTR.Statements.statementEnd)
-                    .append(Space.LINEBR));
-
-        return builder.toString();
-    }
+        super.write(builder.toString()); // send contents to bufferWriter for writing to file
+    }  
 
     public String writeInstance(Instance instance) {
 
