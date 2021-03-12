@@ -24,6 +24,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assume.assumeTrue;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
@@ -31,6 +32,8 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
+import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -41,6 +44,7 @@ import xyz.ottr.lutra.api.StandardFormat;
 import xyz.ottr.lutra.api.StandardTemplateManager;
 import xyz.ottr.lutra.io.Format;
 import xyz.ottr.lutra.model.Signature;
+import xyz.ottr.lutra.system.Message;
 import xyz.ottr.lutra.system.Result;
 
 @RunWith(Parameterized.class)
@@ -103,6 +107,13 @@ public class FormatEquivalenceTest {
 
         // write signature to string
         var writer = this.format.getTemplateWriter().get();
+        
+        BiFunction<String, String, Optional<Message>> writerFunc = (iri, str) -> {
+            return xyz.ottr.lutra.io.Files
+                    .writeTemplatesTo(iri, str, "src/test/resources/FormatEquivalanceTest_temp_folder", "temp_suffix");
+        };
+        writer.setWriterFunction(writerFunc);
+        
         writer.accept(this.signature);
         String coreString = writer.write(this.signature.getIri());
 
@@ -118,6 +129,18 @@ public class FormatEquivalenceTest {
 
         assertThat(ioSignatures.size(), is(1));
         assertThat(ioSignatures.get(0).get(), is(this.signature));
+        
+        deleteDirectory(new File("src/test/resources/FormatEquivalanceTest_temp_folder/"));
 
+    }
+    
+    private void deleteDirectory(File directoryToBeDeleted) {
+        File[] allContents = directoryToBeDeleted.listFiles();
+        if (allContents != null) {
+            for (File file : allContents) {
+                deleteDirectory(file);
+            }
+        }
+        directoryToBeDeleted.delete();
     }
 }

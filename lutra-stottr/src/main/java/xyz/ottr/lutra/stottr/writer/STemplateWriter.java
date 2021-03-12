@@ -25,7 +25,9 @@ package xyz.ottr.lutra.stottr.writer;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
+import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 import org.apache.jena.shared.PrefixMapping;
 import xyz.ottr.lutra.Space;
@@ -37,6 +39,8 @@ import xyz.ottr.lutra.model.types.BasicType;
 import xyz.ottr.lutra.model.types.ComplexType;
 import xyz.ottr.lutra.model.types.Type;
 import xyz.ottr.lutra.stottr.STOTTR;
+import xyz.ottr.lutra.system.Message;
+import xyz.ottr.lutra.system.MessageHandler;
 import xyz.ottr.lutra.writer.TemplateWriter;
 
 public class STemplateWriter implements TemplateWriter {
@@ -46,10 +50,15 @@ public class STemplateWriter implements TemplateWriter {
 
     private final Map<String, Signature> templates;
     private final PrefixMapping prefixes;
+    
+    private MessageHandler msgs;
+    private BiFunction<String, String, Optional<Message>> stringConsumer;
 
     public STemplateWriter(PrefixMapping prefixes) {
         this.templates = new HashMap<>();
         this.prefixes = prefixes;
+        this.msgs = new MessageHandler();
+        stringConsumer = null;
     }
 
     @Override
@@ -60,8 +69,14 @@ public class STemplateWriter implements TemplateWriter {
     @Override
     public void accept(Signature template) {
         this.templates.put(template.getIri(), template);
+        
+        String iri = template.getIri();
+        if (iri != null) {
+            String content = write(iri);
+            stringConsumer.apply(iri, content).ifPresent(msgs::add); //write template to file or console
+        }
     }
-
+    
     public String write() {
         return SPrefixWriter.write(this.prefixes)
             + Space.LINEBR2
@@ -235,5 +250,25 @@ public class STemplateWriter implements TemplateWriter {
         }
 
         return annotations;
+    }
+    
+    /**
+     * Set writer function which will write to file
+     * 
+     * @param stringConsumer
+     *      A function to which the written string are applied
+     * @return
+     */
+    @Override
+    public void setWriterFunction(BiFunction<String, String, Optional<Message>> stringConsumer) {
+        this.stringConsumer = stringConsumer;
+    }
+    
+    /**
+     * @return MessageHandler
+     */
+    @Override
+    public MessageHandler getMessages() {
+        return this.msgs;
     }
 }

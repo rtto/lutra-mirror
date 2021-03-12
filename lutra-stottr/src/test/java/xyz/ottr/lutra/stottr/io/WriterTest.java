@@ -25,12 +25,16 @@ package xyz.ottr.lutra.stottr.io;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
+import java.io.File;
 import java.util.List;
+import java.util.Optional;
+import java.util.function.BiFunction;
 import org.apache.jena.shared.PrefixMapping;
 import org.apache.jena.vocabulary.OWL;
 import org.apache.jena.vocabulary.XSD;
 import org.junit.Test;
 import xyz.ottr.lutra.OTTR;
+import xyz.ottr.lutra.io.Files;
 import xyz.ottr.lutra.model.Argument;
 import xyz.ottr.lutra.model.BaseTemplate;
 import xyz.ottr.lutra.model.Instance;
@@ -43,8 +47,8 @@ import xyz.ottr.lutra.model.terms.IRITerm;
 import xyz.ottr.lutra.model.terms.LiteralTerm;
 import xyz.ottr.lutra.model.terms.NoneTerm;
 import xyz.ottr.lutra.model.types.TypeRegistry;
-import xyz.ottr.lutra.stottr.writer.SInstanceWriter;
 import xyz.ottr.lutra.stottr.writer.STemplateWriter;
+import xyz.ottr.lutra.system.Message;
 
 public class WriterTest {
 
@@ -274,10 +278,27 @@ public class WriterTest {
     private void testWriteSignatures(List<Signature> signatures, String expectedOutput) {
 
         var writer = new STemplateWriter(this.createPrefixes());
+        BiFunction<String, String, Optional<Message>> writerFunc = (iri, str) -> {
+            return Files.writeTemplatesTo(iri, str, "src/test/resources/WriterTest_temp_folder", "temp_suffix");
+        };
+        writer.setWriterFunction(writerFunc);
         signatures.forEach(writer::accept);
         var output = writer.write();
         assertThat(output, is(expectedOutput));
+        
+        deleteDirectory(new File("src/test/resources/WriterTest_temp_folder/"));
     }
+    
+    private void deleteDirectory(File directoryToBeDeleted) {
+        File[] allContents = directoryToBeDeleted.listFiles();
+        if (allContents != null) {
+            for (File file : allContents) {
+                deleteDirectory(file);
+            }
+        }
+        directoryToBeDeleted.delete();
+    }
+    
     /* tests old write func, create new test func
     private void testWriteInstances(List<Instance> instances, String expectedOutput) {
 
