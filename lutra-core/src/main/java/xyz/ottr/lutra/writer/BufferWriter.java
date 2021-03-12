@@ -42,8 +42,8 @@ public abstract class BufferWriter {
      *  
      * @param filePath
      *      A String containing file path to write to.
-     * @param consoleOutput
-     *      A boolean specifying if results should be written to console
+     * @param consoleStream
+     *      A PrintStream used to write output to console
      * @return
      *      Returns message handler containing error or warn messages if file creation failed,
      */
@@ -56,12 +56,8 @@ public abstract class BufferWriter {
             msgs.add(Message.info("Output will be written to console"));
         }
         
-        if (filePath != null) {
-            this.fileOutput = true;
-        } else {
-            this.fileOutput = false;
-            msgs.add(Message.warning("No file path given"));
-        }
+        fileOutput = (filePath != null) ? true : false;
+        
     
         if (fileOutput) {
             try {
@@ -75,7 +71,7 @@ public abstract class BufferWriter {
     }
 
     /**
-     * Write string contents to file
+     * Write string contents to file or console
      *  
      * @param contents
      *      file contents to write
@@ -99,12 +95,17 @@ public abstract class BufferWriter {
     }
 
     /**
-     * Flush contents of BufferedWriter
+     * Flush contents of BufferedWriter and PrintStream
      *  
      * @return
      *      Returns message handler.
      */
     public MessageHandler flush() {
+        
+        if (consoleStream != null) {
+            this.consoleStream.flush();
+        }
+        
         if (fileOutput) {
             try {
                 this.buffWriter.flush();

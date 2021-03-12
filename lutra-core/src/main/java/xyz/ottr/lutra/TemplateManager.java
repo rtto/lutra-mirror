@@ -433,8 +433,11 @@ public class TemplateManager {
      *      applications.
      */
     public MessageHandler writeInstances(ResultStream<Instance> instances, Format format, String filePath, PrintStream consoleStream) {
-        MessageHandler msgs = new MessageHandler();
         Result<InstanceWriter> writerRes = format.getInstanceWriter();
+        MessageHandler msgs = writerRes.getMessageHandler();
+        if (!writerRes.isPresent()) {
+            return msgs;
+        }
         msgs.combine(writerRes.get().init(filePath, consoleStream));
         msgs.combine(writeObjects(instances, writerRes));
         msgs.combine(writerRes.get().flush());
@@ -493,8 +496,7 @@ public class TemplateManager {
     private <T, W extends Consumer<T>> MessageHandler writeObjects(ResultStream<T> objects,
             Result<W> writerRes) { 
 
-        MessageHandler msgs = new MessageHandler();
-        msgs.add(writerRes);
+        MessageHandler msgs = writerRes.getMessageHandler();
 
         writerRes.ifPresent(writer -> {
             ResultConsumer<T> consumer = new ResultConsumer<>(writer);

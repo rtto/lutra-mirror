@@ -46,15 +46,15 @@ public interface InstanceWriter extends Consumer<Instance> {
      *  
      * @param filePath
      *      A String containing file path to write to.
-     * @param consoleOutput
-     *      A boolean specifying if results should be written to console
+     * @param consoleStream
+     *      A PrintStream used to write output to console
      * @return
      *      Returns message handler containing error or warn messages if file creation failed,
      */
     MessageHandler init(String filePath, PrintStream consoleStream);
 
     /**
-     * Write string contents to file
+     * Write string contents to file or console
      *  
      * @param contents
      *      file contents to write
@@ -64,7 +64,7 @@ public interface InstanceWriter extends Consumer<Instance> {
     MessageHandler write(String contents);
 
     /**
-     * Flush contents of BufferedWriter
+     * Flush contents of BufferedWriter and PrintStream
      *  
      * @return
      *      Returns message handler.
