@@ -425,6 +425,12 @@
                     <version>${antlr4-maven-plugin-version}</version>
                 </plugin>
 
+                <plugin>
+                    <groupId>de.elnarion.maven</groupId>
+                    <artifactId>plantuml-generator-maven-plugin</artifactId>
+                    <version>1.2.0</version>
+                </plugin>
+
             </plugins>
         </pluginManagement>
 
