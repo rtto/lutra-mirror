@@ -41,12 +41,10 @@ public class SInstanceWriter extends BufferWriter implements InstanceWriter {
         .thenComparing(i -> Objects.toString(i.getListExpander(), ""), String::compareToIgnoreCase)
         .thenComparing(i -> i.getArguments().toString(), String::compareToIgnoreCase);
 
-    private boolean prefixWriteFlag = true; //flag to ensure prefixes are written only once
-    //protected final List<Instance> instances;
+    private boolean prefixWriteFlag = true; //flag to ensure prefixes are written only once    
     private final STermWriter termWriter;
 
     protected SInstanceWriter(STermWriter termWriter) {
-        //this.instances = new LinkedList<>();
         this.termWriter = termWriter;
     }
 
@@ -56,7 +54,6 @@ public class SInstanceWriter extends BufferWriter implements InstanceWriter {
 
     @Override
     public void accept(Instance instance) {
-        //this.instances.add(instance);
         StringBuilder builder = new StringBuilder();
         
         if (prefixWriteFlag) { //only add prefix on first accept call

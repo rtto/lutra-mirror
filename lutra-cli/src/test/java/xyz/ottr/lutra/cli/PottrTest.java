@@ -1,5 +1,7 @@
 package xyz.ottr.lutra.cli;
 
+
+
 /*-
  * #%L
  * lutra-cli
@@ -22,6 +24,7 @@ package xyz.ottr.lutra.cli;
  * #L%
  */
 
+import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -48,6 +51,7 @@ import xyz.ottr.lutra.stottr.parser.SInstanceParser;
 import xyz.ottr.lutra.stottr.parser.STemplateParser;
 import xyz.ottr.lutra.stottr.writer.SInstanceWriter;
 import xyz.ottr.lutra.system.Message;
+import xyz.ottr.lutra.system.MessageHandler;
 import xyz.ottr.lutra.system.ResultConsumer;
 import xyz.ottr.lutra.system.ResultStream;
 
@@ -150,13 +154,15 @@ public class PottrTest {
             .innerFlatMap(store::expandInstanceFetch);
 
         // Write expanded instances to model
+        String filePath = "src/test/resources/temp_pottrTests";
         SInstanceWriter insWriter = new SInstanceWriter(OTTR.getDefaultPrefixes());
-        insWriter.init("src/test/resources/temp_pottrTests", null);
+        insWriter.init(filePath, null);
         ResultConsumer<Instance> expansionErrors = new ResultConsumer<>(insWriter);
         expandedInInstances.forEach(expansionErrors);
-        insWriter.flush();
-        insWriter.close();
-
-        return expansionErrors.getMessageHandler().getMessages();
+        MessageHandler msgs = expansionErrors.getMessageHandler();
+        msgs.combine(insWriter.flush());
+        msgs.combine(insWriter.close());
+        new File(filePath).delete();
+        return msgs.getMessages();
     }
 }

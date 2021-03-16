@@ -24,7 +24,6 @@ package xyz.ottr.lutra.writer;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
-import java.io.IOException;
 import java.io.PrintStream;
 import java.nio.charset.Charset;
 import xyz.ottr.lutra.system.Message;
@@ -62,7 +61,7 @@ public abstract class BufferWriter {
         if (fileOutput) {
             try {
                 buffWriter = new BufferedWriter(new FileWriter(filePath, Charset.forName("UTF-8")));
-            } catch (IOException ex) {
+            } catch (Exception ex) {
                 Message err = Message.error("Error opening file: " + ex.getMessage());
                 msgs.add(err);
             }
@@ -86,7 +85,7 @@ public abstract class BufferWriter {
         if (fileOutput) {
             try {
                 buffWriter.write(contents);
-            } catch (IOException ex) {
+            } catch (Exception ex) {
                 Message err = Message.error("Error writing file: " + ex.getMessage());
                 msgs.add(err);
             }
@@ -109,7 +108,7 @@ public abstract class BufferWriter {
         if (fileOutput) {
             try {
                 this.buffWriter.flush();
-            } catch (IOException ex) {
+            } catch (Exception ex) {
                 Message err = Message.error("Error flushing contents: " + ex.getMessage());
                 msgs.add(err);
             }
@@ -127,7 +126,7 @@ public abstract class BufferWriter {
         if (fileOutput) {
             try {
                 this.buffWriter.close();
-            } catch (IOException ex) {
+            } catch (Exception ex) {
                 Message err = Message.error("Error closing writer " + ex.getMessage());
                 msgs.add(err);
             }
