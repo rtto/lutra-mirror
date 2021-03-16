@@ -26,6 +26,9 @@ import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.PrintStream;
 import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import xyz.ottr.lutra.system.Message;
 import xyz.ottr.lutra.system.MessageHandler;
 
@@ -60,6 +63,10 @@ public abstract class BufferWriter {
     
         if (fileOutput) {
             try {
+                Path parentDirs = Paths.get(filePath).getParent(); 
+                if (parentDirs != null) {
+                    Files.createDirectories(parentDirs); //create parent directories
+                }
                 buffWriter = new BufferedWriter(new FileWriter(filePath, Charset.forName("UTF-8")));
             } catch (Exception ex) {
                 Message err = Message.error("Error opening file: " + ex.getMessage());

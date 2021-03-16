@@ -44,7 +44,6 @@ import xyz.ottr.lutra.wottr.writer.WInstanceWriter;
 
 public class WriterTest {
 
-    //private static final String BR = System.lineSeparator();
     private static final String BR = "\n";
     private String resourcePath = "src/test/resources/WriterTests/";
     

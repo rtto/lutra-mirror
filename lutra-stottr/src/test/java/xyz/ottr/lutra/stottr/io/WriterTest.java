@@ -69,8 +69,6 @@ public class WriterTest {
         return prefixes;
     }
 
-
-
     private Instance i1 = Instance.builder()
         .iri("http://base.org/T1")
         .arguments(Argument.listOf(

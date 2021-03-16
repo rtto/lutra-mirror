@@ -301,18 +301,6 @@ public class CLI {
         docttr.write(Path.of(this.settings.out));
     }
     
-    /*
-    private Function<String, Optional<Message>> makeInstanceWriter(String suffix) {
-        return str -> {
-            if (shouldPrintOutput()) {
-                this.outStream.println(str);
-            }
-            if (this.settings.out != null) {
-                return Files.writeFile(str, this.settings.out, suffix);
-            }
-            return Optional.empty();
-        };
-    }*/
 
     private BiFunction<String, String, Optional<Message>> makeTemplateWriter(String suffix) {
         return (iri, str) -> {
