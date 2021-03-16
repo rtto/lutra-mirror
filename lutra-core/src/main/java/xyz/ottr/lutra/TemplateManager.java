@@ -472,36 +472,7 @@ public class TemplateManager {
         msgs.combine(writeObjects(this.templateStore.getAllTemplateObjects(), writerRes));
         msgs.combine(writerRes.get().getMessages());
         return msgs;
-        
-        /*
-        return writeObjects(this.templateStore.getAllTemplateObjects(), writerRes, (writer, msgs) -> {
-            for (String iri : writer.getIRIs()) {
-                stringConsumer.apply(iri, writer.write(iri)).ifPresent(msgs::add);
-            }
-        });
-        */
-        
     }
-
-    /*
-    private <T, W extends Consumer<T>> MessageHandler writeObjects(ResultStream<T> objects,
-            Result<W> writerRes, BiConsumer<W, MessageHandler> fileWriter) { 
-
-        MessageHandler msgs = new MessageHandler();
-        msgs.add(writerRes);
-        
-        writerRes.ifPresent(writer -> {
-            ResultConsumer<T> consumer = new ResultConsumer<>(writer);
-            objects.forEach(consumer);
-            msgs.combine(consumer.getMessageHandler());
-
-            if (msgs.getMostSevere().isLessThan(this.settings.haltOn)) {
-                fileWriter.accept(writer, msgs);
-            }
-        });
-        return msgs;
-    }
-    */
     
     private <T, W extends Consumer<T>> MessageHandler writeObjects(ResultStream<T> objects,
             Result<W> writerRes) { 

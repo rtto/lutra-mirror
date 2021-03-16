@@ -22,11 +22,7 @@ package xyz.ottr.lutra.stottr.writer;
  * #L%
  */
 
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 import org.apache.jena.shared.PrefixMapping;
@@ -45,38 +41,43 @@ import xyz.ottr.lutra.writer.TemplateWriter;
 
 public class STemplateWriter implements TemplateWriter {
 
+    /*
     private static final Comparator<Signature> signatureComparator =
         Comparator.comparing(sign -> sign.getClass().getSimpleName() + sign.getIri(), String::compareToIgnoreCase);
-
-    private final Map<String, Signature> templates;
+    */
+    
+    //private final Map<String, Signature> templates;
     private final PrefixMapping prefixes;
     
     private MessageHandler msgs;
     private BiFunction<String, String, Optional<Message>> stringConsumer;
 
     public STemplateWriter(PrefixMapping prefixes) {
-        this.templates = new HashMap<>();
+        //this.templates = new HashMap<>();
         this.prefixes = prefixes;
         this.msgs = new MessageHandler();
         stringConsumer = null;
     }
 
+    /*
     @Override
     public Set<String> getIRIs() {
         return this.templates.keySet();
     }
+    */    
 
     @Override
     public void accept(Signature template) {
-        this.templates.put(template.getIri(), template);
+        //this.templates.put(template.getIri(), template);
         
         String iri = template.getIri();
         if (iri != null) {
-            String content = write(iri);
+            String content = writeSignature(template, true);
             stringConsumer.apply(iri, content).ifPresent(msgs::add); //write template to file or console
         }
     }
     
+    /*
     public String write() {
         return SPrefixWriter.write(this.prefixes)
             + Space.LINEBR2
@@ -85,7 +86,9 @@ public class STemplateWriter implements TemplateWriter {
                 .map(signature -> writeSignature(signature, false))
                 .collect(Collectors.joining(Space.LINEBR2));
     }
+    */
 
+    /*
     public String write(String iri) {
 
         Signature template = this.templates.get(iri);
@@ -93,6 +96,7 @@ public class STemplateWriter implements TemplateWriter {
             ? null
             : writeSignature(template, true);
     }
+    */
 
     public String writeSignature(Signature signature, boolean includePrefixes) {
 

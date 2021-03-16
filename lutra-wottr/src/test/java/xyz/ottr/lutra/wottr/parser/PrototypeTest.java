@@ -129,8 +129,10 @@ public class PrototypeTest {
         WTemplateWriter templateWriter = new WTemplateWriter();
         ResultConsumer<Template> resultConsumer = new ResultConsumer(templateWriter);
         
+        String folderPath = "src/test/resources/ProtoTypeTest/";
+        
         BiFunction<String, String, Optional<Message>> writer = (iri, str) -> {
-            return Files.writeTemplatesTo(iri, str, "src/test/resources/ProtoTypeTest_temp_folder", "temp_suffix");
+            return Files.writeTemplatesTo(iri, str, folderPath, ".suffix");
         };
         templateWriter.setWriterFunction(writer);
         //expGraph.getAllTemplates().forEach(resultConsumer); 
@@ -139,7 +141,7 @@ public class PrototypeTest {
         //System.out.println("Templates:");
         //templateWriter.printDefinitions();
         
-        deleteDirectory(new File("src/test/resources/ProtoTypeTest_temp_folder/"));
+        deleteDirectory(new File(folderPath));
     }
     
     private void deleteDirectory(File directoryToBeDeleted) {

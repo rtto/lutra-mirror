@@ -100,37 +100,35 @@ public class FormatEquivalenceTest {
     }
 
     @Test
-    public void test() throws IOException {
+    public void test() throws Exception {
 
         assumeTrue(this.format.supportsTemplateReader());
         assumeTrue(this.format.supportsTemplateWriter());
-
-        // write signature to string
+       
         var writer = this.format.getTemplateWriter().get();
-        
+        String folderPath = "src/test/resources/FormatEquivalanceTest/";
+                
         BiFunction<String, String, Optional<Message>> writerFunc = (iri, str) -> {
             return xyz.ottr.lutra.io.Files
-                    .writeTemplatesTo(iri, str, "src/test/resources/FormatEquivalanceTest_temp_folder", "temp_suffix");
+                    .writeTemplatesTo(iri, str, folderPath, this.format.getDefaultFileSuffix());
         };
-        writer.setWriterFunction(writerFunc);
         
-        writer.accept(this.signature);
-        String coreString = writer.write(this.signature.getIri());
-
-        // write string to file
-        Path file = Files.createTempFile("template", this.format.getDefaultFileSuffix());
-        Files.write(file, coreString.getBytes(Charset.forName("UTF-8")));
-
+        writer.setWriterFunction(writerFunc);
+        writer.accept(this.signature); //write file
+        
         // read file
+        String iriFilePath = xyz.ottr.lutra.io.Files.iriToPath(this.signature.getIri()) + "" + this.format.getDefaultFileSuffix();
+        String absFilePath = Path.of(folderPath + iriFilePath).toAbsolutePath().toString();
+        
         var reader = this.format.getTemplateReader().get();
-        var ioSignatures = reader.apply(file.toAbsolutePath().toString())
+        var ioSignatures = reader.apply(absFilePath)
             .getStream()
             .collect(Collectors.toList());
-
+                
         assertThat(ioSignatures.size(), is(1));
         assertThat(ioSignatures.get(0).get(), is(this.signature));
         
-        deleteDirectory(new File("src/test/resources/FormatEquivalanceTest_temp_folder/"));
+        deleteDirectory(new File(folderPath));
 
     }
     

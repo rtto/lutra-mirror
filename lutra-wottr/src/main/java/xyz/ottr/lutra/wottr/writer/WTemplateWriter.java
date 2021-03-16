@@ -23,11 +23,8 @@ package xyz.ottr.lutra.wottr.writer;
  */
 
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import java.util.function.BiFunction;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
@@ -51,7 +48,6 @@ import xyz.ottr.lutra.writer.TemplateWriter;
 
 public class WTemplateWriter implements TemplateWriter {
 
-    private final Map<String, Model> models; // TODO: Decide on representation
     private final WInstanceWriter instanceWriter;
     private final PrefixMapping prefixes;
     
@@ -63,47 +59,38 @@ public class WTemplateWriter implements TemplateWriter {
     }
 
     public WTemplateWriter(PrefixMapping prefixes) {
-        this.models = new HashMap<>();
         this.instanceWriter = new WInstanceWriter(prefixes);
         this.prefixes = prefixes;
         this.msgs = new MessageHandler();
     }
 
     @Override
-    public Set<String> getIRIs() {
-        return this.models.keySet();
-    }
-
-    @Override
     public void accept(Signature template) {
         var iri = template.getIri();
-        if (!this.models.containsKey(iri)) {
-            this.models.put(template.getIri(), getModel(template));
-        }
-        
-        String content = RDFIO.writeToString(getModel(template));
+                
+        String content = buildStringRep(template);
         stringConsumer.apply(iri, content).ifPresent(msgs::add); //write template to file or console
     }
-
+       
     public Model getModel(Signature signature) {
-        return this.models.computeIfAbsent(signature.getIri(), ignore -> {
-            Model model = ModelFactory.createDefaultModel();
-            model.setNsPrefixes(this.prefixes);
+        Model model = ModelFactory.createDefaultModel();
+        model.setNsPrefixes(this.prefixes);
 
-            Resource signatureNode = createSignature(model, signature);
+        Resource signatureNode = createSignature(model, signature);
 
-            if (signature instanceof Template) {
-                addInstances(((Template) signature).getPattern(), signatureNode, WOTTR.pattern, model);
-            }
-            PrefixMappings.trim(model);
-            return model;
-        });
+        if (signature instanceof Template) {
+            addInstances(((Template) signature).getPattern(), signatureNode, WOTTR.pattern, model);
+        }
+        PrefixMappings.trim(model);
+        
+        return model;        
     }
     
-    @Override
-    public String write(String iri) {
-        return RDFIO.writeToString(this.models.get(iri));
+    
+    public String buildStringRep(Signature template) {
+        return RDFIO.writeToString(getModel(template));
     }
+    
 
     private Resource createSignature(Model model, Signature signature) {
 

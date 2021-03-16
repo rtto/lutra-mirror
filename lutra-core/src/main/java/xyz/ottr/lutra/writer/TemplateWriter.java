@@ -36,11 +36,6 @@ import xyz.ottr.lutra.system.MessageHandler;
 public interface TemplateWriter extends Consumer<Signature> {
 
     /**
-     * Returns the set of IRIs which is added to this writer.
-     */
-    Set<String> getIRIs();
-
-    /**
      * Adds a template definition to this writer.
      *
      * @param template
@@ -57,8 +52,6 @@ public interface TemplateWriter extends Consumer<Signature> {
     default void addTemplates(Set<Signature> templates) {
         templates.forEach(this);
     }
-
-    String write(String iri);
     
     /**
      * Set writer function which will write to file

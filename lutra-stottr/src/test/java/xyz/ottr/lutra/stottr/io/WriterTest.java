@@ -137,6 +137,7 @@ public class WriterTest {
         testWriteInstances(instances, output);
     }
     
+    //only file write operations are tested, file contents are verified in lutra-api FormatEquivalenceTest
     @Test
     public void testSignatures1() {
         var b1 = BaseTemplate.builder()
@@ -202,7 +203,7 @@ public class WriterTest {
 
         List<Signature> list = List.of(b1, t1, b2, s1, s2, t2, t3, t4);
 
-
+        /*
         var output = "@prefix my: <http://base.org/> ." + BR
             + "@prefix ottr: <http://ns.ottr.xyz/0.4/> ." + BR
             + "@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> ." + BR
@@ -279,20 +280,25 @@ public class WriterTest {
             + "] :: {" + BR
             + "    # Empty pattern" + BR
             + "} .";
-
-        testWriteSignatures(list, output);
+        */
+        testWriteSignatures(list);
     }
 
-    private void testWriteSignatures(List<Signature> signatures, String expectedOutput) {
+    private void testWriteSignatures(List<Signature> signatures) {
         String folderPath = this.resourcePath + "template_folder";
         var writer = new STemplateWriter(this.createPrefixes());
+        
         BiFunction<String, String, Optional<Message>> writerFunc = (iri, str) -> {
-            return Files.writeTemplatesTo(iri, str, folderPath, "temp_suffix");
+            return Files.writeTemplatesTo(iri, str, folderPath, ".suffix");
         };
+        
         writer.setWriterFunction(writerFunc);
         signatures.forEach(writer::accept);
-        var output = writer.write();
-        assertThat(output, is(expectedOutput));
+        
+        MessageHandler msgs = writer.getMessages(); 
+        if (msgs.getMostSevere().isGreaterThan(Severity.WARNING)) {
+            fail(msgs.getMessages().toString()); //template writing failed
+        }
         
         deleteDirectory(new File(folderPath));
     }
