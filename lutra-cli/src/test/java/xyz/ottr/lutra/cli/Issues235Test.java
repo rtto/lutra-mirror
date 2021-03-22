@@ -42,7 +42,7 @@ public class Issues235Test {
             + " " + ROOT + "instance.stottr");
 
 
-        Model actual = RDFIO.fileReader().parse(ROOT + "output.ttl").get();
+        Model actual = RDFIO.fileReader().parse(ROOT + "output").get();
         Model expected = RDFIO.fileReader().parse(ROOT + "expected-output.ttl").get();
 
         TestUtils.testIsomorphicModels(actual, expected);
