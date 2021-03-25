@@ -31,7 +31,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import xyz.ottr.lutra.OTTR;
@@ -45,10 +44,8 @@ import xyz.ottr.lutra.model.Signature;
 import xyz.ottr.lutra.model.Substitution;
 import xyz.ottr.lutra.model.Template;
 import xyz.ottr.lutra.model.terms.BlankNodeTerm;
-import xyz.ottr.lutra.store.Query;
 import xyz.ottr.lutra.store.QueryEngine;
 import xyz.ottr.lutra.store.TemplateStore;
-import xyz.ottr.lutra.store.Tuple;
 import xyz.ottr.lutra.store.checks.Check;
 import xyz.ottr.lutra.store.checks.CheckLibrary;
 import xyz.ottr.lutra.system.Message;
@@ -58,24 +55,10 @@ import xyz.ottr.lutra.system.ResultStream;
 
 public class DependencyGraph implements TemplateStore {
 
-    /**
-     * Constructs a predicate that takes an edge and returns true if the edge points
-     * to a template with an IRI in argument set. Can be used with the
-     * expansion-methods to expand a given vocabulary.
-     *
-     * @param iris
-     *            a set of the IRIs to expand
-     * @return a predicate returning true on edges pointing to a template with IRI
-     *         in argument set
-     */
-    public static Predicate<DependencyEdge> vocabularyExpansionPredicate(Set<String> iris) {
-        return (e) -> iris.contains(e.to.getIri());
-    }
-
-    private final Set<TemplateNode> roots;
-    private final Map<String, TemplateNode> nodes;
-    private final Map<TemplateNode, Set<DependencyEdge>> dependencies;
-    private final Map<String, Set<String>> instanceIndex;
+    private final Set<TemplateNode> roots; // templates without dependencies
+    private final Map<String, TemplateNode> nodes; // main store
+    private final Map<TemplateNode, Set<DependencyEdge>> dependencies; // DependencyEdge replaced by Template.pattern
+    private final Map<String, Set<String>> instanceIndex; // just performance
     private final FormatManager formatManager;
     private Optional<TemplateStore> standardLibrary;
 
@@ -111,19 +94,6 @@ public class DependencyGraph implements TemplateStore {
             addInstanceToIndex(args.get(1).toString(), template);
         } else {
             addInstanceToIndex(instance, template);
-        }
-    }
-
-    private void removeInstanceFromIndex(String instance, String template) {
-
-        this.instanceIndex.get(instance).remove(template);
-    }
-
-    private void removeInstanceFromIndex(String instance, List<Argument> args, String template) {
-        if (instance.equals(OTTR.BaseURI.Triple)) {
-            removeInstanceFromIndex(args.get(1).toString(), template);
-        } else {
-            removeInstanceFromIndex(instance, template);
         }
     }
 
@@ -189,22 +159,6 @@ public class DependencyGraph implements TemplateStore {
         return true;
     }
 
-    /**
-     * Adds an instance call to a knowledge base.
-     *
-     * @param knowledgeBase
-     *            the URI of the knowledge base to add an instance call to
-     * @param pl
-     *            the parameters representing the arguments in the call
-     * @param instance
-     *            the URI of the template called
-     */
-    public void addInstance(String knowledgeBase, List<Argument> pl, ListExpander expander, String instance) {
-        TemplateNode kbNode = addTemplateNode(knowledgeBase);
-        TemplateNode tempNode = addTemplateNode(instance);
-        addDependency(kbNode, pl, expander, tempNode);
-    }
-
     private void addDependency(TemplateNode fromNode, List<Argument> pl, ListExpander expander, TemplateNode toNode) {
         addDependency(new DependencyEdge(fromNode, pl, expander, toNode));
     }
@@ -213,15 +167,6 @@ public class DependencyGraph implements TemplateStore {
         this.dependencies.get(edge.from).add(edge);
         this.roots.remove(edge.to);
         addInstanceToIndex(edge.to.getIri(), edge.argumentList, edge.from.getIri());
-    }
-
-    private void removeDependency(DependencyEdge dependency) {
-        this.dependencies.get(dependency.from).remove(dependency);
-        String instance = dependency.to.getIri();
-        removeInstanceFromIndex(instance, dependency.argumentList, dependency.from.getIri());
-        if (!instance.equals(OTTR.BaseURI.Triple) && this.instanceIndex.get(instance).isEmpty()) {
-            this.roots.add(dependency.to);
-        }
     }
 
     /**
@@ -260,56 +205,6 @@ public class DependencyGraph implements TemplateStore {
 
     private boolean isLeafNode(TemplateNode n) {
         return this.dependencies.get(n).isEmpty();
-    }
-
-    /**
-     * Returns a Tuple with unifiers making body of template with IRI iri1
-     * subset of body of template with IRI iri2, but returns empty list if
-     * no unifier exists.
-     */
-    public Stream<Tuple> unifiesBodyConstants(String iri1, String iri2) {
-        Tuple cons = new Tuple().bind("T1", iri1).bind("T2", iri2);
-        Query unifies = Query.body("T1", "B1")
-            .and(Query.body("T2", "B2"))
-            .and(Query.unifiesBody("B1", "B2", "UB"));
-        return unifies.eval(new DependencyGraphEngine(this), cons);
-    }
-
-    @Override
-    public boolean refactor(String toUse, String toChange) {
-
-        // Compute unifier
-        Stream<Tuple> ans = unifiesBodyConstants(toUse, toChange);
-        Optional<Tuple> optUnifier = ans.findAny();
-        if (optUnifier.isEmpty()) {
-            return false;
-        }
-        Substitution unifier = optUnifier.get().getAs(Substitution.class, "UB");
-        
-        // Remove body parts
-        Result<TemplateNode> changeNodeR = checkIsTemplate(toChange);
-        Result<TemplateNode> useNodeR = checkIsTemplate(toUse);
-        if (!changeNodeR.isPresent() || !useNodeR.isPresent()) {
-            return false;
-        }
-        TemplateNode changeNode = changeNodeR.get();
-        TemplateNode useNode = useNodeR.get();
-
-        for (DependencyEdge toRemove : new HashSet<>(this.dependencies.get(useNode))) {
-            DependencyEdge toRemoveUnifd = new DependencyEdge(changeNode,
-                    unifier.apply(toRemove.argumentList), toRemove.listExpander, toRemove.to);
-            removeDependency(toRemoveUnifd);
-        }
-         
-        // Add dependency of toUse
-        List<Argument> newArgs = useNode.getParameters().stream()
-            .map(Parameter::getTerm)
-            .map(term -> term.apply(unifier))
-            .map(term -> Argument.builder().term(term).build())
-            .collect(Collectors.toList());
-
-        addDependency(changeNode, newArgs, null, useNode); // TODO: is it correct to pass null as expander here?
-        return true;
     }
 
     private Map<TemplateNode, Integer> getIndegrees() {
@@ -679,11 +574,6 @@ public class DependencyGraph implements TemplateStore {
     @Override
     public Result<DependencyGraph> expandAll() {
         return expandOnly(e -> true);
-    }
-
-    @Override
-    public Result<DependencyGraph> expandVocabulary(Set<String> iris) {
-        return expandOnly(vocabularyExpansionPredicate(iris));
     }
 
     private MessageHandler checkTemplatesFor(List<Check> checks) {

@@ -140,12 +140,6 @@ public interface TemplateStore extends Consumer<Signature> {
     Result<Set<String>> getDependencies(String template);
 
     /**
-     * Refactors the template having the second argument as IRI
-     * to instantiate the template having the first argument as IRI.
-     */
-    boolean refactor(String toUse, String toChange);
-
-    /**
      * Performs all checks on all templates in this library, and returns
      * errors or warnings if checks fail. The following is checked:
      * - Type correctness, non-blank flags, and consistent use of resources
@@ -174,17 +168,6 @@ public interface TemplateStore extends Consumer<Signature> {
      *          a new TemplateStore containing the expansion of this graph
      */
     Result<? extends TemplateStore> expandAll();
-
-    /**
-     * Expands all templates in argument set without altering this TemplateStore.
-     *
-     * @param iris
-     *          the set of IRIs of templates which instances to expand
-     *
-     * @return
-     *          a new TemplateStore containing the expansion of this graph
-     */
-    Result<? extends TemplateStore> expandVocabulary(Set<String> iris);
 
     /**
      * Retrieves the definitions of all templates, according to this store.
