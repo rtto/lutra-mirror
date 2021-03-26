@@ -127,3 +127,5 @@ lutra-cli/src/test/resources/issues/235/output.ttl
 settings.xml
 
 lutra-cli/src/test/resources/docttr/
+
+lutra-cli/src/test/resources/issues/298/ottr-doc/
