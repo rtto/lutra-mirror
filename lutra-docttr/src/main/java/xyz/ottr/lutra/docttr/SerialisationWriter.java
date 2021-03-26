@@ -68,6 +68,7 @@ class SerialisationWriter {
 
     Model writeWottrModel(Instance instance) {
         var writer = new WInstanceWriter(this.prefixMapping);
+        writer.accept(instance);
         return writer.writeToModel();
     }
 
