@@ -29,8 +29,12 @@ public class Issues298Test {
     
     private static final String ROOT = "src/test/resources/issues/298/";
     
-    //class xyz.ottr.lutra.model.terms.BlankNodeTerm cannot be cast to class xyz.ottr.lutra.model.terms.IRITerm
-    //at xyz.ottr.lutra.docttr.visualisation.TripleInstanceGraphVisualiser 167
+    /*
+     * class xyz.ottr.lutra.model.terms.BlankNodeTerm cannot be cast to class xyz.ottr.lutra.model.terms.IRITerm 
+     * at xyz.ottr.lutra.docttr.visualisation.TripleInstanceGraphVisualiser::getTypesForLabel
+     * 
+     * Fix: for blank node in triple, return string [blank]
+     */   
     
     @Test
     public void test() {
