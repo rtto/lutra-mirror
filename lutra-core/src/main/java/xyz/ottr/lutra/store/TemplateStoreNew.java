@@ -24,13 +24,14 @@ package xyz.ottr.lutra.store;
 
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 import xyz.ottr.lutra.io.FormatManager;
 import xyz.ottr.lutra.model.Signature;
 import xyz.ottr.lutra.model.Template;
 import xyz.ottr.lutra.system.Result;
 
-public interface TemplateStoreNew {
+public interface TemplateStoreNew extends Consumer<Signature> {
 
     // TODO do we need more than a boolean here?
     /**
@@ -56,6 +57,8 @@ public interface TemplateStoreNew {
      * Returns true if this store contains a template (with definition)
      * with the argument IRI.
      */
+    // needed for store init
+    // TODO definition seems to be used only in the old TemplateNode class - rename to Template here??
     boolean containsDefinitionOf(String iri);
 
     /**
@@ -73,6 +76,7 @@ public interface TemplateStoreNew {
      * Returns the set of IRIs of template objects contained in this store satisfying
      * the argument predicate.
      */
+    // needed for store init
     Set<String> getIRIs(Predicate<String> pred);
 
     // TODO  ------ check if things below stay or not
