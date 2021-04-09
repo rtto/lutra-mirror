@@ -1,0 +1,25 @@
+@prefix rdf:		<http://www.w3.org/1999/02/22-rdf-syntax-ns#> . 
+@prefix rdfs:		<http://www.w3.org/2000/01/rdf-schema#> . 
+@prefix owl:		<http://www.w3.org/2002/07/owl#> . 
+@prefix xsd:		<http://www.w3.org/2001/XMLSchema#> . 
+@prefix om:			<http://www.ontology-of-units-of-measure.org/resource/om-2/> .
+@prefix ottr:		<http://ns.ottr.xyz/0.4/> . 
+@prefix ax:			<http://tpl.ottr.xyz/owl/axiom/0.1/> . 
+@prefix rstr:		<http://tpl.ottr.xyz/owl/restriction/0.1/> .
+@prefix o-owl-dec:	<http://tpl.ottr.xyz/owl/declaration/0.1/> .
+@prefix o-rdf:		<http://tpl.ottr.xyz/rdf/0.1/> .
+@prefix tpl:		<http://w3id.org/ddb/tpl/> .
+@prefix ddbc:    	<https://w3id.org/ddb/ddb_core/> . 
+tpl:Measurement [
+	ottr:IRI ?phenomenon,
+	owl:Class ?quantity,
+	ottr:IRI ?unit,
+	rdfs:Literal ?value
+] :: {
+	o-rdf:Type(_:quantity, ?quantity), 
+	ottr:Triple(?phenomenon, ddbc:hasQuality, _:quantity),
+	ottr:Triple(_:quantity, om:hasValue, _:value),
+	o-rdf:Type(_:value, om:Measure), 
+	ottr:Triple(_:value, om:hasUnit, ?unit),
+	ottr:Triple(_:value, om:hasNumericalValue, ?value)
+} .
