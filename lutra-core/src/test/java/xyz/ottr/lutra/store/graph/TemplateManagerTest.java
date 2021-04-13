@@ -104,6 +104,24 @@ public class TemplateManagerTest {
     }
 
     @Test
+    public void testContainsDefinitionOf() {
+        TemplateStoreNew manager = new TemplateManager(null);
+
+        Signature signature1 = buildDummySignature("iri-1", new String[] {"x", "y"});
+        manager.addSignature(signature1);
+        Template template1 = buildDummyTemplate("iri-1", new String[] {"x", "y"});
+        manager.addTemplate(template1);
+        Signature signature2 = buildDummySignature("iri-2", new String[] {"x", "y"});
+        manager.addSignature(signature2);
+
+        Assert.assertFalse("Checking for IRI that is not in the store should return false", manager.containsDefinitionOf("iri-3"));
+        Assert.assertFalse("Checking for IRI that is in the store but is not a Template should return false",
+                manager.containsDefinitionOf("iri-2"));
+        Assert.assertTrue("Checking for IRI that is in the store and is a Template should return true",
+                manager.containsDefinitionOf("iri-1"));
+    }
+
+    @Test
     public void testGetSignature() {
         TemplateStoreNew manager = new TemplateManager(null);
 
@@ -135,6 +153,23 @@ public class TemplateManagerTest {
         // store containing Signature but asked for getTemplate()
         Assert.assertFalse("Requesting Template that is a Signature in the store should not produce value",
                 manager.getTemplate("iri-2").isPresent());
+    }
+
+    @Test
+    public void testAccept() {
+        TemplateStoreNew manager = new TemplateManager(null);
+
+        Template template1 = buildDummyTemplate("iri-1", new String[] {"x", "y"});
+        manager.accept(template1);
+
+        Assert.assertTrue("Added Signature should be found in TemplateStore", manager.getSignature("iri-1").isPresent());
+        Assert.assertTrue("Added Template should be found in TemplateStore", manager.getTemplate("iri-1").isPresent());
+
+        Signature signature2 = buildDummySignature("iri-2", new String[] {"x", "y"});
+        manager.accept(signature2);
+
+        Assert.assertTrue("Added Signature should be found in TemplateStore", manager.getSignature("iri-2").isPresent());
+        Assert.assertFalse("Added Signature should not be a Template in the in TemplateStore", manager.getTemplate("iri-2").isPresent());
     }
 
     private Signature buildDummySignature(String iri, String[] parameters) {

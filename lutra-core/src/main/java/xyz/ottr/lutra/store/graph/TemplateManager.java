@@ -31,7 +31,6 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import xyz.ottr.lutra.io.FormatManager;
-import xyz.ottr.lutra.model.BaseTemplate;
 import xyz.ottr.lutra.model.Instance;
 import xyz.ottr.lutra.model.Parameter;
 import xyz.ottr.lutra.model.Signature;
@@ -154,8 +153,7 @@ public class TemplateManager implements TemplateStore, TemplateStoreNew {
     public boolean containsDefinitionOf(String iri) {
         boolean result = templates.containsKey(iri);
         if (result) {
-            // TODO check if this is correct - the concept of definitions in TemplateNode was quite different
-            return templates.get(iri) instanceof Template || templates.get(iri) instanceof BaseTemplate;
+            return templates.get(iri) instanceof Template;
         }
         return result;
     }
@@ -255,7 +253,6 @@ public class TemplateManager implements TemplateStore, TemplateStoreNew {
     // coming from Consumer interface - needed at least for store init
     @Override
     public void accept(Signature signature) {
-        // TODO check if this is correct
         if (signature instanceof Template) {
             addTemplate((Template) signature);
         } else {
