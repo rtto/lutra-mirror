@@ -26,12 +26,22 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
+
+import xyz.ottr.lutra.OTTR;
 import xyz.ottr.lutra.io.FormatManager;
 import xyz.ottr.lutra.model.Signature;
 import xyz.ottr.lutra.model.Template;
 import xyz.ottr.lutra.system.Result;
 
 public interface TemplateStoreNew extends Consumer<Signature> {
+
+//    default void addOTTRBaseTemplates() {
+//        OTTR.BaseTemplate.ALL.forEach(this::addSignature);
+//    }
+
+//    default Set<String> getTemplateIRIs() {
+//        return getIRIs(this::containsDefinitionOf);
+//    }
 
     // TODO do we need more than a boolean here?
     /**
