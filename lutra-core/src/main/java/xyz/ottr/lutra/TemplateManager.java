@@ -213,6 +213,7 @@ public class TemplateManager {
      */
     public static TemplateStore makeDefaultStore(FormatManager formatManager) {
         TemplateStore store = new DependencyGraph(formatManager);
+        // TemplateStore store = new xyz.ottr.lutra.store.graph.TemplateManager(formatManager);
         store.addOTTRBaseTemplates();
         return store;
     }

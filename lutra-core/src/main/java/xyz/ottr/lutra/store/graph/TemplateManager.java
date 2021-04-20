@@ -31,6 +31,7 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import xyz.ottr.lutra.io.FormatManager;
+import xyz.ottr.lutra.model.BaseTemplate;
 import xyz.ottr.lutra.model.Instance;
 import xyz.ottr.lutra.model.Parameter;
 import xyz.ottr.lutra.model.Signature;
@@ -141,7 +142,8 @@ public class TemplateManager implements TemplateStore, TemplateStoreNew {
 
     @Override
     public boolean containsBase(String iri) {
-        return false;
+        Signature signature = templates.get(iri);
+        return signature instanceof BaseTemplate;
     }
 
     @Override
@@ -164,6 +166,7 @@ public class TemplateManager implements TemplateStore, TemplateStoreNew {
         if (signature instanceof Template) {
             return Result.of((Template) signature);
         } else {
+            // TODO add error message
             return Result.empty();
         }
     }
@@ -179,6 +182,7 @@ public class TemplateManager implements TemplateStore, TemplateStoreNew {
         if (signature == null) {
             return Result.empty();
         } else {
+            // TODO add error message
             return Result.of(signature);
         }
     }

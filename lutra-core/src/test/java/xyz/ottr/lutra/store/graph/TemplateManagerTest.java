@@ -104,6 +104,20 @@ public class TemplateManagerTest {
     }
 
     @Test
+    public void testContainsBase() {
+        TemplateStoreNew manager = new TemplateManager(null);
+        // TODO re-enable when default method is active
+        // manager.addOTTRBaseTemplates();
+
+        Template template1 = buildDummyTemplate("iri-1", new String[] {"x", "y"});
+        manager.addTemplate(template1);
+
+        Assert.assertFalse("Checking for IRI that is in the store but is not a BaseTemplate should return false",
+                manager.containsBase("iri-1"));
+        // Assert.assertTrue("Checking for a BaseTemplate should return true", manager.containsBase(OTTR.BaseURI.Triple));
+    }
+
+    @Test
     public void testContainsDefinitionOf() {
         TemplateStoreNew manager = new TemplateManager(null);
 
