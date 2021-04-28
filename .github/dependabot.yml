@@ -1,0 +1,31 @@
+version: 2
+updates:
+- package-ecosystem: maven
+  directory: "/"
+  schedule:
+    interval: daily
+  open-pull-requests-limit: 10
+  ignore:
+  - dependency-name: com.github.spotbugs:spotbugs
+    versions:
+    - 4.2.2
+  - dependency-name: com.puppycrawl.tools:checkstyle
+    versions:
+    - "8.39"
+    - "8.40"
+    - "8.41"
+  - dependency-name: org.projectlombok:lombok
+    versions:
+    - 1.18.18
+  - dependency-name: com.googlecode.maven-download-plugin:download-maven-plugin
+    versions:
+    - 1.6.1
+  - dependency-name: org.antlr:antlr4-maven-plugin
+    versions:
+    - 4.9.1
+  - dependency-name: com.github.spotbugs:spotbugs-maven-plugin
+    versions:
+    - 4.2.0
+  - dependency-name: org.eclipse.jgit:org.eclipse.jgit
+    versions:
+    - 5.10.0.202012080955-r
