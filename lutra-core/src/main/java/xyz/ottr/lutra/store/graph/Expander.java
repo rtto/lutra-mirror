@@ -23,7 +23,8 @@ package xyz.ottr.lutra.store.graph;
  */
 
 import xyz.ottr.lutra.model.Instance;
-import xyz.ottr.lutra.store.TemplateStore;
+import xyz.ottr.lutra.model.Template;
+import xyz.ottr.lutra.store.TemplateStoreNew;
 import xyz.ottr.lutra.system.Result;
 import xyz.ottr.lutra.system.ResultStream;
 
@@ -37,7 +38,7 @@ public interface Expander {
      * @return
      *          a new TemplateStore containing the expansion of this graph
      */
-    Result<? extends TemplateStore> expandAll();
+    Result<? extends TemplateStoreNew> expandAll();
 
     /**
      * Expands the argument template instance according to the definitions in this
@@ -45,5 +46,12 @@ public interface Expander {
      * a template wrongly (e.g.~wrong number of arguments or wrong types, optionals).
      */
     ResultStream<Instance> expandInstance(Instance instance);
+
+    /**
+     * Expands the argument template according to the definitions in this
+     * store, and returns empty Result-instances if the template is using
+     * a template wrongly (e.g.~wrong number of arguments or wrong types, optionals).
+     */
+    Result<Template> expandTemplate(Template template);
 
 }

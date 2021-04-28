@@ -32,18 +32,56 @@ import org.junit.Test;
 import xyz.ottr.lutra.OTTR;
 import xyz.ottr.lutra.model.Argument;
 import xyz.ottr.lutra.model.Instance;
+import xyz.ottr.lutra.model.ListExpander;
 import xyz.ottr.lutra.model.Parameter;
-import xyz.ottr.lutra.model.Signature;
 import xyz.ottr.lutra.model.Template;
 import xyz.ottr.lutra.model.terms.IRITerm;
-import xyz.ottr.lutra.store.TemplateStore;
+import xyz.ottr.lutra.model.terms.ListTerm;
+import xyz.ottr.lutra.model.terms.LiteralTerm;
+import xyz.ottr.lutra.store.TemplateStoreNew;
 import xyz.ottr.lutra.system.Result;
 
 public class NewExpanderTest {
 
     @Test
+    public void testExpandAll() {
+        TemplateStoreNew manager = new TemplateManager(null);
+        manager.addOTTRBaseTemplates();
+        NewExpander expander = new NewExpander(manager);
+
+        Template template1 = buildDummyTemplate("iri-1", new String[] {"a", "b"});
+        manager.addTemplate(template1);
+
+        List<Parameter> parameterList = buildParameters();
+
+        Template template2 =  Template.builder()
+                .iri("iri-2")
+                .parameters(parameterList)
+                .instance(Instance.builder()
+                        .iri("iri-1")
+                        .argument(Argument.builder().term(var("a")).build())
+                        .argument(Argument.builder().term(LiteralTerm.createPlainLiteral("1")).build())
+                        .build())
+                .instance(Instance.builder()
+                        .iri("iri-1")
+                        .argument(Argument.builder().term(LiteralTerm.createPlainLiteral("2")).build())
+                        .argument(Argument.builder().term(var("b")).build())
+                        .build())
+                .build();
+
+        manager.addTemplate(template2);
+
+        Result<? extends TemplateStoreNew> newStore = expander.expandAll();
+        Assert.assertTrue("Result should be present after expansion", newStore.isPresent());
+        Assert.assertEquals("Number of BaseTemplates should be the same in both stores",
+                manager.getAllBaseTemplates().getStream().count(), newStore.get().getAllBaseTemplates().getStream().count());
+        Assert.assertEquals("Number of Templates should be the same in both stores",
+                manager.getAllTemplates().getStream().count(), newStore.get().getAllTemplates().getStream().count());
+    }
+
+    @Test
     public void testExpandInstance() {
-        TemplateStore manager = new TemplateManager(null);
+        TemplateStoreNew manager = new TemplateManager(null);
         manager.addOTTRBaseTemplates();
         NewExpander expander = new NewExpander(manager);
 
@@ -56,20 +94,135 @@ public class NewExpanderTest {
                 .build();
 
         Result<List<Instance>> results = expander.expandInstance(instance).aggregate().map(s -> s.collect(Collectors.toList()));
-        Assert.assertTrue(results.isPresent());
-        Assert.assertEquals(2, results.get().size());
+        Assert.assertTrue("Result should be present after expansion", results.isPresent());
+        Assert.assertEquals("Number of results of expansion should be as expected", 2, results.get().size());
     }
 
-    private Signature buildDummySignature(String iri, String[] parameters) {
+    @Test
+    public void testExpandInstanceNonExpandable() {
+        TemplateStoreNew manager = new TemplateManager(null);
+        manager.addOTTRBaseTemplates();
+        NewExpander expander = new NewExpander(manager);
+
+        Instance instance = Instance.builder().iri(OTTR.BaseURI.Triple)
+                .argument(Argument.builder().term(var("x")).build())
+                .argument(Argument.builder().term(var("y")).build())
+                .build();
+
+        Result<List<Instance>> results = expander.expandInstance(instance).aggregate().map(s -> s.collect(Collectors.toList()));
+        // TODO check if this is correct and intended - no result only if errors?
+        Assert.assertTrue("Result should be present after expansion", results.isPresent());
+        Assert.assertEquals("Number of results of expansion should be as expected", 1, results.get().size());
+    }
+
+    @Test
+    public void testExpandInstanceWithListExpander() {
+        TemplateStoreNew manager = new TemplateManager(null);
+        manager.addOTTRBaseTemplates();
+        NewExpander expander = new NewExpander(manager);
+
+        Template template1 = buildDummyTemplate("iri-1", new String[] {"a", "b"});
+        manager.addTemplate(template1);
+
+        Instance instance = Instance.builder().iri("iri-1")
+                .argument(Argument.builder().term(var("x")).build())
+                .argument(Argument.builder().term(
+                        ListTerm.builder()
+                                .term(var("y"))
+                                .term(var("z"))
+                                .build())
+                        .listExpander(true)
+                        .build())
+                .listExpander(ListExpander.cross)
+                .build();
+
+        Result<List<Instance>> results = expander.expandInstance(instance).aggregate().map(s -> s.collect(Collectors.toList()));
+        Assert.assertTrue("Result should be present after expansion", results.isPresent());
+        Assert.assertEquals("Number of results of expansion should be as expected", 4, results.get().size());
+    }
+
+    @Test
+    public void testExpandTemplate() {
+        TemplateStoreNew manager = new TemplateManager(null);
+        manager.addOTTRBaseTemplates();
+        NewExpander expander = new NewExpander(manager);
+
+        Template template1 = buildDummyTemplate("iri-1", new String[] {"a", "b"});
+        manager.addTemplate(template1);
+
+        List<Parameter> parameterList = buildParameters();
+
+        Template template2 =  Template.builder()
+                .iri("iri-2")
+                .parameters(parameterList)
+                .instance(Instance.builder()
+                        .iri("iri-1")
+                        .argument(Argument.builder().term(var("a")).build())
+                        .argument(Argument.builder().term(LiteralTerm.createPlainLiteral("1")).build())
+                        .build())
+                .instance(Instance.builder()
+                        .iri("iri-1")
+                        .argument(Argument.builder().term(LiteralTerm.createPlainLiteral("2")).build())
+                        .argument(Argument.builder().term(var("b")).build())
+                        .build())
+                .build();
+
+        manager.addTemplate(template2);
+
+        Result<Template> result = expander.expandTemplate(template2);
+        Assert.assertTrue("Result should be present after expansion", result.isPresent());
+        Assert.assertEquals("Number of results of expansion should be as expected", 4, result.get().getPattern().size());
+    }
+
+    @Test
+    public void testExpandTemplateWithListExpander() {
+        TemplateStoreNew manager = new TemplateManager(null);
+        manager.addOTTRBaseTemplates();
+        NewExpander expander = new NewExpander(manager);
+
+        Template template1 = buildDummyTemplate("iri-1", new String[] {"a", "b"});
+        manager.addTemplate(template1);
+
+        List<Parameter> parameterList = buildParameters();
+
+        Instance instance2 = Instance.builder().iri("iri-1")
+                .argument(Argument.builder().term(var("a")).build())
+                .argument(Argument.builder().term(
+                        ListTerm.builder()
+                                .term(LiteralTerm.createPlainLiteral("2"))
+                                .term(LiteralTerm.createPlainLiteral("3"))
+                                .term(LiteralTerm.createPlainLiteral("4"))
+                                .build())
+                        .listExpander(true)
+                        .build())
+                .listExpander(ListExpander.cross)
+                .build();
+
+        Template template2 =  Template.builder()
+                .iri("iri-2")
+                .parameters(parameterList)
+                .instance(Instance.builder()
+                        .iri("iri-1")
+                        .argument(Argument.builder().term(var("b")).build())
+                        .argument(Argument.builder().term(LiteralTerm.createPlainLiteral("1")).build())
+                        .build())
+                .instance(instance2)
+                .build();
+
+        manager.addTemplate(template2);
+
+        Result<Template> results = expander.expandTemplate(template2);
+        Assert.assertTrue("Result should be present after expansion", results.isPresent());
+        Assert.assertEquals("Number of results of expansion should be as expected", 8, results.get().getPattern().size());
+    }
+
+    private List<Parameter> buildParameters() {
+        String[] parameters = {"a", "b"};
         List<Parameter> parameterList = new ArrayList<>(parameters.length);
         for (String s : parameters) {
             parameterList.add(Parameter.builder().term(var(s)).build());
         }
-
-        return Signature.superbuilder()
-                .iri(iri)
-                .parameters(parameterList)
-                .build();
+        return parameterList;
     }
 
     private Template buildDummyTemplate(String iri, String[] parameters) {

@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.List;
 import org.junit.Assert;
 import org.junit.Test;
+import xyz.ottr.lutra.OTTR;
 import xyz.ottr.lutra.model.Argument;
 import xyz.ottr.lutra.model.Instance;
 import xyz.ottr.lutra.model.Parameter;
@@ -106,15 +107,14 @@ public class TemplateManagerTest {
     @Test
     public void testContainsBase() {
         TemplateStoreNew manager = new TemplateManager(null);
-        // TODO re-enable when default method is active
-        // manager.addOTTRBaseTemplates();
+        manager.addOTTRBaseTemplates();
 
         Template template1 = buildDummyTemplate("iri-1", new String[] {"x", "y"});
         manager.addTemplate(template1);
 
         Assert.assertFalse("Checking for IRI that is in the store but is not a BaseTemplate should return false",
                 manager.containsBase("iri-1"));
-        // Assert.assertTrue("Checking for a BaseTemplate should return true", manager.containsBase(OTTR.BaseURI.Triple));
+        Assert.assertTrue("Checking for a BaseTemplate should return true", manager.containsBase(OTTR.BaseURI.Triple));
     }
 
     @Test
@@ -167,6 +167,51 @@ public class TemplateManagerTest {
         // store containing Signature but asked for getTemplate()
         Assert.assertFalse("Requesting Template that is a Signature in the store should not produce value",
                 manager.getTemplate("iri-2").isPresent());
+    }
+
+    @Test
+    public void testGetAllTemplates() {
+        TemplateStoreNew manager = new TemplateManager(null);
+        manager.addOTTRBaseTemplates();
+
+        Signature signature1 = buildDummySignature("iri-1", new String[] {"x", "y"});
+        manager.addSignature(signature1);
+        Template template1 = buildDummyTemplate("iri-1", new String[] {"x", "y"});
+        manager.addTemplate(template1);
+        Signature signature2 = buildDummySignature("iri-2", new String[] {"x", "y"});
+        manager.addSignature(signature2);
+
+        Assert.assertEquals("Number of Templates should be as expected", 2, manager.getAllBaseTemplates().getStream().count());
+    }
+
+    @Test
+    public void testGetAllSignatures() {
+        TemplateStoreNew manager = new TemplateManager(null);
+        manager.addOTTRBaseTemplates();
+
+        Signature signature1 = buildDummySignature("iri-1", new String[] {"x", "y"});
+        manager.addSignature(signature1);
+        Template template1 = buildDummyTemplate("iri-1", new String[] {"x", "y"});
+        manager.addTemplate(template1);
+        Signature signature2 = buildDummySignature("iri-2", new String[] {"x", "y"});
+        manager.addSignature(signature2);
+
+        Assert.assertEquals("Number of Signatures should be as expected", 4, manager.getAllSignatures().getStream().count());
+    }
+
+    @Test
+    public void testGetAllBaseTemplates() {
+        TemplateStoreNew manager = new TemplateManager(null);
+        manager.addOTTRBaseTemplates();
+
+        Signature signature1 = buildDummySignature("iri-1", new String[] {"x", "y"});
+        manager.addSignature(signature1);
+        Template template1 = buildDummyTemplate("iri-1", new String[] {"x", "y"});
+        manager.addTemplate(template1);
+        Signature signature2 = buildDummySignature("iri-2", new String[] {"x", "y"});
+        manager.addSignature(signature2);
+
+        Assert.assertEquals("Number of BaseTemplates should be as expected", 2, manager.getAllBaseTemplates().getStream().count());
     }
 
     @Test

@@ -27,9 +27,11 @@ import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import xyz.ottr.lutra.io.FormatManager;
+import xyz.ottr.lutra.model.BaseTemplate;
 import xyz.ottr.lutra.model.Signature;
 import xyz.ottr.lutra.model.Template;
 import xyz.ottr.lutra.system.Result;
+import xyz.ottr.lutra.system.ResultStream;
 
 public interface TemplateStoreNew extends Consumer<Signature> {
 
@@ -37,11 +39,13 @@ public interface TemplateStoreNew extends Consumer<Signature> {
     //default void addOTTRBaseTemplates() {
     //    OTTR.BaseTemplate.ALL.forEach(this::addSignature);
     //}
+    void addOTTRBaseTemplates();
 
     // TODO disabled due to conflict with old interface
     //default Set<String> getTemplateIRIs() {
     //    return getIRIs(this::containsDefinitionOf);
     //}
+    Set<String> getTemplateIRIs();
 
     // TODO do we need more than a boolean here?
     /**
@@ -87,6 +91,21 @@ public interface TemplateStoreNew extends Consumer<Signature> {
      * Returns a signature with the argument IRI if there is one present in the store.
      */
     Result<Signature> getSignature(String iri);
+
+    /**
+     * Returns all templates in the store.
+     */
+    ResultStream<Template> getAllTemplates();
+
+    /**
+     * Returns all signatures (including templates and base templates) in the store.
+     */
+    ResultStream<Signature> getAllSignatures();
+
+    /**
+     * Returns all base templates in the store.
+     */
+    ResultStream<BaseTemplate> getAllBaseTemplates();
 
     /**
      * Returns the IRI of all non-base templates without a definition

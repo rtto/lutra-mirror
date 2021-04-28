@@ -30,6 +30,7 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import xyz.ottr.lutra.OTTR;
 import xyz.ottr.lutra.io.FormatManager;
 import xyz.ottr.lutra.model.BaseTemplate;
 import xyz.ottr.lutra.model.Instance;
@@ -54,6 +55,16 @@ public class TemplateManager implements TemplateStore, TemplateStoreNew {
     public TemplateManager(FormatManager formatManager) {
         this.formatManager = formatManager;
         templates = new ConcurrentHashMap<>();
+    }
+
+    @Override
+    public void addOTTRBaseTemplates() {
+        OTTR.BaseTemplate.ALL.forEach(this::addSignature);
+    }
+
+    @Override
+    public Set<String> getTemplateIRIs() {
+        return getIRIs(this::containsDefinitionOf);
     }
 
     @Override
@@ -185,6 +196,21 @@ public class TemplateManager implements TemplateStore, TemplateStoreNew {
             // TODO add error message
             return Result.of(signature);
         }
+    }
+
+    @Override
+    public ResultStream<Template> getAllTemplates() {
+        return ResultStream.innerOf(templates.values().stream().filter(s -> s instanceof Template).map(b -> (Template)b));
+    }
+
+    @Override
+    public ResultStream<Signature> getAllSignatures() {
+        return ResultStream.innerOf(templates.values().stream());
+    }
+
+    @Override
+    public ResultStream<BaseTemplate> getAllBaseTemplates() {
+        return ResultStream.innerOf(templates.values().stream().filter(s -> s instanceof BaseTemplate).map(b -> (BaseTemplate)b));
     }
 
     @Override
