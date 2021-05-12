@@ -26,15 +26,18 @@ import static xyz.ottr.lutra.model.terms.ObjectTerm.var;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import org.junit.Assert;
 import org.junit.Test;
 import xyz.ottr.lutra.OTTR;
 import xyz.ottr.lutra.model.Argument;
+import xyz.ottr.lutra.model.BaseTemplate;
 import xyz.ottr.lutra.model.Instance;
 import xyz.ottr.lutra.model.Parameter;
 import xyz.ottr.lutra.model.Signature;
 import xyz.ottr.lutra.model.Template;
 import xyz.ottr.lutra.store.TemplateStoreNew;
+import xyz.ottr.lutra.system.Result;
 
 public class TemplateManagerTest {
 
@@ -215,6 +218,50 @@ public class TemplateManagerTest {
     }
 
     @Test
+    public void testGetDependsOn() {
+        TemplateStoreNew manager = new TemplateManager(null);
+
+        BaseTemplate base = BaseTemplate.builder()
+                .iri("base")
+                .parameters(createParametersList(new String[] {"x", "y"}))
+                .build();
+        manager.accept(base);
+
+        // dependent on base
+        Template template1 = buildDummyTemplate("iri-1", new String[] {"x", "y"});
+        manager.addTemplate(template1);
+        // dependent on base, but Signatures are ignored
+        Signature signature2 = buildDummySignature("iri-2", new String[] {"x", "y"});
+        manager.addSignature(signature2);
+
+        // dependent on iri-1
+        Template template3 = Template.builder()
+                .iri("iri-3")
+                .parameters(createParametersList(new String[] {"x", "y"}))
+                .instance(Instance.builder()
+                        .iri("iri-1")
+                        .argument(Argument.builder().term(var("a")).build())
+                        .argument(Argument.builder().term(cons(1)).build())
+                        .build())
+                .build();
+        manager.addTemplate(template3);
+
+        // NOT dependent on iri-1, but on base
+        Template template4 = buildDummyTemplate("iri-4", new String[] {"x", "y"});
+        manager.addTemplate(template4);
+
+        Result<Set<String>> dependentOnBase = manager.getDependsOn("base");
+        Assert.assertTrue(dependentOnBase.isPresent());
+        Assert.assertEquals(Set.of("iri-1", "iri-4"), dependentOnBase.get());
+        Assert.assertNotEquals(Set.of("iri-2"), dependentOnBase.get());
+
+        Result<Set<String>> dependentOnIri1 = manager.getDependsOn("iri-1");
+        Assert.assertTrue(dependentOnIri1.isPresent());
+        Assert.assertEquals(Set.of("iri-3"), dependentOnIri1.get());
+        Assert.assertNotEquals(Set.of("iri-4"), dependentOnIri1.get());
+    }
+
+    @Test
     public void testAccept() {
         TemplateStoreNew manager = new TemplateManager(null);
 
@@ -232,10 +279,7 @@ public class TemplateManagerTest {
     }
 
     private Signature buildDummySignature(String iri, String[] parameters) {
-        List<Parameter> parameterList = new ArrayList<>(parameters.length);
-        for (String s : parameters) {
-            parameterList.add(Parameter.builder().term(var(s)).build());
-        }
+        List<Parameter> parameterList = createParametersList(parameters);
 
         return Signature.superbuilder()
                 .iri(iri)
@@ -244,10 +288,7 @@ public class TemplateManagerTest {
     }
 
     private Template buildDummyTemplate(String iri, String[] parameters) {
-        List<Parameter> parameterList = new ArrayList<>(parameters.length);
-        for (String s : parameters) {
-            parameterList.add(Parameter.builder().term(var(s)).build());
-        }
+        List<Parameter> parameterList = createParametersList(parameters);
 
         return Template.builder()
                 .iri(iri)
@@ -263,6 +304,14 @@ public class TemplateManagerTest {
                         .argument(Argument.builder().term(var("b")).build())
                         .build())
                 .build();
+    }
+
+    private List<Parameter> createParametersList(String[] parameters) {
+        List<Parameter> parameterList = new ArrayList<>(parameters.length);
+        for (String s : parameters) {
+            parameterList.add(Parameter.builder().term(var(s)).build());
+        }
+        return parameterList;
     }
 
 }

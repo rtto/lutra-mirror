@@ -120,7 +120,6 @@ public interface TemplateStoreNew extends Consumer<Signature> {
      * template IRI, or empty Result if argument
      * template is not used in this store.
      */
-    // TODO implement & test
     Result<Set<String>> getDependsOn(String template);
 
     /**

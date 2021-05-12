@@ -22,6 +22,7 @@ package xyz.ottr.lutra.store.graph;
  * #L%
  */
 
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -48,6 +49,7 @@ public class TemplateManager implements TemplateStore, TemplateStoreNew {
     private static final Logger LOGGER = LoggerFactory.getLogger(TemplateManager.class);
 
     private final Map<String, Signature> templates;
+    private final Map<String, Set<String>> dependencyIndex;
     private TemplateStore standardLibrary;
 
     private final FormatManager formatManager;
@@ -55,6 +57,7 @@ public class TemplateManager implements TemplateStore, TemplateStoreNew {
     public TemplateManager(FormatManager formatManager) {
         this.formatManager = formatManager;
         templates = new ConcurrentHashMap<>();
+        dependencyIndex = new ConcurrentHashMap<>();
     }
 
     @Override
@@ -77,12 +80,20 @@ public class TemplateManager implements TemplateStore, TemplateStoreNew {
 
         if (sig == null || checkParametersMatch(template, sig)) {
             templates.put(template.getIri(), template);
+            updateDependencyIndex(template);
             return true;
         } else {
             LOGGER.warn("Parameters of Signature and Template {} differ: {} | {}",
                     template.getIri(), sig.getParameters(), template.getParameters());
             return false;
         }
+    }
+
+    private void updateDependencyIndex(Template template) {
+        template.getPattern().forEach(instance -> {
+            dependencyIndex.putIfAbsent(instance.getIri(), new HashSet<>());
+            dependencyIndex.get(instance.getIri()).add(template.getIri());
+        });
     }
 
     @Override
@@ -94,8 +105,12 @@ public class TemplateManager implements TemplateStore, TemplateStoreNew {
     public boolean addSignature(Signature signature) {
         Signature sig = templates.get(signature.getIri());
         if (sig == null) {
-            templates.put(signature.getIri(), signature);
-            return true;
+            if (signature instanceof Template) {
+                return addTemplate((Template) signature);
+            } else {
+                templates.put(signature.getIri(), signature);
+                return true;
+            }
         } else if (signature instanceof Template && checkParametersMatch(signature, sig)) {
             return addTemplate((Template) signature);
         } else {
@@ -227,7 +242,7 @@ public class TemplateManager implements TemplateStore, TemplateStoreNew {
 
     @Override
     public Result<Set<String>> getDependsOn(String template) {
-        return null;
+        return Result.ofNullable(dependencyIndex.get(template));
     }
 
     @Override
@@ -282,6 +297,7 @@ public class TemplateManager implements TemplateStore, TemplateStoreNew {
 
     // coming from Consumer interface - needed at least for store init
     @Override
+    // TODO introduce addBaseTemplate and refer to this here?
     public void accept(Signature signature) {
         if (signature instanceof Template) {
             addTemplate((Template) signature);
