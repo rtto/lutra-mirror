@@ -22,6 +22,7 @@ package xyz.ottr.lutra.store.graph;
  * #L%
  */
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
@@ -33,6 +34,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import xyz.ottr.lutra.OTTR;
 import xyz.ottr.lutra.io.FormatManager;
+import xyz.ottr.lutra.io.TemplateReader;
 import xyz.ottr.lutra.model.BaseTemplate;
 import xyz.ottr.lutra.model.Instance;
 import xyz.ottr.lutra.model.Parameter;
@@ -42,6 +44,7 @@ import xyz.ottr.lutra.store.TemplateStore;
 import xyz.ottr.lutra.store.TemplateStoreNew;
 import xyz.ottr.lutra.system.MessageHandler;
 import xyz.ottr.lutra.system.Result;
+import xyz.ottr.lutra.system.ResultConsumer;
 import xyz.ottr.lutra.system.ResultStream;
 
 public class TemplateManager implements TemplateStore, TemplateStoreNew {
@@ -243,6 +246,46 @@ public class TemplateManager implements TemplateStore, TemplateStoreNew {
     @Override
     public Result<Set<String>> getDependsOn(String template) {
         return Result.ofNullable(dependencyIndex.get(template));
+    }
+
+    @Override
+    public MessageHandler fetchMissingDependencies() {
+        return fetchMissingDependencies(getMissingDependencies());
+    }
+
+    @Override
+    public MessageHandler fetchMissingDependencies(Collection<String> initMissing) {
+        Optional<TemplateStore> stdLib = getStandardLibrary();
+        ResultConsumer<TemplateReader> messages = new ResultConsumer<>();
+
+        FormatManager formatManager = getFormatManager();
+        if (formatManager == null) {
+            messages.accept(Result.error(
+                    "Attempted fetching missing templates, but has no formats registered."));
+            return messages.getMessageHandler();
+        }
+
+        Set<String> failed = new HashSet<>(); // Stores IRIs that failed fetching
+        // TODO: Perhaps make failed a class-variable, rather than local
+        // such that we do not attempt to fetch templates that failed previously
+        // in the same run?
+        Set<String> missing = new HashSet<>(initMissing);
+
+        while (!missing.isEmpty()) {
+            for (String toFetch : missing) {
+                if (stdLib.isPresent() && stdLib.get().containsTemplate(toFetch)) {
+                    stdLib.get().getTemplate(toFetch).ifPresent(this::addTemplate);
+                } else {
+                    messages.accept(formatManager.attemptAllFormats(reader -> reader.populateTemplateStore(this, toFetch)));
+                }
+                if (!containsTemplate(toFetch)) { // Check if fetched and added to store
+                    failed.add(toFetch);
+                }
+            }
+            missing = getMissingDependencies();
+            missing.removeAll(failed); // Do not attempt to fetch IRIs that previously failed
+        }
+        return messages.getMessageHandler();
     }
 
     @Override

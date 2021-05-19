@@ -285,7 +285,8 @@ public interface TemplateStore extends Consumer<Signature> {
     default MessageHandler fetchMissingDependencies() {
         return fetchMissingDependencies(getMissingDependencies());
     }
-    
+
+    @SuppressWarnings("CPD-START") // code block will be removed
     default MessageHandler fetchMissingDependencies(Collection<String> initMissing) {
 
         Optional<TemplateStore> stdLib = getStandardLibrary();
@@ -320,6 +321,8 @@ public interface TemplateStore extends Consumer<Signature> {
         }
         return messages.getMessageHandler();
     }
+
+    @SuppressWarnings("CPD-END")
     
     Optional<TemplateStore> getStandardLibrary();
     

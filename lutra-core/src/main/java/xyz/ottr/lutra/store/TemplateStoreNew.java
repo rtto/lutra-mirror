@@ -22,6 +22,7 @@ package xyz.ottr.lutra.store;
  * #L%
  */
 
+import java.util.Collection;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -30,21 +31,16 @@ import xyz.ottr.lutra.io.FormatManager;
 import xyz.ottr.lutra.model.BaseTemplate;
 import xyz.ottr.lutra.model.Signature;
 import xyz.ottr.lutra.model.Template;
+import xyz.ottr.lutra.system.MessageHandler;
 import xyz.ottr.lutra.system.Result;
 import xyz.ottr.lutra.system.ResultStream;
 
 public interface TemplateStoreNew extends Consumer<Signature> {
 
-    // TODO disabled due to conflict with old interface
-    //default void addOTTRBaseTemplates() {
-    //    OTTR.BaseTemplate.ALL.forEach(this::addSignature);
-    //}
+    // former default method
     void addOTTRBaseTemplates();
 
-    // TODO disabled due to conflict with old interface
-    //default Set<String> getTemplateIRIs() {
-    //    return getIRIs(this::containsDefinitionOf);
-    //}
+    // former default method
     Set<String> getTemplateIRIs();
 
     // TODO do we need more than a boolean here?
@@ -130,46 +126,12 @@ public interface TemplateStoreNew extends Consumer<Signature> {
      *    A MessageHandler containing all Messages obtained through fetching and
      *    parsing missing templates
      */
-    // TODO disabled due to conflict with old interface
-    /*default MessageHandler fetchMissingDependencies() {
-        return fetchMissingDependencies(getMissingDependencies());
-    }*/
+    // former default method
+    MessageHandler fetchMissingDependencies();
 
-    // TODO disabled due to conflict with old interface
-    /*default MessageHandler fetchMissingDependencies(Collection<String> initMissing) {
-
-        Optional<TemplateStore> stdLib = getStandardLibrary();
-        ResultConsumer<TemplateReader> messages = new ResultConsumer<>();
-
-        FormatManager formatManager = getFormatManager();
-        if (formatManager == null) {
-            messages.accept(Result.error(
-                    "Attempted fetching missing templates, but has no formats registered."));
-            return messages.getMessageHandler();
-        }
-
-        Set<String> failed = new HashSet<>(); // Stores IRIs that failed fetching
-        // TODO: Perhaps make failed a class-variable, rather than local
-        // such that we do not attempt to fetch templates that failed previously
-        // in the same run?
-        Set<String> missing = new HashSet<>(initMissing);
-
-        while (!missing.isEmpty()) {
-            for (String toFetch : missing) {
-                if (stdLib.isPresent() && stdLib.get().containsTemplate(toFetch)) {
-                    stdLib.get().getTemplate(toFetch).ifPresent(this::addTemplate);
-                } else {
-                    messages.accept(formatManager.attemptAllFormats(reader -> reader.populateTemplateStore(this, toFetch)));
-                }
-                if (!containsTemplate(toFetch)) { // Check if fetched and added to store
-                    failed.add(toFetch);
-                }
-            }
-            missing = getMissingDependencies();
-            missing.removeAll(failed); // Do not attempt to fetch IRIs that previously failed
-        }
-        return messages.getMessageHandler();
-    }*/
+    // former default method
+    // TODO needed in interface?
+    MessageHandler fetchMissingDependencies(Collection<String> initMissing);
 
     /**
      * Returns the set of IRIs of template objects contained in this store satisfying
