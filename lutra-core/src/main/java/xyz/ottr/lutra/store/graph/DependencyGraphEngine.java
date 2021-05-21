@@ -22,6 +22,7 @@ package xyz.ottr.lutra.store.graph;
  * #L%
  */
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -469,6 +470,7 @@ public class DependencyGraphEngine extends QueryEngine<DependencyGraph> {
     }
 
     @SuppressWarnings({"CPD-END", "PMD.UnusedPrivateMethod"})
+    @SuppressFBWarnings
     private void annotationAnchor() {
 
     }
