@@ -42,6 +42,24 @@ import xyz.ottr.lutra.system.Result;
 public class TemplateManagerTest {
 
     @Test
+    public void testAddBaseTemplate() {
+        TemplateStoreNew manager = new TemplateManager(null);
+
+        BaseTemplate base = BaseTemplate.builder()
+                .iri("base")
+                .parameters(createParametersList(new String[] {"x", "y"}))
+                .build();
+        manager.addBaseTemplate(base);
+
+        Template template = buildDummyTemplate("iri-0", new String[] {"x", "y"});
+        manager.addTemplate(template);
+
+        Assert.assertTrue("BaseTemplate should be in store", manager.containsBase("base"));
+        Assert.assertTrue("Non-BaseTemplate should be in store but not as BaseTemplate",
+                (!manager.containsBase("iri-0")) && manager.contains("iri-0"));
+    }
+
+    @Test
     public void testAddTemplate() {
         TemplateStoreNew manager = new TemplateManager(null);
 
@@ -259,6 +277,38 @@ public class TemplateManagerTest {
         Assert.assertTrue(dependentOnIri1.isPresent());
         Assert.assertEquals(Set.of("iri-3"), dependentOnIri1.get());
         Assert.assertNotEquals(Set.of("iri-4"), dependentOnIri1.get());
+    }
+
+    @Test
+    public void testMissingDependencies() {
+        TemplateStoreNew manager = new TemplateManager(null);
+
+        BaseTemplate base = BaseTemplate.builder()
+                .iri("base")
+                .parameters(createParametersList(new String[] {"x", "y"}))
+                .build();
+        manager.accept(base);
+
+        // dependent on base
+        Template template1 = buildDummyTemplate("iri-1", new String[] {"x", "y"});
+        manager.addTemplate(template1);
+        // dependent on base, but Signatures are ignored
+        Signature signature2 = buildDummySignature("iri-2", new String[] {"x", "y"});
+        manager.addSignature(signature2);
+
+        // dependent on something unknown
+        Template template3 = Template.builder()
+                .iri("iri-3")
+                .parameters(createParametersList(new String[] {"x", "y"}))
+                .instance(Instance.builder()
+                        .iri("iri-0")
+                        .argument(Argument.builder().term(var("a")).build())
+                        .argument(Argument.builder().term(cons(1)).build())
+                        .build())
+                .build();
+        manager.addTemplate(template3);
+
+        Assert.assertEquals("Only missing dependencies should be returned", Set.of("iri-2", "iri-0"), manager.getMissingDependencies());
     }
 
     @Test

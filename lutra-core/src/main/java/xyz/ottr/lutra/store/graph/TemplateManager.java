@@ -24,6 +24,7 @@ package xyz.ottr.lutra.store.graph;
 
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -42,6 +43,8 @@ import xyz.ottr.lutra.model.Signature;
 import xyz.ottr.lutra.model.Template;
 import xyz.ottr.lutra.store.TemplateStore;
 import xyz.ottr.lutra.store.TemplateStoreNew;
+import xyz.ottr.lutra.store.checks.Check;
+import xyz.ottr.lutra.store.checks.CheckLibrary;
 import xyz.ottr.lutra.system.MessageHandler;
 import xyz.ottr.lutra.system.Result;
 import xyz.ottr.lutra.system.ResultConsumer;
@@ -53,6 +56,7 @@ public class TemplateManager implements TemplateStore, TemplateStoreNew {
 
     private final Map<String, Signature> templates;
     private final Map<String, Set<String>> dependencyIndex;
+    private final Set<String> missingDependencies;
     private TemplateStore standardLibrary;
 
     private final FormatManager formatManager;
@@ -61,16 +65,27 @@ public class TemplateManager implements TemplateStore, TemplateStoreNew {
         this.formatManager = formatManager;
         templates = new ConcurrentHashMap<>();
         dependencyIndex = new ConcurrentHashMap<>();
+        missingDependencies = new HashSet<>();
     }
 
     @Override
     public void addOTTRBaseTemplates() {
-        OTTR.BaseTemplate.ALL.forEach(this::addSignature);
+        OTTR.BaseTemplate.ALL.forEach(baseTemplate -> addBaseTemplate((BaseTemplate) baseTemplate));
     }
 
     @Override
     public Set<String> getTemplateIRIs() {
         return getIRIs(this::containsDefinitionOf);
+    }
+
+    @Override
+    public boolean addBaseTemplate(BaseTemplate baseTemplate) {
+        if (templates.containsKey(baseTemplate.getIri()) && !checkParametersMatch(baseTemplate, templates.get(baseTemplate.getIri()))) {
+            LOGGER.warn("BaseTemplate {} is already in the store with different parameters - nothing will be added", baseTemplate.getIri());
+            return false;
+        }
+        templates.put(baseTemplate.getIri(), baseTemplate);
+        return true;
     }
 
     @Override
@@ -84,12 +99,21 @@ public class TemplateManager implements TemplateStore, TemplateStoreNew {
         if (sig == null || checkParametersMatch(template, sig)) {
             templates.put(template.getIri(), template);
             updateDependencyIndex(template);
+            updateMissingDependencies(template);
             return true;
         } else {
             LOGGER.warn("Parameters of Signature and Template {} differ: {} | {}",
                     template.getIri(), sig.getParameters(), template.getParameters());
             return false;
         }
+    }
+
+    private void updateMissingDependencies(Template template) {
+        missingDependencies.remove(template.getIri());
+        template.getPattern().stream()
+                .map(Instance::getIri)
+                .filter(Predicate.not(templates::containsKey))
+                .forEach(missingDependencies::add);
     }
 
     private void updateDependencyIndex(Template template) {
@@ -112,6 +136,7 @@ public class TemplateManager implements TemplateStore, TemplateStoreNew {
                 return addTemplate((Template) signature);
             } else {
                 templates.put(signature.getIri(), signature);
+                missingDependencies.add(signature.getIri());
                 return true;
             }
         } else if (signature instanceof Template && checkParametersMatch(signature, sig)) {
@@ -294,16 +319,6 @@ public class TemplateManager implements TemplateStore, TemplateStoreNew {
     }
 
     @Override
-    public MessageHandler checkTemplates() {
-        return null;
-    }
-
-    @Override
-    public MessageHandler checkTemplatesForErrorsOnly() {
-        return null;
-    }
-
-    @Override
     public Result<? extends TemplateStore> expandAll() {
         return null;
     }
@@ -320,7 +335,29 @@ public class TemplateManager implements TemplateStore, TemplateStoreNew {
 
     @Override
     public Set<String> getMissingDependencies() {
-        return null;
+        return missingDependencies;
+    }
+
+    @Override
+    public MessageHandler checkTemplatesFor(List<Check> checks) {
+        QueryEngineNew engine = new QueryEngineNew(this);
+        MessageHandler msgs = new MessageHandler();
+
+        checks.stream()
+                .flatMap(c -> c.check(engine))
+                .forEach(msgs::add);
+
+        return msgs;
+    }
+
+    @Override
+    public MessageHandler checkTemplates() {
+        return checkTemplatesFor(CheckLibrary.allChecks);
+    }
+
+    @Override
+    public MessageHandler checkTemplatesForErrorsOnly() {
+        return checkTemplatesFor(CheckLibrary.failsOnErrorChecks);
     }
 
     @Override
@@ -340,10 +377,11 @@ public class TemplateManager implements TemplateStore, TemplateStoreNew {
 
     // coming from Consumer interface - needed at least for store init
     @Override
-    // TODO introduce addBaseTemplate and refer to this here?
     public void accept(Signature signature) {
         if (signature instanceof Template) {
             addTemplate((Template) signature);
+        } else if (signature instanceof BaseTemplate) {
+            addBaseTemplate((BaseTemplate) signature);
         } else {
             addSignature(signature);
         }

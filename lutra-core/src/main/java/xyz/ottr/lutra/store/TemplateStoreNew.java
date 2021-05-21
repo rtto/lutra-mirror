@@ -23,6 +23,7 @@ package xyz.ottr.lutra.store;
  */
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -31,6 +32,7 @@ import xyz.ottr.lutra.io.FormatManager;
 import xyz.ottr.lutra.model.BaseTemplate;
 import xyz.ottr.lutra.model.Signature;
 import xyz.ottr.lutra.model.Template;
+import xyz.ottr.lutra.store.checks.Check;
 import xyz.ottr.lutra.system.MessageHandler;
 import xyz.ottr.lutra.system.Result;
 import xyz.ottr.lutra.system.ResultStream;
@@ -42,6 +44,11 @@ public interface TemplateStoreNew extends Consumer<Signature> {
 
     // former default method
     Set<String> getTemplateIRIs();
+
+    /**
+     * Adds the argument base template definition to this store.
+     */
+    boolean addBaseTemplate(BaseTemplate baseTemplate);
 
     // TODO do we need more than a boolean here?
     /**
@@ -139,6 +146,28 @@ public interface TemplateStoreNew extends Consumer<Signature> {
      */
     // needed for store init
     Set<String> getIRIs(Predicate<String> pred);
+
+    /**
+     * Performs all checks on all templates in this library, and returns
+     * errors or warnings if checks fail. The following is checked:
+     * - Type correctness, non-blank flags, and consistent use of resources
+     * - Correct calling of templates in instances
+     * - Cycles in template definitions
+     * - Unused variables, reused variables in different parameters
+     * - Use of lists and expansion modifiers
+     * - Missing template
+     */
+    MessageHandler checkTemplates();
+
+    /**
+     * Performs the same checks as #checkTemplates(), except "Missing templates".
+     * This method should be used if one either wants to check single templates
+     * (without having its dependencies loaded in the store) or to check templates
+     * in an unfinished library where not all templates are (yet) defined.
+     */
+    MessageHandler checkTemplatesForErrorsOnly();
+
+    MessageHandler checkTemplatesFor(List<Check> checks);
 
     // TODO  ------ check if things below stay or not
 

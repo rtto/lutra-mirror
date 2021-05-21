@@ -38,6 +38,7 @@ import xyz.ottr.lutra.model.HasGetTerm;
 import xyz.ottr.lutra.model.Instance;
 import xyz.ottr.lutra.model.ListExpander;
 import xyz.ottr.lutra.model.Parameter;
+import xyz.ottr.lutra.model.Signature;
 import xyz.ottr.lutra.model.Substitution;
 import xyz.ottr.lutra.model.Template;
 import xyz.ottr.lutra.model.terms.ListTerm;
@@ -49,11 +50,9 @@ import xyz.ottr.lutra.store.TemplateStore;
 import xyz.ottr.lutra.store.Tuple;
 import xyz.ottr.lutra.system.Result;
 
-public class DependencyGraphEngine extends QueryEngine<DependencyGraph> {
+public class QueryEngineNew extends QueryEngine<TemplateManager> {
 
-    @SuppressWarnings("CPD-START") // code block will be removed
-
-    public DependencyGraphEngine(DependencyGraph store) {
+    public QueryEngineNew(TemplateManager store) {
         this.store = store;
     }
 
@@ -72,11 +71,11 @@ public class DependencyGraphEngine extends QueryEngine<DependencyGraph> {
     @Override
     public Stream<Tuple> parameters(Tuple tuple, String template, String params) {
 
-        Result<TemplateNode> resBoundTemplate = this.store.checkIsTemplate(tuple.getAs(String.class, template));
+        Result<Signature> resBoundTemplate = this.store.getSignature(tuple.getAs(String.class, template));
         if (!resBoundTemplate.isPresent()) {
             return Stream.empty(); // template argument is not a template
         }
-        TemplateNode boundTemplate = resBoundTemplate.get();
+        Signature boundTemplate = resBoundTemplate.get();
         if (tuple.hasBound(params)) {
             List<Parameter> boundParams = tuple.getAs(List.class, params);
             return boundTemplate.getParameters().equals(boundParams) ? Stream.of(tuple) : Stream.empty();
@@ -314,7 +313,7 @@ public class DependencyGraphEngine extends QueryEngine<DependencyGraph> {
     @Override
     public Stream<Tuple> body(Tuple tuple, String template, String body) {
 
-        Result<TemplateNode> resBoundTemplate = this.store.checkIsTemplate(tuple.getAs(String.class, template));
+        Result<Signature> resBoundTemplate = this.store.getSignature(tuple.getAs(String.class, template));
         if (!resBoundTemplate.isPresent()) {
             return Stream.empty(); //  argument is not a template
         }
@@ -466,10 +465,5 @@ public class DependencyGraphEngine extends QueryEngine<DependencyGraph> {
         return tuple.hasBound(instanceIRI)
             ? Stream.empty()
             : tuples.build();
-    }
-
-    @SuppressWarnings({"CPD-END", "PMD.UnusedPrivateMethod"})
-    private void annotationAnchor() {
-
     }
 }
