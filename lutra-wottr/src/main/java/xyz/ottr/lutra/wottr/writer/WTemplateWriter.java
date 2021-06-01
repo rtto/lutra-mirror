@@ -48,7 +48,6 @@ import xyz.ottr.lutra.writer.TemplateWriter;
 
 public class WTemplateWriter implements TemplateWriter {
 
-    private final WInstanceWriter instanceWriter;
     private final PrefixMapping prefixes;
     
     private MessageHandler msgs;
@@ -59,7 +58,6 @@ public class WTemplateWriter implements TemplateWriter {
     }
 
     public WTemplateWriter(PrefixMapping prefixes) {
-        this.instanceWriter = new WInstanceWriter(prefixes);
         this.prefixes = prefixes;
         this.msgs = new MessageHandler();
     }
@@ -145,7 +143,7 @@ public class WTemplateWriter implements TemplateWriter {
 
     private void addInstances(Collection<Instance> instances, Resource signature, Property property, Model model) {
         for (Instance instance : instances) {
-            Resource instanceNode = this.instanceWriter.createInstanceNode(model, instance);
+            Resource instanceNode = WriterUtils.createInstanceNode(model, instance);
             model.add(signature, property, instanceNode);
         }
     }
