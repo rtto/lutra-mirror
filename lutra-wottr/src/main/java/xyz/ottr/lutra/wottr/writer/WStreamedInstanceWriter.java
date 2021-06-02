@@ -91,7 +91,7 @@ public class WStreamedInstanceWriter implements InstanceWriter {
                 this.outStream = new FileOutputStream(filePath);
                 this.out = makeStreamRDF(this.outStream);
             } catch (IOException ex) {
-                Message err = Message.error("Error opening file: " + ex.getMessage());
+                Message err = Message.error("Error opening file " + filePath + ": " + ex.getMessage());
                 this.msgs.add(err);
             }
         }
@@ -136,8 +136,6 @@ public class WStreamedInstanceWriter implements InstanceWriter {
 
         writePrefixes();
             
-        // TODO: Only create model if non-triple instance (for efficiency)
-
         Model model = ModelFactory.createDefaultModel();
         List<Triple> triples = new LinkedList<>();
 
@@ -172,11 +170,9 @@ public class WStreamedInstanceWriter implements InstanceWriter {
                 this.out.finish();
                 this.outStream.close();
             }
-            if (this.console != null) {
-                this.console.finish();
-                this.consoleStream.close();
-            }
-        } catch (IOException ex) {
+            // Do not close this.console as it will close console output for rest
+            // of execution!
+        } catch (Exception ex) {
             this.msgs.add(Message.error("Error closing streams: " + ex.getMessage()));
         }
 
