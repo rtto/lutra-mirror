@@ -1,4 +1,4 @@
-package xyz.ottr.lutra.store.graph;
+package xyz.ottr.lutra.store;
 
 /*-
  * #%L
@@ -24,7 +24,6 @@ package xyz.ottr.lutra.store.graph;
 
 import xyz.ottr.lutra.model.Instance;
 import xyz.ottr.lutra.model.Template;
-import xyz.ottr.lutra.store.TemplateStoreNew;
 import xyz.ottr.lutra.system.Result;
 import xyz.ottr.lutra.system.ResultStream;
 

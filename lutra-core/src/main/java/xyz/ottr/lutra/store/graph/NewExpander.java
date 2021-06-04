@@ -32,6 +32,7 @@ import xyz.ottr.lutra.model.Substitution;
 import xyz.ottr.lutra.model.Template;
 import xyz.ottr.lutra.model.terms.BlankNodeTerm;
 import xyz.ottr.lutra.model.terms.Term;
+import xyz.ottr.lutra.store.Expander;
 import xyz.ottr.lutra.store.TemplateStoreNew;
 import xyz.ottr.lutra.system.Result;
 import xyz.ottr.lutra.system.ResultConsumer;

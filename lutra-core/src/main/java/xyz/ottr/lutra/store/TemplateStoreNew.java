@@ -81,7 +81,6 @@ public interface TemplateStoreNew extends Consumer<Signature> {
      * with the argument IRI.
      */
     // needed for store init
-    // TODO definition seems to be used only in the old TemplateNode class - rename to Template here??
     boolean containsDefinitionOf(String iri);
 
     /**
@@ -114,7 +113,6 @@ public interface TemplateStoreNew extends Consumer<Signature> {
      * Returns the IRI of all non-base templates without a definition
      * in this Store.
      */
-    // TODO implement & test
     Set<String> getMissingDependencies();
 
     /**
