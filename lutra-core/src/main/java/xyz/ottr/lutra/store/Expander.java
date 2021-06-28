@@ -30,6 +30,19 @@ import xyz.ottr.lutra.system.ResultStream;
 public interface Expander {
 
     /**
+     * Expands the argument template instance according to the definitions in this
+     * store, but fetches misisng templates, and returns empty Result-instances if the instance is using
+     * a template wrongly (e.g.~wrong number of arguments or wrong types, optionals).
+     *
+     * @param instance
+     *     the template instance to expand
+     *
+     * @return
+     *     a ResultStream of expanded template instances
+     */
+    ResultStream<Instance> expandInstanceFetch(Instance instance);
+
+    /**
      * Expands all nodes without losing information, that is, it does not expand
      * nodes with non-optional possible null valued parameters, and does not alter
      * this TemplateStore.

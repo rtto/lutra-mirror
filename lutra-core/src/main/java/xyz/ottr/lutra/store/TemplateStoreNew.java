@@ -71,10 +71,22 @@ public interface TemplateStoreNew extends Consumer<Signature> {
     boolean contains(String iri);
 
     /**
+     * Returns true if this store contains either a template (base or defined)
+     * or a signature with the argument IRI.
+     */
+    boolean containsTemplate(String iri);
+
+    /**
      * Returns true if this store contains a base template
      * with the argument IRI.
      */
     boolean containsBase(String iri);
+
+    /**
+     * Returns true if this store contains signature
+     * with the argument IRI.
+     */
+    boolean containsSignature(String iri);
 
     /**
      * Returns true if this store contains a template (with definition)
@@ -108,6 +120,14 @@ public interface TemplateStoreNew extends Consumer<Signature> {
      * Returns all base templates in the store.
      */
     ResultStream<BaseTemplate> getAllBaseTemplates();
+
+    /**
+     * Returns a Result containing the IRIs of all
+     * templates of the instances in the body of the argument
+     * template IRI, or empty Result if argument
+     * template has no definition in the store.
+     */
+    Result<Set<String>> getDependencies(String templateIri);
 
     /**
      * Returns the IRI of all non-base templates without a definition
@@ -146,6 +166,11 @@ public interface TemplateStoreNew extends Consumer<Signature> {
     Set<String> getIRIs(Predicate<String> pred);
 
     /**
+     * Returns the IRIs of all Signatures in the store.
+     */
+    Set<String> getAllIRIs();
+
+    /**
      * Performs all checks on all templates in this library, and returns
      * errors or warnings if checks fail. The following is checked:
      * - Type correctness, non-blank flags, and consistent use of resources
@@ -169,9 +194,9 @@ public interface TemplateStoreNew extends Consumer<Signature> {
 
     // TODO  ------ check if things below stay or not
 
-    Optional<TemplateStore> getStandardLibrary();
+    Optional<TemplateStoreNew> getStandardLibrary();
 
-    void registerStandardLibrary(TemplateStore standardLibrary);
+    void registerStandardLibrary(TemplateStoreNew standardLibrary);
 
     FormatManager getFormatManager();
 

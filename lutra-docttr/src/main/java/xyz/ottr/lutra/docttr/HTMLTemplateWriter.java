@@ -52,7 +52,9 @@ import xyz.ottr.lutra.model.Instance;
 import xyz.ottr.lutra.model.Signature;
 import xyz.ottr.lutra.model.Substitution;
 import xyz.ottr.lutra.model.terms.IRITerm;
-import xyz.ottr.lutra.store.TemplateStore;
+import xyz.ottr.lutra.store.Expander;
+import xyz.ottr.lutra.store.TemplateStoreNew;
+import xyz.ottr.lutra.store.graph.NewNoChecksExpander;
 import xyz.ottr.lutra.system.Message;
 import xyz.ottr.lutra.system.Result;
 import xyz.ottr.lutra.system.ResultStream;
@@ -62,19 +64,21 @@ import xyz.ottr.lutra.writer.RDFNodeWriter;
 public class HTMLTemplateWriter {
 
     private final PrefixMapping prefixMapping;
-    private final TemplateStore store;
+    private final TemplateStoreNew store;
+    private final Expander expander;
 
     private final SerialisationWriter serialisationWriter;
     private final DependencyGraphVisualiser dependencyGraphVisualiser;
 
     private ContainerTag tocList;
 
-    public HTMLTemplateWriter(PrefixMapping prefixMapping, TemplateStore store) {
+    public HTMLTemplateWriter(PrefixMapping prefixMapping, TemplateStoreNew store) {
         this.prefixMapping = prefixMapping;
         this.prefixMapping.withDefaultMappings(OTTR.getStandardLibraryPrefixes());
         this.prefixMapping.setNsPrefix("x", OTTR.ns_example_arg);
 
         this.store = store;
+        expander = new NewNoChecksExpander(store);
 
         this.serialisationWriter = new SerialisationWriter(this.prefixMapping);
         this.dependencyGraphVisualiser = new DependencyGraphVisualiser(this.prefixMapping);
@@ -154,7 +158,7 @@ public class HTMLTemplateWriter {
         WInstanceWriter instanceWriter = new WInstanceWriter(this.prefixMapping);
 
         ResultStream.innerOf(annotations)
-            .innerFlatMap(this.store::expandInstanceFetch)
+            .innerFlatMap(this.expander::expandInstanceFetch)
             .innerForEach(instanceWriter);
 
         Model metaData = instanceWriter.writeToModel();
@@ -224,7 +228,7 @@ public class HTMLTemplateWriter {
         var exampleExpansion = this.getExpansion(exampleInstance);
         var wexampleInstance = this.serialisationWriter.writeWottrModel(exampleInstance);
         var expansionViz = new TripleInstanceGraphVisualiser(this.prefixMapping);
-        this.store.expandInstanceWithoutChecks(exampleInstance)
+        this.expander.expandInstance(exampleInstance)
             .innerForEach(expansionViz);
 
         return div(
@@ -276,7 +280,7 @@ public class HTMLTemplateWriter {
     private Tree<Instance> getExpansionTree(Instance exampleInstance) {
         // Build expansion tree
         Function<Instance, List<Instance>> builder = instance -> {
-            var signature = this.store.getTemplateSignature(instance.getIri()).get();
+            var signature = this.store.getTemplate(instance.getIri()).get();
             // TODO: create a substitution from a Map directly to avoid validation
             var substitution = Substitution.resultOf(instance.getArguments(), signature.getParameters()).get();
             return this.store.getTemplate(instance.getIri()).get().getPattern().stream()
@@ -501,7 +505,7 @@ public class HTMLTemplateWriter {
 
     private Model getExpansion(Instance instance) {
         WInstanceWriter instanceWriter = new WInstanceWriter(this.prefixMapping);
-        this.store.expandInstanceWithoutChecks(instance)
+        this.expander.expandInstance(instance)
             .innerForEach(instanceWriter);
         return instanceWriter.writeToModel();
     }

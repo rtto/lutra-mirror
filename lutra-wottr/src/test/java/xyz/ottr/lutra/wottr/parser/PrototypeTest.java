@@ -27,7 +27,8 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import xyz.ottr.lutra.io.TemplateReader;
 import xyz.ottr.lutra.model.Template;
-import xyz.ottr.lutra.store.graph.DependencyGraph;
+import xyz.ottr.lutra.store.TemplateStoreNew;
+import xyz.ottr.lutra.store.graph.TemplateManager;
 import xyz.ottr.lutra.system.ResultConsumer;
 import xyz.ottr.lutra.wottr.io.RDFIO;
 import xyz.ottr.lutra.wottr.writer.WTemplateWriter;
@@ -37,7 +38,7 @@ public class PrototypeTest {
     private static final String inFolder = "src/test/resources/correct/";
     //private static final String inFolder = "src/test/resources/correct/definitions/cluster/pizza-alt/";
     //private static final String inFolder = "/home/leifhka/gits/aibel-templates_altered/tpl/etl/book/";
-    private static DependencyGraph graph;
+    private static TemplateStoreNew graph;
     private static TemplateReader templateReader;
     private static TemplateReader legacyReader;
 
@@ -47,7 +48,7 @@ public class PrototypeTest {
     public static void load() {
         legacyReader = new TemplateReader(RDFIO.fileReader(), new xyz.ottr.lutra.wottr.parser.WTemplateParser());
         templateReader = new TemplateReader(RDFIO.fileReader(), new WTemplateParser());
-        graph = new DependencyGraph(null);
+        graph = new TemplateManager(null);
     }
 
     @Test

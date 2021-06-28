@@ -31,8 +31,10 @@ import org.slf4j.LoggerFactory;
 import xyz.ottr.lutra.io.InstanceReader;
 import xyz.ottr.lutra.io.TemplateReader;
 import xyz.ottr.lutra.model.Instance;
-import xyz.ottr.lutra.store.TemplateStore;
-import xyz.ottr.lutra.store.graph.DependencyGraph;
+import xyz.ottr.lutra.store.Expander;
+import xyz.ottr.lutra.store.TemplateStoreNew;
+import xyz.ottr.lutra.store.graph.NewNoChecksExpander;
+import xyz.ottr.lutra.store.graph.TemplateManager;
 import xyz.ottr.lutra.system.Assertions;
 import xyz.ottr.lutra.system.MessageHandler;
 import xyz.ottr.lutra.system.Result;
@@ -56,8 +58,9 @@ public class BlankNodeTest {
     @Test
     public void shouldBeIsomorphic() {
 
-        TemplateStore store = new DependencyGraph(null);
+        TemplateStoreNew store = new TemplateManager(null);
         store.addOTTRBaseTemplates();
+        Expander expander = new NewNoChecksExpander(store);
 
         // Read templates
         TemplateReader tempReader = new TemplateReader(RDFIO.fileReader(), new WTemplateParser());
@@ -69,7 +72,7 @@ public class BlankNodeTest {
         InstanceReader insReader = new InstanceReader(RDFIO.fileReader(), new WInstanceParser());
         ResultStream<Instance> expandedInInstances = insReader
             .apply("src/test/resources/correct/instances/blank1/in.ttl")
-            .innerFlatMap(store::expandInstance);
+            .innerFlatMap(expander::expandInstance);
 
         // Write expanded instances to model
         WInstanceWriter insWriter = new WInstanceWriter();

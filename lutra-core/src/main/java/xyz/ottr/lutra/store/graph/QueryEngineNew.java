@@ -46,7 +46,7 @@ import xyz.ottr.lutra.model.terms.Term;
 import xyz.ottr.lutra.model.types.ComplexType;
 import xyz.ottr.lutra.model.types.Type;
 import xyz.ottr.lutra.store.QueryEngine;
-import xyz.ottr.lutra.store.TemplateStore;
+import xyz.ottr.lutra.store.TemplateStoreNew;
 import xyz.ottr.lutra.store.Tuple;
 import xyz.ottr.lutra.system.Result;
 
@@ -370,20 +370,20 @@ public class QueryEngineNew extends QueryEngine<TemplateManager> {
 
     @Override
     public Stream<Tuple> isUndefined(Tuple tuple, String template) {
-        return storeContains(tuple, template, (store, iri) -> !store.containsTemplate(iri));
+        return storeContains(tuple, template, (store, iri) -> !store.contains(iri));
     }
 
     @Override
     public Stream<Tuple> isSignature(Tuple tuple, String template) {
-        return storeContains(tuple, template, TemplateStore::containsSignature);
+        return storeContains(tuple, template, TemplateStoreNew::containsSignature);
     }
 
     @Override
     public Stream<Tuple> isBase(Tuple tuple, String template) {
-        return storeContains(tuple, template, TemplateStore::containsBase);
+        return storeContains(tuple, template, TemplateStoreNew::containsBase);
     }
 
-    private Stream<Tuple> storeContains(Tuple tuple, String template, BiPredicate<TemplateStore, String> containsTest) {
+    private Stream<Tuple> storeContains(Tuple tuple, String template, BiPredicate<TemplateStoreNew, String> containsTest) {
         String iri = tuple.getAs(String.class, template);
         return containsTest.test(this.store, iri)
             ? Stream.of(tuple)

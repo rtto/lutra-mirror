@@ -23,6 +23,7 @@ package xyz.ottr.lutra.store.graph;
  */
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -41,7 +42,6 @@ import xyz.ottr.lutra.model.Instance;
 import xyz.ottr.lutra.model.Parameter;
 import xyz.ottr.lutra.model.Signature;
 import xyz.ottr.lutra.model.Template;
-import xyz.ottr.lutra.store.TemplateStore;
 import xyz.ottr.lutra.store.TemplateStoreNew;
 import xyz.ottr.lutra.store.checks.Check;
 import xyz.ottr.lutra.store.checks.CheckLibrary;
@@ -50,14 +50,14 @@ import xyz.ottr.lutra.system.Result;
 import xyz.ottr.lutra.system.ResultConsumer;
 import xyz.ottr.lutra.system.ResultStream;
 
-public class TemplateManager implements TemplateStore, TemplateStoreNew {
+public class TemplateManager implements TemplateStoreNew {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TemplateManager.class);
 
     private final Map<String, Signature> templates;
     private final Map<String, Set<String>> dependencyIndex;
     private final Set<String> missingDependencies;
-    private TemplateStore standardLibrary;
+    private TemplateStoreNew standardLibrary;
 
     private final FormatManager formatManager;
 
@@ -124,11 +124,6 @@ public class TemplateManager implements TemplateStore, TemplateStoreNew {
     }
 
     @Override
-    public boolean addTemplateSignature(Signature signature) {
-        return addSignature(signature);
-    }
-
-    @Override
     public boolean addSignature(Signature signature) {
         Signature sig = templates.get(signature.getIri());
         if (sig == null) {
@@ -147,6 +142,7 @@ public class TemplateManager implements TemplateStore, TemplateStoreNew {
         }
     }
 
+    // TODO move to utility class?
     private boolean checkParametersMatch(Signature sig1, Signature sig2) {
         boolean result = sig1.getParameters().size() == sig2.getParameters().size();
 
@@ -220,23 +216,16 @@ public class TemplateManager implements TemplateStore, TemplateStoreNew {
         if (signature instanceof Template) {
             return Result.of((Template) signature);
         } else {
-            // TODO add error message
-            return Result.empty();
+            return Result.error("Missing Template definition for IRI " + iri);
         }
-    }
-
-    @Override
-    public Result<Signature> getTemplateSignature(String iri) {
-        return getSignature(iri);
     }
 
     @Override
     public Result<Signature> getSignature(String iri) {
         Signature signature = templates.get(iri);
         if (signature == null) {
-            return Result.empty();
+            return Result.error("Missing Signature for IRI " + iri);
         } else {
-            // TODO add error message
             return Result.of(signature);
         }
     }
@@ -257,15 +246,15 @@ public class TemplateManager implements TemplateStore, TemplateStoreNew {
     }
 
     @Override
-    public Result<Signature> getTemplateObject(String iri) {
-        return null;
-    }
-
-    @Override
     public Set<String> getIRIs(Predicate<String> pred) {
         return templates.keySet().stream()
                 .filter(pred::test)
                 .collect(Collectors.toSet());
+    }
+
+    @Override
+    public Set<String> getAllIRIs() {
+        return Collections.unmodifiableSet(templates.keySet());
     }
 
     @Override
@@ -280,7 +269,7 @@ public class TemplateManager implements TemplateStore, TemplateStoreNew {
 
     @Override
     public MessageHandler fetchMissingDependencies(Collection<String> initMissing) {
-        Optional<TemplateStore> stdLib = getStandardLibrary();
+        Optional<TemplateStoreNew> stdLib = getStandardLibrary();
         ResultConsumer<TemplateReader> messages = new ResultConsumer<>();
 
         FormatManager formatManager = getFormatManager();
@@ -313,29 +302,22 @@ public class TemplateManager implements TemplateStore, TemplateStoreNew {
         return messages.getMessageHandler();
     }
 
+    // TODO move to Template class later?
     @Override
-    public Result<Set<String>> getDependencies(String template) {
-        return null;
-    }
+    public Result<Set<String>> getDependencies(String templateIri) {
+        Result<Template> result = getTemplate(templateIri);
+        if (result.isEmpty()) {
+            return Result.error("Template with IRI " + templateIri + " not in store");
+        }
 
-    @Override
-    public Result<? extends TemplateStore> expandAll() {
-        return null;
-    }
-
-    @Override
-    public ResultStream<Instance> expandInstance(Instance instance) {
-        return null;
-    }
-
-    @Override
-    public ResultStream<Instance> expandInstanceWithoutChecks(Instance instance) {
-        return null;
+        Set<Instance> dependencies = result.get().getPattern();
+        Set<String> iris = dependencies.stream().map(instance -> instance.getIri()).collect(Collectors.toSet());
+        return Result.of(iris);
     }
 
     @Override
     public Set<String> getMissingDependencies() {
-        return missingDependencies;
+        return new HashSet<>(missingDependencies);
     }
 
     @Override
@@ -361,12 +343,12 @@ public class TemplateManager implements TemplateStore, TemplateStoreNew {
     }
 
     @Override
-    public Optional<TemplateStore> getStandardLibrary() {
+    public Optional<TemplateStoreNew> getStandardLibrary() {
         return standardLibrary == null ? Optional.empty() : Optional.of(standardLibrary);
     }
 
     @Override
-    public void registerStandardLibrary(TemplateStore standardLibrary) {
+    public void registerStandardLibrary(TemplateStoreNew standardLibrary) {
         this.standardLibrary = standardLibrary;
     }
 

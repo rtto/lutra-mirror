@@ -42,7 +42,9 @@ import xyz.ottr.lutra.api.StandardFormat;
 import xyz.ottr.lutra.io.InstanceReader;
 import xyz.ottr.lutra.io.TemplateReader;
 import xyz.ottr.lutra.model.Instance;
-import xyz.ottr.lutra.store.TemplateStore;
+import xyz.ottr.lutra.store.Expander;
+import xyz.ottr.lutra.store.TemplateStoreNew;
+import xyz.ottr.lutra.store.graph.NewNoChecksExpander;
 import xyz.ottr.lutra.stottr.io.SFileReader;
 import xyz.ottr.lutra.stottr.parser.SInstanceParser;
 import xyz.ottr.lutra.stottr.parser.STemplateParser;
@@ -90,7 +92,8 @@ public class PottrTest {
     }
 
 
-    @Test public void test() {
+    @Test
+    public void test() {
         runExpand(this.instancePath, this.templatePath, this.expectedResults);
     }
 
@@ -101,7 +104,7 @@ public class PottrTest {
     private void runExpand(String fileInstance, String pathTemplates, boolean expectedResults) {
 
         boolean testResults = true;
-        TemplateStore store = getStore();
+        TemplateStoreNew store = getStore();
 
         List<Message> messages = new ArrayList<>();
 
@@ -122,7 +125,7 @@ public class PottrTest {
         Assert.assertThat(messages, matcher.apply(Collections.emptyList()));
     }
 
-    private TemplateStore getStore() {
+    private TemplateStoreNew getStore() {
         TemplateManager tmwf = new TemplateManager();
         for (StandardFormat format : StandardFormat.values()) {
             tmwf.registerFormat(format.format);
@@ -130,7 +133,7 @@ public class PottrTest {
         return tmwf.getTemplateStore();
     }
 
-    private List<Message> testTemplates(TemplateStore store, String path) {
+    private List<Message> testTemplates(TemplateStoreNew store, String path) {
 
         List<Message> messages = new ArrayList<>();
 
@@ -143,11 +146,12 @@ public class PottrTest {
         return messages;
     }
 
-    private List<Message> testInstances(TemplateStore store, String file) {
+    private List<Message> testInstances(TemplateStoreNew store, String file) {
         InstanceReader insReader = new InstanceReader(new SFileReader(), new SInstanceParser());
+        Expander expander = new NewNoChecksExpander(store); // TODO check expander type
         ResultStream<Instance> expandedInInstances = insReader
             .apply(resolve(file))
-            .innerFlatMap(store::expandInstanceFetch);
+            .innerFlatMap(expander::expandInstanceFetch);
 
         // Write expanded instances to model
         SInstanceWriter insWriter = new SInstanceWriter(OTTR.getDefaultPrefixes());

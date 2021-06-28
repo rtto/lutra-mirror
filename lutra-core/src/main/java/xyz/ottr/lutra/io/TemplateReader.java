@@ -24,13 +24,12 @@ package xyz.ottr.lutra.io;
 
 import java.util.Arrays;
 import java.util.Map;
-import java.util.Set;
 import java.util.function.Function;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import xyz.ottr.lutra.model.Signature;
 import xyz.ottr.lutra.parser.TemplateParser;
-import xyz.ottr.lutra.store.TemplateStore;
+import xyz.ottr.lutra.store.TemplateStoreNew;
 import xyz.ottr.lutra.system.MessageHandler;
 import xyz.ottr.lutra.system.ResultConsumer;
 import xyz.ottr.lutra.system.ResultStream;
@@ -55,21 +54,17 @@ public class TemplateReader implements Function<String, ResultStream<Signature>>
         return this.templatePipeline.apply(file);
     }
 
-    public MessageHandler populateTemplateStore(TemplateStore store, String iri) {
+    public MessageHandler populateTemplateStore(TemplateStoreNew store, String iri) {
         return populateTemplateStore(store, ResultStream.innerOf(iri));
     }
 
-    public MessageHandler populateTemplateStore(TemplateStore store, Set<String> iris) {
-        return populateTemplateStore(store, ResultStream.innerOf(iris));
-    }
-
-    public MessageHandler populateTemplateStore(TemplateStore store, ResultStream<String> iris) {
+    public MessageHandler populateTemplateStore(TemplateStoreNew store, ResultStream<String> iris) {
         ResultConsumer<Signature> consumer = new ResultConsumer<>(store);
         iris.innerFlatMap(this.templatePipeline).forEach(consumer);
         return consumer.getMessageHandler();
     }
 
-    public MessageHandler loadTemplatesFromFile(TemplateStore store, String file) {
+    public MessageHandler loadTemplatesFromFile(TemplateStoreNew store, String file) {
         ResultConsumer<Signature> consumer = new ResultConsumer<>(store);
         this.templatePipeline.apply(file).forEach(consumer);
         return consumer.getMessageHandler();
@@ -89,16 +84,16 @@ public class TemplateReader implements Function<String, ResultStream<Signature>>
      * @return
      *       a MessageHandler containing possible Message-s with Warnings, Errors, etc.
      */
-    public MessageHandler loadTemplatesFromFolder(TemplateStore store, String folder,
-            String[] includeExtensions, String[] excludeExtensions) {
+    public MessageHandler loadTemplatesFromFolder(TemplateStoreNew store, String folder,
+                                                  String[] includeExtensions, String[] excludeExtensions) {
 
         this.log.info("Loading all templates from folder " + folder + " with suffix "
                 + Arrays.toString(includeExtensions) + " except " + Arrays.toString(excludeExtensions));
 
         return populateTemplateStore(store,
-                                     Files.loadFromFolder(folder,
-                                                          includeExtensions,
-                                                          excludeExtensions));
+                Files.loadFromFolder(folder,
+                        includeExtensions,
+                        excludeExtensions));
     }
 
     /**

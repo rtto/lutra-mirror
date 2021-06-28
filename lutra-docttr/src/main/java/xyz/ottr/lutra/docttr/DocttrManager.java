@@ -46,7 +46,7 @@ import xyz.ottr.lutra.OTTR;
 import xyz.ottr.lutra.TemplateManager;
 import xyz.ottr.lutra.io.Files;
 import xyz.ottr.lutra.model.Signature;
-import xyz.ottr.lutra.store.TemplateStore;
+import xyz.ottr.lutra.store.TemplateStoreNew;
 import xyz.ottr.lutra.system.Result;
 
 public class DocttrManager {
@@ -61,9 +61,8 @@ public class DocttrManager {
 
     public static final String FRAMENAME_MAIN = "main-frame";
 
-    //private final TemplateManager manager;
     private final PrefixMapping prefixMapping;
-    private final TemplateStore templateStore;
+    private final TemplateStoreNew templateStore;
     private final PrintStream outStream;
 
     public DocttrManager(PrintStream outStream, TemplateManager manager) {
@@ -73,13 +72,10 @@ public class DocttrManager {
     }
 
     private Map<String, Result<Signature>> getSignatureMap() {
-        return this.templateStore.getAllTemplateObjectIRIs().stream()
-            .collect(
-                Collectors.toMap(Function.identity(),
-                    this.templateStore::getTemplateObject));
+        return templateStore.getAllIRIs().stream()
+                .collect(
+                    Collectors.toMap(Function.identity(), templateStore::getSignature));
     }
-
-
 
     public void write(Path outputFolder) {
 

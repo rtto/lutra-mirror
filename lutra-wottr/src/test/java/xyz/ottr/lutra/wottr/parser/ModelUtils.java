@@ -28,8 +28,10 @@ import org.apache.jena.rdf.model.Model;
 import org.junit.Assert;
 import xyz.ottr.lutra.io.InstanceReader;
 import xyz.ottr.lutra.model.Instance;
-import xyz.ottr.lutra.store.TemplateStore;
-import xyz.ottr.lutra.store.graph.DependencyGraph;
+import xyz.ottr.lutra.store.Expander;
+import xyz.ottr.lutra.store.TemplateStoreNew;
+import xyz.ottr.lutra.store.graph.NewNoChecksExpander;
+import xyz.ottr.lutra.store.graph.TemplateManager;
 import xyz.ottr.lutra.system.Assertions;
 import xyz.ottr.lutra.system.ResultConsumer;
 import xyz.ottr.lutra.system.ResultStream;
@@ -63,13 +65,14 @@ public enum ModelUtils {
     // read RDF file, expand instances (only base instances), and return OTTR parsed RDF model
     public static Model getOTTRParsedRDFModel(String filename) {
 
-        TemplateStore store = new DependencyGraph(null);
+        TemplateStoreNew store = new TemplateManager(null);
         store.addOTTRBaseTemplates();
+        Expander expander = new NewNoChecksExpander(store); // TODO check expander type
 
         InstanceReader insReader = new InstanceReader(RDFIO.fileReader(), new WInstanceParser());
         ResultStream<Instance> expandedInInstances = insReader
             .apply(filename)
-            .innerFlatMap(store::expandInstance);
+            .innerFlatMap(expander::expandInstance);
 
         // Write expanded instances to model
         WInstanceWriter insWriter = new WInstanceWriter();

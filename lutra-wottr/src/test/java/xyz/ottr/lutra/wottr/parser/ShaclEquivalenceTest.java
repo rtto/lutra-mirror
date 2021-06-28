@@ -40,8 +40,8 @@ import xyz.ottr.lutra.io.InstanceReader;
 import xyz.ottr.lutra.io.TemplateReader;
 import xyz.ottr.lutra.model.Instance;
 import xyz.ottr.lutra.model.Signature;
-import xyz.ottr.lutra.store.TemplateStore;
-import xyz.ottr.lutra.store.graph.DependencyGraph;
+import xyz.ottr.lutra.store.TemplateStoreNew;
+import xyz.ottr.lutra.store.graph.TemplateManager;
 import xyz.ottr.lutra.system.Assertions;
 import xyz.ottr.lutra.system.Message;
 import xyz.ottr.lutra.system.Result;
@@ -130,7 +130,7 @@ public class ShaclEquivalenceTest {
 
         ResultStream<Signature> templates = this.tempReader.apply(file);
 
-        TemplateStore store = new DependencyGraph(null);
+        TemplateStoreNew store = new TemplateManager(null);
         ResultConsumer<Signature> tplErrorMessages = new ResultConsumer<>(store);
         templates.forEach(tpl -> {
             if (correct) {
@@ -152,7 +152,7 @@ public class ShaclEquivalenceTest {
             assertTrue("File " + file + " should not produce any error messages, but gave:\n"
                 + errors, errors.isEmpty());
             assertTrue("File " + file + " should produce a template, but no templates produced.",
-                store.getAllTemplateObjects().getStream().count() > 0);
+                store.getAllSignatures().getStream().count() > 0);
         }
     }
 

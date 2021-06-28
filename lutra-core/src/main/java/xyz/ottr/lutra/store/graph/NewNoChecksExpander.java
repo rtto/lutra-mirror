@@ -22,28 +22,46 @@ package xyz.ottr.lutra.store.graph;
  * #L%
  */
 
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import xyz.ottr.lutra.model.Argument;
+import xyz.ottr.lutra.model.BaseTemplate;
 import xyz.ottr.lutra.model.Instance;
 import xyz.ottr.lutra.model.Signature;
 import xyz.ottr.lutra.model.Substitution;
 import xyz.ottr.lutra.model.Template;
 import xyz.ottr.lutra.model.terms.BlankNodeTerm;
+import xyz.ottr.lutra.model.terms.NoneTerm;
 import xyz.ottr.lutra.model.terms.Term;
 import xyz.ottr.lutra.store.Expander;
 import xyz.ottr.lutra.store.TemplateStoreNew;
+import xyz.ottr.lutra.system.MessageHandler;
 import xyz.ottr.lutra.system.Result;
 import xyz.ottr.lutra.system.ResultConsumer;
 import xyz.ottr.lutra.system.ResultStream;
 
-public class NewExpander implements Expander {
+public class NewNoChecksExpander implements Expander {
 
     private final TemplateStoreNew templateStore;
 
-    public NewExpander(TemplateStoreNew templateStore) {
+    public NewNoChecksExpander(TemplateStoreNew templateStore) {
         this.templateStore = templateStore;
+    }
+
+    @Override
+    public ResultStream<Instance> expandInstanceFetch(Instance instance) {
+        if (!templateStore.containsTemplate(instance.getIri())) {
+            // Need to fetch missing template
+            MessageHandler messages = templateStore.fetchMissingDependencies(List.of(instance.getIri()));
+            Result<Instance> insWithMsgs = Result.of(instance);
+            messages.toSingleMessage("Fetch missing template: " + instance.getIri())
+                    .ifPresent(insWithMsgs::addMessage);
+            return insWithMsgs.mapToStream(this::expandInstance);
+        }
+
+        return expandInstance(instance);
     }
 
     @Override
@@ -76,7 +94,7 @@ public class NewExpander implements Expander {
 
     // for somme reason PMD does not recognize that the method IS used above
     @SuppressWarnings("PMD.UnusedPrivateMethod")
-    private ResultStream<Instance> expandTemplateInstance(Instance instance, Signature from) {
+    protected ResultStream<Instance> expandTemplateInstance(Instance instance, Signature from) {
         Result<Signature> toResult = templateStore.getSignature(instance.getIri());
         if (toResult.isEmpty()) {
             return ResultStream.of(toResult.map(s -> null));
@@ -85,49 +103,58 @@ public class NewExpander implements Expander {
             return ResultStream.innerOf(instance);
         }
 
-        return performExpansion(instance).innerFlatMap(i -> expandTemplateInstance(i, toResult.get()));
+        return expandInstance(instance).innerFlatMap(i -> expandTemplateInstance(i, toResult.get()));
     }
 
     @Override
     public ResultStream<Instance> expandInstance(Instance instance) {
+        Result<Signature> result = templateStore.getSignature(instance.getIri());
+
+        if (result.isEmpty() || !(result.get() instanceof BaseTemplate || result.get() instanceof Template)) {
+            return ResultStream.of(Result.error("Missing definition for " + instance.getIri()));
+        }
+        if (shouldDiscard(instance, result.get())) {
+            return ResultStream.empty();
+        }
         if (cannotExpand(instance)) {
             return ResultStream.innerOf(instance);
         }
-
-        return performExpansion(instance).innerFlatMap(this::expandInstance);
-    }
-
-    private ResultStream<Instance> performExpansion(Instance instance) {
-        Result<Template> result = templateStore.getTemplate(instance.getIri());
 
         if (instance.hasListExpander()) {
             // TODO move to Instance class later
             Stream<Result<Instance>> expanded = instance.getListExpander().expand(instance.getArguments()).stream()
                     .map(args -> Instance.builder().iri(instance.getIri()).arguments(args).build())
                     .map(Result::of);
-            return new ResultStream<>(expanded);
+            return new ResultStream<>(expanded).innerFlatMap(this::expandInstance);
         } else {
-            Result<Substitution> subst = result.flatMap(t -> Substitution.resultOf(instance.getArguments(), t.getParameters()));
-            Result<Stream<Instance>> combination = Result.zip(result, subst, (t, s) -> t.getPattern().stream().map(i -> i.apply(s)));
+            Result<Template> templateResult = result.map(x -> (Template) x);
+            Result<Substitution> subst = templateResult.flatMap(t -> Substitution.resultOf(instance.getArguments(), t.getParameters()));
+            Result<Stream<Instance>> combination = Result.zip(templateResult, subst,
+                    (t, s) -> t.getPattern().stream().map(i -> i.apply(s)));
 
-            return combination.mapToStream(ResultStream::innerOf);
+            return combination.mapToStream(ResultStream::innerOf).innerFlatMap(this::expandInstance);
         }
     }
 
-    private boolean cannotExpand(Instance instance) {
-        return templateStore.containsBase(instance.getIri()) && !instance.hasListExpander();
+    protected boolean shouldDiscard(Instance instance, Signature signature) {
+        // Should discard this instance if it contains none at a non-optional position
+        for (int i = 0; i < instance.getArguments().size(); i++) {
+            if (instance.getArguments().get(i).getTerm() instanceof NoneTerm
+                    && !signature.isOptional(i)
+                    && !signature.getParameters().get(i).hasDefaultValue()) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
      * Checks if this edge can be expanded (i.e. not base and no optional variables),
      * but does not check for missing definitions.
      */
-    private boolean cannotExpandTemplateInstance(Instance instance, Signature from, Signature to) {
+    protected boolean cannotExpandTemplateInstance(Instance instance, Signature from, Signature to) {
 
         if (cannotExpand(instance)) {
-            return true;
-        }
-        if (instance.hasListExpander() && cannotExpandExpander(instance)) {
             return true;
         }
         for (int i = 0; i < instance.getArguments().size(); i++) {
@@ -139,11 +166,21 @@ public class NewExpander implements Expander {
         return false;
     }
 
+    protected boolean cannotExpand(Instance instance) {
+        if (templateStore.containsBase(instance.getIri()) && !instance.hasListExpander()) {
+            return true;
+        }
+        if (instance.hasListExpander() && cannotExpandExpander(instance)) {
+            return true;
+        }
+        return false;
+    }
+
     /**
      * Checks if this edge's listExpander can be expanded (i.e. no variable or blank marked for expansion),
      * but does not check for missing definitions.
      */
-    private boolean cannotExpandExpander(Instance instance) {
+    protected boolean cannotExpandExpander(Instance instance) {
         for (Argument arg : instance.getArguments()) {
             if (arg.isListExpander()
                     && (arg.getTerm().isVariable()
@@ -154,4 +191,7 @@ public class NewExpander implements Expander {
         return false;
     }
 
+    protected TemplateStoreNew getTemplateStore() {
+        return templateStore;
+    }
 }

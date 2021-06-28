@@ -37,7 +37,7 @@ import xyz.ottr.lutra.model.HasApplySubstitution;
 import xyz.ottr.lutra.model.Substitution;
 import xyz.ottr.lutra.model.types.Type;
 
-public abstract class QueryEngine<S extends TemplateStore> {
+public abstract class QueryEngine<S extends TemplateStoreNew> {
 
     protected S store; // Variable containing the store queries are to be evaluated over
 

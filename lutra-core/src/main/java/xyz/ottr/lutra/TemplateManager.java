@@ -38,8 +38,9 @@ import xyz.ottr.lutra.io.FormatManager;
 import xyz.ottr.lutra.io.InstanceReader;
 import xyz.ottr.lutra.io.TemplateReader;
 import xyz.ottr.lutra.model.Instance;
-import xyz.ottr.lutra.store.TemplateStore;
-import xyz.ottr.lutra.store.graph.DependencyGraph;
+import xyz.ottr.lutra.store.Expander;
+import xyz.ottr.lutra.store.TemplateStoreNew;
+import xyz.ottr.lutra.store.graph.NewNoChecksExpander;
 import xyz.ottr.lutra.system.Message;
 import xyz.ottr.lutra.system.MessageHandler;
 import xyz.ottr.lutra.system.Result;
@@ -54,9 +55,9 @@ public class TemplateManager {
     private final Settings settings;
     @Getter private final PrefixMapping prefixes;
     @Getter private final FormatManager formatManager;
-    @Getter private final TemplateStore templateStore;
+    @Getter private final TemplateStoreNew templateStore;
     
-    private TemplateManager(Settings settings, PrefixMapping prefixes, FormatManager formatManager, TemplateStore templateStore) {
+    private TemplateManager(Settings settings, PrefixMapping prefixes, FormatManager formatManager, TemplateStoreNew templateStore) {
         this.templateStore = templateStore;
         this.formatManager = formatManager;
         this.settings = settings;
@@ -65,7 +66,7 @@ public class TemplateManager {
         Message.setPrintStackTrace(this.settings.stackTrace);
     }
 
-    private TemplateManager(FormatManager formatManager, TemplateStore templateStore) {
+    private TemplateManager(FormatManager formatManager, TemplateStoreNew templateStore) {
         this(new Settings(), PrefixMapping.Factory.create().setNsPrefixes(OTTR.getDefaultPrefixes()),
             formatManager, templateStore);
     }
@@ -78,7 +79,7 @@ public class TemplateManager {
      * @param store
      *      The TemplateStore to use for all Template-related operations.
      */
-    public TemplateManager(TemplateStore store) {
+    public TemplateManager(TemplateStoreNew store) {
         this(store.getFormatManager(), store);
     }
     
@@ -211,9 +212,9 @@ public class TemplateManager {
      *      A TemplateStore containing the OTTR base templates.
      * @see OTTR.BaseTemplate
      */
-    public static TemplateStore makeDefaultStore(FormatManager formatManager) {
-        TemplateStore store = new DependencyGraph(formatManager);
-        // TemplateStore store = new xyz.ottr.lutra.store.graph.TemplateManager(formatManager);
+    @SuppressWarnings("PMD.UnnecessaryFullyQualifiedName")
+    public static TemplateStoreNew makeDefaultStore(FormatManager formatManager) {
+        TemplateStoreNew store = new xyz.ottr.lutra.store.graph.TemplateManager(formatManager);
         store.addOTTRBaseTemplates();
         return store;
     }
@@ -224,7 +225,7 @@ public class TemplateManager {
      * @return
      *      This' TemplateStore used for all Template-related operations..
      */
-    public TemplateStore getTemplateStore() {
+    public TemplateStoreNew getTemplateStore() {
         return this.templateStore;
     }
     
@@ -377,10 +378,11 @@ public class TemplateManager {
      *      this' TemplateStore.
      */
     public Function<Instance, ResultStream<Instance>> makeExpander() {
+        Expander expander = new NewNoChecksExpander(templateStore); // TODO check expander type
         if (this.settings.fetchMissingDependencies) {
-            return this.templateStore::expandInstanceFetch;
+            return expander::expandInstanceFetch;
         } else {
-            return this.templateStore::expandInstance;
+            return expander::expandInstance;
         }
     }
     
@@ -394,7 +396,8 @@ public class TemplateManager {
      *      missing definitions).
      */
     public Result<TemplateManager> expandStore() {
-        return this.templateStore.expandAll().map(expanded ->
+        Expander expander = new NewNoChecksExpander(templateStore); // TODO check expander type
+        return expander.expandAll().map(expanded ->
             new TemplateManager(this.settings, this.prefixes, this.formatManager, expanded)
         );
     }
@@ -460,7 +463,7 @@ public class TemplateManager {
 
         Result<TemplateWriter> writerRes = format.getTemplateWriter();
 
-        return writeObjects(this.templateStore.getAllTemplateObjects(), writerRes, (writer, msgs) -> {
+        return writeObjects(this.templateStore.getAllSignatures(), writerRes, (writer, msgs) -> {
             for (String iri : writer.getIRIs()) {
                 stringConsumer.apply(iri, writer.write(iri)).ifPresent(msgs::add);
             }
