@@ -46,16 +46,16 @@ import xyz.ottr.lutra.model.terms.Term;
 import xyz.ottr.lutra.model.types.NEListType;
 import xyz.ottr.lutra.model.types.TypeRegistry;
 import xyz.ottr.lutra.store.graph.QueryEngineNew;
-import xyz.ottr.lutra.store.graph.TemplateManager;
+import xyz.ottr.lutra.store.graph.StandardTemplateStore;
 import xyz.ottr.lutra.system.Message;
 
 public class CheckLibraryTest {
 
     private static final Logger log = LoggerFactory.getLogger(CheckLibraryTest.class);
 
-    private TemplateManager initStore() {
+    private StandardTemplateStore initStore() {
 
-        TemplateManager store = new TemplateManager(null);
+        StandardTemplateStore store = new StandardTemplateStore(null);
         store.addBaseTemplate(
             BaseTemplate.builder()
                 .iri("base2")
@@ -92,7 +92,7 @@ public class CheckLibraryTest {
     @Test
     public void variableNotUsedWarning() {
 
-        TemplateManager store = initStore();
+        StandardTemplateStore store = initStore();
         store.addTemplate(
             Template.builder()
                 .iri("test")
@@ -115,7 +115,7 @@ public class CheckLibraryTest {
     @Test
     public void variableUsedInsideList() {
 
-        TemplateManager store = initStore();
+        StandardTemplateStore store = initStore();
         store.addTemplate(
             Template.builder().iri("test")
                 .parameters(Parameter.listOf(
@@ -138,7 +138,7 @@ public class CheckLibraryTest {
     @Test
     public void variableDefinedTwiceError() {
 
-        TemplateManager store = initStore();
+        StandardTemplateStore store = initStore();
         store.addTemplate(
             Template.builder()
                 .iri("test")
@@ -161,7 +161,7 @@ public class CheckLibraryTest {
     @Test
     public void incorrectNumberOfArgumentsError() {
 
-        TemplateManager store = initStore();
+        StandardTemplateStore store = initStore();
         store.addTemplate(
             Template.builder().iri("test")
                 .parameters(Parameter.listOf(
@@ -183,7 +183,7 @@ public class CheckLibraryTest {
     @Test
     public void nonNonBlankUsedAsNonBlankError() {
 
-        TemplateManager store = new TemplateManager(null);
+        StandardTemplateStore store = new StandardTemplateStore(null);
         store.addTemplate(
             Template.builder()
                 .iri("base")
@@ -214,7 +214,7 @@ public class CheckLibraryTest {
     @Test
     public void cyclicDependencyError() {
 
-        TemplateManager store = initStore();
+        StandardTemplateStore store = initStore();
 
         store.addTemplate(
             Template.builder()
@@ -270,7 +270,7 @@ public class CheckLibraryTest {
 
     @Test
     public void correctConsistentTypeUsageTest() {
-        TemplateManager store = new TemplateManager(null);
+        StandardTemplateStore store = new StandardTemplateStore(null);
 
         Term varBase1 = new IRITerm("ex.com/var1");
         varBase1.setType(TypeRegistry.IRI);
@@ -317,7 +317,7 @@ public class CheckLibraryTest {
     public void inconsistentTypeUsageTest() {
 
         // Using a constant as both Class and ObjectProperty
-        TemplateManager store = new TemplateManager(null);
+        StandardTemplateStore store = new StandardTemplateStore(null);
 
         Term classVar = new IRITerm("ex.com/classVar");
         classVar.setType(TypeRegistry.asType(OWL.Class));
@@ -366,7 +366,7 @@ public class CheckLibraryTest {
     public void incorrectTypeUsage() {
 
         // Using a variable with type IRI to a parameter with type Class
-        TemplateManager store = new TemplateManager(null);
+        StandardTemplateStore store = new StandardTemplateStore(null);
 
         Term varBase1 = new IRITerm("ex.com/var1");
         varBase1.setType(TypeRegistry.asType(OWL.Class));
@@ -408,7 +408,7 @@ public class CheckLibraryTest {
     public void correctListTypeUsage() {
 
         // Using a variable with type IRI to a parameter with type Class
-        TemplateManager store = new TemplateManager(null);
+        StandardTemplateStore store = new StandardTemplateStore(null);
 
         Term varBase = new BlankNodeTerm("_:classes");
         varBase.setType(new NEListType(TypeRegistry.asType(OWL.Class)));
@@ -444,7 +444,7 @@ public class CheckLibraryTest {
 
         // Using a list of a variable of type Class and a an integer as argument
         // to a parameter of type NEList<Class>
-        TemplateManager store = new TemplateManager(null);
+        StandardTemplateStore store = new StandardTemplateStore(null);
 
         Term varBase = new BlankNodeTerm("_:classes");
         varBase.setType(new NEListType(TypeRegistry.asType(OWL.Class)));
@@ -477,7 +477,7 @@ public class CheckLibraryTest {
     @Test
     public void incorrectDeepListTypeUsage() {
 
-        TemplateManager store = new TemplateManager(null);
+        StandardTemplateStore store = new StandardTemplateStore(null);
 
         Term varBase = new BlankNodeTerm("_:classes");
         varBase.setType(new NEListType(new NEListType(TypeRegistry.asType(OWL.Class))));

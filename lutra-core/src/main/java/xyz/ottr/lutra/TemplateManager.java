@@ -41,6 +41,7 @@ import xyz.ottr.lutra.model.Instance;
 import xyz.ottr.lutra.store.Expander;
 import xyz.ottr.lutra.store.TemplateStore;
 import xyz.ottr.lutra.store.graph.NewNoChecksExpander;
+import xyz.ottr.lutra.store.graph.StandardTemplateStore;
 import xyz.ottr.lutra.system.Message;
 import xyz.ottr.lutra.system.MessageHandler;
 import xyz.ottr.lutra.system.Result;
@@ -72,7 +73,7 @@ public class TemplateManager {
     }
     
     /**
-     * Creates a new TemplateManager using the argument TemplateStore
+     * Creates a new StandardTemplateStore using the argument TemplateStore
      * for all Template related operations. This's FormatManager will
      * be gotten from the argument TemplateStore.
      * 
@@ -84,7 +85,7 @@ public class TemplateManager {
     }
     
     /**
-     * Creates a new TemplateManager using the argument FormatManager
+     * Creates a new StandardTemplateStore using the argument FormatManager
      * to retrieve Formats. A new TemplateStore used for all Template operations
      * will be created using the argument FormatManager.
      * 
@@ -96,7 +97,7 @@ public class TemplateManager {
     }
     
     /**
-     * Creates a new TemplateManager creating a new FormatManager
+     * Creates a new StandardTemplateStore creating a new FormatManager
      * to retrieve Formats. A new TemplateStore used for all Template operations
      * will be created using that FormatManager.
      */
@@ -212,9 +213,8 @@ public class TemplateManager {
      *      A TemplateStore containing the OTTR base templates.
      * @see OTTR.BaseTemplate
      */
-    @SuppressWarnings("PMD.UnnecessaryFullyQualifiedName")
     public static TemplateStore makeDefaultStore(FormatManager formatManager) {
-        TemplateStore store = new xyz.ottr.lutra.store.graph.TemplateManager(formatManager);
+        TemplateStore store = new StandardTemplateStore(formatManager);
         store.addOTTRBaseTemplates();
         return store;
     }
@@ -387,10 +387,10 @@ public class TemplateManager {
     }
     
     /**
-     * Creates a new TemplateManager equivalent to this, but with this' TemplateStore expanded.
+     * Creates a new StandardTemplateStore equivalent to this, but with this' TemplateStore expanded.
      * 
      * @return
-     *      A Result containing an equivalent TemplateManager to this, except that
+     *      A Result containing an equivalent StandardTemplateStore to this, except that
      *      with an expanded TemplateStore. This Result might be empty and contain
      *      errors or other Messages if something went wrong during expansion (e.g.
      *      missing definitions).

@@ -34,7 +34,7 @@ import xyz.ottr.lutra.model.Instance;
 import xyz.ottr.lutra.store.Expander;
 import xyz.ottr.lutra.store.TemplateStore;
 import xyz.ottr.lutra.store.graph.NewNoChecksExpander;
-import xyz.ottr.lutra.store.graph.TemplateManager;
+import xyz.ottr.lutra.store.graph.StandardTemplateStore;
 import xyz.ottr.lutra.system.Assertions;
 import xyz.ottr.lutra.system.MessageHandler;
 import xyz.ottr.lutra.system.Result;
@@ -58,7 +58,7 @@ public class BlankNodeTest {
     @Test
     public void shouldBeIsomorphic() {
 
-        TemplateStore store = new TemplateManager(null);
+        TemplateStore store = new StandardTemplateStore(null);
         store.addOTTRBaseTemplates();
         Expander expander = new NewNoChecksExpander(store);
 

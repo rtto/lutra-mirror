@@ -28,7 +28,7 @@ import org.junit.Test;
 import xyz.ottr.lutra.io.TemplateReader;
 import xyz.ottr.lutra.model.Template;
 import xyz.ottr.lutra.store.TemplateStore;
-import xyz.ottr.lutra.store.graph.TemplateManager;
+import xyz.ottr.lutra.store.graph.StandardTemplateStore;
 import xyz.ottr.lutra.system.ResultConsumer;
 import xyz.ottr.lutra.wottr.io.RDFIO;
 import xyz.ottr.lutra.wottr.writer.WTemplateWriter;
@@ -48,7 +48,7 @@ public class PrototypeTest {
     public static void load() {
         legacyReader = new TemplateReader(RDFIO.fileReader(), new xyz.ottr.lutra.wottr.parser.WTemplateParser());
         templateReader = new TemplateReader(RDFIO.fileReader(), new WTemplateParser());
-        graph = new TemplateManager(null);
+        graph = new StandardTemplateStore(null);
     }
 
     @Test

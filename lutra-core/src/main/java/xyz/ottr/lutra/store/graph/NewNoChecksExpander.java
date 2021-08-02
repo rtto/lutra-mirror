@@ -66,7 +66,7 @@ public class NewNoChecksExpander implements Expander {
 
     @Override
     public Result<? extends TemplateStore> expandAll() {
-        TemplateStore newStore = new TemplateManager(templateStore.getFormatManager());
+        TemplateStore newStore = new StandardTemplateStore(templateStore.getFormatManager());
         templateStore.getAllBaseTemplates().innerForEach(newStore::addSignature);
 
         ResultConsumer<Template> consumer = new ResultConsumer<>(t -> newStore.addTemplate(t));

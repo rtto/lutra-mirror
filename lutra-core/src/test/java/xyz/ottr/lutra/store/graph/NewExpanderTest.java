@@ -46,7 +46,7 @@ public class NewExpanderTest {
 
     @Test
     public void testExpandAll() {
-        TemplateStore manager = new TemplateManager(null);
+        TemplateStore manager = new StandardTemplateStore(null);
         manager.addOTTRBaseTemplates();
         NewNoChecksExpander expander = new NewNoChecksExpander(manager);
 
@@ -82,7 +82,7 @@ public class NewExpanderTest {
 
     @Test
     public void testExpandInstance() {
-        TemplateStore manager = new TemplateManager(null);
+        TemplateStore manager = new StandardTemplateStore(null);
         manager.addOTTRBaseTemplates();
         NewNoChecksExpander expander = new NewNoChecksExpander(manager);
 
@@ -101,7 +101,7 @@ public class NewExpanderTest {
 
     @Test
     public void testExpandInstanceNonExpandable() {
-        TemplateStore manager = new TemplateManager(null);
+        TemplateStore manager = new StandardTemplateStore(null);
         manager.addOTTRBaseTemplates();
         NewNoChecksExpander expander = new NewNoChecksExpander(manager);
 
@@ -118,7 +118,7 @@ public class NewExpanderTest {
 
     @Test
     public void testExpandInstanceWithListExpander() {
-        TemplateStore manager = new TemplateManager(null);
+        TemplateStore manager = new StandardTemplateStore(null);
         manager.addOTTRBaseTemplates();
         NewNoChecksExpander expander = new NewNoChecksExpander(manager);
 
@@ -144,7 +144,7 @@ public class NewExpanderTest {
 
     @Test
     public void testExpandTemplate() {
-        TemplateStore manager = new TemplateManager(null);
+        TemplateStore manager = new StandardTemplateStore(null);
         manager.addOTTRBaseTemplates();
         NewNoChecksExpander expander = new NewNoChecksExpander(manager);
 
@@ -177,7 +177,7 @@ public class NewExpanderTest {
 
     @Test
     public void testExpandTemplateWithListExpander() {
-        TemplateStore manager = new TemplateManager(null);
+        TemplateStore manager = new StandardTemplateStore(null);
         manager.addOTTRBaseTemplates();
         NewNoChecksExpander expander = new NewNoChecksExpander(manager);
 

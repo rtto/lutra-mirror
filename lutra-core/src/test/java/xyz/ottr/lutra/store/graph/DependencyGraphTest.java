@@ -64,7 +64,7 @@ public class DependencyGraphTest {
             .parameter(Parameter.builder().term(var("y")).build())
             .build();
 
-        TemplateStore store = new TemplateManager(null);
+        TemplateStore store = new StandardTemplateStore(null);
         store.addBaseTemplate(base);
 
         for (Template tmpl : toExpand) {
@@ -163,7 +163,7 @@ public class DependencyGraphTest {
                 new IRITerm("http://example.com#object")))
             .build();
 
-        TemplateStore store = new TemplateManager(null);
+        TemplateStore store = new StandardTemplateStore(null);
         store.addOTTRBaseTemplates();
         Expander expander = new NewNoChecksExpander(store);
 
@@ -176,7 +176,7 @@ public class DependencyGraphTest {
     @Test
     public void undefinedTemplateError() {
 
-        TemplateStore store = new TemplateManager(null);
+        TemplateStore store = new StandardTemplateStore(null);
 
         store.addTemplate(
             Template.builder()
@@ -283,7 +283,7 @@ public class DependencyGraphTest {
             .parameters(Parameter.listOf(var("x"), var("y")))
             .build();
 
-        TemplateStore store = new TemplateManager(null);
+        TemplateStore store = new StandardTemplateStore(null);
         store.addBaseTemplate(base);
 
         for (Template tmpl : templates) {
@@ -367,7 +367,7 @@ public class DependencyGraphTest {
     @Test
     public void instanceExpansionErrors() {
 
-        TemplateStore store = new TemplateManager(null);
+        TemplateStore store = new StandardTemplateStore(null);
         store.addBaseTemplate(
             BaseTemplate.builder()
                 .iri("base")

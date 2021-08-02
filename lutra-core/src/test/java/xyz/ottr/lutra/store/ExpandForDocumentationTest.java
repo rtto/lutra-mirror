@@ -37,7 +37,7 @@ import xyz.ottr.lutra.model.terms.BlankNodeTerm;
 import xyz.ottr.lutra.model.terms.Term;
 import xyz.ottr.lutra.model.types.TypeRegistry;
 import xyz.ottr.lutra.store.graph.NewNoChecksExpander;
-import xyz.ottr.lutra.store.graph.TemplateManager;
+import xyz.ottr.lutra.store.graph.StandardTemplateStore;
 import xyz.ottr.lutra.system.Assertions;
 import xyz.ottr.lutra.system.ResultConsumer;
 
@@ -45,7 +45,7 @@ public class ExpandForDocumentationTest {
 
     private void expandAndCheck(Signature toExpand, Set<Signature> templates, int shouldHaveSize) {
 
-        TemplateManager store = new TemplateManager(null);
+        StandardTemplateStore store = new StandardTemplateStore(null);
         templates.forEach(store);
 
         Set<Instance> expanded = new HashSet<>();

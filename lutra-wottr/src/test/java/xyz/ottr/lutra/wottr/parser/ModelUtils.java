@@ -31,7 +31,7 @@ import xyz.ottr.lutra.model.Instance;
 import xyz.ottr.lutra.store.Expander;
 import xyz.ottr.lutra.store.TemplateStore;
 import xyz.ottr.lutra.store.graph.NewNoChecksExpander;
-import xyz.ottr.lutra.store.graph.TemplateManager;
+import xyz.ottr.lutra.store.graph.StandardTemplateStore;
 import xyz.ottr.lutra.system.Assertions;
 import xyz.ottr.lutra.system.ResultConsumer;
 import xyz.ottr.lutra.system.ResultStream;
@@ -65,7 +65,7 @@ public enum ModelUtils {
     // read RDF file, expand instances (only base instances), and return OTTR parsed RDF model
     public static Model getOTTRParsedRDFModel(String filename) {
 
-        TemplateStore store = new TemplateManager(null);
+        TemplateStore store = new StandardTemplateStore(null);
         store.addOTTRBaseTemplates();
         Expander expander = new NewNoChecksExpander(store); // TODO check expander type
 

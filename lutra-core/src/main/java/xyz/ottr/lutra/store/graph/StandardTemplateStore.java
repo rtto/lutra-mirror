@@ -50,9 +50,9 @@ import xyz.ottr.lutra.system.Result;
 import xyz.ottr.lutra.system.ResultConsumer;
 import xyz.ottr.lutra.system.ResultStream;
 
-public class TemplateManager implements TemplateStore {
+public class StandardTemplateStore implements TemplateStore {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(TemplateManager.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(StandardTemplateStore.class);
 
     private final Map<String, Signature> templates;
     private final Map<String, Set<String>> dependencyIndex;
@@ -61,7 +61,7 @@ public class TemplateManager implements TemplateStore {
 
     private final FormatManager formatManager;
 
-    public TemplateManager(FormatManager formatManager) {
+    public StandardTemplateStore(FormatManager formatManager) {
         this.formatManager = formatManager;
         templates = new ConcurrentHashMap<>();
         dependencyIndex = new ConcurrentHashMap<>();
