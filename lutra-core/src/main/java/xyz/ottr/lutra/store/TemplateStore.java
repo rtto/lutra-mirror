@@ -37,7 +37,7 @@ import xyz.ottr.lutra.system.MessageHandler;
 import xyz.ottr.lutra.system.Result;
 import xyz.ottr.lutra.system.ResultStream;
 
-public interface TemplateStoreNew extends Consumer<Signature> {
+public interface TemplateStore extends Consumer<Signature> {
 
     // former default method
     void addOTTRBaseTemplates();
@@ -194,9 +194,9 @@ public interface TemplateStoreNew extends Consumer<Signature> {
 
     // TODO  ------ check if things below stay or not
 
-    Optional<TemplateStoreNew> getStandardLibrary();
+    Optional<TemplateStore> getStandardLibrary();
 
-    void registerStandardLibrary(TemplateStoreNew standardLibrary);
+    void registerStandardLibrary(TemplateStore standardLibrary);
 
     FormatManager getFormatManager();
 

@@ -50,7 +50,7 @@ public interface Expander {
      * @return
      *          a new TemplateStore containing the expansion of this graph
      */
-    Result<? extends TemplateStoreNew> expandAll();
+    Result<? extends TemplateStore> expandAll();
 
     /**
      * Expands the argument template instance according to the definitions in this

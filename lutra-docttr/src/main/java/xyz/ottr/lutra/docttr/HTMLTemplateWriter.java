@@ -53,7 +53,7 @@ import xyz.ottr.lutra.model.Signature;
 import xyz.ottr.lutra.model.Substitution;
 import xyz.ottr.lutra.model.terms.IRITerm;
 import xyz.ottr.lutra.store.Expander;
-import xyz.ottr.lutra.store.TemplateStoreNew;
+import xyz.ottr.lutra.store.TemplateStore;
 import xyz.ottr.lutra.store.graph.NewNoChecksExpander;
 import xyz.ottr.lutra.system.Message;
 import xyz.ottr.lutra.system.Result;
@@ -64,7 +64,7 @@ import xyz.ottr.lutra.writer.RDFNodeWriter;
 public class HTMLTemplateWriter {
 
     private final PrefixMapping prefixMapping;
-    private final TemplateStoreNew store;
+    private final TemplateStore store;
     private final Expander expander;
 
     private final SerialisationWriter serialisationWriter;
@@ -72,7 +72,7 @@ public class HTMLTemplateWriter {
 
     private ContainerTag tocList;
 
-    public HTMLTemplateWriter(PrefixMapping prefixMapping, TemplateStoreNew store) {
+    public HTMLTemplateWriter(PrefixMapping prefixMapping, TemplateStore store) {
         this.prefixMapping = prefixMapping;
         this.prefixMapping.withDefaultMappings(OTTR.getStandardLibraryPrefixes());
         this.prefixMapping.setNsPrefix("x", OTTR.ns_example_arg);

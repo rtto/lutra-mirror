@@ -36,7 +36,7 @@ import xyz.ottr.lutra.model.terms.BlankNodeTerm;
 import xyz.ottr.lutra.model.terms.NoneTerm;
 import xyz.ottr.lutra.model.terms.Term;
 import xyz.ottr.lutra.store.Expander;
-import xyz.ottr.lutra.store.TemplateStoreNew;
+import xyz.ottr.lutra.store.TemplateStore;
 import xyz.ottr.lutra.system.MessageHandler;
 import xyz.ottr.lutra.system.Result;
 import xyz.ottr.lutra.system.ResultConsumer;
@@ -44,9 +44,9 @@ import xyz.ottr.lutra.system.ResultStream;
 
 public class NewNoChecksExpander implements Expander {
 
-    private final TemplateStoreNew templateStore;
+    private final TemplateStore templateStore;
 
-    public NewNoChecksExpander(TemplateStoreNew templateStore) {
+    public NewNoChecksExpander(TemplateStore templateStore) {
         this.templateStore = templateStore;
     }
 
@@ -65,14 +65,14 @@ public class NewNoChecksExpander implements Expander {
     }
 
     @Override
-    public Result<? extends TemplateStoreNew> expandAll() {
-        TemplateStoreNew newStore = new TemplateManager(templateStore.getFormatManager());
+    public Result<? extends TemplateStore> expandAll() {
+        TemplateStore newStore = new TemplateManager(templateStore.getFormatManager());
         templateStore.getAllBaseTemplates().innerForEach(newStore::addSignature);
 
         ResultConsumer<Template> consumer = new ResultConsumer<>(t -> newStore.addTemplate(t));
         templateStore.getAllTemplates().mapFlatMap(this::expandTemplate).forEach(consumer);
 
-        Result<TemplateStoreNew> result = Result.of(newStore);
+        Result<TemplateStore> result = Result.of(newStore);
         result.addMessages(consumer.getMessageHandler().getMessages());
         return result;
     }
@@ -191,7 +191,7 @@ public class NewNoChecksExpander implements Expander {
         return false;
     }
 
-    protected TemplateStoreNew getTemplateStore() {
+    protected TemplateStore getTemplateStore() {
         return templateStore;
     }
 }

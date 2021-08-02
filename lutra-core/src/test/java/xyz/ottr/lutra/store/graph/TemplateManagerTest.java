@@ -36,14 +36,14 @@ import xyz.ottr.lutra.model.Instance;
 import xyz.ottr.lutra.model.Parameter;
 import xyz.ottr.lutra.model.Signature;
 import xyz.ottr.lutra.model.Template;
-import xyz.ottr.lutra.store.TemplateStoreNew;
+import xyz.ottr.lutra.store.TemplateStore;
 import xyz.ottr.lutra.system.Result;
 
 public class TemplateManagerTest {
 
     @Test
     public void testAddBaseTemplate() {
-        TemplateStoreNew manager = new TemplateManager(null);
+        TemplateStore manager = new TemplateManager(null);
 
         BaseTemplate base = BaseTemplate.builder()
                 .iri("base")
@@ -61,7 +61,7 @@ public class TemplateManagerTest {
 
     @Test
     public void testAddTemplate() {
-        TemplateStoreNew manager = new TemplateManager(null);
+        TemplateStore manager = new TemplateManager(null);
 
         // success - no signature
         Template template0 = buildDummyTemplate("iri-0", new String[] {"x", "y"});
@@ -90,7 +90,7 @@ public class TemplateManagerTest {
 
     @Test
     public void testAddSignature() {
-        TemplateStoreNew manager = new TemplateManager(null);
+        TemplateStore manager = new TemplateManager(null);
 
         Signature signature1 = buildDummySignature("iri-1", new String[] {"x", "y"});
         Signature signature2 = buildDummySignature("iri-2", new String[] {"x", "y"});
@@ -103,7 +103,7 @@ public class TemplateManagerTest {
 
     @Test
     public void testContainsWithTemplate() {
-        TemplateStoreNew manager = new TemplateManager(null);
+        TemplateStore manager = new TemplateManager(null);
 
         Signature signature1 = buildDummySignature("iri-1", new String[] {"x", "y"});
         manager.addSignature(signature1);
@@ -116,7 +116,7 @@ public class TemplateManagerTest {
 
     @Test
     public void testContainsWithSignature() {
-        TemplateStoreNew manager = new TemplateManager(null);
+        TemplateStore manager = new TemplateManager(null);
 
         Signature signature1 = buildDummySignature("iri-1", new String[] {"x", "y"});
         manager.addSignature(signature1);
@@ -127,7 +127,7 @@ public class TemplateManagerTest {
 
     @Test
     public void testContainsBase() {
-        TemplateStoreNew manager = new TemplateManager(null);
+        TemplateStore manager = new TemplateManager(null);
         manager.addOTTRBaseTemplates();
 
         Template template1 = buildDummyTemplate("iri-1", new String[] {"x", "y"});
@@ -140,7 +140,7 @@ public class TemplateManagerTest {
 
     @Test
     public void testContainsDefinitionOf() {
-        TemplateStoreNew manager = new TemplateManager(null);
+        TemplateStore manager = new TemplateManager(null);
 
         Signature signature1 = buildDummySignature("iri-1", new String[] {"x", "y"});
         manager.addSignature(signature1);
@@ -158,7 +158,7 @@ public class TemplateManagerTest {
 
     @Test
     public void testGetSignature() {
-        TemplateStoreNew manager = new TemplateManager(null);
+        TemplateStore manager = new TemplateManager(null);
 
         Signature signature1 = buildDummySignature("iri-1", new String[] {"x", "y"});
         manager.addSignature(signature1);
@@ -171,7 +171,7 @@ public class TemplateManagerTest {
 
     @Test
     public void testGetTemplate() {
-        TemplateStoreNew manager = new TemplateManager(null);
+        TemplateStore manager = new TemplateManager(null);
 
         Signature signature1 = buildDummySignature("iri-1", new String[] {"x", "y"});
         manager.addSignature(signature1);
@@ -192,7 +192,7 @@ public class TemplateManagerTest {
 
     @Test
     public void testGetAllTemplates() {
-        TemplateStoreNew manager = new TemplateManager(null);
+        TemplateStore manager = new TemplateManager(null);
         manager.addOTTRBaseTemplates();
 
         Signature signature1 = buildDummySignature("iri-1", new String[] {"x", "y"});
@@ -207,7 +207,7 @@ public class TemplateManagerTest {
 
     @Test
     public void testGetAllSignatures() {
-        TemplateStoreNew manager = new TemplateManager(null);
+        TemplateStore manager = new TemplateManager(null);
         manager.addOTTRBaseTemplates();
 
         Signature signature1 = buildDummySignature("iri-1", new String[] {"x", "y"});
@@ -222,7 +222,7 @@ public class TemplateManagerTest {
 
     @Test
     public void testGetAllBaseTemplates() {
-        TemplateStoreNew manager = new TemplateManager(null);
+        TemplateStore manager = new TemplateManager(null);
         manager.addOTTRBaseTemplates();
 
         Signature signature1 = buildDummySignature("iri-1", new String[] {"x", "y"});
@@ -237,7 +237,7 @@ public class TemplateManagerTest {
 
     @Test
     public void testGetDependsOn() {
-        TemplateStoreNew manager = new TemplateManager(null);
+        TemplateStore manager = new TemplateManager(null);
 
         BaseTemplate base = BaseTemplate.builder()
                 .iri("base")
@@ -281,7 +281,7 @@ public class TemplateManagerTest {
 
     @Test
     public void testMissingDependencies() {
-        TemplateStoreNew manager = new TemplateManager(null);
+        TemplateStore manager = new TemplateManager(null);
 
         BaseTemplate base = BaseTemplate.builder()
                 .iri("base")
@@ -313,7 +313,7 @@ public class TemplateManagerTest {
 
     @Test
     public void testAccept() {
-        TemplateStoreNew manager = new TemplateManager(null);
+        TemplateStore manager = new TemplateManager(null);
 
         Template template1 = buildDummyTemplate("iri-1", new String[] {"x", "y"});
         manager.accept(template1);

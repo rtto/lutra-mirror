@@ -34,15 +34,15 @@ import org.apache.jena.shared.PrefixMapping;
 import xyz.ottr.lutra.docttr.visualisation.DependencyGraphVisualiser;
 import xyz.ottr.lutra.docttr.visualisation.ModuleDependencyGraphVisualiser;
 import xyz.ottr.lutra.model.Signature;
-import xyz.ottr.lutra.store.TemplateStoreNew;
+import xyz.ottr.lutra.store.TemplateStore;
 import xyz.ottr.lutra.system.Result;
 import xyz.ottr.lutra.writer.RDFNodeWriter;
 
 public class HTMLIndexWriter extends HTMLMenuWriter {
 
-    private final TemplateStoreNew store;
+    private final TemplateStore store;
 
-    public HTMLIndexWriter(PrefixMapping prefixMapping, TemplateStoreNew store) {
+    public HTMLIndexWriter(PrefixMapping prefixMapping, TemplateStore store) {
         super(prefixMapping);
         this.store = store;
     }

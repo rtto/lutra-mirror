@@ -32,7 +32,7 @@ import org.apache.commons.io.IOUtils;
 import xyz.ottr.lutra.OTTR;
 import xyz.ottr.lutra.TemplateManager;
 import xyz.ottr.lutra.model.Signature;
-import xyz.ottr.lutra.store.TemplateStoreNew;
+import xyz.ottr.lutra.store.TemplateStore;
 import xyz.ottr.lutra.system.MessageHandler;
 import xyz.ottr.lutra.system.Result;
 import xyz.ottr.lutra.system.ResultConsumer;
@@ -95,7 +95,7 @@ public final class StandardTemplateManager extends TemplateManager {
         }
     }
 
-    public TemplateStoreNew getStandardLibrary() {
+    public TemplateStore getStandardLibrary() {
         return getTemplateStore().getStandardLibrary().get();
     }
 }

@@ -28,13 +28,13 @@ import xyz.ottr.lutra.model.Instance;
 import xyz.ottr.lutra.model.Parameter;
 import xyz.ottr.lutra.model.Signature;
 import xyz.ottr.lutra.model.Template;
-import xyz.ottr.lutra.store.TemplateStoreNew;
+import xyz.ottr.lutra.store.TemplateStore;
 import xyz.ottr.lutra.system.Result;
 import xyz.ottr.lutra.system.ResultStream;
 
 public class NewCheckingExpander extends NewNoChecksExpander {
 
-    public NewCheckingExpander(TemplateStoreNew templateStore) {
+    public NewCheckingExpander(TemplateStore templateStore) {
         super(templateStore);
     }
 

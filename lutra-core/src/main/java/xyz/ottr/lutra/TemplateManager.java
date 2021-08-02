@@ -39,7 +39,7 @@ import xyz.ottr.lutra.io.InstanceReader;
 import xyz.ottr.lutra.io.TemplateReader;
 import xyz.ottr.lutra.model.Instance;
 import xyz.ottr.lutra.store.Expander;
-import xyz.ottr.lutra.store.TemplateStoreNew;
+import xyz.ottr.lutra.store.TemplateStore;
 import xyz.ottr.lutra.store.graph.NewNoChecksExpander;
 import xyz.ottr.lutra.system.Message;
 import xyz.ottr.lutra.system.MessageHandler;
@@ -55,9 +55,9 @@ public class TemplateManager {
     private final Settings settings;
     @Getter private final PrefixMapping prefixes;
     @Getter private final FormatManager formatManager;
-    @Getter private final TemplateStoreNew templateStore;
+    @Getter private final TemplateStore templateStore;
     
-    private TemplateManager(Settings settings, PrefixMapping prefixes, FormatManager formatManager, TemplateStoreNew templateStore) {
+    private TemplateManager(Settings settings, PrefixMapping prefixes, FormatManager formatManager, TemplateStore templateStore) {
         this.templateStore = templateStore;
         this.formatManager = formatManager;
         this.settings = settings;
@@ -66,7 +66,7 @@ public class TemplateManager {
         Message.setPrintStackTrace(this.settings.stackTrace);
     }
 
-    private TemplateManager(FormatManager formatManager, TemplateStoreNew templateStore) {
+    private TemplateManager(FormatManager formatManager, TemplateStore templateStore) {
         this(new Settings(), PrefixMapping.Factory.create().setNsPrefixes(OTTR.getDefaultPrefixes()),
             formatManager, templateStore);
     }
@@ -79,7 +79,7 @@ public class TemplateManager {
      * @param store
      *      The TemplateStore to use for all Template-related operations.
      */
-    public TemplateManager(TemplateStoreNew store) {
+    public TemplateManager(TemplateStore store) {
         this(store.getFormatManager(), store);
     }
     
@@ -213,8 +213,8 @@ public class TemplateManager {
      * @see OTTR.BaseTemplate
      */
     @SuppressWarnings("PMD.UnnecessaryFullyQualifiedName")
-    public static TemplateStoreNew makeDefaultStore(FormatManager formatManager) {
-        TemplateStoreNew store = new xyz.ottr.lutra.store.graph.TemplateManager(formatManager);
+    public static TemplateStore makeDefaultStore(FormatManager formatManager) {
+        TemplateStore store = new xyz.ottr.lutra.store.graph.TemplateManager(formatManager);
         store.addOTTRBaseTemplates();
         return store;
     }
@@ -225,7 +225,7 @@ public class TemplateManager {
      * @return
      *      This' TemplateStore used for all Template-related operations..
      */
-    public TemplateStoreNew getTemplateStore() {
+    public TemplateStore getTemplateStore() {
         return this.templateStore;
     }
     

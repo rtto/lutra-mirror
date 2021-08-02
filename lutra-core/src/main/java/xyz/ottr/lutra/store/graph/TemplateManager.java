@@ -42,7 +42,7 @@ import xyz.ottr.lutra.model.Instance;
 import xyz.ottr.lutra.model.Parameter;
 import xyz.ottr.lutra.model.Signature;
 import xyz.ottr.lutra.model.Template;
-import xyz.ottr.lutra.store.TemplateStoreNew;
+import xyz.ottr.lutra.store.TemplateStore;
 import xyz.ottr.lutra.store.checks.Check;
 import xyz.ottr.lutra.store.checks.CheckLibrary;
 import xyz.ottr.lutra.system.MessageHandler;
@@ -50,14 +50,14 @@ import xyz.ottr.lutra.system.Result;
 import xyz.ottr.lutra.system.ResultConsumer;
 import xyz.ottr.lutra.system.ResultStream;
 
-public class TemplateManager implements TemplateStoreNew {
+public class TemplateManager implements TemplateStore {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TemplateManager.class);
 
     private final Map<String, Signature> templates;
     private final Map<String, Set<String>> dependencyIndex;
     private final Set<String> missingDependencies;
-    private TemplateStoreNew standardLibrary;
+    private TemplateStore standardLibrary;
 
     private final FormatManager formatManager;
 
@@ -269,7 +269,7 @@ public class TemplateManager implements TemplateStoreNew {
 
     @Override
     public MessageHandler fetchMissingDependencies(Collection<String> initMissing) {
-        Optional<TemplateStoreNew> stdLib = getStandardLibrary();
+        Optional<TemplateStore> stdLib = getStandardLibrary();
         ResultConsumer<TemplateReader> messages = new ResultConsumer<>();
 
         FormatManager formatManager = getFormatManager();
@@ -343,12 +343,12 @@ public class TemplateManager implements TemplateStoreNew {
     }
 
     @Override
-    public Optional<TemplateStoreNew> getStandardLibrary() {
+    public Optional<TemplateStore> getStandardLibrary() {
         return standardLibrary == null ? Optional.empty() : Optional.of(standardLibrary);
     }
 
     @Override
-    public void registerStandardLibrary(TemplateStoreNew standardLibrary) {
+    public void registerStandardLibrary(TemplateStore standardLibrary) {
         this.standardLibrary = standardLibrary;
     }
 

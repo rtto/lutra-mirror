@@ -40,7 +40,7 @@ import xyz.ottr.lutra.io.InstanceReader;
 import xyz.ottr.lutra.io.TemplateReader;
 import xyz.ottr.lutra.model.Instance;
 import xyz.ottr.lutra.model.Signature;
-import xyz.ottr.lutra.store.TemplateStoreNew;
+import xyz.ottr.lutra.store.TemplateStore;
 import xyz.ottr.lutra.store.graph.TemplateManager;
 import xyz.ottr.lutra.system.Assertions;
 import xyz.ottr.lutra.system.Message;
@@ -130,7 +130,7 @@ public class ShaclEquivalenceTest {
 
         ResultStream<Signature> templates = this.tempReader.apply(file);
 
-        TemplateStoreNew store = new TemplateManager(null);
+        TemplateStore store = new TemplateManager(null);
         ResultConsumer<Signature> tplErrorMessages = new ResultConsumer<>(store);
         templates.forEach(tpl -> {
             if (correct) {

@@ -37,7 +37,7 @@ import xyz.ottr.lutra.OTTR;
 import xyz.ottr.lutra.docttr.DocttrManager;
 import xyz.ottr.lutra.docttr.NamespaceColours;
 import xyz.ottr.lutra.docttr.Tree;
-import xyz.ottr.lutra.store.TemplateStoreNew;
+import xyz.ottr.lutra.store.TemplateStore;
 
 public class DependencyGraphVisualiser extends GraphVisualiser {
 
@@ -52,7 +52,7 @@ public class DependencyGraphVisualiser extends GraphVisualiser {
     }
 
     // transitively draw all dependencies from iris
-    public DomContent drawGraph(String root, Collection<String> iris, TemplateStoreNew store) {
+    public DomContent drawGraph(String root, Collection<String> iris, TemplateStore store) {
 
         var graph = getGraph();
 

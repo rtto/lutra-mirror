@@ -42,13 +42,12 @@ import xyz.ottr.lutra.model.ListExpander;
 import xyz.ottr.lutra.model.Parameter;
 import xyz.ottr.lutra.model.Signature;
 import xyz.ottr.lutra.model.Template;
-import xyz.ottr.lutra.model.terms.BlankNodeTerm;
 import xyz.ottr.lutra.model.terms.IRITerm;
 import xyz.ottr.lutra.model.terms.ListTerm;
 import xyz.ottr.lutra.model.terms.NoneTerm;
 import xyz.ottr.lutra.model.terms.ObjectTerm;
 import xyz.ottr.lutra.store.Expander;
-import xyz.ottr.lutra.store.TemplateStoreNew;
+import xyz.ottr.lutra.store.TemplateStore;
 import xyz.ottr.lutra.system.Assertions;
 import xyz.ottr.lutra.system.Message;
 import xyz.ottr.lutra.system.Result;
@@ -65,7 +64,7 @@ public class DependencyGraphTest {
             .parameter(Parameter.builder().term(var("y")).build())
             .build();
 
-        TemplateStoreNew store = new TemplateManager(null);
+        TemplateStore store = new TemplateManager(null);
         store.addBaseTemplate(base);
 
         for (Template tmpl : toExpand) {
@@ -73,7 +72,7 @@ public class DependencyGraphTest {
         }
 
         Expander expander = new NewNoChecksExpander(store);
-        Result<? extends TemplateStoreNew> graphRes = expander.expandAll();
+        Result<? extends TemplateStore> graphRes = expander.expandAll();
         assertTrue(graphRes.isPresent());
         store = graphRes.get();
 
@@ -164,7 +163,7 @@ public class DependencyGraphTest {
                 new IRITerm("http://example.com#object")))
             .build();
 
-        TemplateStoreNew store = new TemplateManager(null);
+        TemplateStore store = new TemplateManager(null);
         store.addOTTRBaseTemplates();
         Expander expander = new NewNoChecksExpander(store);
 
@@ -177,7 +176,7 @@ public class DependencyGraphTest {
     @Test
     public void undefinedTemplateError() {
 
-        TemplateStoreNew store = new TemplateManager(null);
+        TemplateStore store = new TemplateManager(null);
 
         store.addTemplate(
             Template.builder()
@@ -201,8 +200,8 @@ public class DependencyGraphTest {
         );
 
         Expander expander = new NewNoChecksExpander(store);
-        Result<TemplateStoreNew> graphRes = (Result<TemplateStoreNew>) expander.expandAll();
-        ResultConsumer<TemplateStoreNew> consumer = new ResultConsumer<>();
+        Result<TemplateStore> graphRes = (Result<TemplateStore>) expander.expandAll();
+        ResultConsumer<TemplateStore> consumer = new ResultConsumer<>();
         consumer.accept(graphRes);
 
         Assertions.atLeast(consumer, Message.Severity.ERROR);
@@ -284,7 +283,7 @@ public class DependencyGraphTest {
             .parameters(Parameter.listOf(var("x"), var("y")))
             .build();
 
-        TemplateStoreNew store = new TemplateManager(null);
+        TemplateStore store = new TemplateManager(null);
         store.addBaseTemplate(base);
 
         for (Template tmpl : templates) {
@@ -302,7 +301,7 @@ public class DependencyGraphTest {
 
         assertThat(expandedIns, is(shouldEqual));
 
-        Result<? extends TemplateStoreNew> graphRes = expander.expandAll();
+        Result<? extends TemplateStore> graphRes = expander.expandAll();
         assertTrue(graphRes.isPresent());
         store = graphRes.get();
 
@@ -368,7 +367,7 @@ public class DependencyGraphTest {
     @Test
     public void instanceExpansionErrors() {
 
-        TemplateStoreNew store = new TemplateManager(null);
+        TemplateStore store = new TemplateManager(null);
         store.addBaseTemplate(
             BaseTemplate.builder()
                 .iri("base")

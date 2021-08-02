@@ -38,7 +38,7 @@ import xyz.ottr.lutra.model.Template;
 import xyz.ottr.lutra.model.terms.IRITerm;
 import xyz.ottr.lutra.model.terms.ListTerm;
 import xyz.ottr.lutra.model.terms.LiteralTerm;
-import xyz.ottr.lutra.store.TemplateStoreNew;
+import xyz.ottr.lutra.store.TemplateStore;
 import xyz.ottr.lutra.system.Result;
 
 // TODO check expander type
@@ -46,7 +46,7 @@ public class NewExpanderTest {
 
     @Test
     public void testExpandAll() {
-        TemplateStoreNew manager = new TemplateManager(null);
+        TemplateStore manager = new TemplateManager(null);
         manager.addOTTRBaseTemplates();
         NewNoChecksExpander expander = new NewNoChecksExpander(manager);
 
@@ -72,7 +72,7 @@ public class NewExpanderTest {
 
         manager.addTemplate(template2);
 
-        Result<? extends TemplateStoreNew> newStore = expander.expandAll();
+        Result<? extends TemplateStore> newStore = expander.expandAll();
         Assert.assertTrue("Result should be present after expansion", newStore.isPresent());
         Assert.assertEquals("Number of BaseTemplates should be the same in both stores",
                 manager.getAllBaseTemplates().getStream().count(), newStore.get().getAllBaseTemplates().getStream().count());
@@ -82,7 +82,7 @@ public class NewExpanderTest {
 
     @Test
     public void testExpandInstance() {
-        TemplateStoreNew manager = new TemplateManager(null);
+        TemplateStore manager = new TemplateManager(null);
         manager.addOTTRBaseTemplates();
         NewNoChecksExpander expander = new NewNoChecksExpander(manager);
 
@@ -101,7 +101,7 @@ public class NewExpanderTest {
 
     @Test
     public void testExpandInstanceNonExpandable() {
-        TemplateStoreNew manager = new TemplateManager(null);
+        TemplateStore manager = new TemplateManager(null);
         manager.addOTTRBaseTemplates();
         NewNoChecksExpander expander = new NewNoChecksExpander(manager);
 
@@ -118,7 +118,7 @@ public class NewExpanderTest {
 
     @Test
     public void testExpandInstanceWithListExpander() {
-        TemplateStoreNew manager = new TemplateManager(null);
+        TemplateStore manager = new TemplateManager(null);
         manager.addOTTRBaseTemplates();
         NewNoChecksExpander expander = new NewNoChecksExpander(manager);
 
@@ -144,7 +144,7 @@ public class NewExpanderTest {
 
     @Test
     public void testExpandTemplate() {
-        TemplateStoreNew manager = new TemplateManager(null);
+        TemplateStore manager = new TemplateManager(null);
         manager.addOTTRBaseTemplates();
         NewNoChecksExpander expander = new NewNoChecksExpander(manager);
 
@@ -177,7 +177,7 @@ public class NewExpanderTest {
 
     @Test
     public void testExpandTemplateWithListExpander() {
-        TemplateStoreNew manager = new TemplateManager(null);
+        TemplateStore manager = new TemplateManager(null);
         manager.addOTTRBaseTemplates();
         NewNoChecksExpander expander = new NewNoChecksExpander(manager);
 
