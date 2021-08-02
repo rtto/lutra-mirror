@@ -42,11 +42,11 @@ import xyz.ottr.lutra.system.Result;
 import xyz.ottr.lutra.system.ResultConsumer;
 import xyz.ottr.lutra.system.ResultStream;
 
-public class NewNoChecksExpander implements Expander {
+public class NonCheckingExpander implements Expander {
 
     private final TemplateStore templateStore;
 
-    public NewNoChecksExpander(TemplateStore templateStore) {
+    public NonCheckingExpander(TemplateStore templateStore) {
         this.templateStore = templateStore;
     }
 

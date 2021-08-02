@@ -30,7 +30,7 @@ import xyz.ottr.lutra.io.InstanceReader;
 import xyz.ottr.lutra.model.Instance;
 import xyz.ottr.lutra.store.Expander;
 import xyz.ottr.lutra.store.TemplateStore;
-import xyz.ottr.lutra.store.graph.NewNoChecksExpander;
+import xyz.ottr.lutra.store.graph.NonCheckingExpander;
 import xyz.ottr.lutra.store.graph.StandardTemplateStore;
 import xyz.ottr.lutra.system.Assertions;
 import xyz.ottr.lutra.system.ResultConsumer;
@@ -67,7 +67,7 @@ public enum ModelUtils {
 
         TemplateStore store = new StandardTemplateStore(null);
         store.addOTTRBaseTemplates();
-        Expander expander = new NewNoChecksExpander(store); // TODO check expander type
+        Expander expander = new NonCheckingExpander(store); // TODO check expander type
 
         InstanceReader insReader = new InstanceReader(RDFIO.fileReader(), new WInstanceParser());
         ResultStream<Instance> expandedInInstances = insReader

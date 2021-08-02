@@ -48,7 +48,7 @@ public class NewExpanderTest {
     public void testExpandAll() {
         TemplateStore manager = new StandardTemplateStore(null);
         manager.addOTTRBaseTemplates();
-        NewNoChecksExpander expander = new NewNoChecksExpander(manager);
+        NonCheckingExpander expander = new NonCheckingExpander(manager);
 
         Template template1 = buildDummyTemplate("iri-1", new String[] {"a", "b"});
         manager.addTemplate(template1);
@@ -84,7 +84,7 @@ public class NewExpanderTest {
     public void testExpandInstance() {
         TemplateStore manager = new StandardTemplateStore(null);
         manager.addOTTRBaseTemplates();
-        NewNoChecksExpander expander = new NewNoChecksExpander(manager);
+        NonCheckingExpander expander = new NonCheckingExpander(manager);
 
         Template template1 = buildDummyTemplate("iri-1", new String[] {"a", "b"});
         manager.addTemplate(template1);
@@ -103,7 +103,7 @@ public class NewExpanderTest {
     public void testExpandInstanceNonExpandable() {
         TemplateStore manager = new StandardTemplateStore(null);
         manager.addOTTRBaseTemplates();
-        NewNoChecksExpander expander = new NewNoChecksExpander(manager);
+        NonCheckingExpander expander = new NonCheckingExpander(manager);
 
         Instance instance = Instance.builder().iri(OTTR.BaseURI.Triple)
                 .argument(Argument.builder().term(var("x")).build())
@@ -120,7 +120,7 @@ public class NewExpanderTest {
     public void testExpandInstanceWithListExpander() {
         TemplateStore manager = new StandardTemplateStore(null);
         manager.addOTTRBaseTemplates();
-        NewNoChecksExpander expander = new NewNoChecksExpander(manager);
+        NonCheckingExpander expander = new NonCheckingExpander(manager);
 
         Template template1 = buildDummyTemplate("iri-1", new String[] {"a", "b"});
         manager.addTemplate(template1);
@@ -146,7 +146,7 @@ public class NewExpanderTest {
     public void testExpandTemplate() {
         TemplateStore manager = new StandardTemplateStore(null);
         manager.addOTTRBaseTemplates();
-        NewNoChecksExpander expander = new NewNoChecksExpander(manager);
+        NonCheckingExpander expander = new NonCheckingExpander(manager);
 
         Template template1 = buildDummyTemplate("iri-1", new String[] {"a", "b"});
         manager.addTemplate(template1);
@@ -179,7 +179,7 @@ public class NewExpanderTest {
     public void testExpandTemplateWithListExpander() {
         TemplateStore manager = new StandardTemplateStore(null);
         manager.addOTTRBaseTemplates();
-        NewNoChecksExpander expander = new NewNoChecksExpander(manager);
+        NonCheckingExpander expander = new NonCheckingExpander(manager);
 
         Template template1 = buildDummyTemplate("iri-1", new String[] {"a", "b"});
         manager.addTemplate(template1);

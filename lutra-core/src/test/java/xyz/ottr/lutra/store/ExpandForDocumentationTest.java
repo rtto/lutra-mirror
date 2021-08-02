@@ -36,7 +36,7 @@ import xyz.ottr.lutra.model.Template;
 import xyz.ottr.lutra.model.terms.BlankNodeTerm;
 import xyz.ottr.lutra.model.terms.Term;
 import xyz.ottr.lutra.model.types.TypeRegistry;
-import xyz.ottr.lutra.store.graph.NewNoChecksExpander;
+import xyz.ottr.lutra.store.graph.NonCheckingExpander;
 import xyz.ottr.lutra.store.graph.StandardTemplateStore;
 import xyz.ottr.lutra.system.Assertions;
 import xyz.ottr.lutra.system.ResultConsumer;
@@ -50,7 +50,7 @@ public class ExpandForDocumentationTest {
 
         Set<Instance> expanded = new HashSet<>();
         ResultConsumer<Instance> consumer = new ResultConsumer<>(expanded::add);
-        Expander expander = new NewNoChecksExpander(store); // TODO check expander type
+        Expander expander = new NonCheckingExpander(store); // TODO check expander type
         expander.expandInstance(toExpand.getExampleInstance())
             .forEach(consumer);
 

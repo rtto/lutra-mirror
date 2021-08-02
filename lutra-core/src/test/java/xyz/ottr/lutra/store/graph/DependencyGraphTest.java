@@ -71,7 +71,7 @@ public class DependencyGraphTest {
             store.addTemplate(tmpl);
         }
 
-        Expander expander = new NewNoChecksExpander(store);
+        Expander expander = new NonCheckingExpander(store);
         Result<? extends TemplateStore> graphRes = expander.expandAll();
         assertTrue(graphRes.isPresent());
         store = graphRes.get();
@@ -165,7 +165,7 @@ public class DependencyGraphTest {
 
         TemplateStore store = new StandardTemplateStore(null);
         store.addOTTRBaseTemplates();
-        Expander expander = new NewNoChecksExpander(store);
+        Expander expander = new NonCheckingExpander(store);
 
         var expanded = expander.expandInstance(tripleInstance).collect(Collectors.toList());
 
@@ -199,7 +199,7 @@ public class DependencyGraphTest {
                 .build()
         );
 
-        Expander expander = new NewNoChecksExpander(store);
+        Expander expander = new NonCheckingExpander(store);
         Result<TemplateStore> graphRes = (Result<TemplateStore>) expander.expandAll();
         ResultConsumer<TemplateStore> consumer = new ResultConsumer<>();
         consumer.accept(graphRes);
@@ -290,7 +290,7 @@ public class DependencyGraphTest {
             store.addTemplate(tmpl);
         }
 
-        Expander expander = new NewNoChecksExpander(store);
+        Expander expander = new NonCheckingExpander(store);
         ResultStream<Instance> expandedInsRes = expander.expandInstance(ins);
 
         Set<Instance> expandedIns = new HashSet<>();
@@ -407,7 +407,7 @@ public class DependencyGraphTest {
             Instance.builder().iri("undefined").arguments(Argument.listOf(cons(1), cons(2))).build()
         );
 
-        Expander expander = new NewNoChecksExpander(store);
+        Expander expander = new NonCheckingExpander(store);
         for (Instance ins : inss) {
             ResultConsumer<Instance> consumer = new ResultConsumer<>();
             expander.expandInstance(ins).forEach(consumer);

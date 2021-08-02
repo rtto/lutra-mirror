@@ -44,7 +44,7 @@ import xyz.ottr.lutra.io.TemplateReader;
 import xyz.ottr.lutra.model.Instance;
 import xyz.ottr.lutra.store.Expander;
 import xyz.ottr.lutra.store.TemplateStore;
-import xyz.ottr.lutra.store.graph.NewNoChecksExpander;
+import xyz.ottr.lutra.store.graph.NonCheckingExpander;
 import xyz.ottr.lutra.stottr.io.SFileReader;
 import xyz.ottr.lutra.stottr.parser.SInstanceParser;
 import xyz.ottr.lutra.stottr.parser.STemplateParser;
@@ -148,7 +148,7 @@ public class PottrTest {
 
     private List<Message> testInstances(TemplateStore store, String file) {
         InstanceReader insReader = new InstanceReader(new SFileReader(), new SInstanceParser());
-        Expander expander = new NewNoChecksExpander(store); // TODO check expander type
+        Expander expander = new NonCheckingExpander(store); // TODO check expander type
         ResultStream<Instance> expandedInInstances = insReader
             .apply(resolve(file))
             .innerFlatMap(expander::expandInstanceFetch);

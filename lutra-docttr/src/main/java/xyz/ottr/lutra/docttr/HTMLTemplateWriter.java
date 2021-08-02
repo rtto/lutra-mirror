@@ -54,7 +54,7 @@ import xyz.ottr.lutra.model.Substitution;
 import xyz.ottr.lutra.model.terms.IRITerm;
 import xyz.ottr.lutra.store.Expander;
 import xyz.ottr.lutra.store.TemplateStore;
-import xyz.ottr.lutra.store.graph.NewNoChecksExpander;
+import xyz.ottr.lutra.store.graph.NonCheckingExpander;
 import xyz.ottr.lutra.system.Message;
 import xyz.ottr.lutra.system.Result;
 import xyz.ottr.lutra.system.ResultStream;
@@ -78,7 +78,7 @@ public class HTMLTemplateWriter {
         this.prefixMapping.setNsPrefix("x", OTTR.ns_example_arg);
 
         this.store = store;
-        expander = new NewNoChecksExpander(store);
+        expander = new NonCheckingExpander(store);
 
         this.serialisationWriter = new SerialisationWriter(this.prefixMapping);
         this.dependencyGraphVisualiser = new DependencyGraphVisualiser(this.prefixMapping);

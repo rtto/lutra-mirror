@@ -32,9 +32,9 @@ import xyz.ottr.lutra.store.TemplateStore;
 import xyz.ottr.lutra.system.Result;
 import xyz.ottr.lutra.system.ResultStream;
 
-public class NewCheckingExpander extends NewNoChecksExpander {
+public class CheckingExpander extends NonCheckingExpander {
 
-    public NewCheckingExpander(TemplateStore templateStore) {
+    public CheckingExpander(TemplateStore templateStore) {
         super(templateStore);
     }
 
