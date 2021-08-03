@@ -322,7 +322,7 @@ public class StandardTemplateStore implements TemplateStore {
 
     @Override
     public MessageHandler checkTemplatesFor(List<Check> checks) {
-        QueryEngineNew engine = new QueryEngineNew(this);
+        StandardQueryEngine engine = new StandardQueryEngine(this);
         MessageHandler msgs = new MessageHandler();
 
         checks.stream()

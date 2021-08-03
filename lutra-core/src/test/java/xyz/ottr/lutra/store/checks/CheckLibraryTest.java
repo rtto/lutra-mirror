@@ -45,7 +45,7 @@ import xyz.ottr.lutra.model.terms.ObjectTerm;
 import xyz.ottr.lutra.model.terms.Term;
 import xyz.ottr.lutra.model.types.NEListType;
 import xyz.ottr.lutra.model.types.TypeRegistry;
-import xyz.ottr.lutra.store.graph.QueryEngineNew;
+import xyz.ottr.lutra.store.graph.StandardQueryEngine;
 import xyz.ottr.lutra.store.graph.StandardTemplateStore;
 import xyz.ottr.lutra.system.Message;
 
@@ -75,7 +75,7 @@ public class CheckLibraryTest {
         return store;
     }
 
-    private void check(QueryEngineNew engine, int numErrors, Message.Severity severity) {
+    private void check(StandardQueryEngine engine, int numErrors, Message.Severity severity) {
 
         List<Message> msgs = CheckLibrary.allChecks
             .stream()
@@ -107,7 +107,7 @@ public class CheckLibraryTest {
                     .build())
             .build());
 
-        QueryEngineNew engine = new QueryEngineNew(store);
+        StandardQueryEngine engine = new StandardQueryEngine(store);
 
         check(engine, 1, Message.Severity.WARNING);
     }
@@ -129,7 +129,7 @@ public class CheckLibraryTest {
                     .build())
             .build());
 
-        QueryEngineNew engine = new QueryEngineNew(store);
+        StandardQueryEngine engine = new StandardQueryEngine(store);
 
         check(engine, 0, Message.Severity.WARNING);
     }
@@ -153,7 +153,7 @@ public class CheckLibraryTest {
                     .build())
             .build());
 
-        QueryEngineNew engine = new QueryEngineNew(store);
+        StandardQueryEngine engine = new StandardQueryEngine(store);
 
         check(engine, 1, Message.Severity.ERROR);
     }
@@ -175,7 +175,7 @@ public class CheckLibraryTest {
                     .build())
             .build());
 
-        QueryEngineNew engine = new QueryEngineNew(store);
+        StandardQueryEngine engine = new StandardQueryEngine(store);
 
         check(engine, 1, Message.Severity.ERROR);
     }
@@ -206,7 +206,7 @@ public class CheckLibraryTest {
                     .build())
                 .build());
 
-        QueryEngineNew engine = new QueryEngineNew(store);
+        StandardQueryEngine engine = new StandardQueryEngine(store);
 
         check(engine, 1, Message.Severity.ERROR);
     }
@@ -263,7 +263,7 @@ public class CheckLibraryTest {
                     .build())
                 .build());
 
-        QueryEngineNew engine = new QueryEngineNew(store);
+        StandardQueryEngine engine = new StandardQueryEngine(store);
 
         check(engine, 3, Message.Severity.ERROR); // One cycle for each testN
     }
@@ -308,7 +308,7 @@ public class CheckLibraryTest {
                     .build()
                 ).build());
 
-        QueryEngineNew engine = new QueryEngineNew(store);
+        StandardQueryEngine engine = new StandardQueryEngine(store);
 
         check(engine, 0, Message.Severity.WARNING);
     }
@@ -357,7 +357,7 @@ public class CheckLibraryTest {
                     .build())
             .build());
 
-        QueryEngineNew engine = new QueryEngineNew(store);
+        StandardQueryEngine engine = new StandardQueryEngine(store);
 
         check(engine, 1, Message.Severity.ERROR);
     }
@@ -399,7 +399,7 @@ public class CheckLibraryTest {
                     .build())
                 .build());
 
-        QueryEngineNew engine = new QueryEngineNew(store);
+        StandardQueryEngine engine = new StandardQueryEngine(store);
 
         check(engine, 1, Message.Severity.ERROR);
     }
@@ -434,7 +434,7 @@ public class CheckLibraryTest {
                     .build())
                 .build());
 
-        QueryEngineNew engine = new QueryEngineNew(store);
+        StandardQueryEngine engine = new StandardQueryEngine(store);
 
         check(engine, 0, Message.Severity.ERROR);
     }
@@ -469,7 +469,7 @@ public class CheckLibraryTest {
                     .build())
                 .build());
 
-        QueryEngineNew engine = new QueryEngineNew(store);
+        StandardQueryEngine engine = new StandardQueryEngine(store);
 
         check(engine, 1, Message.Severity.ERROR);
     }
@@ -504,7 +504,7 @@ public class CheckLibraryTest {
                     .build())
                 .build());
 
-        QueryEngineNew engine = new QueryEngineNew(store);
+        StandardQueryEngine engine = new StandardQueryEngine(store);
 
         check(engine, 1, Message.Severity.ERROR);
     }

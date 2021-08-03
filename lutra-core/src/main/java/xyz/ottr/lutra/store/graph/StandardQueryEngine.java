@@ -50,9 +50,9 @@ import xyz.ottr.lutra.store.TemplateStore;
 import xyz.ottr.lutra.store.Tuple;
 import xyz.ottr.lutra.system.Result;
 
-public class QueryEngineNew extends QueryEngine<StandardTemplateStore> {
+public class StandardQueryEngine extends QueryEngine<StandardTemplateStore> {
 
-    public QueryEngineNew(StandardTemplateStore store) {
+    public StandardQueryEngine(StandardTemplateStore store) {
         this.store = store;
     }
 

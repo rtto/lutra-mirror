@@ -27,7 +27,7 @@ import java.util.stream.Stream;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import xyz.ottr.lutra.store.Tuple;
-import xyz.ottr.lutra.store.graph.QueryEngineNew;
+import xyz.ottr.lutra.store.graph.StandardQueryEngine;
 import xyz.ottr.lutra.system.Message;
 
 @AllArgsConstructor(access = AccessLevel.PACKAGE)
@@ -36,7 +36,7 @@ public class Check {
     private final Query query;
     private final Function<Tuple, Message> toMessage;
 
-    public Stream<Message> check(QueryEngineNew engine) {
+    public Stream<Message> check(StandardQueryEngine engine) {
         return this.query.eval(engine).map(this.toMessage).distinct();
     }
 }

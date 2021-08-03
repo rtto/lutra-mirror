@@ -27,7 +27,7 @@ import java.util.function.BiPredicate;
 import java.util.stream.Stream;
 import xyz.ottr.lutra.model.terms.NoneTerm;
 import xyz.ottr.lutra.store.Tuple;
-import xyz.ottr.lutra.store.graph.QueryEngineNew;
+import xyz.ottr.lutra.store.graph.StandardQueryEngine;
 
 public class Query {
 
@@ -58,17 +58,17 @@ public class Query {
         .and(unifiesBody("B2", "B1", "UB2"));
 
     // rel : (QueryEngine<? extends TemplateStore>, Tuple) -> Stream<Tuple>
-    private final BiFunction<QueryEngineNew, Tuple, Stream<Tuple>> rel;
+    private final BiFunction<StandardQueryEngine, Tuple, Stream<Tuple>> rel;
 
-    private Query(BiFunction<QueryEngineNew, Tuple, Stream<Tuple>> rel) {
+    private Query(BiFunction<StandardQueryEngine, Tuple, Stream<Tuple>> rel) {
         this.rel = rel;
     }
 
-    public Stream<Tuple> eval(QueryEngineNew engine) {
+    public Stream<Tuple> eval(StandardQueryEngine engine) {
         return this.rel.apply(engine, new Tuple());
     }
 
-    public Stream<Tuple> eval(QueryEngineNew engine, Tuple constants) {
+    public Stream<Tuple> eval(StandardQueryEngine engine, Tuple constants) {
         return this.rel.apply(engine, constants.copy());
     }
 
@@ -86,7 +86,7 @@ public class Query {
 
     public static Query not(Query query) {
 
-        BiPredicate<QueryEngineNew, Tuple> shouldKeep = (qe, m) ->
+        BiPredicate<StandardQueryEngine, Tuple> shouldKeep = (qe, m) ->
             query.rel.apply(qe, m).findAny().isEmpty();
 
         return new Query((qe, m) -> shouldKeep.test(qe, m) ? Stream.of(m) : Stream.empty());
