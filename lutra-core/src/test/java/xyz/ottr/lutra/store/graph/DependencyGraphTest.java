@@ -48,6 +48,7 @@ import xyz.ottr.lutra.model.terms.NoneTerm;
 import xyz.ottr.lutra.model.terms.ObjectTerm;
 import xyz.ottr.lutra.store.Expander;
 import xyz.ottr.lutra.store.TemplateStore;
+import xyz.ottr.lutra.store.expansion.NonCheckingExpander;
 import xyz.ottr.lutra.system.Assertions;
 import xyz.ottr.lutra.system.Message;
 import xyz.ottr.lutra.system.Result;

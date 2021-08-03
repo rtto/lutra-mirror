@@ -1,4 +1,4 @@
-package xyz.ottr.lutra.store.graph;
+package xyz.ottr.lutra.store.expansion;
 
 /*-
  * #%L

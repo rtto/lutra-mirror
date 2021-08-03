@@ -44,7 +44,7 @@ import xyz.ottr.lutra.io.TemplateReader;
 import xyz.ottr.lutra.model.Instance;
 import xyz.ottr.lutra.store.Expander;
 import xyz.ottr.lutra.store.TemplateStore;
-import xyz.ottr.lutra.store.graph.NonCheckingExpander;
+import xyz.ottr.lutra.store.expansion.NonCheckingExpander;
 import xyz.ottr.lutra.stottr.io.SFileReader;
 import xyz.ottr.lutra.stottr.parser.SInstanceParser;
 import xyz.ottr.lutra.stottr.parser.STemplateParser;

@@ -1,4 +1,4 @@
-package xyz.ottr.lutra.store.graph;
+package xyz.ottr.lutra.store.expansion;
 
 /*-
  * #%L
@@ -37,6 +37,7 @@ import xyz.ottr.lutra.model.terms.NoneTerm;
 import xyz.ottr.lutra.model.terms.Term;
 import xyz.ottr.lutra.store.Expander;
 import xyz.ottr.lutra.store.TemplateStore;
+import xyz.ottr.lutra.store.graph.StandardTemplateStore;
 import xyz.ottr.lutra.system.MessageHandler;
 import xyz.ottr.lutra.system.Result;
 import xyz.ottr.lutra.system.ResultConsumer;

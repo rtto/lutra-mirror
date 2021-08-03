@@ -36,7 +36,7 @@ import xyz.ottr.lutra.model.Template;
 import xyz.ottr.lutra.model.terms.BlankNodeTerm;
 import xyz.ottr.lutra.model.terms.Term;
 import xyz.ottr.lutra.model.types.TypeRegistry;
-import xyz.ottr.lutra.store.graph.NonCheckingExpander;
+import xyz.ottr.lutra.store.expansion.NonCheckingExpander;
 import xyz.ottr.lutra.store.graph.StandardTemplateStore;
 import xyz.ottr.lutra.system.Assertions;
 import xyz.ottr.lutra.system.ResultConsumer;

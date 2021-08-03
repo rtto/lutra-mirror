@@ -39,6 +39,7 @@ import xyz.ottr.lutra.model.terms.IRITerm;
 import xyz.ottr.lutra.model.terms.ListTerm;
 import xyz.ottr.lutra.model.terms.LiteralTerm;
 import xyz.ottr.lutra.store.TemplateStore;
+import xyz.ottr.lutra.store.expansion.NonCheckingExpander;
 import xyz.ottr.lutra.system.Result;
 
 // TODO check expander type
