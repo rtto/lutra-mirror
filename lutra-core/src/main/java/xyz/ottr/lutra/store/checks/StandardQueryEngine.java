@@ -1,4 +1,4 @@
-package xyz.ottr.lutra.store.graph;
+package xyz.ottr.lutra.store.checks;
 
 /*-
  * #%L
@@ -45,9 +45,8 @@ import xyz.ottr.lutra.model.terms.ListTerm;
 import xyz.ottr.lutra.model.terms.Term;
 import xyz.ottr.lutra.model.types.ComplexType;
 import xyz.ottr.lutra.model.types.Type;
-import xyz.ottr.lutra.store.QueryEngine;
 import xyz.ottr.lutra.store.TemplateStore;
-import xyz.ottr.lutra.store.Tuple;
+import xyz.ottr.lutra.store.graph.StandardTemplateStore;
 import xyz.ottr.lutra.system.Result;
 
 public class StandardQueryEngine extends QueryEngine<StandardTemplateStore> {

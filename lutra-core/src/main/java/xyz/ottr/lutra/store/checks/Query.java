@@ -26,8 +26,6 @@ import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
 import java.util.stream.Stream;
 import xyz.ottr.lutra.model.terms.NoneTerm;
-import xyz.ottr.lutra.store.Tuple;
-import xyz.ottr.lutra.store.graph.StandardQueryEngine;
 
 public class Query {
 

@@ -26,8 +26,6 @@ import java.util.function.Function;
 import java.util.stream.Stream;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
-import xyz.ottr.lutra.store.Tuple;
-import xyz.ottr.lutra.store.graph.StandardQueryEngine;
 import xyz.ottr.lutra.system.Message;
 
 @AllArgsConstructor(access = AccessLevel.PACKAGE)

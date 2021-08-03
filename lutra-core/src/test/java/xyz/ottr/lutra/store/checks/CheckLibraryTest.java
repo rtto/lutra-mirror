@@ -45,7 +45,6 @@ import xyz.ottr.lutra.model.terms.ObjectTerm;
 import xyz.ottr.lutra.model.terms.Term;
 import xyz.ottr.lutra.model.types.NEListType;
 import xyz.ottr.lutra.model.types.TypeRegistry;
-import xyz.ottr.lutra.store.graph.StandardQueryEngine;
 import xyz.ottr.lutra.store.graph.StandardTemplateStore;
 import xyz.ottr.lutra.system.Message;
 
