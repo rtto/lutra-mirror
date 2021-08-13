@@ -1,4 +1,4 @@
-package xyz.ottr.lutra.store.graph;
+package xyz.ottr.lutra.store;
 
 /*-
  * #%L
@@ -36,8 +36,6 @@ import xyz.ottr.lutra.model.Instance;
 import xyz.ottr.lutra.model.Parameter;
 import xyz.ottr.lutra.model.Signature;
 import xyz.ottr.lutra.model.Template;
-import xyz.ottr.lutra.store.StandardTemplateStore;
-import xyz.ottr.lutra.store.TemplateStore;
 import xyz.ottr.lutra.system.Result;
 
 public class StandardTemplateStoreTest {

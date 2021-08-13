@@ -56,6 +56,9 @@ import xyz.ottr.lutra.system.Result;
 import xyz.ottr.lutra.system.ResultConsumer;
 import xyz.ottr.lutra.system.ResultStream;
 
+/**
+ * Legacy test from the old DependencyGraph implementation still working fine with the new one.
+ */
 public class DependencyGraphTest {
 
     private void expandAndCheckEquality(Set<Template> toExpand, Set<Template> shouldEqual) {
