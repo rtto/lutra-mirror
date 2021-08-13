@@ -57,6 +57,7 @@ public class StandardTemplateStore implements TemplateStore {
     private final Map<String, Signature> templates;
     private final Map<String, Set<String>> dependencyIndex;
     private final Set<String> missingDependencies;
+    private final Set<String> failed; // Stores IRIs that failed fetching
     private TemplateStore standardLibrary;
 
     private final FormatManager formatManager;
@@ -66,6 +67,7 @@ public class StandardTemplateStore implements TemplateStore {
         templates = new ConcurrentHashMap<>();
         dependencyIndex = new ConcurrentHashMap<>();
         missingDependencies = new HashSet<>();
+        failed = new HashSet<>();
     }
 
     @Override
@@ -279,14 +281,14 @@ public class StandardTemplateStore implements TemplateStore {
             return messages.getMessageHandler();
         }
 
-        Set<String> failed = new HashSet<>(); // Stores IRIs that failed fetching
-        // TODO: Perhaps make failed a class-variable, rather than local
-        // such that we do not attempt to fetch templates that failed previously
-        // in the same run?
         Set<String> missing = new HashSet<>(initMissing);
 
         while (!missing.isEmpty()) {
             for (String toFetch : missing) {
+                if (failed.contains(toFetch)) { // check if IRI is already know to have failed before
+                    continue;
+                }
+
                 if (stdLib.isPresent() && stdLib.get().containsTemplate(toFetch)) {
                     stdLib.get().getTemplate(toFetch).ifPresent(this::addTemplate);
                 } else {
