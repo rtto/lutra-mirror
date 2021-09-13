@@ -240,6 +240,7 @@ public class CLI {
     private Message.Severity printMessages(MessageHandler handler) {
         var temp = new MessageHandler(this.outStream);
         temp.combine(handler); // Use this.messageHandler's settings
+        this.messageHandler.combine(handler); //add messages to CLI message handler, used in tests
         return temp.printMessages();
     }
 
@@ -316,4 +317,9 @@ public class CLI {
     private boolean shouldPrintOutput() {
         return this.settings.stdout || this.settings.out == null;
     }
+    
+    public MessageHandler getMessageHandler() {
+        return this.messageHandler;
+    }
+
 }
