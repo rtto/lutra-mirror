@@ -56,7 +56,7 @@ public class Issues233Test {
                 + " --library " + ROOT + "template.stottr"
                 + " --libraryFormat stottr"
                 + " -O wottr"
-                + " -o " + ROOT + "output"
+                + " -o " + ROOT + "output.ttl"
                 + " --inputFormat stottr"
                 + " " + ROOT + "instance.stottr");
         
@@ -86,7 +86,7 @@ public class Issues233Test {
         
         CLIRunner.run(" "
                 + " -O wottr"
-                + " -o " + ROOT + "outputWithoutTemplate"
+                + " -o " + ROOT + "outputWithoutTemplate.ttl"
                 + " --inputFormat stottr"
                 + " " + ROOT + "instanceWithoutTemplate.stottr");
         
