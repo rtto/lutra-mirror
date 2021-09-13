@@ -28,7 +28,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Optional;
 import java.util.function.BiFunction;
-import java.util.function.Function;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.jena.rdf.model.Model;
 import picocli.CommandLine;
@@ -125,7 +124,7 @@ public class CLI {
     private void initTemplateManager() {
         this.templateManager.setFullTrace(this.settings.debugFullTrace);
         this.templateManager.setStackTrace(this.settings.debugStackTrace);
-        this.templateManager.setHaltOn(this.settings.haltOn);
+        //this.templateManager.setHaltOn(this.settings.haltOn);
         this.templateManager.setFetchMissingDependencies(this.settings.fetchMissingDependencies);
         this.templateManager.setExtensions(this.settings.extensions);
         this.templateManager.setIgnoreExtensions(this.settings.ignoreExtensions);
@@ -284,8 +283,9 @@ public class CLI {
     private void writeInstances(ResultStream<Instance> ins) {
 
         Format outFormat = this.templateManager.getFormat(this.settings.outputFormat.toString());
-        var msgs = this.templateManager
-            .writeInstances(ins, outFormat, makeInstanceWriter(outFormat.getDefaultFileSuffix()));
+        String filePath = this.settings.out; 
+        PrintStream consoleStream = shouldPrintOutput() ? this.outStream : null;
+        var msgs = this.templateManager.writeInstances(ins, outFormat, filePath, consoleStream);
         printMessages(msgs);
     }
 
@@ -299,18 +299,7 @@ public class CLI {
         var docttr = new DocttrManager(this.outStream, templateManager);
         docttr.write(Path.of(this.settings.out));
     }
-
-    private Function<String, Optional<Message>> makeInstanceWriter(String suffix) {
-        return str -> {
-            if (shouldPrintOutput()) {
-                this.outStream.println(str);
-            }
-            if (this.settings.out != null) {
-                return Files.writeFile(str, this.settings.out, suffix);
-            }
-            return Optional.empty();
-        };
-    }
+    
 
     private BiFunction<String, String, Optional<Message>> makeTemplateWriter(String suffix) {
         return (iri, str) -> {

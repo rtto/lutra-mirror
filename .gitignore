@@ -122,7 +122,7 @@ lutra-cli/dependency-reduced-pom.xml
 
 lutra-docttr/src/test/resources/.output/
 
-lutra-cli/src/test/resources/issues/235/output.ttl
+lutra-cli/src/test/resources/issues/235/output
 
 settings.xml
 

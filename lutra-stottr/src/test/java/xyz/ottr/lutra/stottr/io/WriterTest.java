@@ -24,13 +24,21 @@ package xyz.ottr.lutra.stottr.io;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.file.Paths;
 import java.util.List;
+import java.util.Optional;
+import java.util.function.BiFunction;
 import org.apache.jena.shared.PrefixMapping;
 import org.apache.jena.vocabulary.OWL;
 import org.apache.jena.vocabulary.XSD;
 import org.junit.Test;
 import xyz.ottr.lutra.OTTR;
+import xyz.ottr.lutra.io.Files;
 import xyz.ottr.lutra.model.Argument;
 import xyz.ottr.lutra.model.BaseTemplate;
 import xyz.ottr.lutra.model.Instance;
@@ -45,10 +53,14 @@ import xyz.ottr.lutra.model.terms.NoneTerm;
 import xyz.ottr.lutra.model.types.TypeRegistry;
 import xyz.ottr.lutra.stottr.writer.SInstanceWriter;
 import xyz.ottr.lutra.stottr.writer.STemplateWriter;
+import xyz.ottr.lutra.system.Message;
+import xyz.ottr.lutra.system.Message.Severity;
+import xyz.ottr.lutra.system.MessageHandler;
 
 public class WriterTest {
 
     private static final String BR = System.lineSeparator();
+    private String resourcePath = "src/test/resources/WriterTests/";
 
     private PrefixMapping createPrefixes() {
         var prefixes = PrefixMapping.Factory.create();
@@ -56,8 +68,6 @@ public class WriterTest {
         prefixes.setNsPrefix("my", "http://base.org/");
         return prefixes;
     }
-
-
 
     private Instance i1 = Instance.builder()
         .iri("http://base.org/T1")
@@ -102,9 +112,9 @@ public class WriterTest {
             LiteralTerm.createPlainLiteral("1"),
             LiteralTerm.createPlainLiteral("1"))
         ).build();
-
+    
     @Test
-    public void testInstances1() {
+    public void testInstances1() throws IOException {
 
         var instances = List.of(i1, i2, i3, i4, i5);
 
@@ -116,15 +126,18 @@ public class WriterTest {
                 + "@prefix xsd: <http://www.w3.org/2001/XMLSchema#> ." + BR
                 + "@prefix owl: <http://www.w3.org/2002/07/owl#> ." + BR
                 + BR
-                + "my:T1(\"1\", \"1\", \"1\") ." + BR
-                + "my:T1(\"1\", \"2\", \"3\") ." + BR
                 + "my:T1(\"true\"^^xsd:boolean, none, rdf:type, <http://some.uri/with#part>, \"hello\"@no) ." + BR
+                + "<http://base2.org/T2>(_:myLabel, \"one\", \"two\", \"three\") ."  + BR
+                + "my:T1(\"1\", \"2\", \"3\") ." + BR
                 + "cross | my:T1(\"1\", \"1\", \"1\") ." + BR
-                + "<http://base2.org/T2>(_:myLabel, \"one\", \"two\", \"three\") ."  + BR;
+                + "my:T1(\"1\", \"1\", \"1\") ." + BR;
+                
+                
 
         testWriteInstances(instances, output);
     }
-
+    
+    //only file write operations are tested, file contents are verified in lutra-api FormatEquivalenceTest
     @Test
     public void testSignatures1() {
         var b1 = BaseTemplate.builder()
@@ -190,7 +203,7 @@ public class WriterTest {
 
         List<Signature> list = List.of(b1, t1, b2, s1, s2, t2, t3, t4);
 
-
+        /*
         var output = "@prefix my: <http://base.org/> ." + BR
             + "@prefix ottr: <http://ns.ottr.xyz/0.4/> ." + BR
             + "@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> ." + BR
@@ -267,25 +280,57 @@ public class WriterTest {
             + "] :: {" + BR
             + "    # Empty pattern" + BR
             + "} .";
-
-        testWriteSignatures(list, output);
+        */
+        testWriteSignatures(list);
     }
 
-    private void testWriteSignatures(List<Signature> signatures, String expectedOutput) {
-
+    private void testWriteSignatures(List<Signature> signatures) {
+        String folderPath = this.resourcePath + "template_folder";
         var writer = new STemplateWriter(this.createPrefixes());
+        
+        BiFunction<String, String, Optional<Message>> writerFunc = (iri, str) -> {
+            return Files.writeTemplatesTo(iri, str, folderPath, ".suffix");
+        };
+        
+        writer.setWriterFunction(writerFunc);
         signatures.forEach(writer::accept);
-        var output = writer.write();
-        assertThat(output, is(expectedOutput));
+        
+        MessageHandler msgs = writer.getMessages(); 
+        if (msgs.getMostSevere().isGreaterThan(Severity.WARNING)) {
+            fail(msgs.getMessages().toString()); //template writing failed
+        }
+        
+        deleteDirectory(new File(folderPath));
     }
-
-    private void testWriteInstances(List<Instance> instances, String expectedOutput) {
-
-        var writer = new SInstanceWriter(this.createPrefixes());
+    
+    private void deleteDirectory(File directoryToBeDeleted) {
+        File[] allContents = directoryToBeDeleted.listFiles();
+        if (allContents != null) {
+            for (File file : allContents) {
+                deleteDirectory(file);
+            }
+        }
+        directoryToBeDeleted.delete();
+    }
+    
+    
+    private void testWriteInstances(List<Instance> instances, String expectedOutput) throws IOException {
+        
+        
+        String filePath = this.resourcePath + "instances";
+        SInstanceWriter writer = new SInstanceWriter(this.createPrefixes());
+        writer.init(filePath, null);
         instances.forEach(writer::accept);
-        var output = writer.write();
-        assertThat(output, is(expectedOutput));
+        writer.flush();
+        MessageHandler msgs = writer.close();
+        if (msgs.getMostSevere().isGreaterThan(Severity.WARNING)) { //fail if file write was not possible
+            fail(msgs.getMessages().toString());
+        }
+        String fileContents = java.nio.file.Files.readString(Paths.get(filePath), Charset.forName("UTF-8"));
+        assertThat(fileContents, is(expectedOutput));
+        
+        new File(filePath).delete();
     }
-
+    
 }
 

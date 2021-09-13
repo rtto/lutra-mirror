@@ -23,10 +23,9 @@ package xyz.ottr.lutra.wottr.writer;
  */
 
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.Optional;
+import java.util.function.BiFunction;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.Property;
@@ -40,6 +39,8 @@ import xyz.ottr.lutra.model.Instance;
 import xyz.ottr.lutra.model.Parameter;
 import xyz.ottr.lutra.model.Signature;
 import xyz.ottr.lutra.model.Template;
+import xyz.ottr.lutra.system.Message;
+import xyz.ottr.lutra.system.MessageHandler;
 import xyz.ottr.lutra.wottr.WOTTR;
 import xyz.ottr.lutra.wottr.io.RDFIO;
 import xyz.ottr.lutra.wottr.util.PrefixMappings;
@@ -47,52 +48,47 @@ import xyz.ottr.lutra.writer.TemplateWriter;
 
 public class WTemplateWriter implements TemplateWriter {
 
-    private final Map<String, Model> models; // TODO: Decide on representation
-    private final WInstanceWriter instanceWriter;
     private final PrefixMapping prefixes;
+    
+    private MessageHandler msgs;
+    private BiFunction<String, String, Optional<Message>> stringConsumer;
 
     public WTemplateWriter() {
         this(PrefixMapping.Factory.create());
     }
 
     public WTemplateWriter(PrefixMapping prefixes) {
-        this.models = new HashMap<>();
-        this.instanceWriter = new WInstanceWriter(prefixes);
         this.prefixes = prefixes;
-    }
-
-    @Override
-    public Set<String> getIRIs() {
-        return this.models.keySet();
+        this.msgs = new MessageHandler();
     }
 
     @Override
     public void accept(Signature template) {
         var iri = template.getIri();
-        if (!this.models.containsKey(iri)) {
-            this.models.put(template.getIri(), getModel(template));
-        }
+                
+        String content = buildStringRep(template);
+        stringConsumer.apply(iri, content).ifPresent(msgs::add); //write template to file or console
     }
-
+       
     public Model getModel(Signature signature) {
-        return this.models.computeIfAbsent(signature.getIri(), ignore -> {
-            Model model = ModelFactory.createDefaultModel();
-            model.setNsPrefixes(this.prefixes);
+        Model model = ModelFactory.createDefaultModel();
+        model.setNsPrefixes(this.prefixes);
 
-            Resource signatureNode = createSignature(model, signature);
+        Resource signatureNode = createSignature(model, signature);
 
-            if (signature instanceof Template) {
-                addInstances(((Template) signature).getPattern(), signatureNode, WOTTR.pattern, model);
-            }
-            PrefixMappings.trim(model);
-            return model;
-        });
+        if (signature instanceof Template) {
+            addInstances(((Template) signature).getPattern(), signatureNode, WOTTR.pattern, model);
+        }
+        PrefixMappings.trim(model);
+        
+        return model;        
     }
     
-    @Override
-    public String write(String iri) {
-        return RDFIO.writeToString(this.models.get(iri));
+    
+    public String buildStringRep(Signature template) {
+        return RDFIO.writeToString(getModel(template));
     }
+    
 
     private Resource createSignature(Model model, Signature signature) {
 
@@ -147,9 +143,28 @@ public class WTemplateWriter implements TemplateWriter {
 
     private void addInstances(Collection<Instance> instances, Resource signature, Property property, Model model) {
         for (Instance instance : instances) {
-            Resource instanceNode = this.instanceWriter.createInstanceNode(model, instance);
+            Resource instanceNode = WriterUtils.createInstanceNode(model, instance);
             model.add(signature, property, instanceNode);
         }
     }
-
+    
+    /**
+     * Set writer function which will write to file
+     * 
+     * @param stringConsumer
+     *      A function to which the written string are applied
+     * @return
+     */
+    @Override
+    public void setWriterFunction(BiFunction<String, String, Optional<Message>> stringConsumer) {
+        this.stringConsumer = stringConsumer;
+    }
+    
+    /**
+     * @return MessageHandler
+     */
+    @Override
+    public MessageHandler getMessages() {
+        return this.msgs;
+    }
 }
