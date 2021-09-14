@@ -41,7 +41,7 @@ import xyz.ottr.lutra.model.Instance;
 import xyz.ottr.lutra.store.Expander;
 import xyz.ottr.lutra.store.StandardTemplateStore;
 import xyz.ottr.lutra.store.TemplateStore;
-import xyz.ottr.lutra.store.expansion.NonCheckingExpander;
+import xyz.ottr.lutra.store.expansion.CheckingExpander;
 import xyz.ottr.lutra.system.Message;
 import xyz.ottr.lutra.system.MessageHandler;
 import xyz.ottr.lutra.system.Result;
@@ -378,7 +378,7 @@ public class TemplateManager {
      *      this' TemplateStore.
      */
     public Function<Instance, ResultStream<Instance>> makeExpander() {
-        Expander expander = new NonCheckingExpander(templateStore); // TODO check expander type
+        Expander expander = new CheckingExpander(templateStore); 
         if (this.settings.fetchMissingDependencies) {
             return expander::expandInstanceFetch;
         } else {
@@ -396,7 +396,7 @@ public class TemplateManager {
      *      missing definitions).
      */
     public Result<TemplateManager> expandStore() {
-        Expander expander = new NonCheckingExpander(templateStore); // TODO check expander type
+        Expander expander = new CheckingExpander(templateStore); 
         return expander.expandAll().map(expanded ->
             new TemplateManager(this.settings, this.prefixes, this.formatManager, expanded)
         );

@@ -42,8 +42,7 @@ import xyz.ottr.lutra.store.StandardTemplateStore;
 import xyz.ottr.lutra.store.TemplateStore;
 import xyz.ottr.lutra.system.Result;
 
-// TODO check expander type
-public class NewExpanderTest {
+public class NonCheckingExpanderTest {
 
     @Test
     public void testExpandAll() {

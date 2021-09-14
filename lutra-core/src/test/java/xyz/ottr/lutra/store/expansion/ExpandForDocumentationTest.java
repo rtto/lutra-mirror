@@ -50,7 +50,7 @@ public class ExpandForDocumentationTest {
 
         Set<Instance> expanded = new HashSet<>();
         ResultConsumer<Instance> consumer = new ResultConsumer<>(expanded::add);
-        Expander expander = new NonCheckingExpander(store); // TODO check expander type
+        Expander expander = new NonCheckingExpander(store); 
         expander.expandInstance(toExpand.getExampleInstance())
             .forEach(consumer);
 

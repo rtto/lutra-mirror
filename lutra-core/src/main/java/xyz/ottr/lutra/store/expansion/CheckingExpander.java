@@ -28,7 +28,11 @@ import xyz.ottr.lutra.model.Instance;
 import xyz.ottr.lutra.model.Parameter;
 import xyz.ottr.lutra.model.Signature;
 import xyz.ottr.lutra.model.Template;
+import xyz.ottr.lutra.model.terms.BlankNodeTerm;
+import xyz.ottr.lutra.model.types.ListType;
+import xyz.ottr.lutra.model.types.Type;
 import xyz.ottr.lutra.store.TemplateStore;
+import xyz.ottr.lutra.system.Message;
 import xyz.ottr.lutra.system.Result;
 import xyz.ottr.lutra.system.ResultStream;
 
@@ -56,36 +60,62 @@ public class CheckingExpander extends NonCheckingExpander {
         if (isSignature(signature)) {
             return Result.error("Missing pattern definition of: " + instance.getIri());
         }
-        if (checkParametersMatch(instance, signature.get())) {
-            return Result.error("Arguments do not match parameters");
+
+        Message error = checkParametersMatch(instance, signature.get());
+        if (error != null) {
+            return Result.empty(error);
+        }
+
+        return Result.of(instance);
+    }
+
+    // TODO return messages
+    private Message checkParametersMatch(Instance instance, Signature signature) {
+
+        if (instance.getArguments().size() != signature.getParameters().size()) {
+            return Message.error("Number of arguments do not match number of paramters in instance " + instance.toString());
+        }
+
+        for (int i = 0; i < instance.getArguments().size(); i++) {
+            Argument argument = instance.getArguments().get(i);
+            Parameter parameter = signature.getParameters().get(i);
+            Message error = checkNonCompatibleArgument(argument, parameter);
+
+            if (error != null) {
+                return error;
+            }
         }
 
         return null;
     }
 
-    // TODO return messages
-    private boolean checkParametersMatch(Instance instance, Signature signature) {
-        boolean result = instance.getArguments().size() == signature.getParameters().size();
+    private Message checkNonCompatibleArgument(Argument argument, Parameter parameter) {
+        
+        Type paramType = parameter.getType();
+        Type argType = argument.getTerm().getType();
 
-        if (result) {
-            for (int i = 0; i < instance.getArguments().size(); i++) {
-                Argument argument = instance.getArguments().get(i);
-                Parameter parameter = signature.getParameters().get(i);
-                result = checkParametersEqual(argument, parameter);
-
-                if (!result) {
-                    return result;
-                }
+        if (argument.isListExpander()) {
+            if (argType instanceof ListType) {
+                argType = ((ListType) argType).getInner();
+            } else {
+                return Message.error("List expander applied to non-list argument: "
+                        + argument.toString());
             }
         }
 
-        return result;
-    }
+        if (!argType.isCompatibleWith(paramType)) {
+            return Message.error("Incompatible argument in instance: "
+                    + argument.toString() + " given to parameter "
+                    + parameter.toString() + " - incompatible types.");
+        }
 
-    @SuppressWarnings("PMD.UnusedFormalParameter")
-    private boolean checkParametersEqual(Argument argument, Parameter parameter) {
-        // TODO implement with messages wht is not OK
-        return false;
+        if (argument.getTerm() instanceof BlankNodeTerm && parameter.isNonBlank()) {
+            return Message.error("Incompatible argument in instance:"
+                    + " blank node " + argument.toString() + " given to non-blank"
+                    + " parameter " + parameter.toString());
+        }
+
+        return null;
     }
 
     // TODO should go somewhere else where is can be reused

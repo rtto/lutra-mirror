@@ -67,7 +67,7 @@ public enum ModelUtils {
 
         TemplateStore store = new StandardTemplateStore(null);
         store.addOTTRBaseTemplates();
-        Expander expander = new NonCheckingExpander(store); // TODO check expander type
+        Expander expander = new NonCheckingExpander(store); 
 
         InstanceReader insReader = new InstanceReader(RDFIO.fileReader(), new WInstanceParser());
         ResultStream<Instance> expandedInInstances = insReader
