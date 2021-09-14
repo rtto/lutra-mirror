@@ -5,6 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 0.6.11
+
+### Added
+
+ - #20 initial support for "direct writing" of expanded instances.
+
+### Bug fixes
+
+ - !140 Fix bug where multiple ottr:none values in template body would lead to type error.
+ - #228 Add check to format manager for empty formats
+ - #298 Simplistic fix for "docttr fails on blank node types"
+ - #252 No error message when wrong input file
+ - !142 Fix bug where messages were not printed if using wottr format.
+ - #300 build bug "spotbugs-sast fails"
+	
 ## 0.6.10
 
 Do not fail build due to errors reported by javadoc.
