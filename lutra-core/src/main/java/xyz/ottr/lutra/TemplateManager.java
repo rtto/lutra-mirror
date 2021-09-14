@@ -468,20 +468,14 @@ public class TemplateManager {
     public MessageHandler writeTemplates(Format format, BiFunction<String, String, Optional<Message>> stringConsumer) {
 
         Result<TemplateWriter> writerRes = format.getTemplateWriter();
-
-        return writeObjects(this.templateStore.getAllSignatures(), writerRes, (writer, msgs) -> {
-            for (String iri : writer.getIRIs()) {
-                stringConsumer.apply(iri, writer.write(iri)).ifPresent(msgs::add);
-            }
-        });
-        /*MessageHandler msgs = writerRes.getMessageHandler();
+        MessageHandler msgs = writerRes.getMessageHandler();
         if (!writerRes.isPresent()) {
             return msgs;
         }
         writerRes.get().setWriterFunction(stringConsumer);
-        msgs.combine(writeObjects(this.templateStore.getAllTemplateObjects(), writerRes));
+        msgs.combine(writeObjects(this.templateStore.getAllSignatures(), writerRes));
         msgs.combine(writerRes.get().getMessages());
-        return msgs;*/
+        return msgs;
     }
 
     private <T, W extends Consumer<T>> MessageHandler writeObjects(ResultStream<T> objects,
