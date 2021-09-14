@@ -139,9 +139,14 @@ public class TripleInstanceGraphVisualiser extends GraphVisualiser implements Te
         return node;
     }
 
-    private String getLabel(IRITerm term) {
-        var iri = shortenURI(term.getIri());
-        if (this.argumentsTerms.contains(term)) {
+    private String getLabel(Term term) {
+        if (term instanceof BlankNodeTerm) {
+            return "[blank]";
+        }
+        
+        IRITerm termIRI = (IRITerm) term;
+        var iri = shortenURI(termIRI.getIri());
+        if (this.argumentsTerms.contains(termIRI)) {
             iri = "<b><font color=\"red\">" + iri + "</font></b>";
         }
         return iri;
@@ -164,7 +169,6 @@ public class TripleInstanceGraphVisualiser extends GraphVisualiser implements Te
             .filter(triple -> ((IRITerm)triple.get(1)).getIri().equals(RDF.type.getURI()))
             .map(triple -> triple.get(2))
             .distinct()
-            .map(type -> (IRITerm)type)
             .map(this::getLabel)
             .collect(Collectors.joining(", "));
     }

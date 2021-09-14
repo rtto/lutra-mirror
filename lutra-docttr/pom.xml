@@ -4,7 +4,7 @@
     <parent>
         <groupId>xyz.ottr.lutra</groupId>
         <artifactId>lutra</artifactId>
-        <version>0.6.10</version>
+        <version>0.6.11</version>
     </parent>
     <artifactId>lutra-docttr</artifactId>
 
@@ -38,4 +38,49 @@
         </dependency>
 
     </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <artifactId>plantuml-generator-maven-plugin</artifactId>
+                <groupId>de.elnarion.maven</groupId>
+                <executions>
+                    <execution>
+                        <id>lutra.docttr</id>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <phase>generate-test-sources</phase>
+                        <configuration>
+                            <outputFilename>docttr_all.puml</outputFilename>
+                            <hideFields>true</hideFields>
+                            <hideMethods>true</hideMethods>
+                            <scanPackages>
+                                <scanPackage>
+                                    xyz.ottr.lutra.docttr
+                                </scanPackage>
+                            </scanPackages>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>lutra.docttr.visualisation</id>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <phase>generate-test-sources</phase>
+                        <configuration>
+                            <outputFilename>docttr-visualisation.puml</outputFilename>
+                            <hideFields>true</hideFields>
+                            <hideMethods>true</hideMethods>
+                            <scanPackages>
+                                <scanPackage>
+                                    xyz.ottr.lutra.docttr.visualisation
+                                </scanPackage>
+                            </scanPackages>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 </project>

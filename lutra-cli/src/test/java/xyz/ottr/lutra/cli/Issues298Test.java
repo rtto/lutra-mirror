@@ -2,9 +2,9 @@ package xyz.ottr.lutra.cli;
 
 /*-
  * #%L
- * lutra-cli
+ * xyz.ottr.lutra:lutra-cli
  * %%
- * Copyright (C) 2018 - 2019 University of Oslo
+ * Copyright (C) 2018 - 2021 University of Oslo
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -22,31 +22,27 @@ package xyz.ottr.lutra.cli;
  * #L%
  */
 
-import org.apache.jena.rdf.model.Model;
+
 import org.junit.Test;
-import xyz.ottr.lutra.wottr.io.RDFIO;
 
-public class Issues235Test {
-
-    private static final String ROOT = "src/test/resources/issues/235/";
+public class Issues298Test {
     
-    // Bug was caused by the string starting with a space.
+    private static final String ROOT = "src/test/resources/issues/298/";
+    
+    /*
+     * class xyz.ottr.lutra.model.terms.BlankNodeTerm cannot be cast to class xyz.ottr.lutra.model.terms.IRITerm 
+     * at xyz.ottr.lutra.docttr.visualisation.TripleInstanceGraphVisualiser::getTypesForLabel
+     * 
+     * Fix: for blank node in triple, return string [blank]
+     */
+    
     @Test
     public void test() {
         CLIRunner.run(" "
-            + " --library " + ROOT + "template.stottr"
+            + " --library " + ROOT + "ottr/tpl/"
             + " --libraryFormat stottr"
-            + " -O wottr"
-            + " -o " + ROOT + "output"
-            + " --inputFormat stottr"
-            + " " + ROOT + "instance.stottr");
-
-
-        Model actual = RDFIO.fileReader().parse(ROOT + "output").get();
-        Model expected = RDFIO.fileReader().parse(ROOT + "expected-output.ttl").get();
-
-        TestUtils.testIsomorphicModels(actual, expected);
-
+            + " -f"
+            + " -o " + ROOT + "ottr-doc/"
+            + " -m docttrLibrary");
     }
-
 }

@@ -141,6 +141,7 @@ public enum CheckLibrary {
             .and(Query.removeSymmetry("Ins1", "Ins2"))
             .and(Query.argumentIndex("Ins1", "Index1", "Arg1"))
             .and(Query.hasOccurenceAt("Arg1", "Lvl1", "Val"))
+            .and(Query.isNotNone("Val")) // Do not check type-correctness of ottr:none
             .and(Query.argumentIndex("Ins2", "Index2", "Arg2"))
             .and(Query.hasOccurenceAt("Arg2", "Lvl2", "Val"))
             .and(Query.usedAsType("Ins1", "Index1", "Lvl1", "Type1"))
