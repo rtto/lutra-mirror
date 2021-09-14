@@ -1,0 +1,36 @@
+@prefix rdf:		<http://www.w3.org/1999/02/22-rdf-syntax-ns#> . 
+@prefix rdfs:		<http://www.w3.org/2000/01/rdf-schema#> . 
+@prefix owl:		<http://www.w3.org/2002/07/owl#> . 
+@prefix xsd:		<http://www.w3.org/2001/XMLSchema#> . 
+
+@prefix lis:		<http://standards.iso.org/iso/15926/part14/> .
+@prefix om:			<http://www.ontology-of-units-of-measure.org/resource/om-2/> .
+
+@prefix ottr:		<http://ns.ottr.xyz/0.4/> . 
+@prefix ax:			<http://tpl.ottr.xyz/owl/axiom/0.1/> . 
+@prefix rstr:		<http://tpl.ottr.xyz/owl/restriction/0.1/> .
+@prefix o-rdf:		<http://tpl.ottr.xyz/rdf/0.1/> .
+@prefix o-rdfs:		<http://tpl.ottr.xyz/rdfs/0.2/> .
+
+@prefix tpl:		<http://w3id.org/ddb/tpl/> .
+@prefix ddb-chebi:	<http://w3id.org/ddb/chebi/> .
+@prefix chebi:		<http://purl.obolibrary.org/obo/> .
+
+tpl:StreamHypotheticalComponentSingleton [
+	ottr:IRI ?stream,
+	xsd:string ?label,
+	xsd:nonNegativeInteger ?carbon_count,
+	xsd:double ?amount_of_substance,
+	? xsd:double ?molecular_weight,
+	? xsd:double ?density
+] :: {
+	ottr:Triple(_:restriction, rdf:type, owl:Restriction),
+	ottr:Triple(_:restriction, owl:onProperty, ddb-chebi:hasNumberOfCarbonAtoms),
+	ottr:Triple(_:restriction, owl:hasValue, ?carbon_count),
+	o-rdf:Type(_:component, _:restriction),
+	o-rdf:Type(_:component, chebi:CHEBI_24632),
+	o-rdfs:Label(_:component, ?label),
+	o-rdf:Type(?stream, lis:Stream),
+	ottr:Triple(?stream, lis:hasPart, _:component),
+	tpl:StreamComponentMeasurements(_:component, ?amount_of_substance, ?molecular_weight, ?density)
+} .

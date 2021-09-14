@@ -1,0 +1,60 @@
+@prefix ottt: 	<https://spec.ottr.xyz/rottr/0/> .
+@prefix ottr:   <http://ns.ottr.xyz/0.4/> . 
+@prefix xsd: 	<http://www.w3.org/2001/XMLSchema#> .
+@prefix rdf: 	<http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: 	<http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: 	<http://www.w3.org/2002/07/owl#> .
+@prefix ex: 	<http://example.net/ns#> .
+@prefix trdf:   <http://tpl.ottr.xyz/rdf/0.1/> .
+@prefix towl:   <http://tpl.ottr.xyz/owl/axiom/0.1/> .
+@prefix trdfs:  <http://tpl.ottr.xyz/rdfs/0.1/> . 
+@prefix ex:     <http://local/example/> .
+@prefix skos:   <http://www.w3.org/2004/02/skos/core#> .
+@prefix ddbc: 	<https://informationmodel.mimir.solutions/rdl/> . 
+@prefix uc1: <https://w3id.org/ddb/ddb-use-case1/> .
+@prefix lis: <http://standards.iso.org/iso/15926/part14/> .
+@prefix om2: <http://www.ontology-of-units-of-measure.org/resource/om-2/> .
+@prefix tpl: <https://w3id.org/ddb/template/> .
+@prefix ddbc: <https://w3id.org/ddb/ddb_core/> .
+
+
+
+tpl:hasFeature[
+    ! ottr:IRI ?subject, 
+    ! ottr:IRI ?feature
+] :: {
+    ottr:Triple(?subject, lis:hasFeature,  ?feature)
+} . 
+
+
+tpl:ConnectedTo[
+    ottr:IRI ?subject, 
+    ottr:IRI ?connectedTo
+] :: {
+    ottr:Triple(?subject, lis:connectedTo, ?connectedTo)
+} . 
+
+
+tpl:Contains[
+    ottr:IRI ?container, 
+    ottr:IRI ?containee
+] :: {
+    ottr:Triple(?container, lis:contains, ?containee)
+} . 
+
+tpl:PartOf[
+    ottr:IRI ?part, 
+    ottr:IRI ?whole
+] :: {
+    ottr:Triple(?part, lis:partOf, ?whole)
+} . 
+
+
+
+
+tpl:FunctionalPartOf[
+    ottr:IRI ?subject, 
+    ottr:IRI ?functionalPartOf
+] :: {
+    ottr:Triple(?subject, lis:functionalPartOf, ?functionalPartOf)
+} . 

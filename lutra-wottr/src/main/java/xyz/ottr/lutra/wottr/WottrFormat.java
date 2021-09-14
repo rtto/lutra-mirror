@@ -32,7 +32,7 @@ import xyz.ottr.lutra.system.Result;
 import xyz.ottr.lutra.wottr.io.RDFIO;
 import xyz.ottr.lutra.wottr.parser.WInstanceParser;
 import xyz.ottr.lutra.wottr.parser.WTemplateParser;
-import xyz.ottr.lutra.wottr.writer.WInstanceWriter;
+import xyz.ottr.lutra.wottr.writer.WStreamedInstanceWriter;
 import xyz.ottr.lutra.wottr.writer.WTemplateWriter;
 import xyz.ottr.lutra.writer.InstanceWriter;
 import xyz.ottr.lutra.writer.TemplateWriter;
@@ -73,7 +73,7 @@ public class WottrFormat implements Format {
 
     @Override
     public Result<InstanceWriter> getInstanceWriter() {
-        return Result.of(new WInstanceWriter(this.prefixes));
+        return Result.of(new WStreamedInstanceWriter(this.prefixes));
     }
 
     @Override

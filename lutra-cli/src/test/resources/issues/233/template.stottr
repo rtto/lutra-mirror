@@ -1,0 +1,6 @@
+@prefix ottr: <http://ns.ottr.xyz/0.4/> .
+@prefix ex: <http://example.com/ns#> .
+
+ex:A[ ] :: {
+  cross | ottr:Triple( ++(ex:a1, ex:b1, ex:c1), ex:r1, ++(ex:A1, ex:B1))
+} .

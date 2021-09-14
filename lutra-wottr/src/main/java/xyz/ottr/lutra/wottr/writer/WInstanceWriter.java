@@ -22,21 +22,17 @@ package xyz.ottr.lutra.wottr.writer;
  * #L%
  */
 
-import java.util.List;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
-import org.apache.jena.rdf.model.RDFList;
-import org.apache.jena.rdf.model.RDFNode;
-import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.shared.PrefixMapping;
-import xyz.ottr.lutra.model.Argument;
 import xyz.ottr.lutra.model.Instance;
-import xyz.ottr.lutra.wottr.WOTTR;
+import xyz.ottr.lutra.system.MessageHandler;
 import xyz.ottr.lutra.wottr.io.RDFIO;
 import xyz.ottr.lutra.wottr.util.PrefixMappings;
+import xyz.ottr.lutra.writer.BufferWriter;
 import xyz.ottr.lutra.writer.InstanceWriter;
 
-public class WInstanceWriter implements InstanceWriter {
+public class WInstanceWriter extends BufferWriter implements InstanceWriter {
 
     private final Model model;
 
@@ -54,63 +50,20 @@ public class WInstanceWriter implements InstanceWriter {
         if (WTripleWriter.isTriple(instance)) {
             this.model.add(WTripleWriter.write(this.model, instance));
         } else {
-            createInstanceNode(this.model, instance);
+            WriterUtils.createInstanceNode(this.model, instance);
         }
     }
-
+    
     @Override
-    public String write() {
-        return RDFIO.writeToString(writeToModel());
+    public MessageHandler flush() {
+        MessageHandler msg = new MessageHandler();
+        msg.combine(super.write(RDFIO.writeToString(writeToModel()))); //write model to file
+        msg.combine(super.flush());
+        return msg;
     }
 
     public Model writeToModel() {
         PrefixMappings.trim(this.model);
         return this.model;
-    }
-
-    Resource createInstanceNode(Model model, Instance instance) {
-
-        Resource instanceNode = model.createResource();
-        Resource templateIRI = model.createResource(instance.getIri());
-        model.add(instanceNode, WOTTR.of, templateIRI);
-
-        if (instance.hasListExpander()) {
-            model.add(instanceNode, WOTTR.modifier, WOTTR.listExpanders.getKey(instance.getListExpander()));
-            addArgumentsList(instance.getArguments(), instanceNode, model);
-        } else {
-            addValuesList(instance.getArguments(), instanceNode, model);
-        }
-
-        return instanceNode;
-    }
-
-    private void addValuesList(List<Argument> arguments, Resource instanceNode, Model model) {
-
-        RDFList argsLst = model.createList();
-
-        for (Argument arg : arguments) {
-            RDFNode val = WTermWriter.term(model, arg.getTerm());
-            argsLst = argsLst.with(val);
-        }
-        model.add(instanceNode, WOTTR.values, argsLst);
-
-    }
-
-    private void addArgumentsList(List<Argument> arguments, Resource instanceNode, Model model) {
-
-        RDFList argsLst = model.createList();
-
-        for (Argument arg : arguments) {
-            RDFNode val = WTermWriter.term(model, arg.getTerm());
-
-            Resource argNode = model.createResource();
-            model.add(argNode, WOTTR.value, val);
-
-            if (arg.isListExpander()) {
-                model.add(argNode, WOTTR.modifier, WOTTR.listExpand);
-            }
-            argsLst = argsLst.with(argNode);
-        }
-        model.add(instanceNode, WOTTR.arguments, argsLst);
     }
 }

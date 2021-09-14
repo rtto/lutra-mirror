@@ -1,5 +1,7 @@
 package xyz.ottr.lutra.writer;
 
+
+
 /*-
  * #%L
  * lutra-core
@@ -21,10 +23,11 @@ package xyz.ottr.lutra.writer;
  * <http://www.gnu.org/licenses/lgpl-2.1.html>.
  * #L%
  */
-
+import java.io.PrintStream;
 import java.util.Set;
 import java.util.function.Consumer;
 import xyz.ottr.lutra.model.Instance;
+import xyz.ottr.lutra.system.MessageHandler;
 
 public interface InstanceWriter extends Consumer<Instance> {
 
@@ -37,6 +40,45 @@ public interface InstanceWriter extends Consumer<Instance> {
     default void addInstances(Set<Instance> instances) {
         instances.forEach(this);
     }
+    
+    /**
+     * Initialize Buffered Writer for writing to file, if output is to be written to console, set appropriate flags.
+     *  
+     * @param filePath
+     *      A String containing file path to write to.
+     * @param consoleStream
+     *      A PrintStream used to write output to console
+     * @return
+     *      Returns message handler containing error or warn messages if file creation failed,
+     */
+    MessageHandler init(String filePath, PrintStream consoleStream);
 
-    String write();
+    /**
+     * Write string contents to file or console
+     *  
+     * @param contents
+     *      file contents to write
+     * @return
+     *      Returns message handler
+     */
+    MessageHandler write(String contents);
+
+    /**
+     * Flush contents of BufferedWriter and PrintStream
+     *  
+     * @return
+     *      Returns message handler.
+     */
+    MessageHandler flush();
+
+    /**
+     * Close writer
+     *  
+     * @return
+     *      Returns message handler.
+     */
+    MessageHandler close();
+
+    
+    
 }

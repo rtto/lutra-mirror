@@ -26,6 +26,7 @@ import xyz.ottr.lutra.bottr.model.InstanceMap;
 import xyz.ottr.lutra.bottr.parser.BInstanceMapParser;
 import xyz.ottr.lutra.model.Instance;
 import xyz.ottr.lutra.parser.InstanceParser;
+import xyz.ottr.lutra.system.Result;
 import xyz.ottr.lutra.system.ResultStream;
 import xyz.ottr.lutra.wottr.io.RDFIO;
 
@@ -33,10 +34,20 @@ public class BInstanceReader implements InstanceParser<String> {
 
     @Override
     public ResultStream<Instance> apply(String file) {
+                
+        if (getInstanceStream(file).getStream().count() == 0) {
+            return ResultStream.of(Result.error("Error reading BOTTR file: '" + file + "'"));
+        } else {
+            return getInstanceStream(file);
+        }
+            
+    }
+    
+    private ResultStream<Instance> getInstanceStream(String file) {
         return ResultStream.innerOf(file)
-            .innerFlatMap(RDFIO.fileReader())
-            .innerFlatMap(new BInstanceMapParser(file))
-            .innerFlatMap(InstanceMap::get);
+                .innerFlatMap(RDFIO.fileReader())
+                .innerFlatMap(new BInstanceMapParser(file))
+                .innerFlatMap(InstanceMap::get);
     }
 
 }

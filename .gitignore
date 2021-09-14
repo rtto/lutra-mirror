@@ -97,33 +97,31 @@ Desktop.ini
 *.xml#
 
 
+
+*/.factorypath
+settings.xml
+
 ###
 ### Lutra specifics
 ###
 
+lutra-api/src/main/resources/tpl-library/
+lutra-cli/dependency-reduced-pom.xml
+lutra-cli/src/test/resources/docttr/
+lutra-cli/src/test/resources/issues/233/output.ttl
+lutra-cli/src/test/resources/issues/233/outputWithoutTemplate.ttl
+lutra-cli/src/test/resources/issues/235/output
+lutra-cli/src/test/resources/issues/235/output.ttl
+lutra-cli/src/test/resources/issues/298/ottr-doc/
+lutra-cli/src/test/resources/primer/
 lutra-core/src/main/resources/puntypes\.owl\.ttl
 lutra-core/src/main/resources/types\.owl\.ttl
+lutra-docttr/src/test/resources/.output/
+lutra-stottr/src/main/antlr4/imports/Turtle\.g4
+lutra-stottr/src/main/antlr4/stOTTR\.g4
 lutra-wottr/src/test/resources/spec/core-grammar\.shacl\.ttl
 lutra-wottr/src/test/resources/spec/core-vocabulary\.owl\.ttl
-
 lutra-wottr/src/test/resources/spec/examples/*\.ttl
 lutra-wottr/src/test/resources/spec/tests/correct/*\.ttl
 lutra-wottr/src/test/resources/spec/tests/incorrect/*\.ttl
 
-lutra-stottr/src/main/antlr4/stOTTR\.g4
-
-lutra-stottr/src/main/antlr4/imports/Turtle\.g4
-
-lutra-cli/src/test/resources/primer/
-
-lutra-api/src/main/resources/tpl-library/
-
-lutra-cli/dependency-reduced-pom.xml
-
-lutra-docttr/src/test/resources/.output/
-
-lutra-cli/src/test/resources/issues/235/output.ttl
-
-settings.xml
-
-lutra-cli/src/test/resources/docttr/

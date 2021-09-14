@@ -3,14 +3,13 @@ issue tracker. Please check first that the issue does not already exist.
 See also http://ottr.xyz/#Contact for more options.
 
 If you want to contribute to the project by coding or writing documentation, 
-please send a pull request
-submitted to the `develop` branch
-or suitable feature branch (`feature/*`) where you explain what your PR is
-about and, preferably, linking to an issue you want to address. It is
-always a good idea to create an issue first where you can check if the
-issue is real and your possible solution proposal is likely to be
-accepted if implemented. The pull request will be reviewed by project
-maintainers. 
+please fork the project and submit your contributions via merge requests (MR) to
+the `develop` branch
+or suitable feature branch (`feature/*`) where you explain what your MR is about.  
+If no suitable feature branch exist, you can ask for one to be created.
+In the description of the MR, please link to the issue(s) your contribution addresses. If no issue exists, it can be a good idea to create an issue first
+in order to start a discussion with other developers about if and how the issue should be solved.
+The MR will be reviewed by the project's maintainers.
 
 Please document your code using common documentation practice and
 javadoc, and test your code with unit tests.

@@ -48,26 +48,22 @@ class SerialisationWriter {
 
     String writeStottr(Signature signature) {
         var writer = new STemplateWriter(this.prefixMapping);
-        writer.accept(signature);
         return writer.writeSignature(signature, false);
     }
 
     String writeStottr(Instance instance) {
         var writer = new SInstanceWriter(this.prefixMapping);
-        writer.accept(instance);
         return writer.writeInstance(instance);
     }
 
     String writeStottrPattern(Signature signature) {
         var writer = new STemplatePatternWriter(this.prefixMapping);
-        writer.accept(signature);
         return writer.writeSignature(signature, false);
     }
 
     String writeWottr(Signature signature) {
         var writer = new WTemplateWriter(this.prefixMapping);
-        writer.accept(signature);
-        return removePrefixes(writer.write(signature.getIri()));
+        return removePrefixes(writer.buildStringRep(signature));
     }
 
     Model writeWottrModel(Instance instance) {

@@ -1,0 +1,191 @@
+@prefix ottt: 	<https://spec.ottr.xyz/rottr/0/> .
+@prefix ottr:   <http://ns.ottr.xyz/0.4/> . 
+@prefix xsd: 	<http://www.w3.org/2001/XMLSchema#> .
+@prefix rdf: 	<http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: 	<http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: 	<http://www.w3.org/2002/07/owl#> .
+@prefix ex: 	<http://example.net/ns#> .
+@prefix trdf:   <http://tpl.ottr.xyz/rdf/0.1/> .
+@prefix towl:   <http://tpl.ottr.xyz/owl/axiom/0.1/> .
+@prefix trdfs:  <http://tpl.ottr.xyz/rdfs/0.1/> . 
+@prefix ex:     <http://local/example/> .
+@prefix skos:   <http://www.w3.org/2004/02/skos/core#> .
+@prefix uc1:    <https://w3id.org/ddb/ddb-use-case1/> .
+@prefix rdy:    <http://w3id.org/readi/rdl/> .
+@prefix lis:    <http://standards.iso.org/iso/15926/part14/> .
+@prefix om2:    <http://www.ontology-of-units-of-measure.org/resource/om-2/> .  
+@prefix om2-ddb: <https://w3id.org/ddb/om-2-ddb/> .
+@prefix tpl:    <https://w3id.org/ddb/template/> .
+@prefix ddbc:   <https://w3id.org/ddb/ddb_core/> .
+
+
+tpl:FunctionalObject[
+    ! ottr:IRI ?subject, 
+    ! xsd:string ?label, 
+    ! owl:Class ?type,
+    ?! List<ottr:IRI> ?functionalPartOf, 
+    ? xsd:string ?designation 
+] :: {    
+    cross | tpl:FunctionalPartOf(?subject, ++?functionalPartOf), 
+    tpl:NamedIndividual(?subject, ?type, ?label, none), 
+    ottr:Triple(?subject, skos:altLabel, ?designation)
+
+} .
+
+tpl:ConnectionPoint[    
+    ! ottr:IRI ?subject, 
+    ?! owl:Class ?type, 
+    ! ottr:IRI ?endOne, 
+    ! ottr:IRI ?endTwo
+] :: {
+    tpl:NamedIndividual(?subject, ?type, none, none), 
+    trdf:Type(?subject, ddbc:ConnectionPoint),     
+    tpl:FunctionallyConnectedTo(?endOne, ?subject), 
+    tpl:FunctionallyConnectedTo(?subject, ?endTwo)
+} . 
+
+tpl:Feature[
+    ! ottr:IRI ?subject,     
+    ! xsd:string ?label, 
+    ! owl:Class ?type, 
+    ! ottr:IRI ?featureOf
+] :: {
+    tpl:NamedIndividual(?subject, ?type, ?label, none), 
+    tpl:hasFeature(?featureOf, ?subject) 
+} . 
+
+
+tpl:ProductionProfileProdMat[
+    ottr:IRI ?prodProfile, 
+    ? owl:Class ?profileType, 
+    ? xsd:string ?profileLabel, 
+    ottr:IRI ?prodMatUri, 
+    owl:Class ?prodMatType, 
+    ! xsd:double ?amntMatter
+] :: {
+    tpl:NamedIndividual(?prodProfile, ?profileType, ?profileLabel, none), 
+    tpl:ProductionProfileProduces(?prodProfile, ?prodMatUri, ?prodMatType, ?amntMatter)
+} . 
+
+tpl:ProductionProfileProduces[
+    ottr:IRI ?prodProfile, 
+    ottr:IRI ?prodMatUri,
+    owl:Class ?prodMatType, 
+    ! xsd:double ?amntMatter
+] :: {
+    ottr:Triple(?prodProfile, ddbc:produces, ?prodMatUri), 
+    trdf:Type(?prodMatUri, ?prodMatType), 
+    tpl:OmProperty(?prodMatUri, om2:VolumetricFlowRate, om2-ddb:standardCubicMetrePerDay, ?amntMatter)
+} . 
+
+tpl:OmProperty[
+    ottr:IRI ?phenom,
+    ! ottr:IRI ?quantity, 
+    ! ottr:IRI ?unit,
+    ! xsd:Number ?value
+] :: {
+    ottr:Triple( ?phenom, ddbc:hasQuality, _:quantity),
+    ottr:Triple(_:quantity, om2:hasValue, _:value),
+  
+    trdf:Type(_:quantity, ?quantity), 
+    trdf:Type(_:value, om2:Measure), 
+ 
+    ottr:Triple(_:value, om2:hasUnit, ?unit),
+    ottr:Triple(_:value, om2:hasNumericalValue, ?value)
+} . 
+
+# Coordinates 
+tpl:ObjectLocation[
+    ottr:IRI ?object, 
+    xsd:double ?latitude, 
+    xsd:double ?longitude
+] :: {
+    trdf:Type(_:point, ddbc:CoordinatePoint), 
+    ottr:Triple(?object, ddbc:locatedAt, _:point), 
+    ottr:Triple(_:point, ddbc:latitude, ?latitude), 
+    ottr:Triple(_:point, ddbc:longitude, ?longitude)
+} . 
+
+# Deprecated
+tpl:StreamContainer[
+    ottr:IRI ?stream, 
+    ottr:IRI ?container,
+    ? ottr:IRI ?wholeStream
+] :: {
+    trdf:Type(?stream, lis:Stream),
+    ottr:Triple(?stream, rdy:D101001095, ?container),
+    tpl:PartOf(?stream, ?wholeStream) 
+} . 
+
+tpl:ProcessPoint[
+    ottr:IRI ?processPoint, 
+    ottr:IRI ?feature     
+] :: {
+    trdf:Type(?processPoint, ddbc:ProcessPoint),
+    ottr:Triple(?processPoint, ddbc:locatedAt, ?feature)
+} .
+
+tpl:ProcessPointProperty[
+    ! ottr:IRI ?processPoint,
+    ! ottr:IRI ?feature,    
+    ! ottr:IRI ?property,
+    ! ottr:IRI ?unit,
+    ! xsd:double ?value
+] :: {
+    # The stream part is contained in the feature
+    tpl:ProcessPoint(?processPoint, ?feature),        
+    tpl:OmProperty(?processPoint, ?property, ?unit, ?value)
+} . 
+
+# Deprecated
+tpl:StreamProperty[
+    ! ottr:IRI ?stream,
+    ! ottr:IRI ?feature,
+      ottr:IRI ?wholeStream,
+    ! ottr:IRI ?property,
+    ! ottr:IRI ?unit,
+    ! xsd:double ?value
+] :: {
+    # The stream part is contained in the feature
+    tpl:StreamContainer(?stream, ?feature, ?wholeStream),        
+    tpl:OmProperty(?stream, ?property, ?unit, ?value)
+} . 
+
+
+tpl:NamedIndividual[
+    ottr:IRI ?subject,
+    owl:Class ?type,
+    ? xsd:string ?label, #Type and label should switch places    
+    ? xsd:string ?comment    
+] :: {
+    trdf:Type(?subject, ?type ) ,
+    trdf:Type(?subject, owl:NamedIndividual), 
+    tpl:LabelComment(?subject, ?label, ?comment)     
+} .
+
+# Subject has an rdfs:label and an rdfs:comment
+# Either can be omitted
+tpl:LabelComment[
+    ottr:IRI ?subject,
+    ? xsd:string ?label,
+    ? xsd:string ?comment
+] :: {
+    ottr:Triple(?subject, rdfs:label, ?label),
+    ottr:Triple(?subject, rdfs:comment, ?comment)
+} .
+
+
+tpl:FunctionallyConnectedTo[
+    ottr:IRI ?subject, 
+    ottr:IRI ?connectedTo
+] :: {
+    ottr:Triple(?subject, ddbc:functionallyConnectedTo, ?connectedTo) 
+} .
+
+tpl:OntologyDeclaration[
+    ottr:IRI ?ontology,
+    ? ottr:IRI ?import
+] :: {
+    trdf:Type(?ontology, owl:Ontology),
+    ottr:Triple(?ontology, owl:imports, ?import) 
+} . 

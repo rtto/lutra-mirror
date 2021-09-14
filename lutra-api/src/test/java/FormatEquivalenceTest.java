@@ -24,6 +24,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assume.assumeTrue;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
@@ -31,6 +32,8 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
+import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -39,6 +42,7 @@ import xyz.ottr.lutra.api.StandardFormat;
 import xyz.ottr.lutra.api.StandardTemplateManager;
 import xyz.ottr.lutra.io.Format;
 import xyz.ottr.lutra.model.Signature;
+import xyz.ottr.lutra.system.Message;
 import xyz.ottr.lutra.system.Result;
 
 @RunWith(Parameterized.class)
@@ -83,28 +87,45 @@ public class FormatEquivalenceTest {
     }
 
     @Test
-    public void test() throws IOException {
+    public void test() throws Exception {
 
         assumeTrue(this.format.supportsTemplateReader());
         assumeTrue(this.format.supportsTemplateWriter());
-
-        // write signature to string
+       
         var writer = this.format.getTemplateWriter().get();
-        writer.accept(this.signature);
-        String coreString = writer.write(this.signature.getIri());
-
-        // write string to file
-        Path file = Files.createTempFile("template", this.format.getDefaultFileSuffix());
-        Files.write(file, coreString.getBytes(Charset.forName("UTF-8")));
-
+        String folderPath = "src/test/resources/FormatEquivalanceTest/";
+                
+        BiFunction<String, String, Optional<Message>> writerFunc = (iri, str) -> {
+            return xyz.ottr.lutra.io.Files
+                    .writeTemplatesTo(iri, str, folderPath, this.format.getDefaultFileSuffix());
+        };
+        
+        writer.setWriterFunction(writerFunc);
+        writer.accept(this.signature); //write file
+        
         // read file
+        String iriFilePath = xyz.ottr.lutra.io.Files.iriToPath(this.signature.getIri()) + "" + this.format.getDefaultFileSuffix();
+        String absFilePath = Path.of(folderPath + iriFilePath).toAbsolutePath().toString();
+        
         var reader = this.format.getTemplateReader().get();
-        var ioSignatures = reader.apply(file.toAbsolutePath().toString())
+        var ioSignatures = reader.apply(absFilePath)
             .getStream()
             .collect(Collectors.toList());
-
+                
         assertThat(ioSignatures.size(), is(1));
         assertThat(ioSignatures.get(0).get(), is(this.signature));
+        
+        deleteDirectory(new File(folderPath));
 
+    }
+    
+    private void deleteDirectory(File directoryToBeDeleted) {
+        File[] allContents = directoryToBeDeleted.listFiles();
+        if (allContents != null) {
+            for (File file : allContents) {
+                deleteDirectory(file);
+            }
+        }
+        directoryToBeDeleted.delete();
     }
 }
