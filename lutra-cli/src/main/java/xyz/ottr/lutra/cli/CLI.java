@@ -130,20 +130,21 @@ public class CLI {
         this.templateManager.setIgnoreExtensions(this.settings.ignoreExtensions);
     }
 
-    private void initLibrary() {
+    private boolean initLibrary() {
 
         if (initStandardLibrary().isGreaterEqualThan(this.settings.haltOn)) {
-            return;
+            return false;
         }
         if (parseLibrary().isGreaterEqualThan(this.settings.haltOn)) {
-            return;
+            return false;
         }
         if (parsePrefixes().isGreaterEqualThan(this.settings.haltOn)) {
-            return;
+            return false;
         }
         if (checkLibrary().isGreaterEqualThan(this.settings.haltOn)) {
-            return;
+            return false;
         }
+        return true;
     }
 
     private void execute() {
@@ -154,7 +155,9 @@ public class CLI {
             executeCheckSyntax();
         } else {
 
-            initLibrary();
+            if (!initLibrary()) {
+                return;
+            }
 
             switch (this.settings.mode) {
                 case expand:
