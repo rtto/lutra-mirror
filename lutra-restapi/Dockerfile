@@ -3,6 +3,8 @@ From tomcat:9-jdk11-openjdk-slim
 
 LABEL maintainer="m.g.skjaeveland@gmail.com"
 
+RUN chmod -R 777 /usr/local/tomcat/webapps
+
 ADD target/lutra.war /usr/local/tomcat/webapps/
 
 
