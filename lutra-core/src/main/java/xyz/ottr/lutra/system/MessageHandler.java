@@ -147,13 +147,12 @@ public class MessageHandler {
      */
     public Message.Severity printMessages() {
         var severity = visitMessagesAndTraces(this::printMessage, this::printLocation);
-        this.printedMsgs.clear();
         return severity;
     }
 
 
     public void printMessage(Message msg) {
-        if (!this.quiet || this.printedMsgs.contains(msg.toString())) {
+        if (!this.quiet && !this.printedMsgs.contains(msg.toString())) {
             this.printStream.println("\n" + msg);
             this.printedMsgs.add(msg.toString());
         }
