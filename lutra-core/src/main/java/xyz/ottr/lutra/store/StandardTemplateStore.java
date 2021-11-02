@@ -294,8 +294,12 @@ public class StandardTemplateStore implements TemplateStore {
                 } else {
                     messages.accept(formatManager.attemptAllFormats(reader -> reader.populateTemplateStore(this, toFetch)));
                 }
-                if (!containsTemplate(toFetch)) { // Check if fetched and added to store
+
+                if (containsTemplate(toFetch)) { // Check if fetched and added to store
+                    messages.accept(Result.info("Fetched template " + toFetch));
+                } else {
                     failed.add(toFetch);
+                    messages.accept(Result.warning("Failed fetch for template " + toFetch));
                 }
             }
             missing = getMissingDependencies();
