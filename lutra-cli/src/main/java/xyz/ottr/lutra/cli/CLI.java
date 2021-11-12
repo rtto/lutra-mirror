@@ -239,14 +239,10 @@ public class CLI {
     /// Parsing and writing                                  ///
     ////////////////////////////////////////////////////////////
 
-    // TODO this is a hack to make sure that messages are written to this.outStream. Should refactor MessageHandler.
     private Message.Severity printMessages(MessageHandler handler) {
-        var temp = new MessageHandler(this.outStream);
-        temp.combine(handler); // Use this.messageHandler's settings
-        this.messageHandler.combine(handler); //add messages to CLI message handler, used in tests
-        return temp.printMessages();
+        this.messageHandler.combine(handler);
+        return this.messageHandler.printMessages();
     }
-
 
     private Message.Severity initStandardLibrary() {
         // Load standard library
