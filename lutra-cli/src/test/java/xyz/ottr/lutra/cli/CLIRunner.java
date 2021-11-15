@@ -26,8 +26,12 @@ public enum CLIRunner {
 
     ; // util enum
 
-    public static void run(String args) {
-        CLI.main(args.trim().split("\\s+"));
+    public static int run(String args) {
+        return run(args.trim().split("\\s+"));
+    }
+
+    public static int run(String[] args) {
+        return new CLI().executeArgs(args);
     }
 }
 

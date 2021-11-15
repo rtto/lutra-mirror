@@ -64,29 +64,52 @@ public class CLI {
         this(System.out, System.err);
     }
 
+    /**
+     * <b>NB!</b> This method uses System.exit to return an exit code. System.exit terminates the JVM, therefore
+     * this method should <b>only be used for scripting execution, and not for application servers or unit tests</b>;
+     * use instead {@link #executeArgs(String[])}.
+     */
     public static void main(String[] args) {
-        new CLI().run(args);
+        int exitCode = new CLI().executeArgs(args);
+        System.exit(exitCode);
     }
 
-    public void run(String[] args) {
+    public int executeArgs(String[] args) {
 
         CommandLine cli = new CommandLine(this.settings);
         try {
-            cli.parse(args);
+            cli.parseArgs(args);
         } catch (ParameterException ex) {
             Message err = Message.error(ex.getMessage());
             this.messageHandler.printMessage(err);
-            return;
+            return cli.getCommandSpec().exitCodeOnInvalidInput();
         }
 
         this.messageHandler.setQuiet(this.settings.quiet);
 
         if (cli.isUsageHelpRequested()) {
             cli.usage(this.outStream);
-        } else if (cli.isVersionHelpRequested()) {
+            return cli.getCommandSpec().exitCodeOnUsageHelp();
+        }
+        if (cli.isVersionHelpRequested()) {
             cli.printVersionHelp(this.outStream);
-        } else if (checkOptions()) {
+            return cli.getCommandSpec().exitCodeOnVersionHelp();
+        }
+        if (!checkOptionsValid()) {
+            return cli.getCommandSpec().exitCodeOnInvalidInput();
+        }
+
+        try {
             execute();
+            if (messageHandler.getMostSevere().isGreaterThan(Message.Severity.WARNING)) {
+                // with messages of severity error or higher we return with an error return code
+                return cli.getCommandSpec().exitCodeOnExecutionException();
+            }
+            return cli.getCommandSpec().exitCodeOnSuccess();
+        } catch (Exception e) {
+            Message err = Message.error(e.getMessage());
+            this.messageHandler.printMessage(err);
+            return cli.getCommandSpec().exitCodeOnExecutionException();
         }
     }
 
@@ -94,7 +117,7 @@ public class CLI {
      * Checks that the provided options form a meaningful execution,
      * otherwise prints an error message.
      */
-    private boolean checkOptions() {
+    private boolean checkOptionsValid() {
 
         if (this.settings.inputs.isEmpty()
             && (this.settings.mode == Settings.Mode.expand
