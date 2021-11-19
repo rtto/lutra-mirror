@@ -45,7 +45,9 @@ import xyz.ottr.lutra.api.StandardFormat;
 import xyz.ottr.lutra.io.InstanceReader;
 import xyz.ottr.lutra.io.TemplateReader;
 import xyz.ottr.lutra.model.Instance;
+import xyz.ottr.lutra.store.Expander;
 import xyz.ottr.lutra.store.TemplateStore;
+import xyz.ottr.lutra.store.expansion.CheckingExpander;
 import xyz.ottr.lutra.stottr.io.SFileReader;
 import xyz.ottr.lutra.stottr.parser.SInstanceParser;
 import xyz.ottr.lutra.stottr.parser.STemplateParser;
@@ -94,7 +96,8 @@ public class PottrTest {
     }
 
 
-    @Test public void test() {
+    @Test
+    public void test() {
         runExpand(this.instancePath, this.templatePath, this.expectedResults);
     }
 
@@ -123,7 +126,7 @@ public class PottrTest {
             ? o -> Is.is(o)
             : o -> Is.is(IsNot.not(o));
 
-        Assert.assertThat(messages, matcher.apply(Collections.emptyList()));
+        Assert.assertThat("On " + pathTemplates + " and " + fileInstance, messages, matcher.apply(Collections.emptyList()));
     }
 
     private TemplateStore getStore() {
@@ -149,9 +152,10 @@ public class PottrTest {
 
     private List<Message> testInstances(TemplateStore store, String file) {
         InstanceReader insReader = new InstanceReader(new SFileReader(), new SInstanceParser());
+        Expander expander = new CheckingExpander(store);
         ResultStream<Instance> expandedInInstances = insReader
             .apply(resolve(file))
-            .innerFlatMap(store::expandInstanceFetch);
+            .innerFlatMap(expander::expandInstanceFetch);
 
         // Write expanded instances to model
         String filePath = "src/test/resources/temp_pottrTests";

@@ -136,4 +136,18 @@ public class Signature implements ModelElement {
         }
     }
 
+    public boolean isOptional(int index) {
+        return Objects.nonNull(this.parameters)
+                && this.parameters.get(index).isOptional();
+    }
+
+    public boolean isOptional(Term parameterTerm) {
+        return Objects.nonNull(this.parameters)
+                && this.parameters.stream()
+                .filter(p -> p.getTerm().equals(parameterTerm))
+                .findFirst()
+                .get()
+                .isOptional();
+    }
+
 }

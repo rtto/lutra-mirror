@@ -1,4 +1,4 @@
-package xyz.ottr.lutra.store;
+package xyz.ottr.lutra.store.expansion;
 
 /*-
  * #%L
@@ -36,20 +36,22 @@ import xyz.ottr.lutra.model.Template;
 import xyz.ottr.lutra.model.terms.BlankNodeTerm;
 import xyz.ottr.lutra.model.terms.Term;
 import xyz.ottr.lutra.model.types.TypeRegistry;
-import xyz.ottr.lutra.store.graph.DependencyGraph;
+import xyz.ottr.lutra.store.Expander;
+import xyz.ottr.lutra.store.StandardTemplateStore;
 import xyz.ottr.lutra.system.Assertions;
 import xyz.ottr.lutra.system.ResultConsumer;
 
 public class ExpandForDocumentationTest {
 
     private void expandAndCheck(Signature toExpand, Set<Signature> templates, int shouldHaveSize) {
-        
-        DependencyGraph graph = new DependencyGraph(null);
-        templates.forEach(graph);
+
+        StandardTemplateStore store = new StandardTemplateStore(null);
+        templates.forEach(store);
 
         Set<Instance> expanded = new HashSet<>();
         ResultConsumer<Instance> consumer = new ResultConsumer<>(expanded::add);
-        graph.expandInstanceWithoutChecks(toExpand.getExampleInstance())
+        Expander expander = new NonCheckingExpander(store); 
+        expander.expandInstance(toExpand.getExampleInstance())
             .forEach(consumer);
 
         Assertions.noErrors(consumer);

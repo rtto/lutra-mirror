@@ -1,4 +1,4 @@
-package xyz.ottr.lutra.store;
+package xyz.ottr.lutra.store.checks;
 
 /*-
  * #%L

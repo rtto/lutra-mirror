@@ -109,7 +109,7 @@ public interface Format {
      * this Format does not support any writing operations
      * this method should do nothing.
      * 
-     * OBS: The TemplateManager assumes that the Format keeps
+     * OBS: The StandardTemplateStore assumes that the Format keeps
      * the reference to the argument, and does not make a copy
      * of the PrefixMapping, as more prefixes might be added to
      * the map at a later stage.

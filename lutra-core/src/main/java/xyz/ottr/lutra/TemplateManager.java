@@ -40,8 +40,10 @@ import xyz.ottr.lutra.io.FormatManager;
 import xyz.ottr.lutra.io.InstanceReader;
 import xyz.ottr.lutra.io.TemplateReader;
 import xyz.ottr.lutra.model.Instance;
+import xyz.ottr.lutra.store.Expander;
+import xyz.ottr.lutra.store.StandardTemplateStore;
 import xyz.ottr.lutra.store.TemplateStore;
-import xyz.ottr.lutra.store.graph.DependencyGraph;
+import xyz.ottr.lutra.store.expansion.CheckingExpander;
 import xyz.ottr.lutra.system.Message;
 import xyz.ottr.lutra.system.MessageHandler;
 import xyz.ottr.lutra.system.Result;
@@ -73,7 +75,7 @@ public class TemplateManager {
     }
     
     /**
-     * Creates a new TemplateManager using the argument TemplateStore
+     * Creates a new StandardTemplateStore using the argument TemplateStore
      * for all Template related operations. This's FormatManager will
      * be gotten from the argument TemplateStore.
      * 
@@ -85,7 +87,7 @@ public class TemplateManager {
     }
     
     /**
-     * Creates a new TemplateManager using the argument FormatManager
+     * Creates a new StandardTemplateStore using the argument FormatManager
      * to retrieve Formats. A new TemplateStore used for all Template operations
      * will be created using the argument FormatManager.
      * 
@@ -97,7 +99,7 @@ public class TemplateManager {
     }
     
     /**
-     * Creates a new TemplateManager creating a new FormatManager
+     * Creates a new StandardTemplateStore creating a new FormatManager
      * to retrieve Formats. A new TemplateStore used for all Template operations
      * will be created using that FormatManager.
      */
@@ -134,7 +136,7 @@ public class TemplateManager {
     public void setFetchMissingDependencies(boolean enable) {
         this.settings.fetchMissingDependencies = enable;
     }
-    
+
     /**
      * Halt on messages with a severity equal to or below the argument.
      */
@@ -215,7 +217,7 @@ public class TemplateManager {
      * @see OTTR.BaseTemplate
      */
     public static TemplateStore makeDefaultStore(FormatManager formatManager) {
-        TemplateStore store = new DependencyGraph(formatManager);
+        TemplateStore store = new StandardTemplateStore(formatManager);
         store.addOTTRBaseTemplates();
         return store;
     }
@@ -379,24 +381,26 @@ public class TemplateManager {
      *      this' TemplateStore.
      */
     public Function<Instance, ResultStream<Instance>> makeExpander() {
+        Expander expander = new CheckingExpander(templateStore);
         if (this.settings.fetchMissingDependencies) {
-            return this.templateStore::expandInstanceFetch;
+            return expander::expandInstanceFetch;
         } else {
-            return this.templateStore::expandInstance;
+            return expander::expandInstance;
         }
     }
     
     /**
-     * Creates a new TemplateManager equivalent to this, but with this' TemplateStore expanded.
+     * Creates a new StandardTemplateStore equivalent to this, but with this' TemplateStore expanded.
      * 
      * @return
-     *      A Result containing an equivalent TemplateManager to this, except that
+     *      A Result containing an equivalent StandardTemplateStore to this, except that
      *      with an expanded TemplateStore. This Result might be empty and contain
      *      errors or other Messages if something went wrong during expansion (e.g.
      *      missing definitions).
      */
     public Result<TemplateManager> expandStore() {
-        return this.templateStore.expandAll().map(expanded ->
+        Expander expander = new CheckingExpander(templateStore);
+        return expander.expandAll().map(expanded ->
             new TemplateManager(this.settings, this.prefixes, this.formatManager, expanded)
         );
     }
@@ -417,7 +421,7 @@ public class TemplateManager {
      * Writes the each of the Instances in the argument ResultStream to file.
      * All Messages produced by these function applications is then gathered
      * into the returned MessageHandler.
-     *      * 
+     *      *
      * @param instances
      *      A ResultStream of Instances to write to String.
      * @param format
@@ -469,13 +473,13 @@ public class TemplateManager {
             return msgs;
         }
         writerRes.get().setWriterFunction(stringConsumer);
-        msgs.combine(writeObjects(this.templateStore.getAllTemplateObjects(), writerRes));
+        msgs.combine(writeObjects(this.templateStore.getAllSignatures(), writerRes));
         msgs.combine(writerRes.get().getMessages());
         return msgs;
     }
-    
+
     private <T, W extends Consumer<T>> MessageHandler writeObjects(ResultStream<T> objects,
-            Result<W> writerRes) { 
+            Result<W> writerRes) {
 
         MessageHandler msgs = writerRes.getMessageHandler();
 
@@ -484,7 +488,7 @@ public class TemplateManager {
             objects.forEach(consumer);
             msgs.combine(consumer.getMessageHandler());
         });
-        
+
         return msgs;
     }
 
