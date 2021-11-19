@@ -135,7 +135,7 @@ public class HTMLTemplateWriter {
                     writeParameters(signature),
                     writePattern(signature, expansionTree),
                     writeDependencies(signature),
-                    iff(signature instanceof Template, writeMetrics(expansionTree)),
+                    signature instanceof Template ? writeMetrics(expansionTree) : null,
                     writeSerialisations(signature),
 
                     getTOCHeading("Prefixes"),
@@ -308,19 +308,19 @@ public class HTMLTemplateWriter {
 
         return div(
             getTOCHeading("Dependencies"),
-            iffElse(signature instanceof Template, join(
-                h4("Dependency graph"),
-                HTMLFactory.getInfoP("The graph shows all the templates that this template depends on. "
-                    + "The colour of the node indicates its namespace. "
-                    + "Each node is linked to its documentation page."),
-                this.dependencyGraphVisualiser.drawTree(tree),
-                h4("List of dependencies"),
-                HTMLFactory.getInfoP("The number in parenthesis is the number of instances of each template."),
-                writeDependenciesList(tree)
-                ),
-                p("The resource is a " + signature.getClass().getSimpleName()
-                    + " and depends on no other templates.")
-            ),
+            signature instanceof Template
+                ? join(
+                    h4("Dependency graph"),
+                    HTMLFactory.getInfoP("The graph shows all the templates that this template depends on. "
+                        + "The colour of the node indicates its namespace. "
+                        + "Each node is linked to its documentation page."),
+                    this.dependencyGraphVisualiser.drawTree(tree),
+                    h4("List of dependencies"),
+                    HTMLFactory.getInfoP("The number in parenthesis is the number of instances of each template."),
+                    writeDependenciesList(tree)
+                    )
+                : p("The resource is a " + signature.getClass().getSimpleName()
+                    + " and depends on no other templates."),
             h4("Depending templates"),
             HTMLFactory.getInfoP("The templates in this library that depend on this template."),
             writeDependingTemplates(signature)
