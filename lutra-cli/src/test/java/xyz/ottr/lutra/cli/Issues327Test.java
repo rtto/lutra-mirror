@@ -23,8 +23,8 @@ package xyz.ottr.lutra.cli;
  */
 
 import static junit.framework.TestCase.assertTrue;
+import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
@@ -51,7 +51,7 @@ public class Issues327Test {
     @Test
     public void testOutTTLConsole() {
         // Safe-keep System.out
-        PrintStream oldOut = System.out;
+        final PrintStream oldOut = System.out;
 
         // Create stream to capture System.out:
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
