@@ -329,6 +329,9 @@
 
                         <!-- CLI uses System.out: -->
                         <exclude>**/xyz/ottr/lutra/cli/CLI.class</exclude>
+
+                        <!-- Issue327 uses System.out: -->
+                        <exclude>**/xyz/ottr/lutra/cli/Issues327Test.class</exclude>
                     </excludes>
                 </configuration>
                 <executions>

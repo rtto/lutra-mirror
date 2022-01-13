@@ -29,6 +29,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.io.StringReader;
+import java.nio.charset.StandardCharsets;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.riot.Lang;
@@ -51,22 +52,22 @@ public class Issues327Test {
     @Test
     public void testOutTTLConsole() {
         // Safe-keep System.out
-        final PrintStream oldOut = System.out;
+        final PrintStream stdOut = System.out;
 
         // Create stream to capture System.out:
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        PrintStream ps = new PrintStream(baos);
+        PrintStream ps = new PrintStream(baos, true, StandardCharsets.UTF_8);
         System.setOut(ps);
 
         CLIRunner.run("--mode expand --inputFormat stottr --fetchMissing " + input);
 
         // Restore old out
-        System.out.flush();
-        System.setOut(oldOut);
+        stdOut.flush();
+        System.setOut(stdOut);
 
         // parse captured console output to model
         Model actual = ModelFactory.createDefaultModel();
-        RDFDataMgr.read(actual, new StringReader(baos.toString()), "", Lang.TURTLE);
+        RDFDataMgr.read(actual, new StringReader(baos.toString(StandardCharsets.UTF_8)), "", Lang.TURTLE);
 
         Model expected = RDFDataMgr.loadModel(expectedOutputTTL);
 
