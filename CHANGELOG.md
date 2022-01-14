@@ -5,6 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+
+## 0.6.12 - 2022.01.14
+
+### Added
+
+ - Redesign of internal template store: #308, #319
+
+### Bug fixes
+
+ - #328: log4j security updates
+ - #327: incomplete expansion when output to console
+ - #302: Bump to Jena v4
+ - Logging: #216, #152, #314
+ - #298: Docttr sometimes fails on blank nodes
+
 ## 0.6.11
 
 ### Added
