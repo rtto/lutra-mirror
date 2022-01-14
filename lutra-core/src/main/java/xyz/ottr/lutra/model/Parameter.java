@@ -64,6 +64,10 @@ public class Parameter implements ModelElement, HasGetTerm {
         return Objects.nonNull(this.defaultValue);
     }
 
+    public Type getType() {
+        return term.getType();
+    }
+
     @Override
     public String toString() {
         return toString(OTTR.getDefaultPrefixes());

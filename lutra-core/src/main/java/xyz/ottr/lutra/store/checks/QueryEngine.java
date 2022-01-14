@@ -1,4 +1,4 @@
-package xyz.ottr.lutra.store;
+package xyz.ottr.lutra.store.checks;
 
 /*-
  * #%L
@@ -36,6 +36,7 @@ import org.apache.commons.math3.util.CombinatoricsUtils;
 import xyz.ottr.lutra.model.HasApplySubstitution;
 import xyz.ottr.lutra.model.Substitution;
 import xyz.ottr.lutra.model.types.Type;
+import xyz.ottr.lutra.store.TemplateStore;
 
 public abstract class QueryEngine<S extends TemplateStore> {
 

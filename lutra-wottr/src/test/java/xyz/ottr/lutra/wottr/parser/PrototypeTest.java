@@ -1,8 +1,5 @@
 package xyz.ottr.lutra.wottr.parser;
 
-
-
-
 /*-
  * #%L
  * lutra-wottr
@@ -34,7 +31,8 @@ import org.junit.Test;
 import xyz.ottr.lutra.io.Files;
 import xyz.ottr.lutra.io.TemplateReader;
 import xyz.ottr.lutra.model.Template;
-import xyz.ottr.lutra.store.graph.DependencyGraph;
+import xyz.ottr.lutra.store.StandardTemplateStore;
+import xyz.ottr.lutra.store.TemplateStore;
 import xyz.ottr.lutra.system.Message;
 import xyz.ottr.lutra.system.ResultConsumer;
 import xyz.ottr.lutra.wottr.io.RDFIO;
@@ -46,7 +44,7 @@ public class PrototypeTest {
     private static final String inFolder = "src/test/resources/correct/";
     //private static final String inFolder = "src/test/resources/correct/definitions/cluster/pizza-alt/";
     //private static final String inFolder = "/home/leifhka/gits/aibel-templates_altered/tpl/etl/book/";
-    private static DependencyGraph graph;
+    private static TemplateStore graph;
     private static TemplateReader templateReader;
     private static TemplateReader legacyReader;
 
@@ -56,7 +54,7 @@ public class PrototypeTest {
     public static void load() {
         legacyReader = new TemplateReader(RDFIO.fileReader(), new xyz.ottr.lutra.wottr.parser.WTemplateParser());
         templateReader = new TemplateReader(RDFIO.fileReader(), new WTemplateParser());
-        graph = new DependencyGraph(null);
+        graph = new StandardTemplateStore(null);
     }
 
     @Test
@@ -128,22 +126,22 @@ public class PrototypeTest {
 
         WTemplateWriter templateWriter = new WTemplateWriter();
         ResultConsumer<Template> resultConsumer = new ResultConsumer(templateWriter);
-        
+
         String folderPath = "src/test/resources/ProtoTypeTest/";
-        
+
         BiFunction<String, String, Optional<Message>> writer = (iri, str) -> {
             return Files.writeTemplatesTo(iri, str, folderPath, ".suffix");
         };
         templateWriter.setWriterFunction(writer);
-        //expGraph.getAllTemplates().forEach(resultConsumer); 
+        //expGraph.getAllTemplates().forEach(resultConsumer);
         graph.getAllTemplates().forEach(resultConsumer); 
         resultConsumer.getMessageHandler().combine(templateWriter.getMessages()).printMessages();
         //System.out.println("Templates:");
         //templateWriter.printDefinitions();
-        
+
         deleteDirectory(new File(folderPath));
     }
-    
+
     private void deleteDirectory(File directoryToBeDeleted) {
         File[] allContents = directoryToBeDeleted.listFiles();
         if (allContents != null) {

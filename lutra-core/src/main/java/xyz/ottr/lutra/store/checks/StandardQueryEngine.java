@@ -1,4 +1,4 @@
-package xyz.ottr.lutra.store.graph;
+package xyz.ottr.lutra.store.checks;
 
 /*-
  * #%L
@@ -38,20 +38,20 @@ import xyz.ottr.lutra.model.HasGetTerm;
 import xyz.ottr.lutra.model.Instance;
 import xyz.ottr.lutra.model.ListExpander;
 import xyz.ottr.lutra.model.Parameter;
+import xyz.ottr.lutra.model.Signature;
 import xyz.ottr.lutra.model.Substitution;
 import xyz.ottr.lutra.model.Template;
 import xyz.ottr.lutra.model.terms.ListTerm;
 import xyz.ottr.lutra.model.terms.Term;
 import xyz.ottr.lutra.model.types.ComplexType;
 import xyz.ottr.lutra.model.types.Type;
-import xyz.ottr.lutra.store.QueryEngine;
+import xyz.ottr.lutra.store.StandardTemplateStore;
 import xyz.ottr.lutra.store.TemplateStore;
-import xyz.ottr.lutra.store.Tuple;
 import xyz.ottr.lutra.system.Result;
 
-public class DependencyGraphEngine extends QueryEngine<DependencyGraph> {
+public class StandardQueryEngine extends QueryEngine<StandardTemplateStore> {
 
-    public DependencyGraphEngine(DependencyGraph store) {
+    public StandardQueryEngine(StandardTemplateStore store) {
         this.store = store;
     }
 
@@ -70,11 +70,11 @@ public class DependencyGraphEngine extends QueryEngine<DependencyGraph> {
     @Override
     public Stream<Tuple> parameters(Tuple tuple, String template, String params) {
 
-        Result<TemplateNode> resBoundTemplate = this.store.checkIsTemplate(tuple.getAs(String.class, template));
+        Result<Signature> resBoundTemplate = this.store.getSignature(tuple.getAs(String.class, template));
         if (!resBoundTemplate.isPresent()) {
             return Stream.empty(); // template argument is not a template
         }
-        TemplateNode boundTemplate = resBoundTemplate.get();
+        Signature boundTemplate = resBoundTemplate.get();
         if (tuple.hasBound(params)) {
             List<Parameter> boundParams = tuple.getAs(List.class, params);
             return boundTemplate.getParameters().equals(boundParams) ? Stream.of(tuple) : Stream.empty();
@@ -312,7 +312,7 @@ public class DependencyGraphEngine extends QueryEngine<DependencyGraph> {
     @Override
     public Stream<Tuple> body(Tuple tuple, String template, String body) {
 
-        Result<TemplateNode> resBoundTemplate = this.store.checkIsTemplate(tuple.getAs(String.class, template));
+        Result<Signature> resBoundTemplate = this.store.getSignature(tuple.getAs(String.class, template));
         if (!resBoundTemplate.isPresent()) {
             return Stream.empty(); //  argument is not a template
         }
@@ -369,7 +369,7 @@ public class DependencyGraphEngine extends QueryEngine<DependencyGraph> {
 
     @Override
     public Stream<Tuple> isUndefined(Tuple tuple, String template) {
-        return storeContains(tuple, template, (store, iri) -> !store.containsTemplate(iri));
+        return storeContains(tuple, template, (store, iri) -> !store.contains(iri));
     }
 
     @Override

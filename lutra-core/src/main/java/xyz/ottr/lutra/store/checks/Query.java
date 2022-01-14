@@ -1,4 +1,4 @@
-package xyz.ottr.lutra.store;
+package xyz.ottr.lutra.store.checks;
 
 /*-
  * #%L
@@ -56,17 +56,17 @@ public class Query {
         .and(unifiesBody("B2", "B1", "UB2"));
 
     // rel : (QueryEngine<? extends TemplateStore>, Tuple) -> Stream<Tuple>
-    private final BiFunction<QueryEngine<? extends TemplateStore>, Tuple, Stream<Tuple>> rel;
+    private final BiFunction<StandardQueryEngine, Tuple, Stream<Tuple>> rel;
 
-    private Query(BiFunction<QueryEngine<? extends TemplateStore>, Tuple, Stream<Tuple>> rel) {
+    private Query(BiFunction<StandardQueryEngine, Tuple, Stream<Tuple>> rel) {
         this.rel = rel;
     }
 
-    public Stream<Tuple> eval(QueryEngine<? extends TemplateStore> engine) {
+    public Stream<Tuple> eval(StandardQueryEngine engine) {
         return this.rel.apply(engine, new Tuple());
     }
 
-    public Stream<Tuple> eval(QueryEngine<? extends TemplateStore> engine, Tuple constants) {
+    public Stream<Tuple> eval(StandardQueryEngine engine, Tuple constants) {
         return this.rel.apply(engine, constants.copy());
     }
 
@@ -84,7 +84,7 @@ public class Query {
 
     public static Query not(Query query) {
 
-        BiPredicate<QueryEngine<? extends TemplateStore>, Tuple> shouldKeep = (qe, m) ->
+        BiPredicate<StandardQueryEngine, Tuple> shouldKeep = (qe, m) ->
             query.rel.apply(qe, m).findAny().isEmpty();
 
         return new Query((qe, m) -> shouldKeep.test(qe, m) ? Stream.of(m) : Stream.empty());

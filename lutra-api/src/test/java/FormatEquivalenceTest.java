@@ -35,8 +35,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -52,17 +50,6 @@ public class FormatEquivalenceTest {
 
     private Format format;
     private Signature signature;
-    private static StandardTemplateManager manager;
-
-    @BeforeClass
-    public static void setup() {
-        manager = new StandardTemplateManager();
-    }
-
-    @AfterClass
-    public static void destroy() {
-        manager = null;
-    }
 
     public FormatEquivalenceTest(Signature signature, String uri, Format format, String formatName) {
         this.format = format;
@@ -85,7 +72,7 @@ public class FormatEquivalenceTest {
         stdLib.loadStandardTemplateLibrary();
         // collect signatures
         var signatures = stdLib.getStandardLibrary()
-            .getAllTemplateObjects()
+            .getAllSignatures()
             .getStream()
             .map(Result::get)
             .collect(Collectors.toList());

@@ -51,8 +51,11 @@ import xyz.ottr.lutra.model.Argument;
 import xyz.ottr.lutra.model.Instance;
 import xyz.ottr.lutra.model.Signature;
 import xyz.ottr.lutra.model.Substitution;
+import xyz.ottr.lutra.model.Template;
 import xyz.ottr.lutra.model.terms.IRITerm;
+import xyz.ottr.lutra.store.Expander;
 import xyz.ottr.lutra.store.TemplateStore;
+import xyz.ottr.lutra.store.expansion.NonCheckingExpander;
 import xyz.ottr.lutra.system.Message;
 import xyz.ottr.lutra.system.Result;
 import xyz.ottr.lutra.system.ResultStream;
@@ -63,6 +66,7 @@ public class HTMLTemplateWriter {
 
     private final PrefixMapping prefixMapping;
     private final TemplateStore store;
+    private final Expander expander;
 
     private final SerialisationWriter serialisationWriter;
     private final DependencyGraphVisualiser dependencyGraphVisualiser;
@@ -75,6 +79,7 @@ public class HTMLTemplateWriter {
         this.prefixMapping.setNsPrefix("x", OTTR.ns_example_arg);
 
         this.store = store;
+        expander = new NonCheckingExpander(store);
 
         this.serialisationWriter = new SerialisationWriter(this.prefixMapping);
         this.dependencyGraphVisualiser = new DependencyGraphVisualiser(this.prefixMapping);
@@ -130,7 +135,7 @@ public class HTMLTemplateWriter {
                     writeParameters(signature),
                     writePattern(signature, expansionTree),
                     writeDependencies(signature),
-                    writeMetrics(expansionTree),
+                    signature instanceof Template ? writeMetrics(expansionTree) : null,
                     writeSerialisations(signature),
 
                     getTOCHeading("Prefixes"),
@@ -154,7 +159,7 @@ public class HTMLTemplateWriter {
         WInstanceWriter instanceWriter = new WInstanceWriter(this.prefixMapping);
 
         ResultStream.innerOf(annotations)
-            .innerFlatMap(this.store::expandInstanceFetch)
+            .innerFlatMap(this.expander::expandInstanceFetch)
             .innerForEach(instanceWriter);
 
         Model metaData = instanceWriter.writeToModel();
@@ -220,38 +225,44 @@ public class HTMLTemplateWriter {
 
     private ContainerTag writePattern(Signature signature, Tree<Instance> exampleInstanceTree) {
 
-        var exampleInstance = exampleInstanceTree.getRoot();
-        var exampleExpansion = this.getExpansion(exampleInstance);
-        var wexampleInstance = this.serialisationWriter.writeWottrModel(exampleInstance);
-        var expansionViz = new TripleInstanceGraphVisualiser(this.prefixMapping);
-        this.store.expandInstanceWithoutChecks(exampleInstance)
-            .innerForEach(expansionViz);
+        if (!(signature instanceof Template)) {
+            return div(
+                getTOCHeading("Pattern"),
+                p("The resource is a " + signature.getClass().getSimpleName() + " and has no pattern."));
+        } else {
+            var exampleInstance = exampleInstanceTree.getRoot();
+            var exampleExpansion = this.getExpansion(exampleInstance);
+            var wexampleInstance = this.serialisationWriter.writeWottrModel(exampleInstance);
+            var expansionViz = new TripleInstanceGraphVisualiser(this.prefixMapping);
+            this.expander.expandInstance(exampleInstance)
+                .innerForEach(expansionViz);
 
-        return div(
-            getTOCHeading("Pattern"),
-            h4("stOTTR"),
-            HTMLFactory.getInfoP("stOTTR serialisation of the template without annotation instances."),
-            pre(this.serialisationWriter.writeStottrPattern(signature)),
-            HTMLFactory.getInfoP("The pattern of the template is illustrated by expanding a generated instance. "
-                + "Below the generated instance is shown in different serialisations,"
-                + " and its expansion is presented in different formats."),
-            h4("Generated instance"),
-            b("stOTTR").withClass("heading"),
-            pre(this.serialisationWriter.writeStottr(exampleInstance)),
-            b("RDF/wOTTR").withClass("heading"),
-            pre(this.serialisationWriter.writeRDF(wexampleInstance)),
-            h4("Visualisation of expanded RDF graph"),
-            HTMLFactory.getInfoP("Each resource node is linked to its IRI. Type relationships are not visualised,"
-                + " rather each node contains its type."),
-            expansionViz.draw(exampleInstance.getArguments()),
-            h4("Expanded RDF graph"),
-            pre(this.serialisationWriter.writeRDF(exampleExpansion)),
-            h4("Interactive expansion"),
-            HTMLFactory.getInfoP("Click the list to expand/contract one list element. "
-                + "Click 'expand/contact all' to expand/contract all elements. "
-                + "Note that the interactive expansion is not correct for instances that are marked by list expanders."),
-            div(writeInteractiveExpansion(exampleInstanceTree))
-        ).withId("pattern");
+            return div(
+                getTOCHeading("Pattern"),
+                h4("stOTTR"),
+                HTMLFactory.getInfoP("stOTTR serialisation of the template without annotation instances."),
+                pre(this.serialisationWriter.writeStottrPattern(signature)),
+                HTMLFactory.getInfoP("The pattern of the template is illustrated by expanding a generated instance. "
+                    + "Below the generated instance is shown in different serialisations,"
+                    + " and its expansion is presented in different formats."),
+                h4("Generated instance"),
+                b("stOTTR").withClass("heading"),
+                pre(this.serialisationWriter.writeStottr(exampleInstance)),
+                b("RDF/wOTTR").withClass("heading"),
+                pre(this.serialisationWriter.writeRDF(wexampleInstance)),
+                h4("Visualisation of expanded RDF graph"),
+                HTMLFactory.getInfoP("Each resource node is linked to its IRI. Type relationships are not visualised,"
+                    + " rather each node contains its type."),
+                expansionViz.draw(exampleInstance.getArguments()),
+                h4("Expanded RDF graph"),
+                pre(this.serialisationWriter.writeRDF(exampleExpansion)),
+                h4("Interactive expansion"),
+                HTMLFactory.getInfoP("Click the list to expand/contract one list element. "
+                    + "Click 'expand/contact all' to expand/contract all elements. "
+                    + "Note that the interactive expansion is not correct for instances that are marked by list expanders."),
+                div(writeInteractiveExpansion(exampleInstanceTree))
+            ).withId("pattern");
+        }
     }
 
     private ContainerTag writeInteractiveExpansion(Tree<Instance> expansionTree) {
@@ -276,12 +287,17 @@ public class HTMLTemplateWriter {
     private Tree<Instance> getExpansionTree(Instance exampleInstance) {
         // Build expansion tree
         Function<Instance, List<Instance>> builder = instance -> {
-            var signature = this.store.getTemplateSignature(instance.getIri()).get();
-            // TODO: create a substitution from a Map directly to avoid validation
-            var substitution = Substitution.resultOf(instance.getArguments(), signature.getParameters()).get();
-            return this.store.getTemplate(instance.getIri()).get().getPattern().stream()
-                .map(is -> is.apply(substitution))
-                .collect(Collectors.toList());
+            var templateIRI = instance.getIri();
+            var signature = this.store.getSignature(templateIRI).get();
+            if (!(signature instanceof Template)) {
+                return Collections.emptyList();
+            } else {
+                // TODO: create a substitution from a Map directly to avoid validation
+                var substitution = Substitution.resultOf(instance.getArguments(), signature.getParameters()).get();
+                return this.store.getTemplate(instance.getIri()).get().getPattern().stream()
+                    .map(is -> is.apply(substitution))
+                    .collect(Collectors.toList());
+            }
         };
         return new Tree<>(exampleInstance, builder);
     }
@@ -292,14 +308,19 @@ public class HTMLTemplateWriter {
 
         return div(
             getTOCHeading("Dependencies"),
-            h4("Dependency graph"),
-            HTMLFactory.getInfoP("The graph shows all the templates that this template depends on. "
-                + "The colour of the node indicates its namespace. "
-                + "Each node is linked to its documentation page."),
-            this.dependencyGraphVisualiser.drawTree(tree),
-            h4("List of dependencies"),
-            HTMLFactory.getInfoP("The number in parenthesis is the number of instances of each template."),
-            writeDependenciesList(tree),
+            signature instanceof Template
+                ? join(
+                    h4("Dependency graph"),
+                    HTMLFactory.getInfoP("The graph shows all the templates that this template depends on. "
+                        + "The colour of the node indicates its namespace. "
+                        + "Each node is linked to its documentation page."),
+                    this.dependencyGraphVisualiser.drawTree(tree),
+                    h4("List of dependencies"),
+                    HTMLFactory.getInfoP("The number in parenthesis is the number of instances of each template."),
+                    writeDependenciesList(tree)
+                    )
+                : p("The resource is a " + signature.getClass().getSimpleName()
+                    + " and depends on no other templates."),
             h4("Depending templates"),
             HTMLFactory.getInfoP("The templates in this library that depend on this template."),
             writeDependingTemplates(signature)
@@ -501,7 +522,7 @@ public class HTMLTemplateWriter {
 
     private Model getExpansion(Instance instance) {
         WInstanceWriter instanceWriter = new WInstanceWriter(this.prefixMapping);
-        this.store.expandInstanceWithoutChecks(instance)
+        this.expander.expandInstance(instance)
             .innerForEach(instanceWriter);
         return instanceWriter.writeToModel();
     }

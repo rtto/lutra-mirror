@@ -61,7 +61,6 @@ public class DocttrManager {
 
     public static final String FRAMENAME_MAIN = "main-frame";
 
-    //private final TemplateManager manager;
     private final PrefixMapping prefixMapping;
     private final TemplateStore templateStore;
     private final PrintStream outStream;
@@ -73,13 +72,10 @@ public class DocttrManager {
     }
 
     private Map<String, Result<Signature>> getSignatureMap() {
-        return this.templateStore.getAllTemplateObjectIRIs().stream()
-            .collect(
-                Collectors.toMap(Function.identity(),
-                    this.templateStore::getTemplateObject));
+        return templateStore.getAllIRIs().stream()
+                .collect(
+                    Collectors.toMap(Function.identity(), templateStore::getSignature));
     }
-
-
 
     public void write(Path outputFolder) {
 

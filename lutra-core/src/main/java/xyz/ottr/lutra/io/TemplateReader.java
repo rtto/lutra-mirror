@@ -24,7 +24,6 @@ package xyz.ottr.lutra.io;
 
 import java.util.Arrays;
 import java.util.Map;
-import java.util.Set;
 import java.util.function.Function;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -59,10 +58,6 @@ public class TemplateReader implements Function<String, ResultStream<Signature>>
         return populateTemplateStore(store, ResultStream.innerOf(iri));
     }
 
-    public MessageHandler populateTemplateStore(TemplateStore store, Set<String> iris) {
-        return populateTemplateStore(store, ResultStream.innerOf(iris));
-    }
-
     public MessageHandler populateTemplateStore(TemplateStore store, ResultStream<String> iris) {
         ResultConsumer<Signature> consumer = new ResultConsumer<>(store);
         iris.innerFlatMap(this.templatePipeline).forEach(consumer);
@@ -90,15 +85,15 @@ public class TemplateReader implements Function<String, ResultStream<Signature>>
      *       a MessageHandler containing possible Message-s with Warnings, Errors, etc.
      */
     public MessageHandler loadTemplatesFromFolder(TemplateStore store, String folder,
-            String[] includeExtensions, String[] excludeExtensions) {
+                                                  String[] includeExtensions, String[] excludeExtensions) {
 
         this.log.info("Loading all templates from folder " + folder + " with suffix "
                 + Arrays.toString(includeExtensions) + " except " + Arrays.toString(excludeExtensions));
 
         return populateTemplateStore(store,
-                                     Files.loadFromFolder(folder,
-                                                          includeExtensions,
-                                                          excludeExtensions));
+                Files.loadFromFolder(folder,
+                        includeExtensions,
+                        excludeExtensions));
     }
 
     /**

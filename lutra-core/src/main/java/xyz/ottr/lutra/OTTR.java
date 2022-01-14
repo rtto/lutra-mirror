@@ -83,11 +83,11 @@ public enum OTTR  {
         public static final Set<Signature> ALL;
 
         static {
-            Term sub = new BlankNodeTerm("_:s");
+            Term sub = new BlankNodeTerm("s");
             sub.setType(TypeRegistry.IRI);
-            Term pred = new BlankNodeTerm("_:p");
+            Term pred = new BlankNodeTerm("p");
             pred.setType(TypeRegistry.IRI);
-            Term obj = new BlankNodeTerm("_:o");
+            Term obj = new BlankNodeTerm("o");
             obj.setType(TypeRegistry.TOP);
 
             Triple = xyz.ottr.lutra.model.BaseTemplate.builder()

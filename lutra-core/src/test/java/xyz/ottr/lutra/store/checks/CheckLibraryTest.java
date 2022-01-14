@@ -33,9 +33,9 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import xyz.ottr.lutra.model.Argument;
+import xyz.ottr.lutra.model.BaseTemplate;
 import xyz.ottr.lutra.model.Instance;
 import xyz.ottr.lutra.model.Parameter;
-import xyz.ottr.lutra.model.Signature;
 import xyz.ottr.lutra.model.Template;
 import xyz.ottr.lutra.model.terms.BlankNodeTerm;
 import xyz.ottr.lutra.model.terms.IRITerm;
@@ -45,28 +45,26 @@ import xyz.ottr.lutra.model.terms.ObjectTerm;
 import xyz.ottr.lutra.model.terms.Term;
 import xyz.ottr.lutra.model.types.NEListType;
 import xyz.ottr.lutra.model.types.TypeRegistry;
-import xyz.ottr.lutra.store.QueryEngine;
-import xyz.ottr.lutra.store.graph.DependencyGraph;
-import xyz.ottr.lutra.store.graph.DependencyGraphEngine;
+import xyz.ottr.lutra.store.StandardTemplateStore;
 import xyz.ottr.lutra.system.Message;
 
 public class CheckLibraryTest {
 
     private static final Logger log = LoggerFactory.getLogger(CheckLibraryTest.class);
 
-    private DependencyGraph initStore() {
-        
-        DependencyGraph store = new DependencyGraph(null);
-        store.addTemplateSignature(
-            Signature.superbuilder()
+    private StandardTemplateStore initStore() {
+
+        StandardTemplateStore store = new StandardTemplateStore(null);
+        store.addBaseTemplate(
+            BaseTemplate.builder()
                 .iri("base2")
                 .parameters(Parameter.listOf(
                     ObjectTerm.var("x"),
                     ObjectTerm.var("y")))
                 .build());
 
-        store.addTemplateSignature(
-            Signature.superbuilder()
+        store.addBaseTemplate(
+            BaseTemplate.builder()
                 .iri("base3")
                 .parameters(Parameter.listOf(
                     ObjectTerm.var("x"),
@@ -76,7 +74,7 @@ public class CheckLibraryTest {
         return store;
     }
 
-    private void check(QueryEngine<DependencyGraph> engine, int numErrors, Message.Severity severity) {
+    private void check(StandardQueryEngine engine, int numErrors, Message.Severity severity) {
 
         List<Message> msgs = CheckLibrary.allChecks
             .stream()
@@ -87,13 +85,13 @@ public class CheckLibraryTest {
         String assStr = "Expected " + numErrors + " messages of severity " + severity + " or higher"
              + ", but got " + msgs.size() + " messages: " + msgs;
 
-        assertEquals(assStr, msgs.size(), numErrors);
+        assertEquals(assStr, numErrors, msgs.size());
     }
 
     @Test
     public void variableNotUsedWarning() {
 
-        DependencyGraph store = initStore();
+        StandardTemplateStore store = initStore();
         store.addTemplate(
             Template.builder()
                 .iri("test")
@@ -108,7 +106,7 @@ public class CheckLibraryTest {
                     .build())
             .build());
 
-        QueryEngine<DependencyGraph> engine = new DependencyGraphEngine(store);
+        StandardQueryEngine engine = new StandardQueryEngine(store);
 
         check(engine, 1, Message.Severity.WARNING);
     }
@@ -116,7 +114,7 @@ public class CheckLibraryTest {
     @Test
     public void variableUsedInsideList() {
 
-        DependencyGraph store = initStore();
+        StandardTemplateStore store = initStore();
         store.addTemplate(
             Template.builder().iri("test")
                 .parameters(Parameter.listOf(
@@ -130,7 +128,7 @@ public class CheckLibraryTest {
                     .build())
             .build());
 
-        QueryEngine<DependencyGraph> engine = new DependencyGraphEngine(store);
+        StandardQueryEngine engine = new StandardQueryEngine(store);
 
         check(engine, 0, Message.Severity.WARNING);
     }
@@ -139,7 +137,7 @@ public class CheckLibraryTest {
     @Test
     public void variableDefinedTwiceError() {
 
-        DependencyGraph store = initStore();
+        StandardTemplateStore store = initStore();
         store.addTemplate(
             Template.builder()
                 .iri("test")
@@ -154,7 +152,7 @@ public class CheckLibraryTest {
                     .build())
             .build());
 
-        QueryEngine<DependencyGraph> engine = new DependencyGraphEngine(store);
+        StandardQueryEngine engine = new StandardQueryEngine(store);
 
         check(engine, 1, Message.Severity.ERROR);
     }
@@ -162,7 +160,7 @@ public class CheckLibraryTest {
     @Test
     public void incorrectNumberOfArgumentsError() {
 
-        DependencyGraph store = initStore();
+        StandardTemplateStore store = initStore();
         store.addTemplate(
             Template.builder().iri("test")
                 .parameters(Parameter.listOf(
@@ -176,7 +174,7 @@ public class CheckLibraryTest {
                     .build())
             .build());
 
-        QueryEngine<DependencyGraph> engine = new DependencyGraphEngine(store);
+        StandardQueryEngine engine = new StandardQueryEngine(store);
 
         check(engine, 1, Message.Severity.ERROR);
     }
@@ -184,8 +182,8 @@ public class CheckLibraryTest {
     @Test
     public void nonNonBlankUsedAsNonBlankError() {
 
-        DependencyGraph store = new DependencyGraph(null);
-        store.addTemplateSignature(
+        StandardTemplateStore store = new StandardTemplateStore(null);
+        store.addTemplate(
             Template.builder()
                 .iri("base")
                 .parameter(Parameter.builder().term(ObjectTerm.var("x")).nonBlank(true).build())
@@ -207,7 +205,7 @@ public class CheckLibraryTest {
                     .build())
                 .build());
 
-        QueryEngine<DependencyGraph> engine = new DependencyGraphEngine(store);
+        StandardQueryEngine engine = new StandardQueryEngine(store);
 
         check(engine, 1, Message.Severity.ERROR);
     }
@@ -215,7 +213,7 @@ public class CheckLibraryTest {
     @Test
     public void cyclicDependencyError() {
 
-        DependencyGraph store = initStore();
+        StandardTemplateStore store = initStore();
 
         store.addTemplate(
             Template.builder()
@@ -264,14 +262,14 @@ public class CheckLibraryTest {
                     .build())
                 .build());
 
-        QueryEngine<DependencyGraph> engine = new DependencyGraphEngine(store);
+        StandardQueryEngine engine = new StandardQueryEngine(store);
 
         check(engine, 3, Message.Severity.ERROR); // One cycle for each testN
     }
 
     @Test
     public void correctConsistentTypeUsageTest() {
-        DependencyGraph store = new DependencyGraph(null);
+        StandardTemplateStore store = new StandardTemplateStore(null);
 
         Term varBase1 = new IRITerm("ex.com/var1");
         varBase1.setType(TypeRegistry.IRI);
@@ -279,8 +277,8 @@ public class CheckLibraryTest {
         varBase2.setType(TypeRegistry.asType(OWL.ObjectProperty));
         Term varBase3 = LiteralTerm.createTypedLiteral("7", TypeRegistry.asType(XSD.integer).getIri());
 
-        store.addTemplateSignature(
-            Signature.superbuilder()
+        store.addBaseTemplate(
+            BaseTemplate.builder()
                 .iri("hasInt")
                 .parameters(Parameter.listOf(varBase1, varBase2, varBase3))
                 .build());
@@ -309,7 +307,7 @@ public class CheckLibraryTest {
                     .build()
                 ).build());
 
-        QueryEngine<DependencyGraph> engine = new DependencyGraphEngine(store);
+        StandardQueryEngine engine = new StandardQueryEngine(store);
 
         check(engine, 0, Message.Severity.WARNING);
     }
@@ -318,7 +316,7 @@ public class CheckLibraryTest {
     public void inconsistentTypeUsageTest() {
 
         // Using a constant as both Class and ObjectProperty
-        DependencyGraph store = new DependencyGraph(null);
+        StandardTemplateStore store = new StandardTemplateStore(null);
 
         Term classVar = new IRITerm("ex.com/classVar");
         classVar.setType(TypeRegistry.asType(OWL.Class));
@@ -326,8 +324,8 @@ public class CheckLibraryTest {
         objpropVar.setType(TypeRegistry.asType(OWL.ObjectProperty));
         Term intVar = LiteralTerm.createTypedLiteral("7", TypeRegistry.asType(XSD.integer).getIri());
 
-        store.addTemplateSignature(
-            Signature.superbuilder()
+        store.addBaseTemplate(
+                BaseTemplate.builder()
                 .iri("hasInt")
                 .parameters(Parameter.listOf(classVar, objpropVar, intVar))
                 .build());
@@ -358,7 +356,7 @@ public class CheckLibraryTest {
                     .build())
             .build());
 
-        QueryEngine<DependencyGraph> engine = new DependencyGraphEngine(store);
+        StandardQueryEngine engine = new StandardQueryEngine(store);
 
         check(engine, 1, Message.Severity.ERROR);
     }
@@ -367,7 +365,7 @@ public class CheckLibraryTest {
     public void incorrectTypeUsage() {
 
         // Using a variable with type IRI to a parameter with type Class
-        DependencyGraph store = new DependencyGraph(null);
+        StandardTemplateStore store = new StandardTemplateStore(null);
 
         Term varBase1 = new IRITerm("ex.com/var1");
         varBase1.setType(TypeRegistry.asType(OWL.Class));
@@ -375,8 +373,8 @@ public class CheckLibraryTest {
         varBase2.setType(TypeRegistry.asType(OWL.ObjectProperty));
         Term varBase3 = LiteralTerm.createTypedLiteral("7", TypeRegistry.asType(XSD.integer).getIri());
 
-        store.addTemplateSignature(
-            Signature.superbuilder()
+        store.addBaseTemplate(
+            BaseTemplate.builder()
                 .iri("hasInt")
                 .parameters(Parameter.listOf(varBase1, varBase2, varBase3))
                 .build());
@@ -400,7 +398,7 @@ public class CheckLibraryTest {
                     .build())
                 .build());
 
-        QueryEngine<DependencyGraph> engine = new DependencyGraphEngine(store);
+        StandardQueryEngine engine = new StandardQueryEngine(store);
 
         check(engine, 1, Message.Severity.ERROR);
     }
@@ -409,13 +407,13 @@ public class CheckLibraryTest {
     public void correctListTypeUsage() {
 
         // Using a variable with type IRI to a parameter with type Class
-        DependencyGraph store = new DependencyGraph(null);
+        StandardTemplateStore store = new StandardTemplateStore(null);
 
         Term varBase = new BlankNodeTerm("_:classes");
         varBase.setType(new NEListType(TypeRegistry.asType(OWL.Class)));
 
-        store.addTemplateSignature(
-            Signature.superbuilder()
+        store.addBaseTemplate(
+            BaseTemplate.builder()
                 .iri("areClasses")
                 .parameters(Parameter.listOf(varBase))
                 .build());
@@ -435,7 +433,7 @@ public class CheckLibraryTest {
                     .build())
                 .build());
 
-        QueryEngine<DependencyGraph> engine = new DependencyGraphEngine(store);
+        StandardQueryEngine engine = new StandardQueryEngine(store);
 
         check(engine, 0, Message.Severity.ERROR);
     }
@@ -445,13 +443,13 @@ public class CheckLibraryTest {
 
         // Using a list of a variable of type Class and a an integer as argument
         // to a parameter of type NEList<Class>
-        DependencyGraph store = new DependencyGraph(null);
+        StandardTemplateStore store = new StandardTemplateStore(null);
 
         Term varBase = new BlankNodeTerm("_:classes");
         varBase.setType(new NEListType(TypeRegistry.asType(OWL.Class)));
 
-        store.addTemplateSignature(
-            Signature.superbuilder()
+        store.addBaseTemplate(
+            BaseTemplate.builder()
                 .iri("areClasses")
                 .parameters(Parameter.listOf(varBase))
                 .build());
@@ -470,7 +468,7 @@ public class CheckLibraryTest {
                     .build())
                 .build());
 
-        QueryEngine<DependencyGraph> engine = new DependencyGraphEngine(store);
+        StandardQueryEngine engine = new StandardQueryEngine(store);
 
         check(engine, 1, Message.Severity.ERROR);
     }
@@ -478,13 +476,13 @@ public class CheckLibraryTest {
     @Test
     public void incorrectDeepListTypeUsage() {
 
-        DependencyGraph store = new DependencyGraph(null);
+        StandardTemplateStore store = new StandardTemplateStore(null);
 
         Term varBase = new BlankNodeTerm("_:classes");
         varBase.setType(new NEListType(new NEListType(TypeRegistry.asType(OWL.Class))));
 
-        store.addTemplateSignature(
-            Signature.superbuilder()
+        store.addBaseTemplate(
+            BaseTemplate.builder()
                 .iri("deepLists")
                 .parameters(Parameter.listOf(varBase))
                 .build());
@@ -505,7 +503,7 @@ public class CheckLibraryTest {
                     .build())
                 .build());
 
-        QueryEngine<DependencyGraph> engine = new DependencyGraphEngine(store);
+        StandardQueryEngine engine = new StandardQueryEngine(store);
 
         check(engine, 1, Message.Severity.ERROR);
     }

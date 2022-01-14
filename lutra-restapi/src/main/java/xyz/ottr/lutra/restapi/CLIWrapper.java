@@ -141,7 +141,7 @@ public class CLIWrapper {
         String output;
         try (ByteArrayOutputStream outStream = new ByteArrayOutputStream();
             PrintStream out = new PrintStream(outStream, true, CHARSET)) {
-            new CLI(out, out).run(command.split(" "));
+            new CLI(out, out).executeArgs(command.split(" "));
             output = outStream.toString(CHARSET);
         }
 

@@ -22,9 +22,11 @@ package xyz.ottr.lutra.cli;
  * #L%
  */
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 
 import org.junit.Test;
+import xyz.ottr.lutra.system.Message;
 import xyz.ottr.lutra.system.MessageHandler;
 
 
@@ -52,10 +54,11 @@ public class Issues252Test {
 
         CLI cli = new CLI();       
         MessageHandler msgs = cli.getMessageHandler();
-        cli.run(args.trim().split("\\s+"));
+        int exitCode = cli.executeArgs(args.trim().split("\\s+"));
         // CLI message handler should have error message
         assertNotEquals(0, msgs.getMessages().size());
-
+        assertEquals(Message.Severity.ERROR, msgs.getMostSevere());
+        assertNotEquals("Exit code should not be 0 with error messages", 0, exitCode);
     }
 
 }

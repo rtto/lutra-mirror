@@ -47,7 +47,7 @@ import xyz.ottr.lutra.writer.InstanceWriter;
 
 public class WStreamedInstanceWriter implements InstanceWriter {
 
-    private boolean prefixWriteFlag = true; //flag to ensure prefixes are written only once    
+    private boolean prefixWriteFlag = true; // flag to ensure prefixes are written only once
 
     // Set by constructor
     private PrefixMapping prefixes;
@@ -170,8 +170,13 @@ public class WStreamedInstanceWriter implements InstanceWriter {
                 this.out.finish();
                 this.outStream.close();
             }
-            // Do not close this.console as it will close console output for rest
-            // of execution!
+
+            // Do not close this.consoleSteam as it will close console output for rest
+            // of execution.
+            if (this.console != null) {
+                this.console.finish();
+            }
+
         } catch (Exception ex) {
             this.msgs.add(Message.error("Error closing streams: " + ex.getMessage()));
         }
