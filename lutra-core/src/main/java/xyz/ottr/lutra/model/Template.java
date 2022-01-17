@@ -135,7 +135,7 @@ public class Template extends Signature {
             .map(s -> (Template)s);
 
         if (this.pattern.isEmpty()) {
-            result.addWarning("Template has an empty pattern.");
+            result.addWarning("Template has an empty pattern: " + getIri());
         }
 
         return result;
