@@ -65,7 +65,7 @@ public class Result<E> {
     }
 
     /**
-     * @see Optional#of(R)
+     * @see Optional#of(Object)
      */
     public static <R> Result<R> of(R val) {
         return new Result<>(Optional.of(val));
@@ -79,7 +79,7 @@ public class Result<E> {
     }
 
     /**
-     * @see Optional#ofNullable(R)
+     * @see Optional#ofNullable(Object)
      */
     public static <R> Result<R> ofNullable(R val) {
         return new Result<>(Optional.ofNullable(val));
@@ -383,7 +383,7 @@ public class Result<E> {
     }
 
     /**
-     * @see Optional#orElse(E)
+     * @see Optional#orElse(Object)
      */
     public E orElse(E other) {
         return this.result.orElse(other);

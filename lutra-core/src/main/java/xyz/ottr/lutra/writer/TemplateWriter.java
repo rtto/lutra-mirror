@@ -58,7 +58,6 @@ public interface TemplateWriter extends Consumer<Signature> {
      * 
      * @param stringConsumer
      *      A function to which the written string are applied
-     * @return
      */
     void setWriterFunction(BiFunction<String, String, Optional<Message>> stringConsumer);
     
