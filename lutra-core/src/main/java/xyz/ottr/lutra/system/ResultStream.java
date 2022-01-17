@@ -57,7 +57,7 @@ public class ResultStream<E> {
     }
 
     /**
-     * @see Stream#of(R)
+     * @see Stream#of(Object)
      */
     public static <R> ResultStream<R> of(Result<R> r) {
         return new ResultStream<>(Stream.of(r));

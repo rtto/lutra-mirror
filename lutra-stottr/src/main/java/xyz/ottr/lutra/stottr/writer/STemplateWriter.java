@@ -261,7 +261,6 @@ public class STemplateWriter implements TemplateWriter {
      * 
      * @param stringConsumer
      *      A function to which the written string are applied
-     * @return
      */
     @Override
     public void setWriterFunction(BiFunction<String, String, Optional<Message>> stringConsumer) {
