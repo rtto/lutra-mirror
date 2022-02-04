@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.regex.Pattern;
+import org.apache.jena.ext.xerces.util.URI;
 import org.apache.jena.rdf.model.AnonId;
 import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.rdf.model.Model;
@@ -65,7 +66,7 @@ public class RDFNodeFactory {
             Result<List<RDFNode>> resNodes = Result.aggregate(nodes);
             return resNodes.map(this::toList);
         } else if (TabOTTR.TYPE_IRI.equals(type)) {
-            return Result.of(toResource(value));
+            return validateJenaURI(toResource(value));
         } else if (TabOTTR.TYPE_BLANK.equals(type)) {
             return Result.of(toBlank(value));
         } else if (TabOTTR.TYPE_TEXT.equals(type)) { // string, e.g, untyped literal
@@ -85,6 +86,15 @@ public class RDFNodeFactory {
                 return Result.error("Type " + type + " is not a recognised type.");
             }
             return Result.of(toTypedLiteral(value, type));
+        }
+    }
+
+    private Result<RDFNode> validateJenaURI(Resource resource) {
+        try {
+            new URI(resource.getURI());
+            return Result.of(resource);
+        } catch (URI.MalformedURIException e) {
+            return Result.error(resource.getURI() + " is not a legal URI.");
         }
     }
 
