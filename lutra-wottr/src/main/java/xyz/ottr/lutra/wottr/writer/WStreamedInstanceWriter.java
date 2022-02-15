@@ -79,7 +79,6 @@ public class WStreamedInstanceWriter implements InstanceWriter {
         if (consoleStream != null) {
             this.consoleStream = consoleStream;
             this.console = makeStreamRDF(this.consoleStream);
-            this.msgs.add(Message.info("Output will be written to console"));
         }
         
         if (filePath != null) {

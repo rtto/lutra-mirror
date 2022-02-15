@@ -55,7 +55,6 @@ public abstract class BufferWriter {
         
         if (consoleStream != null) {
             this.consoleStream = consoleStream;
-            msgs.add(Message.info("Output will be written to console"));
         }
         
         fileOutput = (filePath != null) ? true : false;
