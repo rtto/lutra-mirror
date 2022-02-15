@@ -69,8 +69,7 @@ public abstract class BufferWriter {
                 }
                 buffWriter = new BufferedWriter(new FileWriter(filePath, Charset.forName("UTF-8")));
             } catch (Exception ex) {
-                Message err = Message.error("Error opening file: " + ex.getMessage());
-                msgs.add(err);
+                msgs.add(Message.error("Error opening file: " + filePath + ".", ex));
             }
         }
         return msgs;
@@ -93,8 +92,7 @@ public abstract class BufferWriter {
             try {
                 buffWriter.write(contents);
             } catch (Exception ex) {
-                Message err = Message.error("Error writing file: " + ex.getMessage());
-                msgs.add(err);
+                msgs.add(Message.error("Error writing file.", ex));
             }
         }
         return msgs;
@@ -116,8 +114,7 @@ public abstract class BufferWriter {
             try {
                 this.buffWriter.flush();
             } catch (Exception ex) {
-                Message err = Message.error("Error flushing contents: " + ex.getMessage());
-                msgs.add(err);
+                msgs.add(Message.error("Error flushing contents.", ex));
             }
         }
         return msgs;
@@ -134,8 +131,7 @@ public abstract class BufferWriter {
             try {
                 this.buffWriter.close();
             } catch (Exception ex) {
-                Message err = Message.error("Error closing writer " + ex.getMessage());
-                msgs.add(err);
+                msgs.add(Message.error("Error closing writer.", ex));
             }
         }
         return msgs;

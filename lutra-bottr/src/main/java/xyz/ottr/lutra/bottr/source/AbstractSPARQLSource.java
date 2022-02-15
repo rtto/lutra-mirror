@@ -69,7 +69,7 @@ public abstract class AbstractSPARQLSource implements Source<RDFNode> {
         try {
             return Result.of(QueryFactory.create(prefixesOnly.serialize() + queryString));
         } catch (JenaException ex) {
-            return Result.error("Error creating SPARQL query: " + ex.getMessage());
+            return Result.empty(Message.error("Error creating SPARQL query.", ex));
         }
     }
 
@@ -102,8 +102,7 @@ public abstract class AbstractSPARQLSource implements Source<RDFNode> {
                     //    boolean system = exec.execAsk();
                     //    return ResultStream.innerOf(system ? TRUE : FALSE);
                     } else {
-                        return ResultStream.of(Result.empty(Message.error(
-                                "Unsupported SPARQL query type. Query must be SELECT.")));
+                        return ResultStream.of(Result.error("Unsupported SPARQL query type. Query must be SELECT."));
                     }
                 });
     }

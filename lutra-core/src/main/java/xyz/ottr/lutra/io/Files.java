@@ -64,7 +64,7 @@ public enum Files {
         try {
             java.nio.file.Files.write(Paths.get(filePath + suffix), content.getBytes(Charset.forName("UTF-8")));
         } catch (IOException ex) {
-            Message err = Message.error("Error writing output: " + ex.getMessage());
+            Message err = Message.error("Error writing output to file.", ex);
             return Optional.of(err);
         }
         return Optional.empty();
@@ -78,7 +78,7 @@ public enum Files {
             java.nio.file.Files.createDirectories(Paths.get(folder, Files.iriToDirectory(iriPath)));
             java.nio.file.Files.write(Paths.get(folder, iriPath + suffix), content.getBytes(Charset.forName("UTF-8")));
         } catch (IOException | URISyntaxException ex) {
-            Message err = Message.error("Error when writing output -- " + ex.getMessage());
+            Message err = Message.error("Error when writing output to file.", ex);
             return Optional.of(err);
         }
         return Optional.empty();
@@ -112,8 +112,7 @@ public enum Files {
                 return Message.error("The folder " + folder + " is not readable.");
             }
         } catch (SecurityException ex) {
-            return Message.error("Encountered security error when attempting to read"
-                + " folder's metadata -- " + ex.getMessage());
+            return Message.error("Encountered security issue while reading folder metadata.", ex);
         }
 
         return null;

@@ -191,7 +191,7 @@ public class WebLutraServlet extends HttpServlet {
         try {
             output = cli.run();
         } catch (Exception ex) {
-            output = Message.error(ex.getMessage()).toString();
+            output = Message.error(ex).toString();
         }
 
         String origin = request.getHeader("Origin");

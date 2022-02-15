@@ -27,6 +27,7 @@ import java.io.InputStream;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 import xyz.ottr.lutra.io.InputReader;
+import xyz.ottr.lutra.system.Message;
 import xyz.ottr.lutra.system.Result;
 import xyz.ottr.lutra.system.ResultStream;
 
@@ -37,8 +38,7 @@ public class SInputStreamReader implements InputReader<InputStream, CharStream> 
         try {
             return ResultStream.innerOf(CharStreams.fromStream(input));
         } catch (IOException ex) {
-            return ResultStream.of(Result.error("Error reading stOTTR from stream: "
-                    + input.toString() + ": " + ex.getMessage()));
+            return ResultStream.of(Result.empty(Message.error("Error reading stOTTR from stream: " + input.toString(), ex)));
         }
     }
 }

@@ -31,6 +31,7 @@ import org.apache.jena.shared.PrefixMapping;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import xyz.ottr.lutra.io.InputReader;
+import xyz.ottr.lutra.system.Message;
 import xyz.ottr.lutra.system.Result;
 import xyz.ottr.lutra.system.ResultStream;
 
@@ -58,8 +59,7 @@ public class RDFInputStreamReader implements InputReader<InputStream, Model> {
         } catch (JenaException | HttpException ex) {
             // TODO: Correct Message level?
             // TODO: Make messages for other exceptions(?)
-            result = Result.error("Unable to parse model from input stream "
-                    + input.toString() + ": " + ex.getMessage());
+            result = Result.empty(Message.error("Unable to parse model from input stream " + input.toString(), ex));
         }
         return result;
     }
