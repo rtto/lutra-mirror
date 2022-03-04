@@ -83,7 +83,7 @@ public class StandardTemplateStore implements TemplateStore {
     @Override
     public boolean addBaseTemplate(BaseTemplate baseTemplate) {
         if (templates.containsKey(baseTemplate.getIri()) && !checkParametersMatch(baseTemplate, templates.get(baseTemplate.getIri()))) {
-            LOGGER.warn("BaseTemplate {} is already in the store with different parameters - nothing will be added", baseTemplate.getIri());
+            LOGGER.warn("BaseTemplate {} is already added with different parameters. Nothing will be added.", baseTemplate.getIri());
             return false;
         }
         templates.put(baseTemplate.getIri(), baseTemplate);
@@ -94,7 +94,7 @@ public class StandardTemplateStore implements TemplateStore {
     public boolean addTemplate(Template template) {
         Signature sig = templates.get(template.getIri());
         if (sig instanceof Template && !((Template)sig).getPattern().isEmpty()) {
-            LOGGER.warn("Signature {} is a template and has dependencies set - nothing will be added", sig.getIri());
+            LOGGER.warn("Signature {} is a template and has dependencies set. Nothing will be added.", sig.getIri());
             return false;
         }
 
@@ -104,7 +104,7 @@ public class StandardTemplateStore implements TemplateStore {
             updateMissingDependencies(template);
             return true;
         } else {
-            LOGGER.warn("Parameters of Signature and Template {} differ: {} | {}",
+            LOGGER.warn("Parameters of signature and template {} differ: {} | {}",
                     template.getIri(), sig.getParameters(), template.getParameters());
             return false;
         }
@@ -218,7 +218,7 @@ public class StandardTemplateStore implements TemplateStore {
         if (signature instanceof Template) {
             return Result.of((Template) signature);
         } else {
-            return Result.error("Missing Template definition for IRI " + iri);
+            return Result.error("Missing template definition for IRI " + iri);
         }
     }
 
@@ -226,7 +226,7 @@ public class StandardTemplateStore implements TemplateStore {
     public Result<Signature> getSignature(String iri) {
         Signature signature = templates.get(iri);
         if (signature == null) {
-            return Result.error("Missing Signature for IRI " + iri);
+            return Result.error("Missing signature for IRI " + iri);
         } else {
             return Result.of(signature);
         }
@@ -276,8 +276,7 @@ public class StandardTemplateStore implements TemplateStore {
 
         FormatManager formatManager = getFormatManager();
         if (formatManager == null) {
-            messages.accept(Result.error(
-                    "Attempted fetching missing templates, but has no formats registered."));
+            messages.accept(Result.error("Error fetching missing templates: no template reader formats registered."));
             return messages.getMessageHandler();
         }
 
@@ -296,10 +295,10 @@ public class StandardTemplateStore implements TemplateStore {
                 }
 
                 if (containsTemplate(toFetch)) { // Check if fetched and added to store
-                    messages.accept(Result.info("Fetched template " + toFetch));
+                    messages.accept(Result.info("Fetched template: " + toFetch));
                 } else {
                     failed.add(toFetch);
-                    messages.accept(Result.warning("Failed fetch for template " + toFetch));
+                    messages.accept(Result.warning("Failed fetching template: " + toFetch));
                 }
             }
             missing = getMissingDependencies();
@@ -313,7 +312,7 @@ public class StandardTemplateStore implements TemplateStore {
     public Result<Set<String>> getDependencies(String templateIri) {
         Result<Template> result = getTemplate(templateIri);
         if (result.isEmpty()) {
-            return Result.error("Template with IRI " + templateIri + " not in store");
+            return Result.error("Template " + templateIri + " is not in store");
         }
 
         Set<Instance> dependencies = result.get().getPattern();
