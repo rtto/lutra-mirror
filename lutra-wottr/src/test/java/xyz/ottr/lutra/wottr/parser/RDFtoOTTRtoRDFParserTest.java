@@ -22,6 +22,7 @@ package xyz.ottr.lutra.wottr.parser;
  * #L%
  */
 
+import static org.junit.Assume.assumeFalse;
 import static org.junit.Assume.assumeTrue;
 
 import java.io.IOException;
@@ -61,14 +62,15 @@ public class RDFtoOTTRtoRDFParserTest {
     @Test
     public void test() {
 
+        assumeFalse(this.filename.contains("-bad-"));
+        assumeFalse(this.filename.contains("/error"));
+
         // Try parse file with Jena.
         var rdfModel = RDFIO.fileReader().parse(this.filename);
 
         var errors = rdfModel.getAllMessages().stream()
             .filter(message -> message.getSeverity().isGreaterEqualThan(Message.Severity.ERROR))
             .collect(Collectors.toList());
-
-        assumeTrue(errors.isEmpty()); // abort test if the model is not correctly parsed.
 
         Model ottrModel = ModelUtils.getOTTRParsedRDFModel(this.filename);
 
