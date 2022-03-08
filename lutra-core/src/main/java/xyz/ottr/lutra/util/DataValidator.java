@@ -23,36 +23,37 @@ package xyz.ottr.lutra.util;
  */
 
 import java.util.Locale;
+import java.util.Objects;
 import org.apache.commons.lang3.LocaleUtils;
-import org.apache.commons.validator.routines.UrlValidator;
-import org.apache.jena.ext.xerces.util.URI;
+import org.apache.jena.irix.IRIs;
+import org.apache.jena.irix.IRIx;
 import xyz.ottr.lutra.system.Message;
 import xyz.ottr.lutra.system.Result;
 
 public class DataValidator {
 
-    private static final String[] DEFAULT_SCHEMES = { "http", "https", "ftp", "file" };
-    private static final UrlValidator validator = new UrlValidator(DEFAULT_SCHEMES);
+    // private static final Set<String> DEFAULT_SCHEMES = Set.of("http", "https", "sftp", "ftp", "file", "urn");
 
-    public static Result<String> asURL(String value) {
-        return isURL(value)
-            ? Result.of(value)
-            : Result.error("Invalid URL. Value " + value + " is not a valid URL.");
-    }
-
-    public static boolean isURL(String value) {
-        return validator.isValid(value);
+    private static Result<IRIx> asIRIx(String value) {
+        try {
+            return Result.of(IRIs.reference(value));
+        } catch (org.apache.jena.irix.IRIException ex) {
+            return Result.error("Invalid IRI: " + value + ". " + ex.getMessage());
+        }
     }
 
     public static Result<String> asURI(String value) {
-
-        var result = Result.of(value);
-        try {
-            new URI(value);
-        } catch (URI.MalformedURIException ex) {
-            result.addMessage(Message.warning("Suspicious IRI. " + value + ". " + ex.getMessage() + "."));
+        return asIRIx(value).map(IRIx::str);
+        /* Check if scheme is ok. Use IRIs.getScheme(value), which requires a more recent version of Jena?
+            if (DEFAULT_SCHEMES.contains(IRIs.toLowerCase(Locale.getDefault()))) {
+                result.addMessage(Message.warning("Uncommon scheme for URI: " + value
+                + ". Registered common schemes are: " + DEFAULT_SCHEMES));
         }
-        return result;
+        */
+    }
+
+    public static Result<String> asAbsoluteURI(String value) {
+        return asIRIx(value).filter(IRIx::isAbsolute).map(IRIx::str);
     }
 
     public static Result<String> asLanguageTagString(String value) {
@@ -63,6 +64,24 @@ public class DataValidator {
             result.addMessage(Message.warning("Invalid language tag. Value " + value + " is not a valid language tag."));
         }
         return result;
+    }
+
+    public static boolean isLanguageTag(String value) {
+        if (isEmpty(value)) {
+            return false;
+        }
+        // first character must be a letter:
+        if (!isAlpha(value.charAt(0))) {
+            return false;
+        }
+        // only alphanumerics or '-' allowed:
+        for (int i = 1; i < value.length(); i++) {
+            char c = value.charAt(i);
+            if (!(isAlphaNumeric(c) || c == '-')) {
+                return false;
+            }
+        }
+        return true;
     }
 
     public static boolean isChar(String value) {
@@ -105,5 +124,74 @@ public class DataValidator {
         }
     }
     */
+
+    public static boolean isEmpty(String value) {
+        return Objects.isNull(value) || value.isEmpty();
+    }
+
+    public static boolean isBoolean(String value) {
+        return "TRUE".equals(value)
+            || "true".equals(value)
+            || "FALSE".equals(value)
+            || "false".equals(value);
+    }
+
+    public static boolean isDecimal(String value) {
+        int dot = value.indexOf(".");
+        return
+            // there must be a dot:
+            dot != -1
+                // an integer before the dot:
+                && isInteger(value.substring(0, dot), true)
+                // a positive integer after the dot:
+                && isInteger(value.substring(dot + 1), false);
+    }
+
+    public static boolean isInteger(String value) {
+        return isInteger(value, true);
+    }
+
+    private static boolean isInteger(String value, boolean allowNegative) {
+        if (isEmpty(value)) {
+            return false;
+        }
+        int length = value.length();
+        int i = 0;
+        // possibly a minus
+        if (allowNegative && value.charAt(0) == '-') {
+            if (length == 1) {
+                return false;
+            }
+            i = 1;
+        }
+        // only digits allowed:
+        for (; i < length; i++) {
+            char c = value.charAt(i);
+            if (!isDigit(c)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private static boolean isDigit(char c) {
+        return c >= '0' && c <= '9';
+    }
+
+    private static boolean isLowercase(char c) {
+        return c >= 'a' && c <= 'z';
+    }
+
+    private static boolean isUppercase(char c) {
+        return c >= 'A' && c <= 'Z';
+    }
+
+    private static boolean isAlpha(char c) {
+        return isLowercase(c) || isUppercase(c);
+    }
+
+    private static boolean isAlphaNumeric(char c) {
+        return isDigit(c) || isAlpha(c);
+    }
 
 }

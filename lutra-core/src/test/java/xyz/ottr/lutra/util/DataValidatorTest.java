@@ -1,4 +1,4 @@
-package xyz.ottr.lutra.tabottr.parser;
+package xyz.ottr.lutra.util;
 
 /*-
  * #%L

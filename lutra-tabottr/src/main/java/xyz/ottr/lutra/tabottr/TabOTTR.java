@@ -42,4 +42,17 @@ public enum TabOTTR {
     public static final String VALUE_BLANK_NODE_PREFIX = "_:";
     public static final String VALUE_LANGUAGE_TAG_PREFIX = "@@";
     public static final String VALUE_DATATYPE_TAG_PREFIX = "^^";
+
+    public static boolean isBlank(String value) {
+        return isFreshBlank(value) || isNamedBlank(value);
+    }
+
+    public static boolean isFreshBlank(String value) {
+        return VALUE_FRESH_BLANK.equals(value);
+    }
+
+    public static boolean isNamedBlank(String value) {
+        return value.startsWith(VALUE_BLANK_NODE_PREFIX);
+    }
+
 }
