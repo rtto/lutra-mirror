@@ -62,8 +62,6 @@ public class Issue323Test {
         model.setNsPrefix("ex", BLANK_NS);
         RDFNodeFactory factory = new RDFNodeFactory(model);
 
-        Result<RDFNode> autoResult = factory.toRDFNode("ex:Ann", TabOTTR.TYPE_AUTO);
-        assertSame(Message.Severity.ERROR, autoResult.getMessageHandler().getMostSevere());
         Result<RDFNode> iriResult = factory.toRDFNode("ex:Ann", TabOTTR.TYPE_IRI);
         assertSame(Message.Severity.ERROR, iriResult.getMessageHandler().getMostSevere());
 
@@ -76,8 +74,6 @@ public class Issue323Test {
         model.setNsPrefix("ex", LEGAL_NS);
         RDFNodeFactory factory = new RDFNodeFactory(model);
 
-        Result<RDFNode> autoResult = factory.toRDFNode("ex: Ann", TabOTTR.TYPE_AUTO);
-        assertSame(Message.Severity.ERROR, autoResult.getMessageHandler().getMostSevere());
         Result<RDFNode> iriResult = factory.toRDFNode("ex: Ann", TabOTTR.TYPE_IRI);
         assertSame(Message.Severity.ERROR, iriResult.getMessageHandler().getMostSevere());
 
