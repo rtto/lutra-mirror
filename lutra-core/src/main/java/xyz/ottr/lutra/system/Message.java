@@ -110,7 +110,7 @@ public class Message {
     @Override
     public String toString() {
 
-        String output = "[" + this.severity.name() + "] " + this.message;
+        String output = "# [" + this.severity.name() + "] " + this.message;
 
         if (printStackTrace) {
             output += printStackTrace();

@@ -200,11 +200,11 @@ public class MessageHandler {
     }
     
     private static String toReferenceString(String curRef, String eqRef) {
-        return " >>> at " + makeReference(curRef) + " = " + eqRef + "\n";
+        return "# >>> at " + makeReference(curRef) + " = " + eqRef + "\n";
     }
     
     private static String toLocationString(Trace trace, String enumStr) {
-        return " >>> at " + enumStr + " " + trace.getIdentifier() + "\n";
+        return "# >>> at " + enumStr + " " + trace.getIdentifier() + "\n";
     }
     
     public void printLocation(Trace trace) {
