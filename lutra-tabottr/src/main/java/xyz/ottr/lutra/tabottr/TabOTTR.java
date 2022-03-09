@@ -55,4 +55,11 @@ public enum TabOTTR {
         return value.startsWith(VALUE_BLANK_NODE_PREFIX);
     }
 
+    public static boolean isBoolean(String value) {
+        return "TRUE".equals(value)
+            || "true".equals(value)
+            || "FALSE".equals(value)
+            || "false".equals(value);
+    }
+
 }

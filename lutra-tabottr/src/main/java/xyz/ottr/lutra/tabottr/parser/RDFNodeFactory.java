@@ -88,7 +88,7 @@ public class RDFNodeFactory {
     }
 
     private String getAutoType(String value) {
-        if (DataValidator.isBoolean(value)) {
+        if (TabOTTR.isBoolean(value)) {
             return XSD.xboolean.toString();
         } else if (DataValidator.isInteger(value)) {
             return XSD.integer.toString();

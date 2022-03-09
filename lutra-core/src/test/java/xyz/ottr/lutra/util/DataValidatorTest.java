@@ -44,20 +44,6 @@ public class DataValidatorTest {
     private void reject(Predicate<String> func, String value) {
         accept(func.negate(), value);
     }
-
-    @Test
-    public void shouldAcceptBooleans() {
-        for (String value : new String[] { "TRUE", "FALSE", "true", "false" }) {
-            accept(DataValidator::isBoolean, value);
-        }
-    }
-    
-    @Test
-    public void shouldRejectBooleans() {
-        for (String value : new String[] { "True", "yes", "1", "0", "", "asdf" }) {
-            reject(DataValidator::isBoolean, value);
-        }
-    }
     
     @Test
     public void shouldAcceptIntegers() {

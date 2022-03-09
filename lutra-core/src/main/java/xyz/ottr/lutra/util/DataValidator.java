@@ -23,8 +23,8 @@ package xyz.ottr.lutra.util;
  */
 
 import java.util.Locale;
-import java.util.Objects;
 import org.apache.commons.lang3.LocaleUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.jena.irix.IRIs;
 import org.apache.jena.irix.IRIx;
 import xyz.ottr.lutra.system.Message;
@@ -57,7 +57,6 @@ public class DataValidator {
     }
 
     public static Result<String> asLanguageTagString(String value) {
-
         var result = Result.of(value);
         Locale locale = Locale.forLanguageTag(value.replace("-", "_"));
         if (!LocaleUtils.isAvailableLocale(locale)) {
@@ -71,13 +70,13 @@ public class DataValidator {
             return false;
         }
         // first character must be a letter:
-        if (!isAlpha(value.charAt(0))) {
+        if (!isASCIIAlpha(value.charAt(0))) {
             return false;
         }
         // only alphanumerics or '-' allowed:
         for (int i = 1; i < value.length(); i++) {
             char c = value.charAt(i);
-            if (!(isAlphaNumeric(c) || c == '-')) {
+            if (!(isASCIIAlphaNumeric(c) || c == '-')) {
                 return false;
             }
         }
@@ -89,7 +88,6 @@ public class DataValidator {
     }
 
     public static Result<Character> asChar(String value) {
-
         var result = Result.of(value.charAt(0));
         if (isChar(value)) {
             result.addMessage(Message.error("Invalid character. Value " + value + " is not a character."));
@@ -126,14 +124,11 @@ public class DataValidator {
     */
 
     public static boolean isEmpty(String value) {
-        return Objects.isNull(value) || value.isEmpty();
+        return StringUtils.isEmpty(value);
     }
 
-    public static boolean isBoolean(String value) {
-        return "TRUE".equals(value)
-            || "true".equals(value)
-            || "FALSE".equals(value)
-            || "false".equals(value);
+    public static boolean isBlank(String value) {
+        return StringUtils.isBlank(value);
     }
 
     public static boolean isDecimal(String value) {
@@ -152,7 +147,7 @@ public class DataValidator {
     }
 
     private static boolean isInteger(String value, boolean allowNegative) {
-        if (isEmpty(value)) {
+        if (isBlank(value)) {
             return false;
         }
         int length = value.length();
@@ -178,20 +173,20 @@ public class DataValidator {
         return c >= '0' && c <= '9';
     }
 
-    private static boolean isLowercase(char c) {
+    private static boolean isASCIILowercase(char c) {
         return c >= 'a' && c <= 'z';
     }
 
-    private static boolean isUppercase(char c) {
+    private static boolean isASCIIUppercase(char c) {
         return c >= 'A' && c <= 'Z';
     }
 
-    private static boolean isAlpha(char c) {
-        return isLowercase(c) || isUppercase(c);
+    private static boolean isASCIIAlpha(char c) {
+        return isASCIILowercase(c) || isASCIIUppercase(c);
     }
 
-    private static boolean isAlphaNumeric(char c) {
-        return isDigit(c) || isAlpha(c);
+    private static boolean isASCIIAlphaNumeric(char c) {
+        return isDigit(c) || isASCIIAlpha(c);
     }
 
 }
