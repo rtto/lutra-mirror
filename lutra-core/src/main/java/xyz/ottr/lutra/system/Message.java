@@ -89,6 +89,10 @@ public class Message {
         return new Message(Severity.FATAL, e.getMessage(), e.getStackTrace());
     }
 
+    public static Message fatal(String message, Exception e) {
+        return new Message(Severity.FATAL, message + Space.LINEBR + e.getMessage(), e.getStackTrace());
+    }
+
     public static Message error(String msg) {
         return new Message(Severity.ERROR, msg);
     }

@@ -92,7 +92,7 @@ public class ExcelReader implements InstanceParser<String> {
                 + String.join(", ", WorkbookEvaluator.getSupportedFunctionNames());
             return Result.error(message);
         } catch (IOException | EncryptedDocumentException | NotOfficeXmlFileException | InvalidOperationException ex) {
-            return Result.error(ex);
+            return Result.error("Error parsing data from file: " + filename, ex);
         }
     }
 

@@ -69,7 +69,7 @@ public abstract class AbstractSPARQLSource implements Source<RDFNode> {
         try {
             return Result.of(QueryFactory.create(prefixesOnly.serialize() + queryString));
         } catch (JenaException ex) {
-            return Result.empty(Message.error("Error creating SPARQL query.", ex));
+            return Result.error("Error creating SPARQL query.", ex);
         }
     }
 
