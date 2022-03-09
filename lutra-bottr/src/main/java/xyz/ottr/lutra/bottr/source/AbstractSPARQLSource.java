@@ -42,7 +42,6 @@ import xyz.ottr.lutra.bottr.model.ArgumentMap;
 import xyz.ottr.lutra.bottr.model.ArgumentMaps;
 import xyz.ottr.lutra.bottr.model.Source;
 import xyz.ottr.lutra.model.Argument;
-import xyz.ottr.lutra.system.Message;
 import xyz.ottr.lutra.system.Result;
 import xyz.ottr.lutra.system.ResultStream;
 
@@ -69,7 +68,7 @@ public abstract class AbstractSPARQLSource implements Source<RDFNode> {
         try {
             return Result.of(QueryFactory.create(prefixesOnly.serialize() + queryString));
         } catch (JenaException ex) {
-            return Result.error("Error creating SPARQL query: " + ex.getMessage());
+            return Result.error("Error creating SPARQL query.", ex);
         }
     }
 
@@ -102,8 +101,7 @@ public abstract class AbstractSPARQLSource implements Source<RDFNode> {
                     //    boolean system = exec.execAsk();
                     //    return ResultStream.innerOf(system ? TRUE : FALSE);
                     } else {
-                        return ResultStream.of(Result.empty(Message.error(
-                                "Unsupported SPARQL query type. Query must be SELECT.")));
+                        return ResultStream.of(Result.error("Unsupported SPARQL query type. Query must be SELECT."));
                     }
                 });
     }

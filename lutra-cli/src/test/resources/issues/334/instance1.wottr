@@ -1,0 +1,7 @@
+@prefix ex: <http://example.com#> .
+@prefix o-owl-ax: <http://tpl.ottr.xyz/owl/axiom/0.1/> .
+@prefix ottr: <http://ns.ottr.xyz/0.4/> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+[] ottr:arguments ( ex:A "1"^^xsd:nonNegativeInteger ex:p ex:B ) ;
+    ottr:of o-owl-ax:SubObjectExactCardinality .

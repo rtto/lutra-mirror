@@ -181,8 +181,16 @@ public class Result<E> {
         return empty(Message.fatal(msg));
     }
 
+    public static <R> Result<R> fatal(String msg, Exception ex) {
+        return empty(Message.fatal(msg, ex));
+    }
+
     public static <R> Result<R> error(String msg) {
         return empty(Message.error(msg));
+    }
+
+    public static <R> Result<R> error(String msg, Exception ex) {
+        return empty(Message.error(msg, ex));
     }
 
     public static <R> Result<R> warning(String msg) {
@@ -196,7 +204,6 @@ public class Result<E> {
     public static boolean allIsPresent(Result<?>... results) {
         return Arrays.stream(results).allMatch(Result::isPresent);
     }
-
 
     /**
      * Returns an empty system with this system as trace and with the argument message.

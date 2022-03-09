@@ -107,7 +107,7 @@ public class CLI {
             }
             return cli.getCommandSpec().exitCodeOnSuccess();
         } catch (Exception e) {
-            Message err = Message.error(e.getMessage());
+            Message err = Message.fatal(e);
             this.messageHandler.printMessage(err);
             return cli.getCommandSpec().exitCodeOnExecutionException();
         }
