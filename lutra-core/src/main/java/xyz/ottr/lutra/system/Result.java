@@ -181,16 +181,16 @@ public class Result<E> {
         return empty(Message.fatal(msg));
     }
 
-    public static <R> Result<R> fatal(Exception ex) {
-        return empty(Message.fatal(ex));
+    public static <R> Result<R> fatal(String msg, Exception ex) {
+        return empty(Message.fatal(msg, ex));
     }
 
     public static <R> Result<R> error(String msg) {
         return empty(Message.error(msg));
     }
 
-    public static <R> Result<R> error(Exception ex) {
-        return empty(Message.error(ex));
+    public static <R> Result<R> error(String msg, Exception ex) {
+        return empty(Message.error(msg, ex));
     }
 
     public static <R> Result<R> warning(String msg) {
