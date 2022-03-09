@@ -105,6 +105,7 @@ public class WebLutraServlet extends HttpServlet {
 
     private ServletFileUpload initServletFileUpload() {
         DiskFileItemFactory factory = new DiskFileItemFactory();
+        factory.setDefaultCharset("UTF-8");
         // Use default values:
         //factory.setSizeThreshold(MEMORY_THRESHOLD);
         //factory.setRepository(new File(System.getProperty("java.io.tmpdir")));
@@ -112,6 +113,7 @@ public class WebLutraServlet extends HttpServlet {
         ServletFileUpload uploader = new ServletFileUpload(factory);
         uploader.setFileSizeMax(MAX_FILE_SIZE);
         uploader.setSizeMax(MAX_REQUEST_SIZE);
+        uploader.setHeaderEncoding("UTF-8");
 
         return uploader;
     }
