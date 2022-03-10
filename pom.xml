@@ -105,6 +105,7 @@
                     <doclint>none</doclint>
                     <failOnError>false</failOnError>
                     <failOnWarnings>false</failOnWarnings>
+                    <noindex>true</noindex>
                 </configuration>
                 <executions>
                     <execution>
