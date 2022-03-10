@@ -37,17 +37,16 @@ import org.apache.jena.shared.PrefixMapping;
 import org.apache.jena.vocabulary.XSD;
 import xyz.ottr.lutra.system.Result;
 import xyz.ottr.lutra.tabottr.TabOTTR;
+import xyz.ottr.lutra.util.DataValidator;
 import xyz.ottr.lutra.wottr.WOTTR;
 
 public class RDFNodeFactory {
 
     private final Model model;
-    private final DataValidator validator;
     
     public RDFNodeFactory(PrefixMapping prefixes) {
         this.model = ModelFactory.createDefaultModel();
         this.model.setNsPrefixes(prefixes);
-        this.validator = new DataValidator(this.model);
     }
 
     public Result<RDFNode> toRDFNode(String value, String type) {
@@ -65,7 +64,7 @@ public class RDFNodeFactory {
             Result<List<RDFNode>> resNodes = Result.aggregate(nodes);
             return resNodes.map(this::toList);
         } else if (TabOTTR.TYPE_IRI.equals(type)) {
-            return Result.of(toResource(value));
+            return DataValidator.asURI(this.model.expandPrefix(value)).map(this::toResource);
         } else if (TabOTTR.TYPE_BLANK.equals(type)) {
             return Result.of(toBlank(value));
         } else if (TabOTTR.TYPE_TEXT.equals(type)) { // string, e.g, untyped literal
@@ -81,23 +80,23 @@ public class RDFNodeFactory {
                 return toRDFNode(value, getAutoType(value));
             }
         } else { // literal
-            if (!this.validator.isIRI(type)) {
-                return Result.error("Type " + type + " is not a recognised type.");
-            }
-            return Result.of(toTypedLiteral(value, type));
+            return Result.zip(
+                Result.of(value),
+                DataValidator.asAbsoluteURI(this.model.expandPrefix(type)), // check that datatype URI is ok
+                this::toTypedLiteral);
         }
     }
 
     private String getAutoType(String value) {
-        if (DataValidator.isBoolean(value)) {
+        if (TabOTTR.isBoolean(value)) {
             return XSD.xboolean.toString();
         } else if (DataValidator.isInteger(value)) {
             return XSD.integer.toString();
         } else if (DataValidator.isDecimal(value)) {
             return XSD.decimal.toString();
-        } else if (DataValidator.isBlank(value)) {
+        } else if (TabOTTR.isBlank(value)) {
             return TabOTTR.TYPE_BLANK;
-        } else if (this.validator.isIRI(value)) {
+        } else if (DataValidator.asURI(this.model.expandPrefix(value)).isPresent()) {
             return TabOTTR.TYPE_IRI;
         } else { // default
             return TabOTTR.TYPE_TEXT;
@@ -108,12 +107,12 @@ public class RDFNodeFactory {
         return this.model.createList(nodes.iterator());
     }
 
-    public Resource toResource(String qname) {
-        return this.model.createResource(this.model.expandPrefix(qname));
+    public Resource toResource(String iri) {
+        return this.model.createResource(iri);
     }
 
     private Resource toBlank(String value) {
-        if (DataValidator.isFreshBlank(value)) {
+        if (TabOTTR.isFreshBlank(value)) {
             return this.model.createResource();
         } else {
             // remove trailing "_:"
@@ -124,13 +123,13 @@ public class RDFNodeFactory {
         }
     }
 
-    private Literal toTypedLiteral(String value, String type) {
+    private Literal toTypedLiteral(String value, String typeIRI) {
         // default:
-        Literal literal = this.model.createTypedLiteral(value, this.model.expandPrefix(type));
+        Literal literal = this.model.createTypedLiteral(value, typeIRI);
 
         // overwrite default if ...
         // xsd:boolean and value is "1" or any capitalisation of "TRUE" (and similar for false):
-        if (XSD.xboolean.toString().equals(this.model.expandPrefix(type))) {
+        if (XSD.xboolean.toString().equals(typeIRI)) {
             if (value.equals("1") || Boolean.parseBoolean(value) == true) {
                 literal = this. model.createTypedLiteral(true);
             } else if (value.equals("0") || Boolean.parseBoolean(value) == false) {

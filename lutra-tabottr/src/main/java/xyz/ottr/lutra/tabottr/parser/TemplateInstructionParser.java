@@ -37,9 +37,11 @@ import xyz.ottr.lutra.wottr.parser.WTermParser;
 
 public class TemplateInstructionParser {
 
+    private final PrefixMapping prefixes;
     private final RDFNodeFactory dataFactory;
     
     public TemplateInstructionParser(PrefixMapping prefixes) {
+        this.prefixes = prefixes;
         this.dataFactory = new RDFNodeFactory(prefixes);
     }
     
@@ -61,7 +63,8 @@ public class TemplateInstructionParser {
 
     Stream<Result<Instance>> processTemplateInstruction(TemplateInstruction instruction) {
 
-        String templateIRI = this.dataFactory.toResource(instruction.getTemplateIRI()).toString();
+        // TODO: validate that the IRI is infact an IRI? or is this done elsewhere?
+        String templateIRI = this.prefixes.expandPrefix(instruction.getTemplateIRI());
         List<String> argumentTypes = instruction.getArgumentTypes();
 
         return instruction.getTemplateInstanceRows().stream()
