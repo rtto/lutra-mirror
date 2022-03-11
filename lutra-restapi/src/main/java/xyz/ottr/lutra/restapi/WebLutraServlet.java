@@ -57,8 +57,8 @@ public class WebLutraServlet extends HttpServlet {
         originWhitelist = domains;
     }
 
-    private static final long MAX_FILE_SIZE = 100 * 1024;
-    private static final long MAX_REQUEST_SIZE = 5 * MAX_FILE_SIZE;
+    private static long MAX_FILE_SIZE = 100 * 1024;
+    private static long MAX_REQUEST_SIZE = 5 * MAX_FILE_SIZE;
 
     private static final String CHARSET_UTF_8 = "UTF-8";
     private static final String CONTENT_TYPE_TEXT_PLAIN = "text/plain";
@@ -68,6 +68,7 @@ public class WebLutraServlet extends HttpServlet {
     }
 
     private ServletFileUpload initServletFileUpload() {
+        getSystemProperties();
         DiskFileItemFactory factory = new DiskFileItemFactory();
         factory.setDefaultCharset(CHARSET_UTF_8);
 
@@ -77,6 +78,18 @@ public class WebLutraServlet extends HttpServlet {
         uploader.setHeaderEncoding(CHARSET_UTF_8);
 
         return uploader;
+    }
+
+    private void getSystemProperties() {
+        String maxFileSize = System.getProperty("MAX_FILE_SIZE");
+        String maxRequestSize = System.getProperty("MAX_REQUEST_SIZE");
+
+        if (maxFileSize != null) {
+            MAX_FILE_SIZE = Long.parseLong(maxFileSize);
+        }
+        if (maxRequestSize != null) {
+            MAX_REQUEST_SIZE = Long.parseLong(maxRequestSize);
+        }
     }
 
     @Override
