@@ -79,7 +79,6 @@ public class WStreamedInstanceWriter implements InstanceWriter {
         if (consoleStream != null) {
             this.consoleStream = consoleStream;
             this.console = makeStreamRDF(this.consoleStream);
-            this.msgs.add(Message.info("Output will be written to console"));
         }
         
         if (filePath != null) {
@@ -91,8 +90,7 @@ public class WStreamedInstanceWriter implements InstanceWriter {
                 this.outStream = new FileOutputStream(filePath);
                 this.out = makeStreamRDF(this.outStream);
             } catch (IOException ex) {
-                Message err = Message.error("Error opening file " + filePath + ": " + ex.getMessage());
-                this.msgs.add(err);
+                this.msgs.add(Message.error("Error opening file " + filePath + ".", ex));
             }
         }
 
@@ -110,8 +108,7 @@ public class WStreamedInstanceWriter implements InstanceWriter {
             try {
                 this.outStream.write(contents.getBytes(StandardCharsets.UTF_8));
             } catch (IOException ex) {
-                Message err = Message.error("Error writing file: " + ex.getMessage());
-                this.msgs.add(err);
+                this.msgs.add(Message.error("Error writing file.", ex));
             }
         }
         return this.msgs;
@@ -178,7 +175,7 @@ public class WStreamedInstanceWriter implements InstanceWriter {
             }
 
         } catch (Exception ex) {
-            this.msgs.add(Message.error("Error closing streams: " + ex.getMessage()));
+            this.msgs.add(Message.error("Error closing streams.", ex));
         }
 
         return this.msgs;

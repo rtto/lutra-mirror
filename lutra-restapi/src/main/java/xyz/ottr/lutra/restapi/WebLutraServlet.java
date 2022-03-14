@@ -48,7 +48,7 @@ public class WebLutraServlet extends HttpServlet {
     private static final List<String> originWhitelist;
 
     static {
-        var domains = new ArrayList<String>();
+        var domains = new ArrayList<String>(6);
         List.of("", "weblutra.", "www.", "spec.", "primer.", "dev.spec.").stream()
             .forEach(sub -> {
                 domains.add("http://" + sub + "ottr.xyz");
@@ -57,61 +57,24 @@ public class WebLutraServlet extends HttpServlet {
         originWhitelist = domains;
     }
 
-    /*
-    private static final String repoLibrary = "https://gitlab.com/ottr/templates.git";
-
-    private static final String attrLibraryRepo = "libraryRepo";
-    private static final String attrLastPullTime = "lastPullTime";
-
-    private static final long pullInterval = 1000 * 60 * 10; // update repo every 10 mins
-    */
-
     private static final long MAX_FILE_SIZE = 100 * 1024;
     private static final long MAX_REQUEST_SIZE = 5 * MAX_FILE_SIZE;
+
+    private static final String CHARSET_UTF_8 = "UTF-8";
+    private static final String CONTENT_TYPE_TEXT_PLAIN = "text/plain";
 
     static {
         BOTTR.Settings.setRDFSourceQueryLimit(200);
     }
 
-    /*
-    private void updateLibrary() throws IOException, GitAPIException {
-
-        ServletContext context = getServletContext();
-
-        File repo = (File) context.getAttribute(attrLibraryRepo);
-
-        // clone
-        if (repo == null) {
-            repo = Files.createTempDirectory("tplLibrary").toFile();
-            Git.cloneRepository()
-                .setURI(repoLibrary)
-                .setDirectory(repo)
-                .call();
-
-            getServletContext().setAttribute(attrLibraryRepo, repo);
-        }
-
-        long lastPullTime = (Long) ObjectUtils.defaultIfNull(context.getAttribute(attrLastPullTime), 0L);
-        long now = System.currentTimeMillis();
-
-        // pull
-        if (now > lastPullTime + this.pullInterval) {
-            context.setAttribute(attrLastPullTime, now);
-
-            Git git = Git.open(repo);
-            git.pull();
-        }
-    }*/
-
     private ServletFileUpload initServletFileUpload() {
         DiskFileItemFactory factory = new DiskFileItemFactory();
-        // Use default values:
-        //factory.setSizeThreshold(MEMORY_THRESHOLD);
-        //factory.setRepository(new File(System.getProperty("java.io.tmpdir")));
+        factory.setDefaultCharset(CHARSET_UTF_8);
 
         ServletFileUpload uploader = new ServletFileUpload(factory);
         uploader.setFileSizeMax(MAX_FILE_SIZE);
         uploader.setSizeMax(MAX_REQUEST_SIZE);
+        uploader.setHeaderEncoding(CHARSET_UTF_8);
 
         return uploader;
     }
@@ -137,7 +100,7 @@ public class WebLutraServlet extends HttpServlet {
 
             // Must set prefixes first so prefixes are prepended to input and library.
             fileItems.stream()
-                .filter(fi -> fi.getFieldName().equalsIgnoreCase("prefixes"))
+                .filter(fi -> "prefixes".equalsIgnoreCase(fi.getFieldName()))
                 .findFirst()
                 .ifPresent(fi -> cli.setPrefixes(fi.getString()));
 
@@ -191,7 +154,7 @@ public class WebLutraServlet extends HttpServlet {
         try {
             output = cli.run();
         } catch (Exception ex) {
-            output = Message.error(ex.getMessage()).toString();
+            output = Message.error(ex).toString();
         }
 
         String origin = request.getHeader("Origin");
@@ -207,8 +170,8 @@ public class WebLutraServlet extends HttpServlet {
     }
 
     private void writeResponse(HttpServletResponse response, String content) throws IOException {
-        response.setContentType("text/plain");
-        response.setCharacterEncoding("UTF-8");
+        response.setContentType(CONTENT_TYPE_TEXT_PLAIN);
+        response.setCharacterEncoding(CHARSET_UTF_8);
 
         try (PrintWriter writer = response.getWriter()) {
             writer.println(content);

@@ -28,6 +28,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import org.slf4j.Logger;
+import xyz.ottr.lutra.Space;
 
 @EqualsAndHashCode
 public class Message {
@@ -70,20 +71,38 @@ public class Message {
     @Getter private final String message;
     private final StackTraceElement[] stackTrace;
 
-    public Message(Severity severity, String message) {
+    public Message(Severity severity, String message, StackTraceElement[] stackTrace) {
         this.severity = severity;
         this.message = message;
-        this.stackTrace = printStackTrace
-            ? Thread.currentThread().getStackTrace()
-            : null;
+        this.stackTrace = stackTrace.clone();
+    }
+
+    public Message(Severity severity, String message) {
+        this(severity, message, Thread.currentThread().getStackTrace());
     }
 
     public static Message fatal(String msg) {
         return new Message(Severity.FATAL, msg);
     }
 
+    public static Message fatal(Exception e) {
+        return new Message(Severity.FATAL, e.getMessage(), e.getStackTrace());
+    }
+
+    public static Message fatal(String message, Exception e) {
+        return new Message(Severity.FATAL, message + Space.LINEBR + e.getMessage(), e.getStackTrace());
+    }
+
     public static Message error(String msg) {
         return new Message(Severity.ERROR, msg);
+    }
+
+    public static Message error(Exception e) {
+        return new Message(Severity.ERROR, e.getMessage(), e.getStackTrace());
+    }
+
+    public static Message error(String message, Exception e) {
+        return new Message(Severity.ERROR, message + Space.LINEBR + e.getMessage(), e.getStackTrace());
     }
 
     public static Message warning(String msg) {
@@ -110,7 +129,7 @@ public class Message {
     @Override
     public String toString() {
 
-        String output = "[" + this.severity.name() + "] " + this.message;
+        String output = "# [" + this.severity.name() + "] " + this.message;
 
         if (printStackTrace) {
             output += printStackTrace();
@@ -123,8 +142,14 @@ public class Message {
         return
             System.lineSeparator()
             + Arrays.stream(this.stackTrace)
-                .filter(s -> s.getClassName().startsWith("xyz.ottr.lutra"))
-                .skip(2)
+                // filter out system methods of different kinds:
+                .filter(s -> !s.getClassName().startsWith("java.util"))
+                .filter(s -> !s.getClassName().startsWith("java.lang.Thread"))
+                .filter(s -> !s.getClassName().startsWith("java.lang.reflect"))
+                .filter(s -> !s.getClassName().startsWith("jdk.internal.reflect"))
+                .filter(s -> !s.getClassName().startsWith("org.junit"))
+                .filter(s -> !s.getClassName().startsWith("org.apache.maven.surefire"))
+                .filter(s -> !s.getClassName().startsWith("xyz.ottr.lutra.system"))
                 .map(stackTraceElement -> "\t" + stackTraceElement)
                 .collect(Collectors.joining(System.lineSeparator()));
     }

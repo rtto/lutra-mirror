@@ -58,8 +58,7 @@ public class RDFInputStreamReader implements InputReader<InputStream, Model> {
         } catch (JenaException | HttpException ex) {
             // TODO: Correct Message level?
             // TODO: Make messages for other exceptions(?)
-            result = Result.error("Unable to parse model from input stream "
-                    + input.toString() + ": " + ex.getMessage());
+            result = Result.error("Unable to parse model from input stream: " + input, ex);
         }
         return result;
     }
