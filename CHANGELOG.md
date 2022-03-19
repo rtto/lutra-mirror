@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 0.6.13 - 2022.03.14
+
+### Features
+
+ - Improved error checking of IRIs, #323
+ - Error messages written to console as #-prefixed comments
+ - Improving error message phrasing
+ - Removing jQuery from javadoc due to reported vulnerability issues
+ - Removing some INFO messages that cluttered output
+
+### Bug fixes
+
+ - Correct character encoding WebLutra, #342
 
 ## 0.6.12 - 2022.01.14
 
