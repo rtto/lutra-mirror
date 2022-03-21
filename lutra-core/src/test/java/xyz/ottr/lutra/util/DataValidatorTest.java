@@ -22,11 +22,14 @@ package xyz.ottr.lutra.util;
  * #L%
  */
 
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
+
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.function.Predicate;
 import org.junit.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import xyz.ottr.lutra.system.Assertions;
@@ -48,18 +51,11 @@ public class DataValidatorTest {
     private void reject(Predicate<String> func, String value) {
         accept(func.negate(), value);
     }
-    
-    @Test
-    public void shouldAcceptIntegers() {
-        for (String value : new String[] {"0", "1", "00000", "91234", "007", "-123456789012345678901234567890" }) {
-            accept(DataValidator::isInteger, value);
-        }
 
-        accept(DataValidator::isInteger, " 43"); // fail
-        accept(DataValidator::isInteger, "43 "); // fail
-        accept(DataValidator::isInteger, "   43  "); // fail
-
-        //accept(DataValidator::isInteger, "+43"); // fail, not implemented
+    @ParameterizedTest
+    @ValueSource(strings = {"0", "1", "00000", "91234", "007", "-123456789012345678901234567890", " 43", " 43 ", " 43 "})
+    public void shouldAcceptIntegers(String value) {
+        assertTrue(DataValidator.isInteger(value));
     }
 
     @Test
