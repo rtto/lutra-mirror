@@ -23,6 +23,7 @@ package xyz.ottr.lutra.util;
  */
 
 import java.util.Locale;
+import java.util.Objects;
 import org.apache.commons.lang3.LocaleUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.jena.irix.IRIs;
@@ -84,13 +85,23 @@ public class DataValidator {
     }
 
     public static boolean isChar(String value) {
-        return value.length() == 1;
+        // accept single whitespace and escape sequences ' ', '\n', '\0'
+        if (isBlank(value) && value.length() == 1) {
+            return true;
+        }
+        return value.strip().length() == 1;
     }
 
     public static Result<Character> asChar(String value) {
-        var result = Result.of(value.charAt(0));
-        if (isChar(value)) {
+        var result = Result.of(' ');
+        if (isBlank(value) && value.length() == 1) {
+            return result;
+        }
+
+        if (!isChar(value)) {
             result.addMessage(Message.error("Invalid character. Value " + value + " is not a character."));
+        } else {
+            result = Result.of(value.strip().charAt(0));
         }
         return result;
     }
@@ -133,13 +144,23 @@ public class DataValidator {
 
     public static boolean isDecimal(String value) {
         int dot = value.indexOf(".");
+        // there must be a dot:
+        if (dot == -1) {
+            return false;
+        }
+
+        String beforeDot = value.substring(0, dot);
+        String afterDot = value.substring(dot + 1);
+
         return
-            // there must be a dot:
-            dot != -1
-                // an integer before the dot:
-                && isInteger(value.substring(0, dot), true)
-                // a positive integer after the dot:
-                && isInteger(value.substring(dot + 1), false);
+            // an integer before the dot:
+            isInteger(value.substring(0, dot), true)
+            // the integer before dot does not have trailing whitespaces
+            && Objects.equals(beforeDot.stripTrailing(), beforeDot)
+            // a positive integer after the dot:
+            && isInteger(value.substring(dot + 1), false)
+            // the integer after dot does not have leading whitespaces
+            && Objects.equals(afterDot.stripLeading(), afterDot);
     }
 
     public static boolean isInteger(String value) {
@@ -147,6 +168,8 @@ public class DataValidator {
     }
 
     private static boolean isInteger(String value, boolean allowNegative) {
+        value = value.strip();
+
         if (isBlank(value)) {
             return false;
         }
