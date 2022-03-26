@@ -22,34 +22,29 @@ package xyz.ottr.lutra.util;
  * #L%
  */
 
-
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.util.function.Predicate;
-import org.junit.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import xyz.ottr.lutra.system.Assertions;
 import xyz.ottr.lutra.system.Message;
 import xyz.ottr.lutra.system.Result;
 
 public class DataValidatorTest {
-    
-    private static final Logger log = LoggerFactory.getLogger(DataValidatorTest.class);
-    
-    private void accept(Predicate<String> func, String value) {
-        boolean result = func.test(value);
-        if (!result) {
-            this.log.error("Error testing value: " + value);
-        }
-        assertTrue(result);
+
+    @ParameterizedTest
+    @ValueSource(strings = {"", " ", "  "})
+    public void shouldAcceptBlankStrings(String input) {
+        assertTrue(DataValidator.isBlank(input));
     }
-    
-    private void reject(Predicate<String> func, String value) {
-        accept(func.negate(), value);
+
+    @ParameterizedTest
+    @EmptySource
+    public void shouldAcceptEmptyStrings(String input)  {
+        assertTrue(DataValidator.isEmpty(input));
     }
 
     @ParameterizedTest
@@ -58,93 +53,52 @@ public class DataValidatorTest {
         assertTrue(DataValidator.isInteger(value));
     }
 
-    @Test
-    public void shouldRejectIntegers() {
-        for (String value : new String[] { "", "  ", "1.1", "asdf", "--123", "1-2", "12-", "+ 43", "4 3" }) {
-            reject(DataValidator::isInteger, value);
-        }
+    @ParameterizedTest
+    @ValueSource(strings = {"", "  ", "1.1", "asdf", "--123", "1-2", "12-", "+ 43", "4 3"})
+    public void shouldRejectIntegers(String value) {
+        assertFalse(DataValidator.isInteger(value));
     }
 
-    @Test
-    public void shouldAcceptDecimals() {
-        for (String value : new String[] { "1.0", "-1.1", "0.2", "-0.4", "91234.123" }) {
-            accept(DataValidator::isDecimal, value);
-        }
-
-        accept(DataValidator::isDecimal, "1.0 "); // fail
-        accept(DataValidator::isDecimal, " 1.0"); // fail
-        accept(DataValidator::isDecimal, " -1.0 "); // fail
-
-        //accept(DataValidator::isDecimal, "+12.456"); // fail, not implemented
-        //accept(DataValidator::isDecimal, " -.456"); // fail, not implemented
-        //accept(DataValidator::isDecimal, " -456."); // fail, not implemented
-    }
-    
-    @Test
-    public void shouldRejectDecimals() {
-        for (String value : new String[] { "", "1.1-", "asdf", "--123", "1-2", "12-", "1" ,"-54", "-4.6.8", "@", "+ 1234.456", "1 234.456", "1234.456E+2" }) {
-            reject(DataValidator::isDecimal, value);
-        }
+    @ParameterizedTest
+    @ValueSource(strings = {"1.0", "-1.1", "0.2", "-0.4", "91234.123", "1.0 ", " 1.0", " -1.0 "})
+    public void shouldAcceptDecimals(String value) {
+        assertTrue(DataValidator.isDecimal(value));
     }
 
-    // valid char should give no error
-    @Test
-    public void asCharValidTest() {
-        Result<Character> c;
-        for (String value : new String[] { "v", "-" ,"4", "\n", "\0", " "}) {
-            c = DataValidator.asChar(value);
-            Assertions.noErrors(c); // fail
-        }
+    @ParameterizedTest
+    @ValueSource(strings = {"", "abc", "@", "1", "1.1-", "--123", "1-2", "-54", "-4.6.8",
+                            "+ 1234.456", "1 234.456", "1234.456E+2", "123. 45", "123 . 45"})
+    public void shouldRejectDecimals(String value) {
+        assertFalse(DataValidator.isDecimal(value));
     }
 
-    // invalid input should give error
-    @Test
-    public void asCharInvalidTest() {
-        Result<Character> c;
-        for (String value : new String[] {"abc", "--" ,"49"}) {
-            c = DataValidator.asChar(value);
-            assertSame(Message.Severity.ERROR, c.getMessageHandler().getMostSevere()); // fail
-        }
+    @ParameterizedTest
+    @ValueSource(strings = {"-", "v", "Æ", " b", " b  ", "4", "\n", "\0", " "})
+    public void shouldAcceptCharsAndGiveNoErrors(String value) {
+        assertTrue(DataValidator.isChar(value));
+        Assertions.noErrors(DataValidator.asChar(value));
     }
 
-    @Test
-    public void shouldAcceptChar() {
-        for (String value : new String[] { "-", "Æ" ,"4", "\n", "\0", " "}) {
-            accept(DataValidator::isChar, value);
-        }
+    @ParameterizedTest
+    @ValueSource(strings = {"", "  ", "--", "no", "en-GB", "234"})
+    public void shouldRejectCharsAndGiveErrors(String value) {
+        assertFalse(DataValidator.isChar(value));
+        Result<Character> result = DataValidator.asChar(value);
+        assertSame(Message.Severity.ERROR, result.getMessageHandler().getMostSevere());
     }
 
-    @Test
-    public void shouldRejectChar() {
-        for (String value : new String[] { "no", "en-GB", "234", "", "  "}) {
-            reject(DataValidator::isChar, value);
-        }
+    @ParameterizedTest
+    @ValueSource(strings = {"no", "en-GB", "en-GB-London", "cmn-Hans-CN", "en-GB "})
+    public void shouldAcceptLanguageTagsAndGiveNoErrors(String value) {
+        assertTrue(DataValidator.isLanguageTag(value));
+        Assertions.noErrors(DataValidator.asLanguageTagString(value));
     }
 
-    @Test
-    public void shouldAcceptLanguageTag() {
-        for (String value : new String[] { "no", "en-GB", "en-GB-London"}) {
-            accept(DataValidator::isLanguageTag, value);
-        }
-
-        accept(DataValidator::isLanguageTag, "en-GB "); // fail
-    }
-    
-    @Test
-    public void shouldRejectLanguageTag() {
-        for (String value : new String[] { "", ".com", "@", "--123", "1-2", "12-", "1", "a a", "  ", "91234.123", "æøå", null}) {
-            reject(DataValidator::isLanguageTag, value);
-        }
-
-        reject(DataValidator::isLanguageTag, "no-"); // fail
-    }
-
-    // should give warning/error? if the input is invalid
-    @Test
-    public void asLanguageTagStringTest() {
-        for (String value : new String[] { "abcd", "-en-GB", "234", "", ".com", "no-", null}) {
-            Result<String> str = DataValidator.asLanguageTagString(value);
-            assertSame(Message.Severity.WARNING, str.getMessageHandler().getMostSevere());
-        }
+    @ParameterizedTest
+    @ValueSource(strings = {"", "  ", ".com", "@", "--123", "1-2", "1", "91.1", "a a", "æøå", "no-", "-no", "en--GB"})
+    public void shouldRejectLanguageTagAndGiveErrors(String value) {
+        assertFalse(DataValidator.isLanguageTag(value));
+        Result<String> result = DataValidator.asLanguageTagString(value);
+        assertSame(Message.Severity.ERROR, result.getMessageHandler().getMostSevere());
     }
 }
