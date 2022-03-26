@@ -154,11 +154,11 @@ public class DataValidator {
 
         return
             // an integer before the dot:
-            isInteger(value.substring(0, dot), true)
+            isInteger(beforeDot, true)
             // the integer before dot does not have trailing whitespaces
             && Objects.equals(beforeDot.stripTrailing(), beforeDot)
             // a positive integer after the dot:
-            && isInteger(value.substring(dot + 1), false)
+            && isInteger(afterDot, false)
             // the integer after dot does not have leading whitespaces
             && Objects.equals(afterDot.stripLeading(), afterDot);
     }
