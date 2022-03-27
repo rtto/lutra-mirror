@@ -68,15 +68,12 @@ public class WebLutraServlet extends HttpServlet {
     }
 
     private ServletFileUpload initServletFileUpload() {
-        String sysMaxFileSize = getSystemProperty("MAX_FILE_SIZE");
-        String sysMaxRequestSize = getSystemProperty("MAX_REQUEST_SIZE");
-
         DiskFileItemFactory factory = new DiskFileItemFactory();
         factory.setDefaultCharset(CHARSET_UTF_8);
         ServletFileUpload uploader = new ServletFileUpload(factory);
 
-        long maxFileSize = (sysMaxFileSize != null) ? Long.parseLong(sysMaxFileSize) : MAX_FILE_SIZE;
-        long maxRequestSize = (sysMaxRequestSize != null) ? Long.parseLong(sysMaxRequestSize) : MAX_REQUEST_SIZE;
+        long maxFileSize = getValue("WEBLUTRA_MAX_FILE_SIZE", MAX_FILE_SIZE);
+        long maxRequestSize = getValue("WEBLUTRA_MAX_REQUEST_SIZE", MAX_REQUEST_SIZE);
 
         uploader.setFileSizeMax(maxFileSize);
         uploader.setSizeMax(maxRequestSize);
@@ -84,8 +81,9 @@ public class WebLutraServlet extends HttpServlet {
         return uploader;
     }
 
-    private String getSystemProperty(String property) {
-        return System.getProperty(property);
+    private long getValue(String property, long defaultValue) {
+        String sysValue = System.getProperty(property);
+        return (sysValue != null) ? Long.parseLong(sysValue) : defaultValue;
     }
 
     @Override
