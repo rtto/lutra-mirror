@@ -1,0 +1,71 @@
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix fam: <http://www.ifi.uio.no/IN3060/family#> .
+@prefix sim: <http://www.ifi.uio.no/IN3060/simpsons#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+
+# Exercise 2
+sim:Homer rdf:type foaf:Person .
+sim:Marge rdf:type foaf:Person .
+sim:Bart rdf:type foaf:Person .
+sim:Lisa rdf:type foaf:Person .
+sim:Maggie rdf:type foaf:Person .
+
+
+sim:Homer foaf:name "Homer Simpson" .
+sim:Marge foaf:name "Marge Simpson" .
+sim:Bart foaf:name "Bart Simpson" .
+sim:Lisa foaf:name "Lisa Simpson" .
+sim:Maggie foaf:name "Maggie Simpson" .
+
+sim:Homer foaf:age "36"^^xsd:int .
+sim:Marge foaf:age "34"^^xsd:int .
+sim:Bart foaf:age "10"^^xsd:int .
+sim:Lisa foaf:age "8"^^xsd:int .
+sim:Maggie foaf:age "1"^^xsd:int .
+
+
+# Exercise 3
+# Family members
+sim:Simpsons rdf:type fam:Family .
+sim:Simpsons fam:hasFamilyMember sim:Marge ,
+                                  sim:Homer ,
+                                  sim:Bart ,
+                                  sim:Lisa ,
+                                  sim:Maggie .
+
+# Marge and Homer are married
+sim:Marge fam:hasSpouse sim:Homer .
+sim:Homer fam:hasSpouse sim:Marge .
+
+# They are respectively mother and father to Bart, Maggia and Lisa
+sim:Bart fam:hasMother sim:Marge ;
+		 fam:hasFather sim:Homer .
+sim:Maggie fam:hasMother sim:Marge ;
+			fam:hasFather sim:Homer .
+sim:Lisa fam:hasMother sim:Marge ;
+		 fam:hasFather sim:Homer .
+
+
+# Exercise 4 Marge has grandparents Abraham and Mona
+_:parentA fam:hasFather sim:Abraham .
+_:parentB fam:hasMother sim:Mona .
+
+sim:Maggie fam:hasParent _:parentA .
+sim:Maggie fam:hasParent _:parentB .
+
+
+# Exercise 5: Lisa has aunts and uncle
+sim:Lisa fam:hasParent _:parentA ,
+                       _:parentB .
+
+_:parentA fam:hasSister sim:Patty ,
+                        sim:Selma .
+
+sim:Patty fam:hasSister sim:Selma .
+
+_:parentB fam:hasBrother sim:Herb .
+
+
+# Exercise 6: Marge has father-in-law
+sim:Homer fam:hasFather sim:Abraham .
