@@ -88,6 +88,40 @@ public class StandardTemplateStoreTest {
     }
 
     @Test
+    public void testAddExistingTemplate() {
+        TemplateStore manager = new StandardTemplateStore(null);
+
+        // add first template
+        System.out.println("add first template");
+        Template template0 = buildDummyTemplate("iri-0", new String[] {"x", "y"});
+        manager.addTemplate(template0);
+
+        // add an existing template
+        System.out.println("add an existing template");
+
+        Template template1 = buildDummyTemplate("iri-0", new String[] {"x", "y"});
+        manager.addTemplate(template1);
+
+        // add an existing template with different parameters
+        System.out.println("add an existing template with different parameters");
+        Template template2 = buildDummyTemplate("iri-0", new String[] {"x", "y", "z"});
+        manager.addTemplate(template2);
+
+        // differing parameters
+        System.out.println("add a template with different parameters than signature");
+
+        Signature signature1 = buildDummySignature("iri-1", new String[] {"a", "b"});
+        manager.addSignature(signature1);
+
+        Template template3 = buildDummyTemplate("iri-1", new String[] {"a"});
+        manager.addTemplate(template3);
+
+        // print templates
+        manager.getAllTemplates().forEach(System.out::println);
+
+    }
+
+    @Test
     public void testAddSignature() {
         TemplateStore manager = new StandardTemplateStore(null);
 

@@ -92,9 +92,14 @@ public class StandardTemplateStore implements TemplateStore {
 
     @Override
     public boolean addTemplate(Template template) {
+        Result<Template> result = Result.of(template);
+
         Signature sig = templates.get(template.getIri());
         if (sig instanceof Template && !((Template)sig).getPattern().isEmpty()) {
             LOGGER.warn("Signature {} is a template and has dependencies set. Nothing will be added.", sig.getIri());
+
+            result.addWarning("Signature {} is a template and has dependencies set. Nothing will be added." + sig.getIri());
+            result.getMessageHandler().printMessages();
             return false;
         }
 
@@ -106,6 +111,9 @@ public class StandardTemplateStore implements TemplateStore {
         } else {
             LOGGER.warn("Parameters of signature and template {} differ: {} | {}",
                     template.getIri(), sig.getParameters(), template.getParameters());
+
+            result.addWarning("Parameters of signature and template {} differ: {} | {}" + template.getIri() + sig.getParameters() + template.getParameters());
+            result.getMessageHandler().printMessages();
             return false;
         }
     }
