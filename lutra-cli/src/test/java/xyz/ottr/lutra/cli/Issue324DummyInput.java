@@ -10,7 +10,7 @@ public class Issue324DummyInput {
 
     @Test
     public void parseDummyFile() {
-        /*
+
         String args = " "
                 + " --debugStackTrace"
                 + " -l " + ROOT + "dummy.ttl"
@@ -23,14 +23,30 @@ public class Issue324DummyInput {
         //assertNotEquals(0, msgs.getMessages().size());
         //assertEquals(Message.Severity.ERROR, msgs.getMostSevere());
         //assertNotEquals("Exit code should not be 0 with error messages", 0, exitCode);
-         */
 
-        var result = RDFIO.fileReader().parse(ROOT + "dummy.ttl");
-        System.out.println(result);
+
+        //var result = RDFIO.fileReader().parse(ROOT + "dummy.ttl");
+        //System.out.println(result);
     }
 
     @Test
     public void parseFaultyFile() {
+
+        String args = " "
+                + " --debugStackTrace"
+                + " -l " + ROOT + "faultyRDF.ttl"
+                + " " + ROOT + "faultyRDF.ttl";
+
+        CLI cli = new CLI();
+        MessageHandler msgs = cli.getMessageHandler();
+        int exitCode = cli.executeArgs(args.trim().split("\\s+"));
+        //var result = RDFIO.fileReader().parse(ROOT + "faultyRDF.ttl");
+        //System.out.println(result);
+    }
+
+    @Test
+    public void parseFaultyFileRDFReader() {
+
         var result = RDFIO.fileReader().parse(ROOT + "faultyRDF.ttl");
         System.out.println(result);
     }
