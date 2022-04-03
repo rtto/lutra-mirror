@@ -81,40 +81,36 @@ public class StandardTemplateStore implements TemplateStore {
     }
 
     @Override
-    public boolean addBaseTemplate(BaseTemplate baseTemplate) {
+    public Result<BaseTemplate> addBaseTemplate(BaseTemplate baseTemplate) {
         if (templates.containsKey(baseTemplate.getIri()) && !checkParametersMatch(baseTemplate, templates.get(baseTemplate.getIri()))) {
             LOGGER.warn("BaseTemplate {} is already added with different parameters. Nothing will be added.", baseTemplate.getIri());
-            return false;
+            return Result.warning("BaseTemplate " + baseTemplate.getIri() + " is already added with different parameters. "
+                    + "Nothing will be added.");
         }
         templates.put(baseTemplate.getIri(), baseTemplate);
-        return true;
+        return Result.of(baseTemplate);
     }
 
     @Override
-    public boolean addTemplate(Template template) {
-        Result<Template> result = Result.of(template);
-
+    public Result<Template> addTemplate(Template template) {
         Signature sig = templates.get(template.getIri());
-        if (sig instanceof Template && !((Template)sig).getPattern().isEmpty()) {
-            LOGGER.warn("Signature {} is a template and has dependencies set. Nothing will be added.", sig.getIri());
 
-            result.addWarning("Signature {} is a template and has dependencies set. Nothing will be added." + sig.getIri());
-            result.getMessageHandler().printMessages();
-            return false;
+        if (sig instanceof Template && !((Template)sig).getPattern().isEmpty()) {
+            LOGGER.warn("Signature {} is a template and has dependencies set. Nothing will be added. ", sig.getIri());
+            return Result.warning("Signature " + sig.getIri() + " is a template and has dependencies set. Nothing will be added. ");
         }
 
         if (sig == null || checkParametersMatch(template, sig)) {
             templates.put(template.getIri(), template);
             updateDependencyIndex(template);
             updateMissingDependencies(template);
-            return true;
+            return Result.of(template);
         } else {
             LOGGER.warn("Parameters of signature and template {} differ: {} | {}",
                     template.getIri(), sig.getParameters(), template.getParameters());
 
-            result.addWarning("Parameters of signature and template {} differ: {} | {}" + template.getIri() + sig.getParameters() + template.getParameters());
-            result.getMessageHandler().printMessages();
-            return false;
+            return Result.warning("Parameters of signature and template " + template.getIri() + " differ: "
+                    + sig.getParameters() + " | " + template.getParameters());
         }
     }
 
@@ -134,21 +130,23 @@ public class StandardTemplateStore implements TemplateStore {
     }
 
     @Override
-    public boolean addSignature(Signature signature) {
+    public Result<Signature> addSignature(Signature signature) {
         Signature sig = templates.get(signature.getIri());
+
         if (sig == null) {
             if (signature instanceof Template) {
-                return addTemplate((Template) signature);
+                addTemplate((Template) signature);
             } else {
                 templates.put(signature.getIri(), signature);
                 missingDependencies.add(signature.getIri());
-                return true;
             }
+            return Result.of(signature);
         } else if (signature instanceof Template && checkParametersMatch(signature, sig)) {
-            return addTemplate((Template) signature);
+            addTemplate((Template) signature);
+            return Result.of(signature);
         } else {
-            LOGGER.info("Signature {} already exists", sig.getIri());
-            return false;
+            LOGGER.info("Signature {} already exists. ", sig.getIri());
+            return Result.warning("Signature " + sig.getIri() + " already exists. ");
         }
     }
 
@@ -374,11 +372,20 @@ public class StandardTemplateStore implements TemplateStore {
     @Override
     public void accept(Signature signature) {
         if (signature instanceof Template) {
-            addTemplate((Template) signature);
+            Result<Template> result = addTemplate((Template) signature);
+            if (!result.isPresent()) {
+                result.getMessageHandler().printMessages();
+            }
         } else if (signature instanceof BaseTemplate) {
-            addBaseTemplate((BaseTemplate) signature);
+            Result<BaseTemplate> result = addBaseTemplate((BaseTemplate) signature);
+            if (!result.isPresent()) {
+                result.getMessageHandler().printMessages();
+            }
         } else {
-            addSignature(signature);
+            Result<Signature> result = addSignature(signature);
+            if (!result.isPresent()) {
+                result.getMessageHandler().printMessages();
+            }
         }
     }
 }

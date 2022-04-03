@@ -48,13 +48,13 @@ public interface TemplateStore extends Consumer<Signature> {
     /**
      * Adds the argument base template definition to this store.
      */
-    boolean addBaseTemplate(BaseTemplate baseTemplate);
+    Result<BaseTemplate> addBaseTemplate(BaseTemplate baseTemplate);
 
     // TODO do we need more than a boolean here?
     /**
      * Adds the argument template definition to this store.
      */
-    boolean addTemplate(Template template);
+    Result<Template> addTemplate(Template template);
 
     // TODO do we need more than a boolean here?
     /**
@@ -62,7 +62,7 @@ public interface TemplateStore extends Consumer<Signature> {
      * (that is, without a definition) even if it infact is an
      * instance of Template.
      */
-    boolean addSignature(Signature signature);
+    Result<Signature> addSignature(Signature signature);
 
     /**
      * Returns true if this store contains either a template (base or defined)

@@ -64,26 +64,28 @@ public class StandardTemplateStoreTest {
 
         // success - no signature
         Template template0 = buildDummyTemplate("iri-0", new String[] {"x", "y"});
-        Assert.assertTrue("Adding Template without matching Signature present should succeed", manager.addTemplate(template0));
+        manager.addTemplate(template0);
+        Assert.assertTrue("Adding Template without matching Signature present should succeed", manager.containsTemplate("iri-0"));
 
         // success - existing signature
         Signature signature1 = buildDummySignature("iri-1", new String[] {"x", "y"});
         manager.addSignature(signature1);
         Template template1 = buildDummyTemplate("iri-1", new String[] {"x", "y"});
-        Assert.assertTrue("Adding Template with matching Signature present should succeed", manager.addTemplate(template1));
+        manager.addTemplate(template1);
+        Assert.assertTrue("Adding Template with matching Signature present should succeed", manager.containsTemplate("iri-1"));
 
         // existing Sig is Template
         Template template2 = buildDummyTemplate("iri-2", new String[] {"a", "b"});
         manager.addTemplate(template2);
         Assert.assertFalse("Adding Template when there is already one in the store with dependencies set should "
-                + "return false", manager.addTemplate(template2));
+                + "not succeed", manager.addTemplate(template2).isPresent());
 
         // differing parameters
         Signature signature2 = buildDummySignature("iri-2", new String[] {"x", "y"});
         manager.addSignature(signature2);
         Template template3 = buildDummyTemplate("iri-2", new String[] {"x", "y", "z"});
-        Assert.assertFalse("Adding Template with different parameter number than Signature should return false",
-                manager.addTemplate(template3));
+        Assert.assertFalse("Adding Template with different parameter number than Signature should not succeed",
+                manager.addTemplate(template3).isPresent());
         // TODO add "real" differing parameters when implemented not just list length
     }
 
@@ -92,33 +94,23 @@ public class StandardTemplateStoreTest {
         TemplateStore manager = new StandardTemplateStore(null);
 
         // add first template
-        System.out.println("add first template");
         Template template0 = buildDummyTemplate("iri-0", new String[] {"x", "y"});
         manager.addTemplate(template0);
 
         // add an existing template
-        System.out.println("add an existing template");
-
         Template template1 = buildDummyTemplate("iri-0", new String[] {"x", "y"});
         manager.addTemplate(template1);
 
         // add an existing template with different parameters
-        System.out.println("add an existing template with different parameters");
         Template template2 = buildDummyTemplate("iri-0", new String[] {"x", "y", "z"});
         manager.addTemplate(template2);
 
         // differing parameters
-        System.out.println("add a template with different parameters than signature");
-
         Signature signature1 = buildDummySignature("iri-1", new String[] {"a", "b"});
         manager.addSignature(signature1);
 
         Template template3 = buildDummyTemplate("iri-1", new String[] {"a"});
         manager.addTemplate(template3);
-
-        // print templates
-        manager.getAllTemplates().forEach(System.out::println);
-
     }
 
     @Test
@@ -128,11 +120,15 @@ public class StandardTemplateStoreTest {
         Signature signature1 = buildDummySignature("iri-1", new String[] {"x", "y"});
         Signature signature2 = buildDummySignature("iri-2", new String[] {"x", "y"});
 
-        Assert.assertTrue("Adding Signature to empty store should succeed", manager.addSignature(signature1));
-        Assert.assertTrue("Adding non-existing Signature to store should succeed", manager.addSignature(signature2));
-        Assert.assertFalse("Adding existing Signature to store should return false", manager.addSignature(signature1));
+        manager.addSignature(signature1);
+        Assert.assertTrue("Adding Signature to empty store should succeed", manager.containsSignature("iri-1"));
+        manager.addSignature(signature2);
+        Assert.assertTrue("Adding non-existing Signature to store should succeed", manager.containsSignature("iri-2"));
+        Assert.assertFalse("Adding existing Signature to store should return false", manager.addSignature(signature1).isPresent());
         // TODO add Signature that is a Template with/without matching params once this is implemented
     }
+
+
 
     @Test
     public void testContainsWithTemplate() {
