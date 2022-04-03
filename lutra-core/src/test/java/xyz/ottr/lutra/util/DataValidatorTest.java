@@ -48,39 +48,40 @@ public class DataValidatorTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"0", "1", "00000", "91234", "007", "-123456789012345678901234567890", " 43", " 43 ", " 43 "})
+    @ValueSource(strings = {"0", "1", "00000", "91234", "007", "-123456789012345678901234567890"})
     public void shouldAcceptIntegers(String value) {
         assertTrue(DataValidator.isInteger(value));
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"", "  ", "1.1", "asdf", "--123", "1-2", "12-", "+ 43", "4 3"})
+    @ValueSource(strings = {"", "  ", "1.1", "asdf", "--123", "1-2", "12-", "+ 43", "4 3", " 43", " 43 ", " 43 "})
     public void shouldRejectIntegers(String value) {
         assertFalse(DataValidator.isInteger(value));
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"1.0", "-1.1", "0.2", "-0.4", "91234.123", "1.0 ", " 1.0", " -1.0 "})
+    @ValueSource(strings = {"1.0", "-1.1", "0.2", "-0.4", "91234.123"})
     public void shouldAcceptDecimals(String value) {
         assertTrue(DataValidator.isDecimal(value));
     }
 
     @ParameterizedTest
     @ValueSource(strings = {"", "abc", "@", "1", "1.1-", "--123", "1-2", "-54", "-4.6.8",
-                            "+ 1234.456", "1 234.456", "1234.456E+2", "123. 45", "123 . 45"})
+                            "+ 1234.456", "1 234.456", "1234.456E+2", "123. 45", "123 . 45",
+                            " 1.0 ", "1.0 ", " -1.0 "})
     public void shouldRejectDecimals(String value) {
         assertFalse(DataValidator.isDecimal(value));
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"-", "v", "Æ", " b", " b  ", "4", "\n", "\0", " "})
+    @ValueSource(strings = {"-", "v", "Æ", "4", "\n", "\0", " "})
     public void shouldAcceptCharsAndGiveNoErrors(String value) {
         assertTrue(DataValidator.isChar(value));
         Assertions.noErrors(DataValidator.asChar(value));
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"", "  ", "--", "no", "en-GB", "234"})
+    @ValueSource(strings = {"", "  ", "--", "no", "en-GB", "234", " b", "b ", " b "})
     public void shouldRejectCharsAndGiveErrors(String value) {
         assertFalse(DataValidator.isChar(value));
         Result<Character> result = DataValidator.asChar(value);
@@ -88,7 +89,7 @@ public class DataValidatorTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"no", "en-GB", "en-GB-London", "cmn-Hans-CN", "en-GB "})
+    @ValueSource(strings = {"no", "en-GB", "en-GB-London", "cmn-Hans-CN"})
     public void shouldAcceptLanguageTagsAndGiveNoErrors(String value) {
         assertTrue(DataValidator.isLanguageTag(value));
         Assertions.noErrors(DataValidator.asLanguageTagString(value));
@@ -96,7 +97,7 @@ public class DataValidatorTest {
 
     @ParameterizedTest
     @ValueSource(strings = {"", "  ", ".com", "@", "--123", "1-2", "1", "91.1", "a a", "æøå", "no-", "-no", "en--GB"})
-    public void shouldRejectLanguageTagAndGiveErrors(String value) {
+    public void shouldRejectLanguageTagsAndGiveErrors(String value) {
         assertFalse(DataValidator.isLanguageTag(value));
         Result<String> result = DataValidator.asLanguageTagString(value);
         assertSame(Message.Severity.ERROR, result.getMessageHandler().getMostSevere());
