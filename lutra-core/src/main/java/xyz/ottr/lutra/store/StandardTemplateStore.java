@@ -10,12 +10,12 @@ package xyz.ottr.lutra.store;
  * it under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation, either version 2.1 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Lesser Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Lesser Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/lgpl-2.1.html>.
@@ -58,6 +58,8 @@ public class StandardTemplateStore implements TemplateStore {
     private final Map<String, Set<String>> dependencyIndex;
     private final Set<String> missingDependencies;
     private final Set<String> failed; // Stores IRIs that failed fetching
+    private final MessageHandler messageHandler;
+
     private TemplateStore standardLibrary;
 
     private final FormatManager formatManager;
@@ -68,6 +70,7 @@ public class StandardTemplateStore implements TemplateStore {
         dependencyIndex = new ConcurrentHashMap<>();
         missingDependencies = new HashSet<>();
         failed = new HashSet<>();
+        messageHandler = new MessageHandler();
     }
 
     @Override
@@ -84,8 +87,7 @@ public class StandardTemplateStore implements TemplateStore {
     public Result<BaseTemplate> addBaseTemplate(BaseTemplate baseTemplate) {
         if (templates.containsKey(baseTemplate.getIri()) && !checkParametersMatch(baseTemplate, templates.get(baseTemplate.getIri()))) {
             LOGGER.warn("BaseTemplate {} is already added with different parameters. Nothing will be added.", baseTemplate.getIri());
-            return Result.warning("BaseTemplate " + baseTemplate.getIri() + " is already added with different parameters. "
-                    + "Nothing will be added.");
+            return Result.warning("BaseTemplate " + baseTemplate.getIri() + " already exists with different parameters. ");
         }
         templates.put(baseTemplate.getIri(), baseTemplate);
         return Result.of(baseTemplate);
@@ -97,7 +99,7 @@ public class StandardTemplateStore implements TemplateStore {
 
         if (sig instanceof Template && !((Template)sig).getPattern().isEmpty()) {
             LOGGER.warn("Signature {} is a template and has dependencies set. Nothing will be added. ", sig.getIri());
-            return Result.warning("Signature " + sig.getIri() + " is a template and has dependencies set. Nothing will be added. ");
+            return Result.warning("Template " + sig.getIri() + " already exists. ");
         }
 
         if (sig == null || checkParametersMatch(template, sig)) {
@@ -108,9 +110,8 @@ public class StandardTemplateStore implements TemplateStore {
         } else {
             LOGGER.warn("Parameters of signature and template {} differ: {} | {}",
                     template.getIri(), sig.getParameters(), template.getParameters());
-
-            return Result.warning("Parameters of signature and template " + template.getIri() + " differ: "
-                    + sig.getParameters() + " | " + template.getParameters());
+            return Result.warning("Parameters of signature and template " + template.getIri()
+                    + " differ: " + sig.getParameters() + " | " + template.getParameters());
         }
     }
 
@@ -373,19 +374,19 @@ public class StandardTemplateStore implements TemplateStore {
     public void accept(Signature signature) {
         if (signature instanceof Template) {
             Result<Template> result = addTemplate((Template) signature);
-            if (!result.isPresent()) {
-                result.getMessageHandler().printMessages();
-            }
+            messageHandler.add(result);
+
         } else if (signature instanceof BaseTemplate) {
             Result<BaseTemplate> result = addBaseTemplate((BaseTemplate) signature);
-            if (!result.isPresent()) {
-                result.getMessageHandler().printMessages();
-            }
+            messageHandler.add(result);
+
         } else {
             Result<Signature> result = addSignature(signature);
-            if (!result.isPresent()) {
-                result.getMessageHandler().printMessages();
-            }
+            messageHandler.add(result);
         }
+    }
+
+    public MessageHandler getMessageHandler() {
+        return this.messageHandler;
     }
 }

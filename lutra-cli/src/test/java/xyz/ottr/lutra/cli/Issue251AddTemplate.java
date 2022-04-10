@@ -22,9 +22,9 @@ package xyz.ottr.lutra.cli;
  * #L%
  */
 
-import static org.junit.Assert.assertNotEquals;
-
 import org.junit.Test;
+import xyz.ottr.lutra.system.Assertions;
+import xyz.ottr.lutra.system.Message;
 import xyz.ottr.lutra.system.MessageHandler;
 
 public class Issue251AddTemplate {
@@ -32,11 +32,10 @@ public class Issue251AddTemplate {
     private static final String ROOT = "src/test/resources/issues/251AddTemplate/";
 
     @Test
-    public void test() {
+    public void testExistingTemplate() {
 
         String args = " "
-                //+ " --debugStackTrace"
-                + " -l " + ROOT + "templates.stottr"
+                + " -l " + ROOT + "temp_existingTemp.stottr"
                 + " -L stottr"
                 + " --stdout"
                 + " -I stottr"
@@ -46,26 +45,24 @@ public class Issue251AddTemplate {
         MessageHandler msgs = cli.getMessageHandler();
         cli.executeArgs(args.trim().split("\\s+"));
 
-        // CLI message handler should have warning message
-        assertNotEquals(0, msgs.getMessages().size());
+        Assertions.atLeast(msgs, Message.Severity.WARNING);
     }
 
     @Test
-    public void testExpand() {
+    public void testParametersOfSigAndTempDiffer() {
 
         String args = " "
-                + " --debugStackTrace"
-                + " -m expand"
-                + " -l " + ROOT + "templates.stottr"
+                + " -l " + ROOT + "temp_sigAndTempDiffer.stottr"
                 + " -L stottr"
-                + " --inputFormat stottr"
+                + " --stdout"
+                + " -I stottr"
                 + " " + ROOT + "instances.stottr";
 
         CLI cli = new CLI();
         MessageHandler msgs = cli.getMessageHandler();
         cli.executeArgs(args.trim().split("\\s+"));
 
-        // CLI message handler should have error message
-        assertNotEquals(0, msgs.getMessages().size());
+        Assertions.atLeast(msgs, Message.Severity.WARNING);
     }
+
 }

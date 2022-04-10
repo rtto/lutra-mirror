@@ -67,7 +67,10 @@ public class TemplateReader implements Function<String, ResultStream<Signature>>
     public MessageHandler loadTemplatesFromFile(TemplateStore store, String file) {
         ResultConsumer<Signature> consumer = new ResultConsumer<>(store);
         this.templatePipeline.apply(file).forEach(consumer);
-        return consumer.getMessageHandler();
+
+        MessageHandler msgs = store.getMessageHandler();
+        msgs.combine(consumer.getMessageHandler());
+        return msgs;
     }
 
     /**

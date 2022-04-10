@@ -144,6 +144,11 @@ public interface TemplateStore extends Consumer<Signature> {
     Result<Set<String>> getDependsOn(String template);
 
     /**
+     * Returns the MessageHandler in the store
+     */
+    MessageHandler getMessageHandler();
+
+    /**
      * Fetches all missing dependencies (according to #getMissingDependencies())
      * iteratively based on their IRI and adds them to this Store.
      *
