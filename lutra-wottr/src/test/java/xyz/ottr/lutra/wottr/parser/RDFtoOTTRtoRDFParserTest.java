@@ -62,15 +62,15 @@ public class RDFtoOTTRtoRDFParserTest {
     @Test
     public void test() {
 
+        // exclude test files which are bad by design
         assumeFalse(this.filename.contains("-bad-"));
         assumeFalse(this.filename.contains("/error"));
 
         // Try parse file with Jena.
         var rdfModel = RDFIO.fileReader().parse(this.filename);
 
-        var errors = rdfModel.getAllMessages().stream()
-            .filter(message -> message.getSeverity().isGreaterEqualThan(Message.Severity.ERROR))
-            .collect(Collectors.toList());
+        // exclude remaining test files that are not accepted by the RDF parser.
+        assumeTrue(rdfModel.isPresent());
 
         Model ottrModel = ModelUtils.getOTTRParsedRDFModel(this.filename);
 
