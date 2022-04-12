@@ -31,6 +31,11 @@ import xyz.ottr.lutra.model.Instance;
 import xyz.ottr.lutra.parser.InstanceParser;
 import xyz.ottr.lutra.system.ResultStream;
 
+/**
+ * An <code>InstanceReader</code> is a pipeline combining an {@link InputReader},
+ * consuming <code>String</code> denoting file paths,
+ * and an {@link xyz.ottr.lutra.parser.InstanceParser}.
+ */
 public class InstanceReader implements Function<String, ResultStream<Instance>> {
 
     private final Function<String, ResultStream<Instance>> instancePipeline;

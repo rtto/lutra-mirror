@@ -28,6 +28,15 @@ import xyz.ottr.lutra.writer.TemplateWriter;
  * #L%
  */
 
+/**
+ * An implementation of <code>Format</code> corresponds to one OTTR format 
+ * (wOTTR, bOTTR, stOTTR, etc.) and can be used to check what operations the 
+ * format supports (reading templates, writing instances, etc.), and contains 
+ * convenience methods for creating readers ({@link TemplateReader}, 
+ * {@link InstanceReader}) and writers ({@link xyz.ottr.lutra.writer.TemplateWriter}, 
+ * {@link xyz.ottr.lutra.writer.InstanceWriter}) for the format.
+ * A <code>Format</code> is typically retrieved from a {@link FormatManager}.
+ */
 public interface Format {
 
     enum Support {
