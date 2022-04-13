@@ -99,7 +99,7 @@ public class StandardTemplateStore implements TemplateStore {
 
         if (sig instanceof Template && !((Template)sig).getPattern().isEmpty()) {
             LOGGER.warn("Signature {} is a template and has dependencies set. Nothing will be added. ", sig.getIri());
-            return Result.warning("Template " + sig.getIri() + " already exists. ");
+            return Result.warning("There exist duplicate templates which may conflict with each other: " + sig.getIri());
         }
 
         if (sig == null || checkParametersMatch(template, sig)) {
@@ -110,7 +110,7 @@ public class StandardTemplateStore implements TemplateStore {
         } else {
             LOGGER.warn("Parameters of signature and template {} differ: {} | {}",
                     template.getIri(), sig.getParameters(), template.getParameters());
-            return Result.warning("Parameters of signature and template " + template.getIri()
+            return Result.error("Parameters of signature and template " + template.getIri()
                     + " differ: " + sig.getParameters() + " | " + template.getParameters());
         }
     }

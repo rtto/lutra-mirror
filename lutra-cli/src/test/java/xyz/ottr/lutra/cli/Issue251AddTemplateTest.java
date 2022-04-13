@@ -27,7 +27,7 @@ import xyz.ottr.lutra.system.Assertions;
 import xyz.ottr.lutra.system.Message;
 import xyz.ottr.lutra.system.MessageHandler;
 
-public class Issue251AddTemplate {
+public class Issue251AddTemplateTest {
 
     private static final String ROOT = "src/test/resources/issues/251AddTemplate/";
 
@@ -62,7 +62,7 @@ public class Issue251AddTemplate {
         MessageHandler msgs = cli.getMessageHandler();
         cli.executeArgs(args.trim().split("\\s+"));
 
-        Assertions.atLeast(msgs, Message.Severity.WARNING);
+        Assertions.atLeast(msgs, Message.Severity.ERROR);
     }
 
 }
