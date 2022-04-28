@@ -22,12 +22,10 @@ package xyz.ottr.lutra.util;
  * #L%
  */
 
-import java.util.Locale;
-import org.apache.commons.lang3.LocaleUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.jena.irix.IRIs;
 import org.apache.jena.irix.IRIx;
-import xyz.ottr.lutra.system.Message;
+import org.apache.jena.riot.web.LangTag;
 import xyz.ottr.lutra.system.Result;
 
 public class DataValidator {
@@ -57,30 +55,19 @@ public class DataValidator {
     }
 
     public static Result<String> asLanguageTagString(String value) {
-        var result = Result.of(value);
-        Locale locale = Locale.forLanguageTag(value.replace("-", "_"));
-        if (!LocaleUtils.isAvailableLocale(locale)) {
-            result.addMessage(Message.warning("Invalid language tag. Value " + value + " is not a valid language tag."));
+        if (isLanguageTag(value)) {
+            return Result.of(value);
         }
-        return result;
+
+        return Result.error("Invalid language tag. Value " + value + " is not a language tag.");
     }
 
     public static boolean isLanguageTag(String value) {
         if (isEmpty(value)) {
             return false;
         }
-        // first character must be a letter:
-        if (!isASCIIAlpha(value.charAt(0))) {
-            return false;
-        }
-        // only alphanumerics or '-' allowed:
-        for (int i = 1; i < value.length(); i++) {
-            char c = value.charAt(i);
-            if (!(isASCIIAlphaNumeric(c) || c == '-')) {
-                return false;
-            }
-        }
-        return true;
+
+        return LangTag.check(value);
     }
 
     public static boolean isChar(String value) {
@@ -92,11 +79,11 @@ public class DataValidator {
     }
 
     public static Result<Character> asChar(String value) {
-        if (!isChar(value)) {
-            return Result.error("Invalid character. Value " + value + " is not a character.");
+        if (isChar(value)) {
+            return Result.of(value.charAt(0));
         }
 
-        return Result.of(value.charAt(0));
+        return Result.error("Invalid character. Value " + value + " is not a character.");
     }
 
     /*
@@ -175,22 +162,6 @@ public class DataValidator {
 
     private static boolean isDigit(char c) {
         return c >= '0' && c <= '9';
-    }
-
-    private static boolean isASCIILowercase(char c) {
-        return c >= 'a' && c <= 'z';
-    }
-
-    private static boolean isASCIIUppercase(char c) {
-        return c >= 'A' && c <= 'Z';
-    }
-
-    private static boolean isASCIIAlpha(char c) {
-        return isASCIILowercase(c) || isASCIIUppercase(c);
-    }
-
-    private static boolean isASCIIAlphaNumeric(char c) {
-        return isDigit(c) || isASCIIAlpha(c);
     }
 
 }

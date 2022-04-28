@@ -89,7 +89,7 @@ public class DataValidatorTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"no", "en-GB", "en-GB-London", "cmn-Hans-CN"})
+    @ValueSource(strings = {"no", "en-GB", "en-GB-London", "cmn-Hans-CN", "de-CH-1901"})
     public void shouldAcceptLanguageTagsAndGiveNoErrors(String value) {
         assertTrue(DataValidator.isLanguageTag(value));
         Assertions.noErrors(DataValidator.asLanguageTagString(value));
