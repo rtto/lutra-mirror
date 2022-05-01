@@ -30,25 +30,24 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
 import org.apache.commons.io.FilenameUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
-
 import xyz.ottr.lutra.io.Files;
 import xyz.ottr.lutra.io.InstanceReader;
 import xyz.ottr.lutra.io.TemplateReader;
 import xyz.ottr.lutra.model.Instance;
 import xyz.ottr.lutra.model.Signature;
+import xyz.ottr.lutra.store.StandardTemplateStore;
 import xyz.ottr.lutra.store.TemplateStore;
-import xyz.ottr.lutra.store.graph.DependencyGraph;
+import xyz.ottr.lutra.system.Assertions;
 import xyz.ottr.lutra.system.Message;
 import xyz.ottr.lutra.system.Result;
 import xyz.ottr.lutra.system.ResultConsumer;
 import xyz.ottr.lutra.system.ResultStream;
-import xyz.ottr.lutra.wottr.io.RDFFileReader;
+import xyz.ottr.lutra.wottr.io.RDFIO;
 
 
 @RunWith(Parameterized.class)
@@ -58,20 +57,8 @@ public class ShaclEquivalenceTest {
     private static final String incorrect = FilenameUtils.separatorsToSystem("src/test/resources/spec/tests/incorrect/");
 
     private static final Set<String> unsupportedTests = Stream.of(
-            correct + "basetemplate03.ttl", // Annotations
-            correct + "signature10.ttl", // Annotations
-            correct + "signature11.ttl", // Annotations
-            incorrect + "basic01a.ttl", // Prefixes 
-            incorrect + "basic01b.ttl", // Prefixes 
-            incorrect + "basic01c.ttl", // Prefixes 
-            incorrect + "basic01d.ttl", // Prefixes 
-            incorrect + "basic01e.ttl", // Prefixes 
-            incorrect + "basic02.ttl",  // Prefixes
-            incorrect + "basic03.ttl",  // Prefixes
-            incorrect + "basic04.ttl",  // Prefixes
             incorrect + "instance10.ttl", // Instance checking on types
-            incorrect + "signature06.ttl", // TODO: Fix somehow
-            incorrect + "signature12.ttl" // Annotation
+            incorrect + "signature06.ttl" // TODO: Fix somehow
         ).collect(Collectors.toSet());
     
     private static final Set<String> instanceTests = Stream.of(
@@ -80,15 +67,7 @@ public class ShaclEquivalenceTest {
             correct + "instance01.ttl", 
             correct + "instance02.ttl", 
             correct + "instance08.ttl", 
-            incorrect + "argument01.ttl", 
-            incorrect + "basic01a.ttl", 
-            incorrect + "basic01b.ttl", 
-            incorrect + "basic01c.ttl", 
-            incorrect + "basic01d.ttl", 
-            incorrect + "basic01e.ttl", 
-            incorrect + "basic02.ttl", 
-            incorrect + "basic03.ttl", 
-            incorrect + "basic04.ttl", 
+            incorrect + "argument01.ttl",
             incorrect + "instance03.ttl", 
             incorrect + "instance04.ttl", 
             incorrect + "instance05.ttl", 
@@ -97,7 +76,7 @@ public class ShaclEquivalenceTest {
             incorrect + "instance09.ttl", 
             incorrect + "instance10.ttl", 
             incorrect + "instance11.ttl", 
-            incorrect + "instance12.ttl" 
+            incorrect + "instance12.ttl"
         ).collect(Collectors.toSet());
     
     private final TemplateReader tempReader;
@@ -110,8 +89,8 @@ public class ShaclEquivalenceTest {
         this.filename = filename;
         this.isCorrect = isCorrect;
         
-        this.tempReader = new TemplateReader(new RDFFileReader(), new WTemplateParser());
-        this.insReader = new InstanceReader(new RDFFileReader(), new WInstanceParser());
+        this.tempReader = new TemplateReader(RDFIO.fileReader(), new WTemplateParser());
+        this.insReader = new InstanceReader(RDFIO.fileReader(), new WInstanceParser());
     }
     
     @Parameters(name = "{index}: {0} is {1}")
@@ -151,7 +130,7 @@ public class ShaclEquivalenceTest {
 
         ResultStream<Signature> templates = this.tempReader.apply(file);
 
-        TemplateStore store = new DependencyGraph(null);
+        TemplateStore store = new StandardTemplateStore(null);
         ResultConsumer<Signature> tplErrorMessages = new ResultConsumer<>(store);
         templates.forEach(tpl -> {
             if (correct) {
@@ -165,7 +144,7 @@ public class ShaclEquivalenceTest {
             .combine(tplErrorMessages.getMessageHandler())
             .getMessages();
 
-        errors.removeIf(message -> !Message.moreSevere(message.getLevel(), Message.ERROR));
+        errors.removeIf(message -> message.getSeverity().isLessThan(Message.Severity.ERROR));
 
         if (!correct) {
             assertFalse("Should produce error messages: " + file, errors.isEmpty());
@@ -173,7 +152,7 @@ public class ShaclEquivalenceTest {
             assertTrue("File " + file + " should not produce any error messages, but gave:\n"
                 + errors, errors.isEmpty());
             assertTrue("File " + file + " should produce a template, but no templates produced.",
-                store.getAllTemplateObjects().getStream().count() > 0);
+                store.getAllSignatures().getStream().count() > 0);
         }
     }
 
@@ -189,14 +168,10 @@ public class ShaclEquivalenceTest {
             insErrorMessages.accept(ins);
         });
 
-        int msgLvl = insErrorMessages.getMessageHandler().printMessages();
-        if (!correct) {
-            assertTrue("Should produce error messages: " + file, Message.moreSevere(msgLvl, Message.ERROR));
-        }
         if (correct) {
-            assertFalse("File " + file + " should not produce any error messages, but gave:\n"
-                + insErrorMessages.getMessageHandler().getMessages(),
-                Message.moreSevere(msgLvl, Message.ERROR));
+            Assertions.noErrors(insErrorMessages);
+        } else {
+            Assertions.atLeast(insErrorMessages, Message.Severity.ERROR);
         }
     }
 

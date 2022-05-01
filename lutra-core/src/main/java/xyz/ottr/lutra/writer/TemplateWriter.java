@@ -1,5 +1,8 @@
 package xyz.ottr.lutra.writer;
 
+
+
+
 /*-
  * #%L
  * lutra-core
@@ -22,17 +25,15 @@ package xyz.ottr.lutra.writer;
  * #L%
  */
 
+import java.util.Optional;
 import java.util.Set;
+import java.util.function.BiFunction;
 import java.util.function.Consumer;
-
 import xyz.ottr.lutra.model.Signature;
+import xyz.ottr.lutra.system.Message;
+import xyz.ottr.lutra.system.MessageHandler;
 
 public interface TemplateWriter extends Consumer<Signature> {
-
-    /**
-     * Returns the set of IRIs which is added to this writer.
-     */
-    Set<String> getIRIs();
 
     /**
      * Adds a template definition to this writer.
@@ -51,6 +52,17 @@ public interface TemplateWriter extends Consumer<Signature> {
     default void addTemplates(Set<Signature> templates) {
         templates.forEach(this);
     }
-
-    String write(String iri);
+    
+    /**
+     * Set writer function which will write to file
+     * 
+     * @param stringConsumer
+     *      A function to which the written string are applied
+     */
+    void setWriterFunction(BiFunction<String, String, Optional<Message>> stringConsumer);
+    
+    /**
+     * Return message handler
+     */
+    MessageHandler getMessages();
 }

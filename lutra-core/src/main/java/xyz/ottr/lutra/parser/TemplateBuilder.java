@@ -23,7 +23,6 @@ package xyz.ottr.lutra.parser;
  */
 
 import java.util.Set;
-
 import lombok.Builder;
 import xyz.ottr.lutra.model.Instance;
 import xyz.ottr.lutra.model.Signature;
@@ -43,33 +42,25 @@ public enum TemplateBuilder {
             + "a (possibly empty) set of instances."));
 
         var builder = Result.of(Template.builder());
+
+        // Must copy signature fields. @SuperBuilder does not work when annotating static methods
         builder.addResult(signature, (bldr, sign) -> {
             bldr.iri(sign.getIri());
             bldr.parameters(sign.getParameters());
+            bldr.annotations(sign.getAnnotations());
         });
-        builder.addResult(instances, Template.TemplateBuilder::instances);
+        builder.addResult(instances, (bldr, insts) -> {
+            bldr.instances(insts);
+            bldr.isEmptyPattern(insts.isEmpty());
+        });
 
         if (Result.allIsPresent(signature, instances)) {
-            var template = builder.map(Template.TemplateBuilder::build);
-            validate(template);
-            return template;
+            return builder.map(Template.TemplateBuilder::build)
+                .flatMap(Template::validate);
         } else {
             return Result.empty(builder);
         }
     }
-
-    private static void validate(Result<Template> template) {
-        checkEmptyPattern(template);
-    }
-
-    private static void checkEmptyPattern(Result<Template> template) {
-        template.ifPresent(t -> {
-            if (t.getPattern().isEmpty()) {
-                template.addWarning("Template has an empty pattern.");
-            }
-        });
-    }
-
 
 }
 

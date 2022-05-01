@@ -22,119 +22,167 @@ package xyz.ottr.lutra.stottr.writer;
  * #L%
  */
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.Optional;
+import java.util.function.BiFunction;
 import java.util.stream.Collectors;
-
 import org.apache.jena.shared.PrefixMapping;
-import xyz.ottr.lutra.OTTR;
+import xyz.ottr.lutra.Space;
 import xyz.ottr.lutra.model.BaseTemplate;
 import xyz.ottr.lutra.model.Parameter;
 import xyz.ottr.lutra.model.Signature;
 import xyz.ottr.lutra.model.Template;
 import xyz.ottr.lutra.model.types.BasicType;
-import xyz.ottr.lutra.model.types.LUBType;
-import xyz.ottr.lutra.model.types.ListType;
-import xyz.ottr.lutra.model.types.NEListType;
-import xyz.ottr.lutra.model.types.TermType;
+import xyz.ottr.lutra.model.types.ComplexType;
+import xyz.ottr.lutra.model.types.Type;
 import xyz.ottr.lutra.stottr.STOTTR;
+import xyz.ottr.lutra.system.Message;
+import xyz.ottr.lutra.system.MessageHandler;
 import xyz.ottr.lutra.writer.TemplateWriter;
 
 public class STemplateWriter implements TemplateWriter {
 
-    private final Map<String, Signature> templates;
+    /*
+    private static final Comparator<Signature> signatureComparator =
+        Comparator.comparing(sign -> sign.getClass().getSimpleName() + sign.getIri(), String::compareToIgnoreCase);
+    */
+    
+    //private final Map<String, Signature> templates;
     private final PrefixMapping prefixes;
-
-    public STemplateWriter() {
-        this(OTTR.getDefaultPrefixes());
-    }
+    
+    private MessageHandler msgs;
+    private BiFunction<String, String, Optional<Message>> stringConsumer;
 
     public STemplateWriter(PrefixMapping prefixes) {
-        this.templates = new HashMap<>();
+        //this.templates = new HashMap<>();
         this.prefixes = prefixes;
+        this.msgs = new MessageHandler();
+        stringConsumer = null;
     }
 
+    /*
     @Override
     public Set<String> getIRIs() {
         return this.templates.keySet();
     }
+    */    
 
     @Override
     public void accept(Signature template) {
-        this.templates.put(template.getIri(), template);
+        //this.templates.put(template.getIri(), template);
+        
+        String iri = template.getIri();
+        if (iri != null) {
+            String content = writeSignature(template, true);
+            stringConsumer.apply(iri, content).ifPresent(msgs::add); //write template to file or console
+        }
     }
+    
+    /*
+    public String write() {
+        return SPrefixWriter.write(this.prefixes)
+            + Space.LINEBR2
+            + this.templates.values().stream()
+                .sorted(signatureComparator)
+                .map(signature -> writeSignature(signature, false))
+                .collect(Collectors.joining(Space.LINEBR2));
+    }
+    */
 
+    /*
     public String write(String iri) {
 
-        StringBuilder builder = new StringBuilder();
         Signature template = this.templates.get(iri);
+        return template == null
+            ? null
+            : writeSignature(template, true);
+    }
+    */
 
-        if  (template == null) {
-            return null;
-        }
+    public String writeSignature(Signature signature, boolean includePrefixes) {
 
-        var parameterVariables = template.getParameters().stream()
+        var parameterVariables = signature.getParameters().stream()
             .map(Parameter::getTerm)
             .collect(Collectors.toSet());
 
         STermWriter termWriter = new STermWriter(this.prefixes, parameterVariables);
 
-        builder.append(writeSignature(template, termWriter));
+        StringBuilder builder = new StringBuilder();
 
-        if (template instanceof BaseTemplate) {
-            builder.append(" " + STOTTR.Statements.signatureSep + " " + STOTTR.Statements.baseBody);
-        } else if (template instanceof Template) {
-            builder.append(" " + STOTTR.Statements.signatureSep + " " + STOTTR.Statements.bodyStart + "\n");
-            builder.append(writePattern((Template) template, termWriter));
-            builder.append("\n" + STOTTR.Statements.bodyEnd);
+        if (signature instanceof BaseTemplate) {
+            builder.append(writeBaseTemplate((BaseTemplate)signature, termWriter));
+        } else if (signature instanceof Template) {
+            builder.append(writeTemplate((Template)signature, termWriter));
+        } else {
+            builder.append(writeSignature(signature, termWriter));
         }
 
         builder.append(STOTTR.Statements.statementEnd);
 
-        // Write used prefixes at start of String
-        builder.insert(0, writeUsedPrefixes(termWriter.getUsedPrefixes()) + "\n\n");
+        // Write prefixes at start of String
+        if (includePrefixes) {
+            builder.insert(0, SPrefixWriter.write(termWriter.getUsedPrefixes()) + Space.LINEBR2);
+        }
 
         return builder.toString();
     }
 
-    private String writeUsedPrefixes(Set<String> usedPrefixes) {
 
-        PrefixMapping usedPrefixMap = PrefixMapping.Factory.create();
-        for (Map.Entry<String, String> nsln : this.prefixes.getNsPrefixMap().entrySet()) {
-            if (usedPrefixes.contains(nsln.getKey())) {
-                usedPrefixMap.setNsPrefix(nsln.getKey(), nsln.getValue());
-            }
-        }
-        return SPrefixWriter.write(usedPrefixMap);
+    protected StringBuilder writeSignature(Signature signature, STermWriter termWriter) {
+
+        StringBuilder builder = new StringBuilder();
+        builder.append(termWriter.writeIRI(signature.getIri()));
+        builder.append(this.writeParameters(signature, termWriter));
+        builder.append(this.writeAnnotations(signature, termWriter));
+        return builder;
     }
 
-    private StringBuilder writeSignature(Signature template, STermWriter termWriter) {
+    private StringBuilder writeBaseTemplate(BaseTemplate baseTemplate, STermWriter termWriter) {
+
+        StringBuilder builder = new StringBuilder();
+        builder.append(writeSignature(baseTemplate, termWriter));
+        builder.append(STOTTR.Statements.signatureSep);
+        builder.append(STOTTR.Statements.baseBody);
+        return builder;
+    }
+
+    private StringBuilder writeTemplate(Template template, STermWriter termWriter) {
+
+        StringBuilder builder = new StringBuilder();
+        builder.append(writeSignature(template, termWriter));
+        builder.append(STOTTR.Statements.signatureSep);
+        builder.append(STOTTR.Statements.bodyStart);
+        builder.append(writePattern(template, termWriter));
+        builder.append(Space.LINEBR);
+        builder.append(STOTTR.Statements.bodyEnd);
+        return builder;
+    }
+
+    protected StringBuilder writeParameters(Signature signature, STermWriter termWriter) {
+
+        StringBuilder builder = new StringBuilder();
+        builder.append(signature.getParameters().stream()
+            .map(parameter -> writeParameter(parameter, termWriter))
+            .map(p -> Space.LINEBR + Space.INDENT + p)
+            .collect(Collectors.joining(
+                STOTTR.Parameters.paramSep,
+                STOTTR.Parameters.sigParamsStart,
+                Space.LINEBR + STOTTR.Parameters.sigParamsEnd)));
+        return builder;
+    }
+
+    private StringBuilder writeParameter(Parameter parameter, STermWriter termWriter) {
 
         StringBuilder builder = new StringBuilder();
 
-        builder.append(termWriter.writeIRI(template.getIri()));
-        builder.append(STOTTR.Parameters.sigParamsStart);
+        builder.append(writeModes(parameter.isNonBlank(), parameter.isOptional()));
+        builder.append(writeType(parameter.getTerm().getType(), termWriter));
+        builder.append(Space.SPACE);
+        builder.append(termWriter.write(parameter.getTerm()));
 
-        List<Parameter> params = template.getParameters();
-        String sep = "";
-        
-        for (Parameter param : params) {
-
-            builder.append(sep);
-            builder.append(writeModes(param.isNonBlank(), param.isOptional()));
-            builder.append(writeType(param.getTerm().getType(), termWriter));
-            builder.append(" ");
-            builder.append(termWriter.write(param.getTerm()));
-
-            if (param.hasDefaultValue()) {
-                builder.append(STOTTR.Parameters.defaultValSep).append(termWriter.write(param.getDefaultValue()));
-            }
-
-            sep = STOTTR.Parameters.paramSep + " ";
+        if (parameter.hasDefaultValue()) {
+            builder.append(STOTTR.Parameters.defaultValSep).append(termWriter.write(parameter.getDefaultValue()));
         }
-        builder.append(STOTTR.Parameters.sigParamsEnd);
+
         return builder;
     }
 
@@ -142,59 +190,88 @@ public class STemplateWriter implements TemplateWriter {
 
         StringBuilder builder = new StringBuilder();
 
-        boolean written = false;
         if (isNonBlank) {
             builder.append(STOTTR.Parameters.nonBlank);
-            written = true;
         }
 
         if (isOptional) {
             builder.append(STOTTR.Parameters.optional);
-            written = true;
         }
 
-        if (written) {
-            builder.append(" ");
+        if (builder.length() != 0) {
+            builder.append(Space.SPACE);
         }
         return builder;
     }
 
-    private StringBuilder writeType(TermType type, STermWriter termWriter) {
+    private StringBuilder writeType(Type type, STermWriter termWriter) {
+        return type instanceof BasicType
+            ? new StringBuilder(termWriter.writeIRI(((BasicType) type).getIri()))
+            : writeComplexType((ComplexType)type, termWriter);
+    }
+
+    private StringBuilder writeComplexType(ComplexType type, STermWriter termWriter) {
+
+        String typeStr = STOTTR.Types.map.get(type.getClass());
+        Type innerType = type.getInner();
 
         StringBuilder builder = new StringBuilder();
 
-        if (type instanceof BasicType) {
-            builder.append(termWriter.writeIRI(((BasicType) type).getIri()));
-        } else {
-
-            String typeStr;
-            TermType innerType;
-
-            if (type instanceof LUBType) {
-                typeStr = STOTTR.Types.lub;
-                innerType = ((LUBType) type).getInner();
-            } else if (type instanceof ListType) {
-                typeStr = STOTTR.Types.list;
-                innerType = ((ListType) type).getInner();
-            } else { // instanceof NEListType
-                typeStr = STOTTR.Types.neList;
-                innerType = ((NEListType) type).getInner();
-            } 
-
-            builder.append(typeStr).append(STOTTR.Types.innerTypeStart);
-            builder.append(writeType(innerType, termWriter));
-            builder.append(STOTTR.Types.innerTypeEnd);
-        }
+        builder.append(typeStr).append(STOTTR.Types.innerTypeStart);
+        builder.append(writeType(innerType, termWriter));
+        builder.append(STOTTR.Types.innerTypeEnd);
         return builder;
     }
 
     private String writePattern(Template template, STermWriter termWriter) {
-        SInstanceWriter instanceWriter = new SPatternInstanceWriter(termWriter);
-        template.getPattern().forEach(instanceWriter);
-        return instanceWriter.write();
+
+        SInstanceWriter instanceWriter = new SInstanceWriter(termWriter);
+        var pattern = template.getPattern();
+
+        if (pattern.isEmpty()) {
+            return Space.LINEBR + Space.INDENT + STOTTR.Statements.commentStart + "Empty pattern";
+        } else {
+            return pattern.stream()
+                .sorted(instanceWriter.instanceSorter)
+                .map(instanceWriter::writeInstance)
+                .map(i -> Space.LINEBR + Space.INDENT + i)
+                .collect(Collectors.joining(STOTTR.Statements.bodyInsSep));
+        }
     }
 
-    public void printDefinitions() {
-        //TODO
+    protected String writeAnnotations(Signature signature, STermWriter termWriter) {
+
+        SInstanceWriter instanceWriter = new SAnnotationInstanceWriter(termWriter);
+
+        var annotations = signature.getAnnotations().stream()
+                .sorted(instanceWriter.instanceSorter)
+                .map(instanceWriter::writeInstance)
+                .map(i -> Space.LINEBR + STOTTR.Statements.annotationStart +  i)
+                .collect(Collectors.joining(STOTTR.Statements.bodyInsSep));
+
+        if (!annotations.isEmpty()) {
+            annotations += Space.LINEBR;
+        }
+
+        return annotations;
+    }
+    
+    /**
+     * Set writer function which will write to file
+     * 
+     * @param stringConsumer
+     *      A function to which the written string are applied
+     */
+    @Override
+    public void setWriterFunction(BiFunction<String, String, Optional<Message>> stringConsumer) {
+        this.stringConsumer = stringConsumer;
+    }
+    
+    /**
+     * @return MessageHandler
+     */
+    @Override
+    public MessageHandler getMessages() {
+        return this.msgs;
     }
 }

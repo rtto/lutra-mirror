@@ -23,20 +23,19 @@ package xyz.ottr.lutra.wottr.parser;
  */
 
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertFalse;
 
 import org.apache.jena.rdf.model.Model;
-import org.apache.jena.riot.Lang;
 import org.junit.Assert;
 import xyz.ottr.lutra.io.InstanceReader;
 import xyz.ottr.lutra.model.Instance;
+import xyz.ottr.lutra.store.Expander;
+import xyz.ottr.lutra.store.StandardTemplateStore;
 import xyz.ottr.lutra.store.TemplateStore;
-import xyz.ottr.lutra.store.graph.DependencyGraph;
-import xyz.ottr.lutra.system.Message;
+import xyz.ottr.lutra.store.expansion.NonCheckingExpander;
+import xyz.ottr.lutra.system.Assertions;
 import xyz.ottr.lutra.system.ResultConsumer;
 import xyz.ottr.lutra.system.ResultStream;
-import xyz.ottr.lutra.wottr.io.Models;
-import xyz.ottr.lutra.wottr.io.RDFFileReader;
+import xyz.ottr.lutra.wottr.io.RDFIO;
 import xyz.ottr.lutra.wottr.writer.WInstanceWriter;
 
 public enum ModelUtils {
@@ -55,8 +54,8 @@ public enum ModelUtils {
             actual.clearNsPrefixMap();
             expected.clearNsPrefixMap();
 
-            String rdfActual = Models.writeModel(actual, Lang.TURTLE);
-            String rdfExpected = Models.writeModel(expected, Lang.TURTLE);
+            String rdfActual = RDFIO.writeToString(actual);
+            String rdfExpected = RDFIO.writeToString(expected);
 
             Assert.assertThat(rdfActual, is(rdfExpected));
         }
@@ -66,20 +65,20 @@ public enum ModelUtils {
     // read RDF file, expand instances (only base instances), and return OTTR parsed RDF model
     public static Model getOTTRParsedRDFModel(String filename) {
 
-        TemplateStore store = new DependencyGraph(null);
+        TemplateStore store = new StandardTemplateStore(null);
         store.addOTTRBaseTemplates();
+        Expander expander = new NonCheckingExpander(store); 
 
-        InstanceReader insReader = new InstanceReader(new RDFFileReader(), new WInstanceParser());
+        InstanceReader insReader = new InstanceReader(RDFIO.fileReader(), new WInstanceParser());
         ResultStream<Instance> expandedInInstances = insReader
             .apply(filename)
-            .innerFlatMap(store::expandInstance);
+            .innerFlatMap(expander::expandInstance);
 
         // Write expanded instances to model
         WInstanceWriter insWriter = new WInstanceWriter();
         ResultConsumer<Instance> expansionErrors = new ResultConsumer<>(insWriter);
         expandedInInstances.forEach(expansionErrors);
-        assertFalse(Message.moreSevere(expansionErrors.getMessageHandler().printMessages(),
-            Message.ERROR)); // No errors when expanding
+        Assertions.noErrors(expansionErrors);
         return insWriter.writeToModel();
     }
 

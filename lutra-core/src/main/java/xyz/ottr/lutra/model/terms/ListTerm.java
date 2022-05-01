@@ -27,7 +27,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-
 import lombok.Builder;
 import lombok.Singular;
 import org.apache.jena.shared.PrefixMapping;
@@ -35,7 +34,7 @@ import xyz.ottr.lutra.model.Substitution;
 import xyz.ottr.lutra.model.types.LUBType;
 import xyz.ottr.lutra.model.types.ListType;
 import xyz.ottr.lutra.model.types.NEListType;
-import xyz.ottr.lutra.model.types.TermType;
+import xyz.ottr.lutra.model.types.Type;
 import xyz.ottr.lutra.model.types.TypeRegistry;
 
 public class ListTerm extends AbstractTerm<Long> {
@@ -61,7 +60,7 @@ public class ListTerm extends AbstractTerm<Long> {
         this(List.of(terms));
     }
 
-    private static TermType getIntrinsicType(List<Term> terms) {
+    private static Type getIntrinsicType(List<Term> terms) {
         return terms.isEmpty()
             ? new ListType(TypeRegistry.BOT)
             : new NEListType(new LUBType(TypeRegistry.TOP));
@@ -103,8 +102,8 @@ public class ListTerm extends AbstractTerm<Long> {
 
     @Override
     public Term apply(Substitution substitution) {
-        // TODO is it correct to create a new list?
         return this.toBuilder()
+            .clearTerms()
             .terms(substitution.apply(this.terms))
             .build();
     }

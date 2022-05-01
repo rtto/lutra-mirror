@@ -30,7 +30,6 @@ import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
 import lombok.Builder;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.apache.commons.dbutils.QueryRunner;
@@ -42,6 +41,7 @@ import xyz.ottr.lutra.bottr.model.ArgumentMap;
 import xyz.ottr.lutra.bottr.model.ArgumentMaps;
 import xyz.ottr.lutra.bottr.model.Source;
 import xyz.ottr.lutra.model.Argument;
+import xyz.ottr.lutra.system.Message;
 import xyz.ottr.lutra.system.Result;
 import xyz.ottr.lutra.system.ResultStream;
 
@@ -76,8 +76,8 @@ public class JDBCSource implements Source<String> {
             return new ResultStream<>(stream);
 
         } catch (SQLException ex) {
-            return ResultStream.of(Result.error(
-                "Error running query " + query + " over database " + this.dataSource.getUrl() + ": " + ex.getMessage()));
+            return ResultStream.of(Result.empty(Message.error(
+                "Error running query " + query + " over database " + this.dataSource.getUrl() + ".", ex)));
         }
     }
 

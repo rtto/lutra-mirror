@@ -23,24 +23,23 @@ package xyz.ottr.lutra.model.terms;
  */
 
 import java.util.Objects;
-
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import org.apache.jena.shared.PrefixMapping;
 import xyz.ottr.lutra.OTTR;
 import xyz.ottr.lutra.model.Substitution;
-import xyz.ottr.lutra.model.types.TermType;
+import xyz.ottr.lutra.model.types.Type;
 
 @Getter
 @Setter
 public abstract class AbstractTerm<T> implements Term {
 
     private final T identifier;
-    protected @NonNull TermType type;
+    protected @NonNull Type type;
     protected boolean variable;
 
-    AbstractTerm(T identifier, TermType type) {
+    AbstractTerm(T identifier, Type type) {
         this.identifier = identifier;
         this.type = type;
     }

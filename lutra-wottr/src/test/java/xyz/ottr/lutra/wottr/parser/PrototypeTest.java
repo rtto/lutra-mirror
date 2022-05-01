@@ -22,23 +22,29 @@ package xyz.ottr.lutra.wottr.parser;
  * #L%
  */
 
+import java.io.File;
+import java.util.Optional;
+import java.util.function.BiFunction;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import xyz.ottr.lutra.io.Files;
 import xyz.ottr.lutra.io.TemplateReader;
 import xyz.ottr.lutra.model.Template;
-import xyz.ottr.lutra.store.graph.DependencyGraph;
+import xyz.ottr.lutra.store.StandardTemplateStore;
+import xyz.ottr.lutra.store.TemplateStore;
+import xyz.ottr.lutra.system.Message;
 import xyz.ottr.lutra.system.ResultConsumer;
-import xyz.ottr.lutra.wottr.io.RDFFileReader;
-import xyz.ottr.lutra.wottr.parser.WTemplateParser;
+import xyz.ottr.lutra.wottr.io.RDFIO;
 import xyz.ottr.lutra.wottr.writer.WTemplateWriter;
+
 
 public class PrototypeTest {
 
     private static final String inFolder = "src/test/resources/correct/";
     //private static final String inFolder = "src/test/resources/correct/definitions/cluster/pizza-alt/";
     //private static final String inFolder = "/home/leifhka/gits/aibel-templates_altered/tpl/etl/book/";
-    private static DependencyGraph graph;
+    private static TemplateStore graph;
     private static TemplateReader templateReader;
     private static TemplateReader legacyReader;
 
@@ -46,9 +52,9 @@ public class PrototypeTest {
 
     @BeforeClass    
     public static void load() {
-        legacyReader = new TemplateReader(new RDFFileReader(), new xyz.ottr.lutra.wottr.parser.WTemplateParser());
-        templateReader = new TemplateReader(new RDFFileReader(), new WTemplateParser());
-        graph = new DependencyGraph(null);
+        legacyReader = new TemplateReader(RDFIO.fileReader(), new xyz.ottr.lutra.wottr.parser.WTemplateParser());
+        templateReader = new TemplateReader(RDFIO.fileReader(), new WTemplateParser());
+        graph = new StandardTemplateStore(null);
     }
 
     @Test
@@ -102,7 +108,7 @@ public class PrototypeTest {
         //long c = expanded.getStream().count();
         //System.out.println("Done expanding, got " + c + " instances.");
 
-        //InstanceReader instanceReader = new InstanceReader(new RDFFileReader(),
+        //InstanceReader instanceReader = new InstanceReader(RDFIO.fileReader(),
         //        new WInstanceParser());
 
 
@@ -120,11 +126,30 @@ public class PrototypeTest {
 
         WTemplateWriter templateWriter = new WTemplateWriter();
         ResultConsumer<Template> resultConsumer = new ResultConsumer(templateWriter);
-        //expGraph.getAllTemplates().forEach(resultConsumer); 
+
+        String folderPath = "src/test/resources/ProtoTypeTest/";
+
+        BiFunction<String, String, Optional<Message>> writer = (iri, str) -> {
+            return Files.writeTemplatesTo(iri, str, folderPath, ".suffix");
+        };
+        templateWriter.setWriterFunction(writer);
+        //expGraph.getAllTemplates().forEach(resultConsumer);
         graph.getAllTemplates().forEach(resultConsumer); 
-        resultConsumer.getMessageHandler().printMessages();
+        resultConsumer.getMessageHandler().combine(templateWriter.getMessages()).printMessages();
         //System.out.println("Templates:");
         //templateWriter.printDefinitions();
+
+        deleteDirectory(new File(folderPath));
+    }
+
+    private void deleteDirectory(File directoryToBeDeleted) {
+        File[] allContents = directoryToBeDeleted.listFiles();
+        if (allContents != null) {
+            for (File file : allContents) {
+                deleteDirectory(file);
+            }
+        }
+        directoryToBeDeleted.delete();
     }
 
     @AfterClass

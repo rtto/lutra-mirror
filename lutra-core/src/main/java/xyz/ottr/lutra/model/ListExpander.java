@@ -25,7 +25,6 @@ package xyz.ottr.lutra.model;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.IntStream;
-
 import xyz.ottr.lutra.model.terms.ListTerm;
 import xyz.ottr.lutra.model.terms.NoneTerm;
 import xyz.ottr.lutra.model.terms.Term;

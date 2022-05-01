@@ -24,13 +24,14 @@ package xyz.ottr.lutra.system;
 
 import java.io.PrintStream;
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
+import lombok.Setter;
 
 public class MessageHandler {
 
@@ -40,20 +41,17 @@ public class MessageHandler {
     private final PrintStream printStream;
     private final Set<String> printedMsgs;
 
-    private boolean quiet = false;
+    @Setter
+    private boolean quiet;
 
     public MessageHandler(PrintStream printStream) {
         this.printStream = printStream;
-        this.traces = new HashSet<>();
-        this.printedMsgs = new HashSet<>();
+        this.traces = new LinkedHashSet<>();
+        this.printedMsgs = new LinkedHashSet<>();
     }
 
     public MessageHandler() {
         this(System.err);
-    }
-
-    public void setQuiet(boolean isQuiet) {
-        this.quiet = isQuiet;
     }
 
     public void add(Message msg) {
@@ -89,10 +87,8 @@ public class MessageHandler {
      *
      * @param element
      *     Element to applied the consumer to
-     * @param consumer
-     *     Consumer which will consume value in element if present
      */
-    public <T> int use(Result<T> element, Consumer<T> consumer) {
+    public <T> Message.Severity use(Result<T> element, Consumer<T> consumer) {
         // TODO: This only depends on this.output and it not so natural,  perhaps move
         ResultConsumer<T> resConsumer = new ResultConsumer<>(consumer, this.printStream);
         resConsumer.accept(element);
@@ -111,7 +107,7 @@ public class MessageHandler {
         return msgs;
     }
 
-    public int getMostSevere() {
+    public Message.Severity getMostSevere() {
         return visitMessagesAndTraces(_ignore -> { }, _ignore -> { });
     }
     
@@ -123,18 +119,16 @@ public class MessageHandler {
      *      Consumer that accepts all Messages on all Traces in this MessageHandler
      * @param traceConsumer
      *      Consumer that accepts all Traces containing at least one Message in this MessageHandler
-     * @return
-     *      an integer representing the level of the most severe Message (see e.g. Message.ERROR)
      */
-    private int visitMessagesAndTraces(Consumer<Message> msgConsumer, Consumer<Trace> traceConsumer) {
+    private Message.Severity visitMessagesAndTraces(Consumer<Message> msgConsumer, Consumer<Trace> traceConsumer) {
 
-        int[] mostSevere = {Integer.MAX_VALUE};
+        Message.Severity[] mostSevere = { Message.Severity.least() };
 
         Trace.visitTraces(this.traces, trace -> {
             for (Message msg : trace.getMessages()) {
                 msgConsumer.accept(msg);
-                if (Message.moreSevere(msg.getLevel(), mostSevere[0])) {
-                    mostSevere[0] = msg.getLevel();
+                if (msg.getSeverity().isGreaterEqualThan(mostSevere[0])) {
+                    mostSevere[0] = msg.getSeverity();
                 }
             }
             if (!trace.getMessages().isEmpty()) {
@@ -151,15 +145,14 @@ public class MessageHandler {
      * identifier, and returns an int representing
      * the level of the most severe Message.
      */
-    public int printMessages() {
-        int code = visitMessagesAndTraces(this::printMessage, this::printLocation);
-        this.printedMsgs.clear();
-        return code;
+    public Message.Severity printMessages() {
+        var severity = visitMessagesAndTraces(this::printMessage, this::printLocation);
+        return severity;
     }
 
 
     public void printMessage(Message msg) {
-        if (!this.quiet || this.printedMsgs.contains(msg.toString())) {
+        if (!this.quiet && !this.printedMsgs.contains(msg.toString())) {
             this.printStream.println("\n" + msg);
             this.printedMsgs.add(msg.toString());
         }
@@ -207,11 +200,11 @@ public class MessageHandler {
     }
     
     private static String toReferenceString(String curRef, String eqRef) {
-        return " >>> at " + makeReference(curRef) + " = " + eqRef + "\n";
+        return "# >>> at " + makeReference(curRef) + " = " + eqRef + "\n";
     }
     
     private static String toLocationString(Trace trace, String enumStr) {
-        return " >>> at " + enumStr + " " + trace.getIdentifier() + "\n";
+        return "# >>> at " + enumStr + " " + trace.getIdentifier() + "\n";
     }
     
     public void printLocation(Trace trace) {
@@ -222,7 +215,7 @@ public class MessageHandler {
     
     public Optional<Message> toSingleMessage(String initialMessage) {
         StringBuilder str = new StringBuilder();
-        int severity = visitMessagesAndTraces(
+        var severity = visitMessagesAndTraces(
             msg -> str.append(msg).append("\n"),
             trace -> str.append(getLocation(trace)));
 
@@ -232,4 +225,5 @@ public class MessageHandler {
         str.insert(0, initialMessage + "\n");
         return Optional.of(new Message(severity, str.toString()));
     }
+
 }

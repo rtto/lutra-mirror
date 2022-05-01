@@ -2,7 +2,7 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>xyz.ottr.lutra</groupId>
-        <version>0.6.6-SNAPSHOT</version>
+        <version>0.6.14-SNAPSHOT</version>
         <artifactId>lutra</artifactId>
         <relativePath>../pom.xml</relativePath>
     </parent>
@@ -10,8 +10,10 @@
     <artifactId>lutra-wottr</artifactId>
     <packaging>jar</packaging>
 
+    <name>${project.groupId}:${project.artifactId}</name>
+
     <properties>
-        <url.wottrspec>https://dev.spec.ottr.xyz/wOTTR/</url.wottrspec>
+        <url.wottrspec>https://spec.ottr.xyz/wOTTR/0.4/</url.wottrspec>
         <local.wottrspec>${project.basedir}/src/test/resources/spec</local.wottrspec>
     </properties>
 
@@ -93,6 +95,86 @@
                             <!--md5>MD5 SUM HERE</md5 -->
                             <skipCache>true</skipCache>
                             <unpack>true</unpack>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <artifactId>maven-clean-plugin</artifactId>
+                <configuration>
+                    <filesets>
+                        <fileset>
+                            <directory>src/test/resources/spec/tests/correct</directory>
+                            <includes>
+                                <include>**/*.ttl</include>
+                            </includes>
+                            <followSymlinks>false</followSymlinks>
+                        </fileset>
+                        <fileset>
+                            <directory>src/test/resources/spec/tests/incorrect</directory>
+                            <includes>
+                                <include>**/*.ttl</include>
+                            </includes>
+                            <followSymlinks>false</followSymlinks>
+                        </fileset>
+                    </filesets>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <artifactId>plantuml-generator-maven-plugin</artifactId>
+                <groupId>de.elnarion.maven</groupId>
+                <executions>
+                    <execution>
+                        <id>lutra.wottr</id>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <phase>generate-test-sources</phase>
+                        <configuration>
+                            <outputFilename>wottr_all.puml</outputFilename>
+                            <hideFields>true</hideFields>
+                            <hideMethods>true</hideMethods>
+                            <scanPackages>
+                                <scanPackage>
+                                    xyz.ottr.lutra.wottr
+                                </scanPackage>
+                            </scanPackages>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>lutra.wottr.parser</id>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <phase>generate-test-sources</phase>
+                        <configuration>
+                            <outputFilename>wottr-parser.puml</outputFilename>
+                            <hideFields>true</hideFields>
+                            <hideMethods>true</hideMethods>
+                            <scanPackages>
+                                <scanPackage>
+                                    xyz.ottr.lutra.wottr.parser
+                                </scanPackage>
+                            </scanPackages>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>lutra.wottr.writer</id>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <phase>generate-test-sources</phase>
+                        <configuration>
+                            <outputFilename>wottr-writer.puml</outputFilename>
+                            <hideFields>true</hideFields>
+                            <hideMethods>true</hideMethods>
+                            <scanPackages>
+                                <scanPackage>
+                                    xyz.ottr.lutra.wottr.writer
+                                </scanPackage>
+                            </scanPackages>
                         </configuration>
                     </execution>
                 </executions>

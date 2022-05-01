@@ -22,14 +22,12 @@ package xyz.ottr.lutra.stottr.writer;
  * #L%
  */
 
-import java.util.Collections;
+import java.util.Collection;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
-
 import org.apache.jena.shared.PrefixMapping;
-
+import xyz.ottr.lutra.RDFTurtle;
 import xyz.ottr.lutra.model.terms.BlankNodeTerm;
 import xyz.ottr.lutra.model.terms.IRITerm;
 import xyz.ottr.lutra.model.terms.ListTerm;
@@ -42,16 +40,16 @@ import xyz.ottr.lutra.wottr.WOTTR;
 public class STermWriter {
 
     private final PrefixMapping prefixes;
-    private final Set<String> usedPrefixes;
-    private final Set<Term> variables;
+    private final Set<String> usedPrefixNS;
+    private final Collection<Term> variables;
 
-    public STermWriter(PrefixMapping prefixes, Set<Term> variables) {
+    STermWriter(PrefixMapping prefixes, Collection<Term> variables) {
         this.prefixes = prefixes;
         this.variables = variables;
-        this.usedPrefixes = new HashSet<>();
+        this.usedPrefixNS = new HashSet<>();
     }
 
-    public STermWriter(PrefixMapping prefixes) {
+    STermWriter(PrefixMapping prefixes) {
         this(prefixes, new HashSet<>());
     }
 
@@ -59,8 +57,14 @@ public class STermWriter {
         return this.prefixes;
     }
 
-    Set<String> getUsedPrefixes() {
-        return Collections.unmodifiableSet(this.usedPrefixes);
+    /**
+     * Get the prefixes which this was initialised with, but trimmed to those used until method call.
+     */
+    PrefixMapping getUsedPrefixes() {
+        PrefixMapping used = PrefixMapping.Factory.create();
+        this.usedPrefixNS.forEach(ns -> used.setNsPrefix(this.prefixes.getNsURIPrefix(ns), ns));
+        used.lock();
+        return used;
     }
 
     public String write(Term term) {
@@ -68,7 +72,7 @@ public class STermWriter {
         if (term instanceof NoneTerm) {
             return STOTTR.Terms.none;
         } else if (term instanceof IRITerm) {
-            return writeIRI(((IRITerm) term).getIri());
+            return writeIRI((IRITerm) term);
         } else if (term instanceof LiteralTerm) {
             return writeLiteral((LiteralTerm) term);
         } else if (term instanceof BlankNodeTerm) {
@@ -76,8 +80,12 @@ public class STermWriter {
         } else if (term instanceof ListTerm) {
             return writeList((ListTerm) term);
         } else {
-            return null; // TODO: Maybe use Result?
+            throw new IllegalArgumentException("Unknown term of class " + term.getClass().getName());
         }
+    }
+
+    private String writeIRI(IRITerm iri) {
+        return writeIRI(iri.getIri());
     }
 
     String writeIRI(String iri) {
@@ -86,24 +94,24 @@ public class STermWriter {
             return STOTTR.Terms.none;
         }
 
-        // Shorten to qname if possible
-        for (Map.Entry<String, String> nsln : this.prefixes.getNsPrefixMap().entrySet()) {
-            if (iri.startsWith(nsln.getValue())) {
-                String suffix = iri.substring(nsln.getValue().length());
-                this.usedPrefixes.add(nsln.getKey());
-                return nsln.getKey() + ":" + suffix;
-            }
+        String qname = this.prefixes.qnameFor(iri);
+
+        if (qname != null) {
+            String prefix = qname.split(RDFTurtle.qnameSep)[0];
+            this.usedPrefixNS.add(this.prefixes.getNsPrefixURI(prefix));
+            return qname;
         }
-        return "<" + iri + ">";
+
+        return RDFTurtle.fullURI(iri);
     }
 
     private String writeLiteral(LiteralTerm literal) {
 
-        String val = "\"" + literal.getValue() + "\"";
-        if (literal.getDatatype() != null) {
-            val += "^^" + writeIRI(literal.getDatatype());
-        } else if (literal.getLanguageTag() != null) {
-            val += "@" + literal.getLanguageTag();
+        String val = RDFTurtle.literal(literal.getValue());
+        if (literal.getLanguageTag() != null) {
+            val += RDFTurtle.literalLangSep + literal.getLanguageTag();
+        } else if (literal.getDatatype() != null && !literal.getDatatype().equals(RDFTurtle.plainLiteralDatatype)) {
+            val += RDFTurtle.literalTypeSep + writeIRI(literal.getDatatype());
         }
         return val;
     }
@@ -113,7 +121,7 @@ public class STermWriter {
         String label = blank.getLabel();
         String prefix = this.variables.contains(blank)
             ? STOTTR.Terms.variablePrefix
-            : "_:";
+            : STOTTR.Terms.blankPrefix;
         return prefix + label;
     }
 

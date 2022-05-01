@@ -25,28 +25,26 @@ package xyz.ottr.lutra.wottr.parser;
 import java.util.ArrayList;
 import java.util.Set;
 import java.util.function.Function;
-
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 import xyz.ottr.lutra.model.Parameter;
 import xyz.ottr.lutra.model.terms.Term;
-import xyz.ottr.lutra.model.types.TermType;
+import xyz.ottr.lutra.model.types.Type;
 import xyz.ottr.lutra.parser.ParameterBuilder;
 import xyz.ottr.lutra.system.Result;
 import xyz.ottr.lutra.wottr.WOTTR;
 import xyz.ottr.lutra.wottr.util.RDFNodes;
+import xyz.ottr.lutra.writer.RDFNodeWriter;
 
 public class WParameterParser implements Function<RDFNode, Result<Parameter>> {
 
     private final Model model;
-    private final TermSerializer termSerializer;
-    private final TermTypeSerialiser typeFactory;
+    private final WTypeParser typeFactory;
 
     WParameterParser(Model model) {
         this.model = model;
-        this.termSerializer = new TermSerializer();
-        this.typeFactory = new TermTypeSerialiser();
+        this.typeFactory = new WTypeParser();
     }
 
     public Result<Parameter> apply(RDFNode paramNode) {
@@ -70,17 +68,17 @@ public class WParameterParser implements Function<RDFNode, Result<Parameter>> {
 
     private Result<Term> parseTerm(Resource parameter) {
         return ModelSelector.getRequiredObject(this.model, parameter, WOTTR.variable)
-            .flatMap(this.termSerializer);
+            .flatMap(WTermParser::toTerm);
     }
 
-    private Result<TermType> parseType(Resource parameter) {
+    private Result<Type> parseType(Resource parameter) {
         return ModelSelector.getOptionalResourceObject(this.model, parameter, WOTTR.type)
             .flatMap(this.typeFactory);
     }
 
     private Result<Term> parseDefaultValue(Resource param) {
         return ModelSelector.getOptionalObject(this.model, param, WOTTR.defaultVal)
-            .flatMap(this.termSerializer);
+            .flatMap(WTermParser::toTerm);
     }
 
     private Set<RDFNode> parseModifiers(Resource parameter) {
@@ -92,9 +90,8 @@ public class WParameterParser implements Function<RDFNode, Result<Parameter>> {
             var modifierCopy = new ArrayList<>(mods); // make a copy so we don't change input.
             modifierCopy.removeAll(WOTTR.argumentModifiers);
             if (!modifierCopy.isEmpty()) {
-                parameter.addError("Unknown modifier. Permissible modifiers are "
-                    + RDFNodes.toString(WOTTR.argumentModifiers) + ", but found "
-                    + RDFNodes.toString(modifierCopy));
+                parameter.addError("Unknown parameter modifier: " + RDFNodeWriter.toString(modifierCopy)
+                    + " Permissible modifiers are " + RDFNodeWriter.toString(WOTTR.argumentModifiers) + ".");
             }
         });
 

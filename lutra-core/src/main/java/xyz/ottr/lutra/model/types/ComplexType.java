@@ -27,11 +27,11 @@ import lombok.Getter;
 
 @Getter
 @EqualsAndHashCode
-public abstract class ComplexType implements TermType {
+public abstract class ComplexType implements Type {
 
-    protected final TermType inner;
+    protected final Type inner;
 
-    protected ComplexType(TermType inner) {
+    protected ComplexType(Type inner) {
         this.inner = inner;
     }
 

@@ -26,18 +26,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
-
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Singular;
-
 import org.apache.jena.shared.PrefixMapping;
-
 import xyz.ottr.lutra.OTTR;
 import xyz.ottr.lutra.model.terms.ListTerm;
 import xyz.ottr.lutra.model.terms.Term;
-import xyz.ottr.lutra.model.types.TermType;
+import xyz.ottr.lutra.model.types.Type;
+import xyz.ottr.lutra.system.Result;
 
 @SuppressWarnings("PMD.UselessOverridingMethod")
 @Getter
@@ -45,11 +43,34 @@ public class Template extends Signature {
 
     private final @NonNull Set<Instance> pattern;
 
-    @Builder
-    private Template(String iri, @Singular List<Parameter> parameters, @Singular Set<Instance> instances) {
-        super(iri, parameters);
+    private Template(String iri, List<Parameter> parameters, Set<Instance> annotations, Set<Instance> instances) {
+        super(iri, parameters, annotations);
         this.pattern = instances;
         updatePatternVariables();
+    }
+
+    /**
+     *
+     * @param iri
+     * @param parameters
+     * @param instances
+     * @param isEmptyPattern The isEmptyPattern flag is a safety precaution for avoiding inadvertently creating templates
+     *                       with empty patterns.
+     * @return
+     */
+    @Builder
+    public static Template create(String iri, @Singular List<Parameter> parameters, @Singular Set<Instance> annotations,
+                                  @Singular Set<Instance> instances, boolean isEmptyPattern) {
+
+        if (isEmptyPattern != instances.isEmpty()) {
+            var message = "Creating template with "
+                + (instances.isEmpty() ? "empty" : "non-empty")
+                + " pattern, but isEmptyPattern flag is " + isEmptyPattern
+                + ".";
+            throw new IllegalArgumentException(message);
+        }
+
+        return new Template(iri, parameters, annotations, instances);
     }
 
     /**
@@ -58,7 +79,7 @@ public class Template extends Signature {
      */
     private void updatePatternVariables() {
         // Collect parameter types
-        Map<Object, TermType> parameterTypes = getParameters().stream()
+        Map<Object, Type> parameterTypes = getParameters().stream()
             .map(Parameter::getTerm)
             .collect(Collectors.toMap(Term::getIdentifier, Term::getType, (t1, t2) -> t1));
 
@@ -69,7 +90,7 @@ public class Template extends Signature {
                     .collect(Collectors.toList()), parameterTypes));
     }
 
-    private void setTermsToVariables(List<Term> terms, Map<Object, TermType> parameterTypes) {
+    private void setTermsToVariables(List<Term> terms, Map<Object, Type> parameterTypes) {
         terms.forEach(term -> {
             if (term instanceof ListTerm) {
                 ListTerm tl = (ListTerm) term;
@@ -87,6 +108,7 @@ public class Template extends Signature {
         return toString(OTTR.getDefaultPrefixes());
     }
 
+    @Override
     public String toString(PrefixMapping prefixes) {
         return super.toString(prefixes)
             + " ::\n"
@@ -104,5 +126,19 @@ public class Template extends Signature {
     @Override
     public int hashCode() {
         return super.hashCode();
+    }
+
+    @Override
+    public Result<Template> validate() {
+
+        var result = super.validate()
+            .map(s -> (Template)s);
+
+        if (this.pattern.isEmpty()) {
+            result.addWarning("Template " + getIri() + " has an empty pattern. "
+                + "Instances of this template will yield an empty expansion result.");
+        }
+
+        return result;
     }
 }

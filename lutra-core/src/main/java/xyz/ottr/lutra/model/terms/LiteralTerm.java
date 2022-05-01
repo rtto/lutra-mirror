@@ -24,19 +24,14 @@ package xyz.ottr.lutra.model.terms;
 
 import java.util.Objects;
 import java.util.Optional;
-
 import lombok.Getter;
 import lombok.NonNull;
-import org.apache.jena.vocabulary.RDF;
-import org.apache.jena.vocabulary.XSD;
-import xyz.ottr.lutra.model.types.TermType;
+import xyz.ottr.lutra.RDFTurtle;
+import xyz.ottr.lutra.model.types.Type;
 import xyz.ottr.lutra.model.types.TypeRegistry;
 
 @Getter
 public class LiteralTerm extends AbstractTerm<String> {
-
-    public static final String LANG_STRING_DATATYPE = RDF.dtLangString.getURI(); // TODO add this type to the type hierarchy
-    public static final String PLAIN_STRING_DATATYPE = XSD.xstring.toString();
 
     private final @NonNull String value;
     private final @NonNull String datatype;
@@ -50,18 +45,18 @@ public class LiteralTerm extends AbstractTerm<String> {
     }
 
     private static String getIdentifier(String value, String datatype, String languageTag) {
-        return "\"" + value + "\""
+        return RDFTurtle.literal(value)
             + (Objects.nonNull(languageTag)
-            ? "@" + languageTag
-            : "^^" + datatype);
+                ? RDFTurtle.literalLangSep + languageTag
+                : RDFTurtle.literalTypeSep + datatype);
     }
 
-    private static TermType getIntrinsicType(String datatype) {
-        return Objects.requireNonNullElse(TypeRegistry.getType(datatype), TypeRegistry.LITERAL);
+    private static Type getIntrinsicType(String datatype) {
+        return Objects.requireNonNullElse(TypeRegistry.asType(datatype), TypeRegistry.LITERAL);
     }
 
     public static LiteralTerm createLanguageTagLiteral(String value, @NonNull String languageTag) {
-        return new LiteralTerm(value, LANG_STRING_DATATYPE, languageTag);
+        return new LiteralTerm(value, RDFTurtle.langStringDatatype, languageTag);
     }
 
     public static LiteralTerm createTypedLiteral(String value, String datatype) {
@@ -69,7 +64,7 @@ public class LiteralTerm extends AbstractTerm<String> {
     }
 
     public static LiteralTerm createPlainLiteral(String value) {
-        return new LiteralTerm(value, PLAIN_STRING_DATATYPE, null);
+        return new LiteralTerm(value, RDFTurtle.plainLiteralDatatype, null);
     }
 
     public boolean isLanguageTagged() {
@@ -77,7 +72,7 @@ public class LiteralTerm extends AbstractTerm<String> {
     }
 
     public boolean isPlainLiteral() {
-        return PLAIN_STRING_DATATYPE.equals(this.datatype);
+        return RDFTurtle.plainLiteralDatatype.equals(this.datatype);
     }
 
     @Override

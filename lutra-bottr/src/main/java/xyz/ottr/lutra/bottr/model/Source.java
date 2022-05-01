@@ -23,7 +23,6 @@ package xyz.ottr.lutra.bottr.model;
  */
 
 import java.util.List;
-
 import org.apache.jena.shared.PrefixMapping;
 import xyz.ottr.lutra.model.Argument;
 import xyz.ottr.lutra.system.ResultStream;

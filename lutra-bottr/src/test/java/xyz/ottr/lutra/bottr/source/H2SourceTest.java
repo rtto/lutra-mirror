@@ -33,7 +33,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
-
 import org.apache.jena.shared.PrefixMapping;
 import org.junit.Assert;
 import org.junit.Rule;

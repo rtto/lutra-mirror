@@ -30,10 +30,10 @@ import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Stream;
-
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOCase;
 import org.apache.commons.io.filefilter.FileFilterUtils;
@@ -41,10 +41,14 @@ import org.apache.commons.io.filefilter.IOFileFilter;
 import org.apache.commons.io.filefilter.NotFileFilter;
 import org.apache.commons.io.filefilter.PrefixFileFilter;
 import org.apache.commons.io.filefilter.SuffixFileFilter;
+import org.apache.commons.lang3.StringUtils;
 import xyz.ottr.lutra.system.Message;
 import xyz.ottr.lutra.system.Result;
 import xyz.ottr.lutra.system.ResultStream;
 
+/**
+ * Utility class for working with files.
+ */
 public enum Files {
     ;
 
@@ -58,26 +62,26 @@ public enum Files {
     private static final Function<String, IOFileFilter> extFilter = string -> FileFilterUtils.suffixFileFilter(string,
             IOCase.INSENSITIVE);
 
-    public static Optional<Message> writeInstancesTo(String output, String suffix, String filePath) {
+    public static Optional<Message> writeFile(String content, String filePath, String suffix) {
 
         try {
-            java.nio.file.Files.write(Paths.get(filePath + suffix), output.getBytes(Charset.forName("UTF-8")));
+            java.nio.file.Files.write(Paths.get(filePath + suffix), content.getBytes(Charset.forName("UTF-8")));
         } catch (IOException ex) {
-            Message err = Message.error("Error writing output: " + ex.getMessage());
+            Message err = Message.error("Error writing output to file.", ex);
             return Optional.of(err);
         }
         return Optional.empty();
     }
 
-    public static Optional<Message> writeTemplatesTo(String iri, String output, String suffix, String folder) {
+    public static Optional<Message> writeTemplatesTo(String iri, String content, String folder, String suffix) {
 
         try {
             // TODO: cli-arg to decide extension
             String iriPath = Files.iriToPath(iri);
             java.nio.file.Files.createDirectories(Paths.get(folder, Files.iriToDirectory(iriPath)));
-            java.nio.file.Files.write(Paths.get(folder, iriPath + suffix), output.getBytes(Charset.forName("UTF-8")));
+            java.nio.file.Files.write(Paths.get(folder, iriPath + suffix), content.getBytes(Charset.forName("UTF-8")));
         } catch (IOException | URISyntaxException ex) {
-            Message err = Message.error("Error when writing output -- " + ex.getMessage());
+            Message err = Message.error("Error when writing output to file.", ex);
             return Optional.of(err);
         }
         return Optional.empty();
@@ -85,11 +89,16 @@ public enum Files {
     
     public static String iriToDirectory(String pathStr) {
         Path folder = Paths.get(pathStr).getParent();
-        return folder == null ? null : folder.toString();
+        return Objects.toString(folder, null);
     }
 
     public static String iriToPath(String iriStr) throws URISyntaxException {
-        return new URI(iriStr).getPath();
+
+        var uri = new URI(iriStr);
+
+        return uri.getHost()
+            + (StringUtils.isNotBlank(uri.getPath()) ? uri.getPath() : "")
+            + (StringUtils.isNotBlank(uri.getFragment()) ? "/" + uri.getFragment() : "");
     }
 
     public static Message checkFolderReadable(String folder) throws SecurityException {
@@ -106,8 +115,7 @@ public enum Files {
                 return Message.error("The folder " + folder + " is not readable.");
             }
         } catch (SecurityException ex) {
-            return Message.error("Encountered security error when attempting to read"
-                + " folder's metadata -- " + ex.getMessage());
+            return Message.error("Encountered security issue while reading folder metadata.", ex);
         }
 
         return null;

@@ -22,23 +22,29 @@ package xyz.ottr.lutra.wottr;
  * #L%
  */
 
+import java.util.Collection;
+import java.util.Set;
 import org.apache.jena.shared.PrefixMapping;
-
 import xyz.ottr.lutra.io.Format;
 import xyz.ottr.lutra.io.InstanceReader;
 import xyz.ottr.lutra.io.TemplateReader;
 import xyz.ottr.lutra.system.Result;
-import xyz.ottr.lutra.wottr.io.RDFFileReader;
+import xyz.ottr.lutra.wottr.io.RDFIO;
 import xyz.ottr.lutra.wottr.parser.WInstanceParser;
 import xyz.ottr.lutra.wottr.parser.WTemplateParser;
-import xyz.ottr.lutra.wottr.writer.WInstanceWriter;
+import xyz.ottr.lutra.wottr.writer.WStreamedInstanceWriter;
 import xyz.ottr.lutra.wottr.writer.WTemplateWriter;
 import xyz.ottr.lutra.writer.InstanceWriter;
 import xyz.ottr.lutra.writer.TemplateWriter;
 
 public class WottrFormat implements Format {
 
-    public static final String name = "wOTTR";
+    private static final String name = "wOTTR";
+    private static final Collection<Support> support = Set.of(
+        Support.TemplateReader,
+        Support.TemplateWriter,
+        Support.InstanceReader,
+        Support.InstanceWriter);
 
     private PrefixMapping prefixes;
 
@@ -52,7 +58,7 @@ public class WottrFormat implements Format {
 
     @Override
     public Result<TemplateReader> getTemplateReader() {
-        return Result.of(new TemplateReader(new RDFFileReader(), new WTemplateParser()));
+        return Result.of(new TemplateReader(RDFIO.fileReader(), new WTemplateParser()));
     }
 
     @Override
@@ -62,17 +68,17 @@ public class WottrFormat implements Format {
 
     @Override
     public Result<InstanceReader> getInstanceReader() {
-        return Result.of(new InstanceReader(new RDFFileReader(), new WInstanceParser()));
+        return Result.of(new InstanceReader(RDFIO.fileReader(), new WInstanceParser()));
     }
 
     @Override
     public Result<InstanceWriter> getInstanceWriter() {
-        return Result.of(new WInstanceWriter(this.prefixes));
+        return Result.of(new WStreamedInstanceWriter(this.prefixes));
     }
 
     @Override
-    public boolean supports(Format.Operation op, Format.ObjectType ot) {
-        return true;
+    public Collection<Support> getSupport() {
+        return support;
     }
 
     @Override

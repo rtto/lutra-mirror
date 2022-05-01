@@ -1,10 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <groupId>xyz.ottr.lutra</groupId>
-        <version>0.6.6-SNAPSHOT</version>
+        <version>0.6.14-SNAPSHOT</version>
         <artifactId>lutra</artifactId>
         <relativePath>../pom.xml</relativePath>
     </parent>
@@ -13,31 +11,33 @@
     <artifactId>lutra-api</artifactId>
     <packaging>jar</packaging>
 
+    <name>${project.groupId}:${project.artifactId}</name>
+
     <dependencies>
 
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>lutra-core</artifactId>
         </dependency>
-
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>lutra-wottr</artifactId>
         </dependency>
-
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>lutra-stottr</artifactId>
         </dependency>
-
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>lutra-bottr</artifactId>
         </dependency>
-
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>lutra-tabottr</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>lutra-docttr</artifactId>
         </dependency>
 
     </dependencies>
@@ -65,6 +65,30 @@
                         </configuration>
                     </execution>
 
+                </executions>
+            </plugin>
+
+            <plugin>
+                <artifactId>plantuml-generator-maven-plugin</artifactId>
+                <groupId>de.elnarion.maven</groupId>
+                <executions>
+                    <execution>
+                        <id>lutra.api</id>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <phase>generate-test-sources</phase>
+                        <configuration>
+                            <outputFilename>lutra-api_all.puml</outputFilename>
+                            <hideFields>true</hideFields>
+                            <hideMethods>true</hideMethods>
+                            <scanPackages>
+                                <scanPackage>
+                                    xyz.ottr.lutra.api
+                                </scanPackage>
+                            </scanPackages>
+                        </configuration>
+                    </execution>
                 </executions>
             </plugin>
         </plugins>

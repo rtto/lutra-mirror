@@ -22,13 +22,13 @@ package xyz.ottr.lutra.wottr.writer;
  * #L%
  */
 
-import java.util.HashMap;
+import java.util.Collection;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
+import java.util.Optional;
+import java.util.function.BiFunction;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.RDFList;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
@@ -39,74 +39,73 @@ import xyz.ottr.lutra.model.Instance;
 import xyz.ottr.lutra.model.Parameter;
 import xyz.ottr.lutra.model.Signature;
 import xyz.ottr.lutra.model.Template;
+import xyz.ottr.lutra.system.Message;
+import xyz.ottr.lutra.system.MessageHandler;
 import xyz.ottr.lutra.wottr.WOTTR;
-import xyz.ottr.lutra.wottr.io.Models;
+import xyz.ottr.lutra.wottr.io.RDFIO;
+import xyz.ottr.lutra.wottr.util.PrefixMappings;
 import xyz.ottr.lutra.writer.TemplateWriter;
 
 public class WTemplateWriter implements TemplateWriter {
 
-    private final Map<String, Model> models; // TODO: Decide on representation
-    private final WInstanceWriter instanceWriter;
     private final PrefixMapping prefixes;
-    private final RDFFactory rdfFactory;
+    
+    private MessageHandler msgs;
+    private BiFunction<String, String, Optional<Message>> stringConsumer;
 
     public WTemplateWriter() {
         this(PrefixMapping.Factory.create());
     }
 
     public WTemplateWriter(PrefixMapping prefixes) {
-        this(prefixes, new RDFFactory());
-    }
-
-    WTemplateWriter(PrefixMapping prefixes, RDFFactory rdfFactory) {
-        this.models = new HashMap<>();
-        this.rdfFactory = rdfFactory;
-        this.instanceWriter = new WInstanceWriter(prefixes, rdfFactory);
         this.prefixes = prefixes;
-    }
-
-    @Override
-    public Set<String> getIRIs() {
-        return this.models.keySet();
+        this.msgs = new MessageHandler();
     }
 
     @Override
     public void accept(Signature template) {
+        var iri = template.getIri();
+                
+        String content = buildStringRep(template);
+        stringConsumer.apply(iri, content).ifPresent(msgs::add); //write template to file or console
+    }
+       
+    public Model getModel(Signature signature) {
         Model model = ModelFactory.createDefaultModel();
         model.setNsPrefixes(this.prefixes);
-        
-        Resource signatureNode = createSignature(model, template);
-        if (template instanceof Template) {
-            for (Instance instance : ((Template) template).getPattern()) {
-                Resource instanceNode = this.instanceWriter.createInstanceNode(model, instance);
-                model.add(signatureNode, WOTTR.pattern, instanceNode);
-            }
-        }
 
-        Models.trimPrefixes(model);
-        this.models.put(template.getIri(), model);
+        Resource signatureNode = createSignature(model, signature);
+
+        if (signature instanceof Template) {
+            addInstances(((Template) signature).getPattern(), signatureNode, WOTTR.pattern, model);
+        }
+        PrefixMappings.trim(model);
+        
+        return model;        
     }
     
-    @Override
-    public String write(String iri) {
-        return Models.writeModel(this.models.get(iri));
+    
+    public String buildStringRep(Signature template) {
+        return RDFIO.writeToString(getModel(template));
     }
+    
 
-    private Resource createSignature(Model model, Signature template) {
+    private Resource createSignature(Model model, Signature signature) {
 
         Resource templateType;
-        if (template instanceof Template) {
+        if (signature instanceof Template) {
             templateType = WOTTR.Template;
-        } else if (template instanceof BaseTemplate) {
+        } else if (signature instanceof BaseTemplate) {
             templateType = WOTTR.BaseTemplate;
         } else {
             templateType = WOTTR.Signature;
         }
 
-        Resource templateIRI = model.createResource(template.getIri());
-        model.add(templateIRI, RDF.type, templateType);
-        addParameters(template.getParameters(), templateIRI, model);
-        return templateIRI;
+        Resource signatureNode = model.createResource(signature.getIri());
+        model.add(signatureNode, RDF.type, templateType);
+        addParameters(signature.getParameters(), signatureNode, model);
+        addInstances(signature.getAnnotations(), signatureNode, WOTTR.annotation, model);
+        return signatureNode;
     }
 
     private void addParameters(List<Parameter> parameters, Resource iri, Model model) {
@@ -123,8 +122,8 @@ public class WTemplateWriter implements TemplateWriter {
 
         Resource paramNode = model.createResource();
 
-        RDFNode variable = this.rdfFactory.createRDFNode(model, param.getTerm());
-        Resource type = TypeFactory.createRDFType(model, param.getTerm().getType());
+        RDFNode variable = WTermWriter.term(model, param.getTerm());
+        Resource type = WTypeWriter.type(model, param.getTerm().getType());
 
         model.add(paramNode, WOTTR.variable, variable);
         model.add(paramNode, WOTTR.type, type);
@@ -136,11 +135,35 @@ public class WTemplateWriter implements TemplateWriter {
             model.add(paramNode, WOTTR.modifier, WOTTR.nonBlank);
         }
         if (param.hasDefaultValue()) {
-            RDFNode def = this.rdfFactory.createRDFNode(model, param.getDefaultValue());
+            RDFNode def = WTermWriter.term(model, param.getDefaultValue());
             model.add(paramNode, WOTTR.defaultVal, def);
         }
         return paramNode;
     }
 
-
+    private void addInstances(Collection<Instance> instances, Resource signature, Property property, Model model) {
+        for (Instance instance : instances) {
+            Resource instanceNode = WriterUtils.createInstanceNode(model, instance);
+            model.add(signature, property, instanceNode);
+        }
+    }
+    
+    /**
+     * Set writer function which will write to file
+     * 
+     * @param stringConsumer
+     *      A function to which the written string are applied
+     */
+    @Override
+    public void setWriterFunction(BiFunction<String, String, Optional<Message>> stringConsumer) {
+        this.stringConsumer = stringConsumer;
+    }
+    
+    /**
+     * @return MessageHandler
+     */
+    @Override
+    public MessageHandler getMessages() {
+        return this.msgs;
+    }
 }

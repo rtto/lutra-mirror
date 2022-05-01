@@ -98,9 +98,9 @@ public class SPARQLGenerateEval {
             new StringArgumentMap(prefixes),
             new StringArgumentMap(prefixes, TypeRegistry.IRI),
             new StringArgumentMap(prefixes, TypeRegistry.IRI),
-            new StringArgumentMap(prefixes, TypeRegistry.getType(XSD.dateTime.toString())),
-            new StringArgumentMap(prefixes, TypeRegistry.getType(XSD.decimal.toString())),
-            new StringArgumentMap(prefixes, TypeRegistry.getType(XSD.decimal.toString()))
+            new StringArgumentMap(prefixes, TypeRegistry.asType(XSD.dateTime.toString())),
+            new StringArgumentMap(prefixes, TypeRegistry.asType(XSD.decimal.toString())),
+            new StringArgumentMap(prefixes, TypeRegistry.asType(XSD.decimal.toString()))
         ));
 
         // map data to triples
@@ -118,7 +118,7 @@ public class SPARQLGenerateEval {
         store.addOTTRBaseTemplates();
 
         // Read templates
-        TemplateReader tempReader = new TemplateReader(new RDFFileReader(), new WTemplateParser());
+        TemplateReader tempReader = new TemplateReader(RDFIO.fileReader(), new WTemplateParser());
         ResultStream<String> tempIRI = ResultStream.innerOf(this.testRoot.resolve("person.ttl").toString());
         MessageHandler errorMessages = tempReader.populateTemplateStore(store, tempIRI);
         assertFalse(Message.moreSevere(errorMessages.printMessages(), Message.ERROR)); // No errors when parsing
@@ -139,7 +139,7 @@ public class SPARQLGenerateEval {
         // print model
         String outFile = inFile + ".out.ttl";
         //Models.printModel(in);
-        Files.write(this.testRoot.resolve(outFile), Models.writeModel(in).getBytes(Charset.forName("UTF-8")), StandardOpenOption.CREATE);
+        Files.write(this.testRoot.resolve(outFile), RDFIO.writeToString(in).getBytes(Charset.forName("UTF-8")), StandardOpenOption.CREATE);
     }
 
      */

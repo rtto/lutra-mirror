@@ -1,4 +1,3 @@
-
 image: maven:3.6.1-jdk-11
 
 variables:
@@ -10,6 +9,7 @@ cache:
   key: ${CI_COMMIT_REF_SLUG}
   paths:
     - .m2/repository/
+    - ./**/target/
 
 build:
   stage: build
@@ -31,6 +31,20 @@ test:
   script:
     - cp lutra-cli/target/lutra.jar lutra.jar
     - cp lutra-restapi/target/lutra.war lutra.war
+
+deploy-docker-image:
+  image: docker:latest
+  stage: deploy
+  services:
+    - docker:dind
+  before_script:
+    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
+  script:
+    - cd lutra-restapi
+    - docker build --pull -t "$CI_REGISTRY_IMAGE${tag}" .
+    - docker push "$CI_REGISTRY_IMAGE${tag}"
+  only:
+    - master
 
 snapshot:
   <<: *deploy
@@ -55,3 +69,17 @@ release:
 
 include:
   - template: Code-Quality.gitlab-ci.yml
+  - template: Security/License-Scanning.gitlab-ci.yml
+  - template: Security/Secret-Detection.gitlab-ci.yml
+  - template: Security/SAST.gitlab-ci.yml
+
+spotbugs-sast:
+  dependencies:
+    - build
+  variables:
+    MAVEN_REPO_PATH: $CI_PROJECT_DIR/.m2/repository
+    COMPILE: "false"
+  artifacts:
+    reports:
+      sast: gl-sast-report.json
+      

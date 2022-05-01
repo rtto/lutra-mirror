@@ -25,7 +25,6 @@ package xyz.ottr.lutra.stottr.parser;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.tree.TerminalNode;
 import xyz.ottr.lutra.model.Argument;
@@ -98,8 +97,8 @@ public class SInstanceParser extends SParser<Instance> implements InstanceParser
 
         String expanderValue = expanderNode.getSymbol().getText();
 
-        return STOTTR.Expanders.map.containsKey(expanderValue)
-            ? Result.of(STOTTR.Expanders.map.get(expanderValue))
+        return STOTTR.Expanders.map.containsValue(expanderValue)
+            ? Result.of(STOTTR.Expanders.map.getKey(expanderValue))
             : Result.error("Unrecognized listExpander: " + expanderValue);
     }
 

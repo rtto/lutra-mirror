@@ -1,7 +1,6 @@
 package xyz.ottr.lutra.bottr.model;
 
 import java.util.function.Supplier;
-
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NonNull;

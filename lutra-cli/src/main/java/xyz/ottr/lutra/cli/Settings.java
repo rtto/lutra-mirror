@@ -27,7 +27,6 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
-
 import picocli.CommandLine.Command;
 import picocli.CommandLine.IVersionProvider;
 import picocli.CommandLine.Option;
@@ -128,7 +127,7 @@ public class Settings {
     @Parameters(description = {"Files of instances to which operations are to be applied."})
     public List<String> inputs = new LinkedList<>();
 
-    @Option(names = {"-o", "--output"}, description = {"Path to which output from operations are to be written."})
+    @Option(names = {"-o", "--output"}, description = {"Path for writing output."})
     public String out;
 
     @Option(names = {"--stdout"},
@@ -142,13 +141,13 @@ public class Settings {
     public boolean quiet = false;
 
     @Option(names = {"--haltOn"},
-        description = {"Halt on messages with a severity equal to or below the flag.%n"
-                       + "(legal values: 3=INFO, 2=WARNING, 1=ERROR, 0=FATAL; "
-                       + "default: ${DEFAULT-VALUE})"})
-    public int haltOn = Message.ERROR;
+        description = {"Halt execution upon receiving messages with a severity equal to or greater than this value.%n"
+                        + "(legal values: ${COMPLETION-CANDIDATES}; "
+                        + "default: ${DEFAULT-VALUE})"})
+    public Message.Severity haltOn = Message.Severity.ERROR;
 
 
-    public enum Mode { expand, expandLibrary, format, formatLibrary, lint }
+    public enum Mode { expand, expandLibrary, format, formatLibrary, lint, checkSyntax, docttrLibrary }
 
     @Option(names = {"-m", "--mode"},
         description = {"The mode of operation to be applied to input.%n"
@@ -156,12 +155,18 @@ public class Settings {
                        + "default: ${DEFAULT-VALUE})"})
     public Mode mode = Mode.expand;
 
-    @Option(names = {"--deepTrace"},
+    @Option(names = {"--debugFullTrace"},
         description = {"This enables tracing such that printed messages get a stack trace "
                        + "giving more information on the location of the concerned objects. "
                        + "NB! Enabling this flag will deteriorate performance.%n"
                        + "default: ${DEFAULT-VALUE})"})
-    public boolean deepTrace = false;
+    public boolean debugFullTrace = false;
+
+    @Option(names = {"--debugStackTrace"},
+        description = {"This enables printing a regular java stack trace for error messages."
+                + "Enabling this flag will not deteriorate performance.%n"
+                + "default: ${DEFAULT-VALUE})"})
+    public boolean debugStackTrace = false;
     
     /* The following classes restrict the selections of FormatName to supported formats. */
     private static class InstanceInputFormat extends ArrayList<String> {

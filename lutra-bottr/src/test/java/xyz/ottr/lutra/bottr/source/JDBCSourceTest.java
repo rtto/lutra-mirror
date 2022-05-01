@@ -32,13 +32,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
-
 import org.apache.jena.shared.PrefixMapping;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
-
 import xyz.ottr.lutra.bottr.model.ArgumentMaps;
 import xyz.ottr.lutra.model.Argument;
 import xyz.ottr.lutra.model.terms.LiteralTerm;
@@ -75,13 +73,13 @@ public class JDBCSourceTest {
 
         //Create expected system
         Set<List<String>> expected = new HashSet<>();
-        expected.add(List.of("1", "Paulo", "2500"));
-        expected.add(List.of("2", "Pedro", "2700"));
-        expected.add(List.of("3", "Joao", "2800"));
-        expected.add(List.of("4", "Maria", "2000"));
-        expected.add(List.of("5", "Joselito", "1500"));
-        expected.add(List.of("6", "Linhares", "2200"));
-        expected.add(List.of("7", "Lagreca", "1000"));
+        expected.add(List.of("1", "Paulo", "2.5E+3"));
+        expected.add(List.of("2", "Pedro", "2.7E+3"));
+        expected.add(List.of("3", "Joao", "2.8E+3"));
+        expected.add(List.of("4", "Maria", "2E+3"));
+        expected.add(List.of("5", "Joselito", "1.5E+3"));
+        expected.add(List.of("6", "Linhares", "2.2E+3"));
+        expected.add(List.of("7", "Lagreca", "1E+3"));
 
         // Run the source
         JDBCSource jdbcTest = new JDBCSource(driver, url, user, pass);

@@ -29,7 +29,6 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
-
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryExecution;
 import org.apache.jena.query.QueryFactory;
@@ -43,15 +42,10 @@ import xyz.ottr.lutra.bottr.model.ArgumentMap;
 import xyz.ottr.lutra.bottr.model.ArgumentMaps;
 import xyz.ottr.lutra.bottr.model.Source;
 import xyz.ottr.lutra.model.Argument;
-import xyz.ottr.lutra.system.Message;
 import xyz.ottr.lutra.system.Result;
 import xyz.ottr.lutra.system.ResultStream;
 
 public abstract class AbstractSPARQLSource implements Source<RDFNode> {
-
-    // Used for ASK queries, disabled for now.
-    //private static final Result<LiteralTerm> TRUE = TermSerializer.createTypedLiteral("true", XSDDatatype.XSDboolean.getURI());
-    //private static final Result<LiteralTerm> FALSE = TermSerializer.createTypedLiteral("false", XSDDatatype.XSDboolean.getURI());
 
     protected abstract Result<QueryExecution> getQueryExecution(String query);
 
@@ -74,7 +68,7 @@ public abstract class AbstractSPARQLSource implements Source<RDFNode> {
         try {
             return Result.of(QueryFactory.create(prefixesOnly.serialize() + queryString));
         } catch (JenaException ex) {
-            return Result.error("Error creating SPARQL query: " + ex.getMessage());
+            return Result.error("Error creating SPARQL query.", ex);
         }
     }
 
@@ -107,8 +101,7 @@ public abstract class AbstractSPARQLSource implements Source<RDFNode> {
                     //    boolean system = exec.execAsk();
                     //    return ResultStream.innerOf(system ? TRUE : FALSE);
                     } else {
-                        return ResultStream.of(Result.empty(Message.error(
-                                "Unsupported SPARQL query type. Query must be SELECT.")));
+                        return ResultStream.of(Result.error("Unsupported SPARQL query type. Query must be SELECT."));
                     }
                 });
     }

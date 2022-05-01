@@ -16,6 +16,11 @@
  -->
 
 <module name="Checker">
+
+    <module name="SuppressionFilter">
+        <property name="file" value="config/checkstyle-suppressions.xml"/>
+    </module>
+
     <property name="charset" value="UTF-8"/>
 
     <property name="severity" value="error"/>
@@ -23,9 +28,14 @@
     <property name="fileExtensions" value="java, properties, xml"/>
     <!-- Checks for whitespace                               -->
     <!-- See http://checkstyle.sf.net/config_whitespace.html -->
-        <module name="FileTabCharacter">
-            <property name="eachLine" value="true"/>
-        </module>
+    <module name="FileTabCharacter">
+        <property name="eachLine" value="true"/>
+    </module>
+
+    <module name="LineLength">
+        <property name="max" value="140"/>
+        <property name="ignorePattern" value="^package.*|^import.*|a href|href|http://|https://|ftp://"/>
+    </module>
 
     <module name="TreeWalker">
         <module name="OuterTypeFilename"/>
@@ -38,11 +48,6 @@
             <property name="allowEscapesForControlCharacters" value="true"/>
             <property name="allowByTailComment" value="true"/>
             <property name="allowNonPrintableEscapes" value="true"/>
-        </module>
-	<!-- Lutra: We allow longer lines -->
-        <module name="LineLength">
-            <property name="max" value="140"/>
-            <property name="ignorePattern" value="^package.*|^import.*|a href|href|http://|https://|ftp://"/>
         </module>
         <module name="AvoidStarImport"/>
         <module name="OneTopLevelClass"/>
@@ -169,7 +174,7 @@
 	<!-- Lutra: We allow longer abbreviations -->
         <module name="AbbreviationAsWordInName">
             <property name="ignoreFinal" value="false"/>
-            <property name="allowedAbbreviations" value="OTTR,SPARQL"/>
+            <property name="allowedAbbreviations" value="OTTR,SPARQL,RDF,XML,CSV"/>
             <property name="allowedAbbreviationLength" value="5"/>
         </module>
         <module name="OverloadMethodsDeclarationOrder"/>
@@ -207,7 +212,7 @@
             <property name="ignoreInlineTags" value="false"/>
         </module>
         <module name="EmptyCatchBlock">
-            <property name="exceptionVariableName" value="expected"/>
+            <property name="exceptionVariableName" value="ignore|ignored"/>
         </module>
         <module name="CommentsIndentation"/>
 
@@ -216,6 +221,14 @@
 	  <property name="severity" value="warning"/>
 	  <property name="format" value="(TODO)|(FIXME)"/>
 	</module>
+
+        <module name="DescendantToken">
+            <property name="severity" value="warning"/>
+            <property name="tokens" value="METHOD_CALL"/>
+            <property name="limitedTokens" value="METHOD_DEF"/>
+            <property name="maximumNumber" value="0"/>
+            <property name="maximumMessage" value="Consider using lambdas"/>
+        </module>
 
 	<!-- Lutra: Disabling JavaDoc checks for now -->
         <!--module name="JavadocTagContinuationIndentation"/>

@@ -22,23 +22,29 @@ package xyz.ottr.lutra.stottr.writer;
  * #L%
  */
 
-import java.util.LinkedList;
+import java.util.Comparator;
+//import java.util.LinkedList;
 import java.util.List;
-
+import java.util.Objects;
+import java.util.stream.Collectors;
 import org.apache.jena.shared.PrefixMapping;
-import xyz.ottr.lutra.OTTR;
+import xyz.ottr.lutra.Space;
 import xyz.ottr.lutra.model.Argument;
 import xyz.ottr.lutra.model.Instance;
 import xyz.ottr.lutra.stottr.STOTTR;
+import xyz.ottr.lutra.writer.BufferWriter;
 import xyz.ottr.lutra.writer.InstanceWriter;
 
-public class SInstanceWriter implements InstanceWriter {
+public class SInstanceWriter extends BufferWriter implements InstanceWriter {
 
-    protected final List<Instance> instances;
+    protected static final Comparator<Instance> instanceSorter = Comparator.comparing(Instance::getIri)
+        .thenComparing(i -> Objects.toString(i.getListExpander(), ""), String::compareToIgnoreCase)
+        .thenComparing(i -> i.getArguments().toString(), String::compareToIgnoreCase);
+
+    private boolean prefixWriteFlag = true; //flag to ensure prefixes are written only once    
     private final STermWriter termWriter;
-       
+
     protected SInstanceWriter(STermWriter termWriter) {
-        this.instances = new LinkedList<>();
         this.termWriter = termWriter;
     }
 
@@ -46,66 +52,56 @@ public class SInstanceWriter implements InstanceWriter {
         this(new STermWriter(prefixes));
     }
 
-    public SInstanceWriter() {
-        this(OTTR.getDefaultPrefixes());
-    }
-
     @Override
     public void accept(Instance instance) {
-        this.instances.add(instance);
-    }
-
-    @Override
-    public String write() {
-
         StringBuilder builder = new StringBuilder();
-
-        builder
-            .append(SPrefixWriter.write(this.termWriter.getPrefixes()))
-            .append("\n\n");
-
-        this.instances.forEach(instance ->
+        
+        if (prefixWriteFlag) { //only add prefix on first accept call
             builder
-                .append(writeInstance(instance))
-                .append(STOTTR.Statements.statementEnd)
-                .append("\n"));
+                .append(SPrefixWriter.write(this.termWriter.getPrefixes()))
+                .append(Space.LINEBR2);
+            prefixWriteFlag = false;
+        }
+        
+        builder
+            .append(writeInstance(instance))
+            .append(STOTTR.Statements.statementEnd)
+            .append(Space.LINEBR);
 
-        return builder.toString();
-    }
+        super.write(builder.toString()); // send contents to bufferWriter for writing to file
+    }  
 
-    protected StringBuilder writeInstance(Instance instance) {
+    public String writeInstance(Instance instance) {
 
         StringBuilder builder = new StringBuilder();
 
         if (instance.hasListExpander()) {
             builder
-                .append(STOTTR.Expanders.map.getKey(instance.getListExpander()))
-                .append(" ")
-                .append(STOTTR.Expanders.expanderSep)
-                .append(" ");
+                .append(STOTTR.Expanders.map.get(instance.getListExpander()))
+                .append(STOTTR.Expanders.expanderSep);
         }
 
         builder.append(this.termWriter.writeIRI(instance.getIri()));
-        builder.append(STOTTR.Terms.insArgStart)
-            .append(writeArguments(instance.getArguments()))
-            .append(STOTTR.Terms.insArgEnd);
+        builder.append(this.writeArguments(instance.getArguments()));
 
-        return builder;
+        return builder.toString();
     }
 
-    private StringBuilder writeArguments(List<Argument> args) {
+    protected String writeArguments(List<Argument> args) {
+        return args.stream()
+            .map(this::writeArgument)
+            .collect(Collectors.joining(STOTTR.Terms.insArgSep, STOTTR.Terms.insArgStart, STOTTR.Terms.insArgEnd));
+    }
+
+    protected StringBuilder writeArgument(Argument arg) {
 
         StringBuilder builder = new StringBuilder();
-        String sep = "";
 
-        for (Argument arg : args) {
-            builder.append(sep);
-            if (arg.isListExpander()) {
-                builder.append(STOTTR.Expanders.expander);
-            }
-            builder.append(this.termWriter.write(arg.getTerm()));
-            sep = STOTTR.Terms.insArgSep + " ";
+        if (arg.isListExpander()) {
+            builder.append(STOTTR.Expanders.expander);
         }
+        builder.append(this.termWriter.write(arg.getTerm()));
+
         return builder;
     }
 }

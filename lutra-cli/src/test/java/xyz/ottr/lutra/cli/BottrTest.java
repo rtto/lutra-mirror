@@ -45,6 +45,6 @@ public class BottrTest {
     }
 
     public void runCLI(String cmd) {
-        CLI.main(cmd.split(" "));
+        CLIRunner.run(cmd.split(" "));
     }
 }

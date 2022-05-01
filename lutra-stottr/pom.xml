@@ -2,13 +2,15 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>xyz.ottr.lutra</groupId>
-        <version>0.6.6-SNAPSHOT</version>
+        <version>0.6.14-SNAPSHOT</version>
         <artifactId>lutra</artifactId>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
     <artifactId>lutra-stottr</artifactId>
     <packaging>jar</packaging>
+
+    <name>${project.groupId}:${project.artifactId}</name>
 
     <properties>
         <url.stottrspec>https://spec.ottr.xyz/stOTTR/0.1/</url.stottrspec>
@@ -69,7 +71,6 @@
             <plugin>
                 <groupId>org.antlr</groupId>
                 <artifactId>antlr4-maven-plugin</artifactId>
-                <version>4.7</version>
                 <configuration>
                     <arguments>
                         <argument>-package</argument>
@@ -83,6 +84,64 @@
                         <goals>
                             <goal>antlr4</goal>
                         </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <artifactId>plantuml-generator-maven-plugin</artifactId>
+                <groupId>de.elnarion.maven</groupId>
+                <executions>
+                    <execution>
+                        <id>lutra.stottr</id>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <phase>generate-test-sources</phase>
+                        <configuration>
+                            <outputFilename>stottr_all.puml</outputFilename>
+                            <hideFields>true</hideFields>
+                            <hideMethods>true</hideMethods>
+                            <scanPackages>
+                                <scanPackage>
+                                    xyz.ottr.lutra.stottr
+                                </scanPackage>
+                            </scanPackages>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>lutra.stottr.parser</id>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <phase>generate-test-sources</phase>
+                        <configuration>
+                            <outputFilename>stottr-parser.puml</outputFilename>
+                            <hideFields>true</hideFields>
+                            <hideMethods>true</hideMethods>
+                            <scanPackages>
+                                <scanPackage>
+                                    xyz.ottr.lutra.stottr.parser
+                                </scanPackage>
+                            </scanPackages>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>lutra.stottr.writer</id>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <phase>generate-test-sources</phase>
+                        <configuration>
+                            <outputFilename>stottr-writer.puml</outputFilename>
+                            <hideFields>true</hideFields>
+                            <hideMethods>true</hideMethods>
+                            <scanPackages>
+                                <scanPackage>
+                                    xyz.ottr.lutra.stottr.writer
+                                </scanPackage>
+                            </scanPackages>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>

@@ -25,18 +25,18 @@ package xyz.ottr.lutra.model;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
-
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Singular;
 import org.apache.jena.shared.PrefixMapping;
 import xyz.ottr.lutra.OTTR;
+import xyz.ottr.lutra.system.Result;
 
 @Getter
 @EqualsAndHashCode
 @Builder(toBuilder = true)
-public class Instance implements HasApplySubstitution<Instance> {
+public class Instance implements ModelElement, HasApplySubstitution<Instance>  {
 
     private final String iri;
     private final @Singular List<Argument> arguments;
@@ -46,15 +46,18 @@ public class Instance implements HasApplySubstitution<Instance> {
         return this.listExpander != null;
     }
 
+    /* TODO: remove?
     public boolean hasListExpander(int index) {
         return this.arguments.get(index).isListExpander();
     }
+    */
 
     @Override
     public String toString() {
         return toString(OTTR.getDefaultPrefixes());
     }
 
+    @Override
     public String toString(PrefixMapping prefixes) {
         return (Objects.isNull(this.listExpander) ? "" : this.listExpander + " | ")
             + prefixes.shortForm(this.iri)
@@ -66,7 +69,28 @@ public class Instance implements HasApplySubstitution<Instance> {
     @Override
     public Instance apply(Substitution substitution) {
         return this.toBuilder()
+            .clearArguments()
             .arguments(substitution.apply(this.arguments))
             .build();
+    }
+
+    @Override
+    public Result<Instance> validate() {
+
+        var result = Result.of(this);
+
+        // has list expander iff has arguments marked for list expansion.
+        var forExpansion = this.getArguments().stream()
+            .filter(Argument::isListExpander)
+            .collect(Collectors.toList());
+        if (this.hasListExpander() && forExpansion.isEmpty()) {
+            result.addError("The instance is marked with the list expander "
+                + this.getListExpander() + ", but no arguments are marked for list expansion.");
+        } else if (!this.hasListExpander() && !forExpansion.isEmpty()) {
+            result.addError("The instance has arguments which are marked for list expansion:"
+                + forExpansion + ", but the instance is not marked with a list expander");
+        }
+
+        return result;
     }
 }

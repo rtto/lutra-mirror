@@ -22,15 +22,16 @@ package xyz.ottr.lutra.wottr.parser;
  * #L%
  */
 
+import static org.junit.Assert.assertNotNull;
+
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
-
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
-import xyz.ottr.lutra.wottr.io.Models;
+import xyz.ottr.lutra.wottr.io.RDFIO;
 
 @RunWith(Parameterized.class)
 public class BaseInstanceExpansionTest {
@@ -57,8 +58,12 @@ public class BaseInstanceExpansionTest {
     @Test
     public void shouldBeIsomorphic() {
 
+        var output = RDFIO.fileReader().parse(this.output).get();
+
+        assertNotNull(output);
+
         ModelUtils.testIsomorphicModels(
             ModelUtils.getOTTRParsedRDFModel(this.input),
-            Models.readModel(this.output));
+            output);
     }
 }

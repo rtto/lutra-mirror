@@ -23,7 +23,6 @@ package xyz.ottr.lutra.wottr.io;
  */
 
 import java.io.InputStream;
-
 import org.apache.jena.atlas.web.HttpException;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
@@ -31,14 +30,13 @@ import org.apache.jena.shared.JenaException;
 import org.apache.jena.shared.PrefixMapping;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import xyz.ottr.lutra.io.InputReader;
 import xyz.ottr.lutra.system.Result;
 import xyz.ottr.lutra.system.ResultStream;
 
 public class RDFInputStreamReader implements InputReader<InputStream, Model> {
 
-    private static final Logger log = LoggerFactory.getLogger(RDFFileReader.class);
+    private static final Logger log = LoggerFactory.getLogger(RDFInputStreamReader.class);
     private final PrefixMapping prefixes; // Gathers prefixes parsed for later output
     
     public RDFInputStreamReader() {
@@ -60,8 +58,7 @@ public class RDFInputStreamReader implements InputReader<InputStream, Model> {
         } catch (JenaException | HttpException ex) {
             // TODO: Correct Message level?
             // TODO: Make messages for other exceptions(?)
-            result = Result.error("Unable to parse model from input stream "
-                    + input.toString() + ": " + ex.getMessage());
+            result = Result.error("Unable to parse model from input stream: " + input, ex);
         }
         return result;
     }

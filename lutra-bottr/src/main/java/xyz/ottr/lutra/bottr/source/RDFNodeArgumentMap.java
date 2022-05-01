@@ -25,18 +25,20 @@ package xyz.ottr.lutra.bottr.source;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.shared.PrefixMapping;
 import xyz.ottr.lutra.bottr.model.ArgumentMap;
-import xyz.ottr.lutra.bottr.util.TypeFactory;
+import xyz.ottr.lutra.bottr.util.Types;
 import xyz.ottr.lutra.model.terms.Term;
 import xyz.ottr.lutra.model.types.BasicType;
-import xyz.ottr.lutra.model.types.TermType;
+import xyz.ottr.lutra.model.types.Type;
 import xyz.ottr.lutra.model.types.TypeRegistry;
+import xyz.ottr.lutra.parser.TermParser;
 import xyz.ottr.lutra.system.Result;
+import xyz.ottr.lutra.wottr.parser.WTermParser;
 
 public class RDFNodeArgumentMap extends ArgumentMap<RDFNode> {
 
-    private static final TermType DEFAULT_TYPE = TypeRegistry.TOP;
+    private static final Type DEFAULT_TYPE = TypeRegistry.TOP;
 
-    public RDFNodeArgumentMap(PrefixMapping prefixes, TermType type) {
+    public RDFNodeArgumentMap(PrefixMapping prefixes, Type type) {
         super(prefixes, type);
     }
 
@@ -60,18 +62,18 @@ public class RDFNodeArgumentMap extends ArgumentMap<RDFNode> {
     protected Result<Term> getBasicTerm(RDFNode value, BasicType type) {
 
         if (this.literalLangTag != null) {
-            return this.termFactory.createLangLiteral(toString(value), this.literalLangTag)
+            return TermParser.toLangLiteralTerm(toString(value), this.literalLangTag)
                 .map(t -> (Term)t);
         } else {
-            TermType valueType = TypeFactory.getTermType(value);
+            Type valueType = Types.getIntrinsicType(value);
             return valueType.isCompatibleWith(type)
-                ? this.termFactory.createTerm(value)
-                : this.termFactory.createTermByType(toString(value), type);
+                ? WTermParser.toTerm(value)
+                : super.toTerm(toString(value), type);
         }
     }
 
     @Override
     protected Result<Term> getListElementTerm(String value, BasicType type) {
-        return this.termFactory.createTermByType(value, type);
+        return super.toTerm(value, type);
     }
 }

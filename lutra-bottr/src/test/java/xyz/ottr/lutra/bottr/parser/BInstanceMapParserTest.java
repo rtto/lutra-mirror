@@ -29,7 +29,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
-
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -38,8 +37,7 @@ import xyz.ottr.lutra.bottr.model.InstanceMap;
 import xyz.ottr.lutra.io.Files;
 import xyz.ottr.lutra.system.Result;
 import xyz.ottr.lutra.system.ResultStream;
-import xyz.ottr.lutra.wottr.io.RDFFileReader;
-
+import xyz.ottr.lutra.wottr.io.RDFIO;
 
 @RunWith(Parameterized.class)
 public class BInstanceMapParserTest {
@@ -71,7 +69,7 @@ public class BInstanceMapParserTest {
 
     private Result<List<InstanceMap>> getInstanceMaps(String file) {
         return ResultStream.innerOf(file)
-            .innerFlatMap(new RDFFileReader())
+            .innerFlatMap(RDFIO.fileReader())
             .innerFlatMap(new BInstanceMapParser(file))
             .aggregate()
             .map(stream -> stream.collect(Collectors.toList()));

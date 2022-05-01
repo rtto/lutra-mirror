@@ -25,13 +25,17 @@ package xyz.ottr.lutra.io;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.function.Function;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import xyz.ottr.lutra.model.Instance;
 import xyz.ottr.lutra.parser.InstanceParser;
 import xyz.ottr.lutra.system.ResultStream;
 
+/**
+ * An <code>InstanceReader</code> is a pipeline combining an {@link InputReader},
+ * consuming <code>String</code> denoting file paths,
+ * and an {@link xyz.ottr.lutra.parser.InstanceParser}.
+ */
 public class InstanceReader implements Function<String, ResultStream<Instance>> {
 
     private final Function<String, ResultStream<Instance>> instancePipeline;

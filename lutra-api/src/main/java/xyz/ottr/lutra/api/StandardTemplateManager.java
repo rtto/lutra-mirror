@@ -27,11 +27,9 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.LinkedList;
 import java.util.List;
-
 import lombok.Getter;
-
 import org.apache.commons.io.IOUtils;
-
+import xyz.ottr.lutra.OTTR;
 import xyz.ottr.lutra.TemplateManager;
 import xyz.ottr.lutra.model.Signature;
 import xyz.ottr.lutra.store.TemplateStore;
@@ -39,26 +37,28 @@ import xyz.ottr.lutra.system.MessageHandler;
 import xyz.ottr.lutra.system.Result;
 import xyz.ottr.lutra.system.ResultConsumer;
 import xyz.ottr.lutra.system.ResultStream;
-import xyz.ottr.lutra.wottr.io.RDFInputStreamReader;
+import xyz.ottr.lutra.wottr.io.RDFIO;
 import xyz.ottr.lutra.wottr.parser.WTemplateParser;
 
 @Getter
 public final class StandardTemplateManager extends TemplateManager {
-    
-    private static final String templatesListFile = "tpl-library/templates-list.txt";
-    private TemplateStore standardLibrary;
-    
+
+    private static final String standardLibFolder = "tpl-library";
+    private static final String templatesListFile = "templates-list.txt";
+
+
     public StandardTemplateManager() {
         this.loadFormats();
     }
 
     public MessageHandler loadStandardTemplateLibrary() {
 
-        this.standardLibrary = makeDefaultStore(getFormatManager());
-        ResultConsumer<Signature> consumer = new ResultConsumer<>(this.standardLibrary);
-        var reader = ResultStream.innerFlatMapCompose(new RDFInputStreamReader(), new WTemplateParser());
+        var standardLibrary = makeDefaultStore(getFormatManager());
+        ResultConsumer<Signature> consumer = new ResultConsumer<>(standardLibrary);
+        var reader = ResultStream.innerFlatMapCompose(RDFIO.inputStreamReader(), new WTemplateParser());
 
         getLibraryPaths()
+            .innerFilter(path -> !path.startsWith(OTTR.ns_library_package_prefix))
             .innerMap(this::getResourceAsStream)
             .innerFlatMap(reader)
             .forEach(consumer);
@@ -67,12 +67,12 @@ public final class StandardTemplateManager extends TemplateManager {
 
         return consumer.getMessageHandler();
     }
-    
+
     public ResultStream<String> getLibraryPaths() {
 
         var templatesList = getResourceAsStream(templatesListFile);
         if (templatesList == null) {
-            return ResultStream.of(Result.error("File containing list of templates not found in standard library."));
+            return ResultStream.of(Result.error("Failed to read index file of all templates in the standard library."));
         }
 
         List<String> paths = new LinkedList<>();
@@ -86,7 +86,7 @@ public final class StandardTemplateManager extends TemplateManager {
     } 
     
     private InputStream getResourceAsStream(String path) {
-        return this.getClass().getClassLoader().getResourceAsStream(path);
+        return this.getClass().getClassLoader().getResourceAsStream(standardLibFolder + "/" + path);
     }
 
     private void loadFormats() {
@@ -96,6 +96,6 @@ public final class StandardTemplateManager extends TemplateManager {
     }
 
     public TemplateStore getStandardLibrary() {
-        return this.standardLibrary;
+        return getTemplateStore().getStandardLibrary().get();
     }
 }

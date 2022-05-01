@@ -23,7 +23,6 @@ package xyz.ottr.lutra.model.terms;
  */
 
 import java.util.Optional;
-
 import xyz.ottr.lutra.model.types.TypeRegistry;
 
 public class IRITerm extends AbstractTerm<String> {

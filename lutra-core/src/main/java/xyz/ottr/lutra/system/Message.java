@@ -22,54 +22,99 @@ package xyz.ottr.lutra.system;
  * #L%
  */
 
+import java.util.Arrays;
+import java.util.stream.Collectors;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.Setter;
 import org.slf4j.Logger;
+import xyz.ottr.lutra.Space;
 
-@Getter
 @EqualsAndHashCode
 public class Message {
 
-    public static final int FATAL   = 0;
-    public static final int ERROR   = 1;
-    public static final int WARNING = 2;
-    public static final int INFO    = 3;
+    @Setter private static boolean printStackTrace = true;
 
-    private final int level;
-    private final String message;
+    public enum Severity {
+        // the order of enums defines the result of compareTo method.
+        INFO,
+        WARNING,
+        ERROR,
+        FATAL;
 
-    public Message(int level, String message) {
-        this.level = level;
+        public boolean isGreaterThan(Severity other) {
+            return this.compareTo(other) > 0;
+        }
+
+        public boolean isLessThan(Severity other) {
+            return this.compareTo(other) < 0;
+        }
+
+        public boolean isGreaterEqualThan(Severity other) {
+            return this.compareTo(other) >= 0;
+        }
+
+        public boolean isLessEqualThan(Severity other) {
+            return this.compareTo(other) <= 0;
+        }
+
+        public static Severity least() {
+            return INFO;
+        }
+
+        public static Severity greatest() {
+            return FATAL;
+        }
+    }
+
+    @Getter private final Severity severity;
+    @Getter private final String message;
+    private final StackTraceElement[] stackTrace;
+
+    public Message(Severity severity, String message, StackTraceElement[] stackTrace) {
+        this.severity = severity;
         this.message = message;
+        this.stackTrace = stackTrace.clone();
+    }
+
+    public Message(Severity severity, String message) {
+        this(severity, message, Thread.currentThread().getStackTrace());
     }
 
     public static Message fatal(String msg) {
-        return new Message(FATAL, msg);
+        return new Message(Severity.FATAL, msg);
+    }
+
+    public static Message fatal(Exception e) {
+        return new Message(Severity.FATAL, e.getMessage(), e.getStackTrace());
+    }
+
+    public static Message fatal(String message, Exception e) {
+        return new Message(Severity.FATAL, message + Space.LINEBR + e.getMessage(), e.getStackTrace());
     }
 
     public static Message error(String msg) {
-        return new Message(ERROR, msg);
+        return new Message(Severity.ERROR, msg);
+    }
+
+    public static Message error(Exception e) {
+        return new Message(Severity.ERROR, e.getMessage(), e.getStackTrace());
+    }
+
+    public static Message error(String message, Exception e) {
+        return new Message(Severity.ERROR, message + Space.LINEBR + e.getMessage(), e.getStackTrace());
     }
 
     public static Message warning(String msg) {
-        return new Message(WARNING, msg);
+        return new Message(Severity.WARNING, msg);
     }
 
     public static Message info(String msg) {
-        return new Message(INFO, msg);
-    }
-
-    /**
-     * Returns true if the first argument denotes a message level
-     * that is more severe than the level denoted by the second
-     * argument (e.g. Message.ERROR is more severe than Message.WARNING).
-     */
-    public static boolean moreSevere(int lvl1, int lvl2) {
-        return lvl1 <= lvl2;
+        return new Message(Severity.INFO, msg);
     }
 
     public void log(Logger log) {
-        switch (this.level) {
+        switch (this.severity) {
             case WARNING:
                 log.warn(this.message);
                 break;
@@ -81,18 +126,31 @@ public class Message {
         }
     }
 
-    public static String toString(int level) {
-        switch (level) {
-            case FATAL:   return "FATAL";
-            case ERROR:   return "ERROR";
-            case WARNING: return "WARNING";
-            case INFO:    return "INFO";
-            default:      return "UNRECOGNIZED LEVEL";
-        }
-    }
-
     @Override
     public String toString() {
-        return "[" + toString(this.level) + "] " + this.message;
+
+        String output = "# [" + this.severity.name() + "] " + this.message;
+
+        if (printStackTrace) {
+            output += printStackTrace();
+        }
+
+        return output;
+    }
+
+    private String printStackTrace() {
+        return
+            System.lineSeparator()
+            + Arrays.stream(this.stackTrace)
+                // filter out system methods of different kinds:
+                .filter(s -> !s.getClassName().startsWith("java.util"))
+                .filter(s -> !s.getClassName().startsWith("java.lang.Thread"))
+                .filter(s -> !s.getClassName().startsWith("java.lang.reflect"))
+                .filter(s -> !s.getClassName().startsWith("jdk.internal.reflect"))
+                .filter(s -> !s.getClassName().startsWith("org.junit"))
+                .filter(s -> !s.getClassName().startsWith("org.apache.maven.surefire"))
+                .filter(s -> !s.getClassName().startsWith("xyz.ottr.lutra.system"))
+                .map(stackTraceElement -> "\t" + stackTraceElement)
+                .collect(Collectors.joining(System.lineSeparator()));
     }
 }

@@ -2,13 +2,15 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>xyz.ottr.lutra</groupId>
-        <version>0.6.6-SNAPSHOT</version>
+        <version>0.6.14-SNAPSHOT</version>
         <artifactId>lutra</artifactId>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
     <artifactId>lutra-core</artifactId>
     <packaging>jar</packaging>
+
+    <name>${project.groupId}:${project.artifactId}</name>
 
     <dependencies>
 
@@ -29,6 +31,15 @@
         <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>commons-validator</groupId>
+            <artifactId>commons-validator</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.hamcrest</groupId>
+            <artifactId>hamcrest</artifactId>
         </dependency>
 
     </dependencies>
@@ -66,6 +77,81 @@
                             <outputDirectory>${project.basedir}/src/main/resources</outputDirectory>
                             <!--md5>MD5 SUM HERE</md5 -->
                             <skipCache>true</skipCache>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <artifactId>plantuml-generator-maven-plugin</artifactId>
+                <groupId>de.elnarion.maven</groupId>
+                <executions>
+                    <execution>
+                        <id>lutra</id>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <phase>generate-test-sources</phase>
+                        <configuration>
+                            <outputFilename>lutra-core_all.puml</outputFilename>
+                            <hideFields>true</hideFields>
+                            <hideMethods>true</hideMethods>
+                            <scanPackages>
+                                <scanPackage>
+                                    xyz.ottr.lutra
+                                </scanPackage>
+                            </scanPackages>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>lutra.model</id>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <phase>generate-test-sources</phase>
+                        <configuration>
+                            <outputFilename>lutra-model.puml</outputFilename>
+                            <hideFields>true</hideFields>
+                            <hideMethods>true</hideMethods>
+                            <scanPackages>
+                                <scanPackage>
+                                    xyz.ottr.lutra.model
+                                </scanPackage>
+                            </scanPackages>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>lutra.store</id>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <phase>generate-test-sources</phase>
+                        <configuration>
+                            <outputFilename>lutra-store.puml</outputFilename>
+                            <hideFields>true</hideFields>
+                            <hideMethods>true</hideMethods>
+                            <scanPackages>
+                                <scanPackage>
+                                    xyz.ottr.lutra.store
+                                </scanPackage>
+                            </scanPackages>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>lutra.system</id>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <phase>generate-test-sources</phase>
+                        <configuration>
+                            <outputFilename>lutra-system.puml</outputFilename>
+                            <hideFields>true</hideFields>
+                            <hideMethods>true</hideMethods>
+                            <scanPackages>
+                                <scanPackage>
+                                    xyz.ottr.lutra.system
+                                </scanPackage>
+                            </scanPackages>
                         </configuration>
                     </execution>
                 </executions>

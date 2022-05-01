@@ -24,7 +24,6 @@ package xyz.ottr.lutra.store.graph;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static xyz.ottr.lutra.model.terms.ObjectTerm.cons;
@@ -34,8 +33,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
-
-import org.junit.Assert;
 import org.junit.Test;
 import xyz.ottr.lutra.OTTR;
 import xyz.ottr.lutra.model.Argument;
@@ -45,43 +42,52 @@ import xyz.ottr.lutra.model.ListExpander;
 import xyz.ottr.lutra.model.Parameter;
 import xyz.ottr.lutra.model.Signature;
 import xyz.ottr.lutra.model.Template;
-import xyz.ottr.lutra.model.terms.BlankNodeTerm;
 import xyz.ottr.lutra.model.terms.IRITerm;
 import xyz.ottr.lutra.model.terms.ListTerm;
 import xyz.ottr.lutra.model.terms.NoneTerm;
 import xyz.ottr.lutra.model.terms.ObjectTerm;
+import xyz.ottr.lutra.store.Expander;
+import xyz.ottr.lutra.store.StandardTemplateStore;
+import xyz.ottr.lutra.store.TemplateStore;
+import xyz.ottr.lutra.store.expansion.NonCheckingExpander;
+import xyz.ottr.lutra.system.Assertions;
 import xyz.ottr.lutra.system.Message;
 import xyz.ottr.lutra.system.Result;
 import xyz.ottr.lutra.system.ResultConsumer;
 import xyz.ottr.lutra.system.ResultStream;
 
+/**
+ * Legacy test from the old DependencyGraph implementation still working fine with the new one.
+ */
 public class DependencyGraphTest {
 
     private void expandAndCheckEquality(Set<Template> toExpand, Set<Template> shouldEqual) {
         
-        Signature base = Signature.superbuilder()
+        BaseTemplate base = BaseTemplate.builder()
             .iri("base")
             .parameter(Parameter.builder().term(var("x")).build())
             .parameter(Parameter.builder().term(var("y")).build())
             .build();
 
-        DependencyGraph graph = new DependencyGraph(null);
-        graph.addTemplateSignature(base);
+        TemplateStore store = new StandardTemplateStore(null);
+        store.addBaseTemplate(base);
 
         for (Template tmpl : toExpand) {
-            graph.addTemplate(tmpl);
+            store.addTemplate(tmpl);
         }
 
-        Result<DependencyGraph> graphRes = graph.expandAll();
+        Expander expander = new NonCheckingExpander(store);
+        Result<? extends TemplateStore> graphRes = expander.expandAll();
         assertTrue(graphRes.isPresent());
-        graph = graphRes.get();
+        store = graphRes.get();
 
-        ResultStream<Template> tempRes = graph.getAllTemplates();
+        ResultStream<Template> tempRes = store.getAllTemplates();
 
         Set<Template> expanded = new HashSet<>();
         ResultConsumer<Template> consumer = new ResultConsumer<>(expanded::add);
         tempRes.forEach(consumer);
-        assertFalse(Message.moreSevere(consumer.getMessageHandler().printMessages(), Message.ERROR));
+
+        Assertions.noErrors(consumer);
 
         assertEquals(expanded, shouldEqual);
     }
@@ -162,23 +168,22 @@ public class DependencyGraphTest {
                 new IRITerm("http://example.com#object")))
             .build();
 
-        DependencyGraph graph = new DependencyGraph(null);
+        TemplateStore store = new StandardTemplateStore(null);
+        store.addOTTRBaseTemplates();
+        Expander expander = new NonCheckingExpander(store);
 
-        graph.addOTTRBaseTemplates();
-
-        var expanded = graph.expandInstance(tripleInstance).collect(Collectors.toList());
+        var expanded = expander.expandInstance(tripleInstance).collect(Collectors.toList());
 
         assertThat(expanded.size(), is(1));
         assertThat(expanded.get(0).get(), is(tripleInstance));
-
     }
 
     @Test
     public void undefinedTemplateError() {
 
-        DependencyGraph graph = new DependencyGraph(null);
+        TemplateStore store = new StandardTemplateStore(null);
 
-        graph.addTemplate(
+        store.addTemplate(
             Template.builder()
                 .iri("t1")
                 .parameters(Parameter.listOf(var("a"), var("b")))
@@ -192,17 +197,19 @@ public class DependencyGraphTest {
                     .build())
                 .build());
 
-        graph.addTemplateSignature(
+        store.addBaseTemplate(
             BaseTemplate.builder()
                 .iri("base")
                 .parameters(Parameter.listOf(var("x"), var("y")))
                 .build()
         );
 
-        Result<DependencyGraph> graphRes = graph.expandAll();
-        ResultConsumer<DependencyGraph> consumer = new ResultConsumer<>();
+        Expander expander = new NonCheckingExpander(store);
+        Result<TemplateStore> graphRes = (Result<TemplateStore>) expander.expandAll();
+        ResultConsumer<TemplateStore> consumer = new ResultConsumer<>();
         consumer.accept(graphRes);
-        assertTrue(Message.moreSevere(consumer.getMessageHandler().printMessages(), Message.ERROR));
+
+        Assertions.atLeast(consumer, Message.Severity.ERROR);
     }
 
     @Test
@@ -281,32 +288,34 @@ public class DependencyGraphTest {
             .parameters(Parameter.listOf(var("x"), var("y")))
             .build();
 
-        DependencyGraph graph = new DependencyGraph(null);
-        graph.addTemplateSignature(base);
+        TemplateStore store = new StandardTemplateStore(null);
+        store.addBaseTemplate(base);
 
         for (Template tmpl : templates) {
-            graph.addTemplate(tmpl);
+            store.addTemplate(tmpl);
         }
 
-        ResultStream<Instance> expandedInsRes = graph.expandInstance(ins);
+        Expander expander = new NonCheckingExpander(store);
+        ResultStream<Instance> expandedInsRes = expander.expandInstance(ins);
 
         Set<Instance> expandedIns = new HashSet<>();
         ResultConsumer<Instance> consumer = new ResultConsumer<>(expandedIns::add);
         expandedInsRes.forEach(consumer);
-        assertFalse(Message.moreSevere(consumer.getMessageHandler().printMessages(), Message.ERROR));
 
-        Assert.assertThat(expandedIns, is(shouldEqual));
+        Assertions.noErrors(consumer);
 
-        Result<DependencyGraph> graphRes = graph.expandAll();
+        assertThat(expandedIns, is(shouldEqual));
+
+        Result<? extends TemplateStore> graphRes = expander.expandAll();
         assertTrue(graphRes.isPresent());
-        graph = graphRes.get();
+        store = graphRes.get();
 
-        ResultStream<Instance> expandedInsRes2 = graph.expandInstance(ins);
+        ResultStream<Instance> expandedInsRes2 = expander.expandInstance(ins);
 
         Set<Instance> expandedIns2 = new HashSet<>();
         ResultConsumer<Instance> consumer2 = new ResultConsumer<>(expandedIns2::add);
         expandedInsRes2.forEach(consumer2);
-        assertFalse(Message.moreSevere(consumer2.getMessageHandler().printMessages(), Message.ERROR));
+        Assertions.noErrors(consumer2);
 
         assertEquals(expandedIns2, shouldEqual);
     }
@@ -363,8 +372,8 @@ public class DependencyGraphTest {
     @Test
     public void instanceExpansionErrors() {
 
-        DependencyGraph graph = new DependencyGraph(null);
-        graph.addTemplateSignature(
+        TemplateStore store = new StandardTemplateStore(null);
+        store.addBaseTemplate(
             BaseTemplate.builder()
                 .iri("base")
                 .parameters(Parameter.listOf(var("x"), var("y")))
@@ -372,7 +381,7 @@ public class DependencyGraphTest {
         );
 
         ObjectTerm toListExpand = var("a");
-        graph.addTemplate(
+        store.addTemplate(
             Template.builder()
                 .iri("withCross")
                 .parameters(Parameter.listOf(var("a"), var("b")))
@@ -388,22 +397,26 @@ public class DependencyGraphTest {
                     .build())
                 .build());
 
-        graph.addTemplateSignature(
+        store.addSignature(
             Signature.superbuilder()
                 .iri("signature")
                 .parameters(Parameter.listOf(var("v"), var("u")))
                 .build());
         
         List<Instance> inss = List.of(
-            Instance.builder().iri("withCross").arguments(Argument.listOf(new BlankNodeTerm(), cons(2))).build(),
+            // TODO this case needs specification:
+            // is the BlankNodeTerm supposed to cause an error if we cannot expand it or this it working as intended?
+            // TODO https://gitlab.com/ottr/spec/rOTTR/-/issues/16
+            //Instance.builder().iri("withCross").arguments(Argument.listOf(new BlankNodeTerm(), cons(2))).build(),
             Instance.builder().iri("signature").arguments(Argument.listOf(cons(1), cons(2))).build(),
             Instance.builder().iri("undefined").arguments(Argument.listOf(cons(1), cons(2))).build()
         );
 
+        Expander expander = new NonCheckingExpander(store);
         for (Instance ins : inss) {
             ResultConsumer<Instance> consumer = new ResultConsumer<>();
-            graph.expandInstance(ins).forEach(consumer);
-            assertTrue(Message.moreSevere(consumer.getMessageHandler().printMessages(), Message.ERROR));
+            expander.expandInstance(ins).forEach(consumer);
+            Assertions.atLeast(consumer, Message.Severity.ERROR);
         }
     }
 
@@ -448,6 +461,30 @@ public class DependencyGraphTest {
             Instance.builder()
                 .iri("base")
                 .arguments(Argument.listOf(cons(4), cons(1)))
+                .build());
+
+        expandInstanceAndCheckEquality(ins, expandedIns, templates);
+    }
+
+    @Test // testing #212
+    public void listExpansion() {
+
+        Set<Template> templates = Set.of();
+
+        Instance ins = Instance.builder().iri("base")
+            .argument(Argument.builder().term(cons(1)).build())
+            .argument(Argument.builder().term(new ListTerm(List.of(cons("A"), cons("B")))).listExpander(true).build())
+            .listExpander(ListExpander.cross)
+            .build();
+
+        Set<Instance> expandedIns = Set.of(
+            Instance.builder()
+                .iri("base")
+                .arguments(Argument.listOf(cons(1), cons("A")))
+                .build(),
+            Instance.builder()
+                .iri("base")
+                .arguments(Argument.listOf(cons(1), cons("B")))
                 .build());
 
         expandInstanceAndCheckEquality(ins, expandedIns, templates);

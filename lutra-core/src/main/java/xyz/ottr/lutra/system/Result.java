@@ -65,7 +65,7 @@ public class Result<E> {
     }
 
     /**
-     * @see Optional#of(R)
+     * @see Optional#of(Object)
      */
     public static <R> Result<R> of(R val) {
         return new Result<>(Optional.of(val));
@@ -79,7 +79,7 @@ public class Result<E> {
     }
 
     /**
-     * @see Optional#ofNullable(R)
+     * @see Optional#ofNullable(Object)
      */
     public static <R> Result<R> ofNullable(R val) {
         return new Result<>(Optional.ofNullable(val));
@@ -181,8 +181,16 @@ public class Result<E> {
         return empty(Message.fatal(msg));
     }
 
+    public static <R> Result<R> fatal(String msg, Exception ex) {
+        return empty(Message.fatal(msg, ex));
+    }
+
     public static <R> Result<R> error(String msg) {
         return empty(Message.error(msg));
+    }
+
+    public static <R> Result<R> error(String msg, Exception ex) {
+        return empty(Message.error(msg, ex));
     }
 
     public static <R> Result<R> warning(String msg) {
@@ -196,7 +204,6 @@ public class Result<E> {
     public static boolean allIsPresent(Result<?>... results) {
         return Arrays.stream(results).allMatch(Result::isPresent);
     }
-
 
     /**
      * Returns an empty system with this system as trace and with the argument message.
@@ -383,7 +390,7 @@ public class Result<E> {
     }
 
     /**
-     * @see Optional#orElse(E)
+     * @see Optional#orElse(Object)
      */
     public E orElse(E other) {
         return this.result.orElse(other);
@@ -407,9 +414,13 @@ public class Result<E> {
      * To retrieve only Message-s on this Result, use Result#getMessages().
      */
     public List<Message> getAllMessages() {
-        MessageHandler msgs = new MessageHandler();
-        msgs.add(this);
-        return msgs.getMessages();
+        return getMessageHandler().getMessages();
+    }
+
+    public MessageHandler getMessageHandler() {
+        var messageHandler = new MessageHandler();
+        messageHandler.add(this);
+        return messageHandler;
     }
 
     /**

@@ -22,7 +22,6 @@ package xyz.ottr.lutra.wottr.parser;
  * #L%
  */
 
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import org.apache.jena.rdf.model.Model;
@@ -32,14 +31,16 @@ import org.slf4j.LoggerFactory;
 import xyz.ottr.lutra.io.InstanceReader;
 import xyz.ottr.lutra.io.TemplateReader;
 import xyz.ottr.lutra.model.Instance;
+import xyz.ottr.lutra.store.Expander;
+import xyz.ottr.lutra.store.StandardTemplateStore;
 import xyz.ottr.lutra.store.TemplateStore;
-import xyz.ottr.lutra.store.graph.DependencyGraph;
-import xyz.ottr.lutra.system.Message;
+import xyz.ottr.lutra.store.expansion.NonCheckingExpander;
+import xyz.ottr.lutra.system.Assertions;
 import xyz.ottr.lutra.system.MessageHandler;
 import xyz.ottr.lutra.system.Result;
 import xyz.ottr.lutra.system.ResultConsumer;
 import xyz.ottr.lutra.system.ResultStream;
-import xyz.ottr.lutra.wottr.io.RDFFileReader;
+import xyz.ottr.lutra.wottr.io.RDFIO;
 import xyz.ottr.lutra.wottr.writer.WInstanceWriter;
 
 public class BlankNodeTest {
@@ -57,32 +58,32 @@ public class BlankNodeTest {
     @Test
     public void shouldBeIsomorphic() {
 
-        TemplateStore store = new DependencyGraph(null);
+        TemplateStore store = new StandardTemplateStore(null);
         store.addOTTRBaseTemplates();
+        Expander expander = new NonCheckingExpander(store);
 
         // Read templates
-        TemplateReader tempReader = new TemplateReader(new RDFFileReader(), new WTemplateParser());
+        TemplateReader tempReader = new TemplateReader(RDFIO.fileReader(), new WTemplateParser());
         ResultStream<String> tempIRI = ResultStream.innerOf("src/test/resources/correct/definitions/core/Blank.ttl");
-        MessageHandler errorMessages = tempReader.populateTemplateStore(store, tempIRI);
-        assertFalse(Message.moreSevere(errorMessages.printMessages(),
-                Message.ERROR)); // No errors when parsing
+        MessageHandler errorHandler = tempReader.populateTemplateStore(store, tempIRI);
+        Assertions.noErrors(errorHandler);
 
         // Read in-instances and expand
-        InstanceReader insReader = new InstanceReader(new RDFFileReader(), new WInstanceParser());
+        InstanceReader insReader = new InstanceReader(RDFIO.fileReader(), new WInstanceParser());
         ResultStream<Instance> expandedInInstances = insReader
             .apply("src/test/resources/correct/instances/blank1/in.ttl")
-            .innerFlatMap(store::expandInstance);
+            .innerFlatMap(expander::expandInstance);
 
         // Write expanded instances to model
         WInstanceWriter insWriter = new WInstanceWriter();
         ResultConsumer<Instance> expansionErrors = new ResultConsumer<>(insWriter);
         expandedInInstances.forEach(expansionErrors);
-        assertFalse(Message.moreSevere(expansionErrors.getMessageHandler().printMessages(),
-                Message.ERROR)); // No errors when expanding
+        Assertions.noErrors(expansionErrors);
+
         Model in = insWriter.writeToModel();
 
         // Read out-model
-        Result<Model> outRes = new RDFFileReader().parse("src/test/resources/correct/instances/blank1/out.ttl");
+        Result<Model> outRes = RDFIO.fileReader().parse("src/test/resources/correct/instances/blank1/out.ttl");
         if (!outRes.isPresent()) {
             log.error(outRes.toString());
         }

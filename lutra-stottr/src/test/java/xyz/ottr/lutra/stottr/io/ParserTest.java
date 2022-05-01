@@ -23,21 +23,18 @@ package xyz.ottr.lutra.stottr.io;
  */
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-
 import org.apache.jena.vocabulary.XSD;
 import org.junit.Test;
 import xyz.ottr.lutra.model.Argument;
 import xyz.ottr.lutra.model.Instance;
 import xyz.ottr.lutra.model.ListExpander;
 import xyz.ottr.lutra.model.Signature;
-import xyz.ottr.lutra.model.Template;
 import xyz.ottr.lutra.model.terms.IRITerm;
 import xyz.ottr.lutra.model.terms.ListTerm;
 import xyz.ottr.lutra.model.terms.LiteralTerm;
@@ -47,7 +44,7 @@ import xyz.ottr.lutra.stottr.parser.SInstanceParser;
 import xyz.ottr.lutra.stottr.parser.SParserUtils;
 import xyz.ottr.lutra.stottr.parser.SPrefixParser;
 import xyz.ottr.lutra.stottr.parser.STemplateParser;
-import xyz.ottr.lutra.system.Message;
+import xyz.ottr.lutra.system.Assertions;
 import xyz.ottr.lutra.system.Result;
 import xyz.ottr.lutra.system.ResultConsumer;
 
@@ -175,12 +172,25 @@ public class ParserTest {
         ResultConsumer<Signature> consumer = new ResultConsumer<>();
         parser.parseString(signatureString).forEach(consumer);
 
-        assertFalse(Message.moreSevere(consumer.getMessageHandler().printMessages(), Message.ERROR)); // No errors when expanding
+        Assertions.noErrors(consumer);
     }
 
     @Test
     public void testSignature1() {
         testSignatureParsing("<http://example.com#T1> [ ?s ] :: BASE .");
+    }
+
+    @Test
+    public void testSignature2() {
+        testSignatureParsing("<http://example.com#T1> [ ?s ] @@<http://example.com#T2>(true) :: BASE .");
+    }
+
+    @Test
+    public void testSignature3() {
+        testSignatureParsing("<http://example.com#T1> [ ?s ] "
+            + "@@<http://example.com#T2>(true), "
+            + "@@<http://example.com#T2>(true)"
+            + " :: BASE .");
     }
 
     @Test

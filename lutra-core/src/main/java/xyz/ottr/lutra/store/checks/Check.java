@@ -24,13 +24,8 @@ package xyz.ottr.lutra.store.checks;
 
 import java.util.function.Function;
 import java.util.stream.Stream;
-
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
-import xyz.ottr.lutra.store.Query;
-import xyz.ottr.lutra.store.QueryEngine;
-import xyz.ottr.lutra.store.TemplateStore;
-import xyz.ottr.lutra.store.Tuple;
 import xyz.ottr.lutra.system.Message;
 
 @AllArgsConstructor(access = AccessLevel.PACKAGE)
@@ -39,7 +34,7 @@ public class Check {
     private final Query query;
     private final Function<Tuple, Message> toMessage;
 
-    public Stream<Message> check(QueryEngine<? extends TemplateStore> engine) {
+    public Stream<Message> check(StandardQueryEngine engine) {
         return this.query.eval(engine).map(this.toMessage).distinct();
     }
 }

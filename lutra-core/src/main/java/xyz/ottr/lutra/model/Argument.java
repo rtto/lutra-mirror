@@ -25,7 +25,6 @@ package xyz.ottr.lutra.model;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
-
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -33,11 +32,12 @@ import lombok.NonNull;
 import org.apache.jena.shared.PrefixMapping;
 import xyz.ottr.lutra.OTTR;
 import xyz.ottr.lutra.model.terms.Term;
+import xyz.ottr.lutra.system.Result;
 
 @Getter
 @EqualsAndHashCode
 @Builder(toBuilder = true)
-public class Argument implements HasGetTerm, HasApplySubstitution<Argument> {
+public class Argument implements ModelElement, HasGetTerm, HasApplySubstitution<Argument> {
 
     private final @NonNull Term term;
     private final boolean listExpander;
@@ -53,6 +53,7 @@ public class Argument implements HasGetTerm, HasApplySubstitution<Argument> {
         return toString(OTTR.getDefaultPrefixes());
     }
 
+    @Override
     public String toString(PrefixMapping prefixMapping) {
         StringBuilder str = new StringBuilder();
 
@@ -70,4 +71,10 @@ public class Argument implements HasGetTerm, HasApplySubstitution<Argument> {
             .term(this.term.apply(substitution))
             .build();
     }
+
+    @Override
+    public Result<Argument> validate() {
+        return Result.of(this);
+    }
+
 }

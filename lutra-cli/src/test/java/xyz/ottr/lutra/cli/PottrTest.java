@@ -1,5 +1,7 @@
 package xyz.ottr.lutra.cli;
 
+
+
 /*-
  * #%L
  * lutra-cli
@@ -22,16 +24,13 @@ package xyz.ottr.lutra.cli;
  * #L%
  */
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.not;
-
+import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Function;
-
 import org.apache.commons.lang3.StringUtils;
 import org.hamcrest.Matcher;
 import org.hamcrest.core.Is;
@@ -40,18 +39,21 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
-
+import xyz.ottr.lutra.OTTR;
 import xyz.ottr.lutra.TemplateManager;
 import xyz.ottr.lutra.api.StandardFormat;
 import xyz.ottr.lutra.io.InstanceReader;
 import xyz.ottr.lutra.io.TemplateReader;
 import xyz.ottr.lutra.model.Instance;
+import xyz.ottr.lutra.store.Expander;
 import xyz.ottr.lutra.store.TemplateStore;
+import xyz.ottr.lutra.store.expansion.CheckingExpander;
 import xyz.ottr.lutra.stottr.io.SFileReader;
 import xyz.ottr.lutra.stottr.parser.SInstanceParser;
 import xyz.ottr.lutra.stottr.parser.STemplateParser;
 import xyz.ottr.lutra.stottr.writer.SInstanceWriter;
 import xyz.ottr.lutra.system.Message;
+import xyz.ottr.lutra.system.MessageHandler;
 import xyz.ottr.lutra.system.ResultConsumer;
 import xyz.ottr.lutra.system.ResultStream;
 
@@ -94,7 +96,8 @@ public class PottrTest {
     }
 
 
-    @Test public void test() {
+    @Test
+    public void test() {
         runExpand(this.instancePath, this.templatePath, this.expectedResults);
     }
 
@@ -116,14 +119,14 @@ public class PottrTest {
             messages.addAll(testInstances(store, fileInstance));
         }
 
-        messages.removeIf(message -> !Message.moreSevere(message.getLevel(), Message.ERROR));
+        messages.removeIf(message -> message.getSeverity().isLessThan(Message.Severity.ERROR));
 
         // create matcher based on expectedResults: is or is-not if expected is true or false.
         Function<Object, Matcher> matcher = expectedResults
             ? o -> Is.is(o)
             : o -> Is.is(IsNot.not(o));
 
-        Assert.assertThat(messages, matcher.apply(Collections.emptyList()));
+        Assert.assertThat("On " + pathTemplates + " and " + fileInstance, messages, matcher.apply(Collections.emptyList()));
     }
 
     private TemplateStore getStore() {
@@ -149,15 +152,21 @@ public class PottrTest {
 
     private List<Message> testInstances(TemplateStore store, String file) {
         InstanceReader insReader = new InstanceReader(new SFileReader(), new SInstanceParser());
+        Expander expander = new CheckingExpander(store);
         ResultStream<Instance> expandedInInstances = insReader
             .apply(resolve(file))
-            .innerFlatMap(store::expandInstanceFetch);
+            .innerFlatMap(expander::expandInstanceFetch);
 
         // Write expanded instances to model
-        SInstanceWriter insWriter = new SInstanceWriter();
+        String filePath = "src/test/resources/temp_pottrTests";
+        SInstanceWriter insWriter = new SInstanceWriter(OTTR.getDefaultPrefixes());
+        insWriter.init(filePath, null);
         ResultConsumer<Instance> expansionErrors = new ResultConsumer<>(insWriter);
         expandedInInstances.forEach(expansionErrors);
-
-        return expansionErrors.getMessageHandler().getMessages();
+        MessageHandler msgs = expansionErrors.getMessageHandler();
+        msgs.combine(insWriter.flush());
+        msgs.combine(insWriter.close());
+        new File(filePath).delete();
+        return msgs.getMessages();
     }
 }

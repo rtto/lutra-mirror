@@ -22,24 +22,18 @@ package xyz.ottr.lutra.restapi;
  * #L%
  */
 
-import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.nio.file.Files;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
+import java.util.ArrayList;
 import java.util.List;
-import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
-import org.apache.commons.lang3.ObjectUtils;
-import org.eclipse.jgit.api.Git;
-import org.eclipse.jgit.api.errors.GitAPIException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import xyz.ottr.lutra.bottr.BOTTR;
@@ -51,74 +45,45 @@ public class WebLutraServlet extends HttpServlet {
 
     private static final long serialVersionUID = -7342968018534639139L;
 
-    private static final List<String> originWhitelist = List.of(
-        "https://weblutra.ottr.xyz",
-        "https://ottr.xyz",
-        "https://www.ottr.xyz",
-        "https://spec.ottr.xyz",
-        "https://dev.spec.ottr.xyz",
-        // http too:
-        "http://weblutra.ottr.xyz",
-        "http://ottr.xyz",
-        "http://www.ottr.xyz",
-        "http://spec.ottr.xyz",
-        "http://dev.spec.ottr.xyz"
-    );
-    
-    private static final String repoLibrary = "https://gitlab.com/ottr/templates.git";
+    private static final List<String> originWhitelist;
 
-    private static final String attrLibraryRepo = "libraryRepo";
-    private static final String attrLastPullTime = "lastPullTime";
-
-    private static final long pullInterval = 1000 * 60 * 10; // update repo every 10 mins
+    static {
+        var domains = new ArrayList<String>(6);
+        List.of("", "weblutra.", "www.", "spec.", "primer.", "dev.spec.").stream()
+            .forEach(sub -> {
+                domains.add("http://" + sub + "ottr.xyz");
+                domains.add("https://" + sub + "ottr.xyz");
+            });
+        originWhitelist = domains;
+    }
 
     private static final long MAX_FILE_SIZE = 100 * 1024;
     private static final long MAX_REQUEST_SIZE = 5 * MAX_FILE_SIZE;
+
+    private static final String CHARSET_UTF_8 = "UTF-8";
+    private static final String CONTENT_TYPE_TEXT_PLAIN = "text/plain";
 
     static {
         BOTTR.Settings.setRDFSourceQueryLimit(200);
     }
 
-    private void updateLibrary() throws IOException, GitAPIException {
-
-        ServletContext context = getServletContext();
-
-        File repo = (File) context.getAttribute(attrLibraryRepo);
-
-        // clone
-        if (repo == null) {
-            repo = Files.createTempDirectory("tplLibrary").toFile();
-            Git.cloneRepository()
-                .setURI(repoLibrary)
-                .setDirectory(repo)
-                .call();
-
-            getServletContext().setAttribute(attrLibraryRepo, repo);
-        }
-
-        long lastPullTime = (Long) ObjectUtils.defaultIfNull(context.getAttribute(attrLastPullTime), 0L);
-        long now = System.currentTimeMillis();
-
-        // pull
-        if (now > lastPullTime + this.pullInterval) {
-            context.setAttribute(attrLastPullTime, now);
-
-            Git git = Git.open(repo);
-            git.pull();
-        }
-    }
-
     private ServletFileUpload initServletFileUpload() {
         DiskFileItemFactory factory = new DiskFileItemFactory();
-        // Use default values:
-        //factory.setSizeThreshold(MEMORY_THRESHOLD);
-        //factory.setRepository(new File(System.getProperty("java.io.tmpdir")));
-
+        factory.setDefaultCharset(CHARSET_UTF_8);
         ServletFileUpload uploader = new ServletFileUpload(factory);
-        uploader.setFileSizeMax(MAX_FILE_SIZE);
-        uploader.setSizeMax(MAX_REQUEST_SIZE);
 
+        long maxFileSize = getValue("WEBLUTRA_MAX_FILE_SIZE", MAX_FILE_SIZE);
+        long maxRequestSize = getValue("WEBLUTRA_MAX_REQUEST_SIZE", MAX_REQUEST_SIZE);
+
+        uploader.setFileSizeMax(maxFileSize);
+        uploader.setSizeMax(maxRequestSize);
+        uploader.setHeaderEncoding(CHARSET_UTF_8);
         return uploader;
+    }
+
+    private long getValue(String property, long defaultValue) {
+        String sysValue = System.getProperty(property);
+        return (sysValue != null) ? Long.parseLong(sysValue) : defaultValue;
     }
 
     @Override
@@ -135,10 +100,6 @@ public class WebLutraServlet extends HttpServlet {
 
         CLIWrapper cli = new CLIWrapper();
 
-        updateLibrary();
-        File repo = (File) getServletContext().getAttribute(attrLibraryRepo);
-        cli.setTplLibrary(repo.getAbsolutePath());
-
         ServletFileUpload uploader = initServletFileUpload();
         List<FileItem> fileItems = uploader.parseRequest(request);
 
@@ -146,7 +107,7 @@ public class WebLutraServlet extends HttpServlet {
 
             // Must set prefixes first so prefixes are prepended to input and library.
             fileItems.stream()
-                .filter(fi -> fi.getFieldName().equalsIgnoreCase("prefixes"))
+                .filter(fi -> "prefixes".equalsIgnoreCase(fi.getFieldName()))
                 .findFirst()
                 .ifPresent(fi -> cli.setPrefixes(fi.getString()));
 
@@ -174,23 +135,22 @@ public class WebLutraServlet extends HttpServlet {
                     case "mode":
                         cli.setMode(item.getString());
                         break;
-                    case "fetchMissing":
-                        cli.setFetchMissing("true".equalsIgnoreCase(item.getString()));
-                        break;
-                    case "loadStdLib":
-                        cli.setLoadTplLibrary("true".equalsIgnoreCase(item.getString()));
-                        break;
+                    // TODO disable fetching to protect tpl.ottr.xyz server
+                    //case "fetchMissing":
+                    //    cli.setFetchMissing("true".equalsIgnoreCase(item.getString()));
+                    //    break;
+                    //case "loadStdLib":
+                    //    cli.setLoadTplLibrary("true".equalsIgnoreCase(item.getString()));
+                    //    break;
                     case "inputFormat":
                         cli.setInputFormat(item.getString());
                         break;
                     case "outputFormat":
                         cli.setOutputFormat(item.getString());
                         break;
-                    /* Cannot set library format as this may set the wrong format for the tpl library.
                     case "libraryFormat":
                         cli.setLibraryFormat(item.getString());
                         break;
-                    */
                     default:
                         break;
                 }
@@ -201,7 +161,7 @@ public class WebLutraServlet extends HttpServlet {
         try {
             output = cli.run();
         } catch (Exception ex) {
-            output = Message.error(ex.getMessage()).toString();
+            output = Message.error(ex).toString();
         }
 
         String origin = request.getHeader("Origin");
@@ -217,8 +177,8 @@ public class WebLutraServlet extends HttpServlet {
     }
 
     private void writeResponse(HttpServletResponse response, String content) throws IOException {
-        response.setContentType("text/plain");
-        response.setCharacterEncoding("UTF-8");
+        response.setContentType(CONTENT_TYPE_TEXT_PLAIN);
+        response.setCharacterEncoding(CHARSET_UTF_8);
 
         try (PrintWriter writer = response.getWriter()) {
             writer.println(content);

@@ -26,42 +26,44 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-
 import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.shared.PrefixMapping;
 import xyz.ottr.lutra.bottr.util.ListParser;
-import xyz.ottr.lutra.bottr.util.TermFactory;
 import xyz.ottr.lutra.model.terms.ListTerm;
+import xyz.ottr.lutra.model.terms.LiteralTerm;
 import xyz.ottr.lutra.model.terms.Term;
 import xyz.ottr.lutra.model.types.BasicType;
 import xyz.ottr.lutra.model.types.ComplexType;
 import xyz.ottr.lutra.model.types.ListType;
-import xyz.ottr.lutra.model.types.TermType;
+import xyz.ottr.lutra.model.types.Type;
+import xyz.ottr.lutra.model.types.TypeRegistry;
+import xyz.ottr.lutra.parser.TermParser;
+import xyz.ottr.lutra.system.Message;
 import xyz.ottr.lutra.system.Result;
 import xyz.ottr.lutra.system.ResultStream;
+import xyz.ottr.lutra.wottr.parser.WTermParser;
+import xyz.ottr.lutra.writer.RDFNodeWriter;
 
-// TODO use lombok's @SuperBuilder once it has support in IDE, and make fields final. now we simply use setter methods.
 @Setter
 public abstract class ArgumentMap<V> implements Function<V, Result<Term>> {
 
-    protected TermType type;
+    private final PrefixMapping prefixMapping;
+
+    protected Type type;
     protected String literalLangTag;
 
     private TranslationTable translationTable;
     private TranslationSettings translationSettings;
 
-    protected final TermFactory termFactory;
-
     protected ArgumentMap(PrefixMapping prefixMapping) {
-        //this.prefixMapping = prefixMapping;
-        this.termFactory = new TermFactory(prefixMapping);
+        this.prefixMapping = prefixMapping;
         this.translationSettings = TranslationSettings.builder().build();
         this.translationTable = new TranslationTable();
     }
 
-    protected ArgumentMap(PrefixMapping prefixMapping, TermType type) {
+    protected ArgumentMap(PrefixMapping prefixMapping, Type type) {
         this(prefixMapping);
         this.type = type;
     }
@@ -85,17 +87,17 @@ public abstract class ArgumentMap<V> implements Function<V, Result<Term>> {
             : StringUtils.EMPTY;
     }
 
-    private Result<Term> getTerm(V value, TermType type) {
+    private Result<Term> getTerm(V value, Type type) {
 
         if (Objects.isNull(value)) {
             return Result.of(this.translationSettings.getNullValue());
         } else if (StringUtils.isNotEmpty(getBlankNodeLabel(value))) {
-            return this.termFactory.createBlankNode(getBlankNodeLabel(value)).map(t -> (Term) t);
+            return TermParser.toBlankNodeTerm(getBlankNodeLabel(value)).map(t -> (Term) t);
         } else if (this.translationTable.containsKey(toRDFNode(value))) {
             var translatedRDF = this.translationTable.get(toRDFNode(value));
             return translatedRDF.isAnon()
-                    ? TermFactory.createBlankNode().map(t -> (Term) t)
-                    : this.termFactory.createTerm(translatedRDF);
+                    ? TermParser.newBlankNodeTerm().map(t -> (Term) t)
+                    : WTermParser.toTerm(translatedRDF);
         } else if (type instanceof ListType) {
             return getListTerm(toString(value), (ComplexType)type);
         } else {
@@ -135,5 +137,20 @@ public abstract class ArgumentMap<V> implements Function<V, Result<Term>> {
             .aggregate()
             .map(stream -> stream.collect(Collectors.toList()))
             .map(ListTerm::new);
+    }
+
+    public Result<Term> toTerm(String value, BasicType type) {
+        if (type.isSubTypeOf(TypeRegistry.IRI)) {
+            return TermParser.toIRITerm(this.prefixMapping.expandPrefix(value)).map(t -> (Term)t);
+        } else if (type.isProperSubTypeOf(TypeRegistry.LITERAL)) {
+            return TermParser.toTypedLiteralTerm(value, type.getIri()).map(t -> (Term)t);
+        } else {
+            Result<LiteralTerm> result = TermParser.toPlainLiteralTerm(value);
+            if (!type.equals(TypeRegistry.LITERAL)) {
+                result.addMessage(Message.warning("Unknown literal datatype " + RDFNodeWriter.toString(type.getIri())
+                    + ", defaulting to " + RDFNodeWriter.toString(TypeRegistry.LITERAL.getIri())));
+            }
+            return result.map(t -> (Term)t);
+        }
     }
 }

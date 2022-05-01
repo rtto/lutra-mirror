@@ -5,6 +5,111 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 0.6.13 - 2022.03.14
+
+### Features
+
+ - Improved error checking of IRIs, #323
+ - Error messages written to console as #-prefixed comments
+ - Improving error message phrasing
+ - Removing jQuery from javadoc due to reported vulnerability issues
+ - Removing some INFO messages that cluttered output
+
+### Bug fixes
+
+ - Correct character encoding WebLutra, #342
+
+## 0.6.12 - 2022.01.14
+
+### Added
+
+ - Redesign of internal template store: #308, #319
+
+### Bug fixes
+
+ - #328: log4j security updates
+ - #327: incomplete expansion when output to console
+ - #302: Bump to Jena v4
+ - Logging: #216, #152, #314
+ - #298: Docttr sometimes fails on blank nodes
+
+## 0.6.11
+
+### Added
+
+ - #20 initial support for "direct writing" of expanded instances.
+
+### Bug fixes
+
+ - !140 Fix bug where multiple ottr:none values in template body would lead to type error.
+ - #228 Add check to format manager for empty formats
+ - #298 Simplistic fix for "docttr fails on blank node types"
+ - #252 No error message when wrong input file
+ - !142 Fix bug where messages were not printed if using wottr format.
+ - #300 build bug "spotbugs-sast fails"
+	
+## 0.6.10
+
+Do not fail build due to errors reported by javadoc.
+
+
+## 0.6.9
+
+### Added
+
+- Support for reading and writing annotations.
+- Improved docttr, support annotations.
+
+### Bug fixes
+
+- Remove WARNING reported when ottr: vocabulary elements are used as arguments, #268 
+
+### Dependencies
+
+- Bump all github reported dependencies
+
+## 0.6.8
+
+### Added
+
+- Improved docttr.
+
+### Bug fixes
+
+- Include hostname and URI fragment in output folder hierarchy, #206 
+
+### Dependencies
+
+- Bump all github reported dependencies, except jena 3.15.
+- Replaced RDFVizler dependency with guru.nidi.graphviz-java 
+
+## 0.6.7
+
+### Added
+
+- Introduced docttr documentation format for templates. In prototypical state.
+
+### Dependencies
+
+- Bump all github reported dependencies
+
+### Bug fixes
+
+- Expansion of ListTerms, #235
+- Correct location of local copy of tpl.ottr.xyz standard library
+
+## 0.6.6
+
+### Added
+
+- Introduced api module 
+- Improved parsing for wOTTR and stOTTR using Builerpattern
+
+### Removed
+
+- Removed support for legacy format
+
+
 ## 0.6.5
 
 ### Bug fixes

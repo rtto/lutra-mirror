@@ -37,14 +37,18 @@ public enum BaseTemplateBuilder {
         signature = Result.nullToEmpty(signature, Message.error("Missing signature. A base template must have "
             + "a signature."));
 
+        // Must copy signature fields. @SuperBuilder does not work when annotating static methods
         var builder = Result.of(BaseTemplate.builder());
         builder.addResult(signature, (bldr, sign) -> {
             bldr.iri(sign.getIri());
             bldr.parameters(sign.getParameters());
+            bldr.annotations(sign.getAnnotations());
         });
 
         return Result.allIsPresent(signature)
             ? builder.map(BaseTemplate.BaseTemplateBuilder::build)
+                .flatMap(BaseTemplate::validate)
+                .map(b -> (BaseTemplate)b)
             : Result.empty(builder);
     }
 }

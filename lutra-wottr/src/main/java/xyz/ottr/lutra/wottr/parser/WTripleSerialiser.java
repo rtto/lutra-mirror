@@ -26,7 +26,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.function.Function;
-
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.RDFList;
@@ -37,9 +36,11 @@ import org.apache.jena.rdf.model.StmtIterator;
 import org.apache.jena.vocabulary.RDF;
 import xyz.ottr.lutra.wottr.WOTTR;
 
-// TODO can this class be replaced by using WInstanceWriter instead?
+/**
+ * Serialise Instances as the exact triples (keeping blank nodes unchanged) they are parsed from.
+ */
 
-public class WTripleSerialiser {
+class WTripleSerialiser {
 
     private final Model model;
 
@@ -52,21 +53,7 @@ public class WTripleSerialiser {
         return new ArrayList<>();
     }
 
-    List<Statement> serialiseInstance(Resource instance) {
-        List<Statement> triples = getCollection();
-
-        triples.addAll(listStatements(instance));
-        // get argument list, and the neighbourhood of each argument:
-        triples.addAll(serialisePropertyList(instance, WOTTR.arguments, this::listStatements));
-
-        // get value list, which may be a list of lists
-        listStatements(instance, WOTTR.values).forEachRemaining(statement -> {
-            Resource argList = statement.getObject().asResource();
-            triples.addAll(serialiseList(argList, true));
-        });
-
-        return triples;
-    }
+    /*
 
     public List<Statement> serialiseTemplate(Resource template) {
         List<Statement> triples = getCollection();
@@ -96,6 +83,38 @@ public class WTripleSerialiser {
                 }
             });
         }
+        return triples;
+    }
+    */
+
+    List<Statement> serialiseInstance(Resource instance) {
+        List<Statement> triples = getCollection();
+
+        triples.addAll(listStatements(instance));
+        // get argument list, and the neighbourhood of each argument:
+        triples.addAll(serialisePropertyList(instance, WOTTR.arguments, this::serialiseArgument));
+
+        // get value list, which may be a list of lists
+        listStatements(instance, WOTTR.values).forEachRemaining(statement -> {
+            Resource argList = statement.getObject().asResource();
+            triples.addAll(serialiseList(argList, true));
+        });
+
+        return triples;
+    }
+
+    private List<Statement> serialiseArgument(Resource argument) {
+
+        List<Statement> triples = getCollection();
+
+        triples.addAll(listStatements(argument));
+
+        listStatements(argument, WOTTR.value).forEachRemaining(statement -> {
+            if (statement.getObject().canAs(RDFList.class)) {
+                triples.addAll(serialiseList(statement.getObject().asResource(), true));
+            }
+        });
+
         return triples;
     }
 

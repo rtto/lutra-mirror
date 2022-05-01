@@ -23,7 +23,6 @@ package xyz.ottr.lutra.api;
  */
 
 import java.util.Locale;
-
 import xyz.ottr.lutra.bottr.BottrFormat;
 import xyz.ottr.lutra.io.Format;
 import xyz.ottr.lutra.stottr.StottrFormat;
