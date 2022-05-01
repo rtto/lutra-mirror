@@ -29,8 +29,7 @@ import xyz.ottr.lutra.system.Assertions;
 import xyz.ottr.lutra.system.Message;
 import xyz.ottr.lutra.system.MessageHandler;
 
-
-public class Issue324DummyInput {
+public class Issue324DummyInputTest {
 
     private static final String ROOT = "src/test/resources/issues/324DummyInput/";
 
@@ -38,8 +37,8 @@ public class Issue324DummyInput {
     public void parseCorrectFile() {
         String args = " "
                 + " -l " + ROOT + "templates/personTemplate.stottr"
-                + " --stdout"
-                + " " + ROOT + "instances/correct.ttl";
+                + " -L stottr "
+                + ROOT + "correct.ttl";
 
         CLI cli = new CLI();
         MessageHandler msgs = cli.getMessageHandler();
@@ -52,7 +51,8 @@ public class Issue324DummyInput {
     public void parseDummyFile() {
         String args = " "
                 + " -l " + ROOT + "templates/personTemplate.stottr"
-                + " " + ROOT + "instances/dummy.ttl";
+                + " -L stottr "
+                + ROOT + "dummy.ttl";
 
         CLI cli = new CLI();
         MessageHandler msgs = cli.getMessageHandler();
@@ -66,7 +66,8 @@ public class Issue324DummyInput {
     public void parseFaultyFile() {
         String args = " "
                 + " -l " + ROOT + "templates/personTemplate.stottr"
-                + " " + ROOT + "instances/faulty.ttl";
+                + " -L stottr "
+                + ROOT + "faulty.ttl";
 
         CLI cli = new CLI();
         MessageHandler msgs = cli.getMessageHandler();
@@ -77,10 +78,11 @@ public class Issue324DummyInput {
     }
 
     @Test
-    public void readEmptyInstance() {
+    public void emptyInstanceFile() {
         String args = " "
                 + " -l " + ROOT + "templates/personTemplate.stottr"
-                + " " + ROOT + "instances/empty.ttl";
+                + " -L stottr "
+                + ROOT + "empty.ttl";
 
         CLI cli = new CLI();
         MessageHandler msgs = cli.getMessageHandler();
@@ -90,10 +92,11 @@ public class Issue324DummyInput {
     }
 
     @Test
-    public void readEmptyTemplate() {
+    public void emptyTemplateFile() {
         String args = " "
                 + " -l " + ROOT + "templates/emptyTemplate.stottr"
-                + " " + ROOT + "instances/correct.ttl";
+                + " -L stottr "
+                + ROOT + "correct.ttl";
 
         CLI cli = new CLI();
         MessageHandler msgs = cli.getMessageHandler();
@@ -101,4 +104,47 @@ public class Issue324DummyInput {
 
         Assertions.atLeast(msgs, Message.Severity.WARNING);
     }
+
+    @Test
+    public void emptyInstanceFileInFolder() {
+        String args = " "
+                + " -l " + ROOT + "templates/personTemplate.stottr "
+                + " -L stottr "
+                + ROOT + "instances";
+
+        CLI cli = new CLI();
+        MessageHandler msgs = cli.getMessageHandler();
+        cli.executeArgs(args.trim().split("\\s+"));
+
+        Assertions.atLeast(msgs, Message.Severity.WARNING);
+    }
+
+    @Test
+    public void emptyTemplateFileInFolder() {
+        String args = " "
+                + " -l " + ROOT + "templates "
+                + " -L stottr "
+                + ROOT + "correct.ttl";
+
+        CLI cli = new CLI();
+        MessageHandler msgs = cli.getMessageHandler();
+        cli.executeArgs(args.trim().split("\\s+"));
+
+        Assertions.atLeast(msgs, Message.Severity.WARNING);
+    }
+
+    @Test
+    public void emptyTemplateFolder() {
+        String args = " "
+                + " -l " + ROOT + "emptyFolder "
+                + " -L stottr "
+                + ROOT + "correct.ttl";
+
+        CLI cli = new CLI();
+        MessageHandler msgs = cli.getMessageHandler();
+        cli.executeArgs(args.trim().split("\\s+"));
+
+        Assertions.atLeast(msgs, Message.Severity.WARNING);
+    }
+
 }

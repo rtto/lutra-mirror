@@ -22,6 +22,7 @@ package xyz.ottr.lutra.io;
  * #L%
  */
 
+import java.io.File;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.function.Function;
@@ -29,6 +30,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import xyz.ottr.lutra.model.Instance;
 import xyz.ottr.lutra.parser.InstanceParser;
+import xyz.ottr.lutra.system.Message;
+import xyz.ottr.lutra.system.MessageHandler;
+import xyz.ottr.lutra.system.Result;
 import xyz.ottr.lutra.system.ResultStream;
 
 public class InstanceReader implements Function<String, ResultStream<Instance>> {
@@ -52,9 +56,16 @@ public class InstanceReader implements Function<String, ResultStream<Instance>> 
     }
 
     public ResultStream<Instance> apply(String filename) {
-        return Paths.get(filename).toFile().isDirectory()
-            ? loadInstancesFromFolder(filename)
-            : this.instancePipeline.apply(filename);
+        if (Paths.get(filename).toFile().isDirectory()) {
+            checkFolder(filename).printMessages();
+            return loadInstancesFromFolder(filename);
+        }
+
+        if (new File(filename).length() == 0) {
+            return ResultStream.of(Result.warning("Empty file: " + filename));
+        }
+
+        return this.instancePipeline.apply(filename);
     }
 
     /**
@@ -68,5 +79,16 @@ public class InstanceReader implements Function<String, ResultStream<Instance>> 
         this.log.info("Loading all template instaces from folder " + folder + " with suffix "
                 + Arrays.toString(this.includeExtensions) + " except " + Arrays.toString(this.excludeExtensions));
         return readInstances(Files.loadFromFolder(folder, this.includeExtensions, this.excludeExtensions));
+    }
+
+    private MessageHandler checkFolder(String folderName) {
+        MessageHandler msgs = new MessageHandler();
+        File[] files = new File(folderName).listFiles();
+        if (files == null) {
+            msgs.add(Message.error("Folder access denied: " + folderName));
+        } else if (files.length == 0) {
+            msgs.add(Message.warning("Empty folder: " + folderName));
+        }
+        return msgs;
     }
 }
