@@ -88,12 +88,18 @@ public class InstanceReader implements Function<String, ResultStream<Instance>> 
 
     private MessageHandler checkFolder(String folderName) {
         MessageHandler msgs = new MessageHandler();
-        File[] files = new File(folderName).listFiles();
-        if (files == null) {
+
+        try {
+            File[] files = new File(folderName).listFiles();
+            if (files == null) {
+                msgs.add(Message.error("Pathname does not denote a directory: " + folderName));
+            } else if (files.length == 0) {
+                msgs.add(Message.warning("Empty folder: " + folderName));
+            }
+        } catch (SecurityException e) {
             msgs.add(Message.error("Folder access denied: " + folderName));
-        } else if (files.length == 0) {
-            msgs.add(Message.warning("Empty folder: " + folderName));
         }
+
         return msgs;
     }
 }

@@ -135,18 +135,22 @@ public class TemplateReader implements Function<String, ResultStream<Signature>>
 
     private MessageHandler checkEmptiness(String folderName) {
         MessageHandler msgs = new MessageHandler();
-        File[] files = new File(folderName).listFiles();
 
-        if (files == null) {
-            msgs.add(Message.error("Folder access denied: " + folderName));
-        } else if (files.length == 0) {
-            msgs.add(Message.warning("Empty folder: " + folderName));
-        } else {
-            for (File file : files) {
-                if (file.length() == 0) {
-                    msgs.add(Message.warning("Empty file: " + file));
+        try {
+            File[] files = new File(folderName).listFiles();
+            if (files == null) {
+                msgs.add(Message.error("Pathname does not denote a directory: " + folderName));
+            } else if (files.length == 0) {
+                msgs.add(Message.warning("Empty folder: " + folderName));
+            } else {
+                for (File file : files) {
+                    if (file.length() == 0) {
+                        msgs.add(Message.warning("Empty file: " + file));
+                    }
                 }
             }
+        } catch (SecurityException e) {
+            msgs.add(Message.error("Folder access denied: " + folderName));
         }
 
         return msgs;
