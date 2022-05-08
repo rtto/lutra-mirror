@@ -36,6 +36,8 @@ import xyz.ottr.lutra.model.Instance;
 import xyz.ottr.lutra.model.Parameter;
 import xyz.ottr.lutra.model.Signature;
 import xyz.ottr.lutra.model.Template;
+import xyz.ottr.lutra.system.Assertions;
+import xyz.ottr.lutra.system.Message;
 import xyz.ottr.lutra.system.Result;
 
 public class StandardTemplateStoreTest {
@@ -64,26 +66,28 @@ public class StandardTemplateStoreTest {
 
         // success - no signature
         Template template0 = buildDummyTemplate("iri-0", new String[] {"x", "y"});
-        Assert.assertTrue("Adding Template without matching Signature present should succeed", manager.addTemplate(template0));
+        manager.addTemplate(template0);
+        Assert.assertTrue("Adding Template without matching Signature present should succeed", manager.containsTemplate("iri-0"));
 
         // success - existing signature
         Signature signature1 = buildDummySignature("iri-1", new String[] {"x", "y"});
         manager.addSignature(signature1);
         Template template1 = buildDummyTemplate("iri-1", new String[] {"x", "y"});
-        Assert.assertTrue("Adding Template with matching Signature present should succeed", manager.addTemplate(template1));
+        manager.addTemplate(template1);
+        Assert.assertTrue("Adding Template with matching Signature present should succeed", manager.containsTemplate("iri-1"));
 
         // existing Sig is Template
         Template template2 = buildDummyTemplate("iri-2", new String[] {"a", "b"});
         manager.addTemplate(template2);
         Assert.assertFalse("Adding Template when there is already one in the store with dependencies set should "
-                + "return false", manager.addTemplate(template2));
+                + "not succeed", manager.addTemplate(template2).isPresent());
 
         // differing parameters
         Signature signature2 = buildDummySignature("iri-2", new String[] {"x", "y"});
         manager.addSignature(signature2);
         Template template3 = buildDummyTemplate("iri-2", new String[] {"x", "y", "z"});
-        Assert.assertFalse("Adding Template with different parameter number than Signature should return false",
-                manager.addTemplate(template3));
+        Assert.assertFalse("Adding Template with different parameter number than Signature should not succeed",
+                manager.addTemplate(template3).isPresent());
         // TODO add "real" differing parameters when implemented not just list length
     }
 
@@ -94,11 +98,15 @@ public class StandardTemplateStoreTest {
         Signature signature1 = buildDummySignature("iri-1", new String[] {"x", "y"});
         Signature signature2 = buildDummySignature("iri-2", new String[] {"x", "y"});
 
-        Assert.assertTrue("Adding Signature to empty store should succeed", manager.addSignature(signature1));
-        Assert.assertTrue("Adding non-existing Signature to store should succeed", manager.addSignature(signature2));
-        Assert.assertFalse("Adding existing Signature to store should return false", manager.addSignature(signature1));
+        manager.addSignature(signature1);
+        Assert.assertTrue("Adding Signature to empty store should succeed", manager.containsSignature("iri-1"));
+        manager.addSignature(signature2);
+        Assert.assertTrue("Adding non-existing Signature to store should succeed", manager.containsSignature("iri-2"));
+        Assert.assertFalse("Adding existing Signature to store should return false", manager.addSignature(signature1).isPresent());
         // TODO add Signature that is a Template with/without matching params once this is implemented
     }
+
+
 
     @Test
     public void testContainsWithTemplate() {
@@ -325,6 +333,56 @@ public class StandardTemplateStoreTest {
 
         Assert.assertTrue("Added Signature should be found in TemplateStore", manager.getSignature("iri-2").isPresent());
         Assert.assertFalse("Added Signature should not be a Template in the in TemplateStore", manager.getTemplate("iri-2").isPresent());
+    }
+
+    @Test
+    public void testAcceptExistingTemplate() {
+        TemplateStore manager = new StandardTemplateStore(null);
+        Template template0 = buildDummyTemplate("iri-0", new String[] {"x", "y"});
+
+        manager.accept(template0);
+        manager.accept(template0);
+        Assertions.atLeast(manager.getMessageHandler(), Message.Severity.WARNING);
+    }
+
+    @Test
+    public void testParametersOfSigAndTempDiffer() {
+        StandardTemplateStore manager = new StandardTemplateStore(null);
+        Signature signature1 = buildDummySignature("iri-1", new String[] {"a", "b"});
+        Template template3 = buildDummyTemplate("iri-1", new String[] {"a"});
+
+        manager.accept(signature1);
+        manager.accept(template3);
+        Assertions.atLeast(manager.getMessageHandler(), Message.Severity.WARNING);
+    }
+
+    @Test
+    public void testAcceptExistingSignature() {
+        TemplateStore manager = new StandardTemplateStore(null);
+        Signature signature = buildDummySignature("iri-0", new String[] {"a", "b"});
+
+        manager.accept(signature);
+        manager.accept(signature);
+        Assertions.atLeast(manager.getMessageHandler(), Message.Severity.WARNING);
+    }
+
+    @Test
+    public void testAcceptExistingBaseTemplate() {
+        TemplateStore manager = new StandardTemplateStore(null);
+
+        BaseTemplate base1 = BaseTemplate.builder()
+                .iri("base")
+                .parameters(createParametersList(new String[] {"x", "y"}))
+                .build();
+
+        BaseTemplate base2 = BaseTemplate.builder()
+                .iri("base")
+                .parameters(createParametersList(new String[] {"x", "y", "z"}))
+                .build();
+
+        manager.accept(base1);
+        manager.accept(base2);
+        Assertions.atLeast(manager.getMessageHandler(), Message.Severity.WARNING);
     }
 
     private Signature buildDummySignature(String iri, String[] parameters) {

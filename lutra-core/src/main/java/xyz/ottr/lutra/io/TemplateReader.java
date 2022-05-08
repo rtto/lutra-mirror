@@ -36,6 +36,11 @@ import xyz.ottr.lutra.system.MessageHandler;
 import xyz.ottr.lutra.system.ResultConsumer;
 import xyz.ottr.lutra.system.ResultStream;
 
+/**
+ * A <code>TemplateReader</code> is a pipeline combining an {@link InputReader},
+ * consuming <code>String</code> denoting file paths,
+ * and a {@link xyz.ottr.lutra.parser.TemplateParser}.
+ */
 public class TemplateReader implements Function<String, ResultStream<Signature>> {
 
     private final Function<String, ResultStream<Signature>> templatePipeline;
@@ -73,7 +78,10 @@ public class TemplateReader implements Function<String, ResultStream<Signature>>
             consumer.getMessageHandler().add(Message.warning("Empty file: " + file));
         }
         this.templatePipeline.apply(file).forEach(consumer);
-        return consumer.getMessageHandler();
+
+        MessageHandler msgs = store.getMessageHandler();
+        msgs.combine(consumer.getMessageHandler());
+        return msgs;
     }
 
     /**

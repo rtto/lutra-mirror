@@ -1,0 +1,22 @@
+@prefix : <http://example.org/Device#> .
+@prefix ex: <http://example.org/> .
+@prefix class: <http://example.org/Class/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix ottr: <http://ns.ottr.xyz/0.4/> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix ax: <http://tpl.ottr.xyz/owl/axiom/0.1/> .
+@prefix rstr: <http://tpl.ottr.xyz/owl/restriction/0.1/> .
+
+# type of parameter ?DeviceType is different from the type specified in instances.xlsx
+ex:Device[owl:Class ?device, NEList<owl:Class> ?components, ? xsd:string ?label, owl:Class ?DeviceType = class:Device] :: {
+	ex:ConsistsOf(?device, ?components),
+	ottr:Triple(?device, rdfs:label, ?label),
+	ax:SubClassOf(?device, ?DeviceType)
+}.
+
+ex:DeviceInstance[owl:NamedIndividual ?deviceInstance, owl:Class ?device, NEList<owl:NamedIndividual> ?components] :: {
+	ottr:Triple(?deviceInstance, rdf:type, ?device),
+	cross | ottr:Triple(?deviceInstance, ex:hasComponent, ++?components)
+}.

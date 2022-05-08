@@ -46,6 +46,9 @@ import xyz.ottr.lutra.system.Message;
 import xyz.ottr.lutra.system.Result;
 import xyz.ottr.lutra.system.ResultStream;
 
+/**
+ * Utility class for working with files.
+ */
 public enum Files {
     ;
 

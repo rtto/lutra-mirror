@@ -33,6 +33,13 @@ import xyz.ottr.lutra.system.Message;
 import xyz.ottr.lutra.system.MessageHandler;
 import xyz.ottr.lutra.system.Result;
 
+/**
+ * A <code>FormatManager</code> is a registry for {@link Format}s
+ * with methods for retrieving all formats supporting a particular operation
+ * such as reading templates or writing instances. In addition,
+ * it contains utility methods for attempting an operation
+ * with all formats until one succeeds.
+ */
 public class FormatManager {
 
     private final Map<String, Format> formats;
