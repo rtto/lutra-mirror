@@ -73,18 +73,17 @@ class SParameterParser extends SBaseParserVisitor<Parameter> {
     }
 
     private Result<Term> parseDefaultValue(stOTTRParser.ParameterContext ctx) {
-        if(ctx.defaultValue() == null) {
+        stOTTRParser.DefaultValueContext defaultValueContext = ctx.defaultValue();
+
+        if (defaultValueContext == null) {
             return Result.empty();
         }
 
-        // remove '='
-        String defVal = ctx.defaultValue().getText().substring(STOTTR.Parameters.defaultValSep.length());
-        if (defVal.startsWith(STOTTR.Terms.listStart) && defVal.endsWith(STOTTR.Terms.listEnd)) {
+        if (defaultValueContext.constant() == null) {
             return this.termParser.visit(ctx.defaultValue().constantList());
         }
 
         return this.termParser.visit(ctx.defaultValue().constant());
-
     }
 
     private Result<Term> parseTerm(stOTTRParser.ParameterContext ctx) {

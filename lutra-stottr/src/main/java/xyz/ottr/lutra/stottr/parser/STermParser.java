@@ -73,7 +73,7 @@ public class STermParser extends SBaseParserVisitor<Term> {
     public Result<Term> visitTerm(stOTTRParser.TermContext ctx) {
 
         if (ctx.Variable() != null) {
-            return toBlankNodeTerm(getVariableLabel(ctx.Variable())).map(t -> (Term)t); // return Result.of(makeBlank();
+            return toBlankNodeTerm(getVariableLabel(ctx.Variable())).map(t -> t); // return Result.of(makeBlank();
         }
 
         Result<Term> trm = visitChildren(ctx);
@@ -81,6 +81,15 @@ public class STermParser extends SBaseParserVisitor<Term> {
             ? trm
             : Result.empty(Message.error("Expected term but found " + ctx.getText()
             + SParserUtils.getLineAndColumnString(ctx)));
+    }
+
+    public Result<Term> visitConstantTerm(stOTTRParser.ConstantTermContext ctx) {
+        Result<Term> trm = visitChildren(ctx);
+
+        return trm != null
+                ? trm
+                : Result.empty(Message.error("Expected term but found " + ctx.getText()
+                + SParserUtils.getLineAndColumnString(ctx)));
     }
 
     String getVariableLabel(TerminalNode var) {
@@ -93,17 +102,26 @@ public class STermParser extends SBaseParserVisitor<Term> {
 
         if (ctx.BooleanLiteral() != null) {
             String litVal = ctx.BooleanLiteral().getSymbol().getText();
-            return TermParser.toTypedLiteralTerm(litVal, XSD.xboolean.getURI()).map(t -> (Term)t);
+            return TermParser.toTypedLiteralTerm(litVal, XSD.xboolean.getURI()).map(t -> t);
         }
         return visitChildren(ctx);
     }
 
     public Result<Term> visitList(stOTTRParser.ListContext ctx) {
-
         List<Result<Term>> termResLst = ctx.term()
             .stream()
             .map(this::visitTerm)
             .collect(Collectors.toList());
+
+        Result<List<Term>> termLstRes = Result.aggregate(termResLst);
+        return termLstRes.map(ListTerm::new);
+    }
+
+    public Result<Term> visitConstantList(stOTTRParser.ConstantListContext ctx) {
+        List<Result<Term>> termResLst = ctx.constantTerm()
+                .stream()
+                .map(this::visitConstantTerm)
+                .collect(Collectors.toList());
 
         Result<List<Term>> termLstRes = Result.aggregate(termResLst);
         return termLstRes.map(ListTerm::new);
@@ -129,7 +147,7 @@ public class STermParser extends SBaseParserVisitor<Term> {
 
         String val = valNode.getSymbol().getText();
 
-        return TermParser.toTypedLiteralTerm(val, type).map(t -> (Term)t);
+        return TermParser.toTypedLiteralTerm(val, type).map(t -> t);
     }
 
     public Result<Term> visitRdfLiteral(stOTTRParser.RdfLiteralContext ctx) {
@@ -144,7 +162,7 @@ public class STermParser extends SBaseParserVisitor<Term> {
             String tag = ctx.LANGTAG().getSymbol().getText();
             tag = atPat.matcher(tag).replaceFirst(""); // Remove the @-prefix
             return TermParser.toLangLiteralTerm(val, tag)
-                .map(t -> (Term)t);
+                .map(t -> t);
         }
 
         if (ctx.iri() != null) { // Datatype present
@@ -158,11 +176,11 @@ public class STermParser extends SBaseParserVisitor<Term> {
                 .map(t -> (IRITerm)t)
                 .map(IRITerm::getIri)
                 .flatMap(iri -> TermParser.toTypedLiteralTerm(val, iri))
-                .map(t -> (Term)t);
+                .map(t -> t);
         }
 
         return TermParser.toPlainLiteralTerm(val)
-            .map(t -> (Term)t);
+            .map(t -> t);
     }
 
     public Result<Term> visitIri(stOTTRParser.IriContext ctx) {
@@ -217,7 +235,7 @@ public class STermParser extends SBaseParserVisitor<Term> {
     }
 
     public Result<Term> visitAnon(stOTTRParser.AnonContext ctx) {
-        return TermParser.newBlankNodeTerm().map(t -> (Term)t);
+        return TermParser.newBlankNodeTerm().map(t -> t);
     }
 
 }
