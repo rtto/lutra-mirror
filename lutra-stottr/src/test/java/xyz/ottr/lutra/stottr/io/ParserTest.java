@@ -210,6 +210,19 @@ public class ParserTest {
         testSignatureParsing(template);
     }
 
+    @Test
+    public void testTemplate2() {
+
+        String template = "@prefix rdf:    <http://www.w3.org/1999/02/22-rdf-syntax-ns#> . "
+                + "@prefix foaf:   <http://xmlns.com/foaf/0.1/> . "
+                + "@prefix ex:     <http://example.com/ns#> . "
+                + "@prefix ottr:   <http://ns.ottr.xyz/0.4/> . "
+                + " ex:Types[ ?ins, ?class = (ex:Person, ex:Employee) ] :: { "
+                + "  cross | ottr:Triple(?ins, rdf:Type, ++?class) "
+                + "} .";
+
+        testSignatureParsing(template);
+    }
 
 }
 
