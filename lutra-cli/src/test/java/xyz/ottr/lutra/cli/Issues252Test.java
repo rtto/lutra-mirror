@@ -50,7 +50,7 @@ public class Issues252Test {
                 + " --library " + ROOT + "templates.stottr"
                 + " --libraryFormat stottr"
                 + " --inputFormat bottr"
-                + " " + ROOT + "instance.stottr";
+                + " " + ROOT + "instances.stottr";
 
         CLI cli = new CLI();       
         MessageHandler msgs = cli.getMessageHandler();

@@ -21,7 +21,8 @@ package xyz.ottr.lutra.bottr.io;
  * <http://www.gnu.org/licenses/lgpl-2.1.html>.
  * #L%
  */
-
+import java.util.List;
+import java.util.stream.Collectors;
 import xyz.ottr.lutra.bottr.model.InstanceMap;
 import xyz.ottr.lutra.bottr.parser.BInstanceMapParser;
 import xyz.ottr.lutra.model.Instance;
@@ -34,13 +35,17 @@ public class BInstanceReader implements InstanceParser<String> {
 
     @Override
     public ResultStream<Instance> apply(String file) {
-                
-        if (getInstanceStream(file).getStream().count() == 0) {
+        List<Result<Instance>> instances = getInstanceStream(file).collect(Collectors.toList());
+
+        if (instances.size() == 0) {
             return ResultStream.of(Result.error("Error reading BOTTR file: '" + file + "'"));
-        } else {
-            return getInstanceStream(file);
         }
-            
+
+        if (instances.size() == 1 && instances.get(0).isEmpty()) {
+            return ResultStream.of(Result.error("Error reading BOTTR file: '" + file + "'"));
+        }
+
+        return getInstanceStream(file);
     }
     
     private ResultStream<Instance> getInstanceStream(String file) {
