@@ -1,0 +1,9 @@
+@prefix : <http://ns.ottr.xyz/0.4/> .
+
+
+ex:MyMap a :InstanceMap ;
+  :template :Triple ;
+  :query "SELECT ?s ?p ?o WHERE { ?s ?p ?o } LIMIT 0" ;
+  :source
+    [ a :SPARQLEndpointSource ;
+      :sourceURL "https://query.wikidata.org/bigdata/namespace/wdq/sparql" ] .

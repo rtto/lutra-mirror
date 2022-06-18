@@ -1,0 +1,14 @@
+@prefix ottr: <http://ns.ottr.xyz/0.4/> .
+
+[] a ottr:InstanceMap ;
+    ottr:template ottr:Triple ;
+    ottr:query """
+        SELECT ?s ?p ?o  
+	{ ?s ?p ?o }
+    LIMIT 0
+    """ ;
+    ottr:source
+        [ a ottr:RDFFileSource ;
+          ottr:sourceURL 
+	    "http://www.w3.org/2000/01/rdf-schema"
+        ] .
