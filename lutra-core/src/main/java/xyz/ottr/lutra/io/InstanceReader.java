@@ -62,7 +62,7 @@ public class InstanceReader implements Function<String, ResultStream<Instance>> 
 
     public ResultStream<Instance> apply(String filename) {
         if (Paths.get(filename).toFile().isDirectory()) {
-            checkFolder(filename).printMessages();
+            checkEmptyFolder(filename).printMessages();
             return loadInstancesFromFolder(filename);
         }
 
@@ -86,7 +86,7 @@ public class InstanceReader implements Function<String, ResultStream<Instance>> 
         return readInstances(Files.loadFromFolder(folder, this.includeExtensions, this.excludeExtensions));
     }
 
-    private MessageHandler checkFolder(String folderName) {
+    private MessageHandler checkEmptyFolder(String folderName) {
         MessageHandler msgs = new MessageHandler();
 
         try {

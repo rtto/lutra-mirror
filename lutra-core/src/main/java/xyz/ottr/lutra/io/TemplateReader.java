@@ -101,7 +101,7 @@ public class TemplateReader implements Function<String, ResultStream<Signature>>
     public MessageHandler loadTemplatesFromFolder(TemplateStore store, String folder,
                                                   String[] includeExtensions, String[] excludeExtensions) {
 
-        MessageHandler msgs = checkEmptiness(folder);
+        MessageHandler msgs = checkEmptyFolder(folder);
 
         this.log.info("Loading all templates from folder " + folder + " with suffix "
                 + Arrays.toString(includeExtensions) + " except " + Arrays.toString(excludeExtensions));
@@ -133,7 +133,7 @@ public class TemplateReader implements Function<String, ResultStream<Signature>>
             .innerFlatMap(this.templatePipeline);
     }
 
-    private MessageHandler checkEmptiness(String folderName) {
+    private MessageHandler checkEmptyFolder(String folderName) {
         MessageHandler msgs = new MessageHandler();
 
         try {
@@ -143,11 +143,7 @@ public class TemplateReader implements Function<String, ResultStream<Signature>>
             } else if (files.length == 0) {
                 msgs.add(Message.warning("Empty folder: " + folderName));
             } else {
-                for (File file : files) {
-                    if (file.length() == 0) {
-                        msgs.add(Message.warning("Empty file: " + file));
-                    }
-                }
+                checkEmptyFile(msgs, files);
             }
         } catch (SecurityException e) {
             msgs.add(Message.error("Folder access denied: " + folderName));
@@ -155,7 +151,15 @@ public class TemplateReader implements Function<String, ResultStream<Signature>>
 
         return msgs;
     }
-    
+
+    private void checkEmptyFile(MessageHandler msgs, File[] files) {
+        for (File file : files) {
+            if (file.length() == 0) {
+                msgs.add(Message.warning("Empty file: " + file));
+            }
+        }
+    }
+
     @Override
     public String toString() {
         return this.parser.toString();
