@@ -30,8 +30,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import xyz.ottr.lutra.model.Instance;
 import xyz.ottr.lutra.parser.InstanceParser;
-import xyz.ottr.lutra.system.Message;
-import xyz.ottr.lutra.system.MessageHandler;
 import xyz.ottr.lutra.system.Result;
 import xyz.ottr.lutra.system.ResultStream;
 
@@ -62,7 +60,6 @@ public class InstanceReader implements Function<String, ResultStream<Instance>> 
 
     public ResultStream<Instance> apply(String filename) {
         if (Paths.get(filename).toFile().isDirectory()) {
-            checkEmptyFolder(filename).printMessages();
             return loadInstancesFromFolder(filename);
         }
 
@@ -86,20 +83,4 @@ public class InstanceReader implements Function<String, ResultStream<Instance>> 
         return readInstances(Files.loadFromFolder(folder, this.includeExtensions, this.excludeExtensions));
     }
 
-    private MessageHandler checkEmptyFolder(String folderName) {
-        MessageHandler msgs = new MessageHandler();
-
-        try {
-            File[] files = new File(folderName).listFiles();
-            if (files == null) {
-                msgs.add(Message.error("Pathname does not denote a directory: " + folderName));
-            } else if (files.length == 0) {
-                msgs.add(Message.warning("Empty folder: " + folderName));
-            }
-        } catch (SecurityException e) {
-            msgs.add(Message.error("Folder access denied: " + folderName));
-        }
-
-        return msgs;
-    }
 }

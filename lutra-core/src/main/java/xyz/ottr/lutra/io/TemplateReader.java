@@ -22,7 +22,6 @@ package xyz.ottr.lutra.io;
  * #L%
  */
 
-import java.io.File;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.function.Function;
@@ -31,7 +30,6 @@ import org.slf4j.LoggerFactory;
 import xyz.ottr.lutra.model.Signature;
 import xyz.ottr.lutra.parser.TemplateParser;
 import xyz.ottr.lutra.store.TemplateStore;
-import xyz.ottr.lutra.system.Message;
 import xyz.ottr.lutra.system.MessageHandler;
 import xyz.ottr.lutra.system.ResultConsumer;
 import xyz.ottr.lutra.system.ResultStream;
@@ -74,9 +72,6 @@ public class TemplateReader implements Function<String, ResultStream<Signature>>
     public MessageHandler loadTemplatesFromFile(TemplateStore store, String file) {
         ResultConsumer<Signature> consumer = new ResultConsumer<>(store);
 
-        if (new File(file).length() == 0) {
-            consumer.getMessageHandler().add(Message.warning("Empty file: " + file));
-        }
         this.templatePipeline.apply(file).forEach(consumer);
 
         MessageHandler msgs = store.getMessageHandler();
@@ -101,16 +96,13 @@ public class TemplateReader implements Function<String, ResultStream<Signature>>
     public MessageHandler loadTemplatesFromFolder(TemplateStore store, String folder,
                                                   String[] includeExtensions, String[] excludeExtensions) {
 
-        MessageHandler msgs = checkEmptyFolder(folder);
-
         this.log.info("Loading all templates from folder " + folder + " with suffix "
                 + Arrays.toString(includeExtensions) + " except " + Arrays.toString(excludeExtensions));
 
         return populateTemplateStore(store,
                 Files.loadFromFolder(folder,
                         includeExtensions,
-                        excludeExtensions))
-                .combine(msgs);
+                        excludeExtensions));
     }
 
     /**
@@ -131,33 +123,6 @@ public class TemplateReader implements Function<String, ResultStream<Signature>>
                 + Arrays.toString(includeExtensions) + " except " + Arrays.toString(excludeExtensions));
         return Files.loadFromFolder(folder, includeExtensions, excludeExtensions)
             .innerFlatMap(this.templatePipeline);
-    }
-
-    private MessageHandler checkEmptyFolder(String folderName) {
-        MessageHandler msgs = new MessageHandler();
-
-        try {
-            File[] files = new File(folderName).listFiles();
-            if (files == null) {
-                msgs.add(Message.error("Pathname does not denote a directory: " + folderName));
-            } else if (files.length == 0) {
-                msgs.add(Message.warning("Empty folder: " + folderName));
-            } else {
-                checkEmptyFile(msgs, files);
-            }
-        } catch (SecurityException e) {
-            msgs.add(Message.error("Folder access denied: " + folderName));
-        }
-
-        return msgs;
-    }
-
-    private void checkEmptyFile(MessageHandler msgs, File[] files) {
-        for (File file : files) {
-            if (file.length() == 0) {
-                msgs.add(Message.warning("Empty file: " + file));
-            }
-        }
     }
 
     @Override

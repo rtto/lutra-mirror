@@ -147,4 +147,18 @@ public class Issue324DummyInputTest {
         Assertions.atLeast(msgs, Message.Severity.WARNING);
     }
 
+    @Test
+    public void emptyInstanceFolder() {
+        String args = " "
+                + " -l " + ROOT + "templates/personTemplate.stottr "
+                + " -L stottr "
+                + ROOT + "emptyFolder";
+
+        CLI cli = new CLI();
+        MessageHandler msgs = cli.getMessageHandler();
+        cli.executeArgs(args.trim().split("\\s+"));
+
+        Assertions.atLeast(msgs, Message.Severity.WARNING);
+    }
+
 }
