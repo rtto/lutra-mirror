@@ -1,9 +1,13 @@
-@prefix : <http://ns.ottr.xyz/0.4/> .
+@prefix ottr: <http://ns.ottr.xyz/0.4/> .
+@prefix ex: <http://example.com/ns#> .
 
-
-ex:MyMap a :InstanceMap ;
-  :template :Triple ;
-  :query "SELECT ?s ?p ?o WHERE { ?s ?p ?o } LIMIT 0" ;
-  :source
-    [ a :SPARQLEndpointSource ;
-      :sourceURL "https://query.wikidata.org/bigdata/namespace/wdq/sparql" ] .
+[] a ottr:InstanceMap ;
+  ottr:template ottr:Triple ;
+  ottr:query """
+    SELECT ?s ?p ?o
+    { ?s ?p ?o }
+    LIMIT 0
+    """;
+  ottr:source
+    [ a ottr:SPARQLEndpointSource ;
+      ottr:sourceURL "http://dbpedia.org/sparql" ] .

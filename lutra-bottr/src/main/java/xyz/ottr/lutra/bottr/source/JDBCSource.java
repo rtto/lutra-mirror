@@ -67,6 +67,10 @@ public class JDBCSource implements Source<String> {
 
             List<Object[]> queryResult = new QueryRunner().query(conn, query, new ArrayListHandler());
 
+            if (queryResult.isEmpty()) {
+                return ResultStream.of(Result.info("No result set returned by query."));
+            }
+
             Stream<Result<X>> stream = queryResult.stream()
                 .map(array -> Arrays.stream(array)
                     .map(value -> Objects.toString(value, null)) // the string value of null is (the object) null.

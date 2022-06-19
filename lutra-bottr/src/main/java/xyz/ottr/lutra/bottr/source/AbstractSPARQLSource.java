@@ -117,19 +117,29 @@ public abstract class AbstractSPARQLSource implements Source<RDFNode> {
                     .collect(Collectors.toList()))
             .flatMap(translationFunction);
 
-        return new ResultStream<>(StreamSupport.stream(
-            new Spliterators.AbstractSpliterator<>(Long.MAX_VALUE, Spliterator.ORDERED) {
-                @Override
-                public boolean tryAdvance(Consumer<? super Result<X>> action) {
+        if (resultSet.hasNext()) {
+            return new ResultStream<>(StreamSupport.stream(
+                    getAbstractSpliterator(resultSet, rowCreator), false));
+        }
 
-                    if (!resultSet.hasNext()) {
-                        return false;
-                    } else {
-                        action.accept(rowCreator.apply(resultSet.next()));
-                        return true;
-                    }
+        return ResultStream.of(Result.info("No result set returned by query."));
+    }
+
+    private <X> Spliterators.AbstractSpliterator<Result<X>> getAbstractSpliterator(
+            ResultSet resultSet, Function<QuerySolution, Result<X>> rowCreator) {
+        return new Spliterators.AbstractSpliterator<>(Long.MAX_VALUE, Spliterator.ORDERED) {
+
+            @Override
+            public boolean tryAdvance(Consumer<? super Result<X>> action) {
+
+                if (resultSet.hasNext()) {
+                    action.accept(rowCreator.apply(resultSet.next()));
+                    return true;
                 }
-            }, false));
+                return false;
+
+            }
+        };
     }
 
     @Override
