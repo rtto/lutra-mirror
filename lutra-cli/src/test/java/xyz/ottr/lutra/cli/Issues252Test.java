@@ -26,6 +26,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 
 import org.junit.Test;
+import xyz.ottr.lutra.system.Assertions;
 import xyz.ottr.lutra.system.Message;
 import xyz.ottr.lutra.system.MessageHandler;
 
@@ -50,15 +51,12 @@ public class Issues252Test {
                 + " --library " + ROOT + "templates.stottr"
                 + " --libraryFormat stottr"
                 + " --inputFormat bottr"
-                + " " + ROOT + "instance.stottr";
+                + " " + ROOT + "non-existent_file.stottr";
 
         CLI cli = new CLI();       
         MessageHandler msgs = cli.getMessageHandler();
-        int exitCode = cli.executeArgs(args.trim().split("\\s+"));
-        // CLI message handler should have error message
-        assertNotEquals(0, msgs.getMessages().size());
-        assertEquals(Message.Severity.ERROR, msgs.getMostSevere());
-        assertNotEquals("Exit code should not be 0 with error messages", 0, exitCode);
+        cli.executeArgs(args.trim().split("\\s+"));
+        Assertions.atLeast(msgs, Message.Severity.WARNING);
     }
 
 }

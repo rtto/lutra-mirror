@@ -34,13 +34,13 @@ public class BInstanceReader implements InstanceParser<String> {
 
     @Override
     public ResultStream<Instance> apply(String file) {
-                
+
         if (getInstanceStream(file).getStream().count() == 0) {
             return ResultStream.of(Result.error("Error reading BOTTR file: '" + file + "'"));
         } else {
             return getInstanceStream(file);
         }
-            
+
     }
     
     private ResultStream<Instance> getInstanceStream(String file) {

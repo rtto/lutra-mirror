@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.Charset;
+import java.nio.file.DirectoryStream;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
@@ -101,18 +102,17 @@ public enum Files {
             + (StringUtils.isNotBlank(uri.getFragment()) ? "/" + uri.getFragment() : "");
     }
 
-    public static Message checkFolderReadable(String folder) throws SecurityException {
-        Path path = Paths.get(folder);
+    public static Message checkFolderReadable(Path path) throws SecurityException {
 
         try {
             if (!java.nio.file.Files.exists(path)) {
-                return Message.error("No folder with path " + folder + " exists.");
+                return Message.error("No folder with path " + path + " exists.");
             }
             if (!java.nio.file.Files.isDirectory(path)) {
-                return Message.error("The path " + folder + " is not a folder.");
+                return Message.error("The path " + path + " is not a folder.");
             }
             if (!java.nio.file.Files.isReadable(path)) {
-                return Message.error("The folder " + folder + " is not readable.");
+                return Message.error("The folder " + path + " is not readable.");
             }
         } catch (SecurityException ex) {
             return Message.error("Encountered security issue while reading folder metadata.", ex);
@@ -121,10 +121,36 @@ public enum Files {
         return null;
     }
 
+    private static Message checkFolderEmpty(Path path) {
+        try {
+            DirectoryStream<Path> directory = java.nio.file.Files.newDirectoryStream(path);
+            if (directory.iterator().hasNext()) {
+                directory.close();
+                return null;
+            }
+
+            directory.close();
+            return Message.warning("The folder " + path + " is empty.");
+
+        } catch (IOException ex) {
+            return Message.error("I/O error occurred when opening folder", ex);
+        }
+    }
+
+    private static Message checkFolder(String folder) {
+        Path path = Paths.get(folder);
+        Message msg = checkFolderEmpty(path);
+
+        if (msg == null) {
+            msg = checkFolderReadable(path);
+        }
+        return msg;
+    }
+
     public static ResultStream<File> getFolderContents(String folder, String[] includeExtensions,
             String[] excludeExtensions) {
 
-        Message err = checkFolderReadable(folder);
+        Message err = checkFolder(folder);
         if (err != null) {
             return ResultStream.of(Result.empty(err));
         }
