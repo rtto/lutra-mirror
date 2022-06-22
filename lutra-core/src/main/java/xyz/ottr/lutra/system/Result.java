@@ -382,6 +382,12 @@ public class Result<E> {
      * @see Optional#get()
      */
     public E get() {
+
+        // overwrite NoSuchElementException to contain error message trace.
+        if (this.result.isEmpty()) {
+            throw new java.util.NoSuchElementException("No value present. Message trace: " + this.trace.getMessages());
+        }
+
         return this.result.get();
     }
     
