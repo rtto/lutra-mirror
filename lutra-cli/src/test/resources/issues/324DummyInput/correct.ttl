@@ -1,0 +1,8 @@
+@prefix ex: <http://example.com/ns#> .
+@prefix ottr: <http://ns.ottr.xyz/0.4/> .
+
+[] ottr:of ex:Person ;
+   ottr:values ("Ann" "Strong" <mailto:ann.strong@example.com>) .
+
+[] ottr:of ex:Person ;
+   ottr:values ("Bob" "Brite" <mailto:bob.brite@example.com>) .

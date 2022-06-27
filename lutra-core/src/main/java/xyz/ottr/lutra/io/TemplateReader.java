@@ -71,6 +71,7 @@ public class TemplateReader implements Function<String, ResultStream<Signature>>
 
     public MessageHandler loadTemplatesFromFile(TemplateStore store, String file) {
         ResultConsumer<Signature> consumer = new ResultConsumer<>(store);
+
         this.templatePipeline.apply(file).forEach(consumer);
 
         MessageHandler msgs = store.getMessageHandler();
@@ -123,7 +124,7 @@ public class TemplateReader implements Function<String, ResultStream<Signature>>
         return Files.loadFromFolder(folder, includeExtensions, excludeExtensions)
             .innerFlatMap(this.templatePipeline);
     }
-    
+
     @Override
     public String toString() {
         return this.parser.toString();
