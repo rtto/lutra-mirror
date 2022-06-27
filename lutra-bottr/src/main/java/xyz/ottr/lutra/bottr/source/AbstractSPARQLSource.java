@@ -122,7 +122,7 @@ public abstract class AbstractSPARQLSource implements Source<RDFNode> {
                     getAbstractSpliterator(resultSet, rowCreator), false));
         }
 
-        return ResultStream.of(Result.info("No result set returned by query."));
+        return ResultStream.of(Result.info("No result returned by query."));
     }
 
     private <X> Spliterators.AbstractSpliterator<Result<X>> getAbstractSpliterator(
