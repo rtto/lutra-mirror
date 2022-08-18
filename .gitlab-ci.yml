@@ -52,7 +52,7 @@ snapshot:
     - develop
     - master
   artifacts:
-    expire_in: 6 mos 1day
+    expire_in: 2 week
     paths:
       - lutra.jar
       - lutra.war
@@ -62,7 +62,7 @@ release:
   only:
     - tags
   artifacts:
-    expire_in: 48 mos 1day
+    expire_in: 9 mos 1 day
     paths:
     - lutra.jar
     - lutra.war
