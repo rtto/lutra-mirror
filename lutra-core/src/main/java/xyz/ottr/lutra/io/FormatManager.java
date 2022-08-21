@@ -29,6 +29,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
+import xyz.ottr.lutra.store.TemplateStore;
 import xyz.ottr.lutra.system.Message;
 import xyz.ottr.lutra.system.MessageHandler;
 import xyz.ottr.lutra.system.Result;
@@ -143,7 +144,7 @@ public class FormatManager {
      *      Result with an error Message describing what went wrong for each reader
      *      if no Format's TemplateReader succeeded.
      */
-    public Result<TemplateReader> attemptAllFormats(Function<TemplateReader, MessageHandler> readerFunction) {
+    public Result<TemplateReader> attemptAllFormats(TemplateStore store, Function<TemplateReader, MessageHandler> readerFunction) {
         
         // Return warning if no formats are registered
         if (this.formats.isEmpty()) {
@@ -161,6 +162,8 @@ public class FormatManager {
             if (msgs.getMostSevere().isGreaterEqualThan(Message.Severity.ERROR)) {
                 msgs.toSingleMessage("Attempt of parsing templates as " + reader + " format failed:")
                     .ifPresent(unsuccessful::addMessage);
+                // clear error msgs
+                store.getMessageHandler().removeMessages();
             } else {
                 Result<TemplateReader> readerRes = Result.of(reader);
                 msgs.toSingleMessage("")

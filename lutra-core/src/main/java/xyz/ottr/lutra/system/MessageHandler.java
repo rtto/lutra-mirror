@@ -110,7 +110,11 @@ public class MessageHandler {
     public Message.Severity getMostSevere() {
         return visitMessagesAndTraces(_ignore -> { }, _ignore -> { });
     }
-    
+
+    public void removeMessages() {
+        Trace.visitTraces(this.traces, Trace::removeMessages);
+    }
+
     /**
      * Visits all Messages on all Traces contained in this, and feeds them to the
      * Message consumer, and in case a Message on a Trace was fed to the Message consumer,

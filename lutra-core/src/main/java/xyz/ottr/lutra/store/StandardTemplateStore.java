@@ -298,7 +298,7 @@ public class StandardTemplateStore implements TemplateStore {
                 if (stdLib.isPresent() && stdLib.get().containsTemplate(toFetch)) {
                     stdLib.get().getTemplate(toFetch).ifPresent(this::addTemplate);
                 } else {
-                    messages.accept(formatManager.attemptAllFormats(reader -> reader.populateTemplateStore(this, toFetch)));
+                    messages.accept(formatManager.attemptAllFormats(this, reader -> reader.populateTemplateStore(this, toFetch)));
                 }
 
                 if (containsTemplate(toFetch)) { // Check if fetched and added to store

@@ -111,6 +111,10 @@ public class Trace {
     public Collection<Message> getMessages() {
         return this.messages;
     }
+
+    public void removeMessages() {
+        messages.clear();
+    }
     
     /**
      * Adds the argument Trace at the end of the trace, so all children depend on that Trace

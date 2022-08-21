@@ -1,0 +1,4 @@
+@prefix ex: <http://example.com/ns#> .
+
+ex:Person(ex:Ann, <mailto:ann.strong@example.com>) .
+ex:Person(ex:Bob, <mailto:bob.ho@example.com>) .
