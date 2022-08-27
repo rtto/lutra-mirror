@@ -107,7 +107,7 @@ public class STermParser extends SBaseParserVisitor<Term> {
         return visitChildren(ctx);
     }
 
-    public Result<Term> visitList(stOTTRParser.ListContext ctx) {
+    public Result<Term> visitTermList(stOTTRParser.TermListContext ctx) {
         List<Result<Term>> termResLst = ctx.term()
             .stream()
             .map(this::visitTerm)
