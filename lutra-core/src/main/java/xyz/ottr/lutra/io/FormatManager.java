@@ -162,8 +162,6 @@ public class FormatManager {
             if (msgs.getMostSevere().isGreaterEqualThan(Message.Severity.ERROR)) {
                 msgs.toSingleMessage("Attempt of parsing templates as " + reader + " format failed:")
                     .ifPresent(unsuccessful::addMessage);
-                // clear error msgs
-                store.getMessageHandler().removeMessages();
             } else {
                 Result<TemplateReader> readerRes = Result.of(reader);
                 msgs.toSingleMessage("")

@@ -112,10 +112,6 @@ public class Trace {
         return this.messages;
     }
 
-    public void removeMessages() {
-        messages.clear();
-    }
-    
     /**
      * Adds the argument Trace at the end of the trace, so all children depend on that Trace
      * @param elem
