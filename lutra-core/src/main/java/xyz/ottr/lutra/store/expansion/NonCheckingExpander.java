@@ -53,7 +53,9 @@ public class NonCheckingExpander implements Expander {
 
     @Override
     public ResultStream<Instance> expandInstanceFetch(Instance instance) {
-        if (!templateStore.containsTemplate(instance.getIri())) {
+        Result<Signature> result = templateStore.getSignature(instance.getIri());
+
+        if (result.isEmpty() || !templateStore.containsTemplate(instance.getIri()) && !(result.get() instanceof BaseTemplate)) {
             // Need to fetch missing template
             MessageHandler messages = templateStore.fetchMissingDependencies(List.of(instance.getIri()));
             Result<Instance> insWithMsgs = Result.of(instance);
