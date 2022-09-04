@@ -23,6 +23,7 @@ package xyz.ottr.lutra.cli;
  */
 
 import org.junit.Test;
+import xyz.ottr.lutra.system.Assertions;
 import xyz.ottr.lutra.system.MessageHandler;
 
 public class Issues333Test {
@@ -38,7 +39,7 @@ public class Issues333Test {
         MessageHandler msgs = cli.getMessageHandler();
         cli.executeArgs(args.trim().split("\\s+"));
 
-        //assert
+        Assertions.noWarnings(msgs);
 
     }
 
