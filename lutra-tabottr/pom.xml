@@ -17,45 +17,69 @@
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>lutra-core</artifactId>
+            <!-- for transitive dependencies see module POM -->
         </dependency>
 
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>lutra-wottr</artifactId>
+            <!-- for transitive dependencies see module POM -->
         </dependency>
 
         <!-- org.apache.poi uses commons-codec:1.13 which causes problems for newer versions of Jena -->
         <!-- https://mvnrepository.com/artifact/commons-codec/commons-codec -->
         <dependency>
+            <!-- TODO check if the problem still persists and if using a newer version is possible -->
             <groupId>commons-codec</groupId>
             <artifactId>commons-codec</artifactId>
             <version>1.15</version>
+            <!-- no transitive dependencies -->
         </dependency>
 
         <dependency>
             <groupId>org.apache.poi</groupId>
             <artifactId>poi</artifactId>
+            <!-- transitive dependencies:
+                - commons-codec
+                - commons-collections4
+                - slf4j-api
+                - commons-math3
+                - SparseBitSet<
+            -->
         </dependency>
 
         <dependency>
             <groupId>org.apache.poi</groupId>
             <artifactId>poi-ooxml</artifactId>
+            <!-- transitive dependencies:
+                - poi (see above)
+                - commons-collections4
+                - commons-io<
+                - commons-compress
+                - log4j-api
+                - xmlbeans (log4j-api)
+                - poi-ooxml-lite (xmlbeans (log4j-api))
+                - curvesapi
+            -->
         </dependency>
 
-        <dependency>
+    <!-- TODO unused? -->
+        <!--<dependency>
             <groupId>commons-validator</groupId>
             <artifactId>commons-validator</artifactId>
-        </dependency>
+        </dependency>-->
 
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-collections4</artifactId>
+            <!-- no transitive dependencies -->
         </dependency>
 
-        <dependency>
+        <!-- TODO not needed here - if so, might be best to be set for the whole project -->
+       <!-- <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
-        </dependency>
+        </dependency>-->
 
     </dependencies>
 
