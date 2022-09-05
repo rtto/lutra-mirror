@@ -25,6 +25,8 @@ package xyz.ottr.lutra.io;
 import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
+import xyz.ottr.lutra.store.StandardTemplateStore;
+import xyz.ottr.lutra.store.TemplateStore;
 
 public class FormatManagerTest {
 
@@ -35,9 +37,11 @@ public class FormatManagerTest {
      */
     @Test
     public void testAttemptAllFormats_emptyFormats() {
-        FormatManager formatMangaer = new FormatManager();
+        FormatManager formatManager = new FormatManager();
+        TemplateStore store = new StandardTemplateStore(formatManager);
+
         String expectedResponse = "No formats registered to FormatManager";
-        String actualResponse = formatMangaer.attemptAllFormats(null).getAllMessages().get(0).getMessage();
+        String actualResponse = formatManager.attemptAllFormats(store, null).getAllMessages().get(0).getMessage();
         assertEquals(expectedResponse, actualResponse);
     }
 

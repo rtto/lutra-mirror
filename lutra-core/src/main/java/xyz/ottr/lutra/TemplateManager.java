@@ -174,7 +174,7 @@ public class TemplateManager {
      * 
      * @param format
      *      The Format to register to this' FormatManager.
-     * @see FormatManager#attemptAllFormats(Function)
+     * @see FormatManager#attemptAllFormats(TemplateStore, Function)
      */
     public void registerFormat(Format format) {
         format.setPrefixMapping(this.prefixes);
@@ -188,7 +188,7 @@ public class TemplateManager {
      * 
      * @param formats
      *      The Collection of Formats to register to this' FormatManager.
-     * @see FormatManager#attemptAllFormats(Function)
+     * @see FormatManager#attemptAllFormats(TemplateStore, Function)
      */
     public void registerFormats(Collection<Format> formats) {
         this.formatManager.register(formats);
@@ -297,7 +297,7 @@ public class TemplateManager {
      *      A MessageHandler containing all Messages generated during the parsing.
      */
     public MessageHandler readLibrary(Format format, Collection<String> library) {
-        
+
         MessageHandler messages = new MessageHandler();
 
         for (String lib : library) {
@@ -315,7 +315,7 @@ public class TemplateManager {
                 reader = format.getTemplateReader();
                 reader.map(readerFunction).map(messages::combine);
             } else {
-                reader = this.templateStore.getFormatManager().attemptAllFormats(readerFunction);
+                reader = this.templateStore.getFormatManager().attemptAllFormats(this.templateStore, readerFunction);
             }
             messages.add(reader);
             reader.ifPresent(r -> this.prefixes.setNsPrefixes(r.getPrefixes()));
@@ -324,7 +324,7 @@ public class TemplateManager {
         messages.combine(fetchMissingDependencies());
 
         return messages;
-    } 
+    }
     
     public MessageHandler fetchMissingDependencies() {
 
