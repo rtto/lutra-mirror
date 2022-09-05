@@ -447,18 +447,27 @@
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <scope>provided</scope>
+            <!-- no transitive dependencies -->
         </dependency>
 
+        <!-- TODO why are both JUnit 4 and 5 (jupiter) in the project? That does not make sense and may cause problems. -->
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <scope>test</scope>
+            <!-- transitive dependencies:
+                - hamcrest-core
+            -->
         </dependency>
 
         <dependency>
             <groupId>com.google.code.findbugs</groupId>
             <artifactId>annotations</artifactId>
             <scope>provided</scope>
+            <!-- transitive dependencies:
+                - jsr305
+                - jcip-annotations
+            -->
         </dependency>
 
     </dependencies>

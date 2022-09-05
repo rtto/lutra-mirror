@@ -15,26 +15,41 @@
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>lutra-core</artifactId>
+            <!-- for transitive dependencies see module POM -->
         </dependency>
 
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>lutra-wottr</artifactId>
+            <!-- for transitive dependencies see module POM -->
         </dependency>
 
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>lutra-stottr</artifactId>
+            <!-- for transitive dependencies see module POM -->
         </dependency>
 
         <dependency>
             <groupId>com.j2html</groupId>
             <artifactId>j2html</artifactId>
+            <!-- no transitive dependencies -->
         </dependency>
 
         <dependency>
             <groupId>guru.nidi</groupId>
             <artifactId>graphviz-java</artifactId>
+            <!-- transitive dependencies:
+                - slf4j-api
+                - commons-exec
+                - svgSalamander
+                - jul-to-slf4j (slf4j-api)
+                - jsr305
+                - viz.js-graphviz-java
+                - nashorn-promise
+                - j2v8_macosx_x86_64
+                - jcl-over-slf4j (slf4j-api)
+            -->
         </dependency>
 
     </dependencies>

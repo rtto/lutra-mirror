@@ -17,32 +17,42 @@
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>lutra-core</artifactId>
+            <!-- for transitive dependencies see module POM -->
         </dependency>
 
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>lutra-wottr</artifactId>
+            <!-- for transitive dependencies see module POM -->
         </dependency>
 
         <dependency>
             <groupId>commons-dbutils</groupId>
             <artifactId>commons-dbutils</artifactId>
+            <!-- no transitive dependencies -->
         </dependency>
 
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-dbcp2</artifactId>
+            <!-- transitive dependencies:
+                - commons-pool2
+                - commons-logging
+            -->
         </dependency>
 
         <dependency>
+            <!-- TODO not used - might be set to provided? -->
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
+            <!-- no transitive dependencies -->
         </dependency>
 
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-        </dependency>
+        <!-- TODO not needed here - if so, might be best to be set for the whole project -->
+<!--        <dependency>-->
+<!--            <groupId>org.slf4j</groupId>-->
+<!--            <artifactId>slf4j-api</artifactId>-->
+<!--        </dependency>-->
 
     </dependencies>
 

@@ -21,18 +21,34 @@
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>lutra-core</artifactId>
+            <!-- for transitive dependencies see module POM -->
         </dependency>
 
-        <dependency>
+        <!-- TODO unused? -->
+        <!--<dependency>
             <groupId>commons-validator</groupId>
             <artifactId>commons-validator</artifactId>
-        </dependency>
-
+        </dependency>-->
 
         <!-- Needed for RDFDataMgr, RDF I/O -->
         <dependency>
             <groupId>org.apache.jena</groupId>
             <artifactId>jena-arq</artifactId>
+            <!-- transitive dependencies:
+                - jena-core (commons-cli, jena-iri, jena-base (commons-io, commons-lang3, com.github.andrewoma.dexx.collection, jena-shaded-guava, commons-compress, commons-codec, commons-csv, slf4j-api) )
+                - commons-lang3
+                - jsonld-java (commons-io, jcl-over-slf4j)
+                - jackson-core
+                - jackson-databind (jackson-core, jackson-annotations)
+                - gson
+                - protobuf-java
+                - jakarta.json
+                - jcl-over-slf4j (slf4j-api)
+                - titanium-json-ld
+                - httpclient-cache (httpclient (httpcore))
+                - httpclient (httpcore)
+                - libthrift (javax.annotation-api, slf4j-api, httpclient (httpcore))
+            -->
         </dependency>
     </dependencies>
 

@@ -18,26 +18,32 @@
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>lutra-core</artifactId>
+            <!-- for transitive dependencies see module POM -->
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>lutra-wottr</artifactId>
+            <!-- for transitive dependencies see module POM -->
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>lutra-stottr</artifactId>
+            <!-- for transitive dependencies see module POM -->
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>lutra-bottr</artifactId>
+            <!-- for transitive dependencies see module POM -->
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>lutra-tabottr</artifactId>
+            <!-- for transitive dependencies see module POM -->
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>lutra-docttr</artifactId>
+            <!-- for transitive dependencies see module POM -->
         </dependency>
 
     </dependencies>
