@@ -67,7 +67,7 @@
         <java.version>11</java.version>
         <maven.compiler.target>${java.version}</maven.compiler.target>
 
-        <jena.version>4.5.0</jena.version>
+        <jena.version>4.6.0</jena.version>
         <antlr4-maven-plugin-version>4.9.2</antlr4-maven-plugin-version>
     </properties>
 
