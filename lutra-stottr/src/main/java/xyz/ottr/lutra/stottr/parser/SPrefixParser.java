@@ -56,6 +56,9 @@ public class SPrefixParser extends SBaseParserVisitor<Map<String, String>> {
 
 
         public PrefixPair visitPrefixID(stOTTRParser.PrefixIDContext ctx) {
+            if (ctx.PNAME_NS() == null || ctx.IRIREF() == null) {
+                // print error
+            }
             return PrefixPair.makePrefix(ctx.PNAME_NS(), ctx.IRIREF());
         }
 
