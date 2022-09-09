@@ -34,6 +34,7 @@ import lombok.Builder;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.apache.commons.dbutils.QueryRunner;
 import org.apache.commons.dbutils.handlers.ArrayListHandler;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.jena.shared.PrefixMapping;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -62,13 +63,17 @@ public class JDBCSource implements Source<String> {
     }
 
     private <X> ResultStream<X> streamQuery(String query, Function<List<String>, Result<X>> translationFunction) {
+
+        var queryExcerpt = StringUtils.abbreviate(StringUtils.normalizeSpace(query), 40);
+
         try (Connection conn = this.dataSource.getConnection()) {
-            this.log.info("Running query: " + query);
+
+            this.log.info("Running query: " + queryExcerpt);
 
             List<Object[]> queryResult = new QueryRunner().query(conn, query, new ArrayListHandler());
 
             if (queryResult.isEmpty()) {
-                return ResultStream.of(Result.info("No result returned by query."));
+                return ResultStream.of(Result.info("Query '" + queryExcerpt + "' returned no results."));
             }
 
             Stream<Result<X>> stream = queryResult.stream()
@@ -81,7 +86,7 @@ public class JDBCSource implements Source<String> {
 
         } catch (SQLException ex) {
             return ResultStream.of(Result.empty(Message.error(
-                "Error running query " + query + " over database " + this.dataSource.getUrl() + ".", ex)));
+                "Error running query '" + queryExcerpt + "' over database " + this.dataSource.getUrl() + ".", ex)));
         }
     }
 

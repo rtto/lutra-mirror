@@ -29,6 +29,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryExecution;
 import org.apache.jena.query.QueryFactory;
@@ -90,12 +91,20 @@ public abstract class AbstractSPARQLSource implements Source<RDFNode> {
     }
 
     private <X> ResultStream<X> streamQuery(String query, Function<List<RDFNode>, Result<X>> translationFunction) {
+
+        var queryExcerpt = StringUtils.abbreviate(StringUtils.normalizeSpace(query), 20);
+
         return getQueryExecution(query)
                 .mapToStream(exec -> {
                     Query q = exec.getQuery();
                     if (q.isSelectType()) {
                         addQueryLimit(q);
                         ResultSet resultSet = exec.execSelect();
+
+                        if (! resultSet.hasNext()) {
+                            return ResultStream.of(Result.info("Query '" + queryExcerpt + "' returned no results."));
+                        }
+
                         return getResultSetStream(resultSet, translationFunction);
                     //} else if (q.isAskType()) {
                     //    boolean system = exec.execAsk();
@@ -117,12 +126,8 @@ public abstract class AbstractSPARQLSource implements Source<RDFNode> {
                     .collect(Collectors.toList()))
             .flatMap(translationFunction);
 
-        if (resultSet.hasNext()) {
-            return new ResultStream<>(StreamSupport.stream(
+        return new ResultStream<>(StreamSupport.stream(
                     getAbstractSpliterator(resultSet, rowCreator), false));
-        }
-
-        return ResultStream.of(Result.info("No result returned by query."));
     }
 
     private <X> Spliterators.AbstractSpliterator<Result<X>> getAbstractSpliterator(
