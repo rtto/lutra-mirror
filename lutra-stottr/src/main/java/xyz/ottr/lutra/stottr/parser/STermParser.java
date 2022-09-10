@@ -92,8 +92,8 @@ public class STermParser extends SBaseParserVisitor<Term> {
                 + SParserUtils.getLineAndColumnString(ctx)));
     }
 
-    String getVariableLabel(TerminalNode var) {
-        String label = var.getSymbol().getText();
+    String getVariableLabel(TerminalNode varLabel) {
+        String label = varLabel.getSymbol().getText();
         // Need to remove variablePrefix to get label
         return label.substring(STOTTR.Terms.variablePrefix.length());
     }
