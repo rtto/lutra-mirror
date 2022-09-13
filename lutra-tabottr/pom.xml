@@ -68,13 +68,6 @@
             <artifactId>commons-collections4</artifactId>
             <!-- no transitive dependencies -->
         </dependency>
-
-        <!-- TODO not needed here - if so, might be best to be set for the whole project -->
-       <!-- <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-        </dependency>-->
-
     </dependencies>
 
     <build>
