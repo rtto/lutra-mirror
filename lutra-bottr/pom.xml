@@ -42,7 +42,7 @@
         </dependency>
 
         <dependency>
-            <!-- TODO not used - might be set to provided? -->
+            <!-- Needed for tests and possible at runtime  -->
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
             <!-- no transitive dependencies -->
