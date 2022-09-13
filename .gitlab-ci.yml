@@ -5,7 +5,6 @@ stages:
   - test
   - deploy
   - release
-  - publish
 
 variables:
   # This will suppress any download for dependencies and plugins or upload messages which would clutter the console log.
@@ -28,6 +27,55 @@ test:
   script:
     - mvn $MAVEN_CLI_OPTS verify
 
+develop_snapshot:
+  stage: deploy
+  script:
+    - cp lutra-cli/target/lutra.jar lutra.jar
+    - cp lutra-restapi/target/lutra.war lutra.war
+    - apt-get update -qq && apt-get install -y -qq sshpass
+    - sshpass -V
+    - export SSHPASS=$FTP_PASS
+    - cp lutra.jar lutra-snapshot.jar
+    - sshpass -e scp -o stricthostkeychecking=no lutra-snapshot.jar $FTP_HOST:/www.ottr.xyz/downloads/
+  only:
+    - develop
+  artifacts:
+    expire_in: 1 week
+    paths:
+      - lutra.jar
+      - lutra.war
+
+tag_release:
+  stage: deploy
+  only:
+    - tags
+  script:
+    - cp lutra-cli/target/lutra.jar lutra.jar
+    - cp lutra-restapi/target/lutra.war lutra.war
+    - apt-get update -qq && apt-get install -y -qq sshpass
+    - sshpass -V
+    - export SSHPASS=$FTP_PASS
+    - cp lutra.jar lutra-$CI_COMMIT_TAG.jar
+    - cp lutra.jar lutra-latest.jar
+    - sshpass -e scp -o stricthostkeychecking=no lutra-$CI_COMMIT_TAG.jar lutra-latest.jar $FTP_HOST:/www.ottr.xyz/downloads/
+  artifacts:
+    expire_in: 4 mos 1 day
+    paths:
+    - lutra.jar
+    - lutra.war
+
+## This job creates a release in GitLab.
+release_job:
+  stage: release
+  image: registry.gitlab.com/gitlab-org/release-cli:latest
+  rules:
+    - if: $CI_COMMIT_TAG                 # Run this job when a tag is created
+  script:
+    - echo "running release_job"
+  release:                               # See https://docs.gitlab.com/ee/ci/yaml/#release for available properties
+    tag_name: '$CI_COMMIT_TAG'
+    description: '$CI_COMMIT_TAG'
+
 deploy-docker-image:
   image: docker:latest
   stage: deploy
@@ -41,54 +89,6 @@ deploy-docker-image:
     - docker push "$CI_REGISTRY_IMAGE${tag}"
   only:
     - master
-
-snapshot_artifacts:
-  stage: deploy
-  script:
-    - cp lutra-cli/target/lutra.jar lutra.jar
-    - cp lutra-restapi/target/lutra.war lutra.war
-  only:
-    - develop
-    - master
-  artifacts:
-    expire_in: 1 week
-    paths:
-      - lutra.jar
-      - lutra.war
-
-release_artifacts:
-  stage: deploy
-  only:
-    - tags
-  script:
-    - cp lutra-cli/target/lutra.jar lutra.jar
-    - cp lutra-restapi/target/lutra.war lutra.war
-  artifacts:
-    expire_in: 4 mos 1 day
-    paths:
-    - lutra.jar
-    - lutra.war
-
-release_job:
-  stage: release
-  image: registry.gitlab.com/gitlab-org/release-cli:latest
-  rules:
-    - if: $CI_COMMIT_TAG                 # Run this job when a tag is created
-  script:
-    - echo "running release_job"
-  release:                               # See https://docs.gitlab.com/ee/ci/yaml/#release for available properties
-    tag_name: '$CI_COMMIT_TAG'
-    description: '$CI_COMMIT_TAG'
-
-release_publish:
-  stage: publish
-  only:
-    - tags
-  script:
-    - apt-get update -qq && apt-get install -y -qq sshpass
-    - sshpass -V
-    - export SSHPASS=$FTP_PASS 
-    - sshpass -e scp -o stricthostkeychecking=no -r lutra.jar $FTP_HOST:/www.ottr.xyz/downloads/lutra-$CI_COMMIT_TAG.jar
 
 include:
   - template: Code-Quality.gitlab-ci.yml
