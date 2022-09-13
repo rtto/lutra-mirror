@@ -92,13 +92,21 @@ release_publish:
 
 include:
   - template: Code-Quality.gitlab-ci.yml
+    rules:
+      - if: $CI_COMMIT_BRANCH == "develop" || $CI_COMMIT_BRANCH == "master"
   - template: Security/License-Scanning.gitlab-ci.yml
+    rules:
+      - if: $CI_COMMIT_BRANCH == "develop" || $CI_COMMIT_BRANCH == "master"
   - template: Security/Secret-Detection.gitlab-ci.yml
+    rules:
+      - if: $CI_COMMIT_BRANCH == "develop" || $CI_COMMIT_BRANCH == "master"
   - template: Security/SAST.gitlab-ci.yml
-
+    
 spotbugs-sast:
   dependencies:
     - build
+  rules:
+      - if: $CI_COMMIT_BRANCH == "develop" || $CI_COMMIT_BRANCH == "master"
   variables:
     MAVEN_REPO_PATH: $CI_PROJECT_DIR/.m2/repository
     COMPILE: "false"
