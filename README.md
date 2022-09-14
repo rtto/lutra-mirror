@@ -21,7 +21,7 @@ To run Lutra you will need to install Java 11, for instance [OpenJDK][1].
 
 ### Downloads
 
-* [Releases][2]: list of all releases
+* [Releases][2][11]: list of all releases
 * [Latest master snapshot][3]: latest release
 * [Latest develop snapshot][4]: latest development version
 
@@ -80,8 +80,9 @@ See [CONTRIBUTING](CONTRIBUTING.md) for information on how to best contribute to
 
 ## Maintainers
 
-* [Martin G. Skjæveland](http://folk.uio.no/martige/)
-* [Leif Harald Karlsen](http://folk.uio.no/leifhka/)
+* Martin G. Skjæveland
+* Leif Harald Karlsen
+* Oliver Stahl
 
 See also the list of [CONTRIBUTORS](CONTRIBUTORS.md) who have participated in this project.
 
@@ -96,7 +97,8 @@ The project is supported by the [Department of Informatics][9] at University of 
 
 [1]:https://openjdk.java.net/install/index.html
 [2]:https://gitlab.com/ottr/lutra/lutra/-/releases
-[3]:https://gitlab.com/ottr/lutra/lutra/-/jobs/artifacts/master/raw/lutra.jar?job=snapshot
+[3]:https://ottr.xyz/downloads/lutra/lutra-master.jar
+[3]:https://ottr.xyz/downloads/lutra/lutra-develop.jar
 [4]:https://gitlab.com/ottr/lutra/lutra/-/jobs/artifacts/develop/raw/lutra.jar?job=snapshot
 [5]:https://docs.gitlab.com/ee/gitlab-basics/add-merge-request.html
 [6]:https://gitlab.com/ottr/lutra/lutra/tags
@@ -104,3 +106,4 @@ The project is supported by the [Department of Informatics][9] at University of 
 [8]:https://semver.org
 [9]:https://www.ifi.uio.no
 [10]:https://sirius-labs.no
+[11]:https://ottr.xyz/downloads/lutra/
