@@ -37,7 +37,7 @@ release:
     - sshpass -V
     - export SSHPASS=$FTP_PASS
     - cp lutra.jar lutra-$CI_COMMIT_REF_NAME.jar
-    - sshpass -e scp -o stricthostkeychecking=no lutra-$CI_COMMIT_REF_NAME.jar $FTP_HOST:/www.ottr.xyz/downloads/
+    - sshpass -e scp -o stricthostkeychecking=no lutra-$CI_COMMIT_REF_NAME.jar $FTP_HOST:/www.ottr.xyz/downloads/lutra/
   only:
     - develop
     - master
