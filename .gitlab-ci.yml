@@ -61,7 +61,7 @@ register_release:
     description: 'Release of Lutra $CI_COMMIT_TAG.'
     assets:
       links:
-        - name: 'Lutra $CI_COMMIT_TAG'
+        - name: 'Lutra executable JAR file'
           url: 'https://www.ottr.xyz/downloads/lutra/lutra-$CI_COMMIT_TAG.jar'
 
 deploy-docker-image:
