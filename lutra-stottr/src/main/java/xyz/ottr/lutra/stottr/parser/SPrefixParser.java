@@ -39,16 +39,10 @@ public class SPrefixParser extends SBaseParserVisitor<Map<String, String>> {
             return Result.of(new HashMap<>());
         }
 
-        SDirectiveParser dirParser;
-
-        try {
-            dirParser = new SDirectiveParser();
-        } catch (IllegalArgumentException e) {
-            return Result.error("Error parsing prefix. Check syntax of namespace declaration.");
-        }
+        SDirectiveParser dirParser = new SDirectiveParser();
 
         return ResultStream.innerOf(ctx.directive())
-            .innerMap(dirParser::visit)
+            .mapFlatMap(dirParser::visit)
             .aggregate()
             .flatMap(pfs -> {
                 Map<String, String> m = new HashMap<>();
@@ -58,26 +52,35 @@ public class SPrefixParser extends SBaseParserVisitor<Map<String, String>> {
             });
     }
 
-    private static class SDirectiveParser extends stOTTRBaseVisitor<PrefixPair> {
+    private static class SDirectiveParser extends stOTTRBaseVisitor<Result<PrefixPair>> {
 
 
-        public PrefixPair visitPrefixID(stOTTRParser.PrefixIDContext ctx) throws IllegalArgumentException {
+        public Result<PrefixPair> visitPrefixID(stOTTRParser.PrefixIDContext ctx) {
             if (ctx.PNAME_NS() == null || ctx.IRIREF() == null) {
-                throw new IllegalArgumentException("Error parsing prefix.");
+                return Result.error("Syntax error in prefix declarations.");
             }
-            return PrefixPair.makePrefix(ctx.PNAME_NS(), ctx.IRIREF());
+            return Result.of(PrefixPair.makePrefix(ctx.PNAME_NS(), ctx.IRIREF()));
         }
 
-        public PrefixPair visitBase(stOTTRParser.BaseContext ctx) {
-            return PrefixPair.makeBase(ctx.IRIREF());
+        public Result<PrefixPair> visitBase(stOTTRParser.BaseContext ctx) {
+            if (ctx.IRIREF() == null) {
+                return Result.error("Syntax error in prefix declarations.");
+            }
+            return Result.of(PrefixPair.makeBase(ctx.IRIREF()));
         }
 
-        public PrefixPair visitSparqlBase(stOTTRParser.SparqlBaseContext ctx) {
-            return PrefixPair.makeBase(ctx.IRIREF());
+        public Result<PrefixPair> visitSparqlBase(stOTTRParser.SparqlBaseContext ctx) {
+            if (ctx.IRIREF() == null) {
+                return Result.error("Syntax error in SPARQL prefix declarations.");
+            }
+            return Result.of(PrefixPair.makeBase(ctx.IRIREF()));
         }
 
-        public PrefixPair visitSparqlPrefix(stOTTRParser.SparqlPrefixContext ctx) {
-            return PrefixPair.makePrefix(ctx.PNAME_NS(), ctx.IRIREF());
+        public Result<PrefixPair> visitSparqlPrefix(stOTTRParser.SparqlPrefixContext ctx) {
+            if (ctx.PNAME_NS() == null || ctx.IRIREF() == null) {
+                return Result.error("Syntax error in SPARQL prefix declarations.");
+            }
+            return Result.of(PrefixPair.makePrefix(ctx.PNAME_NS(), ctx.IRIREF()));
         }
     }
 
