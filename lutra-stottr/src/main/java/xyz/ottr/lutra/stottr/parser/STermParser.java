@@ -25,6 +25,7 @@ package xyz.ottr.lutra.stottr.parser;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import org.antlr.v4.runtime.tree.TerminalNode;
@@ -35,7 +36,6 @@ import xyz.ottr.lutra.model.terms.Term;
 import xyz.ottr.lutra.parser.TermParser;
 import xyz.ottr.lutra.stottr.STOTTR;
 import xyz.ottr.lutra.stottr.antlr.stOTTRParser;
-import xyz.ottr.lutra.system.Message;
 import xyz.ottr.lutra.system.Result;
 
 public class STermParser extends SBaseParserVisitor<Term> {
@@ -76,20 +76,17 @@ public class STermParser extends SBaseParserVisitor<Term> {
             return toBlankNodeTerm(getVariableLabel(ctx.Variable())).map(t -> (Term)t); // return Result.of(makeBlank();
         }
 
-        Result<Term> trm = visitChildren(ctx);
-        return trm != null
-            ? trm
-            : Result.empty(Message.error("Expected term but found " + ctx.getText()
-            + SParserUtils.getLineAndColumnString(ctx)));
+        return Objects.requireNonNullElse(
+            visitChildren(ctx),
+            Result.error("Expected term. " + SParserUtils.getErrorMessagePostfix(ctx))
+        );
     }
 
     public Result<Term> visitConstantTerm(stOTTRParser.ConstantTermContext ctx) {
-        Result<Term> trm = visitChildren(ctx);
-
-        return trm != null
-                ? trm
-                : Result.empty(Message.error("Expected term but found " + ctx.getText()
-                + SParserUtils.getLineAndColumnString(ctx)));
+        return Objects.requireNonNullElse(
+            visitChildren(ctx),
+            Result.error("Expected constant term. " + SParserUtils.getErrorMessagePostfix(ctx))
+        );
     }
 
     String getVariableLabel(TerminalNode varLabel) {
@@ -142,7 +139,7 @@ public class STermParser extends SBaseParserVisitor<Term> {
             type = XSD.xdouble.getURI();
             valNode = ctx.DOUBLE();
         } else {
-            throw new UnsupportedOperationException("Error stOTTR parser. Unsupported numeric literal context.");
+            throw new UnsupportedOperationException("Unsupported numeric literal context. " + SParserUtils.getErrorMessagePostfix(ctx));
         }
 
         String val = valNode.getSymbol().getText();
@@ -169,7 +166,8 @@ public class STermParser extends SBaseParserVisitor<Term> {
             Result<Term> datatype = visitIri(ctx.iri());
 
             if (datatype.isPresent() && !(datatype.get() instanceof IRITerm)) {
-                return Result.error("Erroneous literal datatype. Expected IRI, but found " + datatype.get());
+                return Result.error("Erroneous literal datatype. Expected IRI, but found "
+                    + datatype.get() + SParserUtils.getLineAndColumnString(ctx));
             }
 
             return datatype
