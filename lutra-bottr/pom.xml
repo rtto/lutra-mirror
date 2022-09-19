@@ -42,18 +42,11 @@
         </dependency>
 
         <dependency>
-            <!-- TODO not used - might be set to provided? -->
+            <!-- Needed for tests and possible at runtime  -->
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
             <!-- no transitive dependencies -->
         </dependency>
-
-        <!-- TODO not needed here - if so, might be best to be set for the whole project -->
-<!--        <dependency>-->
-<!--            <groupId>org.slf4j</groupId>-->
-<!--            <artifactId>slf4j-api</artifactId>-->
-<!--        </dependency>-->
-
     </dependencies>
 
     <build>

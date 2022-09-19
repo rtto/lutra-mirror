@@ -450,6 +450,12 @@
             <!-- no transitive dependencies -->
         </dependency>
 
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <!-- no transitive dependencies -->
+        </dependency>
+
         <!-- TODO why are both JUnit 4 and 5 (jupiter) in the project? That does not make sense and may cause problems. -->
         <dependency>
             <groupId>junit</groupId>

@@ -24,12 +24,6 @@
             <!-- for transitive dependencies see module POM -->
         </dependency>
 
-        <!-- TODO unused? -->
-        <!--<dependency>
-            <groupId>commons-validator</groupId>
-            <artifactId>commons-validator</artifactId>
-        </dependency>-->
-
         <!-- Needed for RDFDataMgr, RDF I/O -->
         <dependency>
             <groupId>org.apache.jena</groupId>
