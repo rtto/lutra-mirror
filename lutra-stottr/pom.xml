@@ -49,7 +49,7 @@
                         </goals>
                         <configuration>
                             <url>${url.stottrspec}stOTTR.g4</url>
-                            <outputDirectory>${local.stottrspec}</outputDirectory>
+                            <outputDirectory>${local.stottrspec}xyz/ottr/lutra/stottr/antlr/</outputDirectory>
                             <!--md5>MD5 SUM HERE</md5 -->
                             <skipCache>true</skipCache>
                         </configuration>
@@ -74,8 +74,6 @@
                 <artifactId>antlr4-maven-plugin</artifactId>
                 <configuration>
                     <arguments>
-                        <argument>-package</argument>
-                        <argument>xyz.ottr.lutra.stottr.antlr</argument>
                         <argument>-visitor</argument>
                     </arguments>
                 </configuration>
