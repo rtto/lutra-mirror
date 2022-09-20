@@ -85,4 +85,8 @@ public enum SParserUtils {
         return " at line " + getLineOf(ctx)
             + " column " + getColumnOf(ctx);
     }
+
+    public static String getErrorMessagePostfix(ParserRuleContext ctx) {
+        return "Found " + ctx.getText() + getLineAndColumnString(ctx);
+    }
 }

@@ -119,7 +119,7 @@ lutra-core/src/main/resources/puntypes\.owl\.ttl
 lutra-core/src/main/resources/types\.owl\.ttl
 lutra-docttr/src/test/resources/.output/
 lutra-stottr/src/main/antlr4/imports/Turtle\.g4
-lutra-stottr/src/main/antlr4/stOTTR\.g4
+lutra-stottr/src/main/antlr4/xyz/ottr/lutra/stottr/antlr/stOTTR.g4
 lutra-wottr/src/test/resources/spec/core-grammar\.shacl\.ttl
 lutra-wottr/src/test/resources/spec/core-vocabulary\.owl\.ttl
 lutra-wottr/src/test/resources/spec/examples/*\.ttl
