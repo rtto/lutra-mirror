@@ -13,8 +13,8 @@
     <name>${project.groupId}:${project.artifactId}</name>
 
     <properties>
-        <!--url.stottrspec>https://spec.ottr.xyz/stOTTR/0.1/</url.stottrspec-->
-        <url.stottrspec>https://dev.spec.ottr.xyz/stOTTR/</url.stottrspec> <!--TODO release spec and update this link -->
+        <url.stottrspec>https://spec.ottr.xyz/stOTTR/0.1/</url.stottrspec>
+        <!--url.stottrspec>https://dev.spec.ottr.xyz/stOTTR/</url.stottrspec-->
         <local.stottrspec>${project.basedir}/src/main/antlr4/</local.stottrspec>
     </properties>
 
