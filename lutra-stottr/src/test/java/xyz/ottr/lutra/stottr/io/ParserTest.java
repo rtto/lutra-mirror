@@ -194,7 +194,50 @@ public class ParserTest {
     }
 
     @Test
-    public void testTemplate1() {
+    public void testSignature4() {
+        testSignatureParsing("<http://example.com#T1> [ ??s ].");
+    }
+
+    @Test
+    public void testSignature5() {
+        testSignatureParsing("<http://example.com#T1> [ !?s ].");
+    }
+
+    @Test
+    public void testSignature6() {
+        testSignatureParsing("<http://example.com#T1> [ ?!?s ].");
+    }
+
+    @Test
+    public void testDefaultValueClass() {
+        testSignatureParsing("@prefix ex:     <http://example.com/ns#> . "
+                + "@prefix p: <http://tpl.ottr.xyz/pizza/0.1/> ."
+                + "ex:NamedPizza [ ?pizza = p:pizza] .");
+    }
+
+    @Test
+    public void testDefaultValueInt() {
+        testSignatureParsing("@prefix ex:     <http://example.com/ns#> . "
+                + "ex:NamedPizza [ ?pizza = 2] .");
+    }
+
+    @Test
+    public void testDefaultValueString() {
+        testSignatureParsing("@prefix ex:     <http://example.com/ns#> . "
+                + "ex:NamedPizza [ ?pizza = 'pizza'] .");
+    }
+
+    @Test
+    public void testLists() {
+        testSignatureParsing("@prefix ex:     <http://example.com/ns#> . "
+                + "ex:NamedPizza ["
+                + "  ?pizza = 'pizza' ,"
+                + "  ?country = ('Italy', 'Spain') ,  "
+                + "  ?toppings = ((()))] .");
+    }
+
+    @Test
+    public void testTemplate() {
 
         String template = "@prefix rdf:    <http://www.w3.org/1999/02/22-rdf-syntax-ns#> . "
             + "@prefix foaf:   <http://xmlns.com/foaf/0.1/> . "
@@ -210,6 +253,19 @@ public class ParserTest {
         testSignatureParsing(template);
     }
 
+    @Test
+    public void testTemplateDefaultList() {
+
+        String template = "@prefix rdf:    <http://www.w3.org/1999/02/22-rdf-syntax-ns#> . "
+                + "@prefix foaf:   <http://xmlns.com/foaf/0.1/> . "
+                + "@prefix ex:     <http://example.com/ns#> . "
+                + "@prefix ottr:   <http://ns.ottr.xyz/0.4/> . "
+                + " ex:Types[ ?ins, ?class = (ex:Person, ex:Employee) ] :: { "
+                + "  cross | ottr:Triple(?ins, rdf:Type, ++?class) "
+                + "} .";
+
+        testSignatureParsing(template);
+    }
 
 }
 
