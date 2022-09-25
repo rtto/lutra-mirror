@@ -56,29 +56,41 @@ public class SPrefixParser extends SBaseParserVisitor<Map<String, String>> {
 
 
         public Result<PrefixPair> visitPrefixID(stOTTRParser.PrefixIDContext ctx) {
-            if (ctx.PNAME_NS() == null || ctx.IRIREF() == null) {
+            if (ctx.PNAME_NS() == null && ctx.IRIREF() == null) {
                 return Result.error("Syntax error in prefix declarations.");
+            }
+            if (ctx.PNAME_NS() == null) {
+                return Result.error("Syntax error in prefix declarations. Prefix name is null.");
+            }
+            if (ctx.IRIREF() == null) {
+                return Result.error("Syntax error in prefix declarations. IRI reference is null.");
             }
             return Result.of(PrefixPair.makePrefix(ctx.PNAME_NS(), ctx.IRIREF()));
         }
 
         public Result<PrefixPair> visitBase(stOTTRParser.BaseContext ctx) {
             if (ctx.IRIREF() == null) {
-                return Result.error("Syntax error in prefix declarations.");
+                return Result.error("Syntax error in base prefix declarations. IRI reference is null.");
             }
             return Result.of(PrefixPair.makeBase(ctx.IRIREF()));
         }
 
         public Result<PrefixPair> visitSparqlBase(stOTTRParser.SparqlBaseContext ctx) {
             if (ctx.IRIREF() == null) {
-                return Result.error("Syntax error in SPARQL prefix declarations.");
+                return Result.error("Syntax error in base prefix declarations. IRI reference is null.");
             }
             return Result.of(PrefixPair.makeBase(ctx.IRIREF()));
         }
 
         public Result<PrefixPair> visitSparqlPrefix(stOTTRParser.SparqlPrefixContext ctx) {
-            if (ctx.PNAME_NS() == null || ctx.IRIREF() == null) {
-                return Result.error("Syntax error in SPARQL prefix declarations.");
+            if (ctx.PNAME_NS() == null && ctx.IRIREF() == null) {
+                return Result.error("Syntax error in prefix declarations.");
+            }
+            if (ctx.PNAME_NS() == null) {
+                return Result.error("Syntax error in prefix declarations. Prefix name is null.");
+            }
+            if (ctx.IRIREF() == null) {
+                return Result.error("Syntax error in prefix declarations. IRI reference is null.");
             }
             return Result.of(PrefixPair.makePrefix(ctx.PNAME_NS(), ctx.IRIREF()));
         }
