@@ -74,7 +74,7 @@ public class SPrefixParser extends SBaseParserVisitor<Map<String, String>> {
 
         private Result<PrefixPair> parseBasePrefix(TerminalNode iriref, ParserRuleContext ctx) {
             if (iriref == null) {
-                return Result.error("Syntax error in base prefix declaration: IRI reference is null, "
+                return Result.error("Syntax error in base prefix declaration: unparsable namespace, "
                     + SParserUtils.getTextWithLineAndColumnString(ctx));
             }
             return Result.of(PrefixPair.makeBase(iriref));
@@ -82,13 +82,13 @@ public class SPrefixParser extends SBaseParserVisitor<Map<String, String>> {
 
         private Result<PrefixPair> parsePrefix(TerminalNode prefixName, TerminalNode iriref, ParserRuleContext ctx) {
             if (prefixName == null || iriref == null) {
-                String errorMessage = "Syntax error in prefix declaration: ";
+                String errorMessage = "Syntax error in prefix declaration:";
 
                 if (prefixName == null) {
-                    errorMessage += " prefix name is null, ";
+                    errorMessage += " unparsable prefix name,";
                 }
                 if (iriref == null) {
-                    errorMessage += " IRI reference is null, ";
+                    errorMessage += " unparsable namespace,";
                 }
                 return Result.error(errorMessage + SParserUtils.getTextWithLineAndColumnString(ctx));
             }
