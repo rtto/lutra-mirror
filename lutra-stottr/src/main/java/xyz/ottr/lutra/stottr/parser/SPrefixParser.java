@@ -25,6 +25,7 @@ package xyz.ottr.lutra.stottr.parser;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Pattern;
+import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.TerminalNode;
 import xyz.ottr.lutra.stottr.antlr.stOTTRBaseVisitor;
 import xyz.ottr.lutra.stottr.antlr.stOTTRParser;
@@ -46,7 +47,8 @@ public class SPrefixParser extends SBaseParserVisitor<Map<String, String>> {
             .aggregate()
             .flatMap(pfs -> {
                 Map<String, String> m = new HashMap<>();
-                pfs.forEach(pair -> m.put(pair.ns, pair.prefix)); // TODO: Check for collitions
+                pfs.forEach(pair -> m.put(pair.ns, pair.prefix));
+                // TODO: Check for collisions
                 // TODO: Check if ns-prefix-pair is non-standard combination and give error
                 return Result.of(m);
             });
@@ -54,45 +56,44 @@ public class SPrefixParser extends SBaseParserVisitor<Map<String, String>> {
 
     private static class SDirectiveParser extends stOTTRBaseVisitor<Result<PrefixPair>> {
 
-
-        public Result<PrefixPair> visitPrefixID(stOTTRParser.PrefixIDContext ctx) {
-            if (ctx.PNAME_NS() == null && ctx.IRIREF() == null) {
-                return Result.error("Syntax error in prefix declarations.");
-            }
-            if (ctx.PNAME_NS() == null) {
-                return Result.error("Syntax error in prefix declarations. Prefix name is null.");
-            }
-            if (ctx.IRIREF() == null) {
-                return Result.error("Syntax error in prefix declarations. IRI reference is null.");
-            }
-            return Result.of(PrefixPair.makePrefix(ctx.PNAME_NS(), ctx.IRIREF()));
-        }
-
         public Result<PrefixPair> visitBase(stOTTRParser.BaseContext ctx) {
-            if (ctx.IRIREF() == null) {
-                return Result.error("Syntax error in base prefix declarations. IRI reference is null.");
-            }
-            return Result.of(PrefixPair.makeBase(ctx.IRIREF()));
+            return parseBasePrefix(ctx.IRIREF(), ctx);
         }
 
         public Result<PrefixPair> visitSparqlBase(stOTTRParser.SparqlBaseContext ctx) {
-            if (ctx.IRIREF() == null) {
-                return Result.error("Syntax error in base prefix declarations. IRI reference is null.");
-            }
-            return Result.of(PrefixPair.makeBase(ctx.IRIREF()));
+            return parseBasePrefix(ctx.IRIREF(), ctx);
+        }
+
+        public Result<PrefixPair> visitPrefixID(stOTTRParser.PrefixIDContext ctx) {
+            return parsePrefix(ctx.PNAME_NS(), ctx.IRIREF(), ctx);
         }
 
         public Result<PrefixPair> visitSparqlPrefix(stOTTRParser.SparqlPrefixContext ctx) {
-            if (ctx.PNAME_NS() == null && ctx.IRIREF() == null) {
-                return Result.error("Syntax error in prefix declarations.");
+            return parsePrefix(ctx.PNAME_NS(), ctx.IRIREF(), ctx);
+        }
+
+        private Result<PrefixPair> parseBasePrefix(TerminalNode iriref, ParserRuleContext ctx) {
+            if (iriref == null) {
+                return Result.error("Syntax error in base prefix declaration: IRI reference is null, "
+                    + SParserUtils.getTextWithLineAndColumnString(ctx));
             }
-            if (ctx.PNAME_NS() == null) {
-                return Result.error("Syntax error in prefix declarations. Prefix name is null.");
+            return Result.of(PrefixPair.makeBase(iriref));
+        }
+
+        private Result<PrefixPair> parsePrefix(TerminalNode pname_ns, TerminalNode iriref, ParserRuleContext ctx) {
+            if (pname_ns == null && iriref == null) {
+                String errorMessage = "Syntax error in prefix declaration: ";
+
+                if (pname_ns == null) {
+                    errorMessage += " prefix name is null, ";
+                }
+                if (iriref == null) {
+                    errorMessage += " IRI reference is null, ";
+                }
+                return Result.error(errorMessage + SParserUtils.getTextWithLineAndColumnString(ctx));
             }
-            if (ctx.IRIREF() == null) {
-                return Result.error("Syntax error in prefix declarations. IRI reference is null.");
-            }
-            return Result.of(PrefixPair.makePrefix(ctx.PNAME_NS(), ctx.IRIREF()));
+
+            return Result.of(PrefixPair.makePrefix(pname_ns, iriref));
         }
     }
 

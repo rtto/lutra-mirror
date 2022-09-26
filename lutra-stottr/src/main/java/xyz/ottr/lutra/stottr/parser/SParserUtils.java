@@ -85,4 +85,8 @@ public enum SParserUtils {
         return " at line " + getLineOf(ctx)
             + " column " + getColumnOf(ctx);
     }
+
+    public static String getTextWithLineAndColumnString(ParserRuleContext ctx) {
+        return " in " + ctx.getText() + getLineAndColumnString(ctx);
+    }
 }
