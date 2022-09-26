@@ -25,7 +25,6 @@ package xyz.ottr.lutra.stottr.parser;
 import org.antlr.v4.runtime.BaseErrorListener;
 import org.antlr.v4.runtime.RecognitionException;
 import org.antlr.v4.runtime.Recognizer;
-import xyz.ottr.lutra.system.Message;
 import xyz.ottr.lutra.system.MessageHandler;
 import xyz.ottr.lutra.system.Result;
 
@@ -46,7 +45,7 @@ public class ErrorToMessageListener extends BaseErrorListener {
         int charPositionInLine, String msg, RecognitionException e) {
         
         String err = "Syntax error at line " + line  + " col " + charPositionInLine + ": " + msg;
-        this.messageHandler.add(Result.empty(Message.error(err)));
+        this.messageHandler.add(Result.error(err));
     }
 
     public MessageHandler getMessageHandler() {

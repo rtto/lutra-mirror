@@ -78,14 +78,14 @@ public class STermParser extends SBaseParserVisitor<Term> {
 
         return Objects.requireNonNullElse(
             visitChildren(ctx),
-            Result.error("Expected term. " + SParserUtils.getErrorMessagePostfix(ctx))
+            Result.error("Unexpected term, " + SParserUtils.getTextWithLineAndColumnString(ctx))
         );
     }
 
     public Result<Term> visitConstantTerm(stOTTRParser.ConstantTermContext ctx) {
         return Objects.requireNonNullElse(
             visitChildren(ctx),
-            Result.error("Expected constant term. " + SParserUtils.getErrorMessagePostfix(ctx))
+            Result.error("Unexpected constant term, " + SParserUtils.getTextWithLineAndColumnString(ctx))
         );
     }
 
@@ -139,7 +139,7 @@ public class STermParser extends SBaseParserVisitor<Term> {
             type = XSD.xdouble.getURI();
             valNode = ctx.DOUBLE();
         } else {
-            throw new UnsupportedOperationException("Unsupported numeric literal context. " + SParserUtils.getErrorMessagePostfix(ctx));
+            return Result.error("Unexpected numeric type, " + SParserUtils.getTextWithLineAndColumnString(ctx));
         }
 
         String val = valNode.getSymbol().getText();
@@ -166,8 +166,8 @@ public class STermParser extends SBaseParserVisitor<Term> {
             Result<Term> datatype = visitIri(ctx.iri());
 
             if (datatype.isPresent() && !(datatype.get() instanceof IRITerm)) {
-                return Result.error("Erroneous literal datatype. Expected IRI, but found "
-                    + datatype.get() + SParserUtils.getLineAndColumnString(ctx));
+                return Result.error("Unexpected literal datatype. Expected IRI, but found "
+                    + datatype.get() + ", " + SParserUtils.getTextWithLineAndColumnString(ctx));
             }
 
             return datatype
@@ -212,8 +212,8 @@ public class STermParser extends SBaseParserVisitor<Term> {
         String prefix = this.prefixes.get(prefixName);
 
         if (prefix == null) { // Prefix not found
-            return Result.error("Unrecognized prefix " + prefixName
-                + " in qname " + qname + SParserUtils.getLineAndColumnString(ctx));
+            return Result.error("Unrecognized prefix " + prefixName + " in QName " + qname
+                + ", " + SParserUtils.getTextWithLineAndColumnString(ctx));
         }
 
         String local = qname.substring(lastColon + 1);
