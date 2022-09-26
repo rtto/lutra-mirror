@@ -42,9 +42,10 @@ public class ErrorToMessageListener extends BaseErrorListener {
     
     @Override
     public void syntaxError(Recognizer<?, ?> recognizer, Object offendingSymbol, int line,
-        int charPositionInLine, String msg, RecognitionException e) {
+        int col, String msg, RecognitionException e) {
         
-        String err = "Syntax error at line " + line  + " col " + charPositionInLine + ": " + msg;
+        String err = "Syntax error: " + msg
+            + SParserUtils.getLineAndColumnString(line, col);
         this.messageHandler.add(Result.error(err));
     }
 

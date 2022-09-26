@@ -166,8 +166,8 @@ public class STermParser extends SBaseParserVisitor<Term> {
             Result<Term> datatype = visitIri(ctx.iri());
 
             if (datatype.isPresent() && !(datatype.get() instanceof IRITerm)) {
-                return Result.error("Unexpected literal datatype. Expected IRI, but found "
-                    + datatype.get() + ", " + SParserUtils.getTextWithLineAndColumnString(ctx));
+                return Result.error("Unexpected literal datatype. Expected IRI, but found '"
+                    + datatype.get() + "', " + SParserUtils.getTextWithLineAndColumnString(ctx));
             }
 
             return datatype
@@ -212,8 +212,8 @@ public class STermParser extends SBaseParserVisitor<Term> {
         String prefix = this.prefixes.get(prefixName);
 
         if (prefix == null) { // Prefix not found
-            return Result.error("Unrecognized prefix " + prefixName + " in QName " + qname
-                + ", " + SParserUtils.getTextWithLineAndColumnString(ctx));
+            return Result.error("Unrecognized prefix '" + prefixName + "'"
+                + SParserUtils.getTextWithLineAndColumnString(ctx));
         }
 
         String local = qname.substring(lastColon + 1);

@@ -99,7 +99,7 @@ public class SInstanceParser extends SParser<Instance> implements InstanceParser
 
         return STOTTR.Expanders.map.containsValue(expanderValue)
             ? Result.of(STOTTR.Expanders.map.getKey(expanderValue))
-            : Result.error("Unrecognized list expander: " + expanderValue + ", " + SParserUtils.getTextWithLineAndColumnString(ctx));
+            : Result.error("Unrecognized list expander, " + SParserUtils.getTextWithLineAndColumnString(ctx));
     }
 
     private Result<List<Argument>> parseArguments(stOTTRParser.InstanceContext ctx) {
