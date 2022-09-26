@@ -81,7 +81,7 @@ public class SPrefixParser extends SBaseParserVisitor<Map<String, String>> {
         }
 
         private Result<PrefixPair> parsePrefix(TerminalNode pname_ns, TerminalNode iriref, ParserRuleContext ctx) {
-            if (pname_ns == null && iriref == null) {
+            if (pname_ns == null || iriref == null) {
                 String errorMessage = "Syntax error in prefix declaration: ";
 
                 if (pname_ns == null) {
