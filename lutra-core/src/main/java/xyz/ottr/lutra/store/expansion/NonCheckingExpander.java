@@ -55,7 +55,7 @@ public class NonCheckingExpander implements Expander {
     public ResultStream<Instance> expandInstanceFetch(Instance instance) {
         Result<Signature> result = templateStore.getSignature(instance.getIri());
 
-        if (!result.isEmpty() && (isTemplate(result) || isBaseTemplate(result))) {
+        if (isTemplate(result) || isBaseTemplate(result)) {
             return expandInstance(instance);
         }
 
@@ -113,7 +113,7 @@ public class NonCheckingExpander implements Expander {
     public ResultStream<Instance> expandInstance(Instance instance) {
         Result<Signature> result = templateStore.getSignature(instance.getIri());
 
-        if (result.isEmpty() || !(isBaseTemplate(result) || isTemplate(result))) {
+        if (!(isBaseTemplate(result) || isTemplate(result))) {
             return ResultStream.of(Result.error("Missing definition for " + instance.getIri()));
         }
         if (shouldDiscard(instance, result.get())) {
@@ -199,10 +199,10 @@ public class NonCheckingExpander implements Expander {
     }
 
     private boolean isBaseTemplate(Result<Signature> result) {
-        return result.get() instanceof BaseTemplate;
+        return !result.isEmpty() && result.get() instanceof BaseTemplate;
     }
 
     private boolean isTemplate(Result<Signature> result) {
-        return result.get() instanceof Template;
+        return !result.isEmpty() && result.get() instanceof Template;
     }
 }
