@@ -10,7 +10,6 @@ variables:
   # This will suppress any download for dependencies and plugins or upload messages which would clutter the console log.
   MAVEN_CLI_OPTS: "--batch-mode --errors --fail-at-end --show-version"
   MAVEN_OPTS: "-Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=WARN -Dorg.slf4j.simpleLogger.showDateTime=true -Djava.awt.headless=true"
-  VERSION_NAME: $CI_COMMIT_TAG
 
 cache:
   key: ${CI_COMMIT_REF_SLUG}
@@ -38,7 +37,6 @@ build:
     paths:
       - ./*
       
-
 test:
   stage: test
   script:
@@ -95,8 +93,8 @@ deploy-docker-image:
     - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
   script:
     - cd lutra-restapi
-    - docker build --pull -t "$CI_REGISTRY_IMAGE${tag}" .
-    - docker push "$CI_REGISTRY_IMAGE${tag}"
+    - docker build --pull -t "$CI_REGISTRY_IMAGE${VERSION_NAME}" .
+    - docker push "$CI_REGISTRY_IMAGE${VERSION_NAME}"
   only:
     - master
 
