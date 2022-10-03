@@ -18,6 +18,10 @@ Thanks to all contributors!
 
  - Various bug fixes and improvements
 
+ ## @yiyaoc
+
+ - Various bug fixes and improvements
+
 # Main development team
 
 - Martin G. Skjæveland (2017 -- )
