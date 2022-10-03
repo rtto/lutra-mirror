@@ -24,6 +24,8 @@ To run Lutra you will need to install Java 11, for instance [OpenJDK][1].
 * Releases: [for download at ottr.xyz][11] and [the list of all releases on GitLab][2]
 * [Latest master snapshot][3]: usually the latest release
 * [Latest develop snapshot][4]: usually the latest development version
+* [Maven artefacts](https://search.maven.org/search?q=g:xyz.ottr.lutra): The entry point module to use Lutra as an Java API is `lutra-api`. 
+* [Javadoc](https://javadoc.io/doc/xyz.ottr.lutra)
 
 ### Installing
 
