@@ -46,8 +46,9 @@ release:
     - apt-get update -qq && apt-get install -y -qq sshpass
     - sshpass -V
     - export SSHPASS=$FTP_PASS
-    - cp lutra.jar lutra-$CI_COMMIT_REF_NAME.jar
-    - sshpass -e scp -o stricthostkeychecking=no lutra-$CI_COMMIT_REF_NAME.jar $FTP_HOST:/www.ottr.xyz/downloads/lutra/
+    - if [ -z $CI_COMMIT_TAG ]; then VERSION_NAME=$CI_COMMIT_TAG; else VERSION_NAME=$CI_COMMIT_REF_NAME; fi # get tag, else use master/develop
+    - cp lutra.jar lutra-$VERSION_NAME.jar
+    - sshpass -e scp -o stricthostkeychecking=no lutra-$VERSION_NAME.jar $FTP_HOST:/www.ottr.xyz/downloads/lutra/
   only:
     - develop
     - master
