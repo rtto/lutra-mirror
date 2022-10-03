@@ -137,15 +137,17 @@
 	      <groupId>com.amashchenko.maven.plugin</groupId>
 	      <artifactId>gitflow-maven-plugin</artifactId>
 	      <version>1.18.0</version>
-	      <configuration>
-                <flowInitContext>
-                  <versionTagPrefix>v</versionTagPrefix>
-                </flowInitContext>
-                <autoVersionSubmodules>true</autoVersionSubmodules>
-                <enableSshAgent>true</enableSshAgent>
-                <noDeploy>false</noDeploy>
-                <scmCommentPrefix>[jgitflow] </scmCommentPrefix>
-              </configuration>
+                <configuration>
+
+                    <gitFlowConfig>
+                        <versionTagPrefix>v</versionTagPrefix>
+                    </gitFlowConfig>
+
+                    <commitMessages>
+                        <commitMessagePrefix xml:space="preserve">[gitflow] </commitMessagePrefix>
+                        <tagReleaseMessage>Tag release @{version}</tagReleaseMessage>
+                    </commitMessages>
+                </configuration>
 	    </plugin>
 
             <plugin>
