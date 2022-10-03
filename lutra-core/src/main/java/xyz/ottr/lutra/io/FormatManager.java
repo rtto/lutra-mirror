@@ -29,10 +29,18 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
+import xyz.ottr.lutra.store.TemplateStore;
 import xyz.ottr.lutra.system.Message;
 import xyz.ottr.lutra.system.MessageHandler;
 import xyz.ottr.lutra.system.Result;
 
+/**
+ * A <code>FormatManager</code> is a registry for {@link Format}s
+ * with methods for retrieving all formats supporting a particular operation
+ * such as reading templates or writing instances. In addition,
+ * it contains utility methods for attempting an operation
+ * with all formats until one succeeds.
+ */
 public class FormatManager {
 
     private final Map<String, Format> formats;
@@ -136,7 +144,7 @@ public class FormatManager {
      *      Result with an error Message describing what went wrong for each reader
      *      if no Format's TemplateReader succeeded.
      */
-    public Result<TemplateReader> attemptAllFormats(Function<TemplateReader, MessageHandler> readerFunction) {
+    public Result<TemplateReader> attemptAllFormats(TemplateStore store, Function<TemplateReader, MessageHandler> readerFunction) {
         
         // Return warning if no formats are registered
         if (this.formats.isEmpty()) {

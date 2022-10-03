@@ -40,37 +40,12 @@ import xyz.ottr.lutra.system.Message;
     parameterListHeading = "%n@|bold PARAMETERS:|@%n",
     optionListHeading = "%n@|bold OPTIONS:|@%n",
     footerHeading = "%n",
-    description = "Tool for working with OTTR Templates, for expanding instances and template definition,"
-        + " translating between different formats and for checking the integrity of a template library.",
-    footer = "@|bold EXAMPLES:|@%n"
-        + "The following command reads all .ttl and .owl-files in ./lib as a template library and checks its intergrity:%n%n"
-        + "    lutra -L wottr -m lint -l ./lib -e \"ttl,owl\"%n%n"
-        + "The following translates all template files (with .ttl-extension) in ./lib from the legacy format to wottr,"
-        + " and writes them to ./wottr:%n%n"
-        + "    lutra -L legacy -O wottr -m formatLibrary -l ./lib -o ./wottr%n%n"
-        + "The following expands all instances in ins1.xlsx and ins2.xlsx in tabOTTR using the templates"
-        + " in ./baselib and ./domain and writes the expanded instances to exp.ttl in the wOTTR format:%n%n"
-        + "    lutra -I tabottr -O wottr -m expand -l ./baselib -l ./domain -o exp.ttl ins1.xlsx ins2.xlsx"
-        + "%n%n@|bold DISCUSSION:|@%n"
-        + "Note that with -O wottr all triple-instances outside of template definitions are written as normal RDF triples,"
-        + " thus to expand a set of instances into an RDF graph this is what should be used."
-        + "%n%nWhen a set of template definitions are written with -o <fpath>,"
-        + " each template will be writen to a folder path of the form <fpath>/<tpath>/<name>.ttl, where"
-        + " <tpath> is the path-part of the template's IRI, and <name> is the fragment of the IRI."
-        + " E.g. with -o ./templates, the template with IRI"
-        + "%n    http://example.org/draft/owl/SubclassOf%n"
-        + "will be written to the path"
-        + "%n    ./templates/draft/owl/SubclassOf.ttl.%n%n"
-        + "Note that one can omit giving a format for libraries. In this case all possible formats are attempted,"
-        + " and the first to succeed for each library is used for that library. However, all files within one"
-        + " library needs to be of the same format, but"
-        + " different libraries can have files of different formats."
-        + "%n%n@|bold FURTHER INFORMATION:|@%n"
-        + "Website: https://ottr.xyz%n"
-        + "Source:  https://gitlab.com/ottr/lutra/lutra"
-        + "%n%n@|bold REPORTING BUGS:|@%n"
-        + "Please report any bugs as issues to our Git repository at"
-        + "%n    https://gitlab.com/ottr/lutra/lutra/issues.",
+    description = "Reference implementation for OTTR Templates. Use for expanding template instances and template definitions,"
+        + " translating between different formats and for checking the integrity of template libraries.",
+    footer = "@|bold LINKS:|@%n"
+        + "Website:  https://ottr.xyz%n"
+        + "Primers:  https://primer.ottr.xyz%n"
+        + "Git repo: https://gitlab.com/ottr/lutra/lutra",
     mixinStandardHelpOptions = true, 
     versionProvider = Settings.JarFileVersionProvider.class)
 public class Settings {

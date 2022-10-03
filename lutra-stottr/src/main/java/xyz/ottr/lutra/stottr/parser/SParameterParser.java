@@ -73,9 +73,13 @@ class SParameterParser extends SBaseParserVisitor<Parameter> {
     }
 
     private Result<Term> parseDefaultValue(stOTTRParser.ParameterContext ctx) {
-        return ctx.defaultValue() != null
-            ? this.termParser.visit(ctx.defaultValue().constant())
-            : Result.empty();
+        stOTTRParser.DefaultValueContext defaultValueContext = ctx.defaultValue();
+
+        if (defaultValueContext == null) {
+            return Result.empty();
+        }
+
+        return this.termParser.visit(ctx.defaultValue().constantTerm());
     }
 
     private Result<Term> parseTerm(stOTTRParser.ParameterContext ctx) {

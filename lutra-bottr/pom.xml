@@ -4,7 +4,7 @@
     <parent>
         <groupId>xyz.ottr.lutra</groupId>
         <artifactId>lutra</artifactId>
-        <version>0.6.13</version>
+        <version>0.6.14</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <artifactId>lutra-bottr</artifactId>
@@ -17,33 +17,36 @@
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>lutra-core</artifactId>
+            <!-- for transitive dependencies see module POM -->
         </dependency>
 
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>lutra-wottr</artifactId>
+            <!-- for transitive dependencies see module POM -->
         </dependency>
 
         <dependency>
             <groupId>commons-dbutils</groupId>
             <artifactId>commons-dbutils</artifactId>
+            <!-- no transitive dependencies -->
         </dependency>
 
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-dbcp2</artifactId>
+            <!-- transitive dependencies:
+                - commons-pool2
+                - commons-logging
+            -->
         </dependency>
 
         <dependency>
+            <!-- Needed for tests and possible at runtime  -->
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
+            <!-- no transitive dependencies -->
         </dependency>
-
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-        </dependency>
-
     </dependencies>
 
     <build>

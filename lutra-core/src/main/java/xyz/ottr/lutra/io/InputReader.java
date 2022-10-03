@@ -25,6 +25,20 @@ package xyz.ottr.lutra.io;
 import java.util.function.Function;
 import xyz.ottr.lutra.system.ResultStream;
 
+/**
+ * An <code>InputReader</code> should come before a reader 
+ * ({@link xyz.ottr.lutra.parser.TemplateParser} or 
+ * {@link xyz.ottr.lutra.parser.InstanceParser}) to translate 
+ * some pointer to an input (e.g. a filename or URL) to an 
+ * output consumable by a reader. An <code>InputReader&lt;T, R&gt;</code> 
+ * can be paired with a parser, e.g. a <code>InstanceParser&lt;R, O&gt;</code>
+ * in order to produce a reader, e.g. <code>InstanceReader&lt;T, O&gt;</code>.
+ * Thus, for any parser consuming something of type <code>R</code> one 
+ * needs to make an <code>InputReader</code> with output of type <code>R</code>.
+ * 
+ * @param <T> The type of a pointer to an input to a reader (e.g. <code>String</code> for filenames)
+ * @param <R> The type of the result of the consumption of the input to a representation consumable by a parser.
+ */
 public interface InputReader<T, R> extends Function<T, ResultStream<R>> {
 
 }

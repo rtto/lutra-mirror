@@ -141,7 +141,7 @@ public class ListTerm extends AbstractTerm<Long> {
     public String toString(PrefixMapping prefixes) {
         return this.terms.stream()
             .map(t -> t.toString(prefixes))
-            .collect(Collectors.joining(", ", "<", ">"))
+            .collect(Collectors.joining(", ", "(", ")"))
             + "(id: " + this.listID + ")";
     }
 

@@ -1,0 +1,8 @@
+@prefix ex: <http://example.com/ns#> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix ottr: <http://ns.ottr.xyz/0.4/> .
+
+ex:Person [?p ] :: {
+    ottr:Triple(?p, rdf:type, foaf:Person)
+} .

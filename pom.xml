@@ -4,7 +4,7 @@
 
 	<groupId>xyz.ottr.lutra</groupId>
 	<artifactId>lutra</artifactId>
-	<version>0.6.13</version>
+	<version>0.6.14</version>
 	<packaging>pom</packaging>
 	<modules>
 		<module>lutra-core</module>
@@ -67,7 +67,7 @@
         <java.version>11</java.version>
         <maven.compiler.target>${java.version}</maven.compiler.target>
 
-        <jena.version>4.4.0</jena.version>
+        <jena.version>4.6.0</jena.version>
         <antlr4-maven-plugin-version>4.9.2</antlr4-maven-plugin-version>
     </properties>
 
@@ -447,18 +447,33 @@
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <scope>provided</scope>
+            <!-- no transitive dependencies -->
         </dependency>
 
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <!-- no transitive dependencies -->
+        </dependency>
+
+        <!-- TODO why are both JUnit 4 and 5 (jupiter) in the project? That does not make sense and may cause problems. -->
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <scope>test</scope>
+            <!-- transitive dependencies:
+                - hamcrest-core
+            -->
         </dependency>
 
         <dependency>
             <groupId>com.google.code.findbugs</groupId>
             <artifactId>annotations</artifactId>
             <scope>provided</scope>
+            <!-- transitive dependencies:
+                - jsr305
+                - jcip-annotations
+            -->
         </dependency>
 
     </dependencies>
@@ -666,6 +681,14 @@
                 <groupId>junit</groupId>
                 <artifactId>junit</artifactId>
                 <version>4.13.2</version>
+                <scope>test</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>org.junit.jupiter</groupId>
+                <artifactId>junit-jupiter-params</artifactId>
+                <version>5.8.1</version>
+                <scope>test</scope>
             </dependency>
 
             <!-- https://mvnrepository.com/artifact/org.hamcrest/hamcrest -->
