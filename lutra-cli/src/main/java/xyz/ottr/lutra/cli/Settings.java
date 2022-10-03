@@ -43,9 +43,9 @@ import xyz.ottr.lutra.system.Message;
     description = "Reference implementation for OTTR Templates. Use for expanding template instances and template definitions,"
         + " translating between different formats and for checking the integrity of template libraries.",
     footer = "@|bold LINKS:|@%n"
-        + "Website: https://ottr.xyz%n"
-        + "Primers: https://primer.ottr.xyz%n"
-        + "Git repo:  https://gitlab.com/ottr/lutra/lutra",
+        + "Website:  https://ottr.xyz%n"
+        + "Primers:  https://primer.ottr.xyz%n"
+        + "Git repo: https://gitlab.com/ottr/lutra/lutra",
     mixinStandardHelpOptions = true, 
     versionProvider = Settings.JarFileVersionProvider.class)
 public class Settings {
