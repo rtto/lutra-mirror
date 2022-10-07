@@ -22,23 +22,20 @@ package xyz.ottr.lutra.stottr.io;
  * #L%
  */
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
 import java.util.*;
 import java.util.stream.Collectors;
 import org.apache.jena.vocabulary.XSD;
 import org.junit.Test;
-import xyz.ottr.lutra.OTTR;
 import xyz.ottr.lutra.model.*;
 import xyz.ottr.lutra.model.terms.*;
 import xyz.ottr.lutra.model.types.TypeRegistry;
-import xyz.ottr.lutra.parser.*;
 import xyz.ottr.lutra.stottr.parser.SInstanceParser;
 import xyz.ottr.lutra.stottr.parser.SParserUtils;
 import xyz.ottr.lutra.stottr.parser.SPrefixParser;
 import xyz.ottr.lutra.stottr.parser.STemplateParser;
 import xyz.ottr.lutra.system.*;
+
+import static org.junit.Assert.*;
 
 public class ParserTest {
 
@@ -161,7 +158,6 @@ public class ParserTest {
         String modifiedSubstring = substring.trim().toLowerCase();
 
         for (Message m : messages) {
-            System.out.println("m: " + m);
             String s = m.getMessage().toLowerCase();
             return s.contains(modifiedSubstring);
         }
@@ -169,26 +165,98 @@ public class ParserTest {
     }
 
     @Test
-    public void testCorrectBaseTemplates() {
-        List<String> signatures = Arrays.asList(
-                "<http://example.com#T1> [  ] :: BASE ."
-                //"<http://example.com#T1> [ ?s ] @@<http://example.com#T2>(true) :: BASE ."
-                //"<http://example.com#T1> [ ??s ].",
-                //"<http://example.com#T1> [ !?s ]."
-        );
+    public void testCorrectBaseTemplate1() {
+        String signature = "<http://example.com#T1> [  ] :: BASE .";
 
-        for (String s : signatures) {
-            Signature expected = buildBaseTemplate(s);
-            STemplateParser parser = new STemplateParser();
-            ResultStream<Signature> resultStream = parser.parseString(s);
-            Signature parsed = resultStream.collect(Collectors.toList()).get(0).get();
+        STemplateParser parser = new STemplateParser();
+        ResultStream<Signature> resultStream = parser.parseString(signature);
+        Signature parsed = resultStream.collect(Collectors.toList()).get(0).get();
 
-            assertEquals(expected, parsed);
-            assertTrue(parsed instanceof BaseTemplate);
-            assertEquals(expected.getIri(), parsed.getIri());
-            assertEquals(expected.getParameters().size(), parsed.getParameters().size());
-            assertEquals(expected.getAnnotations().size(), parsed.getAnnotations().size());
-        }
+        assertTrue(parsed instanceof BaseTemplate);
+        assertEquals("http://example.com#T1", parsed.getIri());
+        assertEquals(0, parsed.getParameters().size());
+        assertEquals(0, parsed.getAnnotations().size());
+    }
+
+    @Test
+    public void testCorrectBaseTemplate2() {
+        String signature = "<http://example.com#T1> [ ?s ] @@<http://example.com#T2>(true) :: BASE .";
+
+        STemplateParser parser = new STemplateParser();
+        ResultStream<Signature> resultStream = parser.parseString(signature);
+        Signature parsed = resultStream.collect(Collectors.toList()).get(0).get();
+
+
+        Parameter firstParam = parsed.getParameters().get(0);
+
+        assertTrue(parsed instanceof BaseTemplate);
+        assertEquals("http://example.com#T1", parsed.getIri());
+        assertEquals(1, parsed.getParameters().size());
+        assertEquals(TypeRegistry.TOP, firstParam.getType());
+        assertTrue(firstParam.getTerm().isVariable());
+        assertFalse(firstParam.isOptional());
+        assertFalse(firstParam.isNonBlank());
+        assertEquals(1, parsed.getAnnotations().size());
+    }
+
+    @Test
+    public void testCorrecSignature1() {
+        String signature = "<http://example.com#T1> [ ??s ].";
+
+        STemplateParser parser = new STemplateParser();
+        ResultStream<Signature> resultStream = parser.parseString(signature);
+        Signature parsed = resultStream.collect(Collectors.toList()).get(0).get();
+
+        Parameter firstParam = parsed.getParameters().get(0);
+        assertEquals("http://example.com#T1", parsed.getIri());
+        assertEquals(1, parsed.getParameters().size());
+        assertEquals(TypeRegistry.TOP, firstParam.getType());
+        assertTrue(firstParam.getTerm().isVariable());
+        assertTrue(firstParam.isOptional());
+        assertFalse(firstParam.isNonBlank());
+        assertEquals(0, parsed.getAnnotations().size());
+    }
+
+    @Test
+    public void testCorrectSignature2() {
+        String signature = "<http://example.com#T1> [ !?s ].";
+
+        STemplateParser parser = new STemplateParser();
+        ResultStream<Signature> resultStream = parser.parseString(signature);
+        Signature parsed = resultStream.collect(Collectors.toList()).get(0).get();
+
+        Parameter firstParam = parsed.getParameters().get(0);
+
+        assertEquals("http://example.com#T1", parsed.getIri());
+        assertEquals(1, parsed.getParameters().size());
+        assertEquals(TypeRegistry.TOP, firstParam.getType());
+        assertTrue(firstParam.getTerm().isVariable());
+        assertFalse(firstParam.isOptional());
+        assertTrue(firstParam.isNonBlank());
+        assertEquals(0, parsed.getAnnotations().size());
+    }
+
+    @Test
+    public void testCorrectTemplate1() {
+        String signature = "@prefix ex: <http://example.com/ns#> . " +
+                "           @prefix ottr: <http://ns.ottr.xyz/0.4/> ." +
+                "               ex:T1[ ottr:IRI ?x ] :: {} .";
+
+        STemplateParser parser = new STemplateParser();
+        ResultStream<Signature> resultStream = parser.parseString(signature);
+        Signature parsed = resultStream.collect(Collectors.toList()).get(0).get();
+
+        Parameter firstParam = parsed.getParameters().get(0);
+
+        assertTrue(parsed instanceof Template);
+        assertEquals("http://example.com/ns#T1", parsed.getIri());
+        assertEquals(1, parsed.getParameters().size());
+        assertEquals(TypeRegistry.IRI, firstParam.getType());
+        assertTrue(firstParam.getTerm().isVariable());
+        assertFalse(firstParam.isOptional());
+        assertFalse(firstParam.isNonBlank());
+        assertEquals(0, parsed.getAnnotations().size());
+        assertEquals(0, ((Template) parsed).getPattern().size());
     }
 
     @Test
@@ -209,88 +277,6 @@ public class ParserTest {
             assertTrue(containsSubstring(consumer.getMessageHandler().getMessages(), expectedString));
         }
     }
-
-    @Test
-    public void testTest() {
-        String signatureString = "@prefix ex: <http://example.com/ns#> . " +
-                "@prefix ottr: <http://ns.ottr.xyz/0.4/> . " +
-                "ex:T1[ ottr:IRI ?x ] :: {} .";
-
-        STemplateParser parser = new STemplateParser();
-
-        List<Result<Signature>> parsedStream = parser.parseString(signatureString).collect(Collectors.toList());
-        Signature parsed = parsedStream.get(0).get();
-
-        IRITerm iriterm = new IRITerm("x");
-
-        Result<Parameter> p = ParameterBuilder.createParameter(Result.of(iriterm), TypeRegistry.get(OTTR.TypeURI.IRI), Result.of(Boolean.FALSE), Result.of(Boolean.FALSE), Result.empty());
-
-        Result<Signature> expectedSignature = SignatureBuilder.builder()
-                .iri(Result.of("http://example.com/ns#T1"))
-                .parameters(Result.of(List.of(p.get())))
-                .annotations(Result.empty())
-                .build();
-
-        Result<Template> resultTemplate = TemplateBuilder.builder()
-                .signature(expectedSignature)
-                .instances(Result.of(new HashSet<>()))
-                .build();
-
-        Template expected = resultTemplate.get();
-
-        assertTrue(parsed instanceof Template);
-        assertEquals(parsed.getIri(), expected.getIri());
-        assertEquals(parsed.getParameters().size(), expected.getParameters().size());
-        assertEquals(parsed.getAnnotations().size(), expected.getAnnotations().size());
-        assertEquals(((Template) parsed).getPattern().size(), expected.getPattern().size());
-
-        for (int i = 0; i < expected.getParameters().size(); i++) {
-            assertEquals(expected.getParameters().get(i).getType(), parsed.getParameters().get(i).getType());
-        }
-        //assertEquals(parsed, expected);
-    }
-
-
-    public Signature buildBaseTemplate(String signatureString) {
-        Result<Signature> baseTemplateSignature;
-        Result<BaseTemplate> baseTemplate;
-
-        List<Parameter> parameters = new ArrayList<>();
-
-        String iriName = signatureString.substring(signatureString.indexOf("<")+1, signatureString.indexOf(">"));
-        String parameterString = signatureString.substring(signatureString.indexOf("[")+1, signatureString.indexOf("]"));
-
-        if (!parameterString.isBlank()) {
-            String[] parameterStringSplitted = parameterString.split(",");
-
-            for (String s : parameterStringSplitted) {
-                s = s.trim();
-                String name = s.substring(s.lastIndexOf("?")+1);
-                IRITerm iriTerm = new IRITerm(name);
-
-                // TODO: consider modifiers
-
-                Result<Parameter> p = ParameterBuilder.createParameter(Result.of(iriTerm), TypeRegistry.get(OTTR.TypeURI.Top), Result.of(Boolean.FALSE), Result.of(Boolean.FALSE), Result.empty());
-                parameters.add(p.get());
-            }
-
-            // TODO: build annotations
-
-        }
-
-        baseTemplateSignature = SignatureBuilder.builder()
-                .iri(Result.of(iriName))
-                .parameters(Result.of(parameters))
-                .annotations(Result.empty())
-                .build();
-
-        baseTemplate = BaseTemplateBuilder.builder()
-                .signature(baseTemplateSignature)
-                .build();
-
-        return baseTemplate.get();
-    }
-
 
     private void testSignatureParsing(String signatureString) {
 
