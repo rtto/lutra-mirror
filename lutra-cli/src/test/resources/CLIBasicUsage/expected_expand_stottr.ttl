@@ -1,0 +1,13 @@
+@prefix ex: <http://example.com/ns#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix ottr: <http://ns.ottr.xyz/0.4/> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+
+ex:Ann  foaf:mbox  <mailto:ann.strong@example.com> ;
+        rdf:type   foaf:Person .
+
+ex:Bob  foaf:mbox  <mailto:bob.ho@example.com> ;
+        rdf:type   foaf:Person .

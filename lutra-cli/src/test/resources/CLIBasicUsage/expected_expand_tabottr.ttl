@@ -1,0 +1,371 @@
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix ottr: <http://ns.ottr.xyz/0.4/> .
+
+<http://example.com#Margherita>
+        rdfs:subClassOf  <http://www.co-ode.org/ontologies/pizza/pizza.owl#NamedPizza> .
+
+_:b0    rdf:type           owl:Restriction ;
+        owl:onProperty     <http://www.co-ode.org/ontologies/pizza/pizza.owl#hasTopping> ;
+        owl:allValuesFrom  _:b1 .
+
+_:b1    rdf:type  owl:Class .
+
+<http://www.co-ode.org/ontologies/pizza/pizza.owl#hasTopping>
+        rdf:type  owl:ObjectProperty .
+
+<http://example.com#Margherita>
+        rdfs:subClassOf  _:b0 .
+
+_:b2    rdf:type            owl:Restriction ;
+        owl:onProperty      <http://www.co-ode.org/ontologies/pizza/pizza.owl#hasTopping> ;
+        owl:someValuesFrom  <http://example.com#Tomato> .
+
+<http://www.co-ode.org/ontologies/pizza/pizza.owl#hasTopping>
+        rdf:type  owl:ObjectProperty .
+
+<http://example.com#Tomato>
+        rdf:type  owl:Class .
+
+<http://example.com#Margherita>
+        rdfs:subClassOf  _:b2 .
+
+_:b3    rdf:type            owl:Restriction ;
+        owl:onProperty      <http://www.co-ode.org/ontologies/pizza/pizza.owl#hasTopping> ;
+        owl:someValuesFrom  <http://example.com#Mozzarella> .
+
+<http://www.co-ode.org/ontologies/pizza/pizza.owl#hasTopping>
+        rdf:type  owl:ObjectProperty .
+
+<http://example.com#Mozzarella>
+        rdf:type  owl:Class .
+
+<http://example.com#Margherita>
+        rdfs:subClassOf  _:b3 .
+
+_:b4    rdf:type        owl:Restriction ;
+        owl:onProperty  <http://www.co-ode.org/ontologies/pizza/pizza.owl#hasCountryOfOrigin> ;
+        owl:hasValue    <http://example.com#Italy> .
+
+<http://www.co-ode.org/ontologies/pizza/pizza.owl#hasCountryOfOrigin>
+        rdf:type  owl:ObjectProperty .
+
+<http://example.com#Margherita>
+        rdfs:subClassOf  _:b4 .
+
+_:b1    rdf:type     owl:Class ;
+        owl:unionOf  _:b5 .
+
+_:b5    rdf:rest   _:b6 ;
+        rdf:first  <http://example.com#Tomato> .
+
+_:b6    rdf:rest   rdf:nil ;
+        rdf:first  <http://example.com#Mozzarella> .
+
+<http://example.com#Grandiosa>
+        rdfs:subClassOf  <http://www.co-ode.org/ontologies/pizza/pizza.owl#NamedPizza> .
+
+_:b7    rdf:type           owl:Restriction ;
+        owl:onProperty     <http://www.co-ode.org/ontologies/pizza/pizza.owl#hasTopping> ;
+        owl:allValuesFrom  _:b8 .
+
+_:b8    rdf:type  owl:Class .
+
+<http://www.co-ode.org/ontologies/pizza/pizza.owl#hasTopping>
+        rdf:type  owl:ObjectProperty .
+
+<http://example.com#Grandiosa>
+        rdfs:subClassOf  _:b7 .
+
+_:b9    rdf:type            owl:Restriction ;
+        owl:onProperty      <http://www.co-ode.org/ontologies/pizza/pizza.owl#hasTopping> ;
+        owl:someValuesFrom  <http://example.com#Tomato> .
+
+<http://www.co-ode.org/ontologies/pizza/pizza.owl#hasTopping>
+        rdf:type  owl:ObjectProperty .
+
+<http://example.com#Tomato>
+        rdf:type  owl:Class .
+
+<http://example.com#Grandiosa>
+        rdfs:subClassOf  _:b9 .
+
+_:b10   rdf:type            owl:Restriction ;
+        owl:onProperty      <http://www.co-ode.org/ontologies/pizza/pizza.owl#hasTopping> ;
+        owl:someValuesFrom  <http://example.com#Jarlsberg> .
+
+<http://www.co-ode.org/ontologies/pizza/pizza.owl#hasTopping>
+        rdf:type  owl:ObjectProperty .
+
+<http://example.com#Jarlsberg>
+        rdf:type  owl:Class .
+
+<http://example.com#Grandiosa>
+        rdfs:subClassOf  _:b10 .
+
+_:b11   rdf:type            owl:Restriction ;
+        owl:onProperty      <http://www.co-ode.org/ontologies/pizza/pizza.owl#hasTopping> ;
+        owl:someValuesFrom  <http://example.com#Ham> .
+
+<http://www.co-ode.org/ontologies/pizza/pizza.owl#hasTopping>
+        rdf:type  owl:ObjectProperty .
+
+<http://example.com#Ham>
+        rdf:type  owl:Class .
+
+<http://example.com#Grandiosa>
+        rdfs:subClassOf  _:b11 .
+
+_:b12   rdf:type            owl:Restriction ;
+        owl:onProperty      <http://www.co-ode.org/ontologies/pizza/pizza.owl#hasTopping> ;
+        owl:someValuesFrom  <http://example.com#SweetPepper> .
+
+<http://www.co-ode.org/ontologies/pizza/pizza.owl#hasTopping>
+        rdf:type  owl:ObjectProperty .
+
+<http://example.com#SweetPepper>
+        rdf:type  owl:Class .
+
+<http://example.com#Grandiosa>
+        rdfs:subClassOf  _:b12 .
+
+_:b13   rdf:type        owl:Restriction ;
+        owl:onProperty  <http://www.co-ode.org/ontologies/pizza/pizza.owl#hasCountryOfOrigin> ;
+        owl:hasValue    <http://example.com#Norway> .
+
+<http://www.co-ode.org/ontologies/pizza/pizza.owl#hasCountryOfOrigin>
+        rdf:type  owl:ObjectProperty .
+
+<http://example.com#Grandiosa>
+        rdfs:subClassOf  _:b13 .
+
+_:b8    rdf:type     owl:Class ;
+        owl:unionOf  _:b14 .
+
+_:b14   rdf:rest   _:b15 ;
+        rdf:first  <http://example.com#Tomato> .
+
+_:b16   rdf:rest   rdf:nil ;
+        rdf:first  <http://example.com#SweetPepper> .
+
+_:b15   rdf:rest   _:b17 ;
+        rdf:first  <http://example.com#Jarlsberg> .
+
+_:b17   rdf:rest   _:b16 ;
+        rdf:first  <http://example.com#Ham> .
+
+<http://example.com#Hawaii>
+        rdfs:subClassOf  <http://www.co-ode.org/ontologies/pizza/pizza.owl#NamedPizza> .
+
+_:b18   rdf:type           owl:Restriction ;
+        owl:onProperty     <http://www.co-ode.org/ontologies/pizza/pizza.owl#hasTopping> ;
+        owl:allValuesFrom  _:b19 .
+
+_:b19   rdf:type  owl:Class .
+
+<http://www.co-ode.org/ontologies/pizza/pizza.owl#hasTopping>
+        rdf:type  owl:ObjectProperty .
+
+<http://example.com#Hawaii>
+        rdfs:subClassOf  _:b18 .
+
+_:b20   rdf:type            owl:Restriction ;
+        owl:onProperty      <http://www.co-ode.org/ontologies/pizza/pizza.owl#hasTopping> ;
+        owl:someValuesFrom  <http://example.com#Tomato> .
+
+<http://www.co-ode.org/ontologies/pizza/pizza.owl#hasTopping>
+        rdf:type  owl:ObjectProperty .
+
+<http://example.com#Tomato>
+        rdf:type  owl:Class .
+
+<http://example.com#Hawaii>
+        rdfs:subClassOf  _:b20 .
+
+_:b21   rdf:type            owl:Restriction ;
+        owl:onProperty      <http://www.co-ode.org/ontologies/pizza/pizza.owl#hasTopping> ;
+        owl:someValuesFrom  <http://example.com#Cheese> .
+
+<http://www.co-ode.org/ontologies/pizza/pizza.owl#hasTopping>
+        rdf:type  owl:ObjectProperty .
+
+<http://example.com#Cheese>
+        rdf:type  owl:Class .
+
+<http://example.com#Hawaii>
+        rdfs:subClassOf  _:b21 .
+
+_:b22   rdf:type            owl:Restriction ;
+        owl:onProperty      <http://www.co-ode.org/ontologies/pizza/pizza.owl#hasTopping> ;
+        owl:someValuesFrom  <http://example.com#Ham> .
+
+<http://www.co-ode.org/ontologies/pizza/pizza.owl#hasTopping>
+        rdf:type  owl:ObjectProperty .
+
+<http://example.com#Ham>
+        rdf:type  owl:Class .
+
+<http://example.com#Hawaii>
+        rdfs:subClassOf  _:b22 .
+
+_:b23   rdf:type            owl:Restriction ;
+        owl:onProperty      <http://www.co-ode.org/ontologies/pizza/pizza.owl#hasTopping> ;
+        owl:someValuesFrom  <http://example.com#PineApple> .
+
+<http://www.co-ode.org/ontologies/pizza/pizza.owl#hasTopping>
+        rdf:type  owl:ObjectProperty .
+
+<http://example.com#PineApple>
+        rdf:type  owl:Class .
+
+<http://example.com#Hawaii>
+        rdfs:subClassOf  _:b23 .
+
+_:b19   rdf:type     owl:Class ;
+        owl:unionOf  _:b24 .
+
+_:b25   rdf:rest   _:b26 ;
+        rdf:first  <http://example.com#Cheese> .
+
+_:b24   rdf:rest   _:b25 ;
+        rdf:first  <http://example.com#Tomato> .
+
+_:b27   rdf:rest   rdf:nil ;
+        rdf:first  <http://example.com#PineApple> .
+
+_:b26   rdf:rest   _:b27 ;
+        rdf:first  <http://example.com#Ham> .
+
+<http://example.com#BigOne>
+        rdfs:subClassOf  <http://www.co-ode.org/ontologies/pizza/pizza.owl#NamedPizza> .
+
+_:b28   rdf:type           owl:Restriction ;
+        owl:onProperty     <http://www.co-ode.org/ontologies/pizza/pizza.owl#hasTopping> ;
+        owl:allValuesFrom  _:b29 .
+
+_:b29   rdf:type  owl:Class .
+
+<http://www.co-ode.org/ontologies/pizza/pizza.owl#hasTopping>
+        rdf:type  owl:ObjectProperty .
+
+<http://example.com#BigOne>
+        rdfs:subClassOf  _:b28 .
+
+_:b30   rdf:type            owl:Restriction ;
+        owl:onProperty      <http://www.co-ode.org/ontologies/pizza/pizza.owl#hasTopping> ;
+        owl:someValuesFrom  <http://example.com#Tomato> .
+
+<http://www.co-ode.org/ontologies/pizza/pizza.owl#hasTopping>
+        rdf:type  owl:ObjectProperty .
+
+<http://example.com#Tomato>
+        rdf:type  owl:Class .
+
+<http://example.com#BigOne>
+        rdfs:subClassOf  _:b30 .
+
+_:b31   rdf:type            owl:Restriction ;
+        owl:onProperty      <http://www.co-ode.org/ontologies/pizza/pizza.owl#hasTopping> ;
+        owl:someValuesFrom  <http://example.com#Cheese> .
+
+<http://www.co-ode.org/ontologies/pizza/pizza.owl#hasTopping>
+        rdf:type  owl:ObjectProperty .
+
+<http://example.com#Cheese>
+        rdf:type  owl:Class .
+
+<http://example.com#BigOne>
+        rdfs:subClassOf  _:b31 .
+
+_:b32   rdf:type            owl:Restriction ;
+        owl:onProperty      <http://www.co-ode.org/ontologies/pizza/pizza.owl#hasTopping> ;
+        owl:someValuesFrom  <http://example.com#Ham> .
+
+<http://www.co-ode.org/ontologies/pizza/pizza.owl#hasTopping>
+        rdf:type  owl:ObjectProperty .
+
+<http://example.com#Ham>
+        rdf:type  owl:Class .
+
+<http://example.com#BigOne>
+        rdfs:subClassOf  _:b32 .
+
+_:b29   rdf:type     owl:Class ;
+        owl:unionOf  _:b33 .
+
+_:b34   rdf:rest   rdf:nil ;
+        rdf:first  <http://example.com#Ham> .
+
+_:b35   rdf:rest   _:b34 ;
+        rdf:first  <http://example.com#Cheese> .
+
+_:b33   rdf:rest   _:b35 ;
+        rdf:first  <http://example.com#Tomato> .
+
+<http://example.com#TuttiFrutti>
+        rdfs:subClassOf  <http://www.co-ode.org/ontologies/pizza/pizza.owl#NamedPizza> .
+
+_:b36   rdf:type           owl:Restriction ;
+        owl:onProperty     <http://www.co-ode.org/ontologies/pizza/pizza.owl#hasTopping> ;
+        owl:allValuesFrom  _:b37 .
+
+_:b37   rdf:type  owl:Class .
+
+<http://www.co-ode.org/ontologies/pizza/pizza.owl#hasTopping>
+        rdf:type  owl:ObjectProperty .
+
+<http://example.com#TuttiFrutti>
+        rdfs:subClassOf  _:b36 .
+
+_:b38   rdf:type            owl:Restriction ;
+        owl:onProperty      <http://www.co-ode.org/ontologies/pizza/pizza.owl#hasTopping> ;
+        owl:someValuesFrom  <http://example.com#Tomato> .
+
+<http://www.co-ode.org/ontologies/pizza/pizza.owl#hasTopping>
+        rdf:type  owl:ObjectProperty .
+
+<http://example.com#Tomato>
+        rdf:type  owl:Class .
+
+<http://example.com#TuttiFrutti>
+        rdfs:subClassOf  _:b38 .
+
+_:b39   rdf:type            owl:Restriction ;
+        owl:onProperty      <http://www.co-ode.org/ontologies/pizza/pizza.owl#hasTopping> ;
+        owl:someValuesFrom  <http://example.com#Apple> .
+
+<http://www.co-ode.org/ontologies/pizza/pizza.owl#hasTopping>
+        rdf:type  owl:ObjectProperty .
+
+<http://example.com#Apple>
+        rdf:type  owl:Class .
+
+<http://example.com#TuttiFrutti>
+        rdfs:subClassOf  _:b39 .
+
+_:b40   rdf:type            owl:Restriction ;
+        owl:onProperty      <http://www.co-ode.org/ontologies/pizza/pizza.owl#hasTopping> ;
+        owl:someValuesFrom  <http://example.com#Pear> .
+
+<http://www.co-ode.org/ontologies/pizza/pizza.owl#hasTopping>
+        rdf:type  owl:ObjectProperty .
+
+<http://example.com#Pear>
+        rdf:type  owl:Class .
+
+<http://example.com#TuttiFrutti>
+        rdfs:subClassOf  _:b40 .
+
+_:b37   rdf:type     owl:Class ;
+        owl:unionOf  _:b41 .
+
+_:b42   rdf:rest   _:b43 ;
+        rdf:first  <http://example.com#Apple> .
+
+_:b43   rdf:rest   rdf:nil ;
+        rdf:first  <http://example.com#Pear> .
+
+_:b41   rdf:rest   _:b42 ;
+        rdf:first  <http://example.com#Tomato> .
