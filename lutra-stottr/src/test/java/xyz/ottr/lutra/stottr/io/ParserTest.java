@@ -75,6 +75,20 @@ public class ParserTest {
         assertEquals(makePrefixes(), parsed.get());
     }
 
+    @Test
+    public void testIncorrectPrefixes() {
+        SPrefixParser prefixParser = new SPrefixParser();
+
+        List<String> prefixes = Arrays.asList("@prefix ex <http://example.org/> .",
+                "@prefix rdf : <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .",
+                "@prefix ottr:  <http://ns.ottr.xyz/0.4/>  ");
+
+        for (String p : prefixes) {
+            Result<Map<String, String>> parsed = SParserUtils.parseString(p, prefixParser);
+            Assertions.atLeast(parsed, Message.Severity.ERROR);
+        }
+    }
+
     ///
     /// Terms
     ///
@@ -153,20 +167,20 @@ public class ParserTest {
         }
     }
 
+    private void testSignatureParsing(String signatureString) {
 
-    public boolean containsSubstring(List<Message> messages, String substring) {
-        String modifiedSubstring = substring.trim().toLowerCase();
+        STemplateParser parser = new STemplateParser();
 
-        for (Message m : messages) {
-            String s = m.getMessage().toLowerCase();
-            return s.contains(modifiedSubstring);
-        }
-        return false;
+        ResultConsumer<Signature> consumer = new ResultConsumer<>();
+        parser.parseString(signatureString).forEach(consumer);
+
+        Assertions.noErrors(consumer);
     }
 
     @Test
-    public void testCorrectBaseTemplate1() {
-        String signature = "<http://example.com#T1> [  ] :: BASE .";
+    public void testBaseTemplate1() {
+        String signature = "<http://example.com#T1> [ ] :: BASE .";
+        testSignatureParsing(signature);
 
         STemplateParser parser = new STemplateParser();
         ResultStream<Signature> resultStream = parser.parseString(signature);
@@ -179,13 +193,32 @@ public class ParserTest {
     }
 
     @Test
-    public void testCorrectBaseTemplate2() {
-        String signature = "<http://example.com#T1> [ ?s ] @@<http://example.com#T2>(true) :: BASE .";
+    public void testBaseTemplate2() {
+        String signature = "<http://example.com#T1> [ ?s ] :: BASE .";
+        testSignatureParsing(signature);
 
         STemplateParser parser = new STemplateParser();
         ResultStream<Signature> resultStream = parser.parseString(signature);
         Signature parsed = resultStream.collect(Collectors.toList()).get(0).get();
 
+        Parameter firstParam = parsed.getParameters().get(0);
+        assertTrue(parsed instanceof BaseTemplate);
+        assertEquals("http://example.com#T1", parsed.getIri());
+        assertEquals(1, parsed.getParameters().size());
+        assertFalse(firstParam.isOptional());
+        assertFalse(firstParam.isNonBlank());
+        assertFalse(firstParam.hasDefaultValue());
+        assertEquals(0, parsed.getAnnotations().size());
+    }
+
+    @Test
+    public void testBaseTemplate3() {
+        String signature = "<http://example.com#T1> [ ?s ] @@<http://example.com#T2>(true) :: BASE .";
+        testSignatureParsing(signature);
+
+        STemplateParser parser = new STemplateParser();
+        ResultStream<Signature> resultStream = parser.parseString(signature);
+        Signature parsed = resultStream.collect(Collectors.toList()).get(0).get();
 
         Parameter firstParam = parsed.getParameters().get(0);
 
@@ -196,30 +229,78 @@ public class ParserTest {
         assertTrue(firstParam.getTerm().isVariable());
         assertFalse(firstParam.isOptional());
         assertFalse(firstParam.isNonBlank());
+        assertFalse(firstParam.hasDefaultValue());
         assertEquals(1, parsed.getAnnotations().size());
     }
 
     @Test
-    public void testCorrecSignature1() {
-        String signature = "<http://example.com#T1> [ ??s ].";
+    public void testBaseTemplate4() {
+        String signature = "<http://example.com#T1> [ ?s ] "
+                + "@@<http://example.com#T2>(true), "
+                + "@@<http://example.com#T2>(true)"
+                + " :: BASE .";
+
+        testSignatureParsing(signature);
 
         STemplateParser parser = new STemplateParser();
         ResultStream<Signature> resultStream = parser.parseString(signature);
         Signature parsed = resultStream.collect(Collectors.toList()).get(0).get();
 
         Parameter firstParam = parsed.getParameters().get(0);
+
+        assertTrue(parsed instanceof BaseTemplate);
+        assertEquals("http://example.com#T1", parsed.getIri());
+        assertEquals(1, parsed.getParameters().size());
+        assertEquals(TypeRegistry.TOP, firstParam.getType());
+        assertTrue(firstParam.getTerm().isVariable());
+        assertFalse(firstParam.isOptional());
+        assertFalse(firstParam.isNonBlank());
+        assertFalse(firstParam.hasDefaultValue());
+        assertEquals(1, parsed.getAnnotations().size());
+    }
+
+    @Test
+    public void testIncorrectBaseTemplates() {
+        String expectedString = "syntax error";
+
+        List<String> signatures = Arrays.asList(
+                "<http://example.com#T1> [  ] :: BASE ",
+                "<http://example.com#T1> [  ] BASE "
+        );
+
+        for (String s : signatures) {
+            STemplateParser parser = new STemplateParser();
+            ResultConsumer<Signature> consumer = new ResultConsumer<>();
+            parser.parseString(s).forEach(consumer);
+            assertTrue(containsSubstring(consumer.getMessageHandler().getMessages(), expectedString));
+        }
+    }
+
+    @Test
+    public void testSignature1() {
+        String signature = "<http://example.com#T1> [ ??s ].";
+        testSignatureParsing(signature);
+
+        STemplateParser parser = new STemplateParser();
+        ResultStream<Signature> resultStream = parser.parseString(signature);
+        Signature parsed = resultStream.collect(Collectors.toList()).get(0).get();
+
+        Parameter firstParam = parsed.getParameters().get(0);
+
         assertEquals("http://example.com#T1", parsed.getIri());
         assertEquals(1, parsed.getParameters().size());
         assertEquals(TypeRegistry.TOP, firstParam.getType());
         assertTrue(firstParam.getTerm().isVariable());
         assertTrue(firstParam.isOptional());
         assertFalse(firstParam.isNonBlank());
+        assertFalse(firstParam.hasDefaultValue());
         assertEquals(0, parsed.getAnnotations().size());
     }
 
     @Test
-    public void testCorrectSignature2() {
+    public void testSignature2() {
         String signature = "<http://example.com#T1> [ !?s ].";
+        testSignatureParsing(signature);
 
         STemplateParser parser = new STemplateParser();
         ResultStream<Signature> resultStream = parser.parseString(signature);
@@ -233,11 +314,195 @@ public class ParserTest {
         assertTrue(firstParam.getTerm().isVariable());
         assertFalse(firstParam.isOptional());
         assertTrue(firstParam.isNonBlank());
+        assertFalse(firstParam.hasDefaultValue());
         assertEquals(0, parsed.getAnnotations().size());
     }
 
     @Test
-    public void testCorrectTemplate1() {
+    public void testSignature3() {
+        String signature = "<http://example.com#T1> [ ?!?s ].";
+        testSignatureParsing(signature);
+
+        STemplateParser parser = new STemplateParser();
+        ResultStream<Signature> resultStream = parser.parseString(signature);
+        Signature parsed = resultStream.collect(Collectors.toList()).get(0).get();
+
+        Parameter firstParam = parsed.getParameters().get(0);
+
+        assertEquals("http://example.com#T1", parsed.getIri());
+        assertEquals(1, parsed.getParameters().size());
+        assertEquals(TypeRegistry.TOP, firstParam.getType());
+        assertTrue(firstParam.getTerm().isVariable());
+        assertTrue(firstParam.isOptional());
+        assertTrue(firstParam.isNonBlank());
+        assertFalse(firstParam.hasDefaultValue());
+        assertEquals(0, parsed.getAnnotations().size());
+    }
+
+    @Test
+    public void testSignatureDefaultValueClass() {
+        String signature = "@prefix ex:     <http://example.com/ns#> . "
+                + "@prefix p: <http://tpl.ottr.xyz/pizza/0.1/> ."
+                + "ex:NamedPizza [ ?pizza = p:pizza] .";
+
+        testSignatureParsing(signature);
+
+        STemplateParser parser = new STemplateParser();
+        ResultStream<Signature> resultStream = parser.parseString(signature);
+        Signature parsed = resultStream.collect(Collectors.toList()).get(0).get();
+
+        Parameter firstParam = parsed.getParameters().get(0);
+
+        assertEquals("http://example.com/ns#NamedPizza", parsed.getIri());
+        assertEquals(1, parsed.getParameters().size());
+        assertEquals(TypeRegistry.TOP, firstParam.getType());
+        assertTrue(firstParam.getTerm().isVariable());
+        assertFalse(firstParam.isOptional());
+        assertFalse(firstParam.isNonBlank());
+        assertTrue(firstParam.hasDefaultValue());
+        assertEquals("http://tpl.ottr.xyz/pizza/0.1/pizza", firstParam.getDefaultValue().getIdentifier().toString());
+        assertEquals(0, parsed.getAnnotations().size());
+    }
+
+    @Test
+    public void testSignatureDefaultValueInt() {
+        String signature = "@prefix ex:     <http://example.com/ns#> . "
+                + "ex:NamedPizza [ ?pizza = 2] .";
+
+        testSignatureParsing(signature);
+
+        STemplateParser parser = new STemplateParser();
+        ResultStream<Signature> resultStream = parser.parseString(signature);
+        Signature parsed = resultStream.collect(Collectors.toList()).get(0).get();
+
+        Parameter firstParam = parsed.getParameters().get(0);
+
+        assertEquals("http://example.com/ns#NamedPizza", parsed.getIri());
+        assertEquals(1, parsed.getParameters().size());
+        assertEquals(TypeRegistry.TOP, firstParam.getType());
+        assertTrue(firstParam.getTerm().isVariable());
+        assertFalse(firstParam.isOptional());
+        assertFalse(firstParam.isNonBlank());
+        assertTrue(firstParam.hasDefaultValue());
+        assertEquals("\"2\"^^http://www.w3.org/2001/XMLSchema#integer", firstParam.getDefaultValue().getIdentifier().toString());
+        assertEquals(0, parsed.getAnnotations().size());
+    }
+
+    @Test
+    public void testSignatureDefaultValueString() {
+        String signature = "@prefix ex:     <http://example.com/ns#> . "
+                + "ex:NamedPizza [ ?pizza = 'pizza'] .";
+        testSignatureParsing(signature);
+
+        STemplateParser parser = new STemplateParser();
+        ResultStream<Signature> resultStream = parser.parseString(signature);
+        Signature parsed = resultStream.collect(Collectors.toList()).get(0).get();
+
+        Parameter firstParam = parsed.getParameters().get(0);
+
+        assertEquals("http://example.com/ns#NamedPizza", parsed.getIri());
+        assertEquals(1, parsed.getParameters().size());
+        assertEquals(TypeRegistry.TOP, firstParam.getType());
+        assertTrue(firstParam.getTerm().isVariable());
+        assertFalse(firstParam.isOptional());
+        assertFalse(firstParam.isNonBlank());
+        assertTrue(firstParam.hasDefaultValue());
+        assertEquals("\"'pizza'\"^^http://www.w3.org/2001/XMLSchema#string", firstParam.getDefaultValue().getIdentifier().toString());
+        assertEquals(0, parsed.getAnnotations().size());
+    }
+
+    @Test
+    public void testSignatureDefaultValueList() {
+        String signature = "@prefix ex:     <http://example.com/ns#> . "
+                + "ex:NamedPizza ["
+                + "  ?pizza = 'pizza' ,"
+                + "  ?country = ('Italy', 'Spain') ,  "
+                + "  ?toppings = ((()))] .";
+
+        testSignatureParsing(signature);
+
+        STemplateParser parser = new STemplateParser();
+        ResultStream<Signature> resultStream = parser.parseString(signature);
+        Signature parsed = resultStream.collect(Collectors.toList()).get(0).get();
+
+        Parameter firstParam = parsed.getParameters().get(0);
+        Parameter secondParam = parsed.getParameters().get(1);
+        Parameter thirdParam = parsed.getParameters().get(2);
+
+        assertEquals("http://example.com/ns#NamedPizza", parsed.getIri());
+        assertEquals(3, parsed.getParameters().size());
+        assertEquals(TypeRegistry.TOP, firstParam.getType());
+        assertTrue(firstParam.getTerm().isVariable());
+        assertFalse(firstParam.isOptional());
+        assertFalse(firstParam.isNonBlank());
+        assertTrue(firstParam.hasDefaultValue());
+        assertEquals("\"'pizza'\"^^http://www.w3.org/2001/XMLSchema#string", firstParam.getDefaultValue().getIdentifier().toString());
+        // TODO: verify second and third parameter
+        assertEquals(0, parsed.getAnnotations().size());
+    }
+
+    @Test
+    public void testIncorrectSignatures() {
+        String expectedString = "syntax error";
+
+        List<String> signatures = Arrays.asList(
+                "<http://example.com#T1> [  ]",
+                "<http://example.com#T1> [  ] :: { ",
+                "<http://example.com#T1 [  ] . "
+        );
+
+        for (String s : signatures) {
+            STemplateParser parser = new STemplateParser();
+            ResultConsumer<Signature> consumer = new ResultConsumer<>();
+            parser.parseString(s).forEach(consumer);
+            assertTrue(containsSubstring(consumer.getMessageHandler().getMessages(), expectedString));
+        }
+    }
+
+
+    @Test
+    public void testTemplate() {
+
+        String template = "@prefix rdf:    <http://www.w3.org/1999/02/22-rdf-syntax-ns#> . "
+            + "@prefix foaf:   <http://xmlns.com/foaf/0.1/> . "
+            + "@prefix ex:     <http://example.com/ns#> . "
+            + "@prefix ottr:   <http://ns.ottr.xyz/0.4/> . "
+            + " ex:Person[ ?firstName, ?lastName, ?email ] :: { "
+            + "  ottr:Triple (_:person, rdf:type, foaf:Person ), "
+            + "  ottr:Triple (_:person, foaf:firstName, ?firstName ), "
+            + "  ottr:Triple (_:person, foaf:lastName, ?lastName ), "
+            + "  ottr:Triple (_:person, foaf:mbox, ?email ) "
+            + "} .";
+
+        testSignatureParsing(template);
+
+        STemplateParser parser = new STemplateParser();
+        ResultStream<Signature> resultStream = parser.parseString(template);
+        Signature parsed = resultStream.collect(Collectors.toList()).get(0).get();
+
+        Parameter firstParam = parsed.getParameters().get(0);
+        Parameter secondParam = parsed.getParameters().get(1);
+        Parameter thirdParam = parsed.getParameters().get(2);
+
+        assertTrue(parsed instanceof Template);
+        assertEquals("http://example.com/ns#Person", parsed.getIri());
+        assertEquals(3, parsed.getParameters().size());
+        assertFalse(firstParam.isOptional());
+        assertFalse(firstParam.isNonBlank());
+        assertFalse(firstParam.hasDefaultValue());
+        assertFalse(secondParam.isOptional());
+        assertFalse(secondParam.isNonBlank());
+        assertFalse(secondParam.hasDefaultValue());
+        assertFalse(thirdParam.isOptional());
+        assertFalse(thirdParam.isNonBlank());
+        assertFalse(thirdParam.hasDefaultValue());
+        assertEquals(4, ((Template) parsed).getPattern().size());
+        assertEquals(0, parsed.getAnnotations().size());
+
+    }
+
+    @Test
+    public void testTemplateEmptPattern() {
         String signature = "@prefix ex: <http://example.com/ns#> . " +
                 "           @prefix ottr: <http://ns.ottr.xyz/0.4/> ." +
                 "               ex:T1[ ottr:IRI ?x ] :: {} .";
@@ -260,113 +525,6 @@ public class ParserTest {
     }
 
     @Test
-    public void testIncorrectSignatures() {
-        String expectedString = "syntax error";
-
-        List<String> signatures = Arrays.asList(
-                "<http://example.com#T1> [  ] :: BASE ",
-                "<http://example.com#T1> [  ] BASE ",
-                "<http://example.com#T1> [  ]",
-                "<http://example.com#T1> [  ] :: { "
-        );
-
-        for (String s : signatures) {
-            STemplateParser parser = new STemplateParser();
-            ResultConsumer<Signature> consumer = new ResultConsumer<>();
-            parser.parseString(s).forEach(consumer);
-            assertTrue(containsSubstring(consumer.getMessageHandler().getMessages(), expectedString));
-        }
-    }
-
-    private void testSignatureParsing(String signatureString) {
-
-        STemplateParser parser = new STemplateParser();
-
-        ResultConsumer<Signature> consumer = new ResultConsumer<>();
-        parser.parseString(signatureString).forEach(consumer);
-
-        Assertions.noErrors(consumer);
-    }
-
-    @Test
-    public void testSignature1() {
-        testSignatureParsing("<http://example.com#T1> [ ?s ] :: BASE .");
-    }
-
-    @Test
-    public void testSignature2() {
-        testSignatureParsing("<http://example.com#T1> [ ?s ] @@<http://example.com#T2>(true) :: BASE .");
-    }
-
-    @Test
-    public void testSignature3() {
-        testSignatureParsing("<http://example.com#T1> [ ?s ] "
-            + "@@<http://example.com#T2>(true), "
-            + "@@<http://example.com#T2>(true)"
-            + " :: BASE .");
-    }
-
-    @Test
-    public void testSignature4() {
-        testSignatureParsing("<http://example.com#T1> [ ??s ].");
-    }
-
-    @Test
-    public void testSignature5() {
-        testSignatureParsing("<http://example.com#T1> [ !?s ].");
-    }
-
-    @Test
-    public void testSignature6() {
-        testSignatureParsing("<http://example.com#T1> [ ?!?s ].");
-    }
-
-    @Test
-    public void testDefaultValueClass() {
-        testSignatureParsing("@prefix ex:     <http://example.com/ns#> . "
-                + "@prefix p: <http://tpl.ottr.xyz/pizza/0.1/> ."
-                + "ex:NamedPizza [ ?pizza = p:pizza] .");
-    }
-
-    @Test
-    public void testDefaultValueInt() {
-        testSignatureParsing("@prefix ex:     <http://example.com/ns#> . "
-                + "ex:NamedPizza [ ?pizza = 2] .");
-    }
-
-    @Test
-    public void testDefaultValueString() {
-        testSignatureParsing("@prefix ex:     <http://example.com/ns#> . "
-                + "ex:NamedPizza [ ?pizza = 'pizza'] .");
-    }
-
-    @Test
-    public void testLists() {
-        testSignatureParsing("@prefix ex:     <http://example.com/ns#> . "
-                + "ex:NamedPizza ["
-                + "  ?pizza = 'pizza' ,"
-                + "  ?country = ('Italy', 'Spain') ,  "
-                + "  ?toppings = ((()))] .");
-    }
-
-    @Test
-    public void testTemplate() {
-
-        String template = "@prefix rdf:    <http://www.w3.org/1999/02/22-rdf-syntax-ns#> . "
-            + "@prefix foaf:   <http://xmlns.com/foaf/0.1/> . "
-            + "@prefix ex:     <http://example.com/ns#> . "
-            + "@prefix ottr:   <http://ns.ottr.xyz/0.4/> . "
-            + " ex:Person[ ?firstName, ?lastName, ?email ] :: { "
-            + "  ottr:Triple (_:person, rdf:type, foaf:Person ), "
-            + "  ottr:Triple (_:person, foaf:firstName, ?firstName ), "
-            + "  ottr:Triple (_:person, foaf:lastName, ?lastName ), "
-            + "  ottr:Triple (_:person, foaf:mbox, ?email ) "
-            + "} .";
-
-        testSignatureParsing(template);
-    }
-
-    @Test
     public void testTemplateDefaultList() {
 
         String template = "@prefix rdf:    <http://www.w3.org/1999/02/22-rdf-syntax-ns#> . "
@@ -378,6 +536,35 @@ public class ParserTest {
                 + "} .";
 
         testSignatureParsing(template);
+
+        STemplateParser parser = new STemplateParser();
+        ResultStream<Signature> resultStream = parser.parseString(template);
+        Signature parsed = resultStream.collect(Collectors.toList()).get(0).get();
+
+        Parameter firstParam = parsed.getParameters().get(0);
+        Parameter secondParam = parsed.getParameters().get(1);
+
+        assertTrue(parsed instanceof Template);
+        assertEquals("http://example.com/ns#Types", parsed.getIri());
+        assertEquals(2, parsed.getParameters().size());
+        assertFalse(firstParam.isOptional());
+        assertFalse(firstParam.isNonBlank());
+        assertFalse(firstParam.hasDefaultValue());
+        assertFalse(secondParam.isOptional());
+        assertFalse(secondParam.isNonBlank());
+        assertTrue(secondParam.hasDefaultValue());
+        assertEquals(1, ((Template) parsed).getPattern().size());
+        assertEquals(0, parsed.getAnnotations().size());
+    }
+
+    public boolean containsSubstring(List<Message> messages, String substring) {
+        String modifiedSubstring = substring.trim().toLowerCase();
+
+        for (Message m : messages) {
+            String s = m.getMessage().toLowerCase();
+            return s.contains(modifiedSubstring);
+        }
+        return false;
     }
 
 }
