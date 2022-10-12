@@ -31,6 +31,9 @@ import xyz.ottr.lutra.system.Assertions;
 import xyz.ottr.lutra.system.Message;
 import xyz.ottr.lutra.system.MessageHandler;
 
+// TODO: delete file
+// equivalent test added in CheckingExpanderTest
+
 public class Issues186Test {
 
     private static final String ROOT = "src/test/resources/issues/186/";
