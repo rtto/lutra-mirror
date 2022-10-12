@@ -26,6 +26,9 @@ import org.junit.Test;
 import xyz.ottr.lutra.system.Assertions;
 import xyz.ottr.lutra.system.MessageHandler;
 
+// TODO: delete file
+// equivalant test added in H2SourceTest, RDFFileSourceTest, SPARQLEndpointSourceTest in bottr-module
+
 public class Issue354BottrTest {
 
     private static final String ROOT = "src/test/resources/issues/354Bottr/";
