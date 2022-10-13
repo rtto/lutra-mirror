@@ -47,7 +47,7 @@ public class CheckingExpanderTest {
 
         ResultStream<Instance> resultStream = expander.expandInstance(instance);
         Result<Instance> emptyResult = resultStream.collect(Collectors.toList()).get(0);
-        Assertions.containsExpectedString(emptyResult.getMessageHandler(), expectedString);
+        Assertions.assertContainsExpectedString(emptyResult.getMessageHandler(), expectedString);
     }
 
     @Test
@@ -81,7 +81,7 @@ public class CheckingExpanderTest {
 
         ResultStream<Instance> resultStream = expander.expandInstance(instance);
         Result<Instance> emptyResult = resultStream.collect(Collectors.toList()).get(0);
-        Assertions.containsExpectedString(emptyResult.getMessageHandler(), expectedString);
+        Assertions.assertContainsExpectedString(emptyResult.getMessageHandler(), expectedString);
     }
 
     @Test
@@ -116,8 +116,8 @@ public class CheckingExpanderTest {
 
         ResultStream<Instance> resultStream = expander.expandInstance(instance);
         Result<Instance> emptyResult = resultStream.collect(Collectors.toList()).get(0);
-        Assertions.containsExpectedString(emptyResult.getMessageHandler(), expectedString1);
-        Assertions.containsExpectedString(emptyResult.getMessageHandler(), expectedString2);
+        Assertions.assertContainsExpectedString(emptyResult.getMessageHandler(), expectedString1);
+        Assertions.assertContainsExpectedString(emptyResult.getMessageHandler(), expectedString2);
     }
 
 }

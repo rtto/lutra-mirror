@@ -73,7 +73,7 @@ public enum Assertions {
         atLeast(result.getMessageHandler(), severity);
     }
 
-    public static void containsExpectedString(MessageHandler messageHandler, String expected) {
+    public static void assertContainsExpectedString(MessageHandler messageHandler, String expected) {
         assertThat(containsExpectedString(messageHandler.getMessages(), expected), is(true));
     }
 

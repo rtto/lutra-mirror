@@ -66,6 +66,6 @@ public class RDFFileSourceTest {
 
         ResultStream<?> resultStream = source.execute("SELECT ?s ?p ?o { ?s ?p ?o } LIMIT 0");
         Result<?> emptyResult = resultStream.getStream().collect(Collectors.toList()).get(0);
-        Assertions.containsExpectedString(emptyResult.getMessageHandler(), expectedString);
+        Assertions.assertContainsExpectedString(emptyResult.getMessageHandler(), expectedString);
     }
 }

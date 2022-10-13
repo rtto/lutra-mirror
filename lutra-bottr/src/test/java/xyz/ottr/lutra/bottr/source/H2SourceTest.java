@@ -130,7 +130,7 @@ public class H2SourceTest {
 
         ResultStream<?> resultStream = csvTest.execute("SELECT ID, NAME FROM CSVREAD('" + input + "') WHERE 1=2;");
         Result<?> emptyResult = resultStream.getStream().collect(Collectors.toList()).get(0);
-        Assertions.containsExpectedString(emptyResult.getMessageHandler(), expectedString);
+        Assertions.assertContainsExpectedString(emptyResult.getMessageHandler(), expectedString);
     }
 
     private String getAbsolutePath(String file) {
