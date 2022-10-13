@@ -27,6 +27,8 @@ import xyz.ottr.lutra.system.Assertions;
 import xyz.ottr.lutra.system.Message;
 import xyz.ottr.lutra.system.MessageHandler;
 
+// TODO: delete file
+// equivalent test exists in StandardTemplateStoreTest
 public class Issue251AddTemplateTest {
 
     private static final String ROOT = "src/test/resources/issues/251AddTemplate/";

@@ -27,6 +27,8 @@ import xyz.ottr.lutra.system.Assertions;
 import xyz.ottr.lutra.system.Message;
 import xyz.ottr.lutra.system.MessageHandler;
 
+// TODO: delete file
+// will be tested in ParserTest in stottr
 public class Issue367PrefixColonTest {
     private static final String ROOT = "src/test/resources/issues/367PrefixColon/";
 
