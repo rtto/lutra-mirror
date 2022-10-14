@@ -23,6 +23,7 @@ package xyz.ottr.lutra.wottr.parser;
  */
 
 import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -49,10 +50,17 @@ public class WInstanceParser implements InstanceParser<Model> {
 
         List<Resource> instanceResources = ModelSelector.getSubjects(model, WOTTR.of);
 
-        var instances = parseInstances(model, instanceResources);
-        var tripleInstances = parseTripleInstances(model, instanceResources);
+        // Keep map of resource -> instance in order to filter on correctly parsed.
+        Map<Resource, Result<Instance>> instanceMap = instanceResources.stream()
+            .collect(Collectors.toMap(Function.identity(), i -> parseInstance(model, i)));
 
-        return ResultStream.concat(instances, tripleInstances);
+        var correctInstances = instanceMap.keySet().stream()
+            .filter(resource -> instanceMap.get(resource).isPresent())
+            .collect(Collectors.toList());
+
+        var tripleInstances = parseTripleInstances(model, correctInstances);
+
+        return ResultStream.concat(ResultStream.of(instanceMap.values()), tripleInstances);
     }
 
     // Get triples which are not part of any of the instances.
