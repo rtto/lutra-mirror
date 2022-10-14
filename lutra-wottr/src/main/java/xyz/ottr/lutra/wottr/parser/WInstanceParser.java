@@ -26,7 +26,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.RDFList;
@@ -58,12 +57,14 @@ public class WInstanceParser implements InstanceParser<Model> {
             .filter(resource -> instanceMap.get(resource).isPresent())
             .collect(Collectors.toList());
 
+        // create triple instances of everything else:
         var tripleInstances = parseTripleInstances(model, correctInstances);
 
-        return ResultStream.concat(ResultStream.of(instanceMap.values()), tripleInstances);
+        return ResultStream.concat(
+            ResultStream.of(instanceMap.values()),
+            tripleInstances);
     }
 
-    // Get triples which are not part of any of the instances.
     private ResultStream<Instance> parseTripleInstances(Model model, List<Resource> instanceResources) {
 
         WTripleSerialiser tripleSerialiser = new WTripleSerialiser(model);
@@ -77,12 +78,6 @@ public class WInstanceParser implements InstanceParser<Model> {
         Model tripleModel = model.difference(instanceModel);
 
         return new WTripleInstanceParser().apply(tripleModel);
-    }
-
-    private ResultStream<Instance> parseInstances(Model model, List<Resource> templateInstances) {
-        Stream<Result<Instance>> parsedInstances = templateInstances.stream()
-            .map(instance -> parseInstance(model, instance));
-        return new ResultStream<>(parsedInstances);
     }
 
     Result<Instance> parseInstance(Model model, Resource instanceNode) {
