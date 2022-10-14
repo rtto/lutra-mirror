@@ -27,6 +27,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -78,11 +79,13 @@ public enum Assertions {
     }
 
     public static boolean containsExpectedString(List<Message> messages, String expected) {
-        String modified = expected.trim().toLowerCase();
+        String modified = expected.trim().toLowerCase(Locale.ENGLISH);
 
         for (Message m : messages) {
-            String s = m.getMessage().toLowerCase();
-            return s.contains(modified);
+            String s = m.getMessage().toLowerCase(Locale.ENGLISH);
+            if (s.contains(modified)) {
+                return true;
+            }
         }
         return false;
     }

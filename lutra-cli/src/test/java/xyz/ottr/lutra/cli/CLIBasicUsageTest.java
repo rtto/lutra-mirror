@@ -1,5 +1,36 @@
 package xyz.ottr.lutra.cli;
 
+/*-
+ * #%L
+ * xyz.ottr.lutra:lutra-cli
+ * %%
+ * Copyright (C) 2018 - 2022 University of Oslo
+ * %%
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation, either version 2.1 of the
+ * License, or (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Lesser Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Lesser Public
+ * License along with this program.  If not, see
+ * <http://www.gnu.org/licenses/lgpl-2.1.html>.
+ * #L%
+ */
+
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.assertTrue;
+
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.PrintStream;
+import java.io.StringReader;
+import java.nio.charset.StandardCharsets;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.riot.Lang;
@@ -7,15 +38,6 @@ import org.apache.jena.riot.RDFDataMgr;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.PrintStream;
-import java.io.StringReader;
-import java.nio.charset.StandardCharsets;
-
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.assertTrue;
 
 public class CLIBasicUsageTest {
     private static final String ROOT = "src/test/resources/CLIBasicUsage/";
@@ -151,26 +173,48 @@ public class CLIBasicUsageTest {
         TestUtils.testIsomorphicModels(actual, expected);
     }
 
-    // -o
-    // -O
+    // --fetchMissing
     @Test
-    public void expand_stottr_instances_and_write_output_to_file() {
-        String args = " "
-                + " -l " + ROOT + "person_template.stottr"
-                + " -L stottr "
-                + ROOT + "person_instances.stottr"
-                + " -I stottr "
-                + " -o " + ROOT + "expand_stottr.out "
-                + " -O wottr ";
+    public void fetchMissing_and_expand_to_console() {
+        // Safe-keep System.out
+        final PrintStream stdOut = System.out;
 
-        CLIRunner.run(args);
+        // Create stream to capture System.out:
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        PrintStream ps = new PrintStream(baos, true, StandardCharsets.UTF_8);
+        System.setOut(ps);
 
-        assertTrue(new File(ROOT + "expand_stottr.out").exists());
+        CLIRunner.run("--mode expand --inputFormat stottr --fetchMissing " + ROOT + "pizza_instances.stottr");
 
-        Model actual = RDFDataMgr.loadModel(ROOT + "expand_stottr.out", Lang.TTL);
-        Model expected = RDFDataMgr.loadModel(ROOT + "expected_expand_stottr.ttl");
+        // Restore old out
+        stdOut.flush();
+        System.setOut(stdOut);
 
-        assertThat(actual.size(), is(expected.size()));
+        // parse captured console output to model
+        Model actual = ModelFactory.createDefaultModel();
+        RDFDataMgr.read(actual, new StringReader(baos.toString(StandardCharsets.UTF_8)), "", Lang.TURTLE);
+
+        Model expected = RDFDataMgr.loadModel(ROOT + "expected_output_pizza.ttl");
+
+        assertThat("should contain the same number of triples", actual.size(), is(expected.size()));
+        TestUtils.testIsomorphicModels(actual, expected);
+    }
+
+    // --output
+    @Test
+    public void fetchMissing_and_expand_to_file() {
+
+        String outFile = ROOT + "pizza_out_file.ttl";
+
+        CLIRunner.run("--mode expand --inputFormat stottr --fetchMissing "
+                + ROOT + "pizza_instances.stottr" + " --output " + outFile);
+
+        assertTrue(new File(outFile).exists());
+
+        Model actual = RDFDataMgr.loadModel(outFile);
+        Model expected = RDFDataMgr.loadModel(ROOT + "expected_output_pizza.ttl");
+
+        assertThat("should contain the same number of triples", actual.size(), is(expected.size()));
         TestUtils.testIsomorphicModels(actual, expected);
     }
 

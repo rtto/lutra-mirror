@@ -36,6 +36,8 @@ import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
 import org.junit.Test;
 
+// TODO: delete file
+// moved tests to CLIBasicUsageTest
 public class Issues327Test {
     
     private static final String ROOT = "src/test/resources/issues/327/";

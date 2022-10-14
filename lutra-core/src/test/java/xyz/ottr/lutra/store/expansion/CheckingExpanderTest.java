@@ -1,18 +1,45 @@
 package xyz.ottr.lutra.store.expansion;
 
+/*-
+ * #%L
+ * xyz.ottr.lutra:lutra-core
+ * %%
+ * Copyright (C) 2018 - 2022 University of Oslo
+ * %%
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation, either version 2.1 of the
+ * License, or (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Lesser Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Lesser Public
+ * License along with this program.  If not, see
+ * <http://www.gnu.org/licenses/lgpl-2.1.html>.
+ * #L%
+ */
+
+import static xyz.ottr.lutra.model.terms.ObjectTerm.var;
+
+import java.util.stream.Collectors;
 import org.junit.Test;
 import xyz.ottr.lutra.OTTR;
-import xyz.ottr.lutra.model.*;
-import xyz.ottr.lutra.model.terms.*;
+import xyz.ottr.lutra.model.Argument;
+import xyz.ottr.lutra.model.Instance;
+import xyz.ottr.lutra.model.Parameter;
+import xyz.ottr.lutra.model.Template;
+import xyz.ottr.lutra.model.terms.BlankNodeTerm;
+import xyz.ottr.lutra.model.terms.IRITerm;
+import xyz.ottr.lutra.model.terms.LiteralTerm;
+import xyz.ottr.lutra.model.terms.Term;
 import xyz.ottr.lutra.store.StandardTemplateStore;
 import xyz.ottr.lutra.store.TemplateStore;
 import xyz.ottr.lutra.system.Assertions;
 import xyz.ottr.lutra.system.Result;
 import xyz.ottr.lutra.system.ResultStream;
-
-import java.util.stream.Collectors;
-
-import static xyz.ottr.lutra.model.terms.ObjectTerm.var;
 
 public class CheckingExpanderTest {
 

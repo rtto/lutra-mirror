@@ -1,0 +1,76 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix ottr: <http://ns.ottr.xyz/0.4/> .
+
+<http://example.org/Cheese>
+    a owl:Class .
+
+<http://example.org/Ham>
+    a owl:Class .
+
+<http://example.org/Hawaii>
+    rdfs:subClassOf <http://www.co-ode.org/ontologies/pizza/pizza.owl#NamedPizza>, [
+        a owl:Restriction ;
+        owl:allValuesFrom [
+            a owl:Class ;
+            owl:unionOf (<http://example.org/Cheese>
+                <http://example.org/Ham>
+                <http://example.org/Pineapple>
+            )
+        ] ;
+        owl:onProperty <http://www.co-ode.org/ontologies/pizza/pizza.owl#hasTopping>
+    ], [
+        a owl:Restriction ;
+        owl:onProperty <http://www.co-ode.org/ontologies/pizza/pizza.owl#hasTopping> ;
+        owl:someValuesFrom <http://example.org/Cheese>
+    ], [
+        a owl:Restriction ;
+        owl:onProperty <http://www.co-ode.org/ontologies/pizza/pizza.owl#hasTopping> ;
+        owl:someValuesFrom <http://example.org/Ham>
+    ], [
+        a owl:Restriction ;
+        owl:onProperty <http://www.co-ode.org/ontologies/pizza/pizza.owl#hasTopping> ;
+        owl:someValuesFrom <http://example.org/Pineapple>
+    ] .
+
+<http://example.org/Margherita>
+    rdfs:subClassOf <http://www.co-ode.org/ontologies/pizza/pizza.owl#NamedPizza>, [
+        a owl:Restriction ;
+        owl:onProperty <http://www.co-ode.org/ontologies/pizza/pizza.owl#hasTopping> ;
+        owl:someValuesFrom <http://example.org/Mozzarella>
+    ], [
+        a owl:Restriction ;
+        owl:onProperty <http://www.co-ode.org/ontologies/pizza/pizza.owl#hasTopping> ;
+        owl:someValuesFrom <http://example.org/Tomato>
+    ], [
+        a owl:Restriction ;
+        owl:allValuesFrom [
+            a owl:Class ;
+            owl:unionOf (<http://example.org/Mozzarella>
+                <http://example.org/Tomato>
+            )
+        ] ;
+        owl:onProperty <http://www.co-ode.org/ontologies/pizza/pizza.owl#hasTopping>
+    ], [
+        a owl:Restriction ;
+        owl:hasValue <http://example.org/Italy> ;
+        owl:onProperty <http://www.co-ode.org/ontologies/pizza/pizza.owl#hasCountryOfOrigin>
+    ] .
+
+<http://example.org/Mozzarella>
+    a owl:Class .
+
+<http://example.org/Pineapple>
+    a owl:Class .
+
+<http://example.org/Tomato>
+    a owl:Class .
+
+<http://www.co-ode.org/ontologies/pizza/pizza.owl#hasCountryOfOrigin>
+    a owl:ObjectProperty .
+
+<http://www.co-ode.org/ontologies/pizza/pizza.owl#hasTopping>
+    a owl:ObjectProperty .
+

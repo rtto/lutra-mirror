@@ -24,6 +24,7 @@ package xyz.ottr.lutra.bottr.source;
 
 import static org.hamcrest.CoreMatchers.is;
 
+import java.util.stream.Collectors;
 import org.apache.jena.rdf.model.RDFNode;
 import org.junit.Assert;
 import org.junit.Test;
@@ -31,8 +32,6 @@ import xyz.ottr.lutra.bottr.model.Source;
 import xyz.ottr.lutra.system.Assertions;
 import xyz.ottr.lutra.system.Result;
 import xyz.ottr.lutra.system.ResultStream;
-
-import java.util.stream.Collectors;
 
 public class SPARQLEndpointSourceTest {
 
