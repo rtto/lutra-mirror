@@ -68,7 +68,7 @@
     <maven.compiler.target>${java.version}</maven.compiler.target>
 
     <jena.version>4.6.0</jena.version>
-    <antlr4-maven-plugin-version>4.9.2</antlr4-maven-plugin-version>
+    <antlr4-version>4.9.2</antlr4-version>
   </properties>
 
   <build>
@@ -430,7 +430,7 @@
         <plugin>
           <groupId>org.antlr</groupId>
           <artifactId>antlr4-maven-plugin</artifactId>
-          <version>${antlr4-maven-plugin-version}</version>
+          <version>${antlr4-version}</version>
         </plugin>
 
         <plugin>
@@ -593,7 +593,7 @@
       <dependency>
         <groupId>org.antlr</groupId>
         <artifactId>antlr4-maven-plugin</artifactId>
-        <version>${antlr4-maven-plugin-version}</version>
+        <version>${antlr4-version}</version>
       </dependency>
 
       <!-- TabOTTR -->
