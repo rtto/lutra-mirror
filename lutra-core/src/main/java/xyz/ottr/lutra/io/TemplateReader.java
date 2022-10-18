@@ -74,8 +74,8 @@ public class TemplateReader implements Function<String, ResultStream<Signature>>
 
         this.templatePipeline.apply(file).forEach(consumer);
 
-        MessageHandler msgs = store.getMessageHandler();
-        msgs.combine(consumer.getMessageHandler());
+        MessageHandler msgs = consumer.getMessageHandler();
+        msgs.combine(store.getMessageHandler());
         return msgs;
     }
 

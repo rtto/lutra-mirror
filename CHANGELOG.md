@@ -5,6 +5,27 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 0.6.14 - 2022.10.03
+
+Milestone: https://gitlab.com/ottr/lutra/lutra/-/milestones/19
+
+Closed issues:
+
+ - CLI help text outdated? #372
+ - Create release plan and procedure #370
+ - Missing colon after prefix gives NullPointerException    #367
+ - Error expanding wOTTR instance    #334
+ - Accepting whitespace in URI #323
+ - Default list values in stOTTR    #297
+ - Dependency graph does not return all Result.errors?  #203
+ - Give error for multiple definitions of template    #251
+ - duplicate class: xyz.ottr.lutra.stottr.antlr.*    #375
+ - Error deploying maven artifacts to maven central    #368
+ - Check if unused dependencies could be removed    #359
+ - bottr error with empty sql select #354
+ - Extend testing in DataValidator class #343
+ - lutra-restapi: hard coded MAX_FILE_SIZE and MAX_REQUEST_SIZE
+	
 ## 0.6.13 - 2022.03.14
 
 ### Features

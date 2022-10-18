@@ -2,7 +2,7 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>xyz.ottr.lutra</groupId>
-        <version>0.6.14-SNAPSHOT</version>
+        <version>0.6.15-SNAPSHOT</version>
         <artifactId>lutra</artifactId>
         <relativePath>../pom.xml</relativePath>
     </parent>
@@ -17,38 +17,62 @@
         <dependency>
             <groupId>org.apache.jena</groupId>
             <artifactId>jena-core</artifactId>
+            <!-- transitive dependencies:
+                - commons-cli
+                - jena-iri
+                - jena-base (commons-io, commons-lang3, com.github.andrewoma.dexx.collection, jena-shaded-guava, commons-compress, commons-codec, commons-csv, slf4j-api)
+            -->
         </dependency>
         <dependency>
             <groupId>org.apache.jena</groupId>
             <artifactId>jena-arq</artifactId>
+            <!-- transitive dependencies:
+                - jena-core (commons-cli, jena-iri, jena-base (commons-io, commons-lang3, com.github.andrewoma.dexx.collection, jena-shaded-guava, commons-compress, commons-codec, commons-csv, slf4j-api) )
+                - commons-lang3
+                - jsonld-java (commons-io, jcl-over-slf4j)
+                - jackson-core
+                - jackson-databind (jackson-core, jackson-annotations)
+                - gson
+                - protobuf-java
+                - jakarta.json
+                - jcl-over-slf4j (slf4j-api)
+                - titanium-json-ld
+                - httpclient-cache (httpclient (httpcore))
+                - httpclient (httpcore)
+                - libthrift (javax.annotation-api, slf4j-api, httpclient (httpcore))
+            -->
         </dependency>
 
         <!-- Apache commons -->
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-collections4</artifactId>
+            <!-- no transitive dependencies -->
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-math3</artifactId>
+            <!-- no transitive dependencies -->
         </dependency>
         <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>commons-validator</groupId>
-            <artifactId>commons-validator</artifactId>
+            <!-- no transitive dependencies -->
         </dependency>
 
         <dependency>
             <groupId>org.hamcrest</groupId>
             <artifactId>hamcrest</artifactId>
+            <!-- no transitive dependencies -->
         </dependency>
 
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-params</artifactId>
+            <!-- transitive dependencies:
+                - junit-jupiter-api (apiguardian-api, opentest4j, junit-platform-commons (apiguardian-api))
+                - apiguardian-api
+            -->
         </dependency>
 
     </dependencies>
