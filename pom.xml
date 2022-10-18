@@ -106,6 +106,17 @@
           <failOnError>false</failOnError>
           <failOnWarnings>false</failOnWarnings>
           <noindex>true</noindex>
+          <links>
+            <link>https://www.javadoc.io/doc/xyz.ottr.lutra/lutra-api/api</link>
+            <link>https://www.javadoc.io/doc/xyz.ottr.lutra/lutra-bottr/api</link>
+            <link>https://www.javadoc.io/doc/xyz.ottr.lutra/lutra-cli/api</link>
+            <link>https://www.javadoc.io/doc/xyz.ottr.lutra/lutra-core/api</link>
+            <link>https://www.javadoc.io/doc/xyz.ottr.lutra/lutra-docttr/api</link>
+            <link>https://www.javadoc.io/doc/xyz.ottr.lutra/lutra-restapi/api</link>
+            <link>https://www.javadoc.io/doc/xyz.ottr.lutra/lutra-stottr/api</link>
+            <link>https://www.javadoc.io/doc/xyz.ottr.lutra/lutra-tabottr/api</link>
+            <link>https://www.javadoc.io/doc/xyz.ottr.lutra/lutra-wottr/api</link>
+          </links>
         </configuration>
         <executions>
           <execution>
