@@ -48,6 +48,10 @@ public enum Assertions {
         }
     }
 
+    public static void noWarnings(MessageHandler messageHandler) {
+        assertSeverity(messageHandler, s -> s.isGreaterEqualThan(Message.Severity.WARNING), 0);
+    }
+
     public static void noErrors(MessageHandler messageHandler) {
         assertSeverity(messageHandler, s -> s.isGreaterEqualThan(Message.Severity.ERROR), 0);
     }
