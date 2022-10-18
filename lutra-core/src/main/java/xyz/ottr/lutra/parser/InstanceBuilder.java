@@ -51,7 +51,7 @@ public enum InstanceBuilder {
             return builder.map(Instance.InstanceBuilder::build)
                 .flatMap(Instance::validate);
         } else {
-           return Result.empty(
+            return Result.empty(
                 Message.error("Error creating instance"
                    + (iri.isPresent() ? " of template " + iri.get() : "")
                    + "."
