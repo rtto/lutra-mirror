@@ -95,7 +95,7 @@ public class NonCheckingExpander implements Expander {
                 .build());
     }
 
-    // for somme reason PMD does not recognize that the method IS used above
+    // for some reason PMD does not recognize that the method IS used above
     @SuppressWarnings("PMD.UnusedPrivateMethod")
     protected ResultStream<Instance> expandTemplateInstance(Instance instance, Signature from) {
         Result<Signature> toResult = templateStore.getSignature(instance.getIri());
@@ -113,7 +113,7 @@ public class NonCheckingExpander implements Expander {
     public ResultStream<Instance> expandInstance(Instance instance) {
         Result<Signature> result = templateStore.getSignature(instance.getIri());
 
-        if (!(isBaseTemplate(result) || isTemplate(result))) {
+        if (!isBaseTemplate(result) && !isTemplate(result)) {
             return ResultStream.of(Result.error("Missing definition for " + instance.getIri()));
         }
         if (shouldDiscard(instance, result.get())) {
@@ -199,10 +199,10 @@ public class NonCheckingExpander implements Expander {
     }
 
     private boolean isBaseTemplate(Result<Signature> result) {
-        return !result.isEmpty() && result.get() instanceof BaseTemplate;
+        return result.isPresent() && result.get() instanceof BaseTemplate;
     }
 
     private boolean isTemplate(Result<Signature> result) {
-        return !result.isEmpty() && result.get() instanceof Template;
+        return result.isPresent() && result.get() instanceof Template;
     }
 }

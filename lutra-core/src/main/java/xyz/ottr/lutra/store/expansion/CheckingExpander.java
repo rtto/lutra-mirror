@@ -73,7 +73,7 @@ public class CheckingExpander extends NonCheckingExpander {
     private Message checkParametersMatch(Instance instance, Signature signature) {
 
         if (instance.getArguments().size() != signature.getParameters().size()) {
-            return Message.error("Number of arguments do not match number of paramters in instance " + instance.toString());
+            return Message.error("Number of arguments do not match number of parameters in instance " + instance.toString());
         }
 
         for (int i = 0; i < instance.getArguments().size(); i++) {
