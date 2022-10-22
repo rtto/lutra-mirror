@@ -51,19 +51,7 @@ public class CheckingExpanderTest {
         CheckingExpander expander = new CheckingExpander(store);
 
         // build template with 1 parameter
-        Term var1 = new IRITerm("example.org/var1");
-
-        Template template = Template.builder()
-                .iri("iri-1")
-                .parameter(Parameter.builder().term(var1).build())
-                .instance(Instance.builder()
-                        .iri(OTTR.BaseURI.Triple)
-                        .argument(Argument.builder().term(var1).build())
-                        .argument(Argument.builder().term(new IRITerm("example.org/hasValue")).build())
-                        .argument(Argument.builder().term(LiteralTerm.createPlainLiteral("value")).build())
-                        .build())
-                .build();
-
+        Template template = buildDummyTemplate("iri-1");
         store.addTemplate(template);
 
         // build instance with 2 arguments
@@ -85,25 +73,13 @@ public class CheckingExpanderTest {
         CheckingExpander expander = new CheckingExpander(store);
 
         // build template, parameter type is IRI
-        Term var1 = new IRITerm("example.org/var1");
-
-        Template template = Template.builder()
-                .iri("iri-1")
-                .parameter(Parameter.builder().term(var1).build())
-                .instance(Instance.builder()
-                        .iri(OTTR.BaseURI.Triple)
-                        .argument(Argument.builder().term(var1).build())
-                        .argument(Argument.builder().term(new IRITerm("example.org/hasValue")).build())
-                        .argument(Argument.builder().term(LiteralTerm.createPlainLiteral("value")).build())
-                        .build())
-                .build();
-
+        Template template = buildDummyTemplate("iri-1");
         store.addTemplate(template);
 
         // build instance, argument type is literal
         Instance instance = Instance.builder().iri("iri-1")
                 .argument(Argument.builder()
-                        .term(LiteralTerm.createPlainLiteral("var1")).build())
+                        .term(LiteralTerm.createPlainLiteral("arg1")).build())
                 .build();
 
         ResultStream<Instance> resultStream = expander.expandInstance(instance);
@@ -120,19 +96,7 @@ public class CheckingExpanderTest {
         CheckingExpander expander = new CheckingExpander(store);
 
         // build template with non-blank parameter
-        Term var1 = new IRITerm("example.org/var1");
-
-        Template template = Template.builder()
-                .iri("iri-1")
-                .parameter(Parameter.builder().term(var1).nonBlank(true).build())
-                .instance(Instance.builder()
-                        .iri(OTTR.BaseURI.Triple)
-                        .argument(Argument.builder().term(var1).build())
-                        .argument(Argument.builder().term(new IRITerm("example.org/hasValue")).build())
-                        .argument(Argument.builder().term(LiteralTerm.createPlainLiteral("var2")).build())
-                        .build())
-                .build();
-
+        Template template = buildDummyTemplate("iri-1");
         store.addTemplate(template);
 
         // build instance with blank node
@@ -145,6 +109,21 @@ public class CheckingExpanderTest {
         Result<Instance> emptyResult = resultStream.collect(Collectors.toList()).get(0);
         Assertions.assertContainsExpectedString(emptyResult.getMessageHandler(), expectedString1);
         Assertions.assertContainsExpectedString(emptyResult.getMessageHandler(), expectedString2);
+    }
+
+    private Template buildDummyTemplate(String iri) {
+        Term var1 = new IRITerm("var1");
+
+        return Template.builder()
+                .iri(iri)
+                .parameter(Parameter.builder().term(var1).nonBlank(true).build())
+                .instance(Instance.builder()
+                        .iri(OTTR.BaseURI.Triple)
+                        .argument(Argument.builder().term(var1).build())
+                        .argument(Argument.builder().term(new IRITerm("hasValue")).build())
+                        .argument(Argument.builder().term(LiteralTerm.createPlainLiteral("value")).build())
+                        .build())
+                .build();
     }
 
 }
