@@ -26,6 +26,8 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.util.Collections;
+import java.util.List;
+import java.util.Locale;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -71,5 +73,22 @@ public enum Assertions {
     public static void atLeast(Result result, Message.Severity severity) {
         atLeast(result.getMessageHandler(), severity);
     }
+
+    public static void assertContainsExpectedString(MessageHandler messageHandler, String expected) {
+        assertThat(containsExpectedString(messageHandler.getMessages(), expected), is(true));
+    }
+
+    public static boolean containsExpectedString(List<Message> messages, String expected) {
+        String modified = expected.trim().toLowerCase(Locale.ENGLISH);
+
+        for (Message m : messages) {
+            String s = m.getMessage().toLowerCase(Locale.ENGLISH);
+            if (s.contains(modified)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
 
 }

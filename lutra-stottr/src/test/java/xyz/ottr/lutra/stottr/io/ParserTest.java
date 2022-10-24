@@ -10,12 +10,12 @@ package xyz.ottr.lutra.stottr.io;
  * it under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation, either version 2.1 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Lesser Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Lesser Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/lgpl-2.1.html>.
@@ -31,7 +31,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import org.apache.jena.vocabulary.XSD;
-import org.junit.Ignore;
 import org.junit.Test;
 import xyz.ottr.lutra.model.Argument;
 import xyz.ottr.lutra.model.BaseTemplate;
@@ -67,7 +66,7 @@ public class ParserTest {
     private Result<Map<String, String>> parsePrefixes() {
 
         SPrefixParser prefixParser = new SPrefixParser();
-        
+
         String prefixes = "@prefix ex: <http://example.org/> .\n"
             + "PREFIX rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> \n"
             + "@prefix ottr:  <http://ns.ottr.xyz/0.4/> .\n"
@@ -76,7 +75,7 @@ public class ParserTest {
 
         return SParserUtils.parseString(prefixes, prefixParser);
     }
-        
+
     private Map<String, String> makePrefixes() {
 
         Map<String, String> prefixes = new HashMap<>();
@@ -114,11 +113,10 @@ public class ParserTest {
     /// Comment
     ///
 
-    @Ignore
     @Test
     public void testComment() {
         String prefixes = "@prefix ex: <http://example.org/> # This is a comment \n"
-                + " # This is a single line comment"
+                + " # This is a single line comment \n"
                 + " @prefix foaf: <http://xmlns.com/foaf/0.1/>. # This is a comment too"
                 + " /***"
                 + " This"
@@ -359,7 +357,7 @@ public class ParserTest {
         assertFalse(firstParam.isOptional());
         assertFalse(firstParam.isNonBlank());
         assertTrue(firstParam.hasDefaultValue());
-        assertEquals("http://tpl.ottr.xyz/pizza/0.1/pizza", firstParam.getDefaultValue().getIdentifier().toString());
+        assertEquals("http://tpl.ottr.xyz/pizza/0.1/pizza", firstParam.getDefaultValue().getIdentifier());
         assertEquals(0, parsed.getAnnotations().size());
     }
 
@@ -384,14 +382,14 @@ public class ParserTest {
         assertFalse(firstParam.isOptional());
         assertFalse(firstParam.isNonBlank());
         assertTrue(firstParam.hasDefaultValue());
-        assertEquals("\"2\"^^http://www.w3.org/2001/XMLSchema#integer", firstParam.getDefaultValue().getIdentifier().toString());
+        assertEquals("\"2\"^^http://www.w3.org/2001/XMLSchema#integer", firstParam.getDefaultValue().getIdentifier());
         assertEquals(0, parsed.getAnnotations().size());
     }
 
     @Test
     public void testSignatureDefaultValueString() {
         String signature = "@prefix ex:     <http://example.com/ns#> . "
-                + "ex:NamedPizza [ ?pizza = 'pizza'] .";
+                + "ex:NamedPizza [ ?pizza = \"pizza\"] .";
         testSignatureParsing(signature);
 
         STemplateParser parser = new STemplateParser();
@@ -408,7 +406,7 @@ public class ParserTest {
         assertFalse(firstParam.isOptional());
         assertFalse(firstParam.isNonBlank());
         assertTrue(firstParam.hasDefaultValue());
-        assertEquals("\"'pizza'\"^^http://www.w3.org/2001/XMLSchema#string", firstParam.getDefaultValue().getIdentifier().toString());
+        assertEquals("\"pizza\"^^http://www.w3.org/2001/XMLSchema#string", firstParam.getDefaultValue().getIdentifier());
         assertEquals(0, parsed.getAnnotations().size());
     }
 
@@ -416,8 +414,8 @@ public class ParserTest {
     public void testSignatureDefaultValueList() {
         String signature = "@prefix ex:     <http://example.com/ns#> . "
                 + "ex:NamedPizza ["
-                + "  ?pizza = 'pizza' ,"
-                + "  ?country = ('Italy', 'Spain') ,  "
+                + "  ?pizza = \"pizza\" ,"
+                + "  ?country = (\"Italy\", \"Spain\") ,  "
                 + "  ?toppings = ((()))] .";
 
         testSignatureParsing(signature);
@@ -438,7 +436,7 @@ public class ParserTest {
         assertFalse(firstParam.isOptional());
         assertFalse(firstParam.isNonBlank());
         assertTrue(firstParam.hasDefaultValue());
-        assertEquals("\"'pizza'\"^^http://www.w3.org/2001/XMLSchema#string", firstParam.getDefaultValue().getIdentifier().toString());
+        assertEquals("\"pizza\"^^http://www.w3.org/2001/XMLSchema#string", firstParam.getDefaultValue().getIdentifier());
 
         // verify second parameter
         Parameter secondParam = parsed.getParameters().get(1);
@@ -454,8 +452,8 @@ public class ParserTest {
 
         Term firstArg = firstDefaultVal.get(0);
         Term secondArg = firstDefaultVal.get(1);
-        assertEquals("\"'Italy'\"^^http://www.w3.org/2001/XMLSchema#string", firstArg.getIdentifier());
-        assertEquals("\"'Spain'\"^^http://www.w3.org/2001/XMLSchema#string", secondArg.getIdentifier());
+        assertEquals("\"Italy\"^^http://www.w3.org/2001/XMLSchema#string", firstArg.getIdentifier());
+        assertEquals("\"Spain\"^^http://www.w3.org/2001/XMLSchema#string", secondArg.getIdentifier());
 
 
         // verify third parameter
@@ -498,7 +496,7 @@ public class ParserTest {
             STemplateParser parser = new STemplateParser();
             ResultConsumer<Signature> consumer = new ResultConsumer<>();
             parser.parseString(s).forEach(consumer);
-            assertTrue(containsSubstring(consumer.getMessageHandler().getMessages(), expectedString));
+            Assertions.assertContainsExpectedString(consumer.getMessageHandler(), expectedString);
         }
     }
 
@@ -608,7 +606,7 @@ public class ParserTest {
             STemplateParser parser = new STemplateParser();
             ResultConsumer<Signature> consumer = new ResultConsumer<>();
             parser.parseString(s).forEach(consumer);
-            assertTrue(containsSubstring(consumer.getMessageHandler().getMessages(), expectedString));
+            Assertions.assertContainsExpectedString(consumer.getMessageHandler(), expectedString);
         }
     }
 
@@ -766,16 +764,6 @@ public class ParserTest {
         parser.parseString(signatureString).forEach(consumer);
 
         Assertions.noErrors(consumer);
-    }
-
-    public boolean containsSubstring(List<Message> messages, String substring) {
-        String modifiedSubstring = substring.trim().toLowerCase();
-
-        for (Message m : messages) {
-            String s = m.getMessage().toLowerCase();
-            return s.contains(modifiedSubstring);
-        }
-        return false;
     }
 
 }
