@@ -732,11 +732,7 @@ public class ParserTest {
                 + " ::"
                 + "{ ex:Template3 ( true, ex:A ) } .";
 
-        testSignatureParsing(template);
-
-        STemplateParser parser = new STemplateParser();
-        ResultStream<Signature> resultStream = parser.parseString(template);
-        Signature parsed = resultStream.collect(Collectors.toList()).get(0).get();
+        Signature parsed = parseCorrectSignature(template);
 
         assertTrue(parsed instanceof Template);
         assertEquals("http://example.com/ns#Template", parsed.getIri());
@@ -764,6 +760,17 @@ public class ParserTest {
         parser.parseString(signatureString).forEach(consumer);
 
         Assertions.noErrors(consumer);
+    }
+
+    private Signature parseCorrectSignature(String signatureString) {
+
+        var parser = new STemplateParser();
+        var resultStream = parser.parseString(signatureString);
+        var result = resultStream.findFirst();
+
+        Assertions.noErrors(result);
+
+        return result.get();
     }
 
 }
