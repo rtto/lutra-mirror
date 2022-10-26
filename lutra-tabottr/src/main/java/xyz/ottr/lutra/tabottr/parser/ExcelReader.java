@@ -81,6 +81,9 @@ public class ExcelReader implements InstanceParser<String> {
         File file = new File(filename);
         // open file in read-only mode and without any password:
         try (Workbook workbook = WorkbookFactory.create(file, null, true)) {
+            if (workbook == null) {
+                return Result.error("Error creating workbook from file: " + filename);
+            }
             List<Table> tables = new ArrayList<>();
             for (int index = 0; index < workbook.getNumberOfSheets(); index += 1) {
                 tables.add(parseTable(workbook.getSheetAt(index), index + 1));
