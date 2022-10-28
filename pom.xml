@@ -107,16 +107,54 @@
           <failOnWarnings>false</failOnWarnings>
           <noindex>true</noindex>
           <links>
-            <link>https://www.javadoc.io/doc/xyz.ottr.lutra/lutra-api/api</link>
-            <link>https://www.javadoc.io/doc/xyz.ottr.lutra/lutra-bottr/api</link>
-            <link>https://www.javadoc.io/doc/xyz.ottr.lutra/lutra-cli/api</link>
-            <link>https://www.javadoc.io/doc/xyz.ottr.lutra/lutra-core/api</link>
-            <link>https://www.javadoc.io/doc/xyz.ottr.lutra/lutra-docttr/api</link>
-            <link>https://www.javadoc.io/doc/xyz.ottr.lutra/lutra-restapi/api</link>
-            <link>https://www.javadoc.io/doc/xyz.ottr.lutra/lutra-stottr/api</link>
-            <link>https://www.javadoc.io/doc/xyz.ottr.lutra/lutra-tabottr/api</link>
-            <link>https://www.javadoc.io/doc/xyz.ottr.lutra/lutra-wottr/api</link>
+            <link>https://www.javadoc.io/doc/xyz.ottr.lutra/lutra-api/api/</link>
+            <link>https://www.javadoc.io/doc/xyz.ottr.lutra/lutra-bottr/api/</link>
+            <link>https://www.javadoc.io/doc/xyz.ottr.lutra/lutra-cli/api/</link>
+            <link>https://www.javadoc.io/doc/xyz.ottr.lutra/lutra-core/api/</link>
+            <link>https://www.javadoc.io/doc/xyz.ottr.lutra/lutra-docttr/api/</link>
+            <link>https://www.javadoc.io/doc/xyz.ottr.lutra/lutra-restapi/api/</link>
+            <link>https://www.javadoc.io/doc/xyz.ottr.lutra/lutra-stottr/api/</link>
+            <link>https://www.javadoc.io/doc/xyz.ottr.lutra/lutra-tabottr/api/</link>
+            <link>https://www.javadoc.io/doc/xyz.ottr.lutra/lutra-wottr/api/</link>
           </links>
+          <offlineLinks>
+            <offlineLink>
+              <url>https://www.javadoc.io/doc/xyz.ottr.lutra/lutra-api/api/</url>
+              <location>../lutra-api/api/</location>
+            </offlineLink>
+            <offlineLink>
+              <url>https://www.javadoc.io/doc/xyz.ottr.lutra/lutra-bottr/api/</url>
+              <location>../lutra-bottr/api/</location>
+            </offlineLink>
+            <offlineLink>
+              <url>https://www.javadoc.io/doc/xyz.ottr.lutra/lutra-cli/api/</url>
+              <location>../lutra-cli/api/</location>
+            </offlineLink>
+            <offlineLink>
+              <url>https://www.javadoc.io/doc/xyz.ottr.lutra/lutra-core/api/</url>
+              <location>../lutra-core/api/</location>
+            </offlineLink>
+            <offlineLink>
+              <url>https://www.javadoc.io/doc/xyz.ottr.lutra/lutra-docttr/api/</url>
+              <location>../lutra-docttr/api/</location>
+            </offlineLink>
+            <offlineLink>
+              <url>https://www.javadoc.io/doc/xyz.ottr.lutra/lutra-restapi/api/</url>
+              <location>../lutra-restapi/api/</location>
+            </offlineLink>
+            <offlineLink>
+              <url>https://www.javadoc.io/doc/xyz.ottr.lutra/lutra-stottr/api/</url>
+              <location>../lutra-stottr/api/</location>
+            </offlineLink>
+            <offlineLink>
+              <url>https://www.javadoc.io/doc/xyz.ottr.lutra/lutra-tabottr/api/</url>
+              <location>../lutra-tabottr/api/</location>
+            </offlineLink>
+            <offlineLink>
+              <url>https://www.javadoc.io/doc/xyz.ottr.lutra/lutra-wottr/api/</url>
+              <location>../lutra-wottr/api/</location>
+            </offlineLink>
+          </offlineLinks>
         </configuration>
         <executions>
           <execution>
