@@ -11,33 +11,33 @@ public class Issue242FormatLibraryTest {
     private static final String ROOT = "src/test/resources/issues/242FormatLibrary/";
 
     @Test
-    public void formatWottrToStottr() {
-        CLI cli = new CLI();
-        MessageHandler msgs = cli.getMessageHandler();
-
-        // format wottr to stottr
-        String args = "-m formatLibrary -L wottr -O stottr "
+    public void wottr_to_stottr_to_wottr() {
+        // format original wottr templates to stottr
+        String args = "-f -m formatLibrary -L wottr -O stottr "
                 + " -l " + ROOT + "templates.wottr "
                 + "-o " + ROOT + "out";
 
-        cli.executeArgs(args.trim().split("\\s+"));
-        Assertions.noErrors(msgs);
+        CLIRunner.run(args);
 
-        // format stottr back to wottr
+        // format stottr templates back to wottr
         String args2 = "-m formatLibrary -L stottr -O wottr "
                 + " -l " + ROOT + "out/example.com/ns/Person.stottr "
                 + "-o " + ROOT + "out";
 
-        cli.executeArgs(args2.trim().split("\\s+"));
-        Assertions.noErrors(msgs);
+        CLIRunner.run(args2);
 
-        // compare result with original
+        // add missing types to original wottr templates
+        String args3 = "-m formatLibrary -L wottr -O wottr "
+                + " -l " + ROOT + "templates.wottr "
+                + "-o " + ROOT + "original_processed";
+
+        CLIRunner.run(args3);
+
+        // compare round-tripped result templates with processed original templates
         Model actual = RDFIO.fileReader().parse(ROOT + "out/example.com/ns/Person.ttl").get();
-        Model expected = RDFIO.fileReader().parse(ROOT + "templates.wottr").get();
+        Model expected = RDFIO.fileReader().parse(ROOT + "original_processed/example.com/ns/Person.ttl").get();
 
-        // original template missing parameter type
         TestUtils.testIsomorphicModels(actual, expected);
-
     }
 
 }
