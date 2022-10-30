@@ -27,9 +27,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-import org.apache.poi.EncryptedDocumentException;
-import org.apache.poi.openxml4j.exceptions.InvalidOperationException;
-import org.apache.poi.openxml4j.exceptions.NotOfficeXmlFileException;
 import org.apache.poi.ss.formula.WorkbookEvaluator;
 import org.apache.poi.ss.formula.eval.NotImplementedException;
 import org.apache.poi.ss.usermodel.Cell;
@@ -79,23 +76,22 @@ public class ExcelReader implements InstanceParser<String> {
     public static Result<List<Table>> parseTables(String filename) {
         // TODO Rather take a File as input, and handle possible file IO issues somewhere more "generic"?
         File file = new File(filename);
+        String errorMessage = "Error parsing tabOTTR instances. \n";
+
         // open file in read-only mode and without any password:
         try (Workbook workbook = WorkbookFactory.create(file, null, true)) {
-            if (workbook == null) {
-                return Result.error("Error creating workbook from file: " + filename);
-            }
             List<Table> tables = new ArrayList<>();
             for (int index = 0; index < workbook.getNumberOfSheets(); index += 1) {
                 tables.add(parseTable(workbook.getSheetAt(index), index + 1));
             }
             return Result.of(tables);
         } catch (NotImplementedException ex) {
-            String message = ex.getMessage()
+            String message = errorMessage + ex.getMessage()
                 + ". Unsupported function. Supported functions are: "
                 + String.join(", ", WorkbookEvaluator.getSupportedFunctionNames());
             return Result.error(message);
-        } catch (IOException | EncryptedDocumentException | NotOfficeXmlFileException | InvalidOperationException ex) {
-            return Result.error("Error parsing data from file: " + filename, ex);
+        } catch (IOException | RuntimeException ex) {
+            return Result.error(errorMessage + "Error parsing data from file: " + filename, ex);
         }
     }
 
