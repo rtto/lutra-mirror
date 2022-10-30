@@ -69,7 +69,8 @@ public class Settings {
     @Option(names = {"-O", "--outputFormat"}, completionCandidates = TemplateOutputFormat.class,
         description = {"Output format of output of operation defined by the mode.%n"
                        + "(legal values: ${COMPLETION-CANDIDATES}; "
-                       + "default: ${DEFAULT-VALUE})"})
+                       + "default: ${DEFAULT-VALUE})"},
+        converter = OutputFormatConverter.class)
     public StandardFormat outputFormat = StandardFormat.wottr;
 
     @Option(names = {"-L", "--libraryFormat"}, completionCandidates = TemplateInputFormat.class,
