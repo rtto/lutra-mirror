@@ -22,44 +22,71 @@ package xyz.ottr.lutra.cli;
  * #L%
  */
 
+import org.junit.Before;
 import org.junit.Test;
+import xyz.ottr.lutra.system.Assertions;
+import xyz.ottr.lutra.system.Message;
+import xyz.ottr.lutra.system.MessageHandler;
 
 public class Issue383inputFormatTest {
     private static final String ROOT = "src/test/resources/issues/383inputFormat/";
+    private CLI cli;
+    private MessageHandler msgHandler;
+
+    @Before
+    public void init() {
+        cli = new CLI();
+        msgHandler = cli.getMessageHandler();
+    }
 
     @Test
     public void testCorrect() {
-        CLIRunner.run(" "
+        String args = " "
                 + " --library " + ROOT + "pizza_templates.stottr "
                 + " --libraryFormat stottr"
                 + " --inputFormat stottr "
-                + ROOT + "pizza_instances.stottr ");
+                + ROOT + "pizza_instances.stottr ";
+
+        cli.executeArgs(args.trim().split("\\s+"));
+        Assertions.noErrors(msgHandler);
     }
 
     @Test
     public void testTabottr() {
-        CLIRunner.run(" "
+        String args = " "
                 + " --library " + ROOT + "pizza_templates.stottr "
                 + " --libraryFormat stottr"
                 + " --inputFormat tabottr "
-                + ROOT + "pizza_instances.stottr ");
+                + ROOT + "pizza_instances.stottr ";
+
+        cli.executeArgs(args.trim().split("\\s+"));
+        Assertions.atLeast(msgHandler, Message.Severity.ERROR);
+        // TODO: verify error message
     }
 
     @Test
     public void testBottr() {
-        CLIRunner.run(" "
+        String args = " "
                 + " --library " + ROOT + "pizza_templates.stottr "
                 + " --libraryFormat stottr"
                 + " --inputFormat bottr "
-                + ROOT + "pizza_instances.stottr ");
+                + ROOT + "pizza_instances.stottr ";
+
+        cli.executeArgs(args.trim().split("\\s+"));
+        Assertions.atLeast(msgHandler, Message.Severity.ERROR);
+        // TODO: verify error message
     }
 
     @Test
     public void testWottr() {
-        CLIRunner.run(" "
+        String args = " "
                 + " --library " + ROOT + "pizza_templates.stottr "
                 + " --libraryFormat stottr"
                 + " --inputFormat wottr "
-                + ROOT + "pizza_instances.stottr ");
+                + ROOT + "pizza_instances.stottr ";
+
+        cli.executeArgs(args.trim().split("\\s+"));
+        Assertions.atLeast(msgHandler, Message.Severity.ERROR);
+        // TODO: verify error message
     }
 }
