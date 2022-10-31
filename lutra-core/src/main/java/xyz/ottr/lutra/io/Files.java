@@ -152,7 +152,7 @@ public enum Files {
 
         Message err = checkFolder(folder);
         if (err != null) {
-            return ResultStream.of(Result.empty(err));
+            return ResultStream.of(Result.error("Error reading folder '" + folder + "'." + err.getMessage()));
         }
 
         // if there are no includes, we include all, i.e, the filter is true, else take the disjunction.
