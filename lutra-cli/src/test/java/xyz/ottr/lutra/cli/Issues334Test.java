@@ -30,6 +30,6 @@ public class Issues334Test {
 
     @Test
     public void testWOTTRBadArguments1() {
-        CLIRunner.run("-f --debugStackTrace " + ROOT + "instance1.wottr");
+        CLIRunner.run("-f " + ROOT + "instance1.wottr");
     }
 }
