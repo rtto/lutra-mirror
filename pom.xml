@@ -106,7 +106,6 @@
           <failOnError>false</failOnError>
           <failOnWarnings>false</failOnWarnings>
           <noindex>false</noindex>
-          <detectLinks>true</detectLinks>
           <links>
             <link>https://jena.apache.org/documentation/javadoc/jena/</link>
             <link>https://projectlombok.org/api/</link>
