@@ -101,7 +101,7 @@ public class CLI {
 
         try {
             execute();
-            if (messageHandler.getMostSevere().isGreaterThan(Message.Severity.WARNING)) {
+            if (this.messageHandler.getMostSevere().isGreaterThan(Message.Severity.WARNING)) {
                 // with messages of severity error or higher we return with an error return code
                 return cli.getCommandSpec().exitCodeOnExecutionException();
             }
@@ -210,7 +210,7 @@ public class CLI {
 
     private void executeCheckSyntax() {
 
-        if (this.settings.inputFormat == StandardFormat.stottr) {
+        if (this.settings.inputFormat.equals(StandardFormat.stottr.toString())) {
 
             for (String file : this.settings.inputs) {
                 this.outStream.println("Checking file: " + file);
@@ -281,7 +281,7 @@ public class CLI {
 
         Format libraryFormat = this.settings.libraryFormat == null
                 ? null
-                : this.templateManager.getFormat(this.settings.libraryFormat.toString());
+                : this.templateManager.getFormat(this.settings.libraryFormat);
 
         return printMessages(this.templateManager.readLibrary(libraryFormat, this.settings.library));
     }
@@ -295,7 +295,7 @@ public class CLI {
     }
 
     public ResultStream<Instance> parseInstances() {
-        Format inFormat = this.templateManager.getFormat(this.settings.inputFormat.toString());
+        Format inFormat = this.templateManager.getFormat(this.settings.inputFormat);
         return this.templateManager.readInstances(inFormat, this.settings.inputs);
     }
 
@@ -305,7 +305,7 @@ public class CLI {
 
     private void writeInstances(ResultStream<Instance> ins) {
 
-        Format outFormat = this.templateManager.getFormat(this.settings.outputFormat.toString());
+        Format outFormat = this.templateManager.getFormat(this.settings.outputFormat);
         String filePath = this.settings.out; 
         PrintStream consoleStream = shouldPrintOutput() ? this.outStream : null;
         var msgs = this.templateManager.writeInstances(ins, outFormat, filePath, consoleStream);
@@ -313,7 +313,7 @@ public class CLI {
     }
 
     private void writeTemplates(TemplateManager templateManager) {
-        Format outFormat = this.templateManager.getFormat(this.settings.outputFormat.toString());
+        Format outFormat = this.templateManager.getFormat(this.settings.outputFormat);
         var msgs = templateManager.writeTemplates(outFormat, makeTemplateWriter(outFormat.getDefaultFileSuffix()));
         printMessages(msgs);
     }
