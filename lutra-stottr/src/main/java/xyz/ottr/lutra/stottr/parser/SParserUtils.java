@@ -33,6 +33,9 @@ import xyz.ottr.lutra.system.Result;
 public enum SParserUtils {
 
     ; // util enum
+
+
+    private static final int messageDigestMaxLength = 30;
     
     public static stOTTRLexer makeLexer(CharStream in, ErrorToMessageListener errListener) {
 
@@ -72,6 +75,16 @@ public enum SParserUtils {
     ///
     /// Utility methods used for making error messages
     ///
+
+    protected static Result ignoreStatement(String name, ParserRuleContext ctx) {
+
+        String statement = ctx.getText();
+        String digest = statement.length() > messageDigestMaxLength
+            ? statement.substring(1, messageDigestMaxLength) + "..."
+            : statement;
+
+        return Result.info("Ignoring " + name + " statement: " + digest);
+    }
 
     public static int getLineOf(ParserRuleContext ctx) {
         return ctx.getStart().getLine();

@@ -26,7 +26,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Stream;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 import xyz.ottr.lutra.model.terms.Term;
@@ -36,7 +35,7 @@ import xyz.ottr.lutra.system.MessageHandler;
 import xyz.ottr.lutra.system.Result;
 import xyz.ottr.lutra.system.ResultStream;
 
-public abstract class SParser<T> extends SBaseParserVisitor<T> {
+public abstract class SDocumentParser<T> extends SBaseParserVisitor<T> {
 
     private Map<String, String> prefixes = new HashMap<>();
     private STermParser termParser = new STermParser(this.prefixes);
@@ -45,19 +44,28 @@ public abstract class SParser<T> extends SBaseParserVisitor<T> {
         return Collections.unmodifiableMap(this.prefixes);
     }
 
+
+    // TODO move this to future PatternInstanceParser
     void setPrefixesAndVariables(Map<String, String> prefixes, Map<String, Term> variables) {
         this.prefixes = prefixes;
         this.termParser = new STermParser(prefixes, variables);
     }
 
     /**
-     * Should initialize subparsers that depend on
-     * the prefix definitions and this.termParser
-     * (such as ParameterParsers)
+     * Initialize sub parsers that depend on prefixes.
      */
-    protected abstract void initSubParsers();
+    protected void initSubParsers(Map<String, String> prefixes) {
+        this.prefixes.putAll(prefixes);
+        this.termParser = new STermParser(this.prefixes);
+    }
 
-    public abstract Result<T> visitStatement(stOTTRParser.StatementContext ctx);
+    public ResultStream<T> apply(CharStream in) {
+        return parseDocument(in);
+    }
+
+    public Result<T> visitStatement(stOTTRParser.StatementContext ctx) {
+        return visitChildren(ctx);
+    }
 
     public ResultStream<T> parseString(String str) {
         return parseDocument(CharStreams.fromString(str));
@@ -67,43 +75,47 @@ public abstract class SParser<T> extends SBaseParserVisitor<T> {
         return this.termParser;
     }
 
-    ResultStream<T> parseDocument(CharStream in) {
-        // Make parser
-        ErrorToMessageListener errListener = new ErrorToMessageListener();
-        stOTTRParser parser = SParserUtils.makeParser(in, errListener);
-        stOTTRParser.StOTTRDocContext document = parser.stOTTRDoc();
 
-        // Parse prefixes
-        SPrefixParser prefixParser = new SPrefixParser();
-        Result<Map<String, String>> prefixRes = prefixParser.visit(document);
-        if (!prefixRes.isPresent()) {
-            return ResultStream.of(prefixRes.map(obj -> (T) obj));
-        }
-        this.prefixes.putAll(prefixRes.get());
-        this.termParser = new STermParser(this.prefixes);
+    private Result<Map<String, String>> parsePrefixes(stOTTRParser.StOTTRDocContext ctx) {
+        var prefixParser = new SPrefixParser();
+        return prefixParser.visit(ctx);
+    }
 
-        initSubParsers();
-        
-        // Parse instances/templates
-        // Below code will not be executed if prefixes are not present
-        ResultStream<T> resultStream = prefixRes.mapToStream(_ignore -> {
+    private ResultStream<T> parseStatements(stOTTRParser.StOTTRDocContext ctx) {
 
-            Stream<Result<T>> results = document
+        var parsedStatements = ctx
                 .statement() // List of statements
                 .stream()
                 .map(this::visitStatement);
 
-            return new ResultStream<>(results);
+        return new ResultStream<>(parsedStatements);
+    }
+
+
+    ResultStream<T> parseDocument(CharStream in) {
+        // Make parser
+        ErrorToMessageListener errListener = new ErrorToMessageListener();
+        stOTTRParser parser = SParserUtils.makeParser(in, errListener);
+
+        stOTTRParser.StOTTRDocContext document = parser.stOTTRDoc();
+
+        var prefixes = parsePrefixes(document);
+        var statements = prefixes.mapToStream(pxs -> {
+            initSubParsers(pxs);
+            return parseStatements(document);
         });
+
 
         // TODO: Somehow put some of these messages more fine-grained on returned instances,
         //       see https://gitlab.com/ottr/lutra/lutra/issues/148
         MessageHandler messageHandler = errListener.getMessageHandler();
         Optional<Message> listenerMessage = messageHandler.toSingleMessage("Parsing stOTTR");
         if (listenerMessage.isPresent()) {
-            resultStream = ResultStream.concat(ResultStream.of(Result.empty(listenerMessage.get())), resultStream);
+            statements = ResultStream.concat(ResultStream.of(Result.empty(listenerMessage.get())), statements);
         }
 
-        return resultStream;
+        return statements;
     }
+
+
 }

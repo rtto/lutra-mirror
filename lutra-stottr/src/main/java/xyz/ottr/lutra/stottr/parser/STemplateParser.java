@@ -22,7 +22,6 @@ package xyz.ottr.lutra.stottr.parser;
  * #L%
  */
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -41,29 +40,19 @@ import xyz.ottr.lutra.parser.TemplateBuilder;
 import xyz.ottr.lutra.parser.TemplateParser;
 import xyz.ottr.lutra.stottr.antlr.stOTTRParser;
 import xyz.ottr.lutra.system.Result;
-import xyz.ottr.lutra.system.ResultStream;
 
-public class STemplateParser extends SParser<Signature> implements TemplateParser<CharStream> {
+public class STemplateParser extends SDocumentParser<Signature> implements TemplateParser<CharStream> {
 
-    private final SParameterParser paramsParser;
+    private SParameterParser paramsParser;
 
-    public STemplateParser() {
+    @Override
+    protected void initSubParsers(Map<String, String> prefixes) {
+        super.initSubParsers(prefixes);
         this.paramsParser = new SParameterParser(getTermParser());
     }
 
-    @Override
-    protected void initSubParsers() {
-        // noop
-    }
-
-    @Override
-    public ResultStream<Signature> apply(CharStream in) {
-        return parseDocument(in);
-    }
-
-    @Override
-    public Result<Signature> visitStatement(stOTTRParser.StatementContext ctx) {
-        return visitChildren(ctx);
+    public Result visitInstance(stOTTRParser.InstanceContext ctx) {
+        return SParserUtils.ignoreStatement("instance", ctx);
     }
 
     public Result<Signature> visitSignature(stOTTRParser.SignatureContext ctx) {
@@ -105,27 +94,19 @@ public class STemplateParser extends SParser<Signature> implements TemplateParse
     }
 
     private Result<List<Parameter>> parseParameters(stOTTRParser.SignatureContext ctx) {
-
-        var paramList = ctx.parameterList().parameter().stream()
-            .map(param -> this.paramsParser.visitParameter(param))
-            .collect(Collectors.toList());
-
-        return Result.aggregate(paramList);
+        return ctx.parameterList().parameter().stream()
+            .map(param -> this.paramsParser.visit(param))
+            .collect(Collectors.collectingAndThen(Collectors.toList(), Result::aggregate));
     }
 
     private Map<String, Term> getVariableMap(Result<Signature> signature) {
-
-        if (!signature.isPresent()) {
-            return new HashMap<>();
-        }
-
-        var map = signature.get().getParameters().stream()
+        return signature
+            .map(s -> s.getParameters().stream()
                 .map(Parameter::getTerm)
-                .collect(Collectors.toMap(
+                .collect(Collectors.toUnmodifiableMap(
                     term -> term.getIdentifier().toString(),
-                    Function.identity()));
-
-        return Collections.unmodifiableMap(map);
+                    Function.identity())))
+            .orElse(new HashMap<>());
     }
 
 

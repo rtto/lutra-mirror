@@ -37,15 +37,10 @@ import xyz.ottr.lutra.parser.InstanceParser;
 import xyz.ottr.lutra.stottr.STOTTR;
 import xyz.ottr.lutra.stottr.antlr.stOTTRParser;
 import xyz.ottr.lutra.system.Result;
-import xyz.ottr.lutra.system.ResultStream;
 
-public class SInstanceParser extends SParser<Instance> implements InstanceParser<CharStream> {
+public class SInstanceParser extends SDocumentParser<Instance> implements InstanceParser<CharStream> {
 
-    private final SArgumentParser argumentParser;
-
-    public SInstanceParser() {
-        this.argumentParser = new SArgumentParser(getTermParser());
-    }
+    private SArgumentParser argumentParser;
 
     /**
      * Makes an InstanceParser with the given set of prefixes and variables,
@@ -57,20 +52,21 @@ public class SInstanceParser extends SParser<Instance> implements InstanceParser
     }
 
     @Override
-    protected void initSubParsers() {
-        // noop
+    protected void initSubParsers(Map<String, String> prefixes) {
+        super.initSubParsers(prefixes);
+        this.argumentParser = new SArgumentParser(getTermParser());
     }
 
-    public ResultStream<Instance> apply(CharStream in) {
-        return parseDocument(in);
+    public Result visitBaseTemplate(stOTTRParser.BaseTemplateContext ctx) {
+        return SParserUtils.ignoreStatement("base template", ctx);
     }
 
+    public Result visitTemplate(stOTTRParser.TemplateContext ctx) {
+        return SParserUtils.ignoreStatement("template", ctx);
+    }
 
-    @Override
-    public Result<Instance> visitStatement(stOTTRParser.StatementContext ctx) {
-        return ctx.instance() != null
-            ? visitInstance(ctx.instance())
-            : Result.empty(); // TODO: Decide on error or ignore?
+    public Result visitSignature(stOTTRParser.SignatureContext ctx) {
+        return SParserUtils.ignoreStatement("signature", ctx);
     }
 
     public Result<Instance> visitInstance(stOTTRParser.InstanceContext ctx) {
@@ -103,12 +99,11 @@ public class SInstanceParser extends SParser<Instance> implements InstanceParser
     }
 
     private Result<List<Argument>> parseArguments(stOTTRParser.InstanceContext ctx) {
-
-        var argumentList = ctx.argumentList().argument().stream()
+        return ctx.argumentList()
+            .argument()
+            .stream()
             .map(arg -> this.argumentParser.visitArgument(arg))
-            .collect(Collectors.toList());
-
-        return Result.aggregate(argumentList);
+            .collect(Collectors.collectingAndThen(Collectors.toList(), Result::aggregate));
     }
 
 }
