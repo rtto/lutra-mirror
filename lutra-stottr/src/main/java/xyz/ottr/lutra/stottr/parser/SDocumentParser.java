@@ -28,9 +28,6 @@ import java.util.Map;
 import java.util.Optional;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
-import org.antlr.v4.runtime.ParserRuleContext;
-import org.apache.commons.lang3.StringUtils;
-import xyz.ottr.lutra.stottr.antlr.stOTTRParser;
 import xyz.ottr.lutra.system.Message;
 import xyz.ottr.lutra.system.MessageHandler;
 import xyz.ottr.lutra.system.Result;
@@ -38,7 +35,7 @@ import xyz.ottr.lutra.system.ResultStream;
 
 public abstract class SDocumentParser<T> extends SBaseParserVisitor<T> {
 
-    private static final int messageDigestMaxLength = 30;
+    //private static final int messageDigestMaxLength = 30;
 
     protected Map<String, String> prefixes = new HashMap<>();
 
@@ -102,6 +99,7 @@ public abstract class SDocumentParser<T> extends SBaseParserVisitor<T> {
         return statements;
     }
 
+    /*
     // These visit methods must be overwritten in extending classes.
 
     public Result visitBaseTemplate(stOTTRParser.BaseTemplateContext ctx) {
@@ -123,5 +121,6 @@ public abstract class SDocumentParser<T> extends SBaseParserVisitor<T> {
     private static Result ignoreStatement(String name, ParserRuleContext ctx) {
         return Result.info("Ignoring statement '" + name + "': " + StringUtils.truncate(ctx.getText(), messageDigestMaxLength));
     }
+    */
 
 }
