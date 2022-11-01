@@ -28,7 +28,8 @@ import java.util.Map;
 import java.util.Optional;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
-import xyz.ottr.lutra.model.terms.Term;
+import org.antlr.v4.runtime.ParserRuleContext;
+import org.apache.commons.lang3.StringUtils;
 import xyz.ottr.lutra.stottr.antlr.stOTTRParser;
 import xyz.ottr.lutra.system.Message;
 import xyz.ottr.lutra.system.MessageHandler;
@@ -37,44 +38,28 @@ import xyz.ottr.lutra.system.ResultStream;
 
 public abstract class SDocumentParser<T> extends SBaseParserVisitor<T> {
 
-    private Map<String, String> prefixes = new HashMap<>();
-    private STermParser termParser = new STermParser(this.prefixes);
+    private static final int messageDigestMaxLength = 30;
+
+    protected Map<String, String> prefixes = new HashMap<>();
 
     public Map<String, String> getPrefixes() {
         return Collections.unmodifiableMap(this.prefixes);
     }
 
+    abstract void initSubParsers();
 
-    // TODO move this to future PatternInstanceParser
-    void setPrefixesAndVariables(Map<String, String> prefixes, Map<String, Term> variables) {
-        this.prefixes = prefixes;
-        this.termParser = new STermParser(prefixes, variables);
-    }
-
-    /**
-     * Initialize sub parsers that depend on prefixes.
-     */
-    protected void initSubParsers(Map<String, String> prefixes) {
+    private void initPrefixes(Map<String, String> prefixes) {
+        // TODO should check for prefix conflicts
         this.prefixes.putAll(prefixes);
-        this.termParser = new STermParser(this.prefixes);
     }
 
     public ResultStream<T> apply(CharStream in) {
         return parseDocument(in);
     }
 
-    public Result<T> visitStatement(stOTTRParser.StatementContext ctx) {
-        return visitChildren(ctx);
-    }
-
     public ResultStream<T> parseString(String str) {
         return parseDocument(CharStreams.fromString(str));
     }
-
-    STermParser getTermParser() {
-        return this.termParser;
-    }
-
 
     private Result<Map<String, String>> parsePrefixes(stOTTRParser.StOTTRDocContext ctx) {
         var prefixParser = new SPrefixParser();
@@ -91,8 +76,7 @@ public abstract class SDocumentParser<T> extends SBaseParserVisitor<T> {
         return new ResultStream<>(parsedStatements);
     }
 
-
-    ResultStream<T> parseDocument(CharStream in) {
+    private ResultStream<T> parseDocument(CharStream in) {
         // Make parser
         ErrorToMessageListener errListener = new ErrorToMessageListener();
         stOTTRParser parser = SParserUtils.makeParser(in, errListener);
@@ -101,7 +85,8 @@ public abstract class SDocumentParser<T> extends SBaseParserVisitor<T> {
 
         var prefixes = parsePrefixes(document);
         var statements = prefixes.mapToStream(pxs -> {
-            initSubParsers(pxs);
+            initPrefixes(pxs);
+            initSubParsers();
             return parseStatements(document);
         });
 
@@ -117,5 +102,26 @@ public abstract class SDocumentParser<T> extends SBaseParserVisitor<T> {
         return statements;
     }
 
+    // These visit methods must be overwritten in extending classes.
+
+    public Result visitBaseTemplate(stOTTRParser.BaseTemplateContext ctx) {
+        return ignoreStatement("base template", ctx);
+    }
+
+    public Result visitTemplate(stOTTRParser.TemplateContext ctx) {
+        return ignoreStatement("template", ctx);
+    }
+
+    public Result visitSignature(stOTTRParser.SignatureContext ctx) {
+        return ignoreStatement("signature", ctx);
+    }
+
+    public Result visitInstance(stOTTRParser.InstanceContext ctx) {
+        return ignoreStatement("instance", ctx);
+    }
+
+    private static Result ignoreStatement(String name, ParserRuleContext ctx) {
+        return Result.info("Ignoring statement '" + name + "': " + StringUtils.truncate(ctx.getText(), messageDigestMaxLength));
+    }
 
 }

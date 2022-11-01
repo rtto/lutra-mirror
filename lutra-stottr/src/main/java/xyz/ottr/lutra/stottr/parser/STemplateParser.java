@@ -43,29 +43,28 @@ import xyz.ottr.lutra.system.Result;
 
 public class STemplateParser extends SDocumentParser<Signature> implements TemplateParser<CharStream> {
 
+    protected STermParser termParser;
     private SParameterParser paramsParser;
 
     @Override
-    protected void initSubParsers(Map<String, String> prefixes) {
-        super.initSubParsers(prefixes);
-        this.paramsParser = new SParameterParser(getTermParser());
+    protected void initSubParsers() {
+        this.termParser = new STermParser(this.prefixes);
+        this.paramsParser = new SParameterParser(this.termParser);
     }
 
-    public Result visitInstance(stOTTRParser.InstanceContext ctx) {
-        return SParserUtils.ignoreStatement("instance", ctx);
-    }
-
+    @Override
     public Result<Signature> visitSignature(stOTTRParser.SignatureContext ctx) {
 
-        SInstanceParser instanceParser = new SInstanceParser(getPrefixes(), Map.of());
+        SInstanceParser annotationsInstanceParser = new SInstanceParser(getPrefixes());
 
         return SignatureBuilder.builder()
             .iri(parseIRI(ctx))
             .parameters(parseParameters(ctx))
-            .annotations(parseAnnotations(ctx, instanceParser))
+            .annotations(parseAnnotations(ctx, annotationsInstanceParser))
             .build();
     }
 
+    @Override
     public Result<Signature> visitBaseTemplate(stOTTRParser.BaseTemplateContext ctx) {
         return BaseTemplateBuilder.builder()
             .signature(visitSignature(ctx.signature()))
@@ -73,12 +72,13 @@ public class STemplateParser extends SDocumentParser<Signature> implements Templ
             .map(t -> (Signature)t);
     }
 
+    @Override
     public Result<Signature> visitTemplate(stOTTRParser.TemplateContext ctx) {
 
         var signature = visitSignature(ctx.signature());
 
         Map<String, Term> variables = getVariableMap(signature);
-        SInstanceParser instanceParser = new SInstanceParser(getPrefixes(), variables);
+        SInstanceParser instanceParser = new SPatternInstanceParser(getPrefixes(), variables);
 
         return TemplateBuilder.builder()
             .signature(signature)
@@ -88,7 +88,7 @@ public class STemplateParser extends SDocumentParser<Signature> implements Templ
     }
 
     private Result<String> parseIRI(stOTTRParser.SignatureContext ctx) {
-        return getTermParser().visit(ctx.templateName())
+        return this.termParser.visit(ctx.templateName())
             .map(term -> (IRITerm) term)
             .map(IRITerm::getIri);
     }

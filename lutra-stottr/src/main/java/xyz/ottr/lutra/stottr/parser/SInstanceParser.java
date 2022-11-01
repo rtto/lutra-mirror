@@ -31,7 +31,6 @@ import xyz.ottr.lutra.model.Argument;
 import xyz.ottr.lutra.model.Instance;
 import xyz.ottr.lutra.model.ListExpander;
 import xyz.ottr.lutra.model.terms.IRITerm;
-import xyz.ottr.lutra.model.terms.Term;
 import xyz.ottr.lutra.parser.InstanceBuilder;
 import xyz.ottr.lutra.parser.InstanceParser;
 import xyz.ottr.lutra.stottr.STOTTR;
@@ -40,35 +39,26 @@ import xyz.ottr.lutra.system.Result;
 
 public class SInstanceParser extends SDocumentParser<Instance> implements InstanceParser<CharStream> {
 
-    private SArgumentParser argumentParser;
+    protected STermParser termParser;
+    protected SArgumentParser argumentParser;
 
-    /**
-     * Makes an InstanceParser with the given set of prefixes and variables,
-     * for parsing instances within a template's body.
-     */
-    public SInstanceParser(Map<String, String> prefixes, Map<String, Term> variables) {
-        super.setPrefixesAndVariables(prefixes, variables);
-        this.argumentParser = new SArgumentParser(getTermParser());
+    public SInstanceParser() {
+        // assumes initSubParsers() is called in super.
+    }
+
+    SInstanceParser(Map<String, String> prefixes) {
+        this();
+        this.prefixes = prefixes;
+        initSubParsers();
     }
 
     @Override
-    protected void initSubParsers(Map<String, String> prefixes) {
-        super.initSubParsers(prefixes);
-        this.argumentParser = new SArgumentParser(getTermParser());
+    protected void initSubParsers() {
+        this.termParser = new STermParser(this.prefixes);
+        this.argumentParser = new SArgumentParser(this.termParser);
     }
 
-    public Result visitBaseTemplate(stOTTRParser.BaseTemplateContext ctx) {
-        return SParserUtils.ignoreStatement("base template", ctx);
-    }
-
-    public Result visitTemplate(stOTTRParser.TemplateContext ctx) {
-        return SParserUtils.ignoreStatement("template", ctx);
-    }
-
-    public Result visitSignature(stOTTRParser.SignatureContext ctx) {
-        return SParserUtils.ignoreStatement("signature", ctx);
-    }
-
+    @Override
     public Result<Instance> visitInstance(stOTTRParser.InstanceContext ctx) {
         return InstanceBuilder.builder()
             .iri(parseIRI(ctx))
@@ -78,7 +68,7 @@ public class SInstanceParser extends SDocumentParser<Instance> implements Instan
     }
 
     private Result<String> parseIRI(stOTTRParser.InstanceContext ctx) {
-        return getTermParser()
+        return this.termParser
             .visitIri(ctx.templateName().iri())
             .map(iri -> ((IRITerm) iri).getIri());
     }

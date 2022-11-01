@@ -1,4 +1,4 @@
-package xyz.ottr.lutra.stottr.io;
+package xyz.ottr.lutra.stottr.parser;
 
 /*-
  * #%L
@@ -40,10 +40,6 @@ import xyz.ottr.lutra.model.terms.ListTerm;
 import xyz.ottr.lutra.model.terms.LiteralTerm;
 import xyz.ottr.lutra.model.terms.NoneTerm;
 import xyz.ottr.lutra.model.terms.Term;
-import xyz.ottr.lutra.stottr.parser.SInstanceParser;
-import xyz.ottr.lutra.stottr.parser.SParserUtils;
-import xyz.ottr.lutra.stottr.parser.SPrefixParser;
-import xyz.ottr.lutra.stottr.parser.STemplateParser;
 import xyz.ottr.lutra.system.Assertions;
 import xyz.ottr.lutra.system.Result;
 import xyz.ottr.lutra.system.ResultConsumer;
@@ -92,7 +88,7 @@ public class ParserTest {
 
     private List<Result<Instance>> parseInstances() {
 
-        SInstanceParser parser = new SInstanceParser(makePrefixes(), new HashMap<>());
+        SInstanceParser parser = new SInstanceParser(makePrefixes());
 
         String instances = ":T1(true, none, rdf:type, <http://some.uri/with#part>) . "
             + "cross | ex:T2(\"hello\"@no, ++ (\"one\", \"two\", \"three\")) . "
