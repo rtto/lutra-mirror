@@ -42,10 +42,6 @@ public class STypeParser extends SBaseParserVisitor<Type> {
         this.termParser = termParser;
     }
 
-    public Result<Type> visitType(stOTTRParser.TypeContext ctx) {
-        return visitChildren(ctx);
-    }
-
     public Result<Type> visitListType(stOTTRParser.ListTypeContext ctx) {
         Result<Type> innerRes = visitType(ctx.type());
         return innerRes.flatMap(inner -> Result.of(new ListType(inner)));

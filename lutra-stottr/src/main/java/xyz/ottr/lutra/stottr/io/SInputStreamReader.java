@@ -38,7 +38,7 @@ public class SInputStreamReader implements InputReader<InputStream, CharStream> 
         try {
             return ResultStream.innerOf(CharStreams.fromStream(input));
         } catch (IOException ex) {
-            return ResultStream.of(Result.empty(Message.error("Error reading stOTTR from stream: " + input.toString(), ex)));
+            return ResultStream.of(Result.empty(Message.error("Error reading stOTTR from stream: " + input, ex)));
         }
     }
 }

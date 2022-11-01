@@ -56,7 +56,7 @@ public class STemplateWriter implements TemplateWriter {
         //this.templates = new HashMap<>();
         this.prefixes = prefixes;
         this.msgs = new MessageHandler();
-        stringConsumer = null;
+        this.stringConsumer = null;
     }
 
     /*
@@ -73,7 +73,7 @@ public class STemplateWriter implements TemplateWriter {
         String iri = template.getIri();
         if (iri != null) {
             String content = writeSignature(template, true);
-            stringConsumer.apply(iri, content).ifPresent(msgs::add); //write template to file or console
+            this.stringConsumer.apply(iri, content).ifPresent(this.msgs::add); //write template to file or console
         }
     }
     
