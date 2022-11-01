@@ -107,11 +107,20 @@ public class FormatManager {
      * @param formatName
      *      Name of Format to retrieve.
      * @return
-     *      The registered Format with the given name, or null if
-     *      no Format with that name is registered. 
+     *      The result of the format, if it exists;
+     *      a null Result if the formatName is null (indicating an unspecified format);
+     *      or an empty Result if no Format with that name is registered.
      */
-    public Format getFormat(String formatName) {
-        return this.formats.get(getKey(formatName));
+    public Result<Format> getFormat(String formatName) {
+        
+        if (formatName == null) {
+            return Result.ofNullable(null);
+        }
+
+        var format = this.formats.get(getKey(formatName));
+        return format == null
+            ? Result.error("No format with name '" + formatName + "'. Registered formats are: " + this.formats.keySet() + ".")
+            : Result.of(format);
     }
 
     /**

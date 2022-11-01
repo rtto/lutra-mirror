@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.Optional;
 import java.util.function.BiFunction;
 import org.apache.commons.lang3.StringUtils;
@@ -154,20 +155,10 @@ public class CLI {
     }
 
     private boolean initLibrary() {
-
-        if (initStandardLibrary().isGreaterEqualThan(this.settings.haltOn)) {
-            return false;
-        }
-        if (parseLibrary().isGreaterEqualThan(this.settings.haltOn)) {
-            return false;
-        }
-        if (parsePrefixes().isGreaterEqualThan(this.settings.haltOn)) {
-            return false;
-        }
-        if (checkLibrary().isGreaterEqualThan(this.settings.haltOn)) {
-            return false;
-        }
-        return true;
+        return initStandardLibrary().isLessThan(this.settings.haltOn)
+            && parseLibrary().isLessThan(this.settings.haltOn)
+            && parsePrefixes().isLessThan(this.settings.haltOn)
+            && checkLibrary().isLessThan(this.settings.haltOn);
     }
 
     private void execute() {
@@ -279,11 +270,7 @@ public class CLI {
             return Message.Severity.least();
         }
 
-        Format libraryFormat = this.settings.libraryFormat == null
-                ? null
-                : this.templateManager.getFormat(this.settings.libraryFormat);
-
-        return printMessages(this.templateManager.readLibrary(libraryFormat, this.settings.library));
+        return printMessages(this.templateManager.readLibrary(this.settings.libraryFormat, Arrays.asList(this.settings.library)));
     }
 
     private Message.Severity parsePrefixes() {
@@ -291,12 +278,11 @@ public class CLI {
             return Message.Severity.least();
         }
         Result<Model> userPrefixes = RDFIO.fileReader().parse(this.settings.prefixes);
-        return this.messageHandler.use(userPrefixes, up -> this.templateManager.addPrefixes(up));
+        return this.messageHandler.use(userPrefixes, this.templateManager::addPrefixes);
     }
 
     public ResultStream<Instance> parseInstances() {
-        Format inFormat = this.templateManager.getFormat(this.settings.inputFormat);
-        return this.templateManager.readInstances(inFormat, this.settings.inputs);
+        return this.templateManager.readInstances(this.settings.inputFormat, this.settings.inputs);
     }
 
     public ResultStream<Instance> parseAndExpandInstances() {
@@ -304,17 +290,23 @@ public class CLI {
     }
 
     private void writeInstances(ResultStream<Instance> ins) {
-
-        Format outFormat = this.templateManager.getFormat(this.settings.outputFormat);
-        String filePath = this.settings.out; 
         PrintStream consoleStream = shouldPrintOutput() ? this.outStream : null;
-        var msgs = this.templateManager.writeInstances(ins, outFormat, filePath, consoleStream);
+        var msgs = this.templateManager.writeInstances(ins, this.settings.outputFormat, this.settings.out, consoleStream);
         printMessages(msgs);
     }
 
     private void writeTemplates(TemplateManager templateManager) {
-        Format outFormat = this.templateManager.getFormat(this.settings.outputFormat);
-        var msgs = templateManager.writeTemplates(outFormat, makeTemplateWriter(outFormat.getDefaultFileSuffix()));
+
+        // TODO: This is a temporary workaround. The lookup (including error handing if no such format
+        //  for formats have now moved from here into TemplateManager and FormatManager using Result. The
+        //  assumption that a format has only one suffix is probably wrong, e.g., RDF has many serialisations,
+        //  so this should probably be separated from the Format.
+        String suffix = templateManager.getFormatManager()
+            .getFormat(this.settings.outputFormat)
+            .map(Format::getDefaultFileSuffix)
+            .orElse("");
+
+        var msgs = templateManager.writeTemplates(this.settings.outputFormat, makeTemplateWriter(suffix));
         printMessages(msgs);
     }
 
@@ -322,7 +314,6 @@ public class CLI {
         var docttr = new DocttrManager(this.outStream, templateManager);
         docttr.write(Path.of(this.settings.out));
     }
-    
 
     private BiFunction<String, String, Optional<Message>> makeTemplateWriter(String suffix) {
         return (iri, str) -> {

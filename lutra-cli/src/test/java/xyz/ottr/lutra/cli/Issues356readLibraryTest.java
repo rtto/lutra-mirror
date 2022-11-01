@@ -24,6 +24,7 @@ package xyz.ottr.lutra.cli;
 
 import static org.junit.Assert.assertEquals;
 
+import java.util.List;
 import org.junit.Test;
 import xyz.ottr.lutra.TemplateManager;
 import xyz.ottr.lutra.api.StandardTemplateManager;
@@ -73,14 +74,14 @@ public class Issues356readLibraryTest {
     @Test
     public void readWottrLibrary() {
         TemplateManager templateManager = new StandardTemplateManager();
-        templateManager.readLibrary(wottrLibPath);
+        templateManager.readLibrary(null, List.of(wottrLibPath));
         assertEquals(1, templateManager.getTemplateStore().getAllTemplates().getStream().count());
     }
 
     @Test
     public void readStottrLibrary() {
         TemplateManager templateManager = new StandardTemplateManager();
-        templateManager.readLibrary(stottrLibPath);
+        templateManager.readLibrary(null, List.of(stottrLibPath));
         assertEquals(1, templateManager.getTemplateStore().getAllTemplates().getStream().count());
     }
 }
