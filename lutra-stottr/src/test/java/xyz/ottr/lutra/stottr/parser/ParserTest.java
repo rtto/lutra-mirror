@@ -263,5 +263,17 @@ public class ParserTest {
         testSignatureParsing(template);
     }
 
+    @Test
+    public void testTemplateCycle() {
+        String templates = "@prefix ex:     <http://example.com/ns#> ."
+            + "ex:A[?x] :: { ex:B(?x) } ."
+            + "ex:B[?x] :: { ex:C(?x) } ."
+            + "ex:C[?x] :: { ex:A(?x) } ."
+            + "ex:A(ex:uri) .";
+
+        testSignatureParsing(templates);
+    }
+
+
 }
 

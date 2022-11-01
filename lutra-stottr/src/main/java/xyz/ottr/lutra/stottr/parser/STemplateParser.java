@@ -46,6 +46,10 @@ public class STemplateParser extends SDocumentParser<Signature> implements Templ
     protected STermParser termParser;
     private SParameterParser paramsParser;
 
+    public STemplateParser() {
+        initSubParsers();
+    }
+
     @Override
     protected void initSubParsers() {
         this.termParser = new STermParser(this.prefixes);
@@ -55,7 +59,7 @@ public class STemplateParser extends SDocumentParser<Signature> implements Templ
     @Override
     public Result<Signature> visitSignature(stOTTRParser.SignatureContext ctx) {
 
-        SInstanceParser annotationsInstanceParser = new SInstanceParser(getPrefixes());
+        SInstanceParser annotationsInstanceParser = new SInstanceParser(this.prefixes);
 
         return SignatureBuilder.builder()
             .iri(parseIRI(ctx))
@@ -78,7 +82,7 @@ public class STemplateParser extends SDocumentParser<Signature> implements Templ
         var signature = visitSignature(ctx.signature());
 
         Map<String, Term> variables = getVariableMap(signature);
-        SInstanceParser instanceParser = new SPatternInstanceParser(getPrefixes(), variables);
+        SInstanceParser instanceParser = new SPatternInstanceParser(this.prefixes, variables);
 
         return TemplateBuilder.builder()
             .signature(signature)

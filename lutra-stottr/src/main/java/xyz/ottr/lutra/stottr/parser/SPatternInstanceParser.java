@@ -23,14 +23,12 @@ package xyz.ottr.lutra.stottr.parser;
  */
 
 import java.util.Map;
-import org.antlr.v4.runtime.CharStream;
 import xyz.ottr.lutra.model.terms.Term;
-import xyz.ottr.lutra.parser.InstanceParser;
 
-public class SPatternInstanceParser extends SInstanceParser implements InstanceParser<CharStream> {
+public class SPatternInstanceParser extends SInstanceParser {
 
     SPatternInstanceParser(Map<String, String> prefixes, Map<String, Term> variables) {
-        super(prefixes);
+        this.prefixes = prefixes;
         this.termParser = new STermParser(this.prefixes, variables);
         this.argumentParser = new SArgumentParser(this.termParser);
     }
