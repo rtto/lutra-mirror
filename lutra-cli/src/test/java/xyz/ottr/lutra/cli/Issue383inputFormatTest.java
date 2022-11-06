@@ -21,7 +21,9 @@ package xyz.ottr.lutra.cli;
  * <http://www.gnu.org/licenses/lgpl-2.1.html>.
  * #L%
  */
+import static org.junit.Assert.assertTrue;
 
+import java.util.Locale;
 import org.junit.Before;
 import org.junit.Test;
 import xyz.ottr.lutra.system.Assertions;
@@ -32,6 +34,19 @@ public class Issue383inputFormatTest {
     private static final String ROOT = "src/test/resources/issues/383inputFormat/";
     private CLI cli;
     private MessageHandler msgHandler;
+
+    public boolean containsSubstring(MessageHandler msgHandler, String substring) {
+        String modifiedSubstring = substring.trim().toLowerCase(Locale.ENGLISH);
+
+        for (Message m : msgHandler.getMessages()) {
+            String s = m.getMessage().toLowerCase(Locale.ENGLISH);
+
+            if (s.contains(modifiedSubstring)) {
+                return true;
+            }
+        }
+        return false;
+    }
 
     @Before
     public void init() {
@@ -53,6 +68,8 @@ public class Issue383inputFormatTest {
 
     @Test
     public void testTabottr() {
+        String expectedMessage = "Error parsing";
+
         String args = " "
                 + " --library " + ROOT + "pizza_templates.stottr "
                 + " --libraryFormat stottr"
@@ -61,11 +78,13 @@ public class Issue383inputFormatTest {
 
         cli.executeArgs(args.trim().split("\\s+"));
         Assertions.atLeast(msgHandler, Message.Severity.ERROR);
-        // TODO: verify error message
+        assertTrue(containsSubstring(msgHandler, expectedMessage));
     }
 
     @Test
     public void testBottr() {
+        String expectedMessage = "Error parsing";
+
         String args = " "
                 + " --library " + ROOT + "pizza_templates.stottr "
                 + " --libraryFormat stottr"
@@ -74,11 +93,13 @@ public class Issue383inputFormatTest {
 
         cli.executeArgs(args.trim().split("\\s+"));
         Assertions.atLeast(msgHandler, Message.Severity.ERROR);
-        // TODO: verify error message
+        assertTrue(containsSubstring(msgHandler, expectedMessage));
     }
 
     @Test
     public void testWottr() {
+        String expectedMessage = "Error parsing";
+
         String args = " "
                 + " --library " + ROOT + "pizza_templates.stottr "
                 + " --libraryFormat stottr"
@@ -87,6 +108,6 @@ public class Issue383inputFormatTest {
 
         cli.executeArgs(args.trim().split("\\s+"));
         Assertions.atLeast(msgHandler, Message.Severity.ERROR);
-        // TODO: verify error message
+        assertTrue(containsSubstring(msgHandler, expectedMessage));
     }
 }
