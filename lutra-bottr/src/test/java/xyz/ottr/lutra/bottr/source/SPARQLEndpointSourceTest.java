@@ -33,7 +33,8 @@ import xyz.ottr.lutra.system.ResultStream;
 
 public class SPARQLEndpointSourceTest {
 
-    @Test @Ignore("Fails sometimes due to 'HttpConnectTimeoutException: HTTP connect timed out'.")
+    @Test
+    @Ignore("Fails sometimes due to 'HttpConnectTimeoutException: HTTP connect timed out'.")
     public void prototypeTest() {
         String endpoint = "http://dbpedia.org/sparql";
         Source<RDFNode> source = new SPARQLEndpointSource(endpoint);
