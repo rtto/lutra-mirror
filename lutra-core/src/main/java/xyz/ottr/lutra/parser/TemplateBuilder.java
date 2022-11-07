@@ -58,7 +58,7 @@ public enum TemplateBuilder {
             return builder.map(Template.TemplateBuilder::build)
                 .flatMap(Template::validate);
         } else {
-            return Result.empty(builder);
+            return Result.empty(Message.error("Error building template."), builder);
         }
     }
 

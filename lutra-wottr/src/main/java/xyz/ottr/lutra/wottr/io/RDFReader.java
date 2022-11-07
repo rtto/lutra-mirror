@@ -83,6 +83,7 @@ public abstract class RDFReader<X> implements InputReader<X, Model> {
         if (parsingMessages.isEmpty() && errorHandler.messages.isEmpty()) {
             return result;
         } else {
+            // #324 Result::mapToStream
             return Result.empty(Message.error("Error parsing " + source + " with "
                 + source.getClass().getSimpleName() + "."), result);
         }

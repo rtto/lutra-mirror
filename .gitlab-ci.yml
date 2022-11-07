@@ -1,4 +1,4 @@
-image: maven:3.6.1-jdk-11
+image: maven:3.8.1-jdk-11-openj9
 
 stages:
   - build

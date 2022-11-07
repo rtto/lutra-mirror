@@ -22,7 +22,7 @@
   <description>
     Lutra is the reference implementation of the OTTR framework, http://ottr.xyz.
   </description>
-  <url>https://gitlab.com/ottr/lutra/lutra</url>
+  <url>http://lutra.ottr.xyz</url>
 
   <licenses>
     <license>
@@ -105,7 +105,14 @@
           <doclint>none</doclint>
           <failOnError>false</failOnError>
           <failOnWarnings>false</failOnWarnings>
-          <noindex>true</noindex>
+          <noindex>false</noindex>
+          <links>
+            <link>https://jena.apache.org/documentation/javadoc/jena/</link>
+            <link>https://projectlombok.org/api/</link>
+            <link>https://javadoc.io/doc/com.j2html/j2html/latest/</link>
+            <link>https://javadoc.io/doc/guru.nidi/graphviz-java/latest</link>
+            <link>https://junit.org/junit5/docs/current/api/</link>
+          </links>
         </configuration>
         <executions>
           <execution>

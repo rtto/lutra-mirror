@@ -49,7 +49,7 @@ public enum BaseTemplateBuilder {
             ? builder.map(BaseTemplate.BaseTemplateBuilder::build)
                 .flatMap(BaseTemplate::validate)
                 .map(b -> (BaseTemplate)b)
-            : Result.empty(builder);
+            : Result.empty(Message.error("Error building base template."), builder);
     }
 }
 
