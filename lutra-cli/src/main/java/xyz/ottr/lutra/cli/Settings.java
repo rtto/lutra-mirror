@@ -143,7 +143,7 @@ public class Settings {
                 + "default: ${DEFAULT-VALUE})"})
     public boolean debugStackTrace = false;
 
-    /* The following classes restrict the selections of FormatName to supported formats. */
+    /* The following classes *informs* the CLI about registered formats. It does not *validate* the input format name. */
     private static class AllFormats extends ArrayList<String> {
 
         private static final long serialVersionUID = 0L; // TODO Not correct!
