@@ -76,7 +76,6 @@ public class ExcelReader implements InstanceParser<String> {
     public static Result<List<Table>> parseTables(String filename) {
         // TODO Rather take a File as input, and handle possible file IO issues somewhere more "generic"?
         File file = new File(filename);
-        String errorMessage = "Error parsing tabOTTR instances. \n";
 
         // open file in read-only mode and without any password:
         try (Workbook workbook = WorkbookFactory.create(file, null, true)) {
@@ -86,12 +85,11 @@ public class ExcelReader implements InstanceParser<String> {
             }
             return Result.of(tables);
         } catch (NotImplementedException ex) {
-            String message = errorMessage + ex.getMessage()
-                + ". Unsupported function. Supported functions are: "
-                + String.join(", ", WorkbookEvaluator.getSupportedFunctionNames());
-            return Result.error(message);
+            return Result.error("Error parsing tabOTTR instances in file: " + filename
+                + ". Unsupported cell function; supported functions are: "
+                + String.join(", ", WorkbookEvaluator.getSupportedFunctionNames()), ex);
         } catch (IOException | RuntimeException ex) {
-            return Result.error(errorMessage + "Error parsing data from file: " + filename, ex);
+            return Result.error("Error parsing tabOTTR instances in file: " + filename, ex);
         }
     }
 

@@ -73,8 +73,7 @@ public abstract class RDFReader<X> implements InputReader<X, Model> {
             // ignore RiotParseException as this is collected by the errorHandler.
         } catch (RuntimeException ex) {
             // must catch all other exceptions since not throwing RiotParseExceptions may cause others to be thrown.
-            parsingMessages.add(Message.error("Error parsing " + source + " with "
-                + source.getClass().getSimpleName() + ".", ex));
+            parsingMessages.add(Message.error(ex));
         }
 
         var result = Result.of(model);
@@ -84,9 +83,8 @@ public abstract class RDFReader<X> implements InputReader<X, Model> {
         if (parsingMessages.isEmpty() && errorHandler.messages.isEmpty()) {
             return result;
         } else {
-            result.addMessage(Message.error("Error parsing RDF file: " + source));
-            // #324 Result::mapToStream
-            return Result.empty(result);
+            return Result.empty(Message.error("Error parsing " + source + " with "
+                + source.getClass().getSimpleName() + "."), result);
         }
     }
 
