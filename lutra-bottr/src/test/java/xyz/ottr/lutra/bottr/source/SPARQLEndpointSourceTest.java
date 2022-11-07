@@ -26,13 +26,14 @@ import static org.hamcrest.CoreMatchers.is;
 
 import org.apache.jena.rdf.model.RDFNode;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 import xyz.ottr.lutra.bottr.model.Source;
 import xyz.ottr.lutra.system.ResultStream;
 
 public class SPARQLEndpointSourceTest {
 
-    @Test
+    @Test @Ignore("Fails sometimes due to 'HttpConnectTimeoutException: HTTP connect timed out'.")
     public void prototypeTest() {
         String endpoint = "http://dbpedia.org/sparql";
         Source<RDFNode> source = new SPARQLEndpointSource(endpoint);
