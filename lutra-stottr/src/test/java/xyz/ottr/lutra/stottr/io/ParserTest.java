@@ -219,9 +219,9 @@ public class ParserTest {
                 " :T1 ",
                 " :T1( , ) .  ",
                 " :T1(true) ",
-                //" :T1(true, ) . ", // NullPointerException
+                //" :T1(true, ) . ", // #393 NullPointerException
                 " :T1(true, , false ) .",
-                //" :T1(true, , , false ) . ", // NullPointerException
+                //" :T1(true, , , false ) . ", // #393 NullPointerException
                 " cross :T1(\"hello\"@no, ++ (\"one\", \"two\", \"three\")) "
         );
 
