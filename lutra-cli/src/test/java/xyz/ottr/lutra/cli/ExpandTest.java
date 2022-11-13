@@ -38,18 +38,14 @@ import org.apache.jena.riot.RDFDataMgr;
 import org.junit.Ignore;
 import org.junit.Test;
 
+public class ExpandTest {
+    private static final String ROOT = "src/test/resources/expand/";
 
-public class CLIBasicUsageTest {
-    private static final String ROOT = "src/test/resources/CLIBasicUsage/";
-
-    /** -m  expand **/
     // -I stottr
     @Test
     public void expand_stottr_instances() {
-        String args = " "
-                + " -l " + ROOT + "person_template.stottr"
-                + " -L stottr "
-                + ROOT + "person_instances.stottr"
+        String args = " -f "
+                + ROOT + "instances/pizza_instances.stottr"
                 + " -I stottr";
 
         // Safe-keep System.out
@@ -60,7 +56,6 @@ public class CLIBasicUsageTest {
         PrintStream ps = new PrintStream(baos, true, StandardCharsets.UTF_8);
         System.setOut(ps);
 
-        //c.executeArgs(args.trim().split("\\s+"));
         CLIRunner.run(args);
 
         // Restore old out
@@ -71,7 +66,7 @@ public class CLIBasicUsageTest {
         Model actual = ModelFactory.createDefaultModel();
         RDFDataMgr.read(actual, new StringReader(baos.toString(StandardCharsets.UTF_8)), "", Lang.TURTLE);
 
-        Model expected = RDFDataMgr.loadModel(ROOT + "expected_expand_stottr.ttl");
+        Model expected = RDFDataMgr.loadModel(ROOT + "expected/expand_pizza.ttl");
 
         assertThat("should contain the same number of triples", actual.size(), is(expected.size()));
         TestUtils.testIsomorphicModels(actual, expected);
@@ -80,10 +75,8 @@ public class CLIBasicUsageTest {
     // -I wottr
     @Test
     public void expand_wottr_instances() {
-        String args = " "
-                + " -l " + ROOT + "person_template.stottr"
-                + " -L stottr "
-                + ROOT + "person_instances.wottr"
+        String args = " -f "
+                + ROOT + "instances/pizza_instances.wottr"
                 + " -I wottr";
 
         // Safe-keep System.out
@@ -104,7 +97,7 @@ public class CLIBasicUsageTest {
         Model actual = ModelFactory.createDefaultModel();
         RDFDataMgr.read(actual, new StringReader(baos.toString(StandardCharsets.UTF_8)), "", Lang.TURTLE);
 
-        Model expected = RDFDataMgr.loadModel(ROOT + "expected_expand_stottr.ttl");
+        Model expected = RDFDataMgr.loadModel(ROOT + "expected/expand_pizza.ttl");
 
         assertThat("should contain the same number of triples", actual.size(), is(expected.size()));
         TestUtils.testIsomorphicModels(actual, expected);
@@ -114,7 +107,7 @@ public class CLIBasicUsageTest {
     // -I tabottr
     @Test
     public void expand_tabottr_instances() {
-        String args = "-I tabottr -f --stdout " + ROOT + "NamedPizza-instances.xlsx";
+        String args = "-I tabottr -f --stdout " + ROOT + "instances/NamedPizza-instances.xlsx";
 
         // Safe-keep System.out
         final PrintStream stdOut = System.out;
@@ -142,7 +135,7 @@ public class CLIBasicUsageTest {
 
     @Test
     public void expand_tabottr_instances2() {
-        String args = "-I tabottr -f --stdout " + ROOT + "PizzaOntology-instances.xlsx";
+        String args = "-I tabottr -f --stdout " + ROOT + "instances/PizzaOntology-instances.xlsx";
 
         // Safe-keep System.out
         final PrintStream stdOut = System.out;
@@ -170,11 +163,10 @@ public class CLIBasicUsageTest {
 
     // -I bottr
     @Test
-    public void expand_bottr_instances() {
+    public void expand_bottr_RDFSource() {
         String bottrRoot = "../lutra-bottr/src/test/resources/maps/";
 
-        String args = "-I bottr -f --stdout -p "
-                + bottrRoot + "instanceMapRDFSource.ttl "
+        String args = "-I bottr -f --stdout  "
                 + bottrRoot + "instanceMapRDFSource.ttl";
 
         // Safe-keep System.out
@@ -195,10 +187,51 @@ public class CLIBasicUsageTest {
         Model actual = ModelFactory.createDefaultModel();
         RDFDataMgr.read(actual, new StringReader(baos.toString(StandardCharsets.UTF_8)), "", Lang.TURTLE);
 
-        Model expected = RDFDataMgr.loadModel(ROOT + "expected_expand_bottr.ttl");
+        Model expected = RDFDataMgr.loadModel(ROOT + "expected/expand_bottr_RDFSource.ttl");
 
         assertThat("should contain the same number of triples", actual.size(), is(expected.size()));
         TestUtils.testIsomorphicModels(actual, expected);
+    }
+
+    @Ignore("Relative source paths inside query don't work.")
+    @Test
+    public void expand_bottr_H2Source() {
+        String bottrRoot = "../lutra-bottr/src/test/resources/maps/";
+
+        String args = "-I bottr -f --stdout "
+                + bottrRoot + "instanceMapH2Source.ttl";
+
+        CLIRunner.run(args);
+
+    }
+
+    @Test
+    public void expand_bottr_SPARQLSource() {
+        String bottrRoot = "../lutra-bottr/src/test/resources/maps/";
+
+        String args = "-I bottr -f --stdout "
+                + bottrRoot + "instanceMapSPARQL.ttl";
+
+        // Safe-keep System.out
+        final PrintStream stdOut = System.out;
+
+        // Create stream to capture System.out:
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        PrintStream ps = new PrintStream(baos, true, StandardCharsets.UTF_8);
+        System.setOut(ps);
+
+        CLIRunner.run(args);
+
+        // Restore old out
+        stdOut.flush();
+        System.setOut(stdOut);
+
+        // parse captured console output to model
+        Model actual = ModelFactory.createDefaultModel();
+        RDFDataMgr.read(actual, new StringReader(baos.toString(StandardCharsets.UTF_8)), "", Lang.TURTLE);
+
+        assertThat("should contain the same number of triples", actual.size(), is(13L));
+
     }
 
     // --fetchMissing
@@ -212,7 +245,7 @@ public class CLIBasicUsageTest {
         PrintStream ps = new PrintStream(baos, true, StandardCharsets.UTF_8);
         System.setOut(ps);
 
-        CLIRunner.run("--mode expand --inputFormat stottr --fetchMissing " + ROOT + "pizza_instances.stottr");
+        CLIRunner.run("--mode expand --inputFormat stottr --fetchMissing " + ROOT + "instances/pizza_instances.stottr");
 
         // Restore old out
         stdOut.flush();
@@ -222,7 +255,7 @@ public class CLIBasicUsageTest {
         Model actual = ModelFactory.createDefaultModel();
         RDFDataMgr.read(actual, new StringReader(baos.toString(StandardCharsets.UTF_8)), "", Lang.TURTLE);
 
-        Model expected = RDFDataMgr.loadModel(ROOT + "expected_output_pizza.ttl");
+        Model expected = RDFDataMgr.loadModel(ROOT + "expected/expand_pizza.ttl");
 
         assertThat("should contain the same number of triples", actual.size(), is(expected.size()));
         TestUtils.testIsomorphicModels(actual, expected);
@@ -232,59 +265,18 @@ public class CLIBasicUsageTest {
     @Test
     public void fetchMissing_and_expand_to_file() {
 
-        String outFile = ROOT + "pizza_out_file.ttl";
+        String outFile = ROOT + "pizza_out.ttl";
 
         CLIRunner.run("--mode expand --inputFormat stottr --fetchMissing "
-                + ROOT + "pizza_instances.stottr" + " --output " + outFile);
+                + ROOT + "instances/pizza_instances.stottr" + " --output " + outFile);
 
         assertTrue(new File(outFile).exists());
 
         Model actual = RDFDataMgr.loadModel(outFile);
-        Model expected = RDFDataMgr.loadModel(ROOT + "expected_output_pizza.ttl");
+        Model expected = RDFDataMgr.loadModel(ROOT + "expected/expand_pizza.ttl");
 
         assertThat("should contain the same number of triples", actual.size(), is(expected.size()));
         TestUtils.testIsomorphicModels(actual, expected);
-    }
-
-    /** -m expandLibrary **/
-    @Test
-    public void expandLibrary() {
-
-    }
-
-    /** -m format **/
-    @Test
-    public void format() {
-
-    }
-
-    /** -m formatLibrary **/
-    @Test
-    public void formatLibrary() {
-
-    }
-
-    /** -m lint **/
-    @Test
-    public void lint() {
-
-    }
-
-    /** -m checkSyntax **/
-    @Test
-    public void checkSyntax() {
-
-    }
-
-    /** -m docttrLibrary **/
-    @Test
-    @Ignore
-    public void docttrLibrary() {
-        String inPath = ROOT + "NamedPizza.ttl";
-        String outPath = ROOT + "docttr";
-        CLIRunner.run("-m docttrLibrary -f -l " + inPath + " -o " + outPath);
-
-        assertTrue(new File(outPath, "index.html").exists());
     }
 
 }

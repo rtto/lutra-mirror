@@ -22,29 +22,21 @@ package xyz.ottr.lutra.cli;
  * #L%
  */
 
-import org.junit.Ignore;
+import static org.junit.Assert.assertTrue;
+
+import java.io.File;
 import org.junit.Test;
 
-public class BottrTest {
+public class DocttrLibraryTest {
 
-    private static final String ROOT = "../lutra-bottr/src/test/resources/maps/";
-    
-    @Ignore("Relative source paths inside query don't work.")
-    public void expandH2Source() {
-        runCLI("-I bottr -f --stdout " + ROOT + "instanceMapH2Source.ttl");
-    }
+    private static final String ROOT = "src/test/resources/";
+    private static final String IN = ROOT + "templates/";
+    private static final String OUT = ROOT + "docttr/";
 
     @Test
-    public void expandRDFSource() {
-        runCLI("-I bottr -f --stdout -p " + ROOT + "instanceMapRDFSource.ttl " + ROOT + "instanceMapRDFSource.ttl");
+    public void test1() {
+        CLIRunner.run("--mode docttrLibrary -f -l " + IN + " -o " + OUT);
+        assertTrue(new File(OUT, "index.html").exists());
     }
 
-    @Test
-    public void expandSPARQLSource() {
-        runCLI("-I bottr -f --stdout " + ROOT + "instanceMapSPARQL.ttl");
-    }
-
-    public void runCLI(String cmd) {
-        CLIRunner.run(cmd.split(" "));
-    }
 }
