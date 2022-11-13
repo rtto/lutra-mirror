@@ -331,8 +331,8 @@
                         <!-- CLI uses System.out: -->
                         <exclude>**/xyz/ottr/lutra/cli/CLI.class</exclude>
 
-                        <!-- CLIBasicUsageTest uses System.out: -->
-                        <exclude>**/xyz/ottr/lutra/cli/CLIBasicUsageTest.class</exclude>
+                        <!-- ExpandTest uses System.out: -->
+                        <exclude>**/xyz/ottr/lutra/cli/ExpandTest.class</exclude>
 
                         <!-- Issue327 uses System.out: -->
                         <exclude>**/xyz/ottr/lutra/cli/Issues327Test.class</exclude>

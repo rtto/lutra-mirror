@@ -78,7 +78,6 @@ public class TripleInstanceGraphVisualiserTest {
     public void perform_BlankNodeTerm() {
         Term blankNodeTerm = new BlankNodeTerm();
         MutableNode mn = visualiser.perform(blankNodeTerm);
-        System.out.println(mn);
         assertEquals("", ((Label) mn.get("label")).value());
         assertEquals("filled", mn.get("style"));
         assertNull(mn.get("URL"));
