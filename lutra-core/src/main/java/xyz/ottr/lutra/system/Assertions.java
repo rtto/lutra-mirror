@@ -26,6 +26,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.util.Collections;
+import java.util.Locale;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -74,6 +75,23 @@ public enum Assertions {
 
     public static void atLeast(Result result, Message.Severity severity) {
         atLeast(result.getMessageHandler(), severity);
+    }
+
+    /**
+     * Checks if the messagehandler contains a message of servery Error or worse,
+     * with an error messages that contains the given string.
+     * @param messageHandler handler to check
+     * @param expected string that at least one error message must contain
+     */
+
+    public static void containsErrorMessageFragment(MessageHandler messageHandler, String expected) {
+        var test = messageHandler.getMessages().stream()
+                .filter(m -> m.getSeverity().isGreaterEqualThan(Message.Severity.ERROR))
+                .map(Message::getMessage)
+                .map(s -> s.toLowerCase(Locale.ENGLISH))
+                .anyMatch(s -> s.contains(expected.trim().toLowerCase(Locale.ENGLISH)));
+
+        assertThat(test, is(true));
     }
 
 }
