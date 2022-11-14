@@ -50,6 +50,12 @@
                 - j2v8_macosx_x86_64
                 - jcl-over-slf4j (slf4j-api)
             -->
+            <exclusions>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>jul-to-slf4j</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
     </dependencies>
