@@ -21,6 +21,7 @@ package xyz.ottr.lutra.stottr.io;
  * <http://www.gnu.org/licenses/lgpl-2.1.html>.
  * #L%
  */
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -230,7 +231,7 @@ public class ParserTest {
 
             ResultConsumer<Instance> consumer = new ResultConsumer<>();
             parser.parseString(s).forEach(consumer);
-            Assertions.assertContainsExpectedString(consumer.getMessageHandler(), expectedString);
+            Assertions.containsErrorMessageFragment(consumer.getMessageHandler(), expectedString);
         }
 
     }
@@ -482,10 +483,7 @@ public class ParserTest {
         );
 
         for (String s : signatures) {
-            STemplateParser parser = new STemplateParser();
-            ResultConsumer<Signature> consumer = new ResultConsumer<>();
-            parser.parseString(s).forEach(consumer);
-            Assertions.assertContainsExpectedString(consumer.getMessageHandler(), expectedString);
+            parseIncorrectSignature(s, expectedString);
         }
     }
 
@@ -585,10 +583,7 @@ public class ParserTest {
         );
 
         for (String s : signatures) {
-            STemplateParser parser = new STemplateParser();
-            ResultConsumer<Signature> consumer = new ResultConsumer<>();
-            parser.parseString(s).forEach(consumer);
-            Assertions.assertContainsExpectedString(consumer.getMessageHandler(), expectedString);
+            parseIncorrectSignature(s, expectedString);
         }
     }
 
@@ -749,6 +744,13 @@ public class ParserTest {
         Assertions.noErrors(result);
 
         return result.get();
+    }
+
+    private void parseIncorrectSignature(String signatureString, String expectedError) {
+        STemplateParser parser = new STemplateParser();
+        ResultConsumer<Signature> consumer = new ResultConsumer<>();
+        parser.parseString(signatureString).forEach(consumer);
+        Assertions.containsErrorMessageFragment(consumer.getMessageHandler(), expectedError);
     }
 
 }

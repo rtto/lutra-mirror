@@ -22,13 +22,13 @@ package xyz.ottr.lutra.system;
  * #L%
  */
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
+
 import java.util.Collections;
 import java.util.Locale;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
 
 public enum Assertions {
     ;
