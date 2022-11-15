@@ -1,18 +1,5 @@
 package xyz.ottr.lutra.cli;
 
-
-import static org.junit.Assert.assertEquals;
-
-import java.util.List;
-import java.util.stream.Collectors;
-import org.junit.Test;
-import xyz.ottr.lutra.io.InstanceReader;
-import xyz.ottr.lutra.model.Instance;
-import xyz.ottr.lutra.system.Result;
-import xyz.ottr.lutra.wottr.io.RDFIO;
-import xyz.ottr.lutra.wottr.parser.WInstanceParser;
-
-
 /*-
  * #%L
  * xyz.ottr.lutra:lutra-cli
@@ -35,6 +22,16 @@ import xyz.ottr.lutra.wottr.parser.WInstanceParser;
  * #L%
  */
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import java.util.List;
+import java.util.stream.Collectors;
+import org.junit.jupiter.api.Test;
+import xyz.ottr.lutra.io.InstanceReader;
+import xyz.ottr.lutra.model.Instance;
+import xyz.ottr.lutra.system.Result;
+import xyz.ottr.lutra.wottr.io.RDFIO;
+import xyz.ottr.lutra.wottr.parser.WInstanceParser;
 
 
 public class Issues233Test {

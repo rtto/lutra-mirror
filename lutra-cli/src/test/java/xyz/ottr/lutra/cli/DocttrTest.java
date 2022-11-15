@@ -22,8 +22,8 @@ package xyz.ottr.lutra.cli;
  * #L%
  */
 
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 public class DocttrTest {
 
@@ -31,8 +31,8 @@ public class DocttrTest {
     private static final String IN = ROOT + "templates/";
     private static final String OUT = ROOT + "docttr/";
 
+    @Disabled
     @Test
-    @Ignore
     public void test1() {
         CLIRunner.run("--mode docttrLibrary -f -l " + IN + " -o " + OUT);
     }

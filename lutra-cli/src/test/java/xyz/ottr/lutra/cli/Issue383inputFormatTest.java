@@ -21,11 +21,11 @@ package xyz.ottr.lutra.cli;
  * <http://www.gnu.org/licenses/lgpl-2.1.html>.
  * #L%
  */
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Locale;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import xyz.ottr.lutra.system.Assertions;
 import xyz.ottr.lutra.system.Message;
 import xyz.ottr.lutra.system.MessageHandler;
@@ -48,7 +48,7 @@ public class Issue383inputFormatTest {
         return false;
     }
 
-    @Before
+    @BeforeEach
     public void init() {
         cli = new CLI();
         msgHandler = cli.getMessageHandler();

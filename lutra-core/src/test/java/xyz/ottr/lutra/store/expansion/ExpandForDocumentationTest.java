@@ -22,11 +22,11 @@ package xyz.ottr.lutra.store.expansion;
  * #L%
  */
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.HashSet;
 import java.util.Set;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import xyz.ottr.lutra.model.Argument;
 import xyz.ottr.lutra.model.BaseTemplate;
 import xyz.ottr.lutra.model.Instance;

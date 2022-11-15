@@ -22,9 +22,9 @@ package xyz.ottr.lutra.stottr.io;
  * #L%
  */
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -32,7 +32,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import org.apache.jena.vocabulary.XSD;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import xyz.ottr.lutra.model.Argument;
 import xyz.ottr.lutra.model.BaseTemplate;
 import xyz.ottr.lutra.model.Instance;

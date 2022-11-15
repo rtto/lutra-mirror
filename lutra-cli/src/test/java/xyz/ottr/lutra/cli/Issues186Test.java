@@ -22,11 +22,11 @@ package xyz.ottr.lutra.cli;
  * #L%
  */
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import xyz.ottr.lutra.system.Assertions;
 import xyz.ottr.lutra.system.Message;
 import xyz.ottr.lutra.system.MessageHandler;
@@ -48,7 +48,7 @@ public class Issues186Test {
         MessageHandler msgs = cli.getMessageHandler();
         cli.executeArgs(args.trim().split("\\s+"));
 
-        assertTrue("Output file not found.", Files.isRegularFile(Paths.get(ROOT + "out.ttl")));
+        assertTrue(Files.isRegularFile(Paths.get(ROOT + "out.ttl")), "Output file not found.");
         Assertions.noErrors(msgs);
     }
 

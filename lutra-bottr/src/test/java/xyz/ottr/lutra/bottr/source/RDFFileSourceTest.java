@@ -28,8 +28,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import org.apache.jena.rdf.model.RDFNode;
-import org.junit.Assert;
-import org.junit.Test;
+import org.hamcrest.MatcherAssert;
+import org.junit.jupiter.api.Test;
 import xyz.ottr.lutra.bottr.model.Source;
 import xyz.ottr.lutra.system.ResultStream;
 
@@ -51,6 +51,6 @@ public class RDFFileSourceTest {
         ResultStream<?> result = source.execute(
                 "PREFIX foaf: <http://xmlns.com/foaf/0.1/>  " 
                         + "SELECT ?s WHERE { ?s a foaf:Person }");
-        Assert.assertThat(result.getStream().count(), is(6L));
+        MatcherAssert.assertThat(result.getStream().count(), is(6L));
     }
 }

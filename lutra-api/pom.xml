@@ -46,6 +46,11 @@
             <!-- for transitive dependencies see module POM -->
         </dependency>
 
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-params</artifactId>
+        </dependency>
+
     </dependencies>
 
     <build>
