@@ -22,14 +22,14 @@ package xyz.ottr.lutra.cli;
  * #L%
  */
 
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 public class BottrTest {
 
     private static final String ROOT = "../lutra-bottr/src/test/resources/maps/";
     
-    @Ignore("Relative source paths inside query don't work.")
+    @Disabled("Relative source paths inside query don't work.")
     public void expandH2Source() {
         runCLI("-I bottr -f --stdout " + ROOT + "instanceMapH2Source.ttl");
     }

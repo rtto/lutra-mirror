@@ -22,7 +22,7 @@ package xyz.ottr.lutra.cli;
  * #L%
  */
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import xyz.ottr.lutra.system.Assertions;
 import xyz.ottr.lutra.system.MessageHandler;
 

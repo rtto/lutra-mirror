@@ -22,64 +22,50 @@ package xyz.ottr.lutra.bottr.parser;
  * #L%
  */
 
-import static org.hamcrest.CoreMatchers.is;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.params.provider.Arguments.arguments;
 
-import java.util.Collection;
-import java.util.List;
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import java.util.stream.Stream;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import xyz.ottr.lutra.bottr.util.ListParser;
 
-@RunWith(Parameterized.class)
 public class ListParserPositiveTest {
 
     ListParser parser = new ListParser('[', ']', ",");
 
-    @Parameterized.Parameters(name = "{index}: {0}")
-    public static Collection<Object[]> data() {
+    @ParameterizedTest
+    @MethodSource("listToSize")
+    public void test(String list, int expectedSize) {
+        int actualSize = this.parser.toList(list).size();
+        assertEquals(expectedSize, actualSize);
+    }
 
-        return List.of(
-            new Object[][]{
-                { "[a, b, c]", 3 },
-                { "[a]", 1 },
-                { "[]", 0 },
+    public static Stream<Arguments> listToSize() {
 
-                { "", 0},
-                { ",,,", 4 },
-                { ",", 2 },
+        return Stream.of(
+                arguments("[a, b, c]", 3),
+                arguments("[a]", 1),
+                arguments("[]", 0),
 
-                { "[[[a]]]", 1 },
-                { "[[a   ], [ b ]]", 2 },
-                { "[[a], [b], [c]]", 3 },
-                { "[[a, b, c], [d, e, f], [g, h]]", 3 },
-                { "[[a, b, c], e, [d, e, f], [g, h]]", 4 },
+                arguments("", 0),
+                arguments(",,,", 4),
+                arguments(",", 2),
+
+                arguments("[[[a]]]", 1),
+                arguments("[[a   ], [ b ]]", 2),
+                arguments("[[a], [b], [c]]", 3),
+                arguments("[[a, b, c], [d, e, f], [g, h]]", 3),
+                arguments("[[a, b, c], e, [d, e, f], [g, h]]", 4),
 
                 // testing empty elements
-                { "[, ]", 2 },
-                { "[, , ]", 3 },
-                { "[[a, b, c], e, , [d, e, f], [g, h]]", 5 },
-                { "[a, ]", 2 },
-                { "[[a], [b], [c], ]", 4 }
-            });
-    }
-
-    private final int size;
-    private final String list;
-
-    public ListParserPositiveTest(String list, int size) {
-        this.list = list;
-        this.size = size;
-    }
-
-    @Test public void testSuccess() {
-        test(this.list, this.size);
-    }
-
-    public void test(String value, int size) {
-        List list = this.parser.toList(value);
-        Assert.assertThat(list.size(), is(size));
+                arguments("[, ]", 2),
+                arguments("[, , ]", 3),
+                arguments("[[a, b, c], e, , [d, e, f], [g, h]]", 5),
+                arguments("[a, ]", 2),
+                arguments("[[a], [b], [c], ]", 4)
+        );
     }
 
 }

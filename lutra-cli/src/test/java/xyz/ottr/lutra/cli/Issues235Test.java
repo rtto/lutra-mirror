@@ -23,7 +23,7 @@ package xyz.ottr.lutra.cli;
  */
 
 import org.apache.jena.rdf.model.Model;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import xyz.ottr.lutra.wottr.io.RDFIO;
 
 public class Issues235Test {

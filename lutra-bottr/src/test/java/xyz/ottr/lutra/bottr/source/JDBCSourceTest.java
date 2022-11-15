@@ -24,6 +24,8 @@ package xyz.ottr.lutra.bottr.source;
 
 import static org.hamcrest.CoreMatchers.is;
 
+import java.io.File;
+import java.nio.file.Path;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -33,10 +35,9 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.apache.jena.shared.PrefixMapping;
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
+import org.hamcrest.MatcherAssert;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 import xyz.ottr.lutra.bottr.model.ArgumentMaps;
 import xyz.ottr.lutra.model.Argument;
 import xyz.ottr.lutra.model.terms.LiteralTerm;
@@ -44,15 +45,15 @@ import xyz.ottr.lutra.system.Result;
 import xyz.ottr.lutra.system.ResultStream;
 
 public class JDBCSourceTest {
-  
-    @Rule
-    public TemporaryFolder testFolder = new TemporaryFolder();
+
+    @TempDir
+    private Path testFolder;
 
     @Test
     public void prototypeTest() throws ClassNotFoundException, SQLException {
 
         String driver = "org.h2.Driver";
-        String url = "jdbc:h2:" + this.testFolder.getRoot().getAbsolutePath() + "/db";
+        String url = "jdbc:h2:" + testFolder.toAbsolutePath() + File.separator + "db";
         String user = "user";
         String pass = "pass";
 
@@ -100,7 +101,7 @@ public class JDBCSourceTest {
             .collect(Collectors.toSet());
 
         //Compare dbOutput to expected result
-        Assert.assertThat(dbOutput, is(expected));
+        MatcherAssert.assertThat(dbOutput, is(expected));
 
         //Clean up
         stmt.close();

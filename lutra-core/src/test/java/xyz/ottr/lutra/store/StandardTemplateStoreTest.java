@@ -27,8 +27,7 @@ import static xyz.ottr.lutra.model.terms.ObjectTerm.var;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import xyz.ottr.lutra.OTTR;
 import xyz.ottr.lutra.model.Argument;
 import xyz.ottr.lutra.model.BaseTemplate;
@@ -55,9 +54,9 @@ public class StandardTemplateStoreTest {
         Template template = buildDummyTemplate("iri-0", new String[] {"x", "y"});
         manager.addTemplate(template);
 
-        Assert.assertTrue("BaseTemplate should be in store", manager.containsBase("base"));
-        Assert.assertTrue("Non-BaseTemplate should be in store but not as BaseTemplate",
-                (!manager.containsBase("iri-0")) && manager.contains("iri-0"));
+        org.junit.jupiter.api.Assertions.assertTrue(manager.containsBase("base"), "BaseTemplate should be in store");
+        org.junit.jupiter.api.Assertions.assertTrue((!manager.containsBase("iri-0")) && manager.contains("iri-0"),
+                "Non-BaseTemplate should be in store but not as BaseTemplate");
     }
 
     @Test
@@ -67,27 +66,29 @@ public class StandardTemplateStoreTest {
         // success - no signature
         Template template0 = buildDummyTemplate("iri-0", new String[] {"x", "y"});
         manager.addTemplate(template0);
-        Assert.assertTrue("Adding Template without matching Signature present should succeed", manager.containsTemplate("iri-0"));
+        org.junit.jupiter.api.Assertions.assertTrue(manager.containsTemplate("iri-0"),
+                "Adding Template without matching Signature present should succeed");
 
         // success - existing signature
         Signature signature1 = buildDummySignature("iri-1", new String[] {"x", "y"});
         manager.addSignature(signature1);
         Template template1 = buildDummyTemplate("iri-1", new String[] {"x", "y"});
         manager.addTemplate(template1);
-        Assert.assertTrue("Adding Template with matching Signature present should succeed", manager.containsTemplate("iri-1"));
+        org.junit.jupiter.api.Assertions.assertTrue(manager.containsTemplate("iri-1"),
+                "Adding Template with matching Signature present should succeed");
 
         // existing Sig is Template
         Template template2 = buildDummyTemplate("iri-2", new String[] {"a", "b"});
         manager.addTemplate(template2);
-        Assert.assertFalse("Adding Template when there is already one in the store with dependencies set should "
-                + "not succeed", manager.addTemplate(template2).isPresent());
+        org.junit.jupiter.api.Assertions.assertFalse(manager.addTemplate(template2).isPresent(),
+                "Adding Template when there is already one in the store with dependencies set should not succeed");
 
         // differing parameters
         Signature signature2 = buildDummySignature("iri-2", new String[] {"x", "y"});
         manager.addSignature(signature2);
         Template template3 = buildDummyTemplate("iri-2", new String[] {"x", "y", "z"});
-        Assert.assertFalse("Adding Template with different parameter number than Signature should not succeed",
-                manager.addTemplate(template3).isPresent());
+        org.junit.jupiter.api.Assertions.assertFalse(manager.addTemplate(template3).isPresent(),
+                "Adding Template with different parameter number than Signature should not succeed");
         // TODO add "real" differing parameters when implemented not just list length
     }
 
@@ -99,10 +100,12 @@ public class StandardTemplateStoreTest {
         Signature signature2 = buildDummySignature("iri-2", new String[] {"x", "y"});
 
         manager.addSignature(signature1);
-        Assert.assertTrue("Adding Signature to empty store should succeed", manager.containsSignature("iri-1"));
+        org.junit.jupiter.api.Assertions.assertTrue(manager.containsSignature("iri-1"), "Adding Signature to empty store should succeed");
         manager.addSignature(signature2);
-        Assert.assertTrue("Adding non-existing Signature to store should succeed", manager.containsSignature("iri-2"));
-        Assert.assertFalse("Adding existing Signature to store should return false", manager.addSignature(signature1).isPresent());
+        org.junit.jupiter.api.Assertions.assertTrue(manager.containsSignature("iri-2"),
+                "Adding non-existing Signature to store should succeed");
+        org.junit.jupiter.api.Assertions.assertFalse(manager.addSignature(signature1).isPresent(),
+                "Adding existing Signature to store should return false");
         // TODO add Signature that is a Template with/without matching params once this is implemented
     }
 
@@ -117,8 +120,10 @@ public class StandardTemplateStoreTest {
         Template template1 = buildDummyTemplate("iri-1", new String[] {"x", "y"});
         manager.addTemplate(template1);
 
-        Assert.assertTrue("Checking for Template that is in the store should return true", manager.contains("iri-1"));
-        Assert.assertFalse("Checking for Template that is not in the store should return false", manager.contains("iri-99"));
+        org.junit.jupiter.api.Assertions.assertTrue(manager.contains("iri-1"),
+                "Checking for Template that is in the store should return true");
+        org.junit.jupiter.api.Assertions.assertFalse(manager.contains("iri-99"),
+                "Checking for Template that is not in the store should return false");
     }
 
     @Test
@@ -128,8 +133,10 @@ public class StandardTemplateStoreTest {
         Signature signature1 = buildDummySignature("iri-1", new String[] {"x", "y"});
         manager.addSignature(signature1);
 
-        Assert.assertTrue("Checking for Signature that is in the store should return true", manager.contains("iri-1"));
-        Assert.assertFalse("Checking for Signature that is not in the store should return false", manager.contains("iri-99"));
+        org.junit.jupiter.api.Assertions.assertTrue(manager.contains("iri-1"),
+                "Checking for Signature that is in the store should return true");
+        org.junit.jupiter.api.Assertions.assertFalse(manager.contains("iri-99"),
+                "Checking for Signature that is not in the store should return false");
     }
 
     @Test
@@ -140,9 +147,10 @@ public class StandardTemplateStoreTest {
         Template template1 = buildDummyTemplate("iri-1", new String[] {"x", "y"});
         manager.addTemplate(template1);
 
-        Assert.assertFalse("Checking for IRI that is in the store but is not a BaseTemplate should return false",
-                manager.containsBase("iri-1"));
-        Assert.assertTrue("Checking for a BaseTemplate should return true", manager.containsBase(OTTR.BaseURI.Triple));
+        org.junit.jupiter.api.Assertions.assertFalse(manager.containsBase("iri-1"),
+                "Checking for IRI that is in the store but is not a BaseTemplate should return false");
+        org.junit.jupiter.api.Assertions.assertTrue(manager.containsBase(OTTR.BaseURI.Triple),
+                "Checking for a BaseTemplate should return true");
     }
 
     @Test
@@ -156,11 +164,12 @@ public class StandardTemplateStoreTest {
         Signature signature2 = buildDummySignature("iri-2", new String[] {"x", "y"});
         manager.addSignature(signature2);
 
-        Assert.assertFalse("Checking for IRI that is not in the store should return false", manager.containsDefinitionOf("iri-3"));
-        Assert.assertFalse("Checking for IRI that is in the store but is not a Template should return false",
-                manager.containsDefinitionOf("iri-2"));
-        Assert.assertTrue("Checking for IRI that is in the store and is a Template should return true",
-                manager.containsDefinitionOf("iri-1"));
+        org.junit.jupiter.api.Assertions.assertFalse(manager.containsDefinitionOf("iri-3"),
+                "Checking for IRI that is not in the store should return false");
+        org.junit.jupiter.api.Assertions.assertFalse(manager.containsDefinitionOf("iri-2"),
+                "Checking for IRI that is in the store but is not a Template should return false");
+        org.junit.jupiter.api.Assertions.assertTrue(manager.containsDefinitionOf("iri-1"),
+                "Checking for IRI that is in the store and is a Template should return true");
     }
 
     @Test
@@ -170,10 +179,10 @@ public class StandardTemplateStoreTest {
         Signature signature1 = buildDummySignature("iri-1", new String[] {"x", "y"});
         manager.addSignature(signature1);
 
-        Assert.assertTrue("Requesting existing Signature from store should produce value",
-                manager.getSignature("iri-1").isPresent());
-        Assert.assertFalse("Requesting non-existing Signature from store should not produce value",
-                manager.getSignature("iri-2").isPresent());
+        org.junit.jupiter.api.Assertions.assertTrue(manager.getSignature("iri-1").isPresent(),
+                "Requesting existing Signature from store should produce value");
+        org.junit.jupiter.api.Assertions.assertFalse(manager.getSignature("iri-2").isPresent(),
+                "Requesting non-existing Signature from store should not produce value");
     }
 
     @Test
@@ -185,16 +194,17 @@ public class StandardTemplateStoreTest {
         Template template1 = buildDummyTemplate("iri-1", new String[] {"x", "y"});
         manager.addTemplate(template1);
 
-        Assert.assertTrue("Requesting existing Template from store should produce value", manager.getTemplate("iri-1").isPresent());
-        Assert.assertFalse("Requesting non-existing Template from store should not produce value",
-                manager.getTemplate("iri-2").isPresent());
+        org.junit.jupiter.api.Assertions.assertTrue(manager.getTemplate("iri-1").isPresent(),
+                "Requesting existing Template from store should produce value");
+        org.junit.jupiter.api.Assertions.assertFalse(manager.getTemplate("iri-2").isPresent(),
+                "Requesting non-existing Template from store should not produce value");
 
         Signature signature2 = buildDummySignature("iri-2", new String[] {"x", "y"});
         manager.addSignature(signature2);
 
         // store containing Signature but asked for getTemplate()
-        Assert.assertFalse("Requesting Template that is a Signature in the store should not produce value",
-                manager.getTemplate("iri-2").isPresent());
+        org.junit.jupiter.api.Assertions.assertFalse(manager.getTemplate("iri-2").isPresent(),
+                "Requesting Template that is a Signature in the store should not produce value");
     }
 
     @Test
@@ -209,7 +219,8 @@ public class StandardTemplateStoreTest {
         Signature signature2 = buildDummySignature("iri-2", new String[] {"x", "y"});
         manager.addSignature(signature2);
 
-        Assert.assertEquals("Number of Templates should be as expected", 2, manager.getAllBaseTemplates().getStream().count());
+        org.junit.jupiter.api.Assertions.assertEquals(2, manager.getAllBaseTemplates().getStream().count(),
+                "Number of Templates should be as expected");
     }
 
     @Test
@@ -224,7 +235,8 @@ public class StandardTemplateStoreTest {
         Signature signature2 = buildDummySignature("iri-2", new String[] {"x", "y"});
         manager.addSignature(signature2);
 
-        Assert.assertEquals("Number of Signatures should be as expected", 4, manager.getAllSignatures().getStream().count());
+        org.junit.jupiter.api.Assertions.assertEquals(4, manager.getAllSignatures().getStream().count(),
+                "Number of Signatures should be as expected");
     }
 
     @Test
@@ -239,7 +251,8 @@ public class StandardTemplateStoreTest {
         Signature signature2 = buildDummySignature("iri-2", new String[] {"x", "y"});
         manager.addSignature(signature2);
 
-        Assert.assertEquals("Number of BaseTemplates should be as expected", 2, manager.getAllBaseTemplates().getStream().count());
+        org.junit.jupiter.api.Assertions.assertEquals(2, manager.getAllBaseTemplates().getStream().count(),
+                "Number of BaseTemplates should be as expected");
     }
 
     @Test
@@ -276,14 +289,14 @@ public class StandardTemplateStoreTest {
         manager.addTemplate(template4);
 
         Result<Set<String>> dependentOnBase = manager.getDependsOn("base");
-        Assert.assertTrue(dependentOnBase.isPresent());
-        Assert.assertEquals(Set.of("iri-1", "iri-4"), dependentOnBase.get());
-        Assert.assertNotEquals(Set.of("iri-2"), dependentOnBase.get());
+        org.junit.jupiter.api.Assertions.assertTrue(dependentOnBase.isPresent());
+        org.junit.jupiter.api.Assertions.assertEquals(Set.of("iri-1", "iri-4"), dependentOnBase.get());
+        org.junit.jupiter.api.Assertions.assertNotEquals(Set.of("iri-2"), dependentOnBase.get());
 
         Result<Set<String>> dependentOnIri1 = manager.getDependsOn("iri-1");
-        Assert.assertTrue(dependentOnIri1.isPresent());
-        Assert.assertEquals(Set.of("iri-3"), dependentOnIri1.get());
-        Assert.assertNotEquals(Set.of("iri-4"), dependentOnIri1.get());
+        org.junit.jupiter.api.Assertions.assertTrue(dependentOnIri1.isPresent());
+        org.junit.jupiter.api.Assertions.assertEquals(Set.of("iri-3"), dependentOnIri1.get());
+        org.junit.jupiter.api.Assertions.assertNotEquals(Set.of("iri-4"), dependentOnIri1.get());
     }
 
     @Test
@@ -315,7 +328,8 @@ public class StandardTemplateStoreTest {
                 .build();
         manager.addTemplate(template3);
 
-        Assert.assertEquals("Only missing dependencies should be returned", Set.of("iri-2", "iri-0"), manager.getMissingDependencies());
+        org.junit.jupiter.api.Assertions.assertEquals(Set.of("iri-2", "iri-0"), manager.getMissingDependencies(),
+                "Only missing dependencies should be returned");
     }
 
     @Test
@@ -325,14 +339,18 @@ public class StandardTemplateStoreTest {
         Template template1 = buildDummyTemplate("iri-1", new String[] {"x", "y"});
         manager.accept(template1);
 
-        Assert.assertTrue("Added Signature should be found in TemplateStore", manager.getSignature("iri-1").isPresent());
-        Assert.assertTrue("Added Template should be found in TemplateStore", manager.getTemplate("iri-1").isPresent());
+        org.junit.jupiter.api.Assertions.assertTrue(manager.getSignature("iri-1").isPresent(),
+                "Added Signature should be found in TemplateStore");
+        org.junit.jupiter.api.Assertions.assertTrue(manager.getTemplate("iri-1").isPresent(),
+                "Added Template should be found in TemplateStore");
 
         Signature signature2 = buildDummySignature("iri-2", new String[] {"x", "y"});
         manager.accept(signature2);
 
-        Assert.assertTrue("Added Signature should be found in TemplateStore", manager.getSignature("iri-2").isPresent());
-        Assert.assertFalse("Added Signature should not be a Template in the in TemplateStore", manager.getTemplate("iri-2").isPresent());
+        org.junit.jupiter.api.Assertions.assertTrue(manager.getSignature("iri-2").isPresent(),
+                "Added Signature should be found in TemplateStore");
+        org.junit.jupiter.api.Assertions.assertFalse(manager.getTemplate("iri-2").isPresent(),
+                "Added Signature should not be a Template in the in TemplateStore");
     }
 
     @Test
