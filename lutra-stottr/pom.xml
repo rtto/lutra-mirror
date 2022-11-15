@@ -33,10 +33,7 @@
         <dependency>
             <groupId>org.antlr</groupId>
             <artifactId>antlr4-runtime</artifactId>
-            <version>${antlr4-version}</version>
-            <!-- transitive dependencies:
-                TODO
-            -->
+            <!-- for transitive dependencies see module POM -->
         </dependency>
     </dependencies>
 
