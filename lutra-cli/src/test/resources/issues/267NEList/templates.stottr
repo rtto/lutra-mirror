@@ -1,0 +1,12 @@
+@prefix ottr: <http://ns.ottr.xyz/0.4/> .
+@prefix ex: <http://example.com/ns#> .
+
+
+ex:associate_with_list[ottr:IRI ?iri, List<ottr:IRI> ?list] :: { 
+	ottr:NullableTriple(?iri, ex:hasList, ?list) 
+} .
+
+ex:associate_with_NElist[ottr:IRI ?iri, NEList<ottr:IRI> ?list] :: { 
+	ottr:NullableTriple(?iri, ex:hasNEList, ?list) 
+} .
+
