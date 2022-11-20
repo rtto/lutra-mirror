@@ -30,6 +30,7 @@ import xyz.ottr.lutra.system.MessageHandler;
 
 public class Issue267NEListTest {
     private static final String ROOT = "src/test/resources/issues/267NEList/";
+
     private CLI cli;
     private MessageHandler msgHandler;
 
@@ -76,7 +77,7 @@ public class Issue267NEListTest {
                 + " " + ROOT + "instances_list_none.stottr";
 
         cli.executeArgs(args.trim().split("\\s+"));
-        Assertions.atLeast(msgHandler, Message.Severity.ERROR);
+        Assertions.atLeast(msgHandler, Message.Severity.WARNING);
     }
 
     @Test
@@ -89,6 +90,6 @@ public class Issue267NEListTest {
                 + " " + ROOT + "instances_nelist_none.stottr";
 
         cli.executeArgs(args.trim().split("\\s+"));
-        Assertions.atLeast(msgHandler, Message.Severity.ERROR);
+        Assertions.atLeast(msgHandler, Message.Severity.WARNING);
     }
 }
