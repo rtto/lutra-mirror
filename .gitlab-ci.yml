@@ -52,7 +52,9 @@ coverage:
     - test
   artifacts:
     reports:
-      cobertura: jacoco/target/site/coverage.xml
+      coverage_report:
+        coverage_format: cobertura
+        path: coverage/cobertura-coverage.xml
 
 ## This job keeps the main artifacts from the build and publishes them to ottr.xyz.
 release:
