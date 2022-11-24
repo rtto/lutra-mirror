@@ -25,9 +25,9 @@ package xyz.ottr.lutra.wottr.parser;
 import java.io.File;
 import java.util.Optional;
 import java.util.function.BiFunction;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 import xyz.ottr.lutra.io.Files;
 import xyz.ottr.lutra.io.TemplateReader;
 import xyz.ottr.lutra.model.Template;
@@ -50,7 +50,7 @@ public class PrototypeTest {
 
     private static final String newTemplate = "http://data.aibel.com/ottr/tpl/etl/book/ASME_B16_9_DIM/NewTemplate";
 
-    @BeforeClass    
+    @BeforeAll
     public static void load() {
         legacyReader = new TemplateReader(RDFIO.fileReader(), new xyz.ottr.lutra.wottr.parser.WTemplateParser());
         templateReader = new TemplateReader(RDFIO.fileReader(), new WTemplateParser());
@@ -152,7 +152,7 @@ public class PrototypeTest {
         directoryToBeDeleted.delete();
     }
 
-    @AfterClass
+    @AfterAll
     public static void clear() {
         graph = null;
         templateReader = null;

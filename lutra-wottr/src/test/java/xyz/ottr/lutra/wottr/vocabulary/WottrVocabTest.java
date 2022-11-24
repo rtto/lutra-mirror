@@ -42,8 +42,8 @@ import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.ResourceFactory;
-import org.junit.Assert;
-import org.junit.Test;
+import org.hamcrest.MatcherAssert;
+import org.junit.jupiter.api.Test;
 import xyz.ottr.lutra.wottr.WOTTR;
 
 public class WottrVocabTest {
@@ -78,7 +78,7 @@ public class WottrVocabTest {
 
         // we want all lutraResources to be contained in specResources, i.e. soundness, not completeness
         clazzResources.removeAll(specResources);
-        Assert.assertThat("Some resources are not defined in vocabulary spec. ", clazzResources, is(Collections.emptyList()));
+        MatcherAssert.assertThat("Some resources are not defined in vocabulary spec. ", clazzResources, is(Collections.emptyList()));
     }
 
     private Set<Resource> getResources(Model model) {

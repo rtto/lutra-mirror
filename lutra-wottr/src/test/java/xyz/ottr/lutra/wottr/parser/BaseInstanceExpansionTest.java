@@ -22,48 +22,36 @@ package xyz.ottr.lutra.wottr.parser;
  * #L%
  */
 
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.params.provider.Arguments.arguments;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import java.util.stream.Stream;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import xyz.ottr.lutra.wottr.io.RDFIO;
 
-@RunWith(Parameterized.class)
 public class BaseInstanceExpansionTest {
 
-    @Parameterized.Parameters(name = "{index}: {0}, {1}")
-    public static List<String[]> data() {
-
-        List<String[]> data = new ArrayList<>();
-
+    public static Stream<Arguments> data() {
         Path root = Paths.get("src",  "test", "resources", "baseinstances");
-
-        data.add(new String[]{ root.resolve("test1-in.ttl").toString(), root.resolve("test1-out.ttl").toString() });
-        return data;
+        return Stream.of(
+                arguments(root.resolve("test1-in.ttl").toString(), root.resolve("test1-out.ttl").toString())
+        );
     }
 
-    private final String input;
-    private final String output;
+    @ParameterizedTest
+    @MethodSource("data")
+    public void shouldBeIsomorphic(String input, String output) {
 
-    public BaseInstanceExpansionTest(String input, String output) {
-        this.input = input;
-        this.output = output;
-    }
+        var parseOutput = RDFIO.fileReader().parse(output).get();
 
-    @Test
-    public void shouldBeIsomorphic() {
-
-        var output = RDFIO.fileReader().parse(this.output).get();
-
-        assertNotNull(output);
+        assertNotNull(parseOutput);
 
         ModelUtils.testIsomorphicModels(
-            ModelUtils.getOTTRParsedRDFModel(this.input),
-            output);
+            ModelUtils.getOTTRParsedRDFModel(input),
+            parseOutput);
     }
 }

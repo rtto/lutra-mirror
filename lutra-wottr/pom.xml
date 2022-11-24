@@ -44,6 +44,11 @@
                 - libthrift (javax.annotation-api, slf4j-api, httpclient (httpcore))
             -->
         </dependency>
+
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-params</artifactId>
+        </dependency>
     </dependencies>
 
     <build>

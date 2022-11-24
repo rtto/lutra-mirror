@@ -23,9 +23,8 @@ package xyz.ottr.lutra.store.graph;
  */
 
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static xyz.ottr.lutra.model.terms.ObjectTerm.cons;
 import static xyz.ottr.lutra.model.terms.ObjectTerm.var;
 
@@ -33,7 +32,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
-import org.junit.Test;
+import org.hamcrest.MatcherAssert;
+import org.junit.jupiter.api.Test;
 import xyz.ottr.lutra.OTTR;
 import xyz.ottr.lutra.model.Argument;
 import xyz.ottr.lutra.model.BaseTemplate;
@@ -174,8 +174,8 @@ public class DependencyGraphTest {
 
         var expanded = expander.expandInstance(tripleInstance).collect(Collectors.toList());
 
-        assertThat(expanded.size(), is(1));
-        assertThat(expanded.get(0).get(), is(tripleInstance));
+        MatcherAssert.assertThat(expanded.size(), is(1));
+        MatcherAssert.assertThat(expanded.get(0).get(), is(tripleInstance));
     }
 
     @Test
@@ -304,7 +304,7 @@ public class DependencyGraphTest {
 
         Assertions.noErrors(consumer);
 
-        assertThat(expandedIns, is(shouldEqual));
+        MatcherAssert.assertThat(expandedIns, is(shouldEqual));
 
         Result<? extends TemplateStore> graphRes = expander.expandAll();
         assertTrue(graphRes.isPresent());
