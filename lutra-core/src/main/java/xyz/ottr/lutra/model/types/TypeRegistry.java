@@ -56,6 +56,7 @@ public enum TypeRegistry {
     public static final BasicType BOT = asType(OTTR.TypeURI.Bot);
     public static final BasicType IRI = asType(OTTR.TypeURI.IRI);
     public static final BasicType LITERAL = asType(OTTR.TypeURI.Literal);
+    public static final BasicType INTEGER = asType(OTTR.TypeURI.Integer);
 
     public static final ComplexType LUB_TOP = new LUBType(TOP);
     public static final ComplexType LUB_IRI = new LUBType(IRI);

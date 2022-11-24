@@ -19,14 +19,14 @@
  * <http://www.gnu.org/licenses/lgpl-2.1.html>.
  * #L%
  */
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 import guru.nidi.graphviz.attribute.Label;
 import guru.nidi.graphviz.model.MutableNode;
 import org.apache.jena.shared.PrefixMapping;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import xyz.ottr.lutra.OTTR;
 import xyz.ottr.lutra.docttr.visualisation.TripleInstanceGraphVisualiser;
 import xyz.ottr.lutra.model.terms.BlankNodeTerm;
@@ -46,7 +46,7 @@ public class TripleInstanceGraphVisualiserTest {
     public static final String CLR_NONE = "pink";
 
 
-    @Before
+    @BeforeEach
     public void setup() {
         PrefixMapping prefixes = OTTR.getDefaultPrefixes();
         visualiser = new TripleInstanceGraphVisualiser(prefixes);

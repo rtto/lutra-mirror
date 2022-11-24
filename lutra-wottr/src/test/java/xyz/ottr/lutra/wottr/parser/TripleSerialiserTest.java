@@ -22,15 +22,15 @@ package xyz.ottr.lutra.wottr.parser;
  * #L%
  */
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
-import static org.junit.Assert.assertThat;
 
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import org.apache.jena.rdf.model.Model;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import xyz.ottr.lutra.OTTR;
 import xyz.ottr.lutra.model.Instance;
 import xyz.ottr.lutra.system.Result;

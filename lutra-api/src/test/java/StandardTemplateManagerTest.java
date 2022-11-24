@@ -20,16 +20,17 @@
  * #L%
  */
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import xyz.ottr.lutra.OTTR;
 import xyz.ottr.lutra.api.StandardTemplateManager;
 
 public class StandardTemplateManagerTest {
 
-    @Test public void nonEmptyStandardLibrary() {
+    @Test
+    public void nonEmptyStandardLibrary() {
 
         var manager = new StandardTemplateManager();
         manager.loadStandardTemplateLibrary();

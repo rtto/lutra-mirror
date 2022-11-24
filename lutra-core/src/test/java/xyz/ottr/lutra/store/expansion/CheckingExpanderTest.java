@@ -25,7 +25,7 @@ package xyz.ottr.lutra.store.expansion;
 import static xyz.ottr.lutra.model.terms.ObjectTerm.var;
 
 import java.util.stream.Collectors;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import xyz.ottr.lutra.OTTR;
 import xyz.ottr.lutra.model.Argument;
 import xyz.ottr.lutra.model.Instance;
@@ -62,7 +62,7 @@ public class CheckingExpanderTest {
 
         ResultStream<Instance> resultStream = expander.expandInstance(instance);
         Result<Instance> emptyResult = resultStream.collect(Collectors.toList()).get(0);
-        Assertions.assertContainsExpectedString(emptyResult.getMessageHandler(), expectedString);
+        Assertions.containsErrorMessageFragment(emptyResult.getMessageHandler(), expectedString);
     }
 
     @Test
@@ -84,7 +84,7 @@ public class CheckingExpanderTest {
 
         ResultStream<Instance> resultStream = expander.expandInstance(instance);
         Result<Instance> emptyResult = resultStream.collect(Collectors.toList()).get(0);
-        Assertions.assertContainsExpectedString(emptyResult.getMessageHandler(), expectedString);
+        Assertions.containsErrorMessageFragment(emptyResult.getMessageHandler(), expectedString);
     }
 
     @Test
@@ -107,8 +107,8 @@ public class CheckingExpanderTest {
 
         ResultStream<Instance> resultStream = expander.expandInstance(instance);
         Result<Instance> emptyResult = resultStream.collect(Collectors.toList()).get(0);
-        Assertions.assertContainsExpectedString(emptyResult.getMessageHandler(), expectedString1);
-        Assertions.assertContainsExpectedString(emptyResult.getMessageHandler(), expectedString2);
+        Assertions.containsErrorMessageFragment(emptyResult.getMessageHandler(), expectedString1);
+        Assertions.containsErrorMessageFragment(emptyResult.getMessageHandler(), expectedString2);
     }
 
     private Template buildDummyTemplate(String iri) {

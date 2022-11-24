@@ -24,7 +24,7 @@ package xyz.ottr.lutra.cli;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -35,8 +35,8 @@ import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 public class ExpandTest {
     private static final String ROOT = "src/test/resources/expand/";
@@ -193,7 +193,7 @@ public class ExpandTest {
         TestUtils.testIsomorphicModels(actual, expected);
     }
 
-    @Ignore("Relative source paths inside query don't work.")
+    @Disabled("Relative source paths inside query don't work.")
     @Test
     public void expand_bottr_H2Source() {
         String bottrRoot = "../lutra-bottr/src/test/resources/maps/";

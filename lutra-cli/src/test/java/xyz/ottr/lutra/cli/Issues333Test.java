@@ -22,23 +22,26 @@ package xyz.ottr.lutra.cli;
  * #L%
  */
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
-import java.io.File;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import xyz.ottr.lutra.system.Assertions;
+import xyz.ottr.lutra.system.MessageHandler;
 
-public class DocttrLibraryTest {
+public class Issues333Test {
 
-    private static final String ROOT = "src/test/resources/";
-    private static final String IN = ROOT + "templates/";
-    private static final String OUT = ROOT + "docttr/";
-
-    @Disabled
+    private static final String ROOT = "src/test/resources/issues/333/";
+    
     @Test
-    public void test1() {
-        CLIRunner.run("--mode docttrLibrary -f -l " + IN + " -o " + OUT);
-        assertTrue(new File(OUT, "index.html").exists());
+    public void test() {
+        String args = " -f -I stottr "
+                + " " + ROOT + "instances.stottr";
+
+        CLI cli = new CLI();
+        MessageHandler msgs = cli.getMessageHandler();
+        cli.executeArgs(args.trim().split("\\s+"));
+
+        Assertions.noWarnings(msgs);
+
     }
+
 
 }

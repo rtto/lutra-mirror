@@ -41,13 +41,17 @@ public class ResultStream<E> {
 
     private final Stream<Result<E>> results;
 
+    //
+    // CONSTRUCTORS
+    //
+
     public ResultStream(Stream<Result<E>> results) {
         this.results = results;
     }
 
-    public ResultStream(Collection<Result<E>> results) {
-        this.results = results.stream();
-    }
+    //
+    // STATIC CONSTRUCTORS
+    //
 
     /**
      * @see Stream#empty()
@@ -57,21 +61,44 @@ public class ResultStream<E> {
     }
 
     /**
+     * Returns a ResultStream containing a single element
+     * which is the result of applying Result#ofNullable(R)
+     * to argument.
+     */
+    public static <R> ResultStream<R> ofNullable(R val) {
+        return of(Result.ofNullable(val));
+    }
+
+
+    /**
      * @see Stream#of(Object)
      */
     public static <R> ResultStream<R> of(Result<R> r) {
         return new ResultStream<>(Stream.of(r));
     }
 
+
+    public static <R> ResultStream<R> of(Stream<Result<R>> results) {
+        return new ResultStream<R>(results);
+    }
+
     public static <R> ResultStream<R> of(Collection<Result<R>> results) {
-        return new ResultStream<>(results);
+        return of(results.stream());
     }
 
     public static <E> ResultStream<E> of(Iterator<Result<E>> iterator) {
         Stream<Result<E>> stream = StreamSupport.stream(
             Spliterators.spliteratorUnknownSize(iterator, Spliterator.ORDERED),
             false);
-        return new ResultStream<>(stream);
+        return of(stream);
+    }
+
+    /**
+     * Returns a ResultStream containing a single element
+     * which is a Result containing the argument.
+     */
+    public static <R> ResultStream<R> innerOf(R val) {
+        return of(Result.of(val));
     }
 
     /**
@@ -92,7 +119,7 @@ public class ResultStream<E> {
 
     /**
      * Returns a ResultStream consisting of one Result per element
-     * in argument array.
+     * in argument iterator.
      */
     public static <R> ResultStream<R> innerOf(Iterator<R> iterator) {
         Stream<R> stream = StreamSupport.stream(
@@ -100,7 +127,6 @@ public class ResultStream<E> {
             false);
         return innerOf(stream);
     }
-
 
     /**
      * Returns a ResultStream consisting of one Result per element
@@ -110,22 +136,9 @@ public class ResultStream<E> {
         return innerOf(Arrays.stream(array));
     }
 
-    /**
-     * Returns a ResultStream containing a single element
-     * which is a Result containing the argument.
-     */
-    public static <R> ResultStream<R> innerOf(R val) {
-        return of(Result.of(val));
-    }
-
-    /**
-     * Returns a ResultStream containing a single element
-     * which is the system of applying Result#ofNullable(R)
-     * to argument.
-     */
-    public static <R> ResultStream<R> ofNullable(R val) {
-        return of(Result.ofNullable(val));
-    }
+    //
+    // METHODS "COPIED" FROM Stream
+    //
 
     /**
      * Returns the underlying stream of Results.
@@ -149,8 +162,7 @@ public class ResultStream<E> {
     }
 
     /**
-     * Returns a new ResultStream which contains all Results of
-     * both the argument streams.
+     * @see Stream#concat(Stream, Stream)
      */
     public static <R> ResultStream<R> concat(ResultStream<R> a, ResultStream<R> b) {
         return new ResultStream<>(Stream.concat(a.results, b.results));
@@ -165,13 +177,6 @@ public class ResultStream<E> {
     }
 
     /**
-     * @see Stream#flatMap(Function)
-     */
-    public <R> ResultStream<R> flatMap(Function<? super Result<E>, ? extends ResultStream<R>> f) {
-        return new ResultStream<>(this.results.flatMap(f.andThen(ResultStream::getStream)));
-    }
-
-    /**
      * @see Stream#peek(Consumer)
      */
     public ResultStream<E> peek(Consumer<? super Result<E>> consumer) {
@@ -179,10 +184,10 @@ public class ResultStream<E> {
     }
 
     /**
-     * @see Stream#map(Function)
+     * @see Stream#findFirst()
      */
-    public <R> ResultStream<R> map(Function<? super Result<E>, ? extends Result<R>> f) {
-        return new ResultStream<>(this.results.map(f));
+    public Result<E> findFirst() {
+        return this.results.findFirst().orElse(Result.empty());
     }
 
     /**
@@ -190,15 +195,6 @@ public class ResultStream<E> {
      */
     public ResultStream<E> filter(Predicate<Result<E>> pred) {
         return new ResultStream<>(this.results.filter(pred));
-    }
-
-    /**
-     * Similar to #filter(Predicate) except that the filter
-     * is applied to the inner values, instead of at each Result.
-     */
-    public ResultStream<E> innerFilter(Predicate<E> pred) {
-        return new ResultStream<>(this.results.filter(res ->
-                res.isPresent() && pred.test(res.get())));
     }
 
     /**
@@ -212,17 +208,23 @@ public class ResultStream<E> {
      * @see Stream#forEach(Consumer)
      */
     public void forEach(Consumer<? super Result<E>> consumer) {
-
         this.results.forEach(consumer);
     }
 
-    /**
-     * Applies the argument Consumer to each value
-     * of each present Result in this stream.
-     */
-    public void innerForEach(Consumer<? super E> consumer) {
+    // MAPs
 
-        this.results.forEach(r -> r.ifPresent(consumer));
+    /**
+     * @see Stream#map(Function)
+     */
+    public <R> ResultStream<R> map(Function<? super Result<E>, ? extends Result<R>> f) {
+        return new ResultStream<>(this.results.map(f));
+    }
+
+    /**
+     * @see Stream#flatMap(Function)
+     */
+    public <R> ResultStream<R> flatMap(Function<? super Result<E>, ? extends ResultStream<R>> f) {
+        return new ResultStream<>(this.results.flatMap(f.andThen(ResultStream::getStream)));
     }
 
     /**
@@ -233,6 +235,36 @@ public class ResultStream<E> {
         return new ResultStream<>(this.results.map(r -> r.flatMap(f)));
     }
 
+    //
+    // "INNER" METHODS
+    //
+
+    /**
+     * Similar to #filter(Predicate) except that the filter
+     * is applied to the inner values, instead of to each Result.
+     */
+    public ResultStream<E> innerFilter(Predicate<E> pred) {
+        return new ResultStream<>(this.results.filter(res ->
+            res.isPresent() && pred.test(res.get())));
+    }
+
+    /**
+     * Applies the argument Consumer to each value
+     * of each present Result in this stream.
+     */
+    public void innerForEach(Consumer<? super E> consumer) {
+        this.results.forEach(r -> r.ifPresent(consumer));
+    }
+
+    /**
+     * Returns a new ResultStream consisting of all this' Results,
+     * but with argument function mapped over each.
+     */
+    public <R> ResultStream<R> innerMap(Function<? super E, R> f) {
+        return new ResultStream<>(this.results.map(r -> r.map(f)));
+    }
+
+
     /**
      * Returns a new ResultStream consisting of the concatenation of all streams
      * resulting from applying each Result's mapToStream on argument function.
@@ -242,11 +274,13 @@ public class ResultStream<E> {
     }
 
     /**
-     * Returns a new ResultStream consisting of all this' Results,
-     * but with argument function mapped over each.
+     * Similar to Result#flatMapCompose(Function), that is, returns a new function
+     * which applies the first function to the argument, and then innerFlatMap-s the
+     * second function over the result.
      */
-    public <R> ResultStream<R> innerMap(Function<? super E, R> f) {
-        return new ResultStream<>(this.results.map(r -> r.map(f)));
+    public static <A,B,C> Function<A, ResultStream<C>> innerFlatMapCompose(Function<A, ResultStream<B>> f,
+                                                                           Function<? super B, ResultStream<C>> g) {
+        return a -> f.apply(a).innerFlatMap(g);
     }
 
     /**
@@ -298,13 +332,5 @@ public class ResultStream<E> {
         return res;
     }
     
-    /**
-     * Similar to Result#flatMapCompose(Function), that is, returns a new function
-     * which applies the first function to the argument, and then innerFlatMap-s the
-     * second function over the system.
-     */
-    public static <A,B,C> Function<A, ResultStream<C>> innerFlatMapCompose(Function<A, ResultStream<B>> f,
-            Function<? super B, ResultStream<C>> g) {
-        return a -> f.apply(a).innerFlatMap(g);
-    }
+
 }

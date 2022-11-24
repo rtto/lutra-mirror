@@ -26,8 +26,9 @@ import static org.hamcrest.CoreMatchers.is;
 
 import java.util.stream.Collectors;
 import org.apache.jena.rdf.model.RDFNode;
-import org.junit.Assert;
-import org.junit.Test;
+import org.hamcrest.MatcherAssert;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import xyz.ottr.lutra.bottr.model.Source;
 import xyz.ottr.lutra.system.Assertions;
 import xyz.ottr.lutra.system.Result;
@@ -36,15 +37,17 @@ import xyz.ottr.lutra.system.ResultStream;
 public class SPARQLEndpointSourceTest {
 
     @Test
-    public void prototype() {
+    @Disabled("Fails sometimes due to 'HttpConnectTimeoutException: HTTP connect timed out'.")
+    public void prototypeTest() {
         String endpoint = "http://dbpedia.org/sparql";
         Source<RDFNode> source = new SPARQLEndpointSource(endpoint);
         
         ResultStream<?> result = source.execute("SELECT ?s ?p ?o WHERE { ?s ?p ?o } LIMIT 13");
-        Assert.assertThat(result.getStream().count(), is(13L));
+        MatcherAssert.assertThat(result.getStream().count(), is(13L));
     }
 
     @Test
+    @Disabled
     public void emptyQueryResult() {
         String expectedString = "no results";
         String endpoint = "http://dbpedia.org/sparql";
@@ -52,7 +55,7 @@ public class SPARQLEndpointSourceTest {
 
         ResultStream<?> resultStream = source.execute("SELECT ?s ?p ?o WHERE { ?s ?p ?o} LIMIT 0");
         Result<?> emptyResult = resultStream.getStream().collect(Collectors.toList()).get(0);
-        Assertions.assertContainsExpectedString(emptyResult.getMessageHandler(), expectedString);
+        Assertions.containsErrorMessageFragment(emptyResult.getMessageHandler(), expectedString);
     }
 
 }

@@ -1,4 +1,4 @@
-image: maven:3.6.1-jdk-11
+image: maven:3.8.1-jdk-11-openj9
 
 stages:
   - build
@@ -27,7 +27,6 @@ build:
     paths:
       - ./*
       
-
 test:
   stage: test
   script:
@@ -46,6 +45,7 @@ release:
     - apt-get update -qq && apt-get install -y -qq sshpass
     - sshpass -V
     - export SSHPASS=$FTP_PASS
+    - echo ${CI_COMMIT_REF_NAME}
     - cp lutra.jar lutra-$CI_COMMIT_REF_NAME.jar
     - sshpass -e scp -o stricthostkeychecking=no lutra-$CI_COMMIT_REF_NAME.jar $FTP_HOST:/www.ottr.xyz/downloads/lutra/
   only:
@@ -83,8 +83,8 @@ deploy-docker-image:
     - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
   script:
     - cd lutra-restapi
-    - docker build --pull -t "$CI_REGISTRY_IMAGE${tag}" .
-    - docker push "$CI_REGISTRY_IMAGE${tag}"
+    - docker build --pull -t "$CI_REGISTRY_IMAGE${CI_COMMIT_REF_NAME}" .
+    - docker push "$CI_REGISTRY_IMAGE${CI_COMMIT_REF_NAME}"
   only:
     - master
 

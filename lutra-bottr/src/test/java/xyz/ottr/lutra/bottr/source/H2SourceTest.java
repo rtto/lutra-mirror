@@ -34,10 +34,10 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.apache.jena.shared.PrefixMapping;
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
+import org.hamcrest.MatcherAssert;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 import xyz.ottr.lutra.bottr.model.ArgumentMaps;
 import xyz.ottr.lutra.bottr.model.InstanceMap;
 import xyz.ottr.lutra.bottr.model.Source;
@@ -50,8 +50,8 @@ public class H2SourceTest {
 
     private static final Path ROOT = Paths.get("src", "test", "resources");
 
-    @Rule
-    public TemporaryFolder testFolder = new TemporaryFolder();
+    @TempDir
+    private Path testFolder;
 
     @Test
     public void prototypeTest() throws IOException {
@@ -61,7 +61,7 @@ public class H2SourceTest {
         prefixes.setNsPrefix("ex", "http://example.com/ns#");
 
         // Write CSV file
-        String root = this.testFolder.getRoot().getAbsolutePath();
+        String root = testFolder.toAbsolutePath().toString();
         String csvFilename = root + "/data.csv";
         String csvContent = "Subject,Predicate,Object\n" // first row contains column names
             + "ex:A1,ex:B1,ex:C1\n"
@@ -84,7 +84,7 @@ public class H2SourceTest {
             .build();
 
         // there should be three triples
-        Assert.assertThat(map.get().getStream().filter(Result::isPresent).count(), is(3L));
+        MatcherAssert.assertThat(map.get().getStream().filter(Result::isPresent).count(), is(3L));
     }
 
     private Set<List<String>> getExpectedResult() {
@@ -123,6 +123,7 @@ public class H2SourceTest {
     }
 
     @Test
+    @Disabled
     public void emptyQueryResult() {
         String expectedString = "no results";
         String input = getAbsolutePath("sources/csv/win.csv");
@@ -130,7 +131,7 @@ public class H2SourceTest {
 
         ResultStream<?> resultStream = csvTest.execute("SELECT ID, NAME FROM CSVREAD('" + input + "') WHERE 1=2;");
         Result<?> emptyResult = resultStream.getStream().collect(Collectors.toList()).get(0);
-        Assertions.assertContainsExpectedString(emptyResult.getMessageHandler(), expectedString);
+        Assertions.containsErrorMessageFragment(emptyResult.getMessageHandler(), expectedString);
     }
 
     private String getAbsolutePath(String file) {
@@ -142,7 +143,7 @@ public class H2SourceTest {
             .filter(Result::isPresent)
             .map(Result::get)
             .collect(Collectors.toSet());
-        Assert.assertThat(dbOutput, is(getExpectedResult()));
+        MatcherAssert.assertThat(dbOutput, is(getExpectedResult()));
     }
 
 }

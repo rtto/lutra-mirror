@@ -29,8 +29,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.apache.jena.shared.PrefixMapping;
-import org.junit.Assert;
-import org.junit.Test;
+import org.hamcrest.MatcherAssert;
+import org.junit.jupiter.api.Test;
 import xyz.ottr.lutra.OTTR;
 import xyz.ottr.lutra.bottr.source.StringArgumentMap;
 import xyz.ottr.lutra.model.Argument;
@@ -118,9 +118,9 @@ public class MapTest {
             .filter(Result::isPresent)
             .map(Result::get)
             .collect(Collectors.toSet());
-        
-        Assert.assertThat(input.size(), is(2));
-        Assert.assertThat(input, is(output));
+
+        MatcherAssert.assertThat(input.size(), is(2));
+        MatcherAssert.assertThat(input, is(output));
     }
 
 }

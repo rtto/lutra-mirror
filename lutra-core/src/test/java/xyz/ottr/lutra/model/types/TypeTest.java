@@ -22,15 +22,15 @@ package xyz.ottr.lutra.model.types;
  * #L%
  */
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.vocabulary.OWL;
 import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.RDFS;
 import org.apache.jena.vocabulary.XSD;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import xyz.ottr.lutra.OTTR;
 
 public class TypeTest {
@@ -45,7 +45,7 @@ public class TypeTest {
 
     private BasicType owlOProp;
 
-    @Before
+    @BeforeEach
     public void setup() {
 
         this.owlOProp = byIRI(OWL.ObjectProperty);

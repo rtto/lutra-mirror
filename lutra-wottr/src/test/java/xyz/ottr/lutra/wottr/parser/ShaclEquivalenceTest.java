@@ -22,19 +22,20 @@ package xyz.ottr.lutra.wottr.parser;
  * #L%
  */
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assume.assumeTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
+import static org.junit.jupiter.params.provider.Arguments.arguments;
 
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.apache.commons.io.FilenameUtils;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameters;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import xyz.ottr.lutra.io.Files;
 import xyz.ottr.lutra.io.InstanceReader;
 import xyz.ottr.lutra.io.TemplateReader;
@@ -44,13 +45,10 @@ import xyz.ottr.lutra.store.StandardTemplateStore;
 import xyz.ottr.lutra.store.TemplateStore;
 import xyz.ottr.lutra.system.Assertions;
 import xyz.ottr.lutra.system.Message;
-import xyz.ottr.lutra.system.Result;
 import xyz.ottr.lutra.system.ResultConsumer;
 import xyz.ottr.lutra.system.ResultStream;
 import xyz.ottr.lutra.wottr.io.RDFIO;
 
-
-@RunWith(Parameterized.class)
 public class ShaclEquivalenceTest {
 
     private static final String correct = FilenameUtils.separatorsToSystem("src/test/resources/spec/tests/correct/");
@@ -79,50 +77,37 @@ public class ShaclEquivalenceTest {
             incorrect + "instance12.ttl"
         ).collect(Collectors.toSet());
     
-    private final TemplateReader tempReader;
-    private final InstanceReader insReader;
-    
-    private final String filename;
-    private final boolean isCorrect;
-    
-    public ShaclEquivalenceTest(String filename, boolean isCorrect) {
-        this.filename = filename;
-        this.isCorrect = isCorrect;
-        
+    private TemplateReader tempReader;
+    private InstanceReader insReader;
+
+    @BeforeEach
+    public void setupReaders() {
         this.tempReader = new TemplateReader(RDFIO.fileReader(), new WTemplateParser());
         this.insReader = new InstanceReader(RDFIO.fileReader(), new WInstanceParser());
     }
-    
-    @Parameters(name = "{index}: {0} is {1}")
-    public static List<Object[]> data() {
 
-        List<Object[]> input = Files.loadFromFolder(correct, new String[] { "ttl" }, new String[0])
-            .getStream()
-            .map(Result::get)
-            .sorted()
-            .map(r -> new Object[]{ r, true })
-            .collect(Collectors.toList());
+    public static Stream<Arguments> data() {
 
-        input.addAll(Files.loadFromFolder(incorrect, new String[] { "ttl" }, new String[0])
-            .getStream()
-            //.filter(x -> false) // for debugging
-            .map(Result::get)
-            .sorted()
-            .map(s -> new Object[]{ s, false })
-            .collect(Collectors.toList()));
+        Stream.Builder<Arguments> streamBuilder = Stream.builder();
 
-        return input;   
+        Files.loadFromFolder(correct, new String[] { "ttl" }, new String[0])
+                .innerForEach(s -> streamBuilder.accept(arguments(s, true)));
+
+        Files.loadFromFolder(incorrect, new String[] { "ttl" }, new String[0])
+                .innerForEach(s -> streamBuilder.accept(arguments(s, false)));
+
+        return streamBuilder.build();
     }
     
-    
-    @Test
-    public void checkFile() {
-        assumeTrue(!unsupportedTests.contains(this.filename));
+    @ParameterizedTest
+    @MethodSource("data")
+    public void checkFile(String filename, boolean isCorrect) {
+        assumeTrue(!unsupportedTests.contains(filename));
         
-        if (instanceTests.contains(this.filename)) {
-            checkInstance(this.filename, this.isCorrect);
+        if (instanceTests.contains(filename)) {
+            checkInstance(filename, isCorrect);
         } else {
-            checkTemplate(this.filename, this.isCorrect);
+            checkTemplate(filename, isCorrect);
         }
     }
 
@@ -134,8 +119,7 @@ public class ShaclEquivalenceTest {
         ResultConsumer<Signature> tplErrorMessages = new ResultConsumer<>(store);
         templates.forEach(tpl -> {
             if (correct) {
-                assertTrue("Should parse: " + file + ", but failed with errors:\n"
-                    + tpl.getAllMessages(), tpl.isPresent());
+                assertTrue(tpl.isPresent(), "Should parse: " + file + ", but failed with errors:\n" + tpl.getAllMessages());
             }
             tplErrorMessages.accept(tpl);
         });
@@ -147,12 +131,11 @@ public class ShaclEquivalenceTest {
         errors.removeIf(message -> message.getSeverity().isLessThan(Message.Severity.ERROR));
 
         if (!correct) {
-            assertFalse("Should produce error messages: " + file, errors.isEmpty());
+            assertFalse(errors.isEmpty(), "Should produce error messages: " + file);
         } else {
-            assertTrue("File " + file + " should not produce any error messages, but gave:\n"
-                + errors, errors.isEmpty());
-            assertTrue("File " + file + " should produce a template, but no templates produced.",
-                store.getAllSignatures().getStream().count() > 0);
+            assertTrue(errors.isEmpty(), "File " + file + " should not produce any error messages, but gave:\n" + errors);
+            assertTrue(store.getAllSignatures().getStream().count() > 0,
+                    "File " + file + " should produce a template, but no templates produced.");
         }
     }
 
@@ -162,8 +145,7 @@ public class ShaclEquivalenceTest {
         ResultConsumer<Instance> insErrorMessages = new ResultConsumer<>();
         instances.forEach(ins -> {
             if (correct) {
-                assertTrue("Should parse: " + file + ", but failed with errors:\n"
-                    + ins.getAllMessages(), ins.isPresent());
+                assertTrue(ins.isPresent(), "Should parse: " + file + ", but failed with errors:\n" + ins.getAllMessages());
             }
             insErrorMessages.accept(ins);
         });

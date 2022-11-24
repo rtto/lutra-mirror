@@ -22,7 +22,7 @@ package xyz.ottr.lutra.system;
  * #L%
  */
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static xyz.ottr.lutra.system.Message.Severity.ERROR;
 import static xyz.ottr.lutra.system.Message.Severity.FATAL;
 import static xyz.ottr.lutra.system.Message.Severity.INFO;
@@ -30,7 +30,7 @@ import static xyz.ottr.lutra.system.Message.Severity.WARNING;
 import static xyz.ottr.lutra.system.Message.Severity.greatest;
 import static xyz.ottr.lutra.system.Message.Severity.least;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class MessageSeverityTest {
 
