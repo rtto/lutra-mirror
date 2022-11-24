@@ -68,9 +68,11 @@
     <maven.compiler.target>${java.version}</maven.compiler.target>
 
     <jena.version>4.6.0</jena.version>
-    <antlr4-version>4.9.2</antlr4-version>
+    <antlr4.version>4.9.2</antlr4.version>
+    <slf4j.version>2.0.3</slf4j.version>
+    <log4j.version>2.17.1</log4j.version>
+    <junit-jupiter.version>5.8.1</junit-jupiter.version>
 
-      <junit-jupiter.version>5.8.1</junit-jupiter.version>
   </properties>
 
   <build>
@@ -439,7 +441,7 @@
         <plugin>
           <groupId>org.antlr</groupId>
           <artifactId>antlr4-maven-plugin</artifactId>
-          <version>${antlr4-version}</version>
+          <version>${antlr4.version}</version>
         </plugin>
 
         <plugin>
@@ -466,7 +468,18 @@
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
-      <!-- no transitive dependencies -->
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-reload4j</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.logging.log4j</groupId>
+      <artifactId>log4j-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.logging.log4j</groupId>
+      <artifactId>log4j-slf4j-impl</artifactId>
     </dependency>
 
     <dependency>
@@ -608,7 +621,15 @@
       <dependency>
         <groupId>org.antlr</groupId>
         <artifactId>antlr4-maven-plugin</artifactId>
-        <version>${antlr4-version}</version>
+        <version>${antlr4.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.antlr</groupId>
+        <artifactId>antlr4-runtime</artifactId>
+        <version>${antlr4.version}</version>
+        <!-- transitive dependencies:
+            TODO
+        -->
       </dependency>
 
       <!-- TabOTTR -->
@@ -672,28 +693,27 @@
         <version>4.6.1</version>
       </dependency>
 
-
       <!-- Logging and testing -->
 
       <dependency>
         <groupId>org.slf4j</groupId>
         <artifactId>slf4j-api</artifactId>
-        <version>1.7.32</version>
+        <version>${slf4j.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>slf4j-reload4j</artifactId>
+        <version>${slf4j.version}</version>
       </dependency>
       <dependency>
         <groupId>org.apache.logging.log4j</groupId>
         <artifactId>log4j-api</artifactId>
-        <version>2.17.1</version>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.logging.log4j</groupId>
-        <artifactId>log4j-core</artifactId>
-        <version>2.17.1</version>
+        <version>${log4j.version}</version>
       </dependency>
       <dependency>
         <groupId>org.apache.logging.log4j</groupId>
         <artifactId>log4j-slf4j-impl</artifactId>
-        <version>2.17.1</version>
+        <version>${log4j.version}</version>
       </dependency>
 
 <!--            <dependency>-->
