@@ -37,7 +37,9 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-// TODO: should we move some methods to UtilityClasses?
+// TODO: should we move some methods to UtilityClasses? Move static methods on multiple results to new class Results?
+// TODO: remove unused methods?
+// TODO: seems that due to a search-replace 'result' has been replaced by 'system' in comments.
 
 public class Result<E> {
 
