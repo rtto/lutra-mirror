@@ -16,7 +16,7 @@ cache:
   paths:
     - .m2/repository/
 
-build:
+build-maven:
   stage: build
   script:
     - mvn $MAVEN_CLI_OPTS compile
@@ -27,7 +27,7 @@ build:
     paths:
       - ./*
       
-test:
+test-maven:
   stage: test
   script:
     - mvn $MAVEN_CLI_OPTS clean org.jacoco:jacoco-maven-plugin:prepare-agent test org.jacoco:jacoco-maven-plugin:report-aggregate
@@ -36,8 +36,9 @@ test:
     paths:
       - ./**/target/
 
-coverage:
-  stage: release
+coverage-cobertura:
+  stage: test
+  needs: ["test-maven"]
   image: haynes/jacoco2cobertura:1.0.7
   script:
     # find all modules containing java source files.
@@ -52,7 +53,7 @@ coverage:
         path: .test-coverage/target/site/coverage.xml
 
 ## This job keeps the main artifacts from the build and publishes them to ottr.xyz.
-release:
+release-ottrxyz:
   stage: release
   script:
     - cp lutra-cli/target/lutra.jar lutra.jar
@@ -76,7 +77,7 @@ release:
       - lutra.war
 
 ## This job creates a release in GitLab.
-register_release:
+release-gitlab:
   stage: release
   image: registry.gitlab.com/gitlab-org/release-cli:latest
   rules:
