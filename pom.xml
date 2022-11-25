@@ -16,6 +16,7 @@
     <module>lutra-restapi</module>
     <module>lutra-api</module>
     <module>lutra-docttr</module>
+    <module>.test-coverage</module>
   </modules>
 
   <name>${project.groupId}:${project.artifactId}</name>
@@ -143,7 +144,6 @@
         </executions>
       </plugin>
 
-
       <plugin>
         <groupId>com.amashchenko.maven.plugin</groupId>
         <artifactId>gitflow-maven-plugin</artifactId>
@@ -185,26 +185,6 @@
             </manifest>
           </archive>
         </configuration>
-      </plugin>
-
-      <plugin>
-        <groupId>org.jacoco</groupId>
-        <artifactId>jacoco-maven-plugin</artifactId>
-        <version>0.8.8</version>
-        <executions>
-          <execution>
-            <goals>
-              <goal>prepare-agent</goal>
-            </goals>
-          </execution>
-          <execution>
-            <id>report</id>
-            <phase>prepare-package</phase>
-            <goals>
-              <goal>report</goal>
-            </goals>
-          </execution>
-        </executions>
       </plugin>
 
       <plugin>
@@ -379,6 +359,29 @@
         </executions>
       </plugin>
 
+      <plugin>
+        <groupId>org.jacoco</groupId>
+        <artifactId>jacoco-maven-plugin</artifactId>
+        <executions>
+          <!-- to avoid bugs in some situations -->
+          <execution>
+            <id>default-prepare-agent</id>
+            <goals>
+              <goal>prepare-agent</goal>
+            </goals>
+          </execution>
+
+          <!-- create report during maven verify phase -->
+          <execution>
+            <id>report</id>
+            <phase>verify</phase>
+            <goals>
+              <goal>prepare-package</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+
     </plugins>
 
     <pluginManagement>
@@ -467,6 +470,12 @@
           <groupId>de.elnarion.maven</groupId>
           <artifactId>plantuml-generator-maven-plugin</artifactId>
           <version>1.2.0</version>
+        </plugin>
+
+        <plugin>
+          <groupId>org.jacoco</groupId>
+          <artifactId>jacoco-maven-plugin</artifactId>
+          <version>0.8.8</version>
         </plugin>
 
       </plugins>
