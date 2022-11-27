@@ -96,8 +96,13 @@ public enum SParserUtils {
         return " in '" + ctx.getText() + "'" + getLineAndColumnString(ctx);
     }
 
-    static Result ignoreStatement(String name, ParserRuleContext ctx) {
-        return Result.info("Ignoring statement '" + name + "': " + StringUtils.truncate(ctx.getText(), messageDigestMaxLength));
+    static Result ignoreStatement(String ignoring, String accepting, ParserRuleContext ctx) {
+        return Result.info(
+                "Ignoring " + ignoring + ": "
+                    + StringUtils.truncate(ctx.getText(), messageDigestMaxLength)
+                    + ". This parser accepts " + accepting + "."
+
+        );
     }
 
 }

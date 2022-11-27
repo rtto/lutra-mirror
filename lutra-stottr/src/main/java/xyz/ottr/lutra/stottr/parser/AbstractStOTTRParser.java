@@ -40,9 +40,14 @@ public abstract class AbstractStOTTRParser<T> implements Function<CharStream, Re
     private Map<String, String> prefixes;
     private Function<Map<String, String>, SBaseParserVisitor<T>> statementParserProvider;
 
-    protected AbstractStOTTRParser(Function<Map<String, String>, SBaseParserVisitor<T>> f) {
+    /**
+     *
+     * @param parserVisitor function to produce a parserVisitor (typically a STemplateParserVisitor
+     *                      or SInstanceParserVisitor) given a prefix map.
+     */
+    protected AbstractStOTTRParser(Function<Map<String, String>, SBaseParserVisitor<T>> parserVisitor) {
         this.prefixes  = new HashMap<>();
-        this.statementParserProvider = f;
+        this.statementParserProvider = parserVisitor;
     }
 
     public Map<String, String> getPrefixes() {
@@ -53,7 +58,7 @@ public abstract class AbstractStOTTRParser<T> implements Function<CharStream, Re
         return parseDocument(in);
     }
 
-    public ResultStream<T> parseString(String str) {
+    public ResultStream<T> apply(String str) {
         return parseDocument(CharStreams.fromString(str));
     }
 

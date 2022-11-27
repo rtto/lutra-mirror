@@ -40,6 +40,9 @@ public class SInstanceParserVisitor extends SBaseParserVisitor<Instance> {
     private STermParserVisitor termParser;
     private SArgumentParserVisitor argumentParser;
 
+    // list of the types of statements this parser accepts. Used in messages when other types are ignored.
+    private final String acceptingList = "instances";
+
     SInstanceParserVisitor(STermParserVisitor termParser) {
         this.termParser = termParser;
         this.argumentParser = new SArgumentParserVisitor(termParser);
@@ -89,17 +92,17 @@ public class SInstanceParserVisitor extends SBaseParserVisitor<Instance> {
 
     @Override
     public Result visitBaseTemplate(stOTTRParser.BaseTemplateContext ctx) {
-        return SParserUtils.ignoreStatement("base template", ctx);
+        return SParserUtils.ignoreStatement("base template", acceptingList, ctx);
     }
 
     @Override
     public Result visitTemplate(stOTTRParser.TemplateContext ctx) {
-        return SParserUtils.ignoreStatement("template", ctx);
+        return SParserUtils.ignoreStatement("template", acceptingList, ctx);
     }
 
     @Override
     public Result visitSignature(stOTTRParser.SignatureContext ctx) {
-        return SParserUtils.ignoreStatement("signature", ctx);
+        return SParserUtils.ignoreStatement("signature", acceptingList, ctx);
     }
 
 }

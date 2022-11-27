@@ -94,7 +94,9 @@ public class ParserTest {
             + "cross | ex:T2(\"hello\"@no, ++ (\"one\", \"two\", \"three\")) . "
             + ":T3(42, 42.01, \"42.02\"^^xsd:int) . ";
 
-        return parser.parseString(instances).getStream().collect(Collectors.toList());
+        return parser.apply(instances)
+                .getStream()
+                .collect(Collectors.toList());
     }
 
     private List<Instance> makeInstances() {
@@ -136,6 +138,29 @@ public class ParserTest {
     }
 
     @Test
+    public void testInstanceParser() {
+
+        SInstanceParser parser = new SInstanceParser();
+        ResultConsumer<Instance> consumer = new ResultConsumer<>();
+
+        parser.apply(
+                "@prefix ex: <http://example.com/> .\n"
+                        + "@prefix : <http://base.org/> .\n"
+                        + "@prefix xsd: <http://xsd.org/> .\n"
+                        + "<https://ex.com/T0>(:a, false) .\n"
+                        + "ex:H1(?c, :d) .\n"
+                        + "ex:H2(4, ?c, ?variable) .\n"
+                        + "ex:H3(:x, (:lst, 1, :val)) .\n"
+                        + "cross | ex:H35(:x, ++(:lst, 1, :val)) .\n"
+                        + "ex:H4(1, 2.32, .45) .\n"
+                        + "ex:H5(\"1\"^^xsd:int, \"hello\"@en) .\n"
+                        + "ex:T6([], _:blank) .")
+                .forEach(consumer);
+
+        Assertions.noErrors(consumer);
+    }
+
+    @Test
     public void termParserTest() {
 
         List<Result<Instance>> parsed = parseInstances();
@@ -167,7 +192,7 @@ public class ParserTest {
         STemplateParser parser = new STemplateParser();
 
         ResultConsumer<Signature> consumer = new ResultConsumer<>();
-        parser.parseString(signatureString).forEach(consumer);
+        parser.apply(signatureString).forEach(consumer);
 
         Assertions.noErrors(consumer);
     }
