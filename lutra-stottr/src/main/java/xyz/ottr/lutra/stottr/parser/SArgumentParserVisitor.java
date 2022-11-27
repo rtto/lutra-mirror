@@ -28,16 +28,16 @@ import xyz.ottr.lutra.parser.ArgumentBuilder;
 import xyz.ottr.lutra.stottr.antlr.stOTTRParser;
 import xyz.ottr.lutra.system.Result;
 
-class SArgumentParser extends SBaseParserVisitor<Argument> {
+class SArgumentParserVisitor extends SBaseParserVisitor<Argument> {
 
-    private final STermParser termParser;
+    private final STermParserVisitor termParser;
 
     /**
      * @param termParser
      *     The parser to use for parsing terms in argument list, which should contain
      *     the prefix definitions of this context.
      */
-    SArgumentParser(STermParser termParser) {
+    SArgumentParserVisitor(STermParserVisitor termParser) {
         this.termParser = termParser;
     }
 

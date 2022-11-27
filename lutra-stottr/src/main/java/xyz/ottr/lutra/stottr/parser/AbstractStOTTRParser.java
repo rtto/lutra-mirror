@@ -26,33 +26,27 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Function;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
-import org.antlr.v4.runtime.ParserRuleContext;
-import org.apache.commons.lang3.StringUtils;
 import xyz.ottr.lutra.stottr.antlr.stOTTRParser;
 import xyz.ottr.lutra.system.Message;
 import xyz.ottr.lutra.system.MessageHandler;
 import xyz.ottr.lutra.system.Result;
 import xyz.ottr.lutra.system.ResultStream;
 
-public abstract class SDocumentParser<T> extends SBaseParserVisitor<T> {
+public abstract class AbstractStOTTRParser<T> implements Function<CharStream, ResultStream<T>> {
 
-    private static final int messageDigestMaxLength = 30;
-    private Map<String, String> prefixes = new HashMap<>();
+    private Map<String, String> prefixes;
+    private Function<Map<String, String>, SBaseParserVisitor<T>> statementParserProvider;
 
-    /**
-     * This method is responsible for initialising parsers that this depend on. This may only be done once
-     * the prefixes have been parsed, with may be after this has been created.
-     */
-    abstract void initSubParsers();
+    protected AbstractStOTTRParser(Function<Map<String, String>, SBaseParserVisitor<T>> f) {
+        this.prefixes  = new HashMap<>();
+        this.statementParserProvider = f;
+    }
 
     public Map<String, String> getPrefixes() {
         return Collections.unmodifiableMap(this.prefixes);
-    }
-
-    protected void setPrefixes(Map<String, String> prefixes) {
-        this.prefixes.putAll(prefixes);
     }
 
     public ResultStream<T> apply(CharStream in) {
@@ -64,18 +58,19 @@ public abstract class SDocumentParser<T> extends SBaseParserVisitor<T> {
     }
 
     private Result<Map<String, String>> parsePrefixes(stOTTRParser.StOTTRDocContext ctx) {
-        var prefixParser = new SPrefixParser();
+        var prefixParser = new SPrefixParserVisitor();
         return prefixParser.visit(ctx);
     }
 
-    public ResultStream<T> parseStatements(stOTTRParser.StOTTRDocContext ctx) {
+    private ResultStream<T> parseStatements(stOTTRParser.StOTTRDocContext ctx, Map<String, String> prefixes) {
+        var parser = this.statementParserProvider.apply(prefixes);
 
         var parsedStatements = ctx
                 .statement() // List of statements
                 .stream()
-                .map(this::visitStatement);
+                .map(parser::visitStatement);
 
-        return new ResultStream(parsedStatements);
+        return new ResultStream<T>(parsedStatements);
     }
 
     private ResultStream<T> parseDocument(CharStream in) {
@@ -84,12 +79,11 @@ public abstract class SDocumentParser<T> extends SBaseParserVisitor<T> {
 
         stOTTRParser.StOTTRDocContext document = parser.stOTTRDoc();
 
-        var statements = parsePrefixes(document).mapToStream(pxs -> {
-            setPrefixes(pxs);
-            initSubParsers();
-            return parseStatements(document);
-        });
+        var prefixes = parsePrefixes(document);
+        prefixes.ifPresent(this.prefixes::putAll);
 
+        ResultStream<T> statements = parsePrefixes(document)
+                .mapToStream(pxs -> this.parseStatements(document, pxs));
 
         // TODO: Somehow put some of these messages more fine-grained on returned instances,
         //       see https://gitlab.com/ottr/lutra/lutra/issues/148
@@ -101,28 +95,5 @@ public abstract class SDocumentParser<T> extends SBaseParserVisitor<T> {
 
         return statements;
     }
-
-    // These visit methods must be overwritten in extending classes.
-
-    public Result visitBaseTemplate(stOTTRParser.BaseTemplateContext ctx) {
-        return ignoreStatement("base template", ctx);
-    }
-
-    public Result visitTemplate(stOTTRParser.TemplateContext ctx) {
-        return ignoreStatement("template", ctx);
-    }
-
-    public Result visitSignature(stOTTRParser.SignatureContext ctx) {
-        return ignoreStatement("signature", ctx);
-    }
-
-
-    // Somehow this method is categorised as unused. Could be due to interference with generated antlr code.
-    @SuppressWarnings("unused")
-    private Result ignoreStatement(String name, ParserRuleContext ctx) {
-        return Result.info("Ignoring statement '" + name + "': " + StringUtils.truncate(ctx.getText(), messageDigestMaxLength));
-    }
-
-
 
 }

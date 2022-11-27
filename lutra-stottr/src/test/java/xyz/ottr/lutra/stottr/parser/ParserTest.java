@@ -47,21 +47,20 @@ import xyz.ottr.lutra.system.ResultConsumer;
 
 public class ParserTest {
 
+    private String prefixes = "@prefix ex: <http://example.org/> .\n"
+            + "PREFIX rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> \n"
+            + "@prefix ottr:  <http://ns.ottr.xyz/0.4/> .\n"
+            + "@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> . \n"
+            + "@prefix :      <http://base.org/> .";
+
     ///
     /// PREFIXES
     ///
 
     private Result<Map<String, String>> parsePrefixes() {
 
-        SPrefixParser prefixParser = new SPrefixParser();
-        
-        String prefixes = "@prefix ex: <http://example.org/> .\n"
-            + "PREFIX rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> \n"
-            + "@prefix ottr:  <http://ns.ottr.xyz/0.4/> .\n"
-            + "@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> . \n"
-            + "@prefix :      <http://base.org/> .";
-
-        return SParserUtils.parseString(prefixes, prefixParser);
+        SPrefixParserVisitor prefixParser = new SPrefixParserVisitor();
+        return SParserUtils.parseString(this.prefixes, prefixParser);
     }
         
     private Map<String, String> makePrefixes() {
@@ -89,9 +88,9 @@ public class ParserTest {
 
     private List<Result<Instance>> parseInstances() {
 
-        SInstanceParser parser = new SInstanceParser(makePrefixes());
+        SInstanceParser parser = new SInstanceParser();
 
-        String instances = ":T1(true, none, rdf:type, <http://some.uri/with#part>) . "
+        String instances = this.prefixes + ":T1(true, none, rdf:type, <http://some.uri/with#part>) . "
             + "cross | ex:T2(\"hello\"@no, ++ (\"one\", \"two\", \"three\")) . "
             + ":T3(42, 42.01, \"42.02\"^^xsd:int) . ";
 

@@ -26,6 +26,7 @@ import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.ParserRuleContext;
+import org.apache.commons.lang3.StringUtils;
 import xyz.ottr.lutra.stottr.antlr.stOTTRLexer;
 import xyz.ottr.lutra.stottr.antlr.stOTTRParser;
 import xyz.ottr.lutra.system.Result;
@@ -33,7 +34,9 @@ import xyz.ottr.lutra.system.Result;
 public enum SParserUtils {
 
     ; // util enum
-    
+
+    private static final int messageDigestMaxLength = 30;
+
     public static stOTTRLexer makeLexer(CharStream in, ErrorToMessageListener errListener) {
 
         stOTTRLexer lexer = new stOTTRLexer(in);
@@ -73,23 +76,28 @@ public enum SParserUtils {
     /// Utility methods used for making error messages
     ///
 
-    public static int getLineOf(ParserRuleContext ctx) {
+    static int getLineOf(ParserRuleContext ctx) {
         return ctx.getStart().getLine();
     }
 
-    public static int getColumnOf(ParserRuleContext ctx) {
+    static int getColumnOf(ParserRuleContext ctx) {
         return ctx.getStart().getCharPositionInLine();
     }
 
-    public static String getLineAndColumnString(ParserRuleContext ctx) {
+    static String getLineAndColumnString(ParserRuleContext ctx) {
         return getLineAndColumnString(getLineOf(ctx), getColumnOf(ctx));
     }
 
-    public static String getLineAndColumnString(int line, int column) {
+    static String getLineAndColumnString(int line, int column) {
         return " at line " + line + " column " + column;
     }
 
-    public static String getTextWithLineAndColumnString(ParserRuleContext ctx) {
+    static String getTextWithLineAndColumnString(ParserRuleContext ctx) {
         return " in '" + ctx.getText() + "'" + getLineAndColumnString(ctx);
     }
+
+    static Result ignoreStatement(String name, ParserRuleContext ctx) {
+        return Result.info("Ignoring statement '" + name + "': " + StringUtils.truncate(ctx.getText(), messageDigestMaxLength));
+    }
+
 }

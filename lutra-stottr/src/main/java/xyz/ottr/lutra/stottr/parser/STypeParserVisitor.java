@@ -32,13 +32,13 @@ import xyz.ottr.lutra.model.types.TypeRegistry;
 import xyz.ottr.lutra.stottr.antlr.stOTTRParser;
 import xyz.ottr.lutra.system.Result;
 
-public class STypeParser extends SBaseParserVisitor<Type> {
+public class STypeParserVisitor extends SBaseParserVisitor<Type> {
 
     // TODO does it make sense to use core's TypeParser?
 
-    private final STermParser termParser;
+    private final STermParserVisitor termParser;
 
-    STypeParser(STermParser termParser) {
+    STypeParserVisitor(STermParserVisitor termParser) {
         this.termParser = termParser;
     }
 

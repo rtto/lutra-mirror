@@ -36,14 +36,14 @@ import xyz.ottr.lutra.stottr.STOTTR;
 import xyz.ottr.lutra.stottr.antlr.stOTTRParser;
 import xyz.ottr.lutra.system.Result;
 
-class SParameterParser extends SBaseParserVisitor<Parameter> {
+class SParameterParserVisitor extends SBaseParserVisitor<Parameter> {
 
-    private final STypeParser typeParser;
-    private final STermParser termParser;
+    private final STypeParserVisitor typeParser;
+    private final STermParserVisitor termParser;
 
-    SParameterParser(STermParser termParser) {
+    SParameterParserVisitor(STermParserVisitor termParser) {
         this.termParser = termParser;
-        this.typeParser = new STypeParser(termParser);
+        this.typeParser = new STypeParserVisitor(termParser);
     }
 
 

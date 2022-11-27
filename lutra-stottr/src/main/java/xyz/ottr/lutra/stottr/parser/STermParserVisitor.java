@@ -38,7 +38,7 @@ import xyz.ottr.lutra.stottr.STOTTR;
 import xyz.ottr.lutra.stottr.antlr.stOTTRParser;
 import xyz.ottr.lutra.system.Result;
 
-public class STermParser extends SBaseParserVisitor<Term> {
+public class STermParserVisitor extends SBaseParserVisitor<Term> {
 
     private static final Pattern quotedStringPat = Pattern.compile("^\".*\"$");
     private static final Pattern quotesPat = Pattern.compile("^\"|\"$");
@@ -50,11 +50,11 @@ public class STermParser extends SBaseParserVisitor<Term> {
     // Maps labels to already parsed (blank node) variable terms
     private final Map<String, Term> variables;
 
-    STermParser(Map<String, String> prefixes) {
+    STermParserVisitor(Map<String, String> prefixes) {
         this(prefixes, new HashMap<>());
     }
 
-    STermParser(Map<String, String> prefixes, Map<String, Term> variables) {
+    STermParserVisitor(Map<String, String> prefixes, Map<String, Term> variables) {
         this.prefixes = prefixes;
         this.variables = variables;
     }
