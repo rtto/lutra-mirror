@@ -33,9 +33,6 @@ import xyz.ottr.lutra.system.Result;
 public enum SParserUtils {
 
     ; // util enum
-
-
-    private static final int messageDigestMaxLength = 30;
     
     public static stOTTRLexer makeLexer(CharStream in, ErrorToMessageListener errListener) {
 

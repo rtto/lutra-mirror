@@ -41,30 +41,26 @@ import xyz.ottr.lutra.parser.TemplateParser;
 import xyz.ottr.lutra.stottr.antlr.stOTTRParser;
 import xyz.ottr.lutra.system.Result;
 
-public class STemplateParser extends SDocumentParser<Signature> implements TemplateParser<CharStream> {
+public class STemplateParser extends SDocumentParser implements TemplateParser<CharStream> {
 
-    protected STermParser termParser;
-    private SParameterParser paramsParser;
+    private STermParser termParser;
+    private SInstanceParser annotationsInstanceParser;
+    private SParameterParser parameterParser;
 
-    public STemplateParser() {
-        initSubParsers();
-    }
-
-    @Override
-    protected void initSubParsers() {
-        this.termParser = new STermParser(this.prefixes);
-        this.paramsParser = new SParameterParser(this.termParser);
+    void initSubParsers() {
+        var prefixes = getPrefixes();
+        this.termParser = new STermParser(prefixes);
+        this.annotationsInstanceParser = new SInstanceParser(prefixes, this.termParser);
+        this.parameterParser = new SParameterParser(this.termParser);
     }
 
     @Override
     public Result<Signature> visitSignature(stOTTRParser.SignatureContext ctx) {
 
-        SInstanceParser annotationsInstanceParser = new SInstanceParser(this.prefixes);
-
         return SignatureBuilder.builder()
             .iri(parseIRI(ctx))
             .parameters(parseParameters(ctx))
-            .annotations(parseAnnotations(ctx, annotationsInstanceParser))
+            .annotations(parseAnnotations(ctx, this.annotationsInstanceParser))
             .build();
     }
 
@@ -82,7 +78,7 @@ public class STemplateParser extends SDocumentParser<Signature> implements Templ
         var signature = visitSignature(ctx.signature());
 
         Map<String, Term> variables = getVariableMap(signature);
-        SInstanceParser instanceParser = new SPatternInstanceParser(this.prefixes, variables);
+        SInstanceParser instanceParser = new SInstanceParser(getPrefixes(), new STermParser(getPrefixes(), variables));
 
         return TemplateBuilder.builder()
             .signature(signature)
@@ -99,7 +95,7 @@ public class STemplateParser extends SDocumentParser<Signature> implements Templ
 
     private Result<List<Parameter>> parseParameters(stOTTRParser.SignatureContext ctx) {
         return ctx.parameterList().parameter().stream()
-            .map(param -> this.paramsParser.visit(param))
+            .map(param -> this.parameterParser.visit(param))
             .collect(Collectors.collectingAndThen(Collectors.toList(), Result::aggregate));
     }
 

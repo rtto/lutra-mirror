@@ -43,18 +43,21 @@ public class SInstanceParser extends SDocumentParser<Instance> implements Instan
     protected SArgumentParser argumentParser;
 
     public SInstanceParser() {
-        // assumes initSubParsers() is called in super.
+    }
+
+    SInstanceParser(Map<String, String> prefixes, STermParser termParser) {
+        setPrefixes(prefixes);
+        this.termParser = termParser;
+        this.argumentParser = new SArgumentParser(termParser);
     }
 
     SInstanceParser(Map<String, String> prefixes) {
-        this();
-        this.prefixes = prefixes;
-        initSubParsers();
+        this(prefixes, new STermParser(prefixes));
     }
 
     @Override
-    protected void initSubParsers() {
-        this.termParser = new STermParser(this.prefixes);
+    void initSubParsers() {
+        this.termParser = new STermParser(getPrefixes());
         this.argumentParser = new SArgumentParser(this.termParser);
     }
 
@@ -95,5 +98,6 @@ public class SInstanceParser extends SDocumentParser<Instance> implements Instan
             .map(arg -> this.argumentParser.visitArgument(arg))
             .collect(Collectors.collectingAndThen(Collectors.toList(), Result::aggregate));
     }
+
 
 }

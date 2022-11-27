@@ -25,6 +25,7 @@ package xyz.ottr.lutra.stottr.parser;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -143,6 +144,7 @@ public class ParserTest {
 
         for (int i = 0; i < parsed.size(); i++) {
             Result<Instance> insRes = parsed.get(i);
+            assertEquals(Collections.EMPTY_LIST, insRes.getMessageHandler().getMessages());
             assertTrue(insRes.isPresent());
             Instance pins = insRes.get();
             Instance mins = made.get(i);

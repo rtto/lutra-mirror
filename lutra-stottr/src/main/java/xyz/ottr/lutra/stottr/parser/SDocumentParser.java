@@ -39,17 +39,19 @@ import xyz.ottr.lutra.system.ResultStream;
 public abstract class SDocumentParser<T> extends SBaseParserVisitor<T> {
 
     private static final int messageDigestMaxLength = 30;
+    private Map<String, String> prefixes = new HashMap<>();
 
-    protected Map<String, String> prefixes = new HashMap<>();
+    /**
+     * This method is responsible for initialising parsers that this depend on. This may only be done once
+     * the prefixes have been parsed, with may be after this has been created.
+     */
+    abstract void initSubParsers();
 
     public Map<String, String> getPrefixes() {
         return Collections.unmodifiableMap(this.prefixes);
     }
 
-    abstract void initSubParsers();
-
-    private void initPrefixes(Map<String, String> prefixes) {
-        // TODO should check for prefix conflicts
+    protected void setPrefixes(Map<String, String> prefixes) {
         this.prefixes.putAll(prefixes);
     }
 
@@ -66,26 +68,24 @@ public abstract class SDocumentParser<T> extends SBaseParserVisitor<T> {
         return prefixParser.visit(ctx);
     }
 
-    private ResultStream<T> parseStatements(stOTTRParser.StOTTRDocContext ctx) {
+    public ResultStream<T> parseStatements(stOTTRParser.StOTTRDocContext ctx) {
 
         var parsedStatements = ctx
                 .statement() // List of statements
                 .stream()
                 .map(this::visitStatement);
 
-        return new ResultStream<>(parsedStatements);
+        return new ResultStream(parsedStatements);
     }
 
     private ResultStream<T> parseDocument(CharStream in) {
-        // Make parser
         ErrorToMessageListener errListener = new ErrorToMessageListener();
         stOTTRParser parser = SParserUtils.makeParser(in, errListener);
 
         stOTTRParser.StOTTRDocContext document = parser.stOTTRDoc();
 
-        var prefixes = parsePrefixes(document);
-        var statements = prefixes.mapToStream(pxs -> {
-            initPrefixes(pxs);
+        var statements = parsePrefixes(document).mapToStream(pxs -> {
+            setPrefixes(pxs);
             initSubParsers();
             return parseStatements(document);
         });
@@ -102,7 +102,6 @@ public abstract class SDocumentParser<T> extends SBaseParserVisitor<T> {
         return statements;
     }
 
-
     // These visit methods must be overwritten in extending classes.
 
     public Result visitBaseTemplate(stOTTRParser.BaseTemplateContext ctx) {
@@ -117,14 +116,13 @@ public abstract class SDocumentParser<T> extends SBaseParserVisitor<T> {
         return ignoreStatement("signature", ctx);
     }
 
-    public Result visitInstance(stOTTRParser.InstanceContext ctx) {
-        return ignoreStatement("instance", ctx);
-    }
 
     // Somehow this method is categorised as unused. Could be due to interference with generated antlr code.
     @SuppressWarnings("unused")
     private Result ignoreStatement(String name, ParserRuleContext ctx) {
         return Result.info("Ignoring statement '" + name + "': " + StringUtils.truncate(ctx.getText(), messageDigestMaxLength));
     }
+
+
 
 }
