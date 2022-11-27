@@ -46,8 +46,6 @@ public class STemplateParserVisitor extends SBaseParserVisitor<Signature>  {
     private SInstanceParserVisitor annotationsInstanceParser;
     private SParameterParserVisitor parameterParser;
 
-    // list of the types of statements this parser accepts. Used in messages when other types are ignored.
-    private final String acceptingList = "signatures, base templates and templates";
 
     STemplateParserVisitor(Map<String, String> prefixes) {
         this.prefixes = prefixes;
@@ -58,7 +56,7 @@ public class STemplateParserVisitor extends SBaseParserVisitor<Signature>  {
 
     @Override
     public Result visitInstance(stOTTRParser.InstanceContext ctx) {
-        return SParserUtils.ignoreStatement("instance", acceptingList, ctx);
+        return SParserUtils.ignoreStatement("instance", "signatures, base templates and templates", ctx);
     }
 
     @Override

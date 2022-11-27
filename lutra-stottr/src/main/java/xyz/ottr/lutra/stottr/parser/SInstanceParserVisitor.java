@@ -41,7 +41,7 @@ public class SInstanceParserVisitor extends SBaseParserVisitor<Instance> {
     private SArgumentParserVisitor argumentParser;
 
     // list of the types of statements this parser accepts. Used in messages when other types are ignored.
-    private final String acceptingList = "instances";
+    private static final String acceptingList = "instances";
 
     SInstanceParserVisitor(STermParserVisitor termParser) {
         this.termParser = termParser;
