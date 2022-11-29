@@ -78,14 +78,14 @@ public class STermParserVisitor extends SBaseParserVisitor<Term> {
 
         return Objects.requireNonNullElse(
             visitChildren(ctx),
-            Result.error("Unexpected term, " + SParserUtils.getTextWithLineAndColumnString(ctx))
+            Result.error("Unrecognized term " + SParserUtils.getTextWithLineAndColumnString(ctx))
         );
     }
 
     public Result<Term> visitConstantTerm(stOTTRParser.ConstantTermContext ctx) {
         return Objects.requireNonNullElse(
             visitChildren(ctx),
-            Result.error("Unexpected constant term, " + SParserUtils.getTextWithLineAndColumnString(ctx))
+            Result.error("Unrecognized constant term " + SParserUtils.getTextWithLineAndColumnString(ctx))
         );
     }
 
@@ -139,7 +139,7 @@ public class STermParserVisitor extends SBaseParserVisitor<Term> {
             type = XSD.xdouble.getURI();
             valNode = ctx.DOUBLE();
         } else {
-            return Result.error("Unexpected numeric type, " + SParserUtils.getTextWithLineAndColumnString(ctx));
+            return Result.error("Unrecognized numeric type " + SParserUtils.getTextWithLineAndColumnString(ctx));
         }
 
         String val = valNode.getSymbol().getText();
@@ -166,8 +166,8 @@ public class STermParserVisitor extends SBaseParserVisitor<Term> {
             Result<Term> datatype = visitIri(ctx.iri());
 
             if (datatype.isPresent() && !(datatype.get() instanceof IRITerm)) {
-                return Result.error("Unexpected literal datatype. Expected IRI, but found '"
-                    + datatype.get() + "', " + SParserUtils.getTextWithLineAndColumnString(ctx));
+                return Result.error("Unrecognized literal datatype. Expected IRI, but found '"
+                    + datatype.get() + SParserUtils.getTextWithLineAndColumnString(ctx));
             }
 
             return datatype

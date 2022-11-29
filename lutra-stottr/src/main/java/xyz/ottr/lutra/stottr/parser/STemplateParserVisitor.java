@@ -61,7 +61,6 @@ public class STemplateParserVisitor extends SBaseParserVisitor<Signature>  {
 
     @Override
     public Result<Signature> visitSignature(stOTTRParser.SignatureContext ctx) {
-
         return SignatureBuilder.builder()
             .iri(parseIRI(ctx))
             .parameters(parseParameters(ctx))
@@ -71,6 +70,11 @@ public class STemplateParserVisitor extends SBaseParserVisitor<Signature>  {
 
     @Override
     public Result<Signature> visitBaseTemplate(stOTTRParser.BaseTemplateContext ctx) {
+
+        if (ctx.signature() == null) {
+            return Result.error("Unrecognized base template: " + SParserUtils.getTextWithLineAndColumnString(ctx));
+        }
+
         return BaseTemplateBuilder.builder()
             .signature(visitSignature(ctx.signature()))
             .build()
@@ -79,6 +83,10 @@ public class STemplateParserVisitor extends SBaseParserVisitor<Signature>  {
 
     @Override
     public Result<Signature> visitTemplate(stOTTRParser.TemplateContext ctx) {
+
+        if (ctx.signature() == null) {
+            return Result.error("Unrecognized template " + SParserUtils.getTextWithLineAndColumnString(ctx));
+        }
 
         var signature = visitSignature(ctx.signature());
 
@@ -93,12 +101,22 @@ public class STemplateParserVisitor extends SBaseParserVisitor<Signature>  {
     }
 
     private Result<String> parseIRI(stOTTRParser.SignatureContext ctx) {
+
+        if (ctx.templateName() == null) {
+            return Result.error("Unrecognized signature IRI " + SParserUtils.getTextWithLineAndColumnString(ctx));
+        }
+
         return this.termParser.visit(ctx.templateName())
             .map(term -> (IRITerm) term)
             .map(IRITerm::getIri);
     }
 
     private Result<List<Parameter>> parseParameters(stOTTRParser.SignatureContext ctx) {
+
+        if (ctx.parameterList() == null || ctx.parameterList().parameter() == null) {
+            return Result.error("Unrecognized signature parameters " + SParserUtils.getTextWithLineAndColumnString(ctx));
+        }
+
         return ctx.parameterList().parameter().stream()
             .map(param -> this.parameterParser.visit(param))
             .collect(Collectors.collectingAndThen(Collectors.toList(), Result::aggregate));
@@ -116,6 +134,11 @@ public class STemplateParserVisitor extends SBaseParserVisitor<Signature>  {
 
 
     private Result<Set<Instance>> parsePattern(stOTTRParser.TemplateContext ctx, SInstanceParserVisitor parser) {
+
+        if (ctx.patternList() == null || ctx.patternList().instance() == null) {
+            return Result.error("Unrecognized template pattern " + SParserUtils.getTextWithLineAndColumnString(ctx));
+        }
+
         return parseInstances(ctx.patternList().instance(), parser);
     }
 

@@ -76,4 +76,16 @@ public enum Assertions {
         atLeast(result.getMessageHandler(), severity);
     }
 
+    public static void atMost(MessageHandler messageHandler, Message.Severity severity) {
+        assertSeverity(messageHandler, s -> s.isLessEqualThan(severity), -1);
+    }
+
+    public static void atMost(ResultConsumer consumer, Message.Severity severity) {
+        atMost(consumer.getMessageHandler(), severity);
+    }
+
+    public static void atMost(Result result, Message.Severity severity) {
+        atMost(result.getMessageHandler(), severity);
+    }
+
 }

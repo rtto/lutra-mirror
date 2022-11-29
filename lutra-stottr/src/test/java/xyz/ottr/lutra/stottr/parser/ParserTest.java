@@ -42,6 +42,7 @@ import xyz.ottr.lutra.model.terms.LiteralTerm;
 import xyz.ottr.lutra.model.terms.NoneTerm;
 import xyz.ottr.lutra.model.terms.Term;
 import xyz.ottr.lutra.system.Assertions;
+import xyz.ottr.lutra.system.Message;
 import xyz.ottr.lutra.system.Result;
 import xyz.ottr.lutra.system.ResultConsumer;
 
@@ -81,10 +82,6 @@ public class ParserTest {
         assertTrue(parsed.isPresent());
         assertEquals(makePrefixes(), parsed.get());
     }
-
-    ///
-    /// Terms
-    ///
 
     private List<Result<Instance>> parseInstances() {
 
@@ -138,7 +135,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testInstanceParser() {
+    public void testInstanceParser1() {
 
         SInstanceParser parser = new SInstanceParser();
         ResultConsumer<Instance> consumer = new ResultConsumer<>();
@@ -158,6 +155,36 @@ public class ParserTest {
                 .forEach(consumer);
 
         Assertions.noErrors(consumer);
+    }
+
+    @Test
+    public void testInstanceParser2() {
+
+        SInstanceParser parser = new SInstanceParser();
+        ResultConsumer<Instance> consumer = new ResultConsumer<>();
+
+        parser.apply(
+                "@prefix ex: <http://example.com/> .\n"
+                        + "ex:Template(ex:A, ,ex:B) .")
+                .forEach(consumer);
+
+        // This should give an error, but not FATAL NullpointerException.
+        Assertions.atMost(consumer, Message.Severity.ERROR);
+    }
+
+    @Test
+    public void testInstanceParser3() {
+
+        SInstanceParser parser = new SInstanceParser();
+        ResultConsumer<Instance> consumer = new ResultConsumer<>();
+
+        parser.apply(
+                "@prefix ex: <http://example.com/> .\n"
+                        + "ex:Template(ex:A, , , ex:B) .")
+                .forEach(consumer);
+
+        // This should give an error, but not FATAL NullpointerException.
+        Assertions.atMost(consumer, Message.Severity.ERROR);
     }
 
     @Test
