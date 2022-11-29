@@ -29,7 +29,7 @@ import xyz.ottr.lutra.parser.InstanceParser;
 public class SInstanceParser extends AbstractStOTTRParser<Instance> implements InstanceParser<CharStream> {
 
     public SInstanceParser() {
-        super(prefix -> new SInstanceParserVisitor(prefix));
+        super(SInstanceParserVisitor::new);
     }
 
 }

@@ -41,7 +41,6 @@ public abstract class AbstractStOTTRParser<T> implements Function<CharStream, Re
     private Function<Map<String, String>, SBaseParserVisitor<T>> statementParserProvider;
 
     /**
-     *
      * @param parserVisitor function to produce a parserVisitor (typically a STemplateParserVisitor
      *                      or SInstanceParserVisitor) given a prefix map.
      */

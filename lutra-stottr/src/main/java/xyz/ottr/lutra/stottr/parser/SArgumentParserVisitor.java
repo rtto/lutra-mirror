@@ -49,6 +49,7 @@ class SArgumentParserVisitor extends SBaseParserVisitor<Argument> {
     }
 
     private Result<Term> parseTerm(stOTTRParser.ArgumentContext ctx) {
+        
         if (ctx.term() == null) {
             return Result.error("Unrecognized instance argument " + SParserUtils.getTextWithLineAndColumnString(ctx));
         }
