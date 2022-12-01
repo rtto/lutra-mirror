@@ -38,7 +38,6 @@ import xyz.ottr.lutra.model.terms.Term;
 import xyz.ottr.lutra.store.Expander;
 import xyz.ottr.lutra.store.StandardTemplateStore;
 import xyz.ottr.lutra.store.TemplateStore;
-import xyz.ottr.lutra.system.Message;
 import xyz.ottr.lutra.system.MessageHandler;
 import xyz.ottr.lutra.system.Result;
 import xyz.ottr.lutra.system.ResultConsumer;
@@ -118,7 +117,7 @@ public class NonCheckingExpander implements Expander {
             return ResultStream.of(Result.error("Missing definition for " + instance.getIri()));
         }
         if (shouldDiscard(instance, result.get())) {
-            return ResultStream.of(Result.empty(Message.warning("Discarded instance with none at non-optional position: " + instance)));
+            return ResultStream.empty();
         }
         if (cannotExpand(instance)) {
             return ResultStream.innerOf(instance);

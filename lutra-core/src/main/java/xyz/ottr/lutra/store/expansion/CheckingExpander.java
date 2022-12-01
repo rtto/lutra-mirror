@@ -29,10 +29,8 @@ import xyz.ottr.lutra.model.Parameter;
 import xyz.ottr.lutra.model.Signature;
 import xyz.ottr.lutra.model.Template;
 import xyz.ottr.lutra.model.terms.BlankNodeTerm;
-import xyz.ottr.lutra.model.terms.ListTerm;
 import xyz.ottr.lutra.model.terms.Term;
 import xyz.ottr.lutra.model.types.ListType;
-import xyz.ottr.lutra.model.types.NEListType;
 import xyz.ottr.lutra.model.types.Type;
 import xyz.ottr.lutra.store.TemplateStore;
 import xyz.ottr.lutra.system.Message;
@@ -117,10 +115,6 @@ public class CheckingExpander extends NonCheckingExpander {
             return Message.error("Incompatible argument in instance:"
                     + " blank node " + argument + " given to non-blank"
                     + " parameter " + parameter);
-        }
-
-        if (argTerm instanceof ListTerm && paramType instanceof NEListType && ((ListTerm)argTerm).asList().isEmpty()) {
-            return Message.error("Empty list given to non-empty list parameter " + parameter);
         }
 
         return null;

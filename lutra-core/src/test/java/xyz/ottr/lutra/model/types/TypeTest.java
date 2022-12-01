@@ -74,6 +74,15 @@ public class TypeTest {
         assertTrue(this.owlOProp.isIncompatibleWith(byIRI(RDF.HTML)));
     }
 
+    @Test
+    public void listCompatibility() {
+        ListType listType = new ListType(TypeRegistry.BOT);
+        NEListType neListType = new NEListType(new LUBType(TypeRegistry.TOP));
+
+        assertTrue(neListType.isCompatibleWith(listType));
+        assertTrue(listType.isIncompatibleWith(neListType));
+    }
+
     /* For debugging
     @Test
     public void test0() throws ModelIOException {

@@ -47,7 +47,7 @@ public class ListType extends ComplexType {
     @Override
     public boolean isCompatibleWith(Type other) {
         return other.equals(TypeRegistry.TOP)
-            || other instanceof ListType
+            || other.getClass().isInstance(this)
             && this.inner.isCompatibleWith(((ListType) other).getInner());
     }
 

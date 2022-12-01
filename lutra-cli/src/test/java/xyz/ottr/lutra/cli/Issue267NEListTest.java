@@ -66,30 +66,4 @@ public class Issue267NEListTest {
         Assertions.atLeast(msgHandler, Message.Severity.ERROR);
     }
 
-
-    @Test
-    public void none_applied_to_List_parameter() {
-
-        String args = " "
-                + " --library " + ROOT + "templates.stottr"
-                + " --libraryFormat stottr"
-                + " --inputFormat stottr"
-                + " " + ROOT + "instances_list_none.stottr";
-
-        cli.executeArgs(args.trim().split("\\s+"));
-        Assertions.atLeast(msgHandler, Message.Severity.WARNING);
-    }
-
-    @Test
-    public void none_applied_to_NEList_parameter() {
-
-        String args = " "
-                + " --library " + ROOT + "templates.stottr"
-                + " --libraryFormat stottr"
-                + " --inputFormat stottr"
-                + " " + ROOT + "instances_nelist_none.stottr";
-
-        cli.executeArgs(args.trim().split("\\s+"));
-        Assertions.atLeast(msgHandler, Message.Severity.WARNING);
-    }
 }

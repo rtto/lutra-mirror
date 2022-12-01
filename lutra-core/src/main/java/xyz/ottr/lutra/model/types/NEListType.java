@@ -47,7 +47,7 @@ public class NEListType extends ListType {
     @Override
     public boolean isCompatibleWith(Type other) {
         return super.isCompatibleWith(other)
-            || other instanceof NEListType
+            || other.getClass().isInstance(this)
                 && getInner().isCompatibleWith(((NEListType) other).getInner());
     }
 
