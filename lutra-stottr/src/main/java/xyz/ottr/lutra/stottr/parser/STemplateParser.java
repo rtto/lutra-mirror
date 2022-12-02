@@ -29,7 +29,7 @@ import xyz.ottr.lutra.parser.TemplateParser;
 public class STemplateParser extends AbstractStOTTRParser<Signature> implements TemplateParser<CharStream> {
 
     public STemplateParser() {
-        super(prefix -> new STemplateParserVisitor(prefix));
+        super(STemplateParserVisitor::new);
     }
 
 }

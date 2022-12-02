@@ -73,9 +73,8 @@ class SParameterParserVisitor extends SBaseParserVisitor<Parameter> {
     }
 
     private Result<Term> parseDefaultValue(stOTTRParser.ParameterContext ctx) {
-        stOTTRParser.DefaultValueContext defaultValueContext = ctx.defaultValue();
 
-        if (defaultValueContext == null) {
+        if (ctx.defaultValue() == null) {
             return Result.empty();
         }
 
@@ -83,13 +82,15 @@ class SParameterParserVisitor extends SBaseParserVisitor<Parameter> {
     }
 
     private Result<Term> parseTerm(stOTTRParser.ParameterContext ctx) {
+        if (ctx.Variable() == null) {
+            return Result.error("Unrecognized parameter variable " + SParserUtils.getTextWithLineAndColumnString(ctx));
+        }
         return Result.of(new BlankNodeTerm(this.termParser.getVariableLabel(ctx.Variable())));
     }
 
     private Result<Type> parseType(stOTTRParser.ParameterContext ctx) {
-        return ctx.type() != null
-            ? this.typeParser.visit(ctx)
-            : Result.empty();
+        return Result.ofNullable(ctx.type())
+                .flatMap(this.typeParser::visit);
     }
 }
 

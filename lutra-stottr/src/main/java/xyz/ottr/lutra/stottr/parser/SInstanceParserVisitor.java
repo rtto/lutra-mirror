@@ -25,7 +25,7 @@ package xyz.ottr.lutra.stottr.parser;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import org.antlr.v4.runtime.tree.TerminalNode;
+import org.antlr.v4.runtime.Token;
 import xyz.ottr.lutra.model.Argument;
 import xyz.ottr.lutra.model.Instance;
 import xyz.ottr.lutra.model.ListExpander;
@@ -62,6 +62,11 @@ public class SInstanceParserVisitor extends SBaseParserVisitor<Instance> {
     }
 
     private Result<String> parseIRI(stOTTRParser.InstanceContext ctx) {
+
+        if (ctx.templateName() == null || ctx.templateName().iri() == null) {
+            return Result.error("Unrecognized instance template IRI " + SParserUtils.getTextWithLineAndColumnString(ctx));
+        }
+
         return this.termParser
             .visitIri(ctx.templateName().iri())
             .map(iri -> ((IRITerm) iri).getIri());
@@ -69,24 +74,26 @@ public class SInstanceParserVisitor extends SBaseParserVisitor<Instance> {
 
     private Result<ListExpander> parseExpander(stOTTRParser.InstanceContext ctx) {
 
-        TerminalNode expanderNode = ctx.ListExpander();
-
-        if (expanderNode == null) {
+        if (ctx.ListExpander() == null) {
             return Result.empty();
         }
 
-        String expanderValue = expanderNode.getSymbol().getText();
-
-        return STOTTR.Expanders.map.containsValue(expanderValue)
-            ? Result.of(STOTTR.Expanders.map.getKey(expanderValue))
-            : Result.error("Unrecognized list expander, " + SParserUtils.getTextWithLineAndColumnString(ctx));
+        return Result.ofNullable(ctx.ListExpander().getSymbol())
+                .map(Token::getText)
+                .map(STOTTR.Expanders.map::getKey)
+                .or(() -> Result.error("Unrecognized list expander " + SParserUtils.getTextWithLineAndColumnString(ctx)));
     }
 
     private Result<List<Argument>> parseArguments(stOTTRParser.InstanceContext ctx) {
+
+        if (ctx.argumentList() == null || ctx.argumentList().argument() == null) {
+            return Result.error("Unrecognized instance arguments " + SParserUtils.getTextWithLineAndColumnString(ctx));
+        }
+
         return ctx.argumentList()
             .argument()
             .stream()
-            .map(arg -> this.argumentParser.visitArgument(arg))
+            .map(this.argumentParser::visitArgument)
             .collect(Collectors.collectingAndThen(Collectors.toList(), Result::aggregate));
     }
 
