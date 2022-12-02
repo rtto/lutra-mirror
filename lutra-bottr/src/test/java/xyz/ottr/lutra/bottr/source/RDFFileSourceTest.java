@@ -59,7 +59,6 @@ public class RDFFileSourceTest {
     }
 
     @Test
-    @Disabled
     public void emptyQueryResult() {
         String expectedString = "no results";
         List<String> modelURIs = List.of(getResourceFile("a.ttl"), getResourceFile("b.ttl"));
@@ -67,6 +66,6 @@ public class RDFFileSourceTest {
 
         ResultStream<?> resultStream = source.execute("SELECT ?s ?p ?o { ?s ?p ?o } LIMIT 0");
         Result<?> emptyResult = resultStream.getStream().collect(Collectors.toList()).get(0);
-        Assertions.containsErrorMessageFragment(emptyResult.getMessageHandler(), expectedString);
+        Assertions.containsInfoMessageFragment(emptyResult.getMessageHandler(), expectedString);
     }
 }

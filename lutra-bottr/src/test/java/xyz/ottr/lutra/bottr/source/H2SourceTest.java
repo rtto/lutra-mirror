@@ -123,7 +123,6 @@ public class H2SourceTest {
     }
 
     @Test
-    @Disabled
     public void emptyQueryResult() {
         String expectedString = "no results";
         String input = getAbsolutePath("sources/csv/win.csv");
@@ -131,7 +130,7 @@ public class H2SourceTest {
 
         ResultStream<?> resultStream = csvTest.execute("SELECT ID, NAME FROM CSVREAD('" + input + "') WHERE 1=2;");
         Result<?> emptyResult = resultStream.getStream().collect(Collectors.toList()).get(0);
-        Assertions.containsErrorMessageFragment(emptyResult.getMessageHandler(), expectedString);
+        Assertions.containsInfoMessageFragment(emptyResult.getMessageHandler(), expectedString);
     }
 
     private String getAbsolutePath(String file) {

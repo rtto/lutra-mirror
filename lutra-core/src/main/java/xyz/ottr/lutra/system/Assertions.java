@@ -78,8 +78,8 @@ public enum Assertions {
     }
 
     /**
-     * Checks if the messagehandler contains a message of servery Error or worse,
-     * with an error messages that contains the given string.
+     * Checks if the messageHandler contains a message of severity Error or worse
+     * which contains the given string.
      * @param messageHandler handler to check
      * @param expected string that at least one error message must contain
      */
@@ -87,6 +87,23 @@ public enum Assertions {
     public static void containsErrorMessageFragment(MessageHandler messageHandler, String expected) {
         var test = messageHandler.getMessages().stream()
                 .filter(m -> m.getSeverity().isGreaterEqualThan(Message.Severity.ERROR))
+                .map(Message::getMessage)
+                .map(s -> s.toLowerCase(Locale.ENGLISH))
+                .anyMatch(s -> s.contains(expected.trim().toLowerCase(Locale.ENGLISH)));
+
+        assertThat(test, is(true));
+    }
+
+    /**
+     * Checks if the messageHandler contains a message of severity Info
+     * which contains the given string.
+     * @param messageHandler handler to check
+     * @param expected string that at least one info message must contain
+     */
+
+    public static void containsInfoMessageFragment(MessageHandler messageHandler, String expected) {
+        var test = messageHandler.getMessages().stream()
+                .filter(m -> m.getSeverity().equals(Message.Severity.INFO))
                 .map(Message::getMessage)
                 .map(s -> s.toLowerCase(Locale.ENGLISH))
                 .anyMatch(s -> s.contains(expected.trim().toLowerCase(Locale.ENGLISH)));

@@ -47,7 +47,6 @@ public class SPARQLEndpointSourceTest {
     }
 
     @Test
-    @Disabled
     public void emptyQueryResult() {
         String expectedString = "no results";
         String endpoint = "http://dbpedia.org/sparql";
@@ -55,7 +54,7 @@ public class SPARQLEndpointSourceTest {
 
         ResultStream<?> resultStream = source.execute("SELECT ?s ?p ?o WHERE { ?s ?p ?o} LIMIT 0");
         Result<?> emptyResult = resultStream.getStream().collect(Collectors.toList()).get(0);
-        Assertions.containsErrorMessageFragment(emptyResult.getMessageHandler(), expectedString);
+        Assertions.containsInfoMessageFragment(emptyResult.getMessageHandler(), expectedString);
     }
 
 }
