@@ -80,7 +80,7 @@ public class TypeTest {
         assertTrue(this.owlOProp.isIncompatibleWith(byIRI(XSD.xlong)));
         assertTrue(this.owlOProp.isIncompatibleWith(byIRI(RDF.HTML)));
     }
-    
+
     @Test
     public void listCompatibility() {
         final ListType listType = TypeRegistry.LIST_TYPE;
