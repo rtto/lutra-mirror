@@ -38,7 +38,7 @@ import xyz.ottr.lutra.stottr.STOTTR;
 import xyz.ottr.lutra.stottr.antlr.stOTTRParser;
 import xyz.ottr.lutra.system.Result;
 
-public class STermParser extends SBaseParserVisitor<Term> {
+public class STermParserVisitor extends SBaseParserVisitor<Term> {
 
     private static final Pattern quotedStringPat = Pattern.compile("^\".*\"$");
     private static final Pattern quotesPat = Pattern.compile("^\"|\"$");
@@ -50,11 +50,11 @@ public class STermParser extends SBaseParserVisitor<Term> {
     // Maps labels to already parsed (blank node) variable terms
     private final Map<String, Term> variables;
 
-    STermParser(Map<String, String> prefixes) {
+    STermParserVisitor(Map<String, String> prefixes) {
         this(prefixes, new HashMap<>());
     }
 
-    STermParser(Map<String, String> prefixes, Map<String, Term> variables) {
+    STermParserVisitor(Map<String, String> prefixes, Map<String, Term> variables) {
         this.prefixes = prefixes;
         this.variables = variables;
     }
@@ -78,14 +78,14 @@ public class STermParser extends SBaseParserVisitor<Term> {
 
         return Objects.requireNonNullElse(
             visitChildren(ctx),
-            Result.error("Unexpected term, " + SParserUtils.getTextWithLineAndColumnString(ctx))
+            Result.error("Unrecognized term " + SParserUtils.getTextWithLineAndColumnString(ctx))
         );
     }
 
     public Result<Term> visitConstantTerm(stOTTRParser.ConstantTermContext ctx) {
         return Objects.requireNonNullElse(
             visitChildren(ctx),
-            Result.error("Unexpected constant term, " + SParserUtils.getTextWithLineAndColumnString(ctx))
+            Result.error("Unrecognized constant term " + SParserUtils.getTextWithLineAndColumnString(ctx))
         );
     }
 
@@ -139,7 +139,7 @@ public class STermParser extends SBaseParserVisitor<Term> {
             type = XSD.xdouble.getURI();
             valNode = ctx.DOUBLE();
         } else {
-            return Result.error("Unexpected numeric type, " + SParserUtils.getTextWithLineAndColumnString(ctx));
+            return Result.error("Unrecognized numeric type " + SParserUtils.getTextWithLineAndColumnString(ctx));
         }
 
         String val = valNode.getSymbol().getText();
@@ -166,8 +166,8 @@ public class STermParser extends SBaseParserVisitor<Term> {
             Result<Term> datatype = visitIri(ctx.iri());
 
             if (datatype.isPresent() && !(datatype.get() instanceof IRITerm)) {
-                return Result.error("Unexpected literal datatype. Expected IRI, but found '"
-                    + datatype.get() + "', " + SParserUtils.getTextWithLineAndColumnString(ctx));
+                return Result.error("Unrecognized literal datatype. Expected IRI, but found '"
+                    + datatype.get() + SParserUtils.getTextWithLineAndColumnString(ctx));
             }
 
             return datatype

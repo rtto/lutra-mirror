@@ -36,14 +36,14 @@ import xyz.ottr.lutra.stottr.STOTTR;
 import xyz.ottr.lutra.stottr.antlr.stOTTRParser;
 import xyz.ottr.lutra.system.Result;
 
-class SParameterParser extends SBaseParserVisitor<Parameter> {
+class SParameterParserVisitor extends SBaseParserVisitor<Parameter> {
 
-    private final STypeParser typeParser;
-    private final STermParser termParser;
+    private final STypeParserVisitor typeParser;
+    private final STermParserVisitor termParser;
 
-    SParameterParser(STermParser termParser) {
+    SParameterParserVisitor(STermParserVisitor termParser) {
         this.termParser = termParser;
-        this.typeParser = new STypeParser(termParser);
+        this.typeParser = new STypeParserVisitor(termParser);
     }
 
 
@@ -73,9 +73,8 @@ class SParameterParser extends SBaseParserVisitor<Parameter> {
     }
 
     private Result<Term> parseDefaultValue(stOTTRParser.ParameterContext ctx) {
-        stOTTRParser.DefaultValueContext defaultValueContext = ctx.defaultValue();
 
-        if (defaultValueContext == null) {
+        if (ctx.defaultValue() == null) {
             return Result.empty();
         }
 
@@ -83,13 +82,15 @@ class SParameterParser extends SBaseParserVisitor<Parameter> {
     }
 
     private Result<Term> parseTerm(stOTTRParser.ParameterContext ctx) {
+        if (ctx.Variable() == null) {
+            return Result.error("Unrecognized parameter variable " + SParserUtils.getTextWithLineAndColumnString(ctx));
+        }
         return Result.of(new BlankNodeTerm(this.termParser.getVariableLabel(ctx.Variable())));
     }
 
     private Result<Type> parseType(stOTTRParser.ParameterContext ctx) {
-        return ctx.type() != null
-            ? this.typeParser.visit(ctx)
-            : Result.empty();
+        return Result.ofNullable(ctx.type())
+                .flatMap(this.typeParser::visit);
     }
 }
 

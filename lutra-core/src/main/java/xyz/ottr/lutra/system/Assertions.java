@@ -53,6 +53,18 @@ public enum Assertions {
         assertSeverity(messageHandler, s -> s.isGreaterEqualThan(Message.Severity.WARNING), 0);
     }
 
+    public static void noFatals(MessageHandler messageHandler) {
+        assertSeverity(messageHandler, s -> s.isGreaterEqualThan(Message.Severity.FATAL), 0);
+    }
+
+    public static void noFatals(ResultConsumer consumer) {
+        noFatals(consumer.getMessageHandler());
+    }
+
+    public static void noFatals(Result result) {
+        noFatals(result.getMessageHandler());
+    }
+
     public static void noErrors(MessageHandler messageHandler) {
         assertSeverity(messageHandler, s -> s.isGreaterEqualThan(Message.Severity.ERROR), 0);
     }
@@ -84,9 +96,9 @@ public enum Assertions {
      * @param expected string that at least one error message must contain
      */
 
-    public static void containsErrorMessageFragment(MessageHandler messageHandler, String expected) {
+    public static void containsErrorMessageFragment(MessageHandler messageHandler, Message.Severity severity, String expected) {
         var test = messageHandler.getMessages().stream()
-                .filter(m -> m.getSeverity().isGreaterEqualThan(Message.Severity.ERROR))
+                .filter(m -> m.getSeverity().equals(severity))
                 .map(Message::getMessage)
                 .map(s -> s.toLowerCase(Locale.ENGLISH))
                 .anyMatch(s -> s.contains(expected.trim().toLowerCase(Locale.ENGLISH)));
