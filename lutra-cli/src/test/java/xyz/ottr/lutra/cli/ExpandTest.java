@@ -37,6 +37,8 @@ import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import xyz.ottr.lutra.system.Assertions;
+import xyz.ottr.lutra.system.MessageHandler;
 
 public class ExpandTest {
     private static final String ROOT = "src/test/resources/expand/";
@@ -45,31 +47,16 @@ public class ExpandTest {
     @Test
     public void expand_stottr_instances() {
         String args = " -f "
-                + ROOT + "instances/pizza_instances.stottr"
-                + " -I stottr";
+                + "-L stottr -l "
+                + ROOT + "templates/device_template.stottr"
+                + " -I stottr "
+                + ROOT + "instances/device_instances.stottr";
 
-        // Safe-keep System.out
-        final PrintStream stdOut = System.out;
+        CLI cli = new CLI();
+        MessageHandler msgHandler = cli.getMessageHandler();
+        cli.executeArgs(args.trim().split("\\s+"));
+        Assertions.noErrors(msgHandler);
 
-        // Create stream to capture System.out:
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        PrintStream ps = new PrintStream(baos, true, StandardCharsets.UTF_8);
-        System.setOut(ps);
-
-        CLIRunner.run(args);
-
-        // Restore old out
-        stdOut.flush();
-        System.setOut(stdOut);
-
-        // parse captured console output to model
-        Model actual = ModelFactory.createDefaultModel();
-        RDFDataMgr.read(actual, new StringReader(baos.toString(StandardCharsets.UTF_8)), "", Lang.TURTLE);
-
-        Model expected = RDFDataMgr.loadModel(ROOT + "expected/expand_pizza.ttl");
-
-        assertThat("should contain the same number of triples", actual.size(), is(expected.size()));
-        TestUtils.testIsomorphicModels(actual, expected);
     }
 
     // -I wottr
@@ -98,6 +85,74 @@ public class ExpandTest {
         RDFDataMgr.read(actual, new StringReader(baos.toString(StandardCharsets.UTF_8)), "", Lang.TURTLE);
 
         Model expected = RDFDataMgr.loadModel(ROOT + "expected/expand_pizza.ttl");
+
+        assertThat("should contain the same number of triples", actual.size(), is(expected.size()));
+        TestUtils.testIsomorphicModels(actual, expected);
+
+    }
+
+    // -I stottr
+    // variables in list
+    @Test
+    public void stottr_template_with_variables_in_list() {
+        String args = "  -f -L stottr -l "
+                + ROOT + "templates/variables_in_list.stottr "
+                + ROOT + "instances/variables_in_list_instances.stottr "
+                + " -I stottr";
+
+        // Safe-keep System.out
+        final PrintStream stdOut = System.out;
+
+        // Create stream to capture System.out:
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        PrintStream ps = new PrintStream(baos, true, StandardCharsets.UTF_8);
+        System.setOut(ps);
+
+        CLIRunner.run(args);
+
+        // Restore old out
+        stdOut.flush();
+        System.setOut(stdOut);
+
+        // parse captured console output to model
+        Model actual = ModelFactory.createDefaultModel();
+        RDFDataMgr.read(actual, new StringReader(baos.toString(StandardCharsets.UTF_8)), "", Lang.TURTLE);
+
+        Model expected = RDFDataMgr.loadModel(ROOT + "expected/variables_in_list.ttl");
+
+        assertThat("should contain the same number of triples", actual.size(), is(expected.size()));
+        TestUtils.testIsomorphicModels(actual, expected);
+
+    }
+
+    // -I wottr
+    // variables in list
+    @Test
+    public void wottr_template_with_variables_in_list() {
+        String args = "  -f -L wottr -l "
+                + ROOT + "templates/variables_in_list.wottr "
+                + ROOT + "instances/variables_in_list_instances.wottr "
+                + " -I wottr";
+
+        // Safe-keep System.out
+        final PrintStream stdOut = System.out;
+
+        // Create stream to capture System.out:
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        PrintStream ps = new PrintStream(baos, true, StandardCharsets.UTF_8);
+        System.setOut(ps);
+
+        CLIRunner.run(args);
+
+        // Restore old out
+        stdOut.flush();
+        System.setOut(stdOut);
+
+        // parse captured console output to model
+        Model actual = ModelFactory.createDefaultModel();
+        RDFDataMgr.read(actual, new StringReader(baos.toString(StandardCharsets.UTF_8)), "", Lang.TURTLE);
+
+        Model expected = RDFDataMgr.loadModel(ROOT + "expected/variables_in_list.ttl");
 
         assertThat("should contain the same number of triples", actual.size(), is(expected.size()));
         TestUtils.testIsomorphicModels(actual, expected);

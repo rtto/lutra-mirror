@@ -1,0 +1,33 @@
+@prefix ex: <http://example.com/ns#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix ottr: <http://ns.ottr.xyz/0.4/> .
+@prefix ax: <http://tpl.ottr.xyz/owl/axiom/0.1/> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix rstr: <http://tpl.ottr.xyz/owl/restriction/0.1/> .
+
+ex:Device[owl:Class ?name, owl:Class ?deviceType, ! NEList<owl:Class> ?components = (ex:Screen, ex:CPU, ex:Battery), ? xsd:string ?label] :: {
+  ax:SubClassOf(?name, ?deviceType),
+  ex:ConsistsOf(?name, ?components),
+  ottr:Triple(?deviceType, owl:oneOf, (ex:Phone, ex:Laptop)),
+  ottr:Triple(?name, rdfs:label, ?label)
+}.
+
+ex:ConsistsOf[owl:Class ?item, ! NEList<owl:Class> ?components] :: {
+  ex:HasComponents(?item, ?components),
+  ex:OnlyComponents(?item, ?components)
+}.
+
+ex:HasComponents[owl:Class ?item, ! NEList<owl:Class> ?components] :: {
+  cross | ex:HasComponent(?item, ++?components)
+}.
+
+ex:HasComponent[owl:Class ?item, owl:Class ?component] :: {
+  ax:SubObjectSomeValuesFrom(?item, ex:hasComponent, ?component)
+}.
+
+ex:OnlyComponents[owl:Class ?item, NEList<owl:Class> ?components] :: {
+  rstr:ObjectUnionOf(_:b, ?components),
+  ax:SubObjectAllValuesFrom(?item, ex:hasComponent, _:b)
+}.
