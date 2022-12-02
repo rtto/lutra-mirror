@@ -22,6 +22,7 @@ package xyz.ottr.lutra.model.types;
  * #L%
  */
 
+import java.util.function.BiPredicate;
 import lombok.EqualsAndHashCode;
 import xyz.ottr.lutra.OTTR;
 
@@ -39,16 +40,23 @@ public class NEListType extends ListType {
 
     @Override
     public boolean isSubTypeOf(Type other) {
-        return super.isSubTypeOf(other)
-            || other instanceof NEListType
-               && getInner().isSubTypeOf(((NEListType) other).getInner());
+        return isSubRelatedTo(Type::isSubTypeOf, other);
     }
 
     @Override
     public boolean isCompatibleWith(Type other) {
-        return super.isCompatibleWith(other)
-            || other.getClass().isInstance(this)
-                && getInner().isCompatibleWith(((NEListType) other).getInner());
+        return isSubRelatedTo(Type::isCompatibleWith, other);
+    }
+
+    /*
+     * This predicate pattern represents the conditions that apply to both isSubTypeOf and isCompatibleWith.
+     */
+    @Override
+    protected boolean isSubRelatedTo(BiPredicate<Type, Type> relation, Type other) {
+        return super.isSubRelatedTo(relation, other)
+                || other instanceof NEListType
+                    // NEListType has no subclasses -- && other.getClass().equals(NEListType.class)
+                    && relation.test(this.inner, ((NEListType) other).getInner());
     }
 
     @Override
