@@ -24,6 +24,7 @@ package xyz.ottr.lutra.model.types;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.Collections;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.vocabulary.OWL;
 import org.apache.jena.vocabulary.RDF;
@@ -32,6 +33,9 @@ import org.apache.jena.vocabulary.XSD;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import xyz.ottr.lutra.OTTR;
+import xyz.ottr.lutra.model.terms.IRITerm;
+import xyz.ottr.lutra.model.terms.ListTerm;
+import xyz.ottr.lutra.model.terms.LiteralTerm;
 
 public class TypeTest {
 
@@ -76,11 +80,35 @@ public class TypeTest {
 
     @Test
     public void listCompatibility() {
-        ListType listType = new ListType(TypeRegistry.BOT);
-        NEListType neListType = new NEListType(new LUBType(TypeRegistry.TOP));
+        final ListType listType = TypeRegistry.LIST_TYPE;
+        final NEListType neListType = TypeRegistry.NELIST_TYPE;
 
         assertTrue(neListType.isCompatibleWith(listType));
+
+        assertTrue(new NEListType(this.owlOProp).isCompatibleWith(new ListType(this.owlOProp)));
+
+        assertTrue(new ListTerm(Collections.EMPTY_LIST).getType().equals(listType));
+        assertTrue(new ListTerm(Collections.EMPTY_LIST).getType().isCompatibleWith(listType));
+
+        // I guess this can break should we decide to make list types more specific, e.g., NEList<ottr:IRI>
+        assertTrue(new ListTerm(new IRITerm("http://example.com")).getType().equals(neListType));
+
+        assertTrue(new ListTerm(new IRITerm("http://example.com")).getType().isCompatibleWith(listType));
+        assertTrue(new ListTerm(new IRITerm("http://example.com")).getType().isCompatibleWith(neListType));
+    }
+
+    @Test
+    public void listInCompatibility() {
+        final ListType listType = TypeRegistry.LIST_TYPE;
+        final NEListType neListType = TypeRegistry.NELIST_TYPE;
+
         assertTrue(listType.isIncompatibleWith(neListType));
+
+        assertTrue(new ListType(this.owlOProp).isIncompatibleWith(new NEListType(this.owlOProp)));
+
+        assertTrue(new ListTerm(Collections.EMPTY_LIST).getType().isIncompatibleWith(neListType));
+
+        assertTrue(new ListTerm(Collections.EMPTY_LIST).getType().isIncompatibleWith(new ListTerm(new IRITerm("http://example.com")).getType()));
     }
 
     /* For debugging

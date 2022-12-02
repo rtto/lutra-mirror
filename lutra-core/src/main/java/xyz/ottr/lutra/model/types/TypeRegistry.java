@@ -61,6 +61,8 @@ public enum TypeRegistry {
     public static final ComplexType LUB_TOP = new LUBType(TOP);
     public static final ComplexType LUB_IRI = new LUBType(IRI);
 
+    public static final ListType LIST_TYPE = new ListType(BOT);
+    public static final NEListType NELIST_TYPE = new NEListType(LUB_TOP);
 
     public static Result<Type> get(String uri) {
         var type = asType(uri);

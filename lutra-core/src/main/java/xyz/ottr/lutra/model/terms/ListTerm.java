@@ -62,8 +62,8 @@ public class ListTerm extends AbstractTerm<Long> {
 
     private static Type getIntrinsicType(List<Term> terms) {
         return terms.isEmpty()
-            ? new ListType(TypeRegistry.BOT)
-            : new NEListType(new LUBType(TypeRegistry.TOP));
+            ? TypeRegistry.LIST_TYPE
+            : TypeRegistry.NELIST_TYPE;
     }
 
     /**
