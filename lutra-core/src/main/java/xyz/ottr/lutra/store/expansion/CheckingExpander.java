@@ -25,11 +25,9 @@ package xyz.ottr.lutra.store.expansion;
 import java.util.LinkedList;
 import java.util.List;
 import xyz.ottr.lutra.model.Argument;
-import xyz.ottr.lutra.model.BaseTemplate;
 import xyz.ottr.lutra.model.Instance;
 import xyz.ottr.lutra.model.Parameter;
 import xyz.ottr.lutra.model.Signature;
-import xyz.ottr.lutra.model.Template;
 import xyz.ottr.lutra.model.terms.BlankNodeTerm;
 import xyz.ottr.lutra.model.types.ListType;
 import xyz.ottr.lutra.model.types.Type;
@@ -53,7 +51,13 @@ public class CheckingExpander extends NonCheckingExpander {
         return super.expandInstance(instance);
     }
 
+    /**
+     * @param instance the instance to check for errors
+     * @return the list of error (messages) found for the instance.
+     */
     private List<Message> checkInstance(Instance instance) {
+
+        // check if instance is of a template or base template
         Result<Signature> signature = getTemplateStore().getSignature(instance.getIri());
         if (signature.isEmpty()) {
             return signature.getMessageHandler().getMessages();
@@ -116,8 +120,5 @@ public class CheckingExpander extends NonCheckingExpander {
         return messages;
     }
 
-    // TODO should go somewhere else where is can be reused
-    private boolean isSignature(Result<Signature> signature) {
-        return !(signature.get() instanceof Template || signature.get() instanceof BaseTemplate);
-    }
+
 }

@@ -198,11 +198,18 @@ public class NonCheckingExpander implements Expander {
         return templateStore;
     }
 
-    private boolean isBaseTemplate(Result<Signature> result) {
+
+    // TODO should go somewhere else where is can be reused?
+
+    protected boolean isBaseTemplate(Result<Signature> result) {
         return result.isPresent() && result.get() instanceof BaseTemplate;
     }
 
-    private boolean isTemplate(Result<Signature> result) {
+    protected boolean isTemplate(Result<Signature> result) {
         return result.isPresent() && result.get() instanceof Template;
+    }
+
+    protected boolean isSignature(Result<Signature> result) {
+        return result.isPresent() && !(result.get() instanceof Template || result.get() instanceof BaseTemplate);
     }
 }
