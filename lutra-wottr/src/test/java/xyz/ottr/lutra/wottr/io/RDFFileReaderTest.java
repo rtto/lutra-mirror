@@ -55,4 +55,14 @@ public class RDFFileReaderTest {
         Assertions.atLeast(result, Message.Severity.ERROR);
     }
 
+    @Test
+    public void parseInvalidFile() {
+        String expectedMsg = "Error parsing";
+        String file = "incorrect/stottr_instances.stottr";
+
+        var result = RDFIO.fileReader().parse(file);
+        Assertions.atLeast(result, Message.Severity.ERROR);
+        Assertions.containsErrorMessageFragment(result.getMessageHandler(), expectedMsg);
+    }
+
 }

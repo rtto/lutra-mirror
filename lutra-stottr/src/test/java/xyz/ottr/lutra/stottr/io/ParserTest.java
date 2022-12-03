@@ -72,7 +72,8 @@ public class ParserTest {
             + "PREFIX rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> \n"
             + "@prefix ottr:  <http://ns.ottr.xyz/0.4/> .\n"
             + "@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> . \n"
-            + "@prefix :      <http://base.org/> .";
+            + "@prefix :      <http://base.org/> . \n"
+            + "@prefix ax: <http://tpl.ottr.xyz/owl/axiom/0.1/>";
 
         return SParserUtils.parseString(prefixes, prefixParser);
     }
