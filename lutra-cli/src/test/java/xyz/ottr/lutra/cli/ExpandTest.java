@@ -73,23 +73,6 @@ public class ExpandTest {
         TestUtils.testIsomorphicModels(actual, expected);
     }
 
-    // -I stottr
-    // variables in list
-    @Test
-    public void stottr_template_with_variables_in_list() {
-        String args = "  -f -L stottr -l "
-                + ROOT + "templates/variables_in_list.stottr "
-                + ROOT + "instances/variables_in_list_instances.stottr "
-                + " -I stottr "
-                + " -o " + ROOT + "output.out";
-
-        CLIRunner.run(args);
-
-        Model actual = RDFIO.fileReader().parse(ROOT + "output.out").get();
-        Model expected = RDFIO.fileReader().parse(ROOT + "expected/variables_in_list.ttl").get();
-        TestUtils.testIsomorphicModels(actual, expected);
-    }
-
     // -I wottr
     // variables in list
     @Test

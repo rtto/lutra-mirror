@@ -40,6 +40,7 @@ import xyz.ottr.lutra.model.ListExpander;
 import xyz.ottr.lutra.model.Parameter;
 import xyz.ottr.lutra.model.Signature;
 import xyz.ottr.lutra.model.Template;
+import xyz.ottr.lutra.model.terms.BlankNodeTerm;
 import xyz.ottr.lutra.model.terms.IRITerm;
 import xyz.ottr.lutra.model.terms.ListTerm;
 import xyz.ottr.lutra.model.terms.LiteralTerm;
@@ -84,6 +85,7 @@ public class ParserTest {
         prefixes.put("ottr", "http://ns.ottr.xyz/0.4/");
         prefixes.put("xsd", "http://www.w3.org/2001/XMLSchema#");
         prefixes.put("", "http://base.org/");
+        prefixes.put("ax", "http://tpl.ottr.xyz/owl/axiom/0.1/");
 
         return prefixes;
     }
@@ -144,7 +146,8 @@ public class ParserTest {
 
         String instances = ":T1(true, none, rdf:type, <http://some.uri/with#part>) . "
             + "cross | ex:T2(\"hello\"@no, ++ (\"one\", \"two\", \"three\")) . "
-            + ":T3(42, 42.01, \"42.02\"^^xsd:int) . ";
+            + ":T3(42, 42.01, \"42.02\"^^xsd:int) . "
+            + "ax:EquivObjectIntersectionOf(?intersection, (?A, ?B)) . "; // test for #156: variables in list
 
         return parser.parseString(instances).getStream().collect(Collectors.toList());
     }
@@ -183,8 +186,14 @@ public class ParserTest {
                 LiteralTerm.createTypedLiteral("42.02", XSD.decimal.getURI()))
             ).build();
 
-        return List.of(i1, i2, i3);
+        var i4 = Instance.builder()
+                .iri("http://tpl.ottr.xyz/owl/axiom/0.1/EquivObjectIntersectionOf")
+                .arguments(Argument.listOf(
+                        new BlankNodeTerm(),
+                        new ListTerm(new BlankNodeTerm(), new BlankNodeTerm()))
+                ).build();
 
+        return List.of(i1, i2, i3, i4);
     }
 
     @Test
