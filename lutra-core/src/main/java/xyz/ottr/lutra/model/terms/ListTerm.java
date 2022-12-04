@@ -31,9 +31,6 @@ import lombok.Builder;
 import lombok.Singular;
 import org.apache.jena.shared.PrefixMapping;
 import xyz.ottr.lutra.model.Substitution;
-import xyz.ottr.lutra.model.types.LUBType;
-import xyz.ottr.lutra.model.types.ListType;
-import xyz.ottr.lutra.model.types.NEListType;
 import xyz.ottr.lutra.model.types.Type;
 import xyz.ottr.lutra.model.types.TypeRegistry;
 
@@ -62,8 +59,8 @@ public class ListTerm extends AbstractTerm<Long> {
 
     private static Type getIntrinsicType(List<Term> terms) {
         return terms.isEmpty()
-            ? new ListType(TypeRegistry.BOT)
-            : new NEListType(new LUBType(TypeRegistry.TOP));
+            ? TypeRegistry.LIST_TYPE
+            : TypeRegistry.NELIST_TYPE;
     }
 
     /**

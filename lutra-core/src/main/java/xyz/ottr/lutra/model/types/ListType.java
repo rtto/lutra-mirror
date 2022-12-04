@@ -22,6 +22,7 @@ package xyz.ottr.lutra.model.types;
  * #L%
  */
 
+import java.util.function.BiPredicate;
 import lombok.EqualsAndHashCode;
 import xyz.ottr.lutra.OTTR;
 
@@ -37,18 +38,25 @@ public class ListType extends ComplexType {
         return OTTR.TypeURI.List;
     }
 
+
     @Override
     public boolean isSubTypeOf(Type other) {
-        return other.equals(TypeRegistry.TOP)
-            || other instanceof ListType
-                && this.inner.isSubTypeOf(((ListType) other).getInner());
+        return isSubRelatedTo(Type::isSubTypeOf, other);
     }
 
     @Override
     public boolean isCompatibleWith(Type other) {
+        return isSubRelatedTo(Type::isCompatibleWith, other);
+    }
+
+    /*
+     * This predicate pattern represents the conditions that apply to both isSubTypeOf and isCompatibleWith.
+     */
+    protected boolean isSubRelatedTo(BiPredicate<Type, Type> relation, Type other) {
         return other.equals(TypeRegistry.TOP)
-            || other instanceof ListType
-            && this.inner.isCompatibleWith(((ListType) other).getInner());
+                || other instanceof ListType
+                    && other.getClass().equals(ListType.class)  // other cannot be a subclass of ListType
+                    && relation.test(this.getInner(), ((ListType) other).getInner());
     }
 
     @Override

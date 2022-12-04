@@ -29,6 +29,7 @@ import xyz.ottr.lutra.model.Parameter;
 import xyz.ottr.lutra.model.Signature;
 import xyz.ottr.lutra.model.Template;
 import xyz.ottr.lutra.model.terms.BlankNodeTerm;
+import xyz.ottr.lutra.model.terms.Term;
 import xyz.ottr.lutra.model.types.ListType;
 import xyz.ottr.lutra.model.types.Type;
 import xyz.ottr.lutra.store.TemplateStore;
@@ -73,7 +74,7 @@ public class CheckingExpander extends NonCheckingExpander {
     private Message checkParametersMatch(Instance instance, Signature signature) {
 
         if (instance.getArguments().size() != signature.getParameters().size()) {
-            return Message.error("Number of arguments do not match number of parameters in instance " + instance.toString());
+            return Message.error("Number of arguments do not match number of parameters in instance " + instance);
         }
 
         for (int i = 0; i < instance.getArguments().size(); i++) {
@@ -92,27 +93,28 @@ public class CheckingExpander extends NonCheckingExpander {
     private Message checkNonCompatibleArgument(Argument argument, Parameter parameter) {
         
         Type paramType = parameter.getType();
-        Type argType = argument.getTerm().getType();
+        Term argTerm = argument.getTerm();
+        Type argType = argTerm.getType();
 
         if (argument.isListExpander()) {
             if (argType instanceof ListType) {
                 argType = ((ListType) argType).getInner();
             } else {
                 return Message.error("List expander applied to non-list argument: "
-                        + argument.toString());
+                        + argument);
             }
         }
 
         if (!argType.isCompatibleWith(paramType)) {
             return Message.error("Incompatible argument in instance: "
-                    + argument.toString() + " given to parameter "
-                    + parameter.toString() + " - incompatible types.");
+                    + argument + " given to parameter "
+                    + parameter + " - incompatible types.");
         }
 
-        if (argument.getTerm() instanceof BlankNodeTerm && parameter.isNonBlank()) {
+        if (argTerm instanceof BlankNodeTerm && parameter.isNonBlank()) {
             return Message.error("Incompatible argument in instance:"
-                    + " blank node " + argument.toString() + " given to non-blank"
-                    + " parameter " + parameter.toString());
+                    + " blank node " + argument + " given to non-blank"
+                    + " parameter " + parameter);
         }
 
         return null;
