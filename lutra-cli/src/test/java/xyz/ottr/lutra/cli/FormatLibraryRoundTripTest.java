@@ -22,7 +22,11 @@ package xyz.ottr.lutra.cli;
  * #L%
  */
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import org.apache.jena.rdf.model.Model;
 import org.junit.jupiter.api.Test;
 import xyz.ottr.lutra.wottr.io.RDFIO;
@@ -54,19 +58,18 @@ public class FormatLibraryRoundTripTest {
         // reformat stottr to wottr
         CLIRunner.run(cliFormatString("stottr", "wottr", ROOT + folder + "2stottr/" + iri + ".stottr", ROOT + folder + "3wottr"));
         // reformat wottr to stottr again
-        //CLIRunner.run(cliFormatString("wottr", "stottr", ROOT + folder + "3wottr/" + iri + ".ttl", ROOT + folder + "4stottr"));
+        CLIRunner.run(cliFormatString("wottr", "stottr", ROOT + folder + "3wottr/" + iri + ".ttl", ROOT + folder + "4stottr"));
 
         // wOTTR: compare normalised original with round-tripped
         Model normalised = RDFIO.fileReader().parse(ROOT + folder + "1wottr/" + iri + ".ttl").get();
         Model roundtripped = RDFIO.fileReader().parse(ROOT + folder + "3wottr/" + iri + ".ttl").get();
         TestUtils.testIsomorphicModels(roundtripped, normalised);
 
-        /*
+
         // stOTTR: compare 1st time translated with 2nd time translated
         String firstTime = Files.readString(Path.of(ROOT + folder + "2stottr/" + iri + ".stottr"));
         String secondTime = Files.readString(Path.of(ROOT + folder + "4stottr/" + iri + ".stottr"));
 
         assertEquals(firstTime, secondTime);
-        */
     }
 }

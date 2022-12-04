@@ -15,13 +15,16 @@ ottr:annotation     [ ottr:values ( o-pizza:NamedPizza rdf:type owl:Class ) ;
 
 
         ottr:parameters  ( [ ottr:type      owl:Class ;
+                             ottr:name      "id" ;
                              ottr:variable  _:b0
                            ]
                            [ ottr:modifier  ottr:optional ;
+                             ottr:name      "country" ;
                              ottr:type      owl:NamedIndividual ;
                              ottr:variable  _:b1
                            ]
                            [ ottr:type      ( ottr:NEList ottr:IRI ) ;
+                             ottr:name      "toppings" ;
                              ottr:variable  _:b2
                            ]
                          ) ;

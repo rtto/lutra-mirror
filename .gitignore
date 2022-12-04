@@ -128,3 +128,5 @@ lutra-wottr/src/test/resources/spec/tests/incorrect/*\.ttl
 
 
 lutra-cli/src/test/resources/issues/327/testOutTTLFile.ttl
+
+lutra-cli/src/test/resources/issues/FormatLibraryRoundTrip/NamedPizza/

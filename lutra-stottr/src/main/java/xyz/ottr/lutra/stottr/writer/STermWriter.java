@@ -22,8 +22,9 @@ package xyz.ottr.lutra.stottr.writer;
  * #L%
  */
 
-import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.apache.jena.shared.PrefixMapping;
@@ -41,16 +42,16 @@ public class STermWriter {
 
     private final PrefixMapping prefixes;
     private final Set<String> usedPrefixNS;
-    private final Collection<Term> variables;
+    private final Map<Term, String> variables; // maps variable terms to optional parameter/variable names
 
-    STermWriter(PrefixMapping prefixes, Collection<Term> variables) {
+    STermWriter(PrefixMapping prefixes, Map<Term, String> variables) {
         this.prefixes = prefixes;
         this.variables = variables;
         this.usedPrefixNS = new HashSet<>();
     }
 
     STermWriter(PrefixMapping prefixes) {
-        this(prefixes, new HashSet<>());
+        this(prefixes, new HashMap<>());
     }
 
     public PrefixMapping getPrefixes() {
@@ -118,10 +119,12 @@ public class STermWriter {
     
     private String writeBlank(BlankNodeTerm blank) {
 
-        String label = blank.getLabel();
-        String prefix = this.variables.contains(blank)
+        String prefix = this.variables.keySet().contains(blank)
             ? STOTTR.Terms.variablePrefix
             : STOTTR.Terms.blankPrefix;
+
+        String label = this.variables.getOrDefault(blank, blank.getLabel()); // use parameter name, if set
+
         return prefix + label;
     }
 
