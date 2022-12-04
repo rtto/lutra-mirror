@@ -22,16 +22,9 @@ package xyz.ottr.lutra.cli;
  * #L%
  */
 
-import static org.junit.Assert.assertEquals;
-
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.sql.ClientInfoStatus;
 import org.apache.jena.rdf.model.Model;
-import org.junit.Test;
-import xyz.ottr.lutra.system.Assertions;
-import xyz.ottr.lutra.system.MessageHandler;
+import org.junit.jupiter.api.Test;
 import xyz.ottr.lutra.wottr.io.RDFIO;
 
 public class FormatLibraryRoundTripTest {
