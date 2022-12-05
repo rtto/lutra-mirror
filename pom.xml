@@ -147,15 +147,16 @@
       <plugin>
         <groupId>com.amashchenko.maven.plugin</groupId>
         <artifactId>gitflow-maven-plugin</artifactId>
-        <version>1.18.0</version>
+        <version>1.19.0</version>
         <configuration>
 
           <gitFlowConfig>
             <versionTagPrefix>v</versionTagPrefix>
           </gitFlowConfig>
 
-          <commitMessages>
-            <commitMessagePrefix xml:space="preserve">[gitflow] </commitMessagePrefix>
+          <commitMessagePrefix xml:space="preserve">[gitflow] </commitMessagePrefix>
+
+          <commitMessages>  
             <tagReleaseMessage>Tag release @{version}</tagReleaseMessage>
           </commitMessages>
         </configuration>
@@ -509,16 +510,6 @@
       <scope>test</scope>
     </dependency>
 
-    <!-- TODO why are both JUnit 4 and 5 (jupiter) in the project? That does not make sense and may cause problems. -->
-    <!--<dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <scope>test</scope>-->
-    <!-- transitive dependencies:
-      - hamcrest-core
-    -->
-    <!--</dependency>-->
-
     <dependency>
       <groupId>com.google.code.findbugs</groupId>
       <artifactId>annotations</artifactId>
@@ -736,13 +727,6 @@
         <artifactId>log4j-slf4j-impl</artifactId>
         <version>${log4j.version}</version>
       </dependency>
-
-<!--            <dependency>-->
-<!--                <groupId>junit</groupId>-->
-<!--                <artifactId>junit</artifactId>-->
-<!--                <version>4.13.2</version>-->
-<!--                <scope>test</scope>-->
-<!--            </dependency>-->
 
             <dependency>
                 <groupId>org.junit.jupiter</groupId>
