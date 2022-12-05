@@ -5,6 +5,25 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 0.6.15 - 2022.12.05
+
+Milestone: https://gitlab.com/ottr/lutra/lutra/-/milestones/20
+
+Closed issues:
+
+ - NullPointerException on extra commas in instance arguments #393
+ - SLF4J error #338
+ - Formatting wottr to illegal stottr #242
+ - Error in stOTTR spec: no-value list not allowed #371
+ - Automate release procedure #369
+ - Check if antlr dependency in stottr module can be removed from artifacts #358
+ - Avoid fetching ottr:Triple #333
+ - Generate javadoc #84
+ - Switch project to Junit 5 #360
+ - Represent parameter variables as IRIs, not blank nodes #282
+ - Unexpected error handling (drop dot in stOTTR statements?) #231
+
+
 ## 0.6.14 - 2022.10.03
 
 Milestone: https://gitlab.com/ottr/lutra/lutra/-/milestones/19
