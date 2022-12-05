@@ -345,19 +345,22 @@
             <!-- CLI uses System.out: -->
             <exclude>**/xyz/ottr/lutra/cli/CLI.class</exclude>
 
+            <!-- ExpandTest uses System.out: -->
+            <exclude>**/xyz/ottr/lutra/cli/ExpandTest.class</exclude>
+
             <!-- Issue327 uses System.out: -->
             <exclude>**/xyz/ottr/lutra/cli/Issues327Test.class</exclude>
-          </excludes>
+            </excludes>
         </configuration>
         <executions>
-          <execution>
-            <goals>
-              <goal>check</goal>
-              <goal>testCheck</goal>
-            </goals>
-          </execution>
+            <execution>
+                <goals>
+                    <goal>check</goal>
+                    <goal>testCheck</goal>
+                </goals>
+            </execution>
         </executions>
-      </plugin>
+    </plugin>
 
       <plugin>
         <groupId>org.jacoco</groupId>

@@ -27,9 +27,14 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.stream.Collectors;
 import org.apache.jena.rdf.model.Model;
 import org.junit.jupiter.api.Test;
 import xyz.ottr.lutra.model.Instance;
+import xyz.ottr.lutra.parser.InstanceParser;
+import xyz.ottr.lutra.system.Assertions;
+import xyz.ottr.lutra.system.Message;
+import xyz.ottr.lutra.system.Result;
 import xyz.ottr.lutra.system.ResultConsumer;
 import xyz.ottr.lutra.system.ResultStream;
 import xyz.ottr.lutra.wottr.io.RDFIO;
@@ -149,5 +154,17 @@ public class ExcelReaderTest {
 
     @Test public void testTypedList() {
         runAtomicTest("typedList");
+    }
+
+    @Test
+    public void testInvalidFile() {
+        String expectedMsg = "Error parsing";
+        String file = ROOT.resolve("incorrect/stottr_instances.stottr").toString();
+
+        InstanceParser<String> parser = new ExcelReader();
+        Result<Instance> result = parser.apply(file).collect(Collectors.toList()).get(0);
+
+        Assertions.atLeast(result, Message.Severity.ERROR);
+        Assertions.containsMessageFragment(result.getMessageHandler(), Message.Severity.ERROR, expectedMsg);
     }
 }

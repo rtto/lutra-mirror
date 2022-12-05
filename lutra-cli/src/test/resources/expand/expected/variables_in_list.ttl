@@ -1,0 +1,21 @@
+@prefix ex: <http://example.com/ns#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix ottr: <http://ns.ottr.xyz/0.4/> .
+@prefix ax: <http://tpl.ottr.xyz/owl/axiom/0.1/> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+
+_:b0    rdf:type  owl:Class .
+
+ex:AB   rdf:type             owl:Class ;
+        owl:equivalentClass  _:b0 .
+
+_:b0    rdf:type            owl:Class ;
+        owl:intersectionOf  _:b1 .
+
+_:b2    rdf:rest   rdf:nil ;
+        rdf:first  ex:B .
+
+_:b1    rdf:rest   _:b2 ;
+        rdf:first  ex:A .

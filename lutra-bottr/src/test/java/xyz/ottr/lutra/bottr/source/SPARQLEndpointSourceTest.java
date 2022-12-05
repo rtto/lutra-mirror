@@ -24,11 +24,15 @@ package xyz.ottr.lutra.bottr.source;
 
 import static org.hamcrest.CoreMatchers.is;
 
+import java.util.stream.Collectors;
 import org.apache.jena.rdf.model.RDFNode;
 import org.hamcrest.MatcherAssert;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import xyz.ottr.lutra.bottr.model.Source;
+import xyz.ottr.lutra.system.Assertions;
+import xyz.ottr.lutra.system.Message;
+import xyz.ottr.lutra.system.Result;
 import xyz.ottr.lutra.system.ResultStream;
 
 public class SPARQLEndpointSourceTest {
@@ -42,4 +46,16 @@ public class SPARQLEndpointSourceTest {
         ResultStream<?> result = source.execute("SELECT ?s ?p ?o WHERE { ?s ?p ?o } LIMIT 13");
         MatcherAssert.assertThat(result.getStream().count(), is(13L));
     }
+
+    @Test
+    public void emptyQueryResult() {
+        String expectedString = "no results";
+        String endpoint = "http://dbpedia.org/sparql";
+        Source<RDFNode> source = new SPARQLEndpointSource(endpoint);
+
+        ResultStream<?> resultStream = source.execute("SELECT ?s ?p ?o WHERE { ?s ?p ?o} LIMIT 0");
+        Result<?> emptyResult = resultStream.getStream().collect(Collectors.toList()).get(0);
+        Assertions.containsMessageFragment(emptyResult.getMessageHandler(), Message.Severity.INFO, expectedString);
+    }
+
 }
