@@ -25,46 +25,38 @@ package xyz.ottr.lutra.bottr.parser;
 import static org.hamcrest.CoreMatchers.is;
 
 import java.io.File;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import java.util.stream.Stream;
+import org.hamcrest.MatcherAssert;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import xyz.ottr.lutra.bottr.model.InstanceMap;
 import xyz.ottr.lutra.io.Files;
 import xyz.ottr.lutra.system.Result;
 import xyz.ottr.lutra.system.ResultStream;
 import xyz.ottr.lutra.wottr.io.RDFIO;
 
-@RunWith(Parameterized.class)
 public class BInstanceMapParserTest {
 
     private static final String ROOT = "src/test/resources/maps/";
     private static final String[] EMPTY_ARRAY = {};
 
-    @Parameterized.Parameters(name = "{index}: {0}")
-    public static Collection<String[]> data() {
-        return Files.getFolderContents(ROOT, new String[]{ "ttl" }, EMPTY_ARRAY)
-            .innerMap(File::toString)
-            .innerMap(string -> new String[] { string })
-            .aggregate()
-            .map(s -> s.collect(Collectors.toList()))
-            .get();
+    public static Stream<Arguments> data() {
+        return Files.getFolderContents(ROOT, new String[]{"ttl"}, EMPTY_ARRAY)
+                .innerMap(File::toString)
+                .innerMap(Arguments::arguments)
+                .aggregate()
+                .get();
     }
 
-    private final String file;
-
-    public BInstanceMapParserTest(String file) {
-        this.file = file;
-    }
-
-    @Test
-    public void shouldParseWithoutError() {
-        Result<List<InstanceMap>> map = getInstanceMaps(this.file);
-        Assert.assertThat(map.getAllMessages(), is(Collections.emptyList()));
+    @ParameterizedTest
+    @MethodSource("data")
+    public void shouldParseWithoutError(String file) {
+        Result<List<InstanceMap>> map = getInstanceMaps(file);
+        MatcherAssert.assertThat(map.getAllMessages(), is(Collections.emptyList()));
     }
 
     private Result<List<InstanceMap>> getInstanceMaps(String file) {

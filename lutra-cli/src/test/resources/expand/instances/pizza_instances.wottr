@@ -1,0 +1,11 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix ex: <http://example.org/> .
+@prefix o-pizza: <http://tpl.ottr.xyz/pizza/0.1/> .
+@prefix ottr: <http://ns.ottr.xyz/0.4/> .
+
+[] ottr:of o-pizza:NamedPizza;
+   ottr:values (ex:Margherita ex:Italy (ex:Mozzarella ex:Tomato)) .
+
+[] ottr:of o-pizza:NamedPizza;
+   ottr:values (ex:Hawaii ottr:none (ex:Cheese ex:Ham ex:Pineapple)) .
+

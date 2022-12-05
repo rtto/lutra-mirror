@@ -53,7 +53,7 @@ public enum ParameterBuilder {
             return builder.map(Parameter.ParameterBuilder::build)
                 .flatMap(Parameter::validate);
         } else {
-            return Result.empty(builder);
+            return Result.empty(Message.error("Error building parameter."), builder);
         }
     }
 

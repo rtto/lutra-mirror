@@ -23,7 +23,7 @@ package xyz.ottr.lutra.cli;
  */
 
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class Issues298Test {
     

@@ -23,57 +23,49 @@ package xyz.ottr.lutra.bottr.parser;
  */
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.junit.jupiter.params.provider.Arguments.arguments;
 
-import java.util.Collection;
 import java.util.List;
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import java.util.stream.Stream;
+import org.hamcrest.MatcherAssert;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import xyz.ottr.lutra.bottr.util.ListParser;
 
-@RunWith(Parameterized.class)
 public class ListParserNegativeTest {
 
-    ListParser parser = new ListParser('[', ']', ",");
+    private final ListParser parser = new ListParser('[', ']', ",");
 
-    @Parameterized.Parameters(name = "{index}: {0}")
-    public static Collection<Object[]> data() {
+    public static Stream<Arguments> data() {
 
-        return List.of(
-            new Object[][]{
-                { "[" },
-                { "]" },
-                { "[[" },
-                { "]]" },
-                { "][" },
-                { "[][]" },
-                { "[]]" },
-                { "[][]]" },
-
-                { "[ ] asdf"},
-                { "asdf [ ] "},
-
-                { "[[a, b, c]" },
-                { "[a]]" },
-                { "[[a], [b]]]" },
-            });
+        return Stream.of(
+                arguments("["),
+                arguments("]"),
+                arguments("[["),
+                arguments("]]"),
+                arguments("]["),
+                arguments("[][]"),
+                arguments("[]]"),
+                arguments("[][]]"),
+                arguments("[ ] asdf"),
+                arguments("asdf [ ] "),
+                arguments("[[a, b, c]"),
+                arguments("[a]]"),
+                arguments("[[a], [b]]]")
+        );
     }
 
-    private final String list;
-
-    public ListParserNegativeTest(String list) {
-        this.list = list;
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void testSuccess() {
-        test(this.list);
+    @ParameterizedTest
+    @MethodSource("data")
+    public void testSuccess(String value) {
+        Assertions.assertThrows(IllegalArgumentException.class, () -> test(value));
     }
 
     public void test(String value) {
         List list = this.parser.toList(value);
-        Assert.assertThat(list.toString(), is(value));
+        MatcherAssert.assertThat(list.toString(), is(value));
     }
 
 }

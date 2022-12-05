@@ -53,16 +53,18 @@ public class NonCheckingExpander implements Expander {
 
     @Override
     public ResultStream<Instance> expandInstanceFetch(Instance instance) {
-        if (!templateStore.containsTemplate(instance.getIri())) {
-            // Need to fetch missing template
-            MessageHandler messages = templateStore.fetchMissingDependencies(List.of(instance.getIri()));
-            Result<Instance> insWithMsgs = Result.of(instance);
-            messages.toSingleMessage("Fetch missing template: " + instance.getIri())
-                    .ifPresent(insWithMsgs::addMessage);
-            return insWithMsgs.mapToStream(this::expandInstance);
+        Result<Signature> result = templateStore.getSignature(instance.getIri());
+
+        if (isTemplate(result) || isBaseTemplate(result)) {
+            return expandInstance(instance);
         }
 
-        return expandInstance(instance);
+        // Need to fetch missing template
+        MessageHandler messages = templateStore.fetchMissingDependencies(List.of(instance.getIri()));
+        Result<Instance> insWithMsgs = Result.of(instance);
+        messages.toSingleMessage("Fetch missing template: " + instance.getIri())
+                .ifPresent(insWithMsgs::addMessage);
+        return insWithMsgs.mapToStream(this::expandInstance);
     }
 
     @Override
@@ -93,7 +95,7 @@ public class NonCheckingExpander implements Expander {
                 .build());
     }
 
-    // for somme reason PMD does not recognize that the method IS used above
+    // for some reason PMD does not recognize that the method IS used above
     @SuppressWarnings("PMD.UnusedPrivateMethod")
     protected ResultStream<Instance> expandTemplateInstance(Instance instance, Signature from) {
         Result<Signature> toResult = templateStore.getSignature(instance.getIri());
@@ -111,7 +113,7 @@ public class NonCheckingExpander implements Expander {
     public ResultStream<Instance> expandInstance(Instance instance) {
         Result<Signature> result = templateStore.getSignature(instance.getIri());
 
-        if (result.isEmpty() || !(result.get() instanceof BaseTemplate || result.get() instanceof Template)) {
+        if (!isBaseTemplate(result) && !isTemplate(result)) {
             return ResultStream.of(Result.error("Missing definition for " + instance.getIri()));
         }
         if (shouldDiscard(instance, result.get())) {
@@ -194,5 +196,20 @@ public class NonCheckingExpander implements Expander {
 
     protected TemplateStore getTemplateStore() {
         return templateStore;
+    }
+
+
+    // TODO should go somewhere else where is can be reused?
+
+    protected boolean isBaseTemplate(Result<Signature> result) {
+        return result.isPresent() && result.get() instanceof BaseTemplate;
+    }
+
+    protected boolean isTemplate(Result<Signature> result) {
+        return result.isPresent() && result.get() instanceof Template;
+    }
+
+    protected boolean isSignature(Result<Signature> result) {
+        return result.isPresent() && !(result.get() instanceof Template || result.get() instanceof BaseTemplate);
     }
 }

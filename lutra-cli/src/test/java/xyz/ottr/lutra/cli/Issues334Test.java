@@ -22,7 +22,7 @@ package xyz.ottr.lutra.cli;
  * #L%
  */
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class Issues334Test {
     
@@ -30,6 +30,6 @@ public class Issues334Test {
 
     @Test
     public void testWOTTRBadArguments1() {
-        CLIRunner.run("-f --debugStackTrace " + ROOT + "instance1.wottr");
+        CLIRunner.run("-f " + ROOT + "instance1.wottr");
     }
 }

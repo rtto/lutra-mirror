@@ -29,8 +29,8 @@ import org.apache.jena.riot.system.PrefixMap;
 import org.apache.jena.riot.system.PrefixMapFactory;
 import org.apache.jena.shared.PrefixMapping;
 import org.apache.jena.sparql.util.NodeFactoryExtra;
-import org.junit.Assert;
-import org.junit.Test;
+import org.hamcrest.MatcherAssert;
+import org.junit.jupiter.api.Test;
 
 public class TermSerializerTest {
 
@@ -61,26 +61,26 @@ public class TermSerializerTest {
 
     private void isURI(String value) {
         Node node = getNode(value);
-        Assert.assertThat(node.isURI(), is(true));
-        Assert.assertThat(node.isLiteral(), is(false));
-        Assert.assertThat(node.isBlank(), is(false));
-        Assert.assertThat(node.isVariable(), is(false));
+        MatcherAssert.assertThat(node.isURI(), is(true));
+        MatcherAssert.assertThat(node.isLiteral(), is(false));
+        MatcherAssert.assertThat(node.isBlank(), is(false));
+        MatcherAssert.assertThat(node.isVariable(), is(false));
     }
 
     private void isLiteral(String value) {
         Node node = getNode(value);
-        Assert.assertThat(node.isURI(), is(false));
-        Assert.assertThat(node.isLiteral(), is(true));
-        Assert.assertThat(node.isBlank(), is(false));
-        Assert.assertThat(node.isVariable(), is(false));
+        MatcherAssert.assertThat(node.isURI(), is(false));
+        MatcherAssert.assertThat(node.isLiteral(), is(true));
+        MatcherAssert.assertThat(node.isBlank(), is(false));
+        MatcherAssert.assertThat(node.isVariable(), is(false));
     }
 
     private void isBlank(String value) {
         Node node = getNode(value);
-        Assert.assertThat(node.isURI(), is(false));
-        Assert.assertThat(node.isLiteral(), is(false));
-        Assert.assertThat(node.isBlank(), is(true));
-        Assert.assertThat(node.isVariable(), is(false));
+        MatcherAssert.assertThat(node.isURI(), is(false));
+        MatcherAssert.assertThat(node.isLiteral(), is(false));
+        MatcherAssert.assertThat(node.isBlank(), is(true));
+        MatcherAssert.assertThat(node.isVariable(), is(false));
     }
 
     private Node getNode(String value) {

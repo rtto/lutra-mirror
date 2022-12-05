@@ -1,0 +1,8 @@
+@prefix ex: <http://example.com/ns#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+ex:Device(ex:Nokia3310, ex:Phone, (ex:Screen, ex:HardCase, ex:CPU, ex:Li-ionBattery), "indestructible"^^xsd:string).
+
+ex:Device(ex:ThinkPad_L420, ex:Laptop, (ex:Screen, ex:i5CPU, ex:Li-ionBattery), none).
+
+ex:Device([], ex:Laptop, none, none).

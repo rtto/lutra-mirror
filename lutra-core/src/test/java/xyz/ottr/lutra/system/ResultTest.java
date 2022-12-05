@@ -27,8 +27,8 @@ import static org.hamcrest.CoreMatchers.is;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
-import org.junit.Assert;
-import org.junit.Test;
+import org.hamcrest.MatcherAssert;
+import org.junit.jupiter.api.Test;
 
 public class ResultTest {
 
@@ -68,7 +68,7 @@ public class ResultTest {
     }
 
     private void testEqualMessages(Result r, Message... messages) {
-        Assert.assertThat(getSortedMessages(r.getAllMessages()), is(getSortedMessages(List.of(messages))));
+        MatcherAssert.assertThat(getSortedMessages(r.getAllMessages()), is(getSortedMessages(List.of(messages))));
     }
 
     private List<String> getSortedMessages(Collection<Message> messages) {

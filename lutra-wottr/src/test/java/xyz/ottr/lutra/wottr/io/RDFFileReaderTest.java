@@ -22,7 +22,7 @@ package xyz.ottr.lutra.wottr.io;
  * #L%
  */
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import xyz.ottr.lutra.system.Assertions;
@@ -53,6 +53,16 @@ public class RDFFileReaderTest {
         String file = "blablabla--this-file-not-exist";
         var result = RDFIO.fileReader().parse(ROOT + file);
         Assertions.atLeast(result, Message.Severity.ERROR);
+    }
+
+    @Test
+    public void parseInvalidFile() {
+        String expectedMsg = "Error parsing";
+        String file = "incorrect/stottr_instances.stottr";
+
+        var result = RDFIO.fileReader().parse(file);
+        Assertions.atLeast(result, Message.Severity.ERROR);
+        Assertions.containsMessageFragment(result.getMessageHandler(), Message.Severity.ERROR, expectedMsg);
     }
 
 }

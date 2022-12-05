@@ -27,8 +27,8 @@ import static xyz.ottr.lutra.model.terms.ObjectTerm.var;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import xyz.ottr.lutra.OTTR;
 import xyz.ottr.lutra.model.Argument;
 import xyz.ottr.lutra.model.Instance;
@@ -73,11 +73,11 @@ public class NonCheckingExpanderTest {
         manager.addTemplate(template2);
 
         Result<? extends TemplateStore> newStore = expander.expandAll();
-        Assert.assertTrue("Result should be present after expansion", newStore.isPresent());
-        Assert.assertEquals("Number of BaseTemplates should be the same in both stores",
-                manager.getAllBaseTemplates().getStream().count(), newStore.get().getAllBaseTemplates().getStream().count());
-        Assert.assertEquals("Number of Templates should be the same in both stores",
-                manager.getAllTemplates().getStream().count(), newStore.get().getAllTemplates().getStream().count());
+        Assertions.assertTrue(newStore.isPresent(), "Result should be present after expansion");
+        Assertions.assertEquals(manager.getAllBaseTemplates().getStream().count(), newStore.get().getAllBaseTemplates().getStream().count(),
+                "Number of BaseTemplates should be the same in both stores");
+        Assertions.assertEquals(manager.getAllTemplates().getStream().count(), newStore.get().getAllTemplates().getStream().count(),
+                "Number of Templates should be the same in both stores");
     }
 
     @Test
@@ -95,8 +95,8 @@ public class NonCheckingExpanderTest {
                 .build();
 
         Result<List<Instance>> results = expander.expandInstance(instance).aggregate().map(s -> s.collect(Collectors.toList()));
-        Assert.assertTrue("Result should be present after expansion", results.isPresent());
-        Assert.assertEquals("Number of results of expansion should be as expected", 2, results.get().size());
+        Assertions.assertTrue(results.isPresent(), "Result should be present after expansion");
+        Assertions.assertEquals(2, results.get().size(), "Number of results of expansion should be as expected");
     }
 
     @Test
@@ -112,8 +112,8 @@ public class NonCheckingExpanderTest {
 
         Result<List<Instance>> results = expander.expandInstance(instance).aggregate().map(s -> s.collect(Collectors.toList()));
         // TODO check if this is correct and intended - no result only if errors?
-        Assert.assertTrue("Result should be present after expansion", results.isPresent());
-        Assert.assertEquals("Number of results of expansion should be as expected", 1, results.get().size());
+        Assertions.assertTrue(results.isPresent(), "Result should be present after expansion");
+        Assertions.assertEquals(1, results.get().size(), "Number of results of expansion should be as expected");
     }
 
     @Test
@@ -138,8 +138,31 @@ public class NonCheckingExpanderTest {
                 .build();
 
         Result<List<Instance>> results = expander.expandInstance(instance).aggregate().map(s -> s.collect(Collectors.toList()));
-        Assert.assertTrue("Result should be present after expansion", results.isPresent());
-        Assert.assertEquals("Number of results of expansion should be as expected", 4, results.get().size());
+        Assertions.assertTrue(results.isPresent(), "Result should be present after expansion");
+        Assertions.assertEquals(4, results.get().size(), "Number of results of expansion should be as expected");
+    }
+
+    /**
+        Test for issue #333: Avoid fetching ottr:Triple
+        Fix: If instance is BaseTemplate, call expandInstance without fetching
+     */
+    @Test
+    public void testExpandInstanceFetch() {
+        TemplateStore manager = new StandardTemplateStore(null);
+        manager.addOTTRBaseTemplates();
+        NonCheckingExpander expander = new NonCheckingExpander(manager);
+
+        Instance instance = Instance.builder().iri(OTTR.BaseURI.Triple)
+                .argument(Argument.builder().term(var("x")).build())
+                .argument(Argument.builder().term(var("y")).build())
+                .argument(Argument.builder().term(var("z")).build())
+                .build();
+
+        Result<List<Instance>> results = expander.expandInstanceFetch(instance).aggregate().map(s -> s.collect(Collectors.toList()));
+
+        Assertions.assertTrue(results.isPresent(), "Result should be present after expansion");
+        Assertions.assertEquals(1, results.get().size(), "Number of results of expansion should be as expected");
+        Assertions.assertTrue(results.getAllMessages().isEmpty(), "No fetching message should be present");
     }
 
     @Test
@@ -171,8 +194,8 @@ public class NonCheckingExpanderTest {
         manager.addTemplate(template2);
 
         Result<Template> result = expander.expandTemplate(template2);
-        Assert.assertTrue("Result should be present after expansion", result.isPresent());
-        Assert.assertEquals("Number of results of expansion should be as expected", 4, result.get().getPattern().size());
+        Assertions.assertTrue(result.isPresent(), "Result should be present after expansion");
+        Assertions.assertEquals(4, result.get().getPattern().size(), "Number of results of expansion should be as expected");
     }
 
     @Test
@@ -213,8 +236,8 @@ public class NonCheckingExpanderTest {
         manager.addTemplate(template2);
 
         Result<Template> results = expander.expandTemplate(template2);
-        Assert.assertTrue("Result should be present after expansion", results.isPresent());
-        Assert.assertEquals("Number of results of expansion should be as expected", 8, results.get().getPattern().size());
+        Assertions.assertTrue(results.isPresent(), "Result should be present after expansion");
+        Assertions.assertEquals(8, results.get().getPattern().size(), "Number of results of expansion should be as expected");
     }
 
     private List<Parameter> buildParameters() {

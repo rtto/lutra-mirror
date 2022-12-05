@@ -1,0 +1,21 @@
+@prefix : <http://ns.ottr.xyz/0.4/> .
+@prefix tpl: <http://example.com/tpl#> .
+@prefix ex: <http://example.com/ns#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix ottr: <http://ns.ottr.xyz/0.4/> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+
+ex:Fred  rdf:type  foaf:Person .
+
+ex:Erika  rdf:type  foaf:Person .
+
+ex:David  rdf:type  foaf:Person .
+
+ex:Ann  rdf:type  foaf:Person .
+
+ex:Bob  rdf:type  foaf:Person .
+
+ex:Carl  rdf:type  foaf:Person .

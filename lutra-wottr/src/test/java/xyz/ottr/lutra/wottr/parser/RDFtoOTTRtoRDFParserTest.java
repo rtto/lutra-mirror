@@ -22,57 +22,47 @@ package xyz.ottr.lutra.wottr.parser;
  * #L%
  */
 
-import static org.junit.Assume.assumeFalse;
-import static org.junit.Assume.assumeTrue;
+import static org.junit.jupiter.api.Assumptions.assumeFalse;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.List;
-import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.apache.jena.rdf.model.Model;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameters;
-import xyz.ottr.lutra.system.Message;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import xyz.ottr.lutra.wottr.io.RDFIO;
 
-@RunWith(Parameterized.class)
 public class RDFtoOTTRtoRDFParserTest {
 
-    @Parameters(name = "{index}: {0}")
-    public static List<String> data() throws IOException {
-        Path folder = Paths.get("src",  "test", "resources", "w3c-rdf-tests");   
+    public static Stream<Arguments> data() throws IOException {
+        Path folder = Paths.get("src",  "test", "resources", "w3c-rdf-tests");
 
         return Files.walk(folder)
                 .filter(Files::isRegularFile)
                 .map(Path::toString)
                 .sorted()
-                .collect(Collectors.toList());
+                .map(Arguments::arguments);
     }
 
-    private final String filename;
-
-    public RDFtoOTTRtoRDFParserTest(String filename) {
-        this.filename = filename;
-    }
-
-    @Test
-    public void test() {
+    @ParameterizedTest
+    @MethodSource("data")
+    public void test(String filename) {
 
         // exclude test files which are bad by design
-        assumeFalse(this.filename.contains("-bad-"));
-        assumeFalse(this.filename.contains("/error"));
+        assumeFalse(filename.contains("-bad-"));
+        assumeFalse(filename.contains("/error"));
 
         // Try parse file with Jena.
-        var rdfModel = RDFIO.fileReader().parse(this.filename);
+        var rdfModel = RDFIO.fileReader().parse(filename);
 
         // exclude remaining test files that are not accepted by the RDF parser.
         assumeTrue(rdfModel.isPresent());
 
-        Model ottrModel = ModelUtils.getOTTRParsedRDFModel(this.filename);
+        Model ottrModel = ModelUtils.getOTTRParsedRDFModel(filename);
 
         ModelUtils.testIsomorphicModels(ottrModel, rdfModel.get());
     }

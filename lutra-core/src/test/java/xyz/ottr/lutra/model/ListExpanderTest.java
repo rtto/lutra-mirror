@@ -28,8 +28,8 @@ import static xyz.ottr.lutra.model.terms.ObjectTerm.cons;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
-import org.junit.Assert;
-import org.junit.Test;
+import org.hamcrest.MatcherAssert;
+import org.junit.jupiter.api.Test;
 import xyz.ottr.lutra.model.terms.ListTerm;
 import xyz.ottr.lutra.model.terms.NoneTerm;
 import xyz.ottr.lutra.model.terms.Term;
@@ -58,7 +58,7 @@ public class ListExpanderTest {
 
     private static void test(List<Argument> input, ListExpander expander, List<List<Term>> expected) {
         List<List<Term>> expanded = expandToTerms(input, expander);
-        Assert.assertThat(expanded, is(expected));
+        MatcherAssert.assertThat(expanded, is(expected));
     }
 
 

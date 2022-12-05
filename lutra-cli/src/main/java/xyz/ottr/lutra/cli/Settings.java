@@ -60,22 +60,22 @@ public class Settings {
                        + "(default: ${DEFAULT-VALUE})"})
     public String[] ignoreExtensions = { };
 
-    @Option(names = {"-I", "--inputFormat"}, completionCandidates = InstanceInputFormat.class,
+    @Option(names = {"-I", "--inputFormat"}, completionCandidates = Settings.InstanceInputFormat.class,
         description = {"Input format of instances.%n"
-                       + "(legal values: ${COMPLETION-CANDIDATES}"
+                       + "(registered formats: ${COMPLETION-CANDIDATES}"
                        + " default: ${DEFAULT-VALUE})"})
-    public StandardFormat inputFormat = StandardFormat.wottr;
+    public String inputFormat = StandardFormat.wottr.toString();
 
-    @Option(names = {"-O", "--outputFormat"}, completionCandidates = TemplateOutputFormat.class,
+    @Option(names = {"-O", "--outputFormat"}, completionCandidates = Settings.AllFormats.class,
         description = {"Output format of output of operation defined by the mode.%n"
-                       + "(legal values: ${COMPLETION-CANDIDATES}; "
+                       + "(registered formats: ${COMPLETION-CANDIDATES}; "
                        + "default: ${DEFAULT-VALUE})"})
-    public StandardFormat outputFormat = StandardFormat.wottr;
+    public String outputFormat = StandardFormat.wottr.toString();
 
-    @Option(names = {"-L", "--libraryFormat"}, completionCandidates = TemplateInputFormat.class,
+    @Option(names = {"-L", "--libraryFormat"}, completionCandidates = Settings.TemplateInputFormat.class,
         description = {"The input format of the libraries. If omitted, all available formats are attempted.%n"
-                       + "(legal values: ${COMPLETION-CANDIDATES})"})
-    public StandardFormat libraryFormat;
+                       + "(registered formats: ${COMPLETION-CANDIDATES})"})
+    public String libraryFormat;
 
 
     @Option(names = {"-f", "--fetchMissing"},
@@ -90,9 +90,9 @@ public class Settings {
             + "   Any other data in the file is read, but ignored.")
     public String prefixes;
 
-    @Option(names = {"-F", "--fetchFormat"},
-        description = {"The input format of the templates fetched via the -f flag."})
-    public StandardFormat fetchFormat;
+    @Option(names = {"-F", "--fetchFormat"}, completionCandidates = Settings.TemplateInputFormat.class,
+        description = {"The input format of the templates fetched via the -f flag (registered formats: ${COMPLETION-CANDIDATES})"})
+    public String fetchFormat;
 
     @Option(names = {"-l", "--library"}, 
         description = {"Folder containing templates to use as library."
@@ -142,8 +142,20 @@ public class Settings {
                 + "Enabling this flag will not deteriorate performance.%n"
                 + "default: ${DEFAULT-VALUE})"})
     public boolean debugStackTrace = false;
-    
-    /* The following classes restrict the selections of FormatName to supported formats. */
+
+    /* The following classes *informs* the CLI about registered formats. It does not *validate* the input format name. */
+    private static class AllFormats extends ArrayList<String> {
+
+        private static final long serialVersionUID = 0L; // TODO Not correct!
+
+        AllFormats() {
+            super(Arrays.stream(StandardFormat.values())
+                .map(StandardFormat::name)
+                .collect(Collectors.toList())
+            );
+        }
+    }
+
     private static class InstanceInputFormat extends ArrayList<String> {
 
         private static final long serialVersionUID = 0L; // TODO Not correct!

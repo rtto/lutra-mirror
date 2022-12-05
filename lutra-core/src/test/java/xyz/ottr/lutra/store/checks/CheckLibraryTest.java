@@ -22,14 +22,14 @@ package xyz.ottr.lutra.store.checks;
  * #L%
  */
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.List;
 import java.util.stream.Collectors;
 import org.apache.jena.vocabulary.OWL;
 import org.apache.jena.vocabulary.XSD;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import xyz.ottr.lutra.model.Argument;
@@ -85,7 +85,7 @@ public class CheckLibraryTest {
         String assStr = "Expected " + numErrors + " messages of severity " + severity + " or higher"
              + ", but got " + msgs.size() + " messages: " + msgs;
 
-        assertEquals(assStr, numErrors, msgs.size());
+        assertEquals(numErrors, msgs.size(), assStr);
     }
 
     @Test
@@ -133,7 +133,7 @@ public class CheckLibraryTest {
         check(engine, 0, Message.Severity.WARNING);
     }
 
-    @Ignore("This test is now performed during parsing.")
+    @Disabled("This test is now performed during parsing.")
     @Test
     public void variableDefinedTwiceError() {
 

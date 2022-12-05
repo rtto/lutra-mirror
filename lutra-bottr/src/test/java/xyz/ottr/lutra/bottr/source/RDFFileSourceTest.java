@@ -27,10 +27,15 @@ import static org.hamcrest.CoreMatchers.is;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.stream.Collectors;
 import org.apache.jena.rdf.model.RDFNode;
-import org.junit.Assert;
-import org.junit.Test;
+import org.hamcrest.MatcherAssert;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import xyz.ottr.lutra.bottr.model.Source;
+import xyz.ottr.lutra.system.Assertions;
+import xyz.ottr.lutra.system.Message;
+import xyz.ottr.lutra.system.Result;
 import xyz.ottr.lutra.system.ResultStream;
 
 public class RDFFileSourceTest {
@@ -42,7 +47,7 @@ public class RDFFileSourceTest {
     }
 
     @Test
-    public void prototypeTest() {
+    public void prototype() {
 
         List<String> modelURIs = List.of(getResourceFile("a.ttl"), getResourceFile("b.ttl"));
 
@@ -51,6 +56,17 @@ public class RDFFileSourceTest {
         ResultStream<?> result = source.execute(
                 "PREFIX foaf: <http://xmlns.com/foaf/0.1/>  " 
                         + "SELECT ?s WHERE { ?s a foaf:Person }");
-        Assert.assertThat(result.getStream().count(), is(6L));
+        MatcherAssert.assertThat(result.getStream().count(), is(6L));
+    }
+
+    @Test
+    public void emptyQueryResult() {
+        String expectedString = "no results";
+        List<String> modelURIs = List.of(getResourceFile("a.ttl"), getResourceFile("b.ttl"));
+        Source<RDFNode> source = new RDFFileSource(modelURIs);
+
+        ResultStream<?> resultStream = source.execute("SELECT ?s ?p ?o { ?s ?p ?o } LIMIT 0");
+        Result<?> emptyResult = resultStream.getStream().collect(Collectors.toList()).get(0);
+        Assertions.containsMessageFragment(emptyResult.getMessageHandler(), Message.Severity.INFO, expectedString);
     }
 }

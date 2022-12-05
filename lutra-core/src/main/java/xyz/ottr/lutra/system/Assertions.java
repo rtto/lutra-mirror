@@ -26,6 +26,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.util.Collections;
+import java.util.Locale;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -46,6 +47,22 @@ public enum Assertions {
         } else {
             assertThat(messages.size(), is(size));
         }
+    }
+
+    public static void noWarnings(MessageHandler messageHandler) {
+        assertSeverity(messageHandler, s -> s.isGreaterEqualThan(Message.Severity.WARNING), 0);
+    }
+
+    public static void noFatals(MessageHandler messageHandler) {
+        assertSeverity(messageHandler, s -> s.isGreaterEqualThan(Message.Severity.FATAL), 0);
+    }
+
+    public static void noFatals(ResultConsumer consumer) {
+        noFatals(consumer.getMessageHandler());
+    }
+
+    public static void noFatals(Result result) {
+        noFatals(result.getMessageHandler());
     }
 
     public static void noErrors(MessageHandler messageHandler) {
@@ -70,6 +87,23 @@ public enum Assertions {
 
     public static void atLeast(Result result, Message.Severity severity) {
         atLeast(result.getMessageHandler(), severity);
+    }
+
+    /**
+     * Checks if the messageHandler contains a message of severity Error or worse
+     * which contains the given string.
+     * @param messageHandler handler to check
+     * @param expected string that at least one error message must contain
+     */
+
+    public static void containsMessageFragment(MessageHandler messageHandler, Message.Severity severity, String expected) {
+        var test = messageHandler.getMessages().stream()
+                .filter(m -> m.getSeverity().equals(severity))
+                .map(Message::getMessage)
+                .map(s -> s.toLowerCase(Locale.ENGLISH))
+                .anyMatch(s -> s.contains(expected.trim().toLowerCase(Locale.ENGLISH)));
+
+        assertThat(test, is(true));
     }
 
 }
