@@ -119,9 +119,6 @@ include:
     rules:
       - if: $CI_COMMIT_BRANCH == "develop" || $CI_COMMIT_BRANCH == "master"
   - template: Security/SAST.gitlab-ci.yml
-  - template: Jobs/Dependency-Scanning.gitlab-ci.yml
-    rules:
-      - if: $CI_COMMIT_BRANCH == "develop" || $CI_COMMIT_BRANCH == "master"
     
 spotbugs-sast:
   dependencies:
