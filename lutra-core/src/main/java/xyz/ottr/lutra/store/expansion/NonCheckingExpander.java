@@ -62,7 +62,7 @@ public class NonCheckingExpander implements Expander {
         // Need to fetch missing template
         MessageHandler messages = templateStore.fetchMissingDependencies(List.of(instance.getIri()));
         Result<Instance> insWithMsgs = Result.of(instance);
-        messages.toSingleMessage("Fetch missing template: " + instance.getIri())
+        messages.toSingleMessage("Fetching template: " + instance.getIri())
                 .ifPresent(insWithMsgs::addMessage);
         return insWithMsgs.mapToStream(this::expandInstance);
     }
@@ -114,7 +114,7 @@ public class NonCheckingExpander implements Expander {
         Result<Signature> result = templateStore.getSignature(instance.getIri());
 
         if (!isBaseTemplate(result) && !isTemplate(result)) {
-            return ResultStream.of(Result.error("Missing definition for " + instance.getIri()));
+            return ResultStream.of(Result.error("Error expanding instance. No template with IRI: " + instance.getIri()));
         }
         if (shouldDiscard(instance, result.get())) {
             return ResultStream.empty();
