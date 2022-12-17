@@ -24,10 +24,12 @@ package xyz.ottr.lutra.cli;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.parallel.Isolated;
 import xyz.ottr.lutra.system.Assertions;
 import xyz.ottr.lutra.system.Message;
 import xyz.ottr.lutra.system.MessageHandler;
 
+@Isolated
 public class Issue267NEListTest {
     private static final String ROOT = "src/test/resources/issues/267NEList/";
 

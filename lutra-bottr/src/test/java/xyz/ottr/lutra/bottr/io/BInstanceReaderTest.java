@@ -30,6 +30,7 @@ import org.apache.jena.rdf.model.Model;
 import org.hamcrest.MatcherAssert;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.parallel.Isolated;
 import xyz.ottr.lutra.model.Instance;
 import xyz.ottr.lutra.parser.InstanceParser;
 import xyz.ottr.lutra.system.Assertions;
@@ -39,6 +40,7 @@ import xyz.ottr.lutra.system.ResultConsumer;
 import xyz.ottr.lutra.wottr.io.RDFIO;
 import xyz.ottr.lutra.wottr.writer.WInstanceWriter;
 
+@Isolated
 public class BInstanceReaderTest {
 
     private static final String ROOT = "src/test/resources/";
