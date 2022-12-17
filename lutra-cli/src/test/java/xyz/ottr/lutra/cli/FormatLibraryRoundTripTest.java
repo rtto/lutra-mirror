@@ -25,8 +25,10 @@ package xyz.ottr.lutra.cli;
 import java.io.IOException;
 import org.apache.jena.rdf.model.Model;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.parallel.Isolated;
 import xyz.ottr.lutra.wottr.io.RDFIO;
 
+@Isolated
 public class FormatLibraryRoundTripTest {
 
     private static final String ROOT = "src/test/resources/issues/FormatLibraryRoundTrip/";
