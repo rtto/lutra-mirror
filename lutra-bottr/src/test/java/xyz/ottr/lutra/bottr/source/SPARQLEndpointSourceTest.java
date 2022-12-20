@@ -23,9 +23,20 @@ package xyz.ottr.lutra.bottr.source;
  */
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import java.util.stream.Collectors;
+import org.apache.jena.query.Query;
+import org.apache.jena.query.QueryExecution;
+import org.apache.jena.query.QueryExecutionFactory;
+import org.apache.jena.query.QueryFactory;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.RDFNode;
+import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.Statement;
 import org.hamcrest.MatcherAssert;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -52,12 +63,45 @@ public class SPARQLEndpointSourceTest {
     @Test
     public void emptyQueryResult() {
         String expectedString = "no results";
-        String endpoint = "http://dbpedia.org/sparql";
-        Source<RDFNode> source = new SPARQLEndpointSource(endpoint);
+        String queryString = "SELECT ?s ?p ?o WHERE {?s ?p ?o} LIMIT 0";
 
-        ResultStream<?> resultStream = source.execute("SELECT ?s ?p ?o WHERE { ?s ?p ?o} LIMIT 0");
+        Model model = createModel();
+        Query query = QueryFactory.create(queryString);
+        QueryExecution qe = QueryExecutionFactory.create(query, model);
+
+        SPARQLEndpointSource source = mock(SPARQLEndpointSource.class);
+        when(source.getQueryExecution(queryString)).thenReturn(Result.of(qe));
+        when(source.execute(queryString)).thenCallRealMethod();
+
+        ResultStream<?> resultStream = source.execute(queryString);
         Result<?> emptyResult = resultStream.getStream().collect(Collectors.toList()).get(0);
         Assertions.containsMessageFragment(emptyResult.getMessageHandler(), Message.Severity.INFO, expectedString);
     }
 
+    public void addStatement(Model model, String s, String p, String o) {
+        Resource subject = model.createResource(s);
+        Property predicate = model.createProperty(p);
+        RDFNode object = model.createResource(o);
+        Statement stmt = model.createStatement(subject, predicate, object);
+        model.add(stmt);
+    }
+
+    public Model createModel() {
+        Model model = ModelFactory.createDefaultModel();
+        String ns = "http://www.example.org#";
+        String nsRDFS = "http://www.w3.org/2000/01/rdf-schema#";
+
+        addStatement(model, ns + "Fish", nsRDFS + "subClassOf", ns + "Animal");
+        addStatement(model, ns + "Fish", ns + "livesIn", ns + "Water");
+        addStatement(model, ns + "Mammal", nsRDFS + "subClassOf", ns + "Animal");
+        addStatement(model, ns + "Mammal", ns + "has", ns + "Vertebra");
+        addStatement(model, ns + "Whale", nsRDFS + "subClassOf", ns + "Mammal");
+        addStatement(model, ns + "Whale", ns + "livesIn", ns + "Water");
+        addStatement(model, ns + "Cat", nsRDFS + "subClassOf", ns + "Mammal");
+        addStatement(model, ns + "Cat", ns + "has", ns + "Fur");
+        addStatement(model, ns + "Bear", nsRDFS + "subClassOf", ns + "Mammal");
+        addStatement(model, ns + "Bear", ns + "has", ns + "Fur");
+
+        return model;
+    }
 }
