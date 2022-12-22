@@ -25,11 +25,8 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
 
-import java.io.File;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
@@ -66,19 +63,19 @@ public class FormatEquivalenceTest {
             .collect(Collectors.toList());
 
         // combine collected templates with collected formats
-        List<Object[]> data = new ArrayList<>();
+        Stream.Builder<Arguments> data = Stream.builder();
         for (Format f : formats) {
             for (Signature s : signatures) {
-                data.add(new Object[] { f, s });
+                data.add(arguments(f, s));
             }
         }
 
-        return data.stream().map(datum -> arguments(datum[0], datum[1]));
+        return data.build();
     }
 
     @ParameterizedTest
     @MethodSource("data")
-    public void test(Format format, Signature signature, @TempDir String folderPath) throws Exception {
+    public void test(Format format, Signature signature, @TempDir Path tmpFolder) throws Exception {
 
         assumeTrue(format.supportsTemplateReader());
         assumeTrue(format.supportsTemplateWriter());
@@ -86,14 +83,14 @@ public class FormatEquivalenceTest {
         var writer = format.getTemplateWriter().get();
 
         BiFunction<String, String, Optional<Message>> writerFunc = (iri, str)
-                -> xyz.ottr.lutra.io.Files.writeTemplatesTo(iri, str, folderPath, format.getDefaultFileSuffix());
+                -> xyz.ottr.lutra.io.Files.writeTemplatesTo(iri, str, tmpFolder.toString(), format.getDefaultFileSuffix());
 
         writer.setWriterFunction(writerFunc);
         writer.accept(signature); //write file
 
         // read file
         String iriFilePath = xyz.ottr.lutra.io.Files.iriToPath(signature.getIri()) + "" + format.getDefaultFileSuffix();
-        String absFilePath = Path.of(folderPath + iriFilePath).toAbsolutePath().toString();
+        String absFilePath = tmpFolder.resolve(iriFilePath).toAbsolutePath().toString();
 
         var reader = format.getTemplateReader().get();
         var ioSignatures = reader.apply(absFilePath)
