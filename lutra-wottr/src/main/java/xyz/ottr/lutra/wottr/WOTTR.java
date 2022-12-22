@@ -34,6 +34,8 @@ import xyz.ottr.lutra.model.ListExpander;
 
 public class WOTTR {
 
+    public static final String version = "0.4.3"; // must match downloads in pom file // TODO can we sync this?
+
     public static final String ns = OTTR.namespace;
    
     // Classes

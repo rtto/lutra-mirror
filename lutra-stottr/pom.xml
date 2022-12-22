@@ -54,7 +54,6 @@
                             <url>${url.stottrspec}stOTTR.g4</url>
                             <outputDirectory>${local.stottrspec}xyz/ottr/lutra/stottr/antlr/</outputDirectory>
                             <!--md5>MD5 SUM HERE</md5 -->
-                            <skipCache>true</skipCache>
                         </configuration>
                     </execution>
                     <execution>
@@ -67,7 +66,6 @@
                             <url>${url.stottrspec}Turtle.g4</url>
                             <outputDirectory>${local.stottrspec}imports/</outputDirectory>
                             <!--md5>MD5 SUM HERE</md5 -->
-                            <skipCache>true</skipCache>
                         </configuration>
                     </execution>
                 </executions>

@@ -13,8 +13,9 @@
     <name>${project.groupId}:${project.artifactId}</name>
 
     <properties>
-        <url.wottrspec>https://spec.ottr.xyz/wOTTR/0.4/</url.wottrspec>
-        <local.wottrspec>${project.basedir}/src/test/resources/spec</local.wottrspec>
+        <wottrspec.version>0.4.3</wottrspec.version>
+        <url.wottrspec>https://spec.ottr.xyz/wOTTR/${wottrspec.version}/</url.wottrspec>
+        <local.wottrspec>${project.basedir}/src/test/resources/spec/${wottrspec.version}</local.wottrspec>
     </properties>
 
     <dependencies>
@@ -68,7 +69,6 @@
                             <url>${url.wottrspec}core-vocabulary.owl.ttl</url>
                             <outputDirectory>${local.wottrspec}</outputDirectory>
                             <!--md5>MD5 SUM HERE</md5 -->
-                            <skipCache>true</skipCache>
                         </configuration>
                     </execution>
                     <execution>
@@ -81,7 +81,6 @@
                             <url>${url.wottrspec}core-grammar.shacl.ttl</url>
                             <outputDirectory>${local.wottrspec}</outputDirectory>
                             <!--md5>MD5 SUM HERE</md5 -->
-                            <skipCache>true</skipCache>
                         </configuration>
                     </execution>
                     <execution>
@@ -94,7 +93,6 @@
                             <url>${url.wottrspec}examples.zip</url>
                             <outputDirectory>${local.wottrspec}</outputDirectory>
                             <!--md5>MD5 SUM HERE</md5 -->
-                            <skipCache>true</skipCache>
                             <unpack>true</unpack>
                         </configuration>
                     </execution>
@@ -108,7 +106,6 @@
                             <url>${url.wottrspec}tests.zip</url>
                             <outputDirectory>${local.wottrspec}</outputDirectory>
                             <!--md5>MD5 SUM HERE</md5 -->
-                            <skipCache>true</skipCache>
                             <unpack>true</unpack>
                         </configuration>
                     </execution>
@@ -120,14 +117,14 @@
                 <configuration>
                     <filesets>
                         <fileset>
-                            <directory>src/test/resources/spec/tests/correct</directory>
+                            <directory>{$local.wottrspec}/tests/correct</directory>
                             <includes>
                                 <include>**/*.ttl</include>
                             </includes>
                             <followSymlinks>false</followSymlinks>
                         </fileset>
                         <fileset>
-                            <directory>src/test/resources/spec/tests/incorrect</directory>
+                            <directory>{$local.wottrspec}/tests/incorrect</directory>
                             <includes>
                                 <include>**/*.ttl</include>
                             </includes>
