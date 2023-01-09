@@ -26,16 +26,6 @@
             <!-- for transitive dependencies see module POM -->
         </dependency>
 
-        <!-- org.apache.poi uses commons-codec:1.13 which causes problems for newer versions of Jena -->
-        <!-- https://mvnrepository.com/artifact/commons-codec/commons-codec -->
-        <dependency>
-            <!-- TODO check if the problem still persists and if using a newer version is possible -->
-            <groupId>commons-codec</groupId>
-            <artifactId>commons-codec</artifactId>
-            <version>1.15</version>
-            <!-- no transitive dependencies -->
-        </dependency>
-
         <dependency>
             <groupId>org.apache.poi</groupId>
             <artifactId>poi</artifactId>
