@@ -306,9 +306,7 @@ public class StandardTemplateStore implements TemplateStore {
                     messages.accept(formatManager.attemptAllFormats(this, reader -> reader.populateTemplateStore(this, toFetch)));
                 }
 
-                if (containsTemplate(toFetch)) { // Check if fetched and added to store //NOPMD suppress PDM warning due to empty if test
-                    // messages.accept(Result.info("Loading template into store: " + toFetch));
-                } else {
+                if (!containsTemplate(toFetch)) {
                     failed.add(toFetch);
                     messages.accept(Result.warning("Failed fetching template: " + toFetch));
                 }
