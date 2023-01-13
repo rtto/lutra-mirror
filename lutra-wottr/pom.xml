@@ -11,6 +11,9 @@
     <packaging>jar</packaging>
 
     <name>${project.groupId}:${project.artifactId}</name>
+    <description>
+        This is a submodule of Lutra implementing wOTTR (https://spec.ottr.xyz/wOTTR/0.4/). wOTTR is a syntax for writing templates and instances directly in RDF, intended for publishing templates and instances on the web, or for storage in a triplestore. This module implements readers and writers for the wOTTR syntax.
+    </description>
 
     <properties>
         <url.wottrspec>https://spec.ottr.xyz/wOTTR/0.4/</url.wottrspec>

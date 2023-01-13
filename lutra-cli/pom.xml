@@ -11,6 +11,10 @@
     <packaging>jar</packaging>
 
     <name>${project.groupId}:${project.artifactId}</name>
+    <description>
+        This is the executable module for Lutra, the reference implementation of the OTTR framework, http://ottr.xyz.
+        This module provides a command-line interface for working with OTTR.
+    </description>
 
     <dependencies>
 

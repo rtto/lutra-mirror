@@ -13,6 +13,9 @@
     <packaging>war</packaging>
 
     <name>${project.groupId}:${project.artifactId}</name>
+    <description>
+        This is a submodule for Lutra implementing a REST API for working with templates and template instances.
+    </description>
 
     <dependencies>
 

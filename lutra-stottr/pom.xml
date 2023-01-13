@@ -11,6 +11,9 @@
     <packaging>jar</packaging>
 
     <name>${project.groupId}:${project.artifactId}</name>
+    <description>
+        This is a submodule of Lutra implementing stOTTR (https://spec.ottr.xyz/stOTTR/0.1/). stOTTR is a human readable syntax for writing templates and instances. This module implements readers and writers for the stOTTR syntax.
+    </description>
 
     <properties>
         <url.stottrspec>https://spec.ottr.xyz/stOTTR/0.1/</url.stottrspec>

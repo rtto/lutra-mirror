@@ -12,6 +12,9 @@
     <packaging>jar</packaging>
 
     <name>${project.groupId}:${project.artifactId}</name>
+    <description>
+        This is the API-module for Lutra, the reference implementation of the OTTR framework, http://ottr.xyz, intended for use as a library.
+    </description>
 
     <dependencies>
 

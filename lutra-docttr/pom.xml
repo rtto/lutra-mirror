@@ -9,6 +9,9 @@
     <artifactId>lutra-docttr</artifactId>
 
     <name>${project.groupId}:${project.artifactId}</name>
+    <description>
+            This is a submodule of Lutra implementing docTTR, automatically producing documentation for template libraries as HTML-pages. The resulting documentation contains dependency graphs, usages, example expansions and annotations extracted from annotation instances on the templates in the library.
+    </description>
 
     <dependencies>
 
