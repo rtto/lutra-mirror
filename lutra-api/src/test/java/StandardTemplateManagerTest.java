@@ -26,29 +26,35 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.Test;
 import xyz.ottr.lutra.OTTR;
 import xyz.ottr.lutra.api.StandardTemplateManager;
+import xyz.ottr.lutra.system.Assertions;
 
 public class StandardTemplateManagerTest {
 
     @Test
-    public void nonEmptyStandardLibrary() {
+    public void checkInitialisedLibrary() {
 
         var manager = new StandardTemplateManager();
-        manager.loadStandardTemplateLibrary();
+        var msgs = manager.loadStandardTemplateLibrary();
 
-        assertFalse(manager.getStandardLibrary().getTemplateIRIs().isEmpty());
+        // check that the templates loaded without errors
+        Assertions.noErrors(msgs);
+
+        // the template store should be empty
         assertTrue(manager.getTemplateStore().getTemplateIRIs().isEmpty());
-    }
 
-    @Test
-    public void doNotLoadPackageTemplates() {
-        var manager = new StandardTemplateManager();
-        manager.loadStandardTemplateLibrary();
+        // check the contents of the standard library
+        var templates = manager.getStandardLibrary().getTemplateIRIs();
 
         // check that there are templates at all
-        assertFalse(manager.getStandardLibrary().getTemplateIRIs().isEmpty());
+        assertFalse(templates.isEmpty());
 
-        // check that none of these templates has an IRI starting with the package path
-        assertTrue(manager.getStandardLibrary().getTemplateIRIs().stream()
-            .noneMatch((String s) -> s.startsWith(OTTR.ns_library_package)));
+        // check that no templates have an IRI starting with the package path
+        assertTrue(templates.stream().noneMatch((String s) -> s.startsWith(OTTR.ns_library_package)));
+
+        // check that there are templates from rdf, rdfs, and owl
+        assertTrue(templates.stream().anyMatch(s -> s.startsWith(OTTR.ns_library + "/rdf/")));
+        assertTrue(templates.stream().anyMatch(s -> s.startsWith(OTTR.ns_library + "/rdfs/")));
+        assertTrue(templates.stream().anyMatch(s -> s.startsWith(OTTR.ns_library + "/owl/")));
     }
+
 }
