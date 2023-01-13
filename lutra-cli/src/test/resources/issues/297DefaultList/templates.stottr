@@ -1,7 +1,0 @@
-@prefix ex: <http://example.org/ns#> .
-@prefix ottr: <http://ns.ottr.xyz/0.4/> .
-@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
-
-ex:Types[?ins = ex:bob, ?class = (ex:Person, ex:Employee) ] :: {
-  cross | ottr:Triple(?ins, rdf:type, ++?class)
-} .

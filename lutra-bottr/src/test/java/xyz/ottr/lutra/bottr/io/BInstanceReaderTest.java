@@ -24,12 +24,16 @@ package xyz.ottr.lutra.bottr.io;
 
 import static org.hamcrest.CoreMatchers.is;
 
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.apache.jena.rdf.model.Model;
-import org.junit.Assert;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.hamcrest.MatcherAssert;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import xyz.ottr.lutra.model.Instance;
+import xyz.ottr.lutra.parser.InstanceParser;
+import xyz.ottr.lutra.system.Assertions;
+import xyz.ottr.lutra.system.Message;
 import xyz.ottr.lutra.system.Result;
 import xyz.ottr.lutra.system.ResultConsumer;
 import xyz.ottr.lutra.wottr.io.RDFIO;
@@ -45,7 +49,7 @@ public class BInstanceReaderTest {
             .getStream()
             .filter(Result::isPresent);
 
-        Assert.assertThat(instances.count(), is(size));
+        MatcherAssert.assertThat(instances.count(), is(size));
     }
 
     private Model getRDFModel(String mapFile) {
@@ -69,7 +73,7 @@ public class BInstanceReaderTest {
     }
 
     @Test
-    @Ignore("Uses external SPARQL endpoint. Problematic to rely on outside sources for unit tests.")
+    @Disabled("Uses external SPARQL endpoint. Problematic to rely on outside sources for unit tests.")
     public void testSPARQLMap() {
         String file = ROOT + "maps/instanceMapSPARQL.ttl";
         testNumberOfInstances(file, 13L);
@@ -83,7 +87,7 @@ public class BInstanceReaderTest {
         printRDFOutput(file);
     }
 
-    @Ignore
+    @Disabled
     @Test
     public void testCSVSourceMap() {
         String file = ROOT + "maps/instanceMapH2Source.ttl";
@@ -103,6 +107,18 @@ public class BInstanceReaderTest {
         String file = ROOT + "maps/listInstanceMapRDFSource.ttl";
         printRDFOutput(file);
         testNumberOfInstances(file, 1L);
+    }
+
+    @Test
+    public void testInvalidFile() {
+        String expectedMsg = "Error parsing";
+        String file = ROOT + "incorrect/stottr_instances.stottr";
+
+        InstanceParser<String> parser = new BInstanceReader();
+        Result<Instance> result = parser.apply(file).collect(Collectors.toList()).get(0);
+
+        Assertions.atLeast(result, Message.Severity.ERROR);
+        Assertions.containsMessageFragment(result.getMessageHandler(), Message.Severity.ERROR, expectedMsg);
     }
 
 

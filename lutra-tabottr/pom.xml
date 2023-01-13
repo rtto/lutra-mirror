@@ -4,7 +4,7 @@
     <parent>
         <groupId>xyz.ottr.lutra</groupId>
         <artifactId>lutra</artifactId>
-        <version>0.6.14-SNAPSHOT</version>
+        <version>0.6.16-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <artifactId>lutra-tabottr</artifactId>
@@ -27,16 +27,6 @@
             <groupId>${project.groupId}</groupId>
             <artifactId>lutra-wottr</artifactId>
             <!-- for transitive dependencies see module POM -->
-        </dependency>
-
-        <!-- org.apache.poi uses commons-codec:1.13 which causes problems for newer versions of Jena -->
-        <!-- https://mvnrepository.com/artifact/commons-codec/commons-codec -->
-        <dependency>
-            <!-- TODO check if the problem still persists and if using a newer version is possible -->
-            <groupId>commons-codec</groupId>
-            <artifactId>commons-codec</artifactId>
-            <version>1.15</version>
-            <!-- no transitive dependencies -->
         </dependency>
 
         <dependency>

@@ -1,3 +1,0 @@
-@prefix ex : <http://example.com/ns#> .
-
-ex:Person(ex:A) .

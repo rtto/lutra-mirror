@@ -27,7 +27,6 @@ package xyz.ottr.lutra;
 import java.io.PrintStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Optional;
 import java.util.function.BiFunction;
@@ -37,7 +36,6 @@ import lombok.Getter;
 import org.apache.jena.shared.PrefixMapping;
 import xyz.ottr.lutra.io.Format;
 import xyz.ottr.lutra.io.FormatManager;
-import xyz.ottr.lutra.io.InstanceReader;
 import xyz.ottr.lutra.io.TemplateReader;
 import xyz.ottr.lutra.model.Instance;
 import xyz.ottr.lutra.store.Expander;
@@ -195,18 +193,6 @@ public class TemplateManager {
     }
 
     /**
-     * Retrieves Format by name from this' FormatManager.
-     * 
-     * @param formatName
-     *      The name of the Format to retrieve.
-     * @return
-     *      The Format with the argument name.
-     */
-    public Format getFormat(String formatName) {
-        return this.formatManager.getFormat(formatName);
-    }
-    
-    /**
      * Creates a TemplateStore using the argument FormatManager and
      * containing the standard OTTR base templates.
      * 
@@ -223,13 +209,21 @@ public class TemplateManager {
     }
 
     /**
-     * Gets this' TemplateStore used for all Template-related operations..
+     * Gets this' TemplateStore used for all Template-related operations.
      * 
      * @return
-     *      This' TemplateStore used for all Template-related operations..
+     *      This' TemplateStore used for all Template-related operations.
      */
     public TemplateStore getTemplateStore() {
         return this.templateStore;
+    }
+
+    /**
+     * @return
+     *      This' FormatManager.
+     */
+    public FormatManager getFormatManager() {
+        return this.formatManager;
     }
     
     /**
@@ -255,48 +249,18 @@ public class TemplateManager {
     /**
      * Populates this' TemplateStore with parsed Templates from the argument folders,
      * and returns a MessageHandler with potential errors that occurred during parsing.
-     * As no Format is provided, it will attempt all Formats registered and use the
+     * If no Format is provided, it will attempt all Formats registered and use the
      * first that succeeds.
      * 
-     * @param library
-     *      Strings denoting paths to folders which should be parsed and loaded into this'
-     *      TemplateStore.
-     * @return
-     *      A MessageHandler containing all Messages generated during the parsing.
-     */
-    public MessageHandler readLibrary(String... library) {
-        return readLibrary(null, library);
-    }
-
-    /**
-     * Populates this' TemplateStore with parsed Templates from the argument folders,
-     * and returns a MessageHandler with potential errors that occurred during parsing.
-     * 
      * @param format
-     *      Format to use for the parsing. 
+     *      Name of format to use for reading templates. If null is given, then all registered formats are attempted.
      * @param library
-     *      Strings denoting paths to folders which should be parsed and loaded into this'
-     *      TemplateStore.
-     * @return
-     *      A MessageHandler containing all Messages generated during the parsing.
-     */
-    public MessageHandler readLibrary(Format format, String... library) {
-        return readLibrary(format, Arrays.asList(library));
-    }
-
-    /**
-     * Populates this' TemplateStore with parsed Templates from the argument folders,
-     * and returns a MessageHandler with potential errors that occurred during parsing.
-     * 
-     * @param format
-     *      Format to use for the parsing. 
-     * @param library
-     *      A Collection of Strings denoting paths to folders which should be parsed and
+     *      A Collection of Strings denoting paths to folders which are be parsed and
      *      loaded into this' TemplateStore.
      * @return
-     *      A MessageHandler containing all Messages generated during the parsing.
+     *      A MessageHandler containing all Messages generated during the operation.
      */
-    public MessageHandler readLibrary(Format format, Collection<String> library) {
+    public MessageHandler readLibrary(String format, Collection<String> library) {
 
         MessageHandler messages = new MessageHandler();
 
@@ -312,7 +276,7 @@ public class TemplateManager {
             Result<TemplateReader> reader;
             // check if libraryFormat is set or not
             if (format != null) {
-                reader = format.getTemplateReader();
+                reader = this.formatManager.getFormat(format).flatMap(Format::getTemplateReader);
                 reader.map(readerFunction).map(messages::combine);
             } else {
                 reader = this.templateStore.getFormatManager().attemptAllFormats(this.templateStore, readerFunction);
@@ -334,23 +298,6 @@ public class TemplateManager {
         }
         return messages;
     }
-        
-
-    /**
-     * Reads the instances contained in files denoted by argument Strings,
-     * using the argument Format.
-     * 
-     * @param format
-     *      The format to use for parsing the instances.
-     * @param files
-     *      Strings denoting paths to files containing instances.
-     * @return
-     *      A ResultStream of Instances, where the contained results
-     *      also contains possible Messages generated during parsing.
-     */
-    public ResultStream<Instance> readInstances(Format format, String... files) {
-        return readInstances(format, Arrays.asList(files));
-    }
 
     /**
      * Reads the instances contained in files denoted by the Strings in the argument
@@ -364,12 +311,12 @@ public class TemplateManager {
      *      A ResultStream of Instances, where the contained results
      *      also contains possible Messages generated during parsing.
      */
-    public ResultStream<Instance> readInstances(Format format, Collection<String> files) {
+    public ResultStream<Instance> readInstances(String format, Collection<String> files) {
 
-        Result<InstanceReader> reader = format.getInstanceReader();
         ResultStream<String> fileStream = ResultStream.innerOf(files);
-
-        return reader.mapToStream(fileStream::innerFlatMap);
+        return this.formatManager.getFormat(format)
+            .flatMap(Format::getInstanceReader)
+            .mapToStream(fileStream::innerFlatMap);
     }
     
     /**
@@ -434,8 +381,9 @@ public class TemplateManager {
      *      A MessageHandler containing all Messages generated by the function
      *      applications.
      */
-    public MessageHandler writeInstances(ResultStream<Instance> instances, Format format, String filePath, PrintStream consoleStream) {
-        Result<InstanceWriter> writerRes = format.getInstanceWriter();
+    public MessageHandler writeInstances(ResultStream<Instance> instances, String format, String filePath, PrintStream consoleStream) {
+        Result<InstanceWriter> writerRes = this.formatManager.getFormat(format)
+            .flatMap(Format::getInstanceWriter);
         MessageHandler msgs = writerRes.getMessageHandler();
         if (!writerRes.isPresent()) {
             return msgs;
@@ -458,16 +406,17 @@ public class TemplateManager {
      * or to some other output.  
      * 
      * @param format
-     *      The Format used to write the Template-objects to String.
+     *      Name for format used to write the Template-objects to String.
      * @param stringConsumer
      *      A Function to which the written Strings will be applied.
      * @return
      *      A MessageHandler containing all Messages generated by the function
      *      applications.
      */
-    public MessageHandler writeTemplates(Format format, BiFunction<String, String, Optional<Message>> stringConsumer) {
+    public MessageHandler writeTemplates(String format, BiFunction<String, String, Optional<Message>> stringConsumer) {
 
-        Result<TemplateWriter> writerRes = format.getTemplateWriter();
+        Result<TemplateWriter> writerRes =  this.formatManager.getFormat(format)
+            .flatMap(Format::getTemplateWriter);
         MessageHandler msgs = writerRes.getMessageHandler();
         if (!writerRes.isPresent()) {
             return msgs;

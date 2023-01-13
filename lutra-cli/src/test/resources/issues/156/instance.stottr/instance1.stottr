@@ -1,3 +1,0 @@
-@prefix ex: <http://example.com/ns#> .
-
-ex:intersect(ex:A, ex:B, ex:AB) .

@@ -4,7 +4,7 @@
     <parent>
         <artifactId>lutra</artifactId>
         <groupId>xyz.ottr.lutra</groupId>
-        <version>0.6.14-SNAPSHOT</version>
+        <version>0.6.16-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
@@ -16,6 +16,10 @@
     <description>
         This is a submodule for Lutra implementing a REST API for working with templates and template instances.
     </description>
+
+    <properties>
+       <maven.deploy.skip>true</maven.deploy.skip>
+    </properties>
 
     <dependencies>
 

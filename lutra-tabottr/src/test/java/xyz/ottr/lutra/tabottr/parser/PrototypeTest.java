@@ -25,7 +25,7 @@ package xyz.ottr.lutra.tabottr.parser;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import xyz.ottr.lutra.model.Instance;
 import xyz.ottr.lutra.parser.InstanceParser;
 import xyz.ottr.lutra.system.Assertions;
@@ -39,7 +39,7 @@ public class PrototypeTest {
 
     private static final Path ROOT = Paths.get("src", "test", "resources");
 
-    @Test 
+    @Test
     public void testAutoTyping() {
         shouldParseToInstances("test1.xlsx");
     }

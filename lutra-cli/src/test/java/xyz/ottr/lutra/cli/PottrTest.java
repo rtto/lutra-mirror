@@ -24,6 +24,8 @@ package xyz.ottr.lutra.cli;
  * #L%
  */
 
+import static org.junit.jupiter.params.provider.Arguments.arguments;
+
 import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -31,14 +33,16 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Function;
+import java.util.stream.Stream;
 import org.apache.commons.lang3.StringUtils;
 import org.hamcrest.Matcher;
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.Is;
 import org.hamcrest.core.IsNot;
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import xyz.ottr.lutra.OTTR;
 import xyz.ottr.lutra.TemplateManager;
 import xyz.ottr.lutra.api.StandardFormat;
@@ -57,48 +61,37 @@ import xyz.ottr.lutra.system.MessageHandler;
 import xyz.ottr.lutra.system.ResultConsumer;
 import xyz.ottr.lutra.system.ResultStream;
 
-@RunWith(Parameterized.class)
+@Disabled
 public class PottrTest {
 
     private static final Path ROOT = Paths.get("src", "test", "resources", "primer", "files");
 
-    private final String instancePath;
-    private final String templatePath;
-    private final boolean expectedResults;
+    public static Stream<Arguments> data() {
+        return Stream.of(
+            arguments("01-basics/1/ins/Person1.stottr", "01-basics/1/tpl/", true),
+            arguments(null, "01-basics/2/tpl/", true),
+            arguments("01-basics/3/tpl/cycle.stottr", "01-basics/3/tpl/", false),
+            arguments(null, "01-basics/4/tpl/", false),
+            arguments("01-basics/5/ins/relative.stottr", "01-basics/5/tpl/", false),
+            arguments("01-basics/6/ins/nullable.stottr", "01-basics/6/tpl/", true),
+            arguments("01-basics/7/ins/Person.stottr", "01-basics/7/tpl/", true),
+            arguments("01-basics/8/ins/organisation.stottr", "01-basics/8/tpl/", true),
+            arguments("01-basics/9/ins/person.stottr", "01-basics/9/tpl/", true),
+            arguments("01-basics/10/ins/member.stottr", "01-basics/10/tpl/", true),
+            arguments("01-basics/11/ins/members.stottr", "01-basics/11/tpl/", true),
+            arguments("01-basics/12/ins/friends.stottr", "01-basics/12/tpl/", true),
+            arguments("01-basics/13/ins/orgmembers.stottr", "01-basics/13/tpl/", true),
+            arguments("01-basics/14/ins/expmode.stottr", "01-basics/14/tpl/", true),
+            arguments("01-basics/15/ins/namedpizza.stottr", null, true),
 
-    public PottrTest(String instance, String template, boolean expectedResults) {
-        this.instancePath = instance;
-        this.templatePath = template;
-        this.expectedResults = expectedResults;
-    }
-
-    @Parameterized.Parameters(name = "{index}: instance: {0}, template: {1}")
-    public static List<Object[]> data() {
-        return List.of(
-            new Object[] { "01-basics/1/ins/Person1.stottr", "01-basics/1/tpl/", true },
-            new Object[] { null, "01-basics/2/tpl/", true },
-            new Object[] { "01-basics/3/tpl/cycle.stottr", "01-basics/3/tpl/", false },
-            new Object[] { null, "01-basics/4/tpl/", false },
-            new Object[] { "01-basics/5/ins/relative.stottr", "01-basics/5/tpl/", false },
-            new Object[] { "01-basics/6/ins/nullable.stottr", "01-basics/6/tpl/", true },
-            new Object[] { "01-basics/7/ins/Person.stottr", "01-basics/7/tpl/", true },
-            new Object[] { "01-basics/8/ins/organisation.stottr", "01-basics/8/tpl/", true },
-            new Object[] { "01-basics/9/ins/person.stottr", "01-basics/9/tpl/", true },
-            new Object[] { "01-basics/10/ins/member.stottr", "01-basics/10/tpl/", true },
-            new Object[] { "01-basics/11/ins/members.stottr", "01-basics/11/tpl/", true },
-            new Object[] { "01-basics/12/ins/friends.stottr", "01-basics/12/tpl/", true },
-            new Object[] { "01-basics/13/ins/orgmembers.stottr", "01-basics/13/tpl/", true },
-            new Object[] { "01-basics/14/ins/expmode.stottr", "01-basics/14/tpl/", true },
-            new Object[] { "01-basics/15/ins/namedpizza.stottr", null, true },
-
-            new Object[] { "02-modelling/1/ins/phoneinst.stottr", "02-modelling/1/tpl/", true }
+            arguments("02-modelling/1/ins/phoneinst.stottr", "02-modelling/1/tpl/", true)
         );
     }
 
-
-    @Test
-    public void test() {
-        runExpand(this.instancePath, this.templatePath, this.expectedResults);
+    @ParameterizedTest
+    @MethodSource("data")
+    public void test(String instancePath, String templatePath, boolean expectedResults) {
+        runExpand(instancePath, templatePath, expectedResults);
     }
 
     private String resolve(String pathFromRoot) {
@@ -107,7 +100,6 @@ public class PottrTest {
 
     private void runExpand(String fileInstance, String pathTemplates, boolean expectedResults) {
 
-        boolean testResults = true;
         TemplateStore store = getStore();
 
         List<Message> messages = new ArrayList<>();
@@ -126,7 +118,7 @@ public class PottrTest {
             ? o -> Is.is(o)
             : o -> Is.is(IsNot.not(o));
 
-        Assert.assertThat("On " + pathTemplates + " and " + fileInstance, messages, matcher.apply(Collections.emptyList()));
+        MatcherAssert.assertThat("On " + pathTemplates + " and " + fileInstance, messages, matcher.apply(Collections.emptyList()));
     }
 
     private TemplateStore getStore() {

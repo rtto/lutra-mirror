@@ -22,16 +22,16 @@ package xyz.ottr.lutra.wottr.parser;
  * #L%
  */
 
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.RDFList;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.vocabulary.RDF;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 import xyz.ottr.lutra.model.Signature;
 import xyz.ottr.lutra.system.ResultStream;
 import xyz.ottr.lutra.wottr.WOTTR;
@@ -40,7 +40,7 @@ public class RDFTemplateParserTest {
 
     private static WTemplateParser templateParser;
 
-    @BeforeClass    
+    @BeforeAll
     public static void load() {
         templateParser = new WTemplateParser();
     }
@@ -67,7 +67,7 @@ public class RDFTemplateParserTest {
         noBody.innerForEach(none -> fail());
     }
 
-    @AfterClass
+    @AfterAll
     public static void clear() {
         templateParser = null;
     }

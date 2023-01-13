@@ -56,11 +56,11 @@ public class SInstanceWriter extends BufferWriter implements InstanceWriter {
     public void accept(Instance instance) {
         StringBuilder builder = new StringBuilder();
         
-        if (prefixWriteFlag) { //only add prefix on first accept call
+        if (this.prefixWriteFlag) { //only add prefix on first accept call
             builder
                 .append(SPrefixWriter.write(this.termWriter.getPrefixes()))
                 .append(Space.LINEBR2);
-            prefixWriteFlag = false;
+            this.prefixWriteFlag = false;
         }
         
         builder

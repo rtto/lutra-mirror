@@ -25,7 +25,7 @@ package xyz.ottr.lutra.wottr.parser;
 import static org.hamcrest.CoreMatchers.is;
 
 import org.apache.jena.rdf.model.Model;
-import org.junit.Assert;
+import org.hamcrest.MatcherAssert;
 import xyz.ottr.lutra.io.InstanceReader;
 import xyz.ottr.lutra.model.Instance;
 import xyz.ottr.lutra.store.Expander;
@@ -47,7 +47,7 @@ public enum ModelUtils {
         boolean isIsomorphic = actual.isIsomorphicWith(expected);
 
         if (isIsomorphic) {
-            Assert.assertTrue(isIsomorphic);
+            org.junit.jupiter.api.Assertions.assertTrue(isIsomorphic);
         } else { // if error, i.e., models are different, print nice error message
 
             // clear prefixes to better diff-ing
@@ -57,7 +57,7 @@ public enum ModelUtils {
             String rdfActual = RDFIO.writeToString(actual);
             String rdfExpected = RDFIO.writeToString(expected);
 
-            Assert.assertThat(rdfActual, is(rdfExpected));
+            MatcherAssert.assertThat(rdfActual, is(rdfExpected));
         }
     }
 

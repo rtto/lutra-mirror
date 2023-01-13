@@ -22,9 +22,9 @@ package xyz.ottr.lutra.cli;
  * #L%
  */
 
-import static org.junit.Assert.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import xyz.ottr.lutra.system.Assertions;
 import xyz.ottr.lutra.system.Message;
 import xyz.ottr.lutra.system.MessageHandler;
@@ -59,7 +59,7 @@ public class Issue324DummyInputTest {
         int exitCode = cli.executeArgs(args.trim().split("\\s+"));
 
         assertNotEquals(0, msgs.getMessages().size());
-        assertNotEquals("Exit code should not be 0 with error messages", 0, exitCode);
+        assertNotEquals(0, exitCode, "Exit code should not be 0 with error messages");
     }
 
     @Test
@@ -74,7 +74,7 @@ public class Issue324DummyInputTest {
         int exitCode = cli.executeArgs(args.trim().split("\\s+"));
 
         assertNotEquals(0, msgs.getMessages().size());
-        assertNotEquals("Exit code should not be 0 with error messages", 0, exitCode);
+        assertNotEquals(0, exitCode, "Exit code should not be 0 with error messages");
     }
 
     @Test

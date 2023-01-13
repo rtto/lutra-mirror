@@ -224,16 +224,21 @@ public class StandardTemplateStore implements TemplateStore {
         Signature signature = templates.get(iri);
         if (signature instanceof Template) {
             return Result.of((Template) signature);
+        } else if (signature instanceof BaseTemplate) {
+            return Result.error("No template (but base template) found for IRI " + iri);
+        } else if (signature != null) { // must be Signature if not null
+            return Result.error("No template (just signature) found for IRI " + iri);
         } else {
-            return Result.error("Missing template definition for IRI " + iri);
+            return Result.error("No template found for IRI " + iri);
         }
     }
+
 
     @Override
     public Result<Signature> getSignature(String iri) {
         Signature signature = templates.get(iri);
         if (signature == null) {
-            return Result.error("Missing signature for IRI " + iri);
+            return Result.error("No signature found for IRI " + iri);
         } else {
             return Result.of(signature);
         }

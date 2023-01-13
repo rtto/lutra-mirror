@@ -23,14 +23,14 @@ package xyz.ottr.lutra.model;
  */
 
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
 import java.util.Map;
-import org.junit.Assert;
-import org.junit.Test;
+import org.hamcrest.MatcherAssert;
+import org.junit.jupiter.api.Test;
 import xyz.ottr.lutra.model.terms.BlankNodeTerm;
 import xyz.ottr.lutra.model.terms.ListTerm;
 import xyz.ottr.lutra.model.terms.NoneTerm;
@@ -110,7 +110,7 @@ public class SubstitutionTest {
 
         ListTerm actualOutput = (ListTerm) input.apply(subst);
 
-        Assert.assertThat(actualOutput.asList(), is(expectedOutput.asList()));
+        MatcherAssert.assertThat(actualOutput.asList(), is(expectedOutput.asList()));
     }
 
     @Test

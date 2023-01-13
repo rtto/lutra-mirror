@@ -35,9 +35,12 @@ import java.util.function.BiPredicate;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
-// TODO: should we move some methods to UtilityClasses?
+// TODO: should we move some methods to UtilityClasses? Move static methods on multiple results to new class Results?
+// TODO: remove unused methods?
+// TODO: seems that due to a search-replace 'result' has been replaced by 'system' in comments.
 
 public class Result<E> {
 
@@ -400,6 +403,19 @@ public class Result<E> {
      */
     public E orElse(E other) {
         return this.result.orElse(other);
+    }
+
+    /**
+     * @see Optional#or(Supplier)
+     */
+    public Result<E> or(Supplier<? extends Result<? extends E>> supplier) {
+        Objects.requireNonNull(supplier);
+        if (this.isPresent()) {
+            return this;
+        } else {
+            Result<E> r = (Result<E>) supplier.get();
+            return Objects.requireNonNull(r);
+        }
     }
 
     protected Trace getTrace() {

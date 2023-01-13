@@ -21,13 +21,11 @@
  */
 
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assume.assumeTrue;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
+import static org.junit.jupiter.params.provider.Arguments.arguments;
 
 import java.io.File;
-import java.io.IOException;
-import java.nio.charset.Charset;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -35,9 +33,10 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import java.util.stream.Stream;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import xyz.ottr.lutra.api.StandardFormat;
 import xyz.ottr.lutra.api.StandardTemplateManager;
 import xyz.ottr.lutra.io.Format;
@@ -45,21 +44,9 @@ import xyz.ottr.lutra.model.Signature;
 import xyz.ottr.lutra.system.Message;
 import xyz.ottr.lutra.system.Result;
 
-@RunWith(Parameterized.class)
 public class FormatEquivalenceTest {
 
-    private Format format;
-    private Signature signature;
-
-    public FormatEquivalenceTest(Signature signature, String uri, Format format, String formatName) {
-        this.format = format;
-        this.signature = signature;
-    }
-
-    @Parameterized.Parameters(name = "{index}: {3}: {1} ")
-    public static List<Object[]> data() {
-
-        List<Object[]> data = new ArrayList<>();
+    public static Stream<Arguments> data() {
 
         // collect formats relevant for templates
         var formats = Arrays.stream(StandardFormat.values())
@@ -78,42 +65,45 @@ public class FormatEquivalenceTest {
             .collect(Collectors.toList());
 
         // combine collected templates with collected formats
+        List<Object[]> data = new ArrayList<>();
         for (Format f : formats) {
             for (Signature s : signatures) {
-                data.add(new Object[] { s, s.getIri(), f, f.getFormatName() });
+                data.add(new Object[] { f, s });
             }
         }
-        return data;
+
+        return data.stream().map(datum -> arguments(datum[0], datum[1]));
     }
 
-    @Test
-    public void test() throws Exception {
+    @ParameterizedTest
+    @MethodSource("data")
+    public void test(Format format, Signature signature) throws Exception {
 
-        assumeTrue(this.format.supportsTemplateReader());
-        assumeTrue(this.format.supportsTemplateWriter());
+        assumeTrue(format.supportsTemplateReader());
+        assumeTrue(format.supportsTemplateWriter());
        
-        var writer = this.format.getTemplateWriter().get();
+        var writer = format.getTemplateWriter().get();
         String folderPath = "src/test/resources/FormatEquivalanceTest/";
                 
         BiFunction<String, String, Optional<Message>> writerFunc = (iri, str) -> {
             return xyz.ottr.lutra.io.Files
-                    .writeTemplatesTo(iri, str, folderPath, this.format.getDefaultFileSuffix());
+                    .writeTemplatesTo(iri, str, folderPath, format.getDefaultFileSuffix());
         };
         
         writer.setWriterFunction(writerFunc);
-        writer.accept(this.signature); //write file
+        writer.accept(signature); //write file
         
         // read file
-        String iriFilePath = xyz.ottr.lutra.io.Files.iriToPath(this.signature.getIri()) + "" + this.format.getDefaultFileSuffix();
+        String iriFilePath = xyz.ottr.lutra.io.Files.iriToPath(signature.getIri()) + "" + format.getDefaultFileSuffix();
         String absFilePath = Path.of(folderPath + iriFilePath).toAbsolutePath().toString();
         
-        var reader = this.format.getTemplateReader().get();
+        var reader = format.getTemplateReader().get();
         var ioSignatures = reader.apply(absFilePath)
             .getStream()
             .collect(Collectors.toList());
                 
         assertThat(ioSignatures.size(), is(1));
-        assertThat(ioSignatures.get(0).get(), is(this.signature));
+        assertThat(ioSignatures.get(0).get(), is(signature));
         
         deleteDirectory(new File(folderPath));
 

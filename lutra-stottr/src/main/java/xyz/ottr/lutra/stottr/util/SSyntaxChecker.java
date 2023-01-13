@@ -79,7 +79,7 @@ public class SSyntaxChecker {
             this.messageHandler.add(Message.info(printParseTree(parser)));
         }
 
-        return messageHandler;
+        return this.messageHandler;
     }
 
     private String printTokens(CommonTokenStream tokens) {
@@ -117,9 +117,7 @@ public class SSyntaxChecker {
                 if (indentation > 1) {
                     str.append(Space.LINEBR);
                 }
-                for (int i = 0; i < indentation; i++) {
-                    str.append(Space.INDENT);
-                }
+                str.append(Space.INDENT.repeat(Math.max(0, indentation)));
                 indentation++;
             } else if (c == ')') {
                 indentation--;
