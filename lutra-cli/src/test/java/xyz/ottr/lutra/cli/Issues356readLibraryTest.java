@@ -26,13 +26,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.List;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.parallel.Isolated;
 import xyz.ottr.lutra.TemplateManager;
 import xyz.ottr.lutra.api.StandardTemplateManager;
 import xyz.ottr.lutra.system.Assertions;
 import xyz.ottr.lutra.system.MessageHandler;
 
-@Isolated
 public class Issues356readLibraryTest {
 
     private static final String ROOT = "src/test/resources/issues/";

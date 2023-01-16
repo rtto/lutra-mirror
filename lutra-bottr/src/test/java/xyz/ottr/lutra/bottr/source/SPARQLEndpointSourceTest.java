@@ -40,14 +40,12 @@ import org.apache.jena.rdf.model.Statement;
 import org.hamcrest.MatcherAssert;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.parallel.Isolated;
 import xyz.ottr.lutra.bottr.model.Source;
 import xyz.ottr.lutra.system.Assertions;
 import xyz.ottr.lutra.system.Message;
 import xyz.ottr.lutra.system.Result;
 import xyz.ottr.lutra.system.ResultStream;
 
-@Isolated
 public class SPARQLEndpointSourceTest {
 
     @Test

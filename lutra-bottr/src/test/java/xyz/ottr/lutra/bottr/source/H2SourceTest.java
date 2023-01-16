@@ -37,7 +37,6 @@ import org.apache.jena.shared.PrefixMapping;
 import org.hamcrest.MatcherAssert;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
-import org.junit.jupiter.api.parallel.Isolated;
 import xyz.ottr.lutra.bottr.model.ArgumentMaps;
 import xyz.ottr.lutra.bottr.model.InstanceMap;
 import xyz.ottr.lutra.bottr.model.Source;
@@ -48,7 +47,6 @@ import xyz.ottr.lutra.system.ResultStream;
 import xyz.ottr.lutra.wottr.WOTTR;
 
 
-@Isolated
 public class H2SourceTest {
 
     private static final Path ROOT = Paths.get("src", "test", "resources");

@@ -27,7 +27,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.parallel.Isolated;
 import xyz.ottr.lutra.io.InstanceReader;
 import xyz.ottr.lutra.model.Instance;
 import xyz.ottr.lutra.system.Result;
@@ -35,7 +34,6 @@ import xyz.ottr.lutra.wottr.io.RDFIO;
 import xyz.ottr.lutra.wottr.parser.WInstanceParser;
 
 
-@Isolated
 public class Issues233Test {
 
     private static final String ROOT = "src/test/resources/issues/233/";

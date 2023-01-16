@@ -30,7 +30,6 @@ import java.nio.file.Paths;
 import java.util.stream.Collectors;
 import org.apache.jena.rdf.model.Model;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.parallel.Isolated;
 import xyz.ottr.lutra.model.Instance;
 import xyz.ottr.lutra.parser.InstanceParser;
 import xyz.ottr.lutra.system.Assertions;
@@ -42,7 +41,6 @@ import xyz.ottr.lutra.wottr.io.RDFIO;
 import xyz.ottr.lutra.wottr.parser.WInstanceParser;
 import xyz.ottr.lutra.wottr.writer.WInstanceWriter;
 
-@Isolated
 public class ExcelReaderTest {
 
     private static final Path ROOT = Paths.get("src", "test", "resources");

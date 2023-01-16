@@ -35,12 +35,10 @@ import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.parallel.Isolated;
 import xyz.ottr.lutra.system.Assertions;
 import xyz.ottr.lutra.system.MessageHandler;
 import xyz.ottr.lutra.wottr.io.RDFIO;
 
-@Isolated
 public class ExpandTest {
     private static final String ROOT = "src/test/resources/expand/";
 

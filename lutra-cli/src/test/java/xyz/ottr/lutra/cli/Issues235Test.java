@@ -24,10 +24,8 @@ package xyz.ottr.lutra.cli;
 
 import org.apache.jena.rdf.model.Model;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.parallel.Isolated;
 import xyz.ottr.lutra.wottr.io.RDFIO;
 
-@Isolated
 public class Issues235Test {
 
     private static final String ROOT = "src/test/resources/issues/235/";
