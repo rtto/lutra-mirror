@@ -12,7 +12,10 @@
 
     <name>${project.groupId}:${project.artifactId}</name>
     <description>
-        This is a submodule of Lutra implementing stOTTR (https://spec.ottr.xyz/stOTTR/0.1/). stOTTR is a human readable syntax for writing templates and instances. This module implements readers and writers for the stOTTR syntax.
+        This Lutra submodule implements readers and writers for the stOTTR formalisation format (https://spec.ottr.xyz/stOTTR/0.1/). 
+        stOTTR is a custom-built serialisation format for OTTR intended to be easy to read and write for humans.
+
+        Lutra is the reference implementation of the OTTR framework. For more information about OTTR, see http://ottr.xyz.
     </description>
 
     <properties>

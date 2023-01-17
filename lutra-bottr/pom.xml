@@ -12,7 +12,10 @@
 
     <name>${project.groupId}:${project.artifactId}</name>
     <description>
-        This is a submodule of Lutra implementing the bOTTR-spec (https://spec.ottr.xyz/bOTTR/0.1/). bOTTR is a mapping language for transforming data from relational databases, triplestores, CSV-files and other sources, into instances of templates.
+        This Lutra submodule implements bOTTR (https://spec.ottr.xyz/bOTTR/0.1/). bOTTR is a mapping language for transforming 
+        data from relational databases, triplestores, CSV-files and other sources, into instances of templates.
+
+        Lutra is the reference implementation of the OTTR framework. For more information about OTTR, see http://ottr.xyz.
     </description>
 
     <dependencies>

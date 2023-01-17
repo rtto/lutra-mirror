@@ -12,8 +12,10 @@
 
     <name>${project.groupId}:${project.artifactId}</name>
     <description>
-        This is the executable module for Lutra, the reference implementation of the OTTR framework, http://ottr.xyz.
-        This module provides a command-line interface for working with OTTR.
+        This Lutra submodule provides a command-line interface (CLI) for Lutra. This modules is intended used as a Java 
+        executable. Other usage interfaces are provided by the lutra-cli and lutra-api modules.
+
+        Lutra is the reference implementation of the OTTR framework. For more information about OTTR, see http://ottr.xyz.
     </description>
 
     <properties>

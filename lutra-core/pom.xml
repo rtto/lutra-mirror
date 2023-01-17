@@ -11,6 +11,11 @@
     <packaging>jar</packaging>
 
     <name>${project.groupId}:${project.artifactId}</name>
+    <description>
+        This Lutra submodule provides establishes a common framework that other submodules in Lutra extend.
+
+        Lutra is the reference implementation of the OTTR framework. For more information about OTTR, see http://ottr.xyz.
+    </description>
 
     <dependencies>
 
