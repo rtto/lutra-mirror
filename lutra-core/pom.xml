@@ -12,7 +12,12 @@
 
     <name>${project.groupId}:${project.artifactId}</name>
     <description>
-        This Lutra submodule provides establishes a common framework that other submodules in Lutra extend.
+        This Lutra submodule provides a common framework that other submodules in Lutra use and extend.
+        It includes an implementation of OTTR's data model with classes for templates, instances, types,
+        etc.; a system for handling results and error messages; core interfaces and abstract classes for
+        streamed pipelines for parsing and writing templates and instances; as well as implementation of
+        the TemplateStore, a container for templates, with algorithms for checking correctness of templates
+        and expanding and checking correctness of instances.
 
         Lutra is the reference implementation of the OTTR framework. For more information about OTTR, see http://ottr.xyz.
     </description>
