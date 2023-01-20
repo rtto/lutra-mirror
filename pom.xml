@@ -20,9 +20,14 @@
   </modules>
 
   <name>${project.groupId}:${project.artifactId}</name>
-  <description>
-    Lutra is the reference implementation of the OTTR framework, http://ottr.xyz.
-  </description>
+    <description>
+        This is the parent module of Lutra. Lutra is the reference implementation of the OTTR framework.
+        
+        The common interfaces for Lutra are lutra-api (a Java API), lutra-cli (a command line interface
+        available as a Java executable), and lutra-restapi (a Java servlet available as a WAR file.)
+        
+        For more information about OTTR, see http://ottr.xyz.
+    </description>
   <url>http://lutra.ottr.xyz</url>
 
   <licenses>

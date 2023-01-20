@@ -10,6 +10,12 @@
     <artifactId>lutra-tabottr</artifactId>
 
     <name>${project.groupId}:${project.artifactId}</name>
+    <description>
+        This Lutra submodule implements tabOTTR (https://spec.ottr.xyz/tabOTTR/0.3/). tabOTTR is a mapping language for 
+        transforming spreadsheets into template instances.
+        
+        Lutra is the reference implementation of the OTTR framework. For more information about OTTR, see http://ottr.xyz.
+    </description>
     <packaging>jar</packaging>
 
     <dependencies>

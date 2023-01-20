@@ -13,6 +13,13 @@
     <packaging>war</packaging>
 
     <name>${project.groupId}:${project.artifactId}</name>
+    <description>
+        This Lutra submodule implements a servlet that provides a wrapper over the Lutra CLI for use as a web application.
+        The module is built into a WAR file for deployment to a Java Web Server.
+        The module is intended to be repurposed into a REST API.
+        
+        Lutra is the reference implementation of the OTTR framework. For more information about OTTR, see http://ottr.xyz.
+    </description>
 
     <properties>
        <maven.deploy.skip>true</maven.deploy.skip>

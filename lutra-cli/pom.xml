@@ -11,6 +11,12 @@
     <packaging>jar</packaging>
 
     <name>${project.groupId}:${project.artifactId}</name>
+    <description>
+        This Lutra submodule provides a command-line interface (CLI) for Lutra. This modules is intended used as a Java 
+        executable. Other usage interfaces are provided by the lutra-api and lutra-restapi modules.
+
+        Lutra is the reference implementation of the OTTR framework. For more information about OTTR, see http://ottr.xyz.
+    </description>
 
     <properties>
        <maven.deploy.skip>true</maven.deploy.skip>
