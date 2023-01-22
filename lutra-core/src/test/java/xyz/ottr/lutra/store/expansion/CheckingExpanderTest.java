@@ -22,6 +22,7 @@ package xyz.ottr.lutra.store.expansion;
  * #L%
  */
 
+import static xyz.ottr.lutra.model.terms.ObjectTerm.cons;
 import static xyz.ottr.lutra.model.terms.ObjectTerm.var;
 
 import java.util.stream.Collectors;
@@ -33,8 +34,10 @@ import xyz.ottr.lutra.model.Parameter;
 import xyz.ottr.lutra.model.Template;
 import xyz.ottr.lutra.model.terms.BlankNodeTerm;
 import xyz.ottr.lutra.model.terms.IRITerm;
+import xyz.ottr.lutra.model.terms.ListTerm;
 import xyz.ottr.lutra.model.terms.LiteralTerm;
 import xyz.ottr.lutra.model.terms.Term;
+import xyz.ottr.lutra.model.types.TypeRegistry;
 import xyz.ottr.lutra.store.StandardTemplateStore;
 import xyz.ottr.lutra.store.TemplateStore;
 import xyz.ottr.lutra.system.Assertions;
@@ -51,14 +54,13 @@ public class CheckingExpanderTest {
         TemplateStore store = new StandardTemplateStore(null);
         CheckingExpander expander = new CheckingExpander(store);
 
-        // build template with 1 parameter
+        // build template with 2 parameters
         Template template = buildDummyTemplate("iri-1");
         store.addTemplate(template);
 
-        // build instance with 2 arguments
+        // build instance with 1 arguments
         Instance instance = Instance.builder().iri("iri-1")
                 .argument(Argument.builder().term(var("x")).build())
-                .argument(Argument.builder().term(var("y")).build())
                 .build();
 
         ResultStream<Instance> resultStream = expander.expandInstance(instance);
@@ -73,14 +75,14 @@ public class CheckingExpanderTest {
         TemplateStore store = new StandardTemplateStore(null);
         CheckingExpander expander = new CheckingExpander(store);
 
-        // build template, parameter type is IRI
+        // build template, second parameter type is NEList
         Template template = buildDummyTemplate("iri-1");
         store.addTemplate(template);
 
-        // build instance, argument type is literal
+        // build instance, second argument is empty list
         Instance instance = Instance.builder().iri("iri-1")
-                .argument(Argument.builder()
-                        .term(LiteralTerm.createPlainLiteral("arg1")).build())
+                .argument(Argument.builder().term(new IRITerm("x")).build())
+                .argument(Argument.builder().term(new ListTerm()).build())
                 .build();
 
         ResultStream<Instance> resultStream = expander.expandInstance(instance);
@@ -103,6 +105,8 @@ public class CheckingExpanderTest {
         Instance instance = Instance.builder().iri("iri-1")
                 .argument(Argument.builder()
                         .term(new BlankNodeTerm()).build())
+                .argument(Argument.builder()
+                        .term(new ListTerm(cons("c1"), cons("c2"))).build())
                 .build();
 
         ResultStream<Instance> resultStream = expander.expandInstance(instance);
@@ -112,10 +116,13 @@ public class CheckingExpanderTest {
 
     private Template buildDummyTemplate(String iri) {
         Term var1 = new IRITerm("var1");
+        Term var2 = new IRITerm("var2");
+        var2.setType(TypeRegistry.NELIST_TYPE);
 
         return Template.builder()
                 .iri(iri)
                 .parameter(Parameter.builder().term(var1).nonBlank(true).build())
+                .parameter(Parameter.builder().term(var2).build())
                 .instance(Instance.builder()
                         .iri(OTTR.BaseURI.Triple)
                         .argument(Argument.builder().term(var1).build())
