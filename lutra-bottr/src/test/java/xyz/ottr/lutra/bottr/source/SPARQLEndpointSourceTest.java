@@ -59,6 +59,22 @@ public class SPARQLEndpointSourceTest {
     }
 
     @Test
+    public void selectSevenRows() {
+        String queryString = "SELECT ?s ?p ?o WHERE {?s ?p ?o} LIMIT 7";
+
+        Model model = createModel();
+        Query query = QueryFactory.create(queryString);
+        QueryExecution qe = QueryExecutionFactory.create(query, model);
+
+        SPARQLEndpointSource source = mock(SPARQLEndpointSource.class);
+        when(source.getQueryExecution(queryString)).thenReturn(Result.of(qe));
+        when(source.execute(queryString)).thenCallRealMethod();
+
+        ResultStream<?> resultStream = source.execute(queryString);
+        MatcherAssert.assertThat(resultStream.getStream().count(), is(7L));
+    }
+
+    @Test
     public void emptyQueryResult() {
         String expectedString = "no results";
         String queryString = "SELECT ?s ?p ?o WHERE {?s ?p ?o} LIMIT 0";
