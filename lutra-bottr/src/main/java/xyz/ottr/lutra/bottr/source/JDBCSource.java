@@ -26,13 +26,12 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Spliterator;
 import java.util.Spliterators;
 import java.util.function.Consumer;
 import java.util.function.Function;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 import java.util.stream.StreamSupport;
 import lombok.Builder;
 import org.apache.commons.dbcp2.BasicDataSource;
@@ -100,21 +99,18 @@ public class JDBCSource implements Source<String> {
         };
     }
 
-    private Result<String> getValue(ResultSet res, int c) {
-        try {
-            return Result.of(res.getString(c));
-        } catch (SQLException ex) {
-            return Result.error("Error extracting value from result:", ex);
-        }
-    }
-
     private Result<List<String>> getRow(ResultSet res, int columns) {
 
-        return Result.aggregate(
-                IntStream.range(1, columns + 1) // ResultSets count from 1 (not 0)
-                    .mapToObj(c -> getValue(res, c))
-                    .collect(Collectors.toList())
-                );
+        try {
+
+            List<String> vals = new LinkedList<>();
+            for (int c = 1; c <= columns; c++) { // ResultSets count from 1 (not 0)
+                vals.add(res.getString(c));
+            }
+            return Result.of(vals);
+        } catch (SQLException ex) {
+            return Result.error("Error getting row from result of query.", ex);
+        }
     }
 
     private <X> ResultStream<X> getResultSetStream(ResultSet resultSet, Function<List<String>, Result<X>> translationFunction)
@@ -137,6 +133,7 @@ public class JDBCSource implements Source<String> {
             this.log.info("Running query: " + queryExcerpt);
 
             this.statement = this.connection.createStatement();
+            //this.statement.setFetchSize(1); // TODO: Implement bOTTR-setting in mapping for this
             this.queryResults = statement.executeQuery(query);
 
             if (!queryResults.isBeforeFirst()) {
