@@ -1,5 +1,0 @@
-@prefix ex: <http://example.com/ns#> .
-
-ex:associate_with_list(ex:x, (ex:a, ex:b, ex:c)) .
-
-ex:associate_with_NElist(ex:x, (ex:a, ex:b, ex:c)) .
