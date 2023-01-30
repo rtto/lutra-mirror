@@ -58,9 +58,11 @@ public class FormatManagerTest {
 
     @Test
     public void testGetNonExistingFormat() {
+        String nonExistingFormat = "nonExistingFormat";
+        String expected = "No format with name '" + nonExistingFormat + "'";
         FormatManager formatManager = new FormatManager();
-        Result<Format> actual = formatManager.getFormat("nonExisting");
-        Assertions.atLeast(actual, Message.Severity.ERROR);
+        Result<Format> result = formatManager.getFormat(nonExistingFormat);
+        Assertions.containsMessageFragment(result.getMessageHandler(), Message.Severity.ERROR, expected);
     }
 
 }
