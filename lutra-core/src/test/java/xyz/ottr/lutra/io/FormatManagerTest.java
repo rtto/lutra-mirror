@@ -52,8 +52,8 @@ public class FormatManagerTest {
     @Test
     public void testGetNullFormat() {
         FormatManager formatManager = new FormatManager();
-        Result<Format> actual = formatManager.getFormat(null);
-        assertTrue(actual.isEmpty());
+        Result<Format> result = formatManager.getFormat(null);
+        assertTrue(result.isEmpty());
     }
 
     @Test

@@ -26,6 +26,10 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
+import xyz.ottr.lutra.system.Assertions;
+import xyz.ottr.lutra.system.Message;
+import xyz.ottr.lutra.system.Result;
+import xyz.ottr.lutra.writer.InstanceWriter;
 
 public class TabottrFormatTest {
 
@@ -37,6 +41,14 @@ public class TabottrFormatTest {
         assertFalse(format.supportsInstanceWriter());
         assertFalse(format.supportsTemplateReader());
         assertFalse(format.supportsTemplateWriter());
+    }
+
+    @Test
+    public void getInstanceWriter() {
+        String expected = "Unsupported format operation";
+        TabottrFormat format = new TabottrFormat();
+        Result<InstanceWriter> result = format.getInstanceWriter();
+        Assertions.containsMessageFragment(result.getMessageHandler(), Message.Severity.ERROR, expected);
     }
 
 }
