@@ -38,50 +38,29 @@ public class Issues356readLibraryTest {
     private static final String wottrLibPath = ROOT + "356readLibrary/templates.wottr";
 
     @Test
-    public void specifyLibraryAndInputFormat() {
-        String args = "-I stottr -l "
-                + stottrLibPath + " -L stottr "
-                + ROOT + "356readLibrary/instances.stottr";
-
-        CLI cli = new CLI();
-        MessageHandler msgs = cli.getMessageHandler();
-        cli.executeArgs(args.trim().split("\\s+"));
-        Assertions.noErrors(msgs);
-    }
-
-    @Test
-    public void doNotSpecifyWottrLibraryFormat() {
-        String args = "-I stottr -l " + wottrLibPath + " "
-                + ROOT + "356readLibrary/instances.stottr";
-
-        CLI cli = new CLI();
-        MessageHandler msgs = cli.getMessageHandler();
-        cli.executeArgs(args.trim().split("\\s+"));
-        Assertions.noErrors(msgs);
-    }
-
-    @Test
-    public void doNotSpecifyStottrLibraryFormat() {
-        String args = "-I stottr -l " + stottrLibPath + " "
-                + ROOT + "356readLibrary/instances.stottr";
-
-        CLI cli = new CLI();
-        MessageHandler msgs = cli.getMessageHandler();
-        cli.executeArgs(args.trim().split("\\s+"));
-        Assertions.noErrors(msgs);
-    }
-
-    @Test
-    public void readWottrLibrary() {
+    public void specifyLibraryFormat() {
         TemplateManager templateManager = new StandardTemplateManager();
-        templateManager.readLibrary(null, List.of(wottrLibPath));
+        MessageHandler msgHandler  = templateManager.readLibrary("stottr", List.of(stottrLibPath));
+
+        Assertions.noErrors(msgHandler);
         assertEquals(1, templateManager.getTemplateStore().getAllTemplates().getStream().count());
     }
 
     @Test
-    public void readStottrLibrary() {
+    public void doNotSpecifyWottrLibraryFormat() {
         TemplateManager templateManager = new StandardTemplateManager();
-        templateManager.readLibrary(null, List.of(stottrLibPath));
+        MessageHandler msgHandler  = templateManager.readLibrary(null, List.of(wottrLibPath));
+
+        Assertions.noErrors(msgHandler);
+        assertEquals(1, templateManager.getTemplateStore().getAllTemplates().getStream().count());
+    }
+
+    @Test
+    public void doNotSpecifyStottrLibraryFormat() {
+        TemplateManager templateManager = new StandardTemplateManager();
+        MessageHandler msgHandler = templateManager.readLibrary(null, List.of(stottrLibPath));
+
+        Assertions.noErrors(msgHandler);
         assertEquals(1, templateManager.getTemplateStore().getAllTemplates().getStream().count());
     }
 }

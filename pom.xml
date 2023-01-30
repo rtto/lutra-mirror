@@ -78,6 +78,7 @@
     <slf4j.version>2.0.3</slf4j.version>
     <log4j.version>2.17.1</log4j.version>
     <junit-jupiter.version>5.8.1</junit-jupiter.version>
+    <mockito.version>4.10.0</mockito.version>
 
 
     <!-- used with profiles for selecting unit tests -->
@@ -536,6 +537,12 @@
     </dependency>
 
     <dependency>
+      <groupId>org.mockito</groupId>
+      <artifactId>mockito-core</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
       <groupId>com.google.code.findbugs</groupId>
       <artifactId>annotations</artifactId>
       <scope>provided</scope>
@@ -766,6 +773,13 @@
                 <version>${junit-jupiter.version}</version>
                 <scope>test</scope>
             </dependency>
+
+      <dependency>
+        <groupId>org.mockito</groupId>
+        <artifactId>mockito-core</artifactId>
+        <version>${mockito.version}</version>
+        <scope>test</scope>
+      </dependency>
 
       <!-- https://mvnrepository.com/artifact/org.hamcrest/hamcrest -->
       <dependency>
