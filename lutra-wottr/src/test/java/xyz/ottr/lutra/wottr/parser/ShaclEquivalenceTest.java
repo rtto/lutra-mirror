@@ -52,8 +52,8 @@ import xyz.ottr.lutra.wottr.io.RDFIO;
 
 public class ShaclEquivalenceTest {
 
-    private static final String correct = "src/test/resources/spec/" + WOTTR.version + "/tests/correct/";
-    private static final String incorrect = "src/test/resources/spec/" + WOTTR.version + "/tests/incorrect/";
+    private static final String correct = "src/test/resources/spec/tests/correct/";
+    private static final String incorrect = "src/test/resources/spec/tests/incorrect/";
 
     private static final Set<String> unsupportedTests = Stream.of(
             incorrect + "instance10.ttl", // Instance checking on types
