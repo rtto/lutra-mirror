@@ -23,17 +23,18 @@ package xyz.ottr.lutra.bottr.source;
  */
 
 import java.sql.Connection;
+import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Arrays;
+import java.sql.Statement;
+import java.util.LinkedList;
 import java.util.List;
-import java.util.Objects;
+import java.util.Spliterator;
+import java.util.Spliterators;
+import java.util.function.Consumer;
 import java.util.function.Function;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 import lombok.Builder;
 import org.apache.commons.dbcp2.BasicDataSource;
-import org.apache.commons.dbutils.QueryRunner;
-import org.apache.commons.dbutils.handlers.ArrayListHandler;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.jena.shared.PrefixMapping;
 import org.slf4j.Logger;
@@ -51,37 +52,99 @@ public class JDBCSource implements Source<String> {
 
     private final BasicDataSource dataSource;
 
+    // For closing sources once all results are parsed
+    private Connection connection;
+    private Statement statement;
+    private ResultSet queryResults;
+    private final Integer fetchSize;
+
     @Builder
-    protected JDBCSource(String databaseDriver, String databaseURL, String username, String password) {
+    protected JDBCSource(String databaseDriver, String databaseURL, String username, String password, Integer fetchSize) {
         this.dataSource = new BasicDataSource();
 
         this.dataSource.setDriverClassName(databaseDriver);
         this.dataSource.setUsername(username);
         this.dataSource.setPassword(password);
         this.dataSource.setUrl(databaseURL);
+        this.fetchSize = fetchSize;
+    }
+
+    private <X> Spliterators.AbstractSpliterator<Result<X>> getAbstractSpliterator(
+            ResultSet resultSet, Function<ResultSet, Result<X>> rowCreator) {
+        return new Spliterators.AbstractSpliterator<>(Long.MAX_VALUE, Spliterator.ORDERED) {
+
+            @Override
+            public boolean tryAdvance(Consumer<? super Result<X>> action) {
+
+                try {
+                    if (resultSet.next()) {
+                        action.accept(rowCreator.apply(resultSet));
+                        return true;
+                    }
+                } catch (SQLException ex) {
+                    action.accept(
+                        Result.error("Error fetching results from query.", ex)
+                    );
+                } 
+
+                // advance failed so clean up
+                try {
+                    queryResults.close();
+                    statement.close();
+                    connection.close();
+                } catch (SQLException ex) {
+                    action.accept(
+                        Result.error("Error closing connection to database.", ex)
+                    );
+                }
+                return false;
+            }
+        };
+    }
+
+    private Result<List<String>> getRow(ResultSet res, int columns) {
+
+        try {
+            List<String> vals = new LinkedList<>();
+            for (int c = 1; c <= columns; c++) { // ResultSets count from 1 (not 0)
+                vals.add(res.getString(c));
+            }
+            return Result.of(vals);
+        } catch (SQLException ex) {
+            return Result.error("Error getting row from query result.", ex);
+        }
+    }
+
+    private <X> ResultStream<X> getResultSetStream(ResultSet resultSet, Function<List<String>, Result<X>> translationFunction)
+        throws SQLException {
+
+        int columns = resultSet.getMetaData().getColumnCount();
+        Function<ResultSet, Result<X>> rowCreator = (res) -> getRow(res, columns).flatMap(translationFunction);
+
+        return new ResultStream<>(StreamSupport.stream(
+                    getAbstractSpliterator(resultSet, rowCreator), false));
     }
 
     private <X> ResultStream<X> streamQuery(String query, Function<List<String>, Result<X>> translationFunction) {
 
         var queryExcerpt = StringUtils.abbreviate(StringUtils.normalizeSpace(query), 40);
 
-        try (Connection conn = this.dataSource.getConnection()) {
+        try {
+            this.connection = this.dataSource.getConnection();
 
             this.log.info("Running query: " + queryExcerpt);
 
-            List<Object[]> queryResult = new QueryRunner().query(conn, query, new ArrayListHandler());
+            this.statement = this.connection.createStatement();
+            if (this.fetchSize != null) {
+                this.statement.setFetchSize(this.fetchSize);
+            }
+            this.queryResults = statement.executeQuery(query);
 
-            if (queryResult.isEmpty()) {
+            if (!queryResults.isBeforeFirst()) {
                 return ResultStream.of(Result.info("Query '" + queryExcerpt + "' returned no results."));
             }
 
-            Stream<Result<X>> stream = queryResult.stream()
-                .map(array -> Arrays.stream(array)
-                    .map(value -> Objects.toString(value, null)) // the string value of null is (the object) null.
-                    .collect(Collectors.toList()))
-                .map(translationFunction);
-
-            return new ResultStream<>(stream);
+            return getResultSetStream(queryResults, translationFunction);
 
         } catch (SQLException ex) {
             return ResultStream.of(Result.error(
@@ -103,5 +166,4 @@ public class JDBCSource implements Source<String> {
     public ArgumentMap<String> createArgumentMap(PrefixMapping prefixMapping) {
         return new StringArgumentMap(prefixMapping);
     }
-
 }

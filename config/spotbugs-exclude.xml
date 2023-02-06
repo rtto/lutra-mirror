@@ -31,4 +31,10 @@
     <Bug pattern="UPM_UNCALLED_PRIVATE_METHOD" />
   </Match>
 
+  <Match>
+    <!-- Passes SQL query as string from bOTTR-map directly to execute() -->
+    <Class name="xyz.ottr.lutra.bottr.source.H2Source" />
+    <Bug pattern="SQL_NONCONSTANT_STRING_PASSED_TO_EXECUTE" />
+  </Match>
+
 </FindBugsFilter>

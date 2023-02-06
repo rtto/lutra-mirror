@@ -61,7 +61,9 @@ public class MessageHandler {
     }
 
     public void add(Trace trace) {
-        if (trace != null) {
+        if (trace != null
+            && !(trace.getMessages().isEmpty() && trace.getTrace().isEmpty())) { // Avoid adding empty Trace
+
             this.traces.add(trace);
         }
     }
