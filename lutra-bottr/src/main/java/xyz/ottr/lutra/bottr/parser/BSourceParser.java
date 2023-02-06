@@ -101,10 +101,15 @@ class BSourceParser implements Function<Resource, Result<Source<?>>> {
     private Result<Source<?>> getSQLSource(Resource source) {
 
         Result<JDBCSource.JDBCSourceBuilder> builder = Result.of(JDBCSource.builder());
+
         builder.addResult(getRequiredLiteralString(source, BOTTR.sourceURL), JDBCSource.JDBCSourceBuilder::databaseURL);
         builder.addResult(getRequiredLiteralString(source, BOTTR.jdbcDriver), JDBCSource.JDBCSourceBuilder::databaseDriver);
         builder.addResult(getRequiredLiteralString(source, BOTTR.username), JDBCSource.JDBCSourceBuilder::username);
         builder.addResult(getRequiredLiteralString(source, BOTTR.password), JDBCSource.JDBCSourceBuilder::password);
+
+        Result<Integer> fs = ModelSelector.getOptionalLiteralObject(this.model, source, BOTTR.fetchSize).map(l -> l.getInt());
+        builder.addResult(fs, JDBCSource.JDBCSourceBuilder::fetchSize);
+
         return builder.map(JDBCSource.JDBCSourceBuilder::build);
     }
     

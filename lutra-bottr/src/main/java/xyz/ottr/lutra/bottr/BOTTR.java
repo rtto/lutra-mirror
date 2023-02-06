@@ -65,6 +65,7 @@ public class BOTTR extends WOTTR {
     public static final Property entry = getProperty(ns + "entry");
     public static final Property inValue = getProperty(ns + "inValue");
     public static final Property outValue = getProperty(ns + "outValue");
+    public static final Property fetchSize = getProperty(ns + "fetchSize");
 
     // TOKENS
     public static final String THIS_DIR = "@@THIS_DIR@@";

@@ -56,15 +56,17 @@ public class JDBCSource implements Source<String> {
     private Connection connection;
     private Statement statement;
     private ResultSet queryResults;
+    private final Integer fetchSize;
 
     @Builder
-    protected JDBCSource(String databaseDriver, String databaseURL, String username, String password) {
+    protected JDBCSource(String databaseDriver, String databaseURL, String username, String password, Integer fetchSize) {
         this.dataSource = new BasicDataSource();
 
         this.dataSource.setDriverClassName(databaseDriver);
         this.dataSource.setUsername(username);
         this.dataSource.setPassword(password);
         this.dataSource.setUrl(databaseURL);
+        this.fetchSize = fetchSize;
     }
 
     private <X> Spliterators.AbstractSpliterator<Result<X>> getAbstractSpliterator(
@@ -81,17 +83,18 @@ public class JDBCSource implements Source<String> {
                     }
                 } catch (SQLException ex) {
                     action.accept(
-                        Result.error("ERROR: Error when fetching results from query: ", ex)
+                        Result.error("ERROR: Error when fetching results from query. ", ex)
                     );
                 } 
 
+                // advance failed so clean up
                 try {
                     queryResults.close();
                     statement.close();
                     connection.close();
                 } catch (SQLException ex) {
                     action.accept(
-                        Result.error("ERROR: Error when closing connection to database: ", ex)
+                        Result.error("ERROR: Error when closing connection to database. ", ex)
                     );
                 }
                 return false;
@@ -133,7 +136,9 @@ public class JDBCSource implements Source<String> {
             this.log.info("Running query: " + queryExcerpt);
 
             this.statement = this.connection.createStatement();
-            //this.statement.setFetchSize(1); // TODO: Implement bOTTR-setting in mapping for this
+            if (this.fetchSize != null) {
+                this.statement.setFetchSize(this.fetchSize);
+            }
             this.queryResults = statement.executeQuery(query);
 
             if (!queryResults.isBeforeFirst()) {
@@ -162,5 +167,4 @@ public class JDBCSource implements Source<String> {
     public ArgumentMap<String> createArgumentMap(PrefixMapping prefixMapping) {
         return new StringArgumentMap(prefixMapping);
     }
-
 }
