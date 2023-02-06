@@ -116,6 +116,7 @@ lutra-cli/src/test/resources/issues/235/output
 lutra-cli/src/test/resources/issues/235/output.ttl
 lutra-cli/src/test/resources/issues/298/ottr-doc/
 lutra-cli/src/test/resources/issues/327/testOutTTLFile.ttl
+lutra-cli/src/test/resources/issues/FormatLibraryRoundTrip/
 lutra-cli/src/test/resources/primer/
 
 lutra-core/src/main/resources/puntypes\.owl\.ttl
@@ -127,6 +128,8 @@ lutra-stottr/src/main/antlr4/imports/Turtle\.g4
 lutra-stottr/src/main/antlr4/xyz/ottr/lutra/stottr/antlr/stOTTR\.g4
 
 lutra-wottr/src/test/resources/spec/
+
+
 
 
 
