@@ -72,6 +72,8 @@
                         </goals>
                         <configuration>
                             <url>${url.stottrspec}Turtle.g4</url>
+                            <skipCache>false</skipCache>
+                            <overwrite>true</overwrite>
                             <outputDirectory>${local.stottrspec}imports/</outputDirectory>
                         </configuration>
                     </execution>
