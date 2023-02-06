@@ -61,8 +61,8 @@
                             <url>https://primer.ottr.xyz/master.zip</url>
                             <outputFileName>master.zip</outputFileName>
                             <outputDirectory>${project.basedir}/src/test/resources/primer</outputDirectory>
-                            <!--md5>MD5 SUM HERE</md5 -->
-                            <skipCache>true</skipCache>
+                            <skipCache>false</skipCache>
+                            <overwrite>true</overwrite>
                         </configuration>
                     </execution>
 

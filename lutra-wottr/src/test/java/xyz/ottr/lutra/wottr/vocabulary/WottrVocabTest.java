@@ -54,7 +54,7 @@ public class WottrVocabTest {
         // read spec RDF file
         syncTest(
             WOTTR.class,
-            "https://spec.ottr.xyz/wOTTR/0.4/core-vocabulary.owl.ttl",
+            "src/test/resources/spec/core-vocabulary.owl.ttl",
             WOTTR.ns);
 
     }

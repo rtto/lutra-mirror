@@ -77,8 +77,8 @@
                             <outputFileName>library.zip</outputFileName>
                             <unpack>true</unpack>
                             <outputDirectory>${project.basedir}/src/main/resources/tpl-library</outputDirectory>
-                            <!--md5>MD5 SUM HERE</md5 -->
                             <skipCache>true</skipCache>
+                            <overwrite>true</overwrite>
                         </configuration>
                     </execution>
 
