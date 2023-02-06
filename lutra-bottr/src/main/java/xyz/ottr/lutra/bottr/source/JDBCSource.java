@@ -83,7 +83,7 @@ public class JDBCSource implements Source<String> {
                     }
                 } catch (SQLException ex) {
                     action.accept(
-                        Result.error("ERROR: Error when fetching results from query. ", ex)
+                        Result.error("Error fetching results from query.", ex)
                     );
                 } 
 
@@ -94,7 +94,7 @@ public class JDBCSource implements Source<String> {
                     connection.close();
                 } catch (SQLException ex) {
                     action.accept(
-                        Result.error("ERROR: Error when closing connection to database. ", ex)
+                        Result.error("Error closing connection to database.", ex)
                     );
                 }
                 return false;
@@ -105,14 +105,13 @@ public class JDBCSource implements Source<String> {
     private Result<List<String>> getRow(ResultSet res, int columns) {
 
         try {
-
             List<String> vals = new LinkedList<>();
             for (int c = 1; c <= columns; c++) { // ResultSets count from 1 (not 0)
                 vals.add(res.getString(c));
             }
             return Result.of(vals);
         } catch (SQLException ex) {
-            return Result.error("Error getting row from result of query.", ex);
+            return Result.error("Error getting row from query result.", ex);
         }
     }
 
