@@ -46,6 +46,9 @@ public class ListExpanderTest {
         Argument.builder().term(new ListTerm(cons(4), cons(5))).listExpander(true).build(),
         Argument.builder().term(new ListTerm()).listExpander(true).build());
 
+    private final List<Argument> args3 = List.of(
+        Argument.builder().term(new NoneTerm()).listExpander(true).build(),
+        Argument.builder().term(cons(6)).build());
 
     private static List<List<Term>> expandToTerms(List<Argument> arguments, ListExpander expander) {
         return expander.expand(arguments).stream()
@@ -107,4 +110,16 @@ public class ListExpanderTest {
         test(this.args2, ListExpander.zipMin, Collections.emptyList());
     }
 
+    @Test
+    public void expandNoneTest() {
+
+        List<List<Term>> shouldEqual = List.of(List.of(
+            new NoneTerm(), cons(6))
+        );
+
+        // check that ++none == none
+        test(this.args3, ListExpander.cross, shouldEqual);
+        test(this.args3, ListExpander.zipMin, shouldEqual);
+        test(this.args3, ListExpander.zipMax, shouldEqual);
+    }
 }
