@@ -97,7 +97,6 @@ Desktop.ini
 *.xml#
 
 
-
 */.factorypath
 settings.xml
 
@@ -107,7 +106,7 @@ settings.xml
 
 lutra-api/src/main/resources/tpl-library/
 
-lutra-cli/src/test/resources/docttr/
+lutra-cli/dependency-reduced-pom.xml
 lutra-cli/src/test/resources/issues/186/out.ttl
 lutra-cli/src/test/resources/issues/233/output.ttl
 lutra-cli/src/test/resources/issues/233/outputWithoutTemplate.ttl
@@ -126,3 +125,4 @@ lutra-stottr/src/main/antlr4/imports/Turtle\.g4
 lutra-stottr/src/main/antlr4/xyz/ottr/lutra/stottr/antlr/stOTTR\.g4
 
 lutra-wottr/src/test/resources/spec/
+

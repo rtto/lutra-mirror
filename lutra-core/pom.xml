@@ -12,6 +12,11 @@
 
     <name>${project.groupId}:${project.artifactId}</name>
 
+    <properties>
+        <rottr.version>0.2.0</rottr.version>
+        <url.rottrspec>https://spec.ottr.xyz/rOTTR/${rottr.version}/</url.rottrspec>
+    </properties>
+
     <dependencies>
 
         <dependency>
@@ -91,11 +96,10 @@
                             <goal>wget</goal>
                         </goals>
                         <configuration>
-                            <url>https://spec.ottr.xyz/rOTTR/0.2/types.owl.ttl</url>
-                            <outputFileName>types.owl.ttl</outputFileName>
+                            <url>${url.rottrspec}types.owl.ttl</url>
                             <outputDirectory>${project.basedir}/src/main/resources</outputDirectory>
-                            <!--md5>MD5 SUM HERE</md5 -->
-                            <skipCache>true</skipCache>
+                            <skipCache>false</skipCache>
+                            <overwrite>true</overwrite>
                         </configuration>
                     </execution>
                     <execution>
@@ -105,11 +109,10 @@
                             <goal>wget</goal>
                         </goals>
                         <configuration>
-                            <url>https://spec.ottr.xyz/rOTTR/0.2/puntypes.owl.ttl</url>
-                            <outputFileName>puntypes.owl.ttl</outputFileName>
+                            <url>${url.rottrspec}/puntypes.owl.ttl</url>
                             <outputDirectory>${project.basedir}/src/main/resources</outputDirectory>
-                            <!--md5>MD5 SUM HERE</md5 -->
-                            <skipCache>true</skipCache>
+                            <skipCache>false</skipCache>
+                            <overwrite>true</overwrite>
                         </configuration>
                     </execution>
                 </executions>

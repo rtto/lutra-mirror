@@ -13,9 +13,9 @@
     <name>${project.groupId}:${project.artifactId}</name>
 
     <properties>
-        <wottrspec.version>0.4.3</wottrspec.version>
-        <url.wottrspec>https://spec.ottr.xyz/wOTTR/${wottrspec.version}/</url.wottrspec>
-        <local.wottrspec>${project.basedir}/src/test/resources/spec/${wottrspec.version}</local.wottrspec>
+        <wottr.version>0.4.3</wottr.version>
+        <url.wottrspec>https://spec.ottr.xyz/wOTTR/${wottr.version}/</url.wottrspec>
+        <local.wottrspec>${project.basedir}/src/test/resources/spec/</local.wottrspec>
     </properties>
 
     <dependencies>
@@ -68,7 +68,8 @@
                         <configuration>
                             <url>${url.wottrspec}core-vocabulary.owl.ttl</url>
                             <outputDirectory>${local.wottrspec}</outputDirectory>
-                            <!--md5>MD5 SUM HERE</md5 -->
+                            <overwrite>true</overwrite>
+                            <skipCache>false</skipCache>
                         </configuration>
                     </execution>
                     <execution>
@@ -80,7 +81,8 @@
                         <configuration>
                             <url>${url.wottrspec}core-grammar.shacl.ttl</url>
                             <outputDirectory>${local.wottrspec}</outputDirectory>
-                            <!--md5>MD5 SUM HERE</md5 -->
+                            <overwrite>true</overwrite>
+                            <skipCache>false</skipCache>
                         </configuration>
                     </execution>
                     <execution>
@@ -92,7 +94,8 @@
                         <configuration>
                             <url>${url.wottrspec}examples.zip</url>
                             <outputDirectory>${local.wottrspec}</outputDirectory>
-                            <!--md5>MD5 SUM HERE</md5 -->
+                            <overwrite>true</overwrite>
+                            <skipCache>false</skipCache>
                             <unpack>true</unpack>
                         </configuration>
                     </execution>
@@ -105,7 +108,8 @@
                         <configuration>
                             <url>${url.wottrspec}tests.zip</url>
                             <outputDirectory>${local.wottrspec}</outputDirectory>
-                            <!--md5>MD5 SUM HERE</md5 -->
+                            <overwrite>true</overwrite>
+                            <skipCache>false</skipCache>
                             <unpack>true</unpack>
                         </configuration>
                     </execution>
