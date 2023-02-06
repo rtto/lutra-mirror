@@ -288,7 +288,7 @@ public class StandardTemplateStore implements TemplateStore {
 
         FormatManager formatManager = getFormatManager();
         if (formatManager == null) {
-            messages.accept(Result.error("Error fetching missing templates: no template reader formats registered."));
+            messages.accept(Result.error("Error fetching templates: no registered template reader formats"));
             return messages.getMessageHandler();
         }
 
@@ -306,9 +306,7 @@ public class StandardTemplateStore implements TemplateStore {
                     messages.accept(formatManager.attemptAllFormats(this, reader -> reader.populateTemplateStore(this, toFetch)));
                 }
 
-                if (containsTemplate(toFetch)) { // Check if fetched and added to store
-                    messages.accept(Result.info("Fetched template: " + toFetch));
-                } else {
+                if (!containsTemplate(toFetch)) {
                     failed.add(toFetch);
                     messages.accept(Result.warning("Failed fetching template: " + toFetch));
                 }
@@ -324,7 +322,7 @@ public class StandardTemplateStore implements TemplateStore {
     public Result<Set<String>> getDependencies(String templateIri) {
         Result<Template> result = getTemplate(templateIri);
         if (result.isEmpty()) {
-            return Result.error("Template " + templateIri + " is not in store");
+            return Result.error("Template not in store: " + templateIri);
         }
 
         Set<Instance> dependencies = result.get().getPattern();

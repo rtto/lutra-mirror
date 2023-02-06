@@ -104,6 +104,8 @@ settings.xml
 ### Lutra specifics
 ###
 
+config/.settings.local.xml
+
 lutra-api/src/main/resources/tpl-library/
 
 lutra-cli/dependency-reduced-pom.xml
@@ -125,4 +127,6 @@ lutra-stottr/src/main/antlr4/imports/Turtle\.g4
 lutra-stottr/src/main/antlr4/xyz/ottr/lutra/stottr/antlr/stOTTR\.g4
 
 lutra-wottr/src/test/resources/spec/
+
+
 

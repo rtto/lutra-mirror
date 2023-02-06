@@ -35,7 +35,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import org.apache.jena.shared.PrefixMapping;
 import org.hamcrest.MatcherAssert;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import xyz.ottr.lutra.bottr.model.ArgumentMaps;
@@ -46,6 +45,7 @@ import xyz.ottr.lutra.system.Message;
 import xyz.ottr.lutra.system.Result;
 import xyz.ottr.lutra.system.ResultStream;
 import xyz.ottr.lutra.wottr.WOTTR;
+
 
 public class H2SourceTest {
 

@@ -1,3 +1,0 @@
-@prefix ex: <http://example.com/ns#> .
-
-ex:associate_with_NElist(ex:x, none) .

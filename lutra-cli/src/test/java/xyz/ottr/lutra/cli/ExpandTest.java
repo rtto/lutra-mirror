@@ -145,6 +145,7 @@ public class ExpandTest {
 
     }
 
+    @Disabled("Fails sometimes due to 'HttpConnectTimeoutException: HTTP connect timed out'.")
     @Test
     public void expand_bottr_SPARQLSource() {
         String bottrRoot = "../lutra-bottr/src/test/resources/maps/";

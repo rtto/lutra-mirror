@@ -1,0 +1,21 @@
+<settings>
+    <servers>
+    <server>
+      <id>ossrh</id>
+      <username>user</username>
+      <password>pass</password>
+    </server>
+  </servers>
+  <profiles>
+    <profile>
+      <id>ossrh</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <properties>
+        <gpg.executable>gpg</gpg.executable>
+        <gpg.passphrase>pass</gpg.passphrase>
+      </properties>
+    </profile>
+  </profiles>
+</settings>
