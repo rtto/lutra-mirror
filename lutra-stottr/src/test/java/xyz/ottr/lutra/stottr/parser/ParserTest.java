@@ -349,6 +349,21 @@ public class ParserTest {
     }
 
     @Test
+    public void testOptionalCommaBetweenAnnotations() {
+        String signature = "@prefix ex:     <http://example.com#> . "
+                + "ex:T1 [ ] "
+                + "@@ex:Template1(ex:Template4, \"arg\") "
+                + "@@ex:Template1(ex:Template4, \"other arg\") "
+                + ".";
+
+        Signature parsed = parseCorrectSignature(signature);
+
+        assertEquals("http://example.com#T1", parsed.getIri());
+        assertEquals(0, parsed.getParameters().size());
+        assertEquals(2, parsed.getAnnotations().size());
+    }
+
+    @Test
     public void testSignatureDefaultValueClass() {
         String signature = "@prefix ex:     <http://example.com/ns#> . "
                 + "@prefix p: <http://tpl.ottr.xyz/pizza/0.1/> ."
@@ -638,6 +653,42 @@ public class ParserTest {
         assertFalse(thirdParam.isOptional());
         assertFalse(thirdParam.isNonBlank());
         assertFalse(thirdParam.hasDefaultValue());
+    }
+
+    @Test
+    public void testOptionalCommaBetweenInstances() {
+
+        String template = "@prefix rdf:    <http://www.w3.org/1999/02/22-rdf-syntax-ns#> . "
+                + "@prefix foaf:   <http://xmlns.com/foaf/0.1/> . "
+                + "@prefix ex:     <http://example.com/ns#> . "
+                + "@prefix ottr:   <http://ns.ottr.xyz/0.4/> . "
+                + " ex:Person[ ?firstName, ?email ] :: { "
+                + "  ottr:Triple (_:person, rdf:type, foaf:Person ) "
+                + "  ottr:Triple (_:person, foaf:firstName, ?firstName ) "
+                + "  ottr:Triple (_:person, foaf:mbox, ?email ) , "
+                + "} .";
+
+        Signature parsed = parseCorrectSignature(template);
+
+        assertTrue(parsed instanceof Template);
+        assertEquals("http://example.com/ns#Person", parsed.getIri());
+        assertEquals(2, parsed.getParameters().size());
+        assertEquals(3, ((Template) parsed).getPattern().size());
+        assertEquals(0, parsed.getAnnotations().size());
+
+        Parameter firstParam = parsed.getParameters().get(0);
+        assertEquals(TypeRegistry.TOP, firstParam.getType());
+        assertEquals("firstName", firstParam.getTerm().getIdentifier());
+        assertFalse(firstParam.isOptional());
+        assertFalse(firstParam.isNonBlank());
+        assertFalse(firstParam.hasDefaultValue());
+
+        Parameter secondParam = parsed.getParameters().get(1);
+        assertEquals(TypeRegistry.TOP, secondParam.getType());
+        assertEquals("email", secondParam.getTerm().getIdentifier());
+        assertFalse(secondParam.isOptional());
+        assertFalse(secondParam.isNonBlank());
+        assertFalse(secondParam.hasDefaultValue());
     }
 
     @Test
