@@ -2,7 +2,7 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>xyz.ottr.lutra</groupId>
-        <version>0.6.15</version>
+        <version>0.6.16</version>
         <artifactId>lutra</artifactId>
         <relativePath>../pom.xml</relativePath>
     </parent>
@@ -11,9 +11,16 @@
     <packaging>jar</packaging>
 
     <name>${project.groupId}:${project.artifactId}</name>
+    <description>
+        This Lutra submodule implements readers and writers for the stOTTR formalisation format (https://spec.ottr.xyz/stOTTR/).
+        stOTTR is a custom-built serialisation format for OTTR intended to be easy to read and write for humans (and computers!).
+
+        Lutra is the reference implementation of the OTTR framework. For more information about OTTR, see http://ottr.xyz.
+    </description>
 
     <properties>
-        <url.stottrspec>https://spec.ottr.xyz/stOTTR/0.1.2/</url.stottrspec>
+        <stottr.version>0.1.3</stottr.version>
+        <url.stottrspec>https://spec.ottr.xyz/stOTTR/${stottr.version}/</url.stottrspec>
         <!--url.stottrspec>https://dev.spec.ottr.xyz/stOTTR/</url.stottrspec-->
         <local.stottrspec>${project.basedir}/src/main/antlr4/</local.stottrspec>
     </properties>
@@ -52,9 +59,9 @@
                         </goals>
                         <configuration>
                             <url>${url.stottrspec}stOTTR.g4</url>
+                            <skipCache>false</skipCache>
+                            <overwrite>true</overwrite>
                             <outputDirectory>${local.stottrspec}xyz/ottr/lutra/stottr/antlr/</outputDirectory>
-                            <!--md5>MD5 SUM HERE</md5 -->
-                            <skipCache>true</skipCache>
                         </configuration>
                     </execution>
                     <execution>
@@ -65,9 +72,9 @@
                         </goals>
                         <configuration>
                             <url>${url.stottrspec}Turtle.g4</url>
+                            <skipCache>false</skipCache>
+                            <overwrite>true</overwrite>
                             <outputDirectory>${local.stottrspec}imports/</outputDirectory>
-                            <!--md5>MD5 SUM HERE</md5 -->
-                            <skipCache>true</skipCache>
                         </configuration>
                     </execution>
                 </executions>

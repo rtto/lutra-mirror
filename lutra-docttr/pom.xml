@@ -4,11 +4,18 @@
     <parent>
         <groupId>xyz.ottr.lutra</groupId>
         <artifactId>lutra</artifactId>
-        <version>0.6.15</version>
+        <version>0.6.16</version>
     </parent>
     <artifactId>lutra-docttr</artifactId>
 
     <name>${project.groupId}:${project.artifactId}</name>
+    <description>
+        This Lutra submodule implements docTTR which is a tool of producing documentation for template libraries as 
+        HTML pages. The resulting documentation contains dependency graphs, usages, example expansions and annotations 
+        extracted from annotation instances on the templates in the library.
+        
+        Lutra is the reference implementation of the OTTR framework. For more information about OTTR, see http://ottr.xyz.
+    </description>
 
     <dependencies>
 

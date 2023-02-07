@@ -1,4 +1,0 @@
-@prefix ex: <http://example.com/ns#> .
-
-ex:Pizza(ex:Hawaii, "Hawaii"@en) .
-ex:Pizza(ex:Grandiosa, "Grandiosa"@no) .

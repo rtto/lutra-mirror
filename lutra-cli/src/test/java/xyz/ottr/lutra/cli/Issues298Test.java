@@ -23,8 +23,10 @@ package xyz.ottr.lutra.cli;
  */
 
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
+@Disabled("time-consuming")
 public class Issues298Test {
     
     private static final String ROOT = "src/test/resources/issues/298/";

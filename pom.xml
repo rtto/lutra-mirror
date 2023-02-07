@@ -4,7 +4,7 @@
 
   <groupId>xyz.ottr.lutra</groupId>
   <artifactId>lutra</artifactId>
-  <version>0.6.15</version>
+  <version>0.6.16</version>
   <packaging>pom</packaging>
   <modules>
     <module>lutra-core</module>
@@ -20,9 +20,14 @@
   </modules>
 
   <name>${project.groupId}:${project.artifactId}</name>
-  <description>
-    Lutra is the reference implementation of the OTTR framework, http://ottr.xyz.
-  </description>
+    <description>
+        This is the parent module of Lutra. Lutra is the reference implementation of the OTTR framework.
+        
+        The common interfaces for Lutra are lutra-api (a Java API), lutra-cli (a command line interface
+        available as a Java executable), and lutra-restapi (a Java servlet available as a WAR file.)
+        
+        For more information about OTTR, see http://ottr.xyz.
+    </description>
   <url>http://lutra.ottr.xyz</url>
 
   <licenses>
@@ -73,8 +78,29 @@
     <slf4j.version>2.0.3</slf4j.version>
     <log4j.version>2.17.1</log4j.version>
     <junit-jupiter.version>5.8.1</junit-jupiter.version>
+    <mockito.version>4.10.0</mockito.version>
+
+
+    <!-- used with profiles for selecting unit tests -->
+    <!-- The following (case-sensitive) tags are used (keep this list updated):
+      * 'sync' : tests if code base is in sync with OTTR resources external to code base such as wOTTR vocabulary, core OTTR templates
+    -->
+    <!-- Keep these properties empty, rather overwrite in <profiles> below -->
+    <includeTestsTags></includeTestsTags>
+    <excludeTestsTags></excludeTestsTags>
 
   </properties>
+
+  <!-- profiles are enabled with -P flag, e.g., "mvn -PfeatureBranch test" -->
+  <profiles>
+    <profile>
+      <id>featureBranch</id>
+      <properties>
+        <excludeTestsTags>sync</excludeTestsTags>
+      </properties>
+    </profile>
+  </profiles>
+
 
   <build>
     <plugins>
@@ -415,7 +441,7 @@
         <plugin>
           <groupId>com.googlecode.maven-download-plugin</groupId>
           <artifactId>download-maven-plugin</artifactId>
-          <version>1.6.6</version>
+          <version>1.6.8</version>
         </plugin>
 
         <plugin>
@@ -511,6 +537,12 @@
     </dependency>
 
     <dependency>
+      <groupId>org.mockito</groupId>
+      <artifactId>mockito-core</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
       <groupId>com.google.code.findbugs</groupId>
       <artifactId>annotations</artifactId>
       <scope>provided</scope>
@@ -572,7 +604,7 @@
       <dependency>
         <groupId>org.projectlombok</groupId>
         <artifactId>lombok</artifactId>
-        <version>1.18.20</version>
+        <version>1.18.22</version>
       </dependency>
 
       <dependency>
@@ -741,6 +773,13 @@
                 <version>${junit-jupiter.version}</version>
                 <scope>test</scope>
             </dependency>
+
+      <dependency>
+        <groupId>org.mockito</groupId>
+        <artifactId>mockito-core</artifactId>
+        <version>${mockito.version}</version>
+        <scope>test</scope>
+      </dependency>
 
       <!-- https://mvnrepository.com/artifact/org.hamcrest/hamcrest -->
       <dependency>

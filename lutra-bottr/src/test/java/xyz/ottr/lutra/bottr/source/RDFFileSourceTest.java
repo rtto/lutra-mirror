@@ -30,7 +30,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 import org.apache.jena.rdf.model.RDFNode;
 import org.hamcrest.MatcherAssert;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import xyz.ottr.lutra.bottr.model.Source;
 import xyz.ottr.lutra.system.Assertions;

@@ -37,7 +37,7 @@ public class H2Source extends JDBCSource {
     private final Optional<String> mapFolder;
 
     public H2Source(String mapPath, String path) {
-        super("org.h2.Driver","jdbc:h2:" + path, "user", "pass");
+        super("org.h2.Driver","jdbc:h2:" + path, "user", "pass", null);
         this.mapFolder = getParentFolder(mapPath);
     }
 

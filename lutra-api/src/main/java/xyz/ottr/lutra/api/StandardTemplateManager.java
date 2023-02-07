@@ -58,7 +58,9 @@ public final class StandardTemplateManager extends TemplateManager {
         var reader = ResultStream.innerFlatMapCompose(RDFIO.inputStreamReader(), new WTemplateParser());
 
         getLibraryPaths()
+            // only load "real" modules: owl, rdf, rdfs, ...
             .innerFilter(path -> !path.startsWith(OTTR.ns_library_package_prefix))
+            .innerFilter(path -> !path.startsWith(OTTR.ns_library + "/pizza"))
             .innerMap(this::getResourceAsStream)
             .innerFlatMap(reader)
             .forEach(consumer);

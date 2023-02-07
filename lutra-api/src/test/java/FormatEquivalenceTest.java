@@ -25,15 +25,13 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
 
-import java.io.File;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -65,57 +63,41 @@ public class FormatEquivalenceTest {
             .collect(Collectors.toList());
 
         // combine collected templates with collected formats
-        List<Object[]> data = new ArrayList<>();
+        Stream.Builder<Arguments> data = Stream.builder();
         for (Format f : formats) {
             for (Signature s : signatures) {
-                data.add(new Object[] { f, s });
+                data.add(arguments(f, s));
             }
         }
 
-        return data.stream().map(datum -> arguments(datum[0], datum[1]));
+        return data.build();
     }
 
     @ParameterizedTest
     @MethodSource("data")
-    public void test(Format format, Signature signature) throws Exception {
+    public void test(Format format, Signature signature, @TempDir Path tmpFolder) throws Exception {
 
         assumeTrue(format.supportsTemplateReader());
         assumeTrue(format.supportsTemplateWriter());
-       
+
         var writer = format.getTemplateWriter().get();
-        String folderPath = "src/test/resources/FormatEquivalanceTest/";
-                
-        BiFunction<String, String, Optional<Message>> writerFunc = (iri, str) -> {
-            return xyz.ottr.lutra.io.Files
-                    .writeTemplatesTo(iri, str, folderPath, format.getDefaultFileSuffix());
-        };
-        
+
+        BiFunction<String, String, Optional<Message>> writerFunc = (iri, str)
+                -> xyz.ottr.lutra.io.Files.writeTemplatesTo(iri, str, tmpFolder.toString(), format.getDefaultFileSuffix());
+
         writer.setWriterFunction(writerFunc);
         writer.accept(signature); //write file
-        
+
         // read file
         String iriFilePath = xyz.ottr.lutra.io.Files.iriToPath(signature.getIri()) + "" + format.getDefaultFileSuffix();
-        String absFilePath = Path.of(folderPath + iriFilePath).toAbsolutePath().toString();
-        
+        String absFilePath = tmpFolder.resolve(iriFilePath).toAbsolutePath().toString();
+
         var reader = format.getTemplateReader().get();
         var ioSignatures = reader.apply(absFilePath)
             .getStream()
             .collect(Collectors.toList());
-                
+
         assertThat(ioSignatures.size(), is(1));
         assertThat(ioSignatures.get(0).get(), is(signature));
-        
-        deleteDirectory(new File(folderPath));
-
-    }
-    
-    private void deleteDirectory(File directoryToBeDeleted) {
-        File[] allContents = directoryToBeDeleted.listFiles();
-        if (allContents != null) {
-            for (File file : allContents) {
-                deleteDirectory(file);
-            }
-        }
-        directoryToBeDeleted.delete();
     }
 }

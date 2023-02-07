@@ -7,6 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## 0.6.15 - 2022.12.05
 
+Milestone: https://gitlab.com/ottr/lutra/lutra/-/milestones/21
+
+Closed issues:
+
+ - Multiple test sets: unit tests and integration tests #400
+ - Ensure stable use of external non-code dependencies #388
+ - Streamed processing of bOTTR-maps #351
+ - Parameterise deployment of lutra.jar to ottr.xyz with project name #407
+ - # [INFO] Fetched template: -- really?! #399
+ - Build should not fail because remote resources are not available #391
+ - Docker image in container registry is replaced for new versions #387
+ - Write javadoc package descriptions for modules #385
+ - Check if commons-codec from poi still causes problems with jena #361
+
+## 0.6.15 - 2022.12.05
+
 Milestone: https://gitlab.com/ottr/lutra/lutra/-/milestones/20
 
 Closed issues:
@@ -44,7 +60,7 @@ Closed issues:
  - bottr error with empty sql select #354
  - Extend testing in DataValidator class #343
  - lutra-restapi: hard coded MAX_FILE_SIZE and MAX_REQUEST_SIZE
-	
+
 ## 0.6.13 - 2022.03.14
 
 ### Features
@@ -87,7 +103,7 @@ Closed issues:
  - #252 No error message when wrong input file
  - !142 Fix bug where messages were not printed if using wottr format.
  - #300 build bug "spotbugs-sast fails"
-	
+
 ## 0.6.10
 
 Do not fail build due to errors reported by javadoc.
@@ -102,7 +118,7 @@ Do not fail build due to errors reported by javadoc.
 
 ### Bug fixes
 
-- Remove WARNING reported when ottr: vocabulary elements are used as arguments, #268 
+- Remove WARNING reported when ottr: vocabulary elements are used as arguments, #268
 
 ### Dependencies
 
@@ -116,12 +132,12 @@ Do not fail build due to errors reported by javadoc.
 
 ### Bug fixes
 
-- Include hostname and URI fragment in output folder hierarchy, #206 
+- Include hostname and URI fragment in output folder hierarchy, #206
 
 ### Dependencies
 
 - Bump all github reported dependencies, except jena 3.15.
-- Replaced RDFVizler dependency with guru.nidi.graphviz-java 
+- Replaced RDFVizler dependency with guru.nidi.graphviz-java
 
 ## 0.6.7
 
@@ -142,7 +158,7 @@ Do not fail build due to errors reported by javadoc.
 
 ### Added
 
-- Introduced api module 
+- Introduced api module
 - Improved parsing for wOTTR and stOTTR using Builerpattern
 
 ### Removed
