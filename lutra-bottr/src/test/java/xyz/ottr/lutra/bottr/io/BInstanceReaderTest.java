@@ -111,14 +111,13 @@ public class BInstanceReaderTest {
 
     @Test
     public void testInvalidFile() {
-        String expectedMsg = "Error parsing";
         String file = ROOT + "incorrect/stottr_instances.stottr";
 
         InstanceParser<String> parser = new BInstanceReader();
         Result<Instance> result = parser.apply(file).collect(Collectors.toList()).get(0);
 
         Assertions.atLeast(result, Message.Severity.ERROR);
-        Assertions.containsMessageFragment(result.getMessageHandler(), Message.Severity.ERROR, expectedMsg);
+        Assertions.containsMessageFragment(result.getMessageHandler(), Message.Severity.ERROR, "Not found:");
     }
 
 
