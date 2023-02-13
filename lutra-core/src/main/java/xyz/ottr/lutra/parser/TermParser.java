@@ -33,6 +33,8 @@ import xyz.ottr.lutra.model.terms.ListTerm;
 import xyz.ottr.lutra.model.terms.LiteralTerm;
 import xyz.ottr.lutra.model.terms.NoneTerm;
 import xyz.ottr.lutra.model.terms.Term;
+import xyz.ottr.lutra.model.types.Type;
+import xyz.ottr.lutra.model.types.TypeRegistry;
 import xyz.ottr.lutra.system.Result;
 import xyz.ottr.lutra.util.DataValidator;
 
@@ -77,8 +79,16 @@ public class TermParser {
         }
     }
 
+    private static Result<String> getLiteralDatatype(String datatype) {
+        return datatype == null
+                ? Result.of(OTTR.TypeURI.Top)
+                : DataValidator.asURI(datatype)
+                    .flatMap(TypeRegistry::get)
+                    .map(Type::toString);
+    }
+
     public static Result<LiteralTerm> toTypedLiteralTerm(String value, String datatype) {
-        return DataValidator.asURI(datatype)
+        return getLiteralDatatype(datatype)
             .map(iri -> LiteralTerm.createTypedLiteral(value, iri));
     }
 
