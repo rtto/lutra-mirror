@@ -70,7 +70,7 @@ public enum TypeRegistry {
 
         return type != null
             ? Result.of(type)
-            : Result.warning("Unrecognized type: " + RDFNodeWriter.toString(uri) + ". No such type registered.");
+            : Result.error("Unrecognized type: " + RDFNodeWriter.toString(uri) + ". No such type registered.");
     }
 
     public static boolean isSubTypeOf(BasicType subType, BasicType superType) {
