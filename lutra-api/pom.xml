@@ -2,7 +2,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <groupId>xyz.ottr.lutra</groupId>
-        <version>0.6.16-SNAPSHOT</version>
+        <version>0.6.17-SNAPSHOT</version>
         <artifactId>lutra</artifactId>
         <relativePath>../pom.xml</relativePath>
     </parent>
@@ -77,8 +77,8 @@
                             <outputFileName>library.zip</outputFileName>
                             <unpack>true</unpack>
                             <outputDirectory>${project.basedir}/src/main/resources/tpl-library</outputDirectory>
-                            <!--md5>MD5 SUM HERE</md5 -->
                             <skipCache>true</skipCache>
+                            <overwrite>true</overwrite>
                         </configuration>
                     </execution>
 
