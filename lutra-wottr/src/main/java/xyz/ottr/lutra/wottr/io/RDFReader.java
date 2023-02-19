@@ -58,7 +58,8 @@ public abstract class RDFReader<X> implements InputReader<X, Model> {
     public Result<Model> parse(X source) {
 
         setSource(source);
-        var errorHandler = new RDFReaderErrorHandler(source.toString());
+        String sourceLabel = source.toString();
+        var errorHandler = new RDFReaderErrorHandler(sourceLabel);
         Model model = ModelFactory.createDefaultModel();
 
         List<Message> parsingMessages = new ArrayList<>();
@@ -73,7 +74,13 @@ public abstract class RDFReader<X> implements InputReader<X, Model> {
         } catch (RiotParseException ignored) {
             // ignore RiotParseException as this is collected by the errorHandler.
         } catch (RiotException ex) {
-            parsingMessages.add(Message.error(ex));
+            parsingMessages.add(Message.error(errorHandler.getErrorMessagePrefix(), ex));
+        } catch (NullPointerException ex) {
+            // Ignore null pointers that are likely caused by our custom error handling:
+            // since we do not immediately throw errors, new problems occur as nulls.
+            if (!errorHandler.isFatal) {
+                parsingMessages.add(Message.error(errorHandler.getErrorMessagePrefix(), ex));
+            }
         }
 
         var result = Result.of(model);
@@ -105,8 +112,12 @@ public abstract class RDFReader<X> implements InputReader<X, Model> {
             this.sourceLabel = sourceLabel;
         }
 
+        String getErrorMessagePrefix() {
+            return "RDF parsing error in: " + sourceLabel;
+        }
+
         private void addMessage(Message.Severity severity, String message, long line, long col) {
-            Message msg = new Message(severity, "RDF parsing error in: " + sourceLabel + " "
+            Message msg = new Message(severity, getErrorMessagePrefix() + " "
                     + fmtMessage(message, line, col) + Space.LINEBR);
             this.messages.add(msg);
         }
