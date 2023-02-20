@@ -22,15 +22,19 @@ package xyz.ottr.lutra.stottr.parser;
  * #L%
  */
 
+import java.util.AbstractMap;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.TerminalNode;
+import org.apache.jena.shared.PrefixMapping;
 import xyz.ottr.lutra.stottr.antlr.stOTTRBaseVisitor;
 import xyz.ottr.lutra.stottr.antlr.stOTTRParser;
 import xyz.ottr.lutra.system.Result;
 import xyz.ottr.lutra.system.ResultStream;
+import xyz.ottr.lutra.util.PrefixValidator;
 
 public class SPrefixParserVisitor extends SBaseParserVisitor<Map<String, String>> {
 
@@ -44,14 +48,12 @@ public class SPrefixParserVisitor extends SBaseParserVisitor<Map<String, String>
 
         return ResultStream.innerOf(ctx.directive())
             .mapFlatMap(dirParser::visit)
+            .innerMap(PrefixPair::toMapEntry)
             .aggregate()
-            .flatMap(pfs -> {
-                Map<String, String> m = new HashMap<>();
-                pfs.forEach(pair -> m.put(pair.ns, pair.prefix));
-                // TODO: Check for collisions
-                // TODO: Check if ns-prefix-pair is non-standard combination and give error
-                return Result.of(m);
-            });
+            .map(stream -> stream.collect(Collectors.toList()))
+            .flatMap(PrefixValidator::buildPrefixMapping)
+            .flatMap(PrefixValidator::check)
+            .map(PrefixMapping::getNsPrefixMap);
     }
 
     private static class SDirectiveParser extends stOTTRBaseVisitor<Result<PrefixPair>> {
@@ -103,12 +105,12 @@ public class SPrefixParserVisitor extends SBaseParserVisitor<Map<String, String>
         private static final Pattern colonPat = Pattern.compile(":$");
         private static final Pattern angularPat = Pattern.compile("^<|>$");
 
-        public final String ns;
         public final String prefix;
+        public final String ns;
 
-        PrefixPair(String ns, String prefix) {
-            this.ns = stripNamespace(ns);
+        PrefixPair(String prefix, String ns) {
             this.prefix = stripPrefix(prefix);
+            this.ns = stripNamespace(ns);
         }
 
         private static String stripNamespace(String ns) {
@@ -121,13 +123,17 @@ public class SPrefixParserVisitor extends SBaseParserVisitor<Map<String, String>
 
         static PrefixPair makeBase(TerminalNode prefixNode) {
             String prefix = prefixNode.getSymbol().getText();
-            return new PrefixPair(BASE_PREFIX, prefix);
+            return new PrefixPair(prefix, BASE_PREFIX);
         }
 
         static PrefixPair makePrefix(TerminalNode nsNode, TerminalNode prefixNode) {
-            String ns = nsNode.getSymbol().getText();
-            String prefix = prefixNode.getSymbol().getText();
-            return new PrefixPair(ns, prefix);
+            String prefix = nsNode.getSymbol().getText();
+            String ns = prefixNode.getSymbol().getText();
+            return new PrefixPair(prefix, ns);
+        }
+
+        private Map.Entry<String, String> toMapEntry() {
+            return new AbstractMap.SimpleEntry<>(prefix, ns);
         }
     }
 }
