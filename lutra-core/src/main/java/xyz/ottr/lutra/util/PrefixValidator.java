@@ -24,6 +24,7 @@ package xyz.ottr.lutra.util;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -37,7 +38,7 @@ public class PrefixValidator {
     private static Map<String, String> stdPrefixMap;
 
     static {
-        stdPrefixMap = Map.copyOf(PrefixMapping.Extended.getNsPrefixMap());
+        stdPrefixMap = new HashMap<>(PrefixMapping.Extended.getNsPrefixMap());
         stdPrefixMap.put(OTTR.prefix, OTTR.namespace);
     }
 
@@ -57,13 +58,13 @@ public class PrefixValidator {
                         Map.Entry::getValue,
                         (ns1, ns2) -> {  // run merge function on values if identical keys
                             if (!ns1.equals(ns2)) {
-                                errors.add(Message.error("Error multiple prefix definitions. Namespaces "
-                                        + ns1 + " and " + ns2 + " share the same prefix."));
+                                errors.add(Message.error("Conflicting prefix declarations. Namespaces '"
+                                        + ns1 + "' and '" + ns2 + "' share the same prefix."));
                             }
                             return ns1; // if both are equal, then the first one will do.
                         }));
 
-        // NOTE: we keep the system even though there are errors in other to collect more possible errors.
+        // NOTE: we keep the result even though there are errors in other to collect more possible errors.
         Result<PrefixMapping> prefixes = Result.of(PrefixMapping.Factory.create().setNsPrefixes(pxMap));
         prefixes.addMessages(errors);
         return prefixes;
@@ -72,7 +73,7 @@ public class PrefixValidator {
     /**
      * Checks if the given prefixMap is inconsistent with standard prefix declarations. Inconsistencies are reported
      * as Warnings.
-     * @param prefixMap
+     * @param prefixMap prefixMap to check
      * @return The input prefixMap unchanged in a Result, with messages attached if applicable.
      */
     public static Result<PrefixMapping> check(PrefixMapping prefixMap) {
@@ -89,14 +90,14 @@ public class PrefixValidator {
 
                 if (prefix.equalsIgnoreCase(stdPrefix) && !namespace.equals(stdNamespace)) {
                     result.addWarning("Standard prefix declared with unusual namespace: "
-                            + "Prefix " + prefix + " declared as " + namespace
-                            + ", but standard value is " + stdNamespace);
+                            + "The prefix '" + prefix + "' declared with the namespace '" + namespace
+                            + "', but the standard namespace is '" + stdNamespace + "'");
                 }
 
                 if (namespace.equals(stdNamespace) && !prefix.equals(stdPrefix)) {
                     result.addWarning("Standard namespace declared with unusual prefix: "
-                            + "Namespace " + namespace + " is given prefix " + prefix
-                            + ", but common prefix is " + stdPrefix);
+                            + "The namespace '" + namespace + "' is declared with the prefix '" + prefix
+                            + "', but the common prefix is '" + stdPrefix + "'");
                 }
             }
         }
