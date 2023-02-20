@@ -76,7 +76,7 @@ public class PrefixValidator {
      * @param prefixMap prefixMap to check
      * @return The input prefixMap unchanged in a Result, with messages attached if applicable.
      */
-    public static Result<PrefixMapping> check(PrefixMapping prefixMap) {
+    public static <X extends PrefixMapping> Result<X> check(X prefixMap) {
 
         var result = Result.of(prefixMap);
 

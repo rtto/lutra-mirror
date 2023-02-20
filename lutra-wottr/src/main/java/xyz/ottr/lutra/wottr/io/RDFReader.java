@@ -38,6 +38,7 @@ import xyz.ottr.lutra.io.InputReader;
 import xyz.ottr.lutra.system.Message;
 import xyz.ottr.lutra.system.Result;
 import xyz.ottr.lutra.system.ResultStream;
+import xyz.ottr.lutra.util.PrefixValidator;
 
 @Getter
 public abstract class RDFReader<X> implements InputReader<X, Model> {
@@ -76,7 +77,9 @@ public abstract class RDFReader<X> implements InputReader<X, Model> {
             parsingMessages.add(Message.error(ex));
         }
 
-        var result = Result.of(model);
+        var result = Result.of(model)
+                .flatMap(PrefixValidator::check);
+
         result.addMessages(parsingMessages);
         result.addMessages(errorHandler.messages);
 
