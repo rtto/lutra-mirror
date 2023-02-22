@@ -66,8 +66,8 @@ public class TermParser {
     public static Result<LiteralTerm> toLiteralTerm(String value, String datatype, String language) {
 
         if (StringUtils.isNotEmpty(language) && !RDF.langString.getURI().equals(datatype)) {
-            return Result.error("Error creating literal. Cannot have a language tag: " + language
-                + " and the datatype: " + datatype);
+            return Result.error("Error creating literal. Cannot have both a language tag '" + language
+                + "'' and the datatype '" + datatype + "'");
         } else if (StringUtils.isNotEmpty(language)) {
             return toLangLiteralTerm(value, language);
         } else if (StringUtils.isNotEmpty(datatype)) {
@@ -80,7 +80,7 @@ public class TermParser {
     public static Result<LiteralTerm> toTypedLiteralTerm(String value, String datatype) {
         Result<LiteralTerm> literal = Result.of(LiteralTerm.createTypedLiteral(value, datatype));
         if (!DataValidator.isDatatypeURI(datatype)) {
-            literal.addWarning("Unusual datatype " + datatype + " for literal: " + literal);
+            literal.addWarning("Unusual datatype '" + datatype + "'' for literal '" + literal + "'");
         }
         return literal;
     }
