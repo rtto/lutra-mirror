@@ -224,16 +224,21 @@ public class StandardTemplateStore implements TemplateStore {
         Signature signature = templates.get(iri);
         if (signature instanceof Template) {
             return Result.of((Template) signature);
+        } else if (signature instanceof BaseTemplate) {
+            return Result.error("No template (but base template) found for IRI " + iri);
+        } else if (signature != null) { // must be Signature if not null
+            return Result.error("No template (just signature) found for IRI " + iri);
         } else {
-            return Result.error("Missing template definition for IRI " + iri);
+            return Result.error("No template found for IRI " + iri);
         }
     }
+
 
     @Override
     public Result<Signature> getSignature(String iri) {
         Signature signature = templates.get(iri);
         if (signature == null) {
-            return Result.error("Missing signature for IRI " + iri);
+            return Result.error("No signature found for IRI " + iri);
         } else {
             return Result.of(signature);
         }
@@ -283,7 +288,7 @@ public class StandardTemplateStore implements TemplateStore {
 
         FormatManager formatManager = getFormatManager();
         if (formatManager == null) {
-            messages.accept(Result.error("Error fetching missing templates: no template reader formats registered."));
+            messages.accept(Result.error("Error fetching templates: no registered template reader formats"));
             return messages.getMessageHandler();
         }
 
@@ -301,9 +306,7 @@ public class StandardTemplateStore implements TemplateStore {
                     messages.accept(formatManager.attemptAllFormats(this, reader -> reader.populateTemplateStore(this, toFetch)));
                 }
 
-                if (containsTemplate(toFetch)) { // Check if fetched and added to store
-                    messages.accept(Result.info("Fetched template: " + toFetch));
-                } else {
+                if (!containsTemplate(toFetch)) {
                     failed.add(toFetch);
                     messages.accept(Result.warning("Failed fetching template: " + toFetch));
                 }
@@ -319,7 +322,7 @@ public class StandardTemplateStore implements TemplateStore {
     public Result<Set<String>> getDependencies(String templateIri) {
         Result<Template> result = getTemplate(templateIri);
         if (result.isEmpty()) {
-            return Result.error("Template " + templateIri + " is not in store");
+            return Result.error("Template not in store: " + templateIri);
         }
 
         Set<Instance> dependencies = result.get().getPattern();

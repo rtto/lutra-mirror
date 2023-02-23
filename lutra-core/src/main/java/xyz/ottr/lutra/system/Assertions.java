@@ -90,13 +90,13 @@ public enum Assertions {
     }
 
     /**
-     * Checks if the messagehandler contains a message of servery Error or worse,
-     * with an error messages that contains the given string.
+     * Checks if the messageHandler contains a message of severity Error or worse
+     * which contains the given string.
      * @param messageHandler handler to check
      * @param expected string that at least one error message must contain
      */
 
-    public static void containsErrorMessageFragment(MessageHandler messageHandler, Message.Severity severity, String expected) {
+    public static void containsMessageFragment(MessageHandler messageHandler, Message.Severity severity, String expected) {
         var test = messageHandler.getMessages().stream()
                 .filter(m -> m.getSeverity().equals(severity))
                 .map(Message::getMessage)

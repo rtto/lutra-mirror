@@ -22,13 +22,14 @@ package xyz.ottr.lutra.store.expansion;
  * #L%
  */
 
+import java.util.LinkedList;
+import java.util.List;
 import xyz.ottr.lutra.model.Argument;
-import xyz.ottr.lutra.model.BaseTemplate;
 import xyz.ottr.lutra.model.Instance;
 import xyz.ottr.lutra.model.Parameter;
 import xyz.ottr.lutra.model.Signature;
-import xyz.ottr.lutra.model.Template;
 import xyz.ottr.lutra.model.terms.BlankNodeTerm;
+import xyz.ottr.lutra.model.terms.NoneTerm;
 import xyz.ottr.lutra.model.terms.Term;
 import xyz.ottr.lutra.model.types.ListType;
 import xyz.ottr.lutra.model.types.Type;
@@ -45,83 +46,82 @@ public class CheckingExpander extends NonCheckingExpander {
 
     @Override
     public ResultStream<Instance> expandInstance(Instance instance) {
-        Result<Instance> errorMessage = checkInstance(instance);
-        if (errorMessage.isEmpty()) {
-            return ResultStream.of(errorMessage);
+        var errors = checkInstance(instance);
+        if (!errors.isEmpty()) {
+            return ResultStream.of(Result.empty(errors));
         }
-
         return super.expandInstance(instance);
     }
 
-    private Result<Instance> checkInstance(Instance instance) {
+    /**
+     * @param instance the instance to check for errors
+     * @return the list of error (messages) found for the instance.
+     */
+    private List<Message> checkInstance(Instance instance) {
+
+        // check if instance is of a template or base template
         Result<Signature> signature = getTemplateStore().getSignature(instance.getIri());
         if (signature.isEmpty()) {
-            return signature.map(x -> null);
+            return signature.getMessageHandler().getMessages();
         }
         if (isSignature(signature)) {
-            return Result.error("Missing pattern definition of: " + instance.getIri());
+            return List.of(Message.error("No template (only signature) found for instance " + instance));
         }
 
-        Message error = checkParametersMatch(instance, signature.get());
-        if (error != null) {
-            return Result.empty(error);
-        }
-
-        return Result.of(instance);
+        return checkArgumentList(instance, signature.get());
     }
 
-    // TODO return messages
-    private Message checkParametersMatch(Instance instance, Signature signature) {
+    private List<Message> checkArgumentList(Instance instance, Signature signature) {
 
-        if (instance.getArguments().size() != signature.getParameters().size()) {
-            return Message.error("Number of arguments do not match number of parameters in instance " + instance);
+        var messages = new LinkedList<Message>();
+
+        var noArgs = instance.getArguments().size();
+        var noParams = signature.getParameters().size();
+
+        if (noArgs != noParams) {
+            messages.add(Message.error("Wrong number of arguments. Expected "
+                    + noParams + " arguments, but found " + noArgs
+                    + " in instance: " + instance));
         }
 
-        for (int i = 0; i < instance.getArguments().size(); i++) {
+        for (int i = 0; i < noArgs && i < noParams; i++) {
             Argument argument = instance.getArguments().get(i);
             Parameter parameter = signature.getParameters().get(i);
-            Message error = checkNonCompatibleArgument(argument, parameter);
-
-            if (error != null) {
-                return error;
-            }
+            messages.addAll(checkArgument(argument, parameter));
         }
 
-        return null;
+        return messages;
     }
 
-    private Message checkNonCompatibleArgument(Argument argument, Parameter parameter) {
+    private List<Message> checkArgument(Argument argument, Parameter parameter) {
+
+        var messages = new LinkedList<Message>();
         
         Type paramType = parameter.getType();
         Term argTerm = argument.getTerm();
         Type argType = argTerm.getType();
 
-        if (argument.isListExpander()) {
+        if (argument.isListExpander() && !(argTerm instanceof NoneTerm)) {
             if (argType instanceof ListType) {
                 argType = ((ListType) argType).getInner();
             } else {
-                return Message.error("List expander applied to non-list argument: "
-                        + argument);
+                messages.add(Message.error("List expander applied to non-list argument: " + argument));
             }
         }
 
         if (!argType.isCompatibleWith(paramType)) {
-            return Message.error("Incompatible argument in instance: "
-                    + argument + " given to parameter "
-                    + parameter + " - incompatible types.");
+            messages.add(Message.error("Incompatible argument type. Argument " + argument
+                    + " with type " + argType
+                    + " given to parameter " + parameter));
         }
 
-        if (argTerm instanceof BlankNodeTerm && parameter.isNonBlank()) {
-            return Message.error("Incompatible argument in instance:"
-                    + " blank node " + argument + " given to non-blank"
-                    + " parameter " + parameter);
+        if (argument.getTerm() instanceof BlankNodeTerm && parameter.isNonBlank()) {
+            messages.add(Message.error("Incompatible blank node argument. Blank node " + argument
+                    + " given to non-blank parameter " + parameter));
         }
 
-        return null;
+        return messages;
     }
 
-    // TODO should go somewhere else where is can be reused
-    private boolean isSignature(Result<Signature> signature) {
-        return !(signature.get() instanceof Template || signature.get() instanceof BaseTemplate);
-    }
+
 }

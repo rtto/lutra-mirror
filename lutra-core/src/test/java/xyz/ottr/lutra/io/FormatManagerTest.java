@@ -23,10 +23,14 @@ package xyz.ottr.lutra.io;
  */
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
 import xyz.ottr.lutra.store.StandardTemplateStore;
 import xyz.ottr.lutra.store.TemplateStore;
+import xyz.ottr.lutra.system.Assertions;
+import xyz.ottr.lutra.system.Message;
+import xyz.ottr.lutra.system.Result;
 
 public class FormatManagerTest {
 
@@ -43,6 +47,22 @@ public class FormatManagerTest {
         String expectedResponse = "No formats registered to FormatManager";
         String actualResponse = formatManager.attemptAllFormats(store, null).getAllMessages().get(0).getMessage();
         assertEquals(expectedResponse, actualResponse);
+    }
+
+    @Test
+    public void testGetNullFormat() {
+        FormatManager formatManager = new FormatManager();
+        Result<Format> result = formatManager.getFormat(null);
+        assertTrue(result.isEmpty());
+    }
+
+    @Test
+    public void testGetNonExistingFormat() {
+        String nonExistingFormat = "nonExistingFormat";
+        String expected = "No format with name '" + nonExistingFormat + "'";
+        FormatManager formatManager = new FormatManager();
+        Result<Format> result = formatManager.getFormat(nonExistingFormat);
+        Assertions.containsMessageFragment(result.getMessageHandler(), Message.Severity.ERROR, expected);
     }
 
 }

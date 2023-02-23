@@ -83,7 +83,7 @@ public class JDBCSourceTest {
         expected.add(List.of("7", "Lagreca", "1E+3"));
 
         // Run the source
-        JDBCSource jdbcTest = new JDBCSource(driver, url, user, pass);
+        JDBCSource jdbcTest = new JDBCSource(driver, url, user, pass, null);
 
         ArgumentMaps<String> argMaps = new ArgumentMaps<>(PrefixMapping.Standard, jdbcTest);
 

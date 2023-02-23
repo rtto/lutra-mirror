@@ -4,12 +4,18 @@
     <parent>
         <groupId>xyz.ottr.lutra</groupId>
         <artifactId>lutra</artifactId>
-        <version>0.6.15-SNAPSHOT</version>
+        <version>0.6.17-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <artifactId>lutra-tabottr</artifactId>
 
     <name>${project.groupId}:${project.artifactId}</name>
+    <description>
+        This Lutra submodule implements tabOTTR (https://spec.ottr.xyz/tabOTTR/0.3/). tabOTTR is a mapping language for 
+        transforming spreadsheets into template instances.
+        
+        Lutra is the reference implementation of the OTTR framework. For more information about OTTR, see http://ottr.xyz.
+    </description>
     <packaging>jar</packaging>
 
     <dependencies>
@@ -24,16 +30,6 @@
             <groupId>${project.groupId}</groupId>
             <artifactId>lutra-wottr</artifactId>
             <!-- for transitive dependencies see module POM -->
-        </dependency>
-
-        <!-- org.apache.poi uses commons-codec:1.13 which causes problems for newer versions of Jena -->
-        <!-- https://mvnrepository.com/artifact/commons-codec/commons-codec -->
-        <dependency>
-            <!-- TODO check if the problem still persists and if using a newer version is possible -->
-            <groupId>commons-codec</groupId>
-            <artifactId>commons-codec</artifactId>
-            <version>1.15</version>
-            <!-- no transitive dependencies -->
         </dependency>
 
         <dependency>

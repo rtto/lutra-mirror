@@ -142,6 +142,29 @@ public class NonCheckingExpanderTest {
         Assertions.assertEquals(4, results.get().size(), "Number of results of expansion should be as expected");
     }
 
+    /**
+        Test for issue #333: Avoid fetching ottr:Triple
+        Fix: If instance is BaseTemplate, call expandInstance without fetching
+     */
+    @Test
+    public void testExpandInstanceFetch() {
+        TemplateStore manager = new StandardTemplateStore(null);
+        manager.addOTTRBaseTemplates();
+        NonCheckingExpander expander = new NonCheckingExpander(manager);
+
+        Instance instance = Instance.builder().iri(OTTR.BaseURI.Triple)
+                .argument(Argument.builder().term(var("x")).build())
+                .argument(Argument.builder().term(var("y")).build())
+                .argument(Argument.builder().term(var("z")).build())
+                .build();
+
+        Result<List<Instance>> results = expander.expandInstanceFetch(instance).aggregate().map(s -> s.collect(Collectors.toList()));
+
+        Assertions.assertTrue(results.isPresent(), "Result should be present after expansion");
+        Assertions.assertEquals(1, results.get().size(), "Number of results of expansion should be as expected");
+        Assertions.assertTrue(results.getAllMessages().isEmpty(), "No fetching message should be present");
+    }
+
     @Test
     public void testExpandTemplate() {
         TemplateStore manager = new StandardTemplateStore(null);

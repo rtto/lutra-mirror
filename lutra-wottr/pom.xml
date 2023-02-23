@@ -2,7 +2,7 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>xyz.ottr.lutra</groupId>
-        <version>0.6.15-SNAPSHOT</version>
+        <version>0.6.17-SNAPSHOT</version>
         <artifactId>lutra</artifactId>
         <relativePath>../pom.xml</relativePath>
     </parent>
@@ -11,10 +11,18 @@
     <packaging>jar</packaging>
 
     <name>${project.groupId}:${project.artifactId}</name>
+    <description>
+        This Lutra submodule implements readers and writers for the wOTTR serialisation format (https://spec.ottr.xyz/wOTTR/0.4/). 
+        wOTTR is a syntax for writing templates and instances in RDF intended for publishing templates and instances on the 
+        web or for storage in a triplestore. 
+        
+        Lutra is the reference implementation of the OTTR framework. For more information about OTTR, see http://ottr.xyz.
+    </description>
 
     <properties>
-        <url.wottrspec>https://spec.ottr.xyz/wOTTR/0.4/</url.wottrspec>
-        <local.wottrspec>${project.basedir}/src/test/resources/spec</local.wottrspec>
+        <wottr.version>0.4.4</wottr.version>
+        <url.wottrspec>https://spec.ottr.xyz/wOTTR/${wottr.version}/</url.wottrspec>
+        <local.wottrspec>${project.basedir}/src/test/resources/spec/</local.wottrspec>
     </properties>
 
     <dependencies>
@@ -67,8 +75,8 @@
                         <configuration>
                             <url>${url.wottrspec}core-vocabulary.owl.ttl</url>
                             <outputDirectory>${local.wottrspec}</outputDirectory>
-                            <!--md5>MD5 SUM HERE</md5 -->
-                            <skipCache>true</skipCache>
+                            <overwrite>true</overwrite>
+                            <skipCache>false</skipCache>
                         </configuration>
                     </execution>
                     <execution>
@@ -80,8 +88,8 @@
                         <configuration>
                             <url>${url.wottrspec}core-grammar.shacl.ttl</url>
                             <outputDirectory>${local.wottrspec}</outputDirectory>
-                            <!--md5>MD5 SUM HERE</md5 -->
-                            <skipCache>true</skipCache>
+                            <overwrite>true</overwrite>
+                            <skipCache>false</skipCache>
                         </configuration>
                     </execution>
                     <execution>
@@ -93,8 +101,8 @@
                         <configuration>
                             <url>${url.wottrspec}examples.zip</url>
                             <outputDirectory>${local.wottrspec}</outputDirectory>
-                            <!--md5>MD5 SUM HERE</md5 -->
-                            <skipCache>true</skipCache>
+                            <overwrite>true</overwrite>
+                            <skipCache>false</skipCache>
                             <unpack>true</unpack>
                         </configuration>
                     </execution>
@@ -107,8 +115,8 @@
                         <configuration>
                             <url>${url.wottrspec}tests.zip</url>
                             <outputDirectory>${local.wottrspec}</outputDirectory>
-                            <!--md5>MD5 SUM HERE</md5 -->
-                            <skipCache>true</skipCache>
+                            <overwrite>true</overwrite>
+                            <skipCache>false</skipCache>
                             <unpack>true</unpack>
                         </configuration>
                     </execution>
@@ -120,14 +128,14 @@
                 <configuration>
                     <filesets>
                         <fileset>
-                            <directory>src/test/resources/spec/tests/correct</directory>
+                            <directory>{$local.wottrspec}/tests/correct</directory>
                             <includes>
                                 <include>**/*.ttl</include>
                             </includes>
                             <followSymlinks>false</followSymlinks>
                         </fileset>
                         <fileset>
-                            <directory>src/test/resources/spec/tests/incorrect</directory>
+                            <directory>{$local.wottrspec}/tests/incorrect</directory>
                             <includes>
                                 <include>**/*.ttl</include>
                             </includes>

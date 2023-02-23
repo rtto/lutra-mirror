@@ -40,9 +40,12 @@ import org.junit.jupiter.api.io.TempDir;
 import xyz.ottr.lutra.bottr.model.ArgumentMaps;
 import xyz.ottr.lutra.bottr.model.InstanceMap;
 import xyz.ottr.lutra.bottr.model.Source;
+import xyz.ottr.lutra.system.Assertions;
+import xyz.ottr.lutra.system.Message;
 import xyz.ottr.lutra.system.Result;
 import xyz.ottr.lutra.system.ResultStream;
 import xyz.ottr.lutra.wottr.WOTTR;
+
 
 public class H2SourceTest {
 
@@ -118,6 +121,17 @@ public class H2SourceTest {
         String input = getAbsolutePath("sources/csv/win.csv");
         H2Source csvTest = new H2Source();
         testAgainstExpectedResult(csvTest.execute("SELECT ID, NAME, SALARY FROM CSVREAD('" + input + "');"));
+    }
+
+    @Test
+    public void emptyQueryResult() {
+        String expectedString = "no results";
+        String input = getAbsolutePath("sources/csv/win.csv");
+        H2Source csvTest = new H2Source();
+
+        ResultStream<?> resultStream = csvTest.execute("SELECT ID, NAME FROM CSVREAD('" + input + "') WHERE 1=2;");
+        Result<?> emptyResult = resultStream.getStream().collect(Collectors.toList()).get(0);
+        Assertions.containsMessageFragment(emptyResult.getMessageHandler(), Message.Severity.INFO, expectedString);
     }
 
     private String getAbsolutePath(String file) {

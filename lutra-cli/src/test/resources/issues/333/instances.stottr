@@ -1,7 +1,0 @@
-@prefix ottr: <http://ns.ottr.xyz/0.4/> .
-@prefix ex: <http://example.com/ns#> .
-
-ottr:Triple(ex:A, ex:P, ex:B) .
-ottr:Triple(none, ex:P, ex:B) .
-ottr:Triple(ex:A, none, ex:B) .
-ottr:Triple(ex:A, ex:P, none) .

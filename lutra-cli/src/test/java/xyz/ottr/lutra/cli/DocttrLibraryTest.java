@@ -2,9 +2,9 @@ package xyz.ottr.lutra.cli;
 
 /*-
  * #%L
- * xyz.ottr.lutra:lutra-cli
+ * lutra-cli
  * %%
- * Copyright (C) 2018 - 2021 University of Oslo
+ * Copyright (C) 2018 - 2019 University of Oslo
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -22,29 +22,23 @@ package xyz.ottr.lutra.cli;
  * #L%
  */
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.io.File;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
-@Disabled("time-consuming")
-public class Issues298Test {
-    
-    private static final String ROOT = "src/test/resources/issues/298/";
-    
-    /*
-     * class xyz.ottr.lutra.model.terms.BlankNodeTerm cannot be cast to class xyz.ottr.lutra.model.terms.IRITerm 
-     * at xyz.ottr.lutra.docttr.visualisation.TripleInstanceGraphVisualiser::getTypesForLabel
-     * 
-     * Fix: for blank node in triple, return string [blank]
-     */
-    
+public class DocttrLibraryTest {
+
+    private static final String ROOT = "src/test/resources/";
+    private static final String IN = ROOT + "templates/";
+    private static final String OUT = ROOT + "docttr/";
+
+    @Disabled
     @Test
-    public void test() {
-        CLIRunner.run(" "
-            + " --library " + ROOT + "ottr/tpl/"
-            + " --libraryFormat stottr"
-            + " -f"
-            + " -o " + ROOT + "ottr-doc/"
-            + " -m docttrLibrary");
+    public void test1() {
+        CLIRunner.run("--mode docttrLibrary -f -l " + IN + " -o " + OUT);
+        assertTrue(new File(OUT, "index.html").exists());
     }
+
 }
