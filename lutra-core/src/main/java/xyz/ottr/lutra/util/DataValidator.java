@@ -23,7 +23,6 @@ package xyz.ottr.lutra.util;
  */
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.jena.datatypes.TypeMapper;
 import org.apache.jena.irix.IRIs;
 import org.apache.jena.irix.IRIx;
 import org.apache.jena.riot.web.LangTag;
@@ -39,11 +38,6 @@ public class DataValidator {
         } catch (org.apache.jena.irix.IRIException ex) {
             return Result.error("Invalid IRI: " + value + ". " + ex.getMessage());
         }
-    }
-
-    /* Using Jena's TypeMapper to check if type is registeres. */
-    public static boolean isDatatypeURI(String value) {
-        return TypeMapper.getInstance().getTypeByName(value) != null;
     }
 
     public static Result<String> asURI(String value) {

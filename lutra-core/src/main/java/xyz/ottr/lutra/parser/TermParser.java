@@ -25,6 +25,8 @@ package xyz.ottr.lutra.parser;
 import java.util.HashMap;
 import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.jena.datatypes.RDFDatatype;
+import org.apache.jena.datatypes.TypeMapper;
 import org.apache.jena.vocabulary.RDF;
 import xyz.ottr.lutra.OTTR;
 import xyz.ottr.lutra.model.terms.BlankNodeTerm;
@@ -79,8 +81,15 @@ public class TermParser {
 
     public static Result<LiteralTerm> toTypedLiteralTerm(String value, String datatype) {
         Result<LiteralTerm> literal = Result.of(LiteralTerm.createTypedLiteral(value, datatype));
-        if (!DataValidator.isDatatypeURI(datatype)) {
-            literal.addWarning("Unusual datatype '" + datatype + "'' for literal '" + literal + "'");
+
+        // get registered datatype
+        RDFDatatype redisteredDatatype = TypeMapper.getInstance().getTypeByName(datatype);
+
+        if (redisteredDatatype == null) {
+            literal.addWarning("Unusual datatype '" + datatype + "' for literal '" + literal + "'");
+        } else if (!redisteredDatatype.isValid(value)) {
+            literal.addError("Invalid datatype value. Value '" + value + "' is not in the lexical space"
+                    + " of the datatype '" + datatype + "'");
         }
         return literal;
     }
