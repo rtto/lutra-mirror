@@ -115,13 +115,20 @@ public class PrefixValidator {
         return result;
     }
 
+    /**
+     * Returns a set of the duplicate elements contained in the input collection.
+     * @param collection
+     * @param <T>
+     * @return
+     */
+
     private static <T> Set<T> getDuplicates(Collection<T> collection) {
 
         Set<T> duplicates = new HashSet<>();
         Set<T> uniques = new HashSet<>();
 
-        for(T t : collection) {
-            if(!uniques.add(t)) {
+        for (T t : collection) {
+            if (!uniques.add(t)) {
                 duplicates.add(t);
             }
         }
