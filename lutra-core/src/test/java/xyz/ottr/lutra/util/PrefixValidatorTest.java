@@ -28,7 +28,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import org.apache.jena.shared.PrefixMapping;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import xyz.ottr.lutra.system.Assertions;
 import xyz.ottr.lutra.system.Message;
@@ -44,20 +43,20 @@ public class PrefixValidatorTest {
 
         Result<PrefixMapping> result = PrefixValidator.buildPrefixMapping(prefixes);
         Assertions.atLeast(result, Message.Severity.ERROR);
+        assertTrue(result.isEmpty());
     }
 
-    @Disabled
     @Test
     public void same_namespace_different_prefixes() {
-        List<Map.Entry<String,String>> prefixes = new LinkedList<>();
-        prefixes.add(Map.entry("foaf", "http://xmlns.com/foaf/0.1/"));
-        prefixes.add(Map.entry("my-foaf", "http://xmlns.com/foaf/0.1/"));
+        PrefixMapping prefixes = PrefixMapping.Factory.create();
+        prefixes.setNsPrefix("foaf", "http://xmlns.com/foaf/0.1/");
+        prefixes.setNsPrefix("my-foaf", "http://xmlns.com/foaf/0.1/");
 
         PrefixMapping expected = PrefixMapping.Factory.create();
         expected.setNsPrefix("foaf", "http://xmlns.com/foaf/0.1/");
         expected.setNsPrefix("my-foaf", "http://xmlns.com/foaf/0.1/");
 
-        Result<PrefixMapping> result = PrefixValidator.buildPrefixMapping(prefixes);
+        Result<PrefixMapping> result = PrefixValidator.check(prefixes);
         Assertions.atLeast(result, Message.Severity.WARNING);
         assertTrue(result.get().samePrefixMappingAs(expected));
     }
