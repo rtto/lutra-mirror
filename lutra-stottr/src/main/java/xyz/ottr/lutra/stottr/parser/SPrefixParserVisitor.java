@@ -114,11 +114,11 @@ public class SPrefixParserVisitor extends SBaseParserVisitor<Map<String, String>
         }
 
         private static String stripNamespace(String ns) {
-            return colonPat.matcher(ns).replaceAll("");
+            return angularPat.matcher(ns).replaceAll("");
         }
 
         private static String stripPrefix(String prefix) {
-            return angularPat.matcher(prefix).replaceAll("");
+            return colonPat.matcher(prefix).replaceAll("");
         }
 
         static PrefixPair makeBase(TerminalNode prefixNode) {
@@ -126,9 +126,9 @@ public class SPrefixParserVisitor extends SBaseParserVisitor<Map<String, String>
             return new PrefixPair(prefix, BASE_PREFIX);
         }
 
-        static PrefixPair makePrefix(TerminalNode nsNode, TerminalNode prefixNode) {
-            String prefix = nsNode.getSymbol().getText();
-            String ns = prefixNode.getSymbol().getText();
+        static PrefixPair makePrefix(TerminalNode prefixNode, TerminalNode nsNode) {
+            String prefix = prefixNode.getSymbol().getText();
+            String ns = nsNode.getSymbol().getText();
             return new PrefixPair(prefix, ns);
         }
 
