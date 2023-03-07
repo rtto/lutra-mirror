@@ -75,8 +75,7 @@ public class PrefixValidator {
     public static Result<PrefixMapping> buildPrefixMapping(Map<String, String> pxMap) {
         try {
             return Result.of(PrefixMapping.Factory.create().setNsPrefixes(pxMap));
-        }
-        catch (PrefixMapping.IllegalPrefixException ex) {
+        } catch (PrefixMapping.IllegalPrefixException ex) {
             return Result.error("Illegal prefix declaration", ex);
         }
     }
