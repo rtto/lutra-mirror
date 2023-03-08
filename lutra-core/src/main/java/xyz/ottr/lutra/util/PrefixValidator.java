@@ -25,8 +25,10 @@ package xyz.ottr.lutra.util;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 import org.apache.jena.shared.PrefixMapping;
 import xyz.ottr.lutra.OTTR;
@@ -86,9 +88,15 @@ public class PrefixValidator {
      * @param prefixMap prefixMap to check
      * @return The input prefixMap unchanged in a Result, with messages attached if applicable.
      */
-    public static Result<PrefixMapping> check(PrefixMapping prefixMap) {
+    public static <X extends PrefixMapping> Result<X> check(X prefixMap) {
 
         var result = Result.of(prefixMap);
+
+        // check for namespaces with multiple prefixes
+        var duplicates = getDuplicates(prefixMap.getNsPrefixMap().values());
+        if (!duplicates.isEmpty()) {
+            result.addWarning("Prefix declaration namespaces with multiple prefix declarations: " + duplicates);
+        }
 
         for (var entry : prefixMap.getNsPrefixMap().entrySet()) {
             var prefix = entry.getKey();
@@ -109,8 +117,31 @@ public class PrefixValidator {
                             + "The namespace '" + namespace + "' is declared with the prefix '" + prefix
                             + "', but the common prefix is '" + stdPrefix + "'");
                 }
+
+
             }
         }
         return result;
+    }
+
+    /**
+     * Returns a set of the duplicate elements contained in the input collection.
+     * @param collection
+     * @param <T>
+     * @return
+     */
+
+    private static <T> Set<T> getDuplicates(Collection<T> collection) {
+
+        Set<T> duplicates = new HashSet<>();
+        Set<T> uniques = new HashSet<>();
+
+        for (T t : collection) {
+            if (!uniques.add(t)) {
+                duplicates.add(t);
+            }
+        }
+
+        return duplicates;
     }
 }

@@ -1,16 +1,16 @@
-@prefix : <http://ns.ottr.xyz/0.4/> .
+@prefix ottr: <http://ns.ottr.xyz/0.4/> .
 @prefix ex: <http://example.com/ns#> .
 @prefix tpl: <http://example.com/tpl#> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
 
-ex:MyMap a :InstanceMap ;
-  :template tpl:MyTemplate ;
-  :query "SELECT name, age, company FROM TABLE tblEmployee" ;
-  :source ex:PersonellDB .
+ex:MyMap a ottr:InstanceMap ;
+  ottr:template tpl:MyTemplate ;
+  ottr:query "SELECT name, age, company FROM TABLE tblEmployee" ;
+  ottr:source ex:PersonellDB .
 
-ex:PersonellDB a :JDBCSource ;
-  :username "Bob" ;
-  :password "mySecret" ;
-  :jdbcDriver "com.database" ;
-  :sourceURL "jdbc:mysql://hostname:port" .
+ex:PersonellDB a ottr:JDBCSource ;
+  ottr:username "Bob" ;
+  ottr:password "mySecret" ;
+  ottr:jdbcDriver "com.database" ;
+  ottr:sourceURL "jdbc:mysql://hostname:port" .

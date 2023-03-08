@@ -1,4 +1,4 @@
-@prefix : <http://ns.ottr.xyz/0.4/> .
+@prefix ottr: <http://ns.ottr.xyz/0.4/> .
 @prefix ex: <http://example.com/ns#> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
@@ -6,9 +6,9 @@
 ##id,name,age,address,salary
 ##1,Paulo,32,Niteroi,N/A
 
-ex:MyMap1 a :InstanceMap ;
-      :template :Triple ;
-      :query """
+ex:MyMap1 a ottr:InstanceMap ;
+      ottr:template ottr:Triple ;
+      ottr:query """
         SELECT
           'ex:test',
           'ex:test',
@@ -16,11 +16,11 @@ ex:MyMap1 a :InstanceMap ;
         FROM CSVREAD('src/test/resources/sources/csv/linux.csv')
        ;
         """ ;
-       :argumentMaps(
-                [ :type :IRI ]
-                [ :type :IRI ]
-                [ :type (:NEList xsd:integer); :translationSettings [ :listSep "£" ] ]
+       ottr:argumentMaps(
+                [ ottr:type ottr:IRI ]
+                [ ottr:type ottr:IRI ]
+                [ ottr:type (ottr:NEList xsd:integer); ottr:translationSettings [ ottr:listSep "£" ] ]
                 ) ;
-      :source [ a :H2Source ] .
+      ottr:source [ a ottr:H2Source ] .
 
 
