@@ -76,7 +76,7 @@ public class SPrefixParserVisitor extends SBaseParserVisitor<Map<String, String>
 
         private Result<PrefixPair> parseBasePrefix(TerminalNode iriref, ParserRuleContext ctx) {
             if (iriref == null) {
-                return Result.error("Syntax error in base prefix declaration: unparsable namespace, "
+                return Result.error("Syntax error in base prefix declaration: unparsable base URI, "
                     + SParserUtils.getTextWithLineAndColumnString(ctx));
             }
             return Result.of(PrefixPair.makeBase(iriref));
@@ -90,7 +90,7 @@ public class SPrefixParserVisitor extends SBaseParserVisitor<Map<String, String>
                     errorMessage += " unparsable prefix name,";
                 }
                 if (iriref == null) {
-                    errorMessage += " unparsable namespace,";
+                    errorMessage += " unparsable prefix URI,";
                 }
                 return Result.error(errorMessage + SParserUtils.getTextWithLineAndColumnString(ctx));
             }
@@ -102,28 +102,20 @@ public class SPrefixParserVisitor extends SBaseParserVisitor<Map<String, String>
     private static class PrefixPair {
 
         private static final String BASE_PREFIX = ""; // TODO: correct rep. of (empty) base?
-        private static final Pattern colonPat = Pattern.compile(":$");
-        private static final Pattern angularPat = Pattern.compile("^<|>$");
+        private static final Pattern lastColonPat = Pattern.compile(":$");
+        private static final Pattern angularBracesPat = Pattern.compile("^<|>$");
 
-        public final String prefix;
-        public final String ns;
+        public final String prefixName;
+        public final String prefixURI;
 
-        PrefixPair(String prefix, String ns) {
-            this.prefix = stripPrefix(prefix);
-            this.ns = stripNamespace(ns);
+        PrefixPair(String prefixName, String prefixURI) {
+            this.prefixName = lastColonPat.matcher(prefixName).replaceAll("");
+            this.prefixURI = angularBracesPat.matcher(prefixURI).replaceAll("");
         }
 
-        private static String stripNamespace(String ns) {
-            return angularPat.matcher(ns).replaceAll("");
-        }
-
-        private static String stripPrefix(String prefix) {
-            return colonPat.matcher(prefix).replaceAll("");
-        }
-
-        static PrefixPair makeBase(TerminalNode prefixNode) {
-            String prefix = prefixNode.getSymbol().getText();
-            return new PrefixPair(prefix, BASE_PREFIX);
+        static PrefixPair makeBase(TerminalNode baseNode) {
+            String baseURI = baseNode.getSymbol().getText();
+            return new PrefixPair(BASE_PREFIX, baseURI);
         }
 
         static PrefixPair makePrefix(TerminalNode prefixNode, TerminalNode nsNode) {
@@ -133,7 +125,7 @@ public class SPrefixParserVisitor extends SBaseParserVisitor<Map<String, String>
         }
 
         private Map.Entry<String, String> toMapEntry() {
-            return new AbstractMap.SimpleEntry<>(prefix, ns);
+            return new AbstractMap.SimpleEntry<>(prefixName, prefixURI);
         }
     }
 }
