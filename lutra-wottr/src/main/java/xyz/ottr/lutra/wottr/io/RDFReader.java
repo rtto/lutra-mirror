@@ -30,6 +30,7 @@ import lombok.Getter;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.riot.RDFParserBuilder;
+import org.apache.jena.riot.RiotException;
 import org.apache.jena.riot.RiotParseException;
 import org.apache.jena.riot.system.ErrorHandler;
 import org.apache.jena.shared.PrefixMapping;
@@ -58,7 +59,8 @@ public abstract class RDFReader<X> implements InputReader<X, Model> {
     public Result<Model> parse(X source) {
 
         setSource(source);
-        var errorHandler = new RDFReaderErrorHandler();
+        String sourceLabel = source.toString();
+        var errorHandler = new RDFReaderErrorHandler(sourceLabel);
         Model model = ModelFactory.createDefaultModel();
 
         List<Message> parsingMessages = new ArrayList<>();
@@ -72,9 +74,14 @@ public abstract class RDFReader<X> implements InputReader<X, Model> {
 
         } catch (RiotParseException ignored) {
             // ignore RiotParseException as this is collected by the errorHandler.
-        } catch (RuntimeException ex) {
-            // must catch all other exceptions since not throwing RiotParseExceptions may cause others to be thrown.
-            parsingMessages.add(Message.error(ex));
+        } catch (RiotException ex) {
+            parsingMessages.add(Message.error(errorHandler.getErrorMessagePrefix(), ex));
+        } catch (NullPointerException ex) {
+            // Ignore null pointers that are likely caused by our custom error handling:
+            // since we do not immediately throw errors, new problems occur as nulls.
+            if (!errorHandler.isFatal) {
+                parsingMessages.add(Message.error(errorHandler.getErrorMessagePrefix(), ex));
+            }
         }
 
         var result = Result.of(model)
@@ -83,13 +90,11 @@ public abstract class RDFReader<X> implements InputReader<X, Model> {
         result.addMessages(parsingMessages);
         result.addMessages(errorHandler.messages);
 
-        if (parsingMessages.isEmpty() && errorHandler.messages.isEmpty()) {
-            return result;
-        } else {
-            // #324 Result::mapToStream
-            return Result.empty(Message.error("Error parsing " + source + " with "
-                + source.getClass().getSimpleName() + "."), result);
+        if (!parsingMessages.isEmpty() || errorHandler.isFatal || errorHandler.isError) {
+            return Result.empty(result);
         }
+
+        return result;
     }
 
 
@@ -101,10 +106,23 @@ public abstract class RDFReader<X> implements InputReader<X, Model> {
      */
     private class RDFReaderErrorHandler implements ErrorHandler {
 
+        private String sourceLabel;
         private List<Message> messages = new ArrayList<>();
+        private boolean isFatal = false;
+        private boolean isError = false;
+
+        RDFReaderErrorHandler(String sourceLabel) {
+            this.sourceLabel = sourceLabel;
+        }
+
+        String getErrorMessagePrefix() {
+            return "RDF parsing error in: " + sourceLabel;
+        }
 
         private void addMessage(Message.Severity severity, String message, long line, long col) {
-            this.messages.add(new Message(severity, fmtMessage(message, line, col) + Space.LINEBR));
+            Message msg = new Message(severity, getErrorMessagePrefix() + " "
+                    + fmtMessage(message, line, col) + Space.LINEBR);
+            this.messages.add(msg);
         }
 
         @Override
@@ -114,11 +132,13 @@ public abstract class RDFReader<X> implements InputReader<X, Model> {
 
         @Override
         public void error(String message, long line, long col) {
+            isError = true;
             addMessage(Message.Severity.ERROR, message, line, col);
         }
 
         @Override
         public void fatal(String message, long line, long col) {
+            isFatal = true;
             addMessage(Message.Severity.FATAL, message, line, col);
         }
     }
