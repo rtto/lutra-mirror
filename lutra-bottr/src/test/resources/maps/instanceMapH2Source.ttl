@@ -1,4 +1,4 @@
-@prefix : <http://ns.ottr.xyz/0.4/> .
+@prefix ottr: <http://ns.ottr.xyz/0.4/> .
 @prefix ex: <http://example.com/ns#> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
@@ -6,59 +6,59 @@
 ##id,name,age,address,salary
 ##1,Paulo,32,Niteroi,N/A
 
-ex:MyMap1 a :InstanceMap ;
-      :template :Triple ;
-      :query "SELECT CONCAT('ex:map1_id', ID), 'ex:hasSalary', SALARY FROM CSVREAD('@@THIS_DIR@@/../sources/csv/linux.csv') WHERE ID = '1';" ;
-       :argumentMaps(
-                [ :type :IRI ]
-                [ :type :IRI ]
-                [ :type rdfs:Resource ]
+ex:MyMap1 a ottr:InstanceMap ;
+      ottr:template ottr:Triple ;
+      ottr:query "SELECT CONCAT('ex:map1_id', ID), 'ex:hasSalary', SALARY FROM CSVREAD('@@THIS_DIR@@/../sources/csv/linux.csv') WHERE ID = '1';" ;
+      ottr:argumentMaps(
+                [ ottr:type ottr:IRI ]
+                [ ottr:type ottr:IRI ]
+                [ ottr:type rdfs:Resource ]
                 ) ;
-      :source [ a :H2Source ] .
+      ottr:source [ a ottr:H2Source ] .
 
-ex:MyMap2 a :InstanceMap ;
-      :template :Triple ;
-      :query "SELECT CONCAT('ex:map2_id', ID), 'ex:hasSalary', SALARY FROM CSVREAD('src/test/resources/sources/csv/linux.csv') WHERE ID = '1';" ;
-      :source [ a :H2Source ] ;
-      :argumentMaps(
-          [ :type :IRI ]
-          [ :type :IRI ]
-          [ :type xsd:float ]
+ex:MyMap2 a ottr:InstanceMap ;
+      ottr:template ottr:Triple ;
+      ottr:query "SELECT CONCAT('ex:map2_id', ID), 'ex:hasSalary', SALARY FROM CSVREAD('src/test/resources/sources/csv/linux.csv') WHERE ID = '1';" ;
+      ottr:source [ a ottr:H2Source ] ;
+      ottr:argumentMaps(
+          [ ottr:type ottr:IRI ]
+          [ ottr:type ottr:IRI ]
+          [ ottr:type xsd:float ]
       ) .
 
 
-ex:MyMap3a a :InstanceMap ;
-      :template :Triple ;
-      :query "SELECT CONCAT('_:', ID), 'ex:hasSalary', SALARY FROM CSVREAD('src/test/resources/sources/csv/linux.csv') WHERE ID = '1';" ;
-      :source [ a :H2Source ] ;
-      :argumentMaps(
-          [ :type :IRI ]
-          [ :type :IRI ]
-          [ :type xsd:integer; :translationTable ex:table ]
+ex:MyMap3a a ottr:InstanceMap ;
+      ottr:template ottr:Triple ;
+      ottr:query "SELECT CONCAT('_:', ID), 'ex:hasSalary', SALARY FROM CSVREAD('src/test/resources/sources/csv/linux.csv') WHERE ID = '1';" ;
+      ottr:source [ a ottr:H2Source ] ;
+      ottr:argumentMaps(
+          [ ottr:type ottr:IRI ]
+          [ ottr:type ottr:IRI ]
+          [ ottr:type xsd:integer; ottr:translationTable ex:table ]
       ) .
 
-ex:MyMap4a a :InstanceMap ;
-    :template :Triple ;
-    :query "SELECT CONCAT('ex:map4_id', ID), 'ex:hasSalary', NULL FROM CSVREAD('src/test/resources/sources/csv/linux.csv') WHERE ID = '1';" ;
-    :argumentMaps(
-      [ :type :IRI ]
-      [ :type :IRI; :translationTable ex:table ]
-      [ :type rdfs:Resource; :translationTable ex:table  ]
+ex:MyMap4a a ottr:InstanceMap ;
+    ottr:template ottr:Triple ;
+    ottr:query "SELECT CONCAT('ex:map4_id', ID), 'ex:hasSalary', NULL FROM CSVREAD('src/test/resources/sources/csv/linux.csv') WHERE ID = '1';" ;
+    ottr:argumentMaps(
+      [ ottr:type ottr:IRI ]
+      [ ottr:type ottr:IRI; ottr:translationTable ex:table ]
+      [ ottr:type rdfs:Resource; ottr:translationTable ex:table  ]
      ) ;
-     :source
-     [ a :H2Source ] .
+     ottr:source
+     [ a ottr:H2Source ] .
 
-ex:MyMap4b a :InstanceMap ;
-    :template :Triple ;
-    :query "SELECT CONCAT('ex:map4_id', ID), 'ex:hasSalary', NULL FROM CSVREAD('src/test/resources/sources/csv/linux.csv') WHERE ID = '1';" ;
-    :argumentMaps(
-    [ :type :IRI ]
-    [ :type :IRI]
-    [ :type rdfs:Resource ; :translationSettings [ :nullValue "myNull" ] ]
+ex:MyMap4b a ottr:InstanceMap ;
+    ottr:template ottr:Triple ;
+    ottr:query "SELECT CONCAT('ex:map4_id', ID), 'ex:hasSalary', NULL FROM CSVREAD('src/test/resources/sources/csv/linux.csv') WHERE ID = '1';" ;
+    ottr:argumentMaps(
+    [ ottr:type ottr:IRI ]
+    [ ottr:type ottr:IRI]
+    [ ottr:type rdfs:Resource ; ottr:translationSettings [ ottr:nullValue "myNull" ] ]
     ) ;
-    :source [ a :H2Source ] .
+    ottr:source [ a ottr:H2Source ] .
 
 
 ex:table
-:entry [ :inValue "2500" ; :outValue 99999 ] ;
-:entry [ :inValue "ex:hasSalary" ; :outValue ex:hasIncome ] .
+ ottr:entry [ ottr:inValue "2500" ; ottr:outValue 99999 ] ;
+ ottr:entry [ ottr:inValue "ex:hasSalary" ; ottr:outValue ex:hasIncome ] .
