@@ -66,10 +66,19 @@ public class PrefixValidator {
                             return ns1; // if both are equal, then the first one will do.
                         }));
 
-        if (errors.isEmpty()) {
-            return Result.of(PrefixMapping.Factory.create().setNsPrefixes(pxMap));
-        } else {
+
+        if (!errors.isEmpty()) {
             return Result.empty(errors);
+        }
+
+        return buildPrefixMapping(pxMap);
+    }
+
+    public static Result<PrefixMapping> buildPrefixMapping(Map<String, String> pxMap) {
+        try {
+            return Result.of(PrefixMapping.Factory.create().setNsPrefixes(pxMap));
+        } catch (PrefixMapping.IllegalPrefixException ex) {
+            return Result.error("Illegal prefix declaration", ex);
         }
     }
 
