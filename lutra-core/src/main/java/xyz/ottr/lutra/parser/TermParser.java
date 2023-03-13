@@ -68,8 +68,8 @@ public class TermParser {
     public static Result<LiteralTerm> toLiteralTerm(String value, String datatype, String language) {
 
         if (StringUtils.isNotEmpty(language) && !RDF.langString.getURI().equals(datatype)) {
-            return Result.error("Error creating literal. Cannot have both a language tag '" + language
-                + "'' and the datatype '" + datatype + "'");
+            return Result.error("Malformed literal value. Literals cannot have both a language tag '" + language
+                + "'' and the datatype '" + datatype + "' (the literal value is: '" + value + "')");
         } else if (StringUtils.isNotEmpty(language)) {
             return toLangLiteralTerm(value, language);
         } else if (StringUtils.isNotEmpty(datatype)) {
@@ -83,12 +83,13 @@ public class TermParser {
         Result<LiteralTerm> literal = Result.of(LiteralTerm.createTypedLiteral(value, datatype));
 
         // get registered datatype
-        RDFDatatype redisteredDatatype = TypeMapper.getInstance().getTypeByName(datatype);
+        RDFDatatype registeredDatatype = TypeMapper.getInstance().getTypeByName(datatype);
 
-        if (redisteredDatatype == null) {
-            literal.addWarning("Unusual datatype '" + datatype + "' for literal '" + literal + "'");
-        } else if (!redisteredDatatype.isValid(value)) {
-            literal.addError("Invalid datatype value. Value '" + value + "' is not in the lexical space"
+        if (registeredDatatype == null) {
+            literal.addWarning("Unusual literal datatype. The literal value'" + literal + "' uses a datatype '"
+                    + datatype + "' that is not registered by the parser");
+        } else if (!registeredDatatype.isValid(value)) {
+            literal.addError("Invalid literal value. The value '" + value + "' is not in the lexical space"
                     + " of the datatype '" + datatype + "'");
         }
         return literal;
