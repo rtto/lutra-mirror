@@ -151,7 +151,7 @@ public class STermParserVisitor extends SBaseParserVisitor<Term> {
     public Result<Term> visitRdfLiteral(stOTTRParser.RdfLiteralContext ctx) {
 
         if (ctx.String() == null) {
-            return Result.error("Parsing literal, but no literal found. "
+            return Result.error("Expected literal, but no literal found "
                     + SParserUtils.getTextWithLineAndColumnString(ctx));
         }
 
@@ -196,7 +196,7 @@ public class STermParserVisitor extends SBaseParserVisitor<Term> {
         }
 
         if (ctx.IRIREF() == null) {
-            return Result.error("Parsing IRI, but no IRI found "
+            return Result.error("IRI expected, but no IRI found "
                     + SParserUtils.getTextWithLineAndColumnString(ctx));
         }
 
@@ -209,8 +209,6 @@ public class STermParserVisitor extends SBaseParserVisitor<Term> {
     }
 
     public Result<Term> visitPrefixedName(stOTTRParser.PrefixedNameContext ctx) {
-
-        // TODO can we simplify this by using Jena's PrefixMapping instead?
 
         String qname;
         TerminalNode onlyNS = ctx.PNAME_NS();
@@ -241,7 +239,7 @@ public class STermParserVisitor extends SBaseParserVisitor<Term> {
         }
 
         if (ctx.BLANK_NODE_LABEL() == null) {
-            return Result.error("Parsing blank node, but no blank node found "
+            return Result.error("Blank node label expected, but no blank node label found "
                     + SParserUtils.getTextWithLineAndColumnString(ctx));
         }
 
