@@ -35,6 +35,7 @@ import org.apache.commons.collections4.iterators.PermutationIterator;
 import org.apache.commons.math3.util.CombinatoricsUtils;
 import xyz.ottr.lutra.model.HasApplySubstitution;
 import xyz.ottr.lutra.model.Substitution;
+import xyz.ottr.lutra.model.types.ListType;
 import xyz.ottr.lutra.model.types.Type;
 import xyz.ottr.lutra.store.TemplateStore;
 
@@ -257,6 +258,35 @@ public abstract class QueryEngine<S extends TemplateStore> {
         return boundType1.isCompatibleWith(boundType2)
             ? Stream.of(tuple)
             : Stream.empty();
+    }
+
+    /**
+     * Wraps the first type into a list type, i.e. new ListType(type)
+     *
+     * @param tuple
+     *      a Map representing a tuple from variables to values
+     * @param type
+     *      a variable name denoting a term type
+     * @param lstType
+     *      a variable name equal to the previous argument's type wrapped in List
+     * @return
+     *      a Stream of tuples binding lstType to a type euqal to new ListType(type)
+     */
+    public Stream<Tuple> wrapIntoList(Tuple tuple, String type, String lstType) {
+
+        Type boundType = tuple.getAs(Type.class, type);
+        Type wrappedType = new ListType(boundType);
+        
+        if (tuple.hasBound(lstType)) {
+
+            Type boundLstType = tuple.getAs(Type.class, lstType);
+
+            return wrappedType.equals(boundLstType)
+                ? Stream.of(tuple)
+                : Stream.empty();
+        }
+
+        return Stream.of(tuple.bind(lstType, wrappedType));
     }
 
     /**
