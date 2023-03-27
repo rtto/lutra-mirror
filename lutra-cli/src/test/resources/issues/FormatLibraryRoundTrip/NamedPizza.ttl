@@ -21,7 +21,7 @@ ottr:annotation     [ ottr:values ( o-pizza:NamedPizza rdf:type owl:Class ) ;
                              ottr:type      owl:NamedIndividual ;
                              ottr:variable  _:b1
                            ]
-                           [ ottr:type      ( ottr:NEList ottr:IRI ) ;
+                           [ ottr:type      ( ottr:NEList owl:Class  ) ;
                              ottr:variable  _:b2
                            ]
                          ) ;
