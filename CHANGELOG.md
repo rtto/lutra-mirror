@@ -5,7 +5,23 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## 0.6.15 - 2022.12.05
+## 0.6.17 - 2022.04.10
+
+Milestone: https://gitlab.com/groups/ottr/lutra/-/milestones/2
+
+Added several checks for prefixes, datatypes and literals. Enhancement and bug fix of list types.
+
+Closed issues:
+
+  - stOTTR prefix parsing #415
+  - Check for validity of typed values #414
+  - Unknown datatypes #412
+  - [ERROR] List expander applied to non-list argument: ++ottr:none #345
+  - Irrelevant prefixes in docttr output #274
+  - Give warning if using different or old `ottr:` prefix than the current #202
+  - check prefixes #51
+
+## 0.6.16 - 2022.02.06
 
 Milestone: https://gitlab.com/ottr/lutra/lutra/-/milestones/21
 
