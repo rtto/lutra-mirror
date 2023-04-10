@@ -35,6 +35,7 @@ import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.reasoner.Reasoner;
 import org.apache.jena.reasoner.ReasonerRegistry;
+import org.apache.jena.riot.Lang;
 import org.apache.jena.util.FileUtils;
 import org.apache.jena.vocabulary.RDF;
 import xyz.ottr.lutra.OTTR;
@@ -79,7 +80,7 @@ public enum TypeRegistry {
     private static void init(String modelFile) {
         InputStream filename = TypeRegistry.class.getClassLoader().getResourceAsStream(modelFile);
         Model types = ModelFactory.createDefaultModel();
-        types.read(filename, null, FileUtils.guessLang(modelFile, "TTL"));
+        types.read(filename, null, FileUtils.guessLang(modelFile, Lang.TTL.getName()));
         Reasoner owlMicro = ReasonerRegistry.getOWLMicroReasoner();
         Model model = ModelFactory.createInfModel(owlMicro, types);
 

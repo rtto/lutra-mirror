@@ -4,7 +4,7 @@
 
   <groupId>xyz.ottr.lutra</groupId>
   <artifactId>lutra</artifactId>
-  <version>0.6.16</version>
+  <version>0.6.17</version>
   <packaging>pom</packaging>
   <modules>
     <module>lutra-core</module>
@@ -489,7 +489,7 @@
         <plugin>
           <groupId>de.elnarion.maven</groupId>
           <artifactId>plantuml-generator-maven-plugin</artifactId>
-          <version>1.2.0</version>
+          <version>2.0.0</version>
         </plugin>
 
         <plugin>

@@ -142,7 +142,7 @@ public class ParserTest {
 
         String instances = this.prefixes + " :T1(true, none, rdf:type, <http://some.uri/with#part>) . "
             + "cross | ex:T2(\"hello\"@no, ++ (\"one\", \"two\", \"three\")) . "
-            + ":T3(42, 42.01, \"42.02\"^^xsd:int) . "
+            + ":T3(42, 42.01, \"42.02\"^^xsd:decimal) . "
             + "ax:EquivObjectIntersectionOf(?intersection, (?A, ?B)) . "; // test for #156: variables in list
 
         return parser.apply(instances)
@@ -228,10 +228,11 @@ public class ParserTest {
                 " :T1 ",
                 " :T1( , ) .  ",
                 " :T1(true) ",
-                //" :T1(true, ) . ", // #393 NullPointerException
+                " :T1(true, ) . ",
                 " :T1(true, , false ) .",
-                //" :T1(true, , , false ) . ", // #393 NullPointerException
-                " cross :T1(\"hello\"@no, ++ (\"one\", \"two\", \"three\")) "
+                " :T1(true, , , false ) . ",
+                " cross :T1(\"hello\"@no, ++ (\"one\", \"two\", \"three\")) ",
+                " :T2(\"2\"^^xsd:int, \"42\"^^) . " // #412 NullPointerException
         );
 
         for (String s : instances) {

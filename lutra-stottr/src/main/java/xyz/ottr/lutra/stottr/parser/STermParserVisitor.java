@@ -36,6 +36,7 @@ import xyz.ottr.lutra.model.terms.Term;
 import xyz.ottr.lutra.parser.TermParser;
 import xyz.ottr.lutra.stottr.STOTTR;
 import xyz.ottr.lutra.stottr.antlr.stOTTRParser;
+import xyz.ottr.lutra.system.Message;
 import xyz.ottr.lutra.system.Result;
 
 public class STermParserVisitor extends SBaseParserVisitor<Term> {
@@ -149,6 +150,11 @@ public class STermParserVisitor extends SBaseParserVisitor<Term> {
 
     public Result<Term> visitRdfLiteral(stOTTRParser.RdfLiteralContext ctx) {
 
+        if (ctx.String() == null) {
+            return Result.error("Expected literal, but no literal found "
+                    + SParserUtils.getTextWithLineAndColumnString(ctx));
+        }
+
         String valStr = ctx.String().getSymbol().getText();
         // valStr might be a String containing surrounding quotes, so we remove these:
         String val = quotedStringPat.matcher(valStr).matches() // Only replace if both first and last char is \"
@@ -165,9 +171,9 @@ public class STermParserVisitor extends SBaseParserVisitor<Term> {
         if (ctx.iri() != null) { // Datatype present
             Result<Term> datatype = visitIri(ctx.iri());
 
-            if (datatype.isPresent() && !(datatype.get() instanceof IRITerm)) {
-                return Result.error("Unrecognized literal datatype. Expected IRI, but found '"
-                    + datatype.get() + SParserUtils.getTextWithLineAndColumnString(ctx));
+            if (datatype.isEmpty()) {
+                return Result.empty(Message.error("Unrecognized literal datatype IRI "
+                        + SParserUtils.getTextWithLineAndColumnString(ctx)), datatype);
             }
 
             return datatype
@@ -187,18 +193,22 @@ public class STermParserVisitor extends SBaseParserVisitor<Term> {
 
         if (prefixCtx != null) {
             return visitPrefixedName(prefixCtx);
-        } else {
-            String iriBraces = ctx.IRIREF().getSymbol().getText();
-            // IRIs in Lutra are always full, so do not use surrounding '<','>'
-            String iri = angularPat.matcher(iriBraces).replaceAll("");
-
-            return TermParser.toTerm(iri);
         }
+
+        if (ctx.IRIREF() == null) {
+            return Result.error("IRI expected, but no IRI found "
+                    + SParserUtils.getTextWithLineAndColumnString(ctx));
+        }
+
+        String iriBraces = ctx.IRIREF().getSymbol().getText();
+        // IRIs in Lutra are always full, so do not use surrounding '<','>'
+        String iri = angularPat.matcher(iriBraces).replaceAll("");
+
+        return TermParser.toIRITerm(iri).map(t -> (Term)t);
+
     }
 
     public Result<Term> visitPrefixedName(stOTTRParser.PrefixedNameContext ctx) {
-
-        // TODO can we simplify this by using Jena's PrefixMapping instead?
 
         String qname;
         TerminalNode onlyNS = ctx.PNAME_NS();
@@ -226,6 +236,11 @@ public class STermParserVisitor extends SBaseParserVisitor<Term> {
 
         if (ctx.anon() != null) { // Of the form [], i.e. no label
             return visitAnon(ctx.anon());
+        }
+
+        if (ctx.BLANK_NODE_LABEL() == null) {
+            return Result.error("Blank node label expected, but no blank node label found "
+                    + SParserUtils.getTextWithLineAndColumnString(ctx));
         }
 
         String label = ctx.BLANK_NODE_LABEL().getSymbol().getText();

@@ -29,6 +29,7 @@ import xyz.ottr.lutra.model.Instance;
 import xyz.ottr.lutra.model.Parameter;
 import xyz.ottr.lutra.model.Signature;
 import xyz.ottr.lutra.model.terms.BlankNodeTerm;
+import xyz.ottr.lutra.model.terms.NoneTerm;
 import xyz.ottr.lutra.model.terms.Term;
 import xyz.ottr.lutra.model.types.ListType;
 import xyz.ottr.lutra.model.types.Type;
@@ -100,7 +101,7 @@ public class CheckingExpander extends NonCheckingExpander {
         Term argTerm = argument.getTerm();
         Type argType = argTerm.getType();
 
-        if (argument.isListExpander()) {
+        if (argument.isListExpander() && !(argTerm instanceof NoneTerm)) {
             if (argType instanceof ListType) {
                 argType = ((ListType) argType).getInner();
             } else {

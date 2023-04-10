@@ -1,4 +1,4 @@
-@prefix : <http://ns.ottr.xyz/0.4/> .
+@prefix ottr: <http://ns.ottr.xyz/0.4/> .
 @prefix ex: <http://example.com/ns#> .
 @prefix tpl: <http://example.com/tpl#> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
@@ -7,17 +7,17 @@
 @prefix foaf: <http://xmlns.com/foaf/0.1/> . ## note that this is used in the query.
 
 
-ex:MyMap a :InstanceMap ;
-  :template :Triple ;
-  :query "SELECT ?s ?p ?o WHERE { ?s a foaf:Person ; ?p ?o }" ;
-  :argumentMaps (
-    [ :type :IRI ]
-    [ :type :IRI ]
-    [ :type :IRI ]
+ex:MyMap a ottr:InstanceMap ;
+  ottr:template ottr:Triple ;
+  ottr:query "SELECT ?s ?p ?o WHERE { ?s a foaf:Person ; ?p ?o }" ;
+  ottr:argumentMaps (
+    [ ottr:type ottr:IRI ]
+    [ ottr:type ottr:IRI ]
+    [ ottr:type ottr:IRI ]
     ) ;
-  :source
-    [ a :RDFFileSource ;
-      :sourceURL
+  ottr:source
+    [ a ottr:RDFFileSource ;
+      ottr:sourceURL
         "../sources/rdf/a.ttl" ,
         "../sources/rdf/b.ttl" ] .
 

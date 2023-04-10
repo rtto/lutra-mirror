@@ -1,4 +1,4 @@
-@prefix o-pizza: <http://tpl.ottr.xyz/pizza/0.1/> .
+@prefix test: <http://example.com/test/ns#> .
 @prefix pav:   <http://purl.org/pav/> .
 @prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix owl:   <http://www.w3.org/2002/07/owl#> .
@@ -7,21 +7,15 @@
 @prefix pz:    <http://www.co-ode.org/ontologies/pizza/pizza.owl#> .
 @prefix o-owl-ax: <http://tpl.ottr.xyz/owl/axiom/0.1/> .
 
-o-pizza:NamedPizza  a    ottr:Template ;
-
-ottr:annotation     [ ottr:values ( o-pizza:NamedPizza rdf:type owl:Class ) ;
-                           ottr:of         ottr:Triple
-                         ] ;
-
-
+test:NamedPizza  a    ottr:Template ;
         ottr:parameters  ( [ ottr:type      owl:Class ;
-                             ottr:variable  _:b0
+                             ottr:variable  undefined:b0
                            ]
                            [ ottr:modifier  ottr:optional ;
                              ottr:type      owl:NamedIndividual ;
                              ottr:variable  _:b1
                            ]
-                           [ ottr:type      ( ottr:NEList owl:Class  ) ;
+                           [ ottr:type      ( ottr:NEList ottr:IRI ) ;
                              ottr:variable  _:b2
                            ]
                          ) ;

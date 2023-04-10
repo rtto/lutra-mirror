@@ -43,12 +43,19 @@ public enum ListExpander {
                 List<List<Argument>> newexpanded = new LinkedList<>();
                 for (List<Argument> list : expanded) {
                     if (arg.isListExpander()) {
-                        // add *all elements* of list term to all list in expanded.
-                        for (Term term : ((ListTerm) arg.getTerm()).asList()) {
-                            Argument termArg = Argument.builder().term(term).build();
-                            List<Argument> newlist = new LinkedList<>(list);
-                            newlist.add(termArg);
-                            newexpanded.add(newlist);
+
+                        if (arg.getTerm() instanceof NoneTerm) {
+                            Argument none = Argument.builder().term(new NoneTerm()).build();
+                            list.add(none);
+                            newexpanded.add(list);
+                        } else {
+                            // add *all elements* of list term to all list in expanded.
+                            for (Term term : ((ListTerm) arg.getTerm()).asList()) {
+                                Argument termArg = Argument.builder().term(term).build();
+                                List<Argument> newlist = new LinkedList<>(list);
+                                newlist.add(termArg);
+                                newexpanded.add(newlist);
+                            }
                         }
                     } else {
                         list.add(arg);
@@ -64,14 +71,14 @@ public enum ListExpander {
     zipMin {
         @Override
         public List<List<Argument>> expand(List<Argument> arguments) {
-            return zip(arguments, ListExpander.getListTermExpanderSizes(arguments).min().orElse(0));
+            return zip(arguments, ListExpander.getListTermExpanderSizes(arguments).min().orElse(1));
         }
     },
 
     zipMax {
         @Override
         public List<List<Argument>> expand(List<Argument> arguments) {
-            return zip(arguments, ListExpander.getListTermExpanderSizes(arguments).max().orElse(0));
+            return zip(arguments, ListExpander.getListTermExpanderSizes(arguments).max().orElse(1));
         }
     };
 
@@ -87,6 +94,7 @@ public enum ListExpander {
     private static IntStream getListTermExpanderSizes(List<Argument> arguments) {
         return arguments.stream()
             .filter(Argument::isListExpander)
+            .filter(a -> !(a.getTerm() instanceof NoneTerm)) // Remove ++none
             .mapToInt(a -> ((ListTerm) a.getTerm()).asList().size());
     }
 
@@ -101,12 +109,16 @@ public enum ListExpander {
             List<Argument> zipStep = new LinkedList<>();
             for (Argument arg : arguments) {
                 if (arg.isListExpander()) {
-                    List<Term> argTerms = ((ListTerm) arg.getTerm()).asList();
-                    // Use None if the list is not long enough, only applies for zipMax.
-                    Term newTerm = argTerms.size() <= pick
-                        ? new NoneTerm()
-                        : argTerms.get(pick);
-                    zipStep.add(Argument.builder().term(newTerm).build());
+                    if (arg.getTerm() instanceof NoneTerm) {
+                        zipStep.add(Argument.builder().term(new NoneTerm()).build());
+                    } else {
+                        List<Term> argTerms = ((ListTerm) arg.getTerm()).asList();
+                        // Use None if the list is not long enough, only applies for zipMax.
+                        Term newTerm = argTerms.size() <= pick
+                            ? new NoneTerm()
+                            : argTerms.get(pick);
+                        zipStep.add(Argument.builder().term(newTerm).build());
+                    }
                 } else {
                     zipStep.add(arg);
                 }

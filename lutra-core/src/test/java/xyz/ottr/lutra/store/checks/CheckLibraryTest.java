@@ -35,6 +35,7 @@ import org.slf4j.LoggerFactory;
 import xyz.ottr.lutra.model.Argument;
 import xyz.ottr.lutra.model.BaseTemplate;
 import xyz.ottr.lutra.model.Instance;
+import xyz.ottr.lutra.model.ListExpander;
 import xyz.ottr.lutra.model.Parameter;
 import xyz.ottr.lutra.model.Template;
 import xyz.ottr.lutra.model.terms.BlankNodeTerm;
@@ -506,5 +507,41 @@ public class CheckLibraryTest {
         StandardQueryEngine engine = new StandardQueryEngine(store);
 
         check(engine, 1, Message.Severity.ERROR);
+    }
+
+    @Test
+    public void correctDeepListTypeUsage() {
+
+        StandardTemplateStore store = new StandardTemplateStore(null);
+
+        Term varBase = new BlankNodeTerm("_:iriList");
+        varBase.setType(new NEListType(TypeRegistry.IRI));
+
+        store.addBaseTemplate(
+            BaseTemplate.builder()
+                .iri("baseNL")
+                .parameters(Parameter.listOf(varBase))
+                .build());
+
+        Term varTemp = new BlankNodeTerm("_:iriListList");
+        varTemp.setType(new NEListType(new NEListType(TypeRegistry.IRI)));
+
+        store.addTemplate(
+            Template.builder()
+                .iri("tempNL")
+                .parameters(Parameter.listOf(varTemp))
+                .instance(
+                    Instance.builder()
+                        .iri("baseNL")
+                        .listExpander(ListExpander.cross)
+                        .argument(Argument.builder()
+                                    .term(varTemp)
+                                    .listExpander(true)
+                                    .build())
+                        .build())
+                .build());
+
+        StandardQueryEngine engine = new StandardQueryEngine(store);
+        check(engine, 0, Message.Severity.ERROR);
     }
 }
