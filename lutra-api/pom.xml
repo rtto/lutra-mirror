@@ -73,8 +73,8 @@
                             <goal>wget</goal>
                         </goals>
                         <configuration>
-                            <url>https://tpl.ottr.xyz/library.zip</url>
-                            <outputFileName>library.zip</outputFileName>
+                            <url>https://tpl.ottr.xyz/contents.zip</url>
+                            <outputFileName>contents.zip</outputFileName>
                             <unpack>true</unpack>
                             <outputDirectory>${project.basedir}/src/main/resources/tpl-library</outputDirectory>
                             <skipCache>true</skipCache>
