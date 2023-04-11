@@ -133,7 +133,6 @@ public enum OTTR  {
         map.setNsPrefix("o-owl-ax", "http://tpl.ottr.xyz/owl/axiom/0.1/");
         map.setNsPrefix("o-owl-re", "http://tpl.ottr.xyz/owl/restriction/0.1/");
         map.setNsPrefix("o-owl-ut", "http://tpl.ottr.xyz/owl/util/0.1/");
-        map.setNsPrefix("o-pizza", "http://tpl.ottr.xyz/pizza/0.1/");
         map.lock();
         return map;
     }
