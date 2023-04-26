@@ -43,6 +43,7 @@ public enum InstanceBuilder {
         listExpander = Result.nullToEmpty(listExpander);
 
         var builder = Result.of(Instance.builder());
+        builder.setLocation("Signature with IRI '" + iri.orElse("[IRI missing]") + "'");
         builder.addResult(iri, Instance.InstanceBuilder::iri);
         builder.addResult(arguments, Instance.InstanceBuilder::arguments);
         builder.addResult(listExpander, Instance.InstanceBuilder::listExpander);

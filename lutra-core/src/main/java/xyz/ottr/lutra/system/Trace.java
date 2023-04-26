@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
-import java.util.function.Function;
 import lombok.Setter;
 
 /*-
@@ -34,42 +33,13 @@ import lombok.Setter;
 
 public class Trace {
 
-    private static final int MAX_CONTENT_LENGTH = 60;
-    // Used to construct a printable identifier, which is stored within the Trace
-    // object to provide in the trace. This is used by a MessageHandler
-    // to give a location to the Messages printed. The default is just a slightly modified
-    // toString-representation of the original object, prefixed with the object's Class,
-    // but one can override this to get a different identifier.
-    private static Function<Object, Optional<String>> toIdentifier = obj -> { 
-        if (obj == null) {
-            return Optional.empty();
-        }
-
-        int maxLength = MAX_CONTENT_LENGTH;
-        String prefix = "(" + obj.getClass().getName() + ") ";
-        String content = obj.toString();
-        String id = prefix
-            + (content.length() <= maxLength ? content : content.substring(0, maxLength) + " ...");
-        return Optional.of(id);
-    };
-
-    /** 
-     * Sets the argument function to be the method to construct a printable identifier, which is
-     * stored within a Trace object.
-     * This identifier is then used by a MessageHandler to give a context to the Messages printed. 
-     * The default is just a slightly modifier Object#toString() prefixed with the Class-name
-     */
-    public static void setToIdentifierFunction(Function<Object, Optional<String>> fun) {
-        toIdentifier = fun;
-    }
-
-    private final Optional<String> identifier;
+    private Optional<String> location;
     private final Set<Trace> trace;
     private final Collection<Message> messages;
     @Setter private static boolean deepTrace;
    
-    protected Trace(Optional<?> value) {
-        this.identifier = value.map(o -> (Object) o).flatMap(toIdentifier);
+    protected Trace(Optional<String> location) {
+        this.location = location;
         this.trace = new HashSet<>();
         if (deepTrace) {
             this.messages = new LinkedList<>();
@@ -81,11 +51,19 @@ public class Trace {
     protected Trace() {
         this(Optional.empty());
     }
+
+    public void setLocation(String location) {
+        this.location = Optional.of(location);
+    }
     
     protected static Trace fork(Collection<Trace> fs) {
         Trace fork = new Trace();
         if (fork.deepTrace) {
-            fork.trace.addAll(fs);
+            for (Trace f : fs) {
+                if (f.hasLocation() || f.hasMessages()) {
+                    fork.trace.add(f);
+                }
+            }
         } else {
             fs.stream().forEach(f -> fork.addMessages(f.getMessages()));
         }
@@ -96,12 +74,12 @@ public class Trace {
         return fork(List.of(fs));
     }
     
-    public boolean hasIdentifier() {
-        return this.identifier.isPresent();
+    public boolean hasLocation() {
+        return this.location.isPresent();
     }
     
-    public String getIdentifier() {
-        return this.identifier.get();
+    public String getLocation() {
+        return this.location.get();
     }
 
     public Set<Trace> getTrace() {
@@ -110,6 +88,10 @@ public class Trace {
 
     public Collection<Message> getMessages() {
         return this.messages;
+    }
+
+    public boolean hasMessages() {
+        return !this.messages.isEmpty();
     }
 
     /**
@@ -147,9 +129,14 @@ public class Trace {
      *      Trace element to add to this' trace
      */
     protected void addDirectTrace(Trace elem) {
+
         if (!this.equals(elem)) {
             if (deepTrace) {
-                this.trace.add(elem);
+                if (elem.hasLocation() || elem.hasMessages()) {
+                    this.trace.add(elem);
+                } else {
+                    elem.getTrace().forEach(this::addDirectTrace);
+                }
             } else {
                 this.addMessages(elem.getMessages());
             }

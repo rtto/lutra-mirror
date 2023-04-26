@@ -34,14 +34,18 @@ public class SFileReader implements InputReader<String, CharStream> {
 
     public ResultStream<CharStream> apply(String filename) {
 
+        Result<CharStream> res = null; 
+
         if (new File(filename).length() == 0) {
-            return ResultStream.of(Result.warning("Empty file: " + filename));
+            res = Result.warning("Empty file: " + filename);
+            return ResultStream.of(res);
         }
 
         try {
-            return ResultStream.innerOf(CharStreams.fromFileName(filename));
+            res = Result.of(CharStreams.fromFileName(filename));
         } catch (IOException ex) {
-            return ResultStream.of(Result.error("Reading stOTTR file: '" + filename + "'.", ex));
+            res = Result.error("Reading stOTTR file: '" + filename + "'.", ex);    
         }
+        return ResultStream.of(res.setLocation("File " + filename));
     }
 }

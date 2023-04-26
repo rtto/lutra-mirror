@@ -83,7 +83,7 @@ public class ExcelReader implements InstanceParser<String> {
             for (int index = 0; index < workbook.getNumberOfSheets(); index += 1) {
                 tables.add(parseTable(workbook.getSheetAt(index), index + 1));
             }
-            return Result.of(tables);
+            return Result.of(tables).setLocation("File " + filename);
         } catch (NotImplementedException ex) {
             return Result.error("Error parsing tabOTTR instances in file: " + filename
                 + ". Unsupported cell function; supported functions are: "

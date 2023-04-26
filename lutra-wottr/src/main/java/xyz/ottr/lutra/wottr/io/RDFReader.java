@@ -87,6 +87,7 @@ public abstract class RDFReader<X> implements InputReader<X, Model> {
         var result = Result.of(model)
                 .flatMap(PrefixValidator::check);
 
+        result.setLocation("Source " + sourceLabel);
         result.addMessages(parsingMessages);
         result.addMessages(errorHandler.messages);
 

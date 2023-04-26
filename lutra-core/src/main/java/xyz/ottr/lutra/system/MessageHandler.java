@@ -184,7 +184,7 @@ public class MessageHandler {
             return;
         } 
         refs.put(trace, makeReference(curRef));
-        if (trace.hasIdentifier()) {
+        if (trace.hasLocation()) {
             // Assign enumeration to trace element, and append to trace
             context.append(toLocationString(trace, refs.get(trace)));
         }
@@ -206,7 +206,7 @@ public class MessageHandler {
     }
     
     private static String toLocationString(Trace trace, String enumStr) {
-        return "# >>> at " + enumStr + " " + trace.getIdentifier() + "\n";
+        return "# >>> at " + enumStr + " " + trace.getLocation() + "\n";
     }
     
     public void printLocation(Trace trace) {
