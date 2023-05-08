@@ -296,7 +296,7 @@ public class StandardTemplateStore implements TemplateStore {
 
         while (!missing.isEmpty()) {
             for (String toFetch : missing) {
-                if (failed.contains(toFetch)) { // check if IRI is already know to have failed before
+                if (failed.contains(toFetch)) { // skip if IRI has already failed
                     continue;
                 }
 
@@ -308,11 +308,11 @@ public class StandardTemplateStore implements TemplateStore {
 
                 if (!containsTemplate(toFetch)) {
                     failed.add(toFetch);
-                    messages.accept(Result.warning("Failed fetching template: " + toFetch));
+                    messages.accept(Result.error("Failed fetching template: " + toFetch));
                 }
             }
             missing = getMissingDependencies();
-            missing.removeAll(failed); // Do not attempt to fetch IRIs that previously failed
+            missing.removeAll(failed); // Do not fetch IRIs that have failed
         }
         return messages.getMessageHandler();
     }
