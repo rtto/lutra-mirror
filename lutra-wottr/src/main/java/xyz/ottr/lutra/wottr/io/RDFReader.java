@@ -27,6 +27,7 @@ import static org.apache.jena.riot.SysRIOT.fmtMessage;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.Getter;
+import org.apache.jena.atlas.web.HttpException;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.riot.RDFParserBuilder;
@@ -74,7 +75,7 @@ public abstract class RDFReader<X> implements InputReader<X, Model> {
 
         } catch (RiotParseException ignored) {
             // ignore RiotParseException as this is collected by the errorHandler.
-        } catch (RiotException ex) {
+        } catch (RiotException | HttpException ex) {
             parsingMessages.add(Message.error(errorHandler.getErrorMessagePrefix(), ex));
         } catch (NullPointerException ex) {
             // Ignore null pointers that are likely caused by our custom error handling:
