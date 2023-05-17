@@ -22,9 +22,11 @@ package xyz.ottr.lutra.stottr.writer;
  * #L%
  */
 
+
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.apache.jena.shared.PrefixMapping;
@@ -42,7 +44,12 @@ public class STermWriter {
 
     private final PrefixMapping prefixes;
     private final Set<String> usedPrefixNS;
-    private final Map<Term, String> variables; // maps variable terms to optional parameter/variable names
+    /**
+     * The variables map has two functions:
+     * 1. Its keySet contains the blank node terms that are used as variables.
+     * 2. The mapped value contains the name of the variable, which might be null, in case a variable name is not set.
+     */
+    private final Map<Term, String> variables;
 
     STermWriter(PrefixMapping prefixes, Map<Term, String> variables) {
         this.prefixes = prefixes;
@@ -111,21 +118,22 @@ public class STermWriter {
         String val = RDFTurtle.literal(literal.getValue());
         if (literal.getLanguageTag() != null) {
             val += RDFTurtle.literalLangSep + literal.getLanguageTag();
-        } else if (literal.getDatatype() != null && !literal.getDatatype().equals(RDFTurtle.plainLiteralDatatype)) {
+        } else if (!literal.getDatatype().equals(RDFTurtle.plainLiteralDatatype)) {
             val += RDFTurtle.literalTypeSep + writeIRI(literal.getDatatype());
         }
         return val;
     }
-    
+
+    /**
+     * A blank node may represent a variable or a regular blank node.
+     */
     private String writeBlank(BlankNodeTerm blank) {
-
-        String prefix = this.variables.keySet().contains(blank)
-            ? STOTTR.Terms.variablePrefix
-            : STOTTR.Terms.blankPrefix;
-
-        String label = this.variables.getOrDefault(blank, blank.getLabel()); // use parameter name, if set
-
-        return prefix + label;
+        if (this.variables.containsKey(blank)) {
+            return STOTTR.Terms.variablePrefix
+                + Objects.requireNonNullElse(this.variables.get(blank), blank.getLabel()); // use variable name, if set.
+        } else {
+            return STOTTR.Terms.blankPrefix + blank.getLabel();
+        }
     }
 
     private String writeList(ListTerm list) {
