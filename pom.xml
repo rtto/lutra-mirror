@@ -96,7 +96,7 @@
     <profile>
       <id>featureBranch</id>
       <properties>
-        <excludeTestsTags>sync</excludeTestsTags>
+        <excludeTestsTags>SpecificationIntegrationTest</excludeTestsTags> <!-- tests with @Tag("...") are skipped -->
       </properties>
     </profile>
   </profiles>

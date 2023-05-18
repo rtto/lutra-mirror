@@ -43,12 +43,14 @@ import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.ResourceFactory;
 import org.hamcrest.MatcherAssert;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import xyz.ottr.lutra.wottr.WOTTR;
 
 public class WottrVocabTest {
 
     @Test
+    @Tag("SpecificationIntegrationTest")
     public void testWOTTR04() {
 
         // read spec RDF file
