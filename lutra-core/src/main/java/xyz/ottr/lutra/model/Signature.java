@@ -22,10 +22,12 @@ package xyz.ottr.lutra.model;
  * #L%
  */
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.Builder;
 import lombok.Getter;
@@ -72,7 +74,7 @@ public class Signature implements ModelElement {
     @Override
     public boolean equals(Object o) {
         return this == o 
-                || Objects.nonNull(o) 
+                || Objects.nonNull(o)
                         && getClass() == o.getClass()
                         && Objects.equals(this.iri, ((Signature) o).iri);
     }
@@ -82,20 +84,35 @@ public class Signature implements ModelElement {
 
         var result = Result.of(this);
 
-        // duplicate variable names
-        var duplicateVarNames = this.getParameters().stream()
-                .collect(Collectors.groupingBy(p -> p.getTerm().getIdentifier())) // group parameters by variable name
-                .entrySet()
-                .stream()
-                .filter(e -> e.getValue().size() > 1)
-                .map(Map.Entry::getKey)
-                .collect(Collectors.toList());
+        // check for duplicate names and variables
+        var duplicateVarNames = getDuplicates(this.getParameters(), p -> p.getName());
         if (!duplicateVarNames.isEmpty()) {
+            result.addError("Parameter variable names must be unique. Signature contains multiple occurrences "
+                    + "of the same variable name: " + duplicateVarNames);
+        }
+        var duplicateVars = getDuplicates(this.getParameters(), p -> p.getTerm().getIdentifier());
+        if (!duplicateVars.isEmpty()) {
             result.addError("Parameter variables must be unique. Signature contains multiple occurrences "
-                + "of the same variable name: " + duplicateVarNames);
+                + "of the same variable: " + duplicateVars);
         }
 
         return result;
+    }
+
+    /**
+     * Generic method for getting duplicate values of *non-null* function calls applied to a collection.
+     * Returns the duplicate function call values.
+     */
+    public <X,V> Collection<V> getDuplicates(Collection<X> collection, Function<X,V> function) {
+        return collection.stream()
+                .map(function)
+                .filter(Objects::nonNull)
+                .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()))
+                .entrySet()
+                .stream()
+                .filter(e -> e.getValue() > 1)
+                .map(Map.Entry::getKey)
+                .collect(Collectors.toList());
     }
 
     public Instance asInstance() {
