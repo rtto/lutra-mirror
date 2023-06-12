@@ -25,6 +25,8 @@ package xyz.ottr.lutra.parser;
 import java.util.HashMap;
 import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.jena.datatypes.RDFDatatype;
+import org.apache.jena.datatypes.TypeMapper;
 import org.apache.jena.vocabulary.RDF;
 import xyz.ottr.lutra.OTTR;
 import xyz.ottr.lutra.model.terms.BlankNodeTerm;
@@ -66,8 +68,8 @@ public class TermParser {
     public static Result<LiteralTerm> toLiteralTerm(String value, String datatype, String language) {
 
         if (StringUtils.isNotEmpty(language) && !RDF.langString.getURI().equals(datatype)) {
-            return Result.error("Error creating literal. Cannot have a language tag: " + language
-                + " and the datatype: " + datatype);
+            return Result.error("Malformed literal value. Literals cannot have both a language tag '" + language
+                + "'' and the datatype '" + datatype + "' (the literal value is: '" + value + "')");
         } else if (StringUtils.isNotEmpty(language)) {
             return toLangLiteralTerm(value, language);
         } else if (StringUtils.isNotEmpty(datatype)) {
@@ -78,8 +80,19 @@ public class TermParser {
     }
 
     public static Result<LiteralTerm> toTypedLiteralTerm(String value, String datatype) {
-        return DataValidator.asURI(datatype)
-            .map(iri -> LiteralTerm.createTypedLiteral(value, iri));
+        Result<LiteralTerm> literal = Result.of(LiteralTerm.createTypedLiteral(value, datatype));
+
+        // get registered datatype
+        RDFDatatype registeredDatatype = TypeMapper.getInstance().getTypeByName(datatype);
+
+        if (registeredDatatype == null) {
+            literal.addWarning("Unusual literal datatype. The literal value'" + literal + "' uses a datatype '"
+                    + datatype + "' that is not registered by the parser");
+        } else if (!registeredDatatype.isValid(value)) {
+            literal.addError("Invalid literal value. The value '" + value + "' is not in the lexical space"
+                    + " of the datatype '" + datatype + "'");
+        }
+        return literal;
     }
 
     public static Result<LiteralTerm> toLangLiteralTerm(String value, String languageTag) {

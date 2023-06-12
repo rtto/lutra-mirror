@@ -1,0 +1,53 @@
+@prefix test: <http://example.com/test/ns#> .
+@prefix pav:   <http://purl.org/pav/> .
+@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix owl:   <http://www.w3.org/2002/07/owl#> .
+@prefix ottr:  <http://ns.ottr.xyz/0.4/> .
+@prefix o-owl-re: <http://tpl.ottr.xyz/owl/restriction/0.1/> .
+@prefix pz:    <http://www.co-ode.org/ontologies/pizza/pizza.owl#> .
+@prefix o-owl-ax: <http://tpl.ottr.xyz/owl/axiom/0.1/> .
+
+test:NamedPizza  a    ottr:Template ;
+        ottr:parameters  ( [ ottr:type      owl:Class ;
+                             ottr:variable  undefined:b0
+                           ]
+                           [ ottr:modifier  ottr:optional ;
+                             ottr:type      owl:NamedIndividual ;
+                             ottr:variable  _:b1
+                           ]
+                           [ ottr:type      ( ottr:NEList ottr:IRI ) ;
+                             ottr:variable  _:b2
+                           ]
+                         ) ;
+        ottr:pattern     [ ottr:arguments  ( [ ottr:value  _:b0 ]
+                                             [ ottr:value  pz:hasTopping ]
+                                             [ ottr:value  _:b3 ]
+                                           ) ;
+                           ottr:of         o-owl-ax:SubObjectAllValuesFrom
+                         ] ;
+        ottr:pattern     [ ottr:arguments  ( [ ottr:value  _:b0 ]
+                                             [ ottr:value  pz:NamedPizza ]
+                                           ) ;
+                           ottr:of         o-owl-ax:SubClassOf
+                         ] ;
+        ottr:pattern     [ ottr:arguments  ( [ ottr:value  _:b3 ]
+                                             [ ottr:value  _:b2 ]
+                                           ) ;
+                           ottr:of         o-owl-re:ObjectUnionOf
+                         ] ;
+        ottr:pattern     [ ottr:arguments  ( [ ottr:value  _:b0 ]
+                                             [ ottr:value  pz:hasTopping ]
+                                             [ ottr:modifier  ottr:listExpand ;
+                                               ottr:value     _:b2
+                                             ]
+                                           ) ;
+                           ottr:modifier   ottr:cross ;
+                           ottr:of         o-owl-ax:SubObjectSomeValuesFrom
+                         ] ;
+        ottr:pattern     [ ottr:arguments  ( [ ottr:value  _:b0 ]
+                                             [ ottr:value  pz:hasCountryOfOrigin ]
+                                             [ ottr:value  _:b1 ]
+                                           ) ;
+                           ottr:of         o-owl-ax:SubObjectHasValue
+                         ] ;
+        pav:version      "0.1.0" .

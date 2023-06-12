@@ -59,6 +59,7 @@ import xyz.ottr.lutra.store.expansion.NonCheckingExpander;
 import xyz.ottr.lutra.system.Message;
 import xyz.ottr.lutra.system.Result;
 import xyz.ottr.lutra.system.ResultStream;
+import xyz.ottr.lutra.wottr.util.PrefixMappings;
 import xyz.ottr.lutra.wottr.writer.WInstanceWriter;
 import xyz.ottr.lutra.writer.RDFNodeWriter;
 
@@ -116,6 +117,8 @@ public class HTMLTemplateWriter {
         var exampleInstance = signature.getExampleInstance();
         var expansionTree = getExpansionTree(exampleInstance);
 
+        PrefixMapping usedPrefixes = PrefixMappings.trim(signature, this.prefixMapping);
+
         return html(
             getHead(signature),
             body(
@@ -139,7 +142,7 @@ public class HTMLTemplateWriter {
                     writeSerialisations(signature),
 
                     getTOCHeading("Prefixes"),
-                    HTMLFactory.getPrefixDiv(this.prefixMapping).withId("prefixes")
+                    HTMLFactory.getPrefixDiv(usedPrefixes).withId("prefixes")
                 ),
                 HTMLFactory.getFooterDiv(),
                 HTMLFactory.getScripts()

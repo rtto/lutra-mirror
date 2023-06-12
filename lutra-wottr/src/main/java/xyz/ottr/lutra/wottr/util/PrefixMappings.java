@@ -31,6 +31,8 @@ import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.shared.PrefixMapping;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import xyz.ottr.lutra.model.Signature;
+import xyz.ottr.lutra.wottr.writer.WTemplateWriter;
 
 // TODO evolve this into a util class for checking conflicting prefixes?
 public enum PrefixMappings {
@@ -132,6 +134,17 @@ public enum PrefixMappings {
         }
         return model;
     }
+
+    public static PrefixMapping trim(Signature signature, PrefixMapping prefixes) {
+        WTemplateWriter writer = new WTemplateWriter(prefixes);
+        Model model = writer.getModel(signature);
+
+        PrefixMapping trimmedPrefixes = PrefixMapping.Factory.create();
+        trimmedPrefixes.setNsPrefixes(model.getNsPrefixMap());
+
+        return trimmedPrefixes;
+    }
+
 
     // TODO This might be too heavy for big data, should be possible to disable.
     private static Set<String> getAllURIsNamespaces(Model model) {

@@ -276,17 +276,24 @@ public class Query {
         String para = Tuple.freshVar();
         String parType = Tuple.freshVar();
         String args = Tuple.freshVar();
-        String outer = Tuple.freshVar();
+        String lstType = Tuple.freshVar();
 
         return instanceIRI(instance, temp)
             .and(parameterIndex(temp, index, para))
             .and(arguments(instance, args))
             .and(type(para, parType))
             .and(hasListExpander(args, index)
-                .and(innerTypeAt(parType, level, outer))
-                .and(innerType(outer, type))
+                .and(wrapIntoList(parType, lstType)) //binding lstType to "List<parType>"
+                .and(innerTypeAt(lstType, level, type)) // binding type to level'th nesting of types in List<parType>
                 .or(not(hasListExpander(args, index))
                     .and(innerTypeAt(parType, level, type))));
+    }
+
+    /**
+     * Wraps the first argument type into a listtype, i.e. ?type -> List<?type>.
+     */
+    public static Query wrapIntoList(String type, String lstType) {
+        return new Query((qe, m) -> qe.wrapIntoList(m, type, lstType));
     }
 
     ////////////////////

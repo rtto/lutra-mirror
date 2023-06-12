@@ -36,6 +36,7 @@ import xyz.ottr.lutra.docttr.visualisation.ModuleDependencyGraphVisualiser;
 import xyz.ottr.lutra.model.Signature;
 import xyz.ottr.lutra.store.TemplateStore;
 import xyz.ottr.lutra.system.Result;
+import xyz.ottr.lutra.wottr.util.PrefixMappings;
 import xyz.ottr.lutra.writer.RDFNodeWriter;
 
 public class HTMLIndexWriter extends HTMLMenuWriter {
@@ -51,6 +52,11 @@ public class HTMLIndexWriter extends HTMLMenuWriter {
 
         var iriDepViz = new DependencyGraphVisualiser(this.prefixMapping);
         var modDepViz = new ModuleDependencyGraphVisualiser(this.prefixMapping);
+
+        PrefixMapping usedPrefixes = PrefixMapping.Factory.create();
+        iris.forEach((k,v) -> {
+            usedPrefixes.withDefaultMappings(PrefixMappings.trim(v.get(), this.prefixMapping));
+        });
 
         return document(html(
             HTMLFactory.getHead("OTTR template library " + Objects.toString(root, "")),
@@ -79,7 +85,7 @@ public class HTMLIndexWriter extends HTMLMenuWriter {
                     text(", grouped by their namespace."))),
                 div(getSignatureList(root, iris))),
                 h2("Prefixes"),
-                HTMLFactory.getPrefixDiv(this.prefixMapping),
+                HTMLFactory.getPrefixDiv(usedPrefixes),
                 HTMLFactory.getFooterDiv(),
                 HTMLFactory.getScripts()
             ));

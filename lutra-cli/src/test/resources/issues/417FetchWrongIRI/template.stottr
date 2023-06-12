@@ -1,0 +1,7 @@
+@prefix ex: <http://example.com/ns#> .
+@prefix o: <http://tpl.ottr.xyz/rdf/0.1/> .
+
+ex:A[ ] :: {
+     o:type(ex:a, ex:b) # Should be o:Type
+} .
+

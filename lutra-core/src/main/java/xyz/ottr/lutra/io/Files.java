@@ -102,6 +102,17 @@ public enum Files {
             + (StringUtils.isNotBlank(uri.getFragment()) ? "/" + uri.getFragment() : "");
     }
 
+    public static boolean isRegularFile(String file) {
+        return java.nio.file.Files.isRegularFile(Path.of(file));
+    }
+
+    public static Message checkFileEmpty(String filename) {
+        if (new File(filename).length() == 0) {
+            return Message.error("The file " + filename + " is empty.");
+        }
+        return null;
+    }
+
     public static Message checkFolderReadable(Path path) throws SecurityException {
 
         try {
