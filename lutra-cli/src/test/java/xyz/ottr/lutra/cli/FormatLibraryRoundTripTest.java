@@ -70,6 +70,12 @@ public class FormatLibraryRoundTripTest {
         String firstTime = Files.readString(Path.of(ROOT + folder + "2stottr/" + iri + ".stottr"));
         String secondTime = Files.readString(Path.of(ROOT + folder + "4stottr/" + iri + ".stottr"));
 
-        assertEquals(firstTime, secondTime);
+        // have to align blank nodes
+        String blankNodeMatch = "_:blank\\d+";
+        String blankNodeReplace = "_:blank_X";
+        String stottr1 = firstTime.replaceAll(blankNodeMatch, blankNodeReplace);
+        String stottr2 = firstTime.replaceAll(blankNodeMatch, blankNodeReplace);
+
+        assertEquals(stottr1, stottr2);
     }
 }
