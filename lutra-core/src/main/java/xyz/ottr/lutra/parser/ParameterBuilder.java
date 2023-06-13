@@ -33,10 +33,11 @@ public enum ParameterBuilder {
     ;
 
     @Builder
-    public static Result<Parameter> createParameter(Result<Term> term, Result<Type> type, Result<Boolean> nonBlank,
+    public static Result<Parameter> createParameter(Result<Term> term, Result<String> name, Result<Type> type, Result<Boolean> nonBlank,
                                                     Result<Boolean> optional, Result<Term> defaultValue) {
 
         term = Result.nullToEmpty(term, Message.error("Missing variable. A parameter must have a variable term."));
+        name = Result.nullToEmpty(name);
         type = Result.nullToEmpty(type);
         nonBlank = Result.nullToEmpty(nonBlank);
         optional = Result.nullToEmpty(optional);
@@ -44,6 +45,7 @@ public enum ParameterBuilder {
 
         var builder = Result.of(Parameter.builder());
         builder.addResult(term, Parameter.ParameterBuilder::term);
+        builder.addResult(name, Parameter.ParameterBuilder::name);
         builder.addResult(type, Parameter.ParameterBuilder::type);
         builder.addResult(nonBlank, Parameter.ParameterBuilder::nonBlank);
         builder.addResult(optional, Parameter.ParameterBuilder::optional);

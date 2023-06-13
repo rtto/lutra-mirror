@@ -25,6 +25,7 @@ package xyz.ottr.lutra.wottr.parser;
 import java.util.ArrayList;
 import java.util.Set;
 import java.util.function.Function;
+import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
@@ -55,6 +56,7 @@ public class WParameterParser implements Function<RDFNode, Result<Parameter>> {
 
         var parameter = ParameterBuilder.builder()
             .term(parameterResource.flatMap(this::parseTerm))
+            .name(parameterResource.flatMap(this::parseName))
             .type(parameterResource.flatMap(this::parseType))
             .optional(modifiers.map(mods -> mods.contains(WOTTR.optional)))
             .nonBlank(modifiers.map(mods -> mods.contains(WOTTR.nonBlank)))
@@ -69,6 +71,11 @@ public class WParameterParser implements Function<RDFNode, Result<Parameter>> {
     private Result<Term> parseTerm(Resource parameter) {
         return ModelSelector.getRequiredObject(this.model, parameter, WOTTR.variable)
             .flatMap(WTermParser::toTerm);
+    }
+
+    private Result<String> parseName(Resource parameter) {
+        return ModelSelector.getOptionalLiteralObject(this.model, parameter, WOTTR.name)
+                .map(Literal::getString);
     }
 
     private Result<Type> parseType(Resource parameter) {

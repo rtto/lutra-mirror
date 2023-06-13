@@ -20,8 +20,9 @@
     </description>
 
     <properties>
-        <wottr.version>0.4.4</wottr.version>
+        <wottr.version>0.4.5</wottr.version>
         <url.wottrspec>https://spec.ottr.xyz/wOTTR/${wottr.version}/</url.wottrspec>
+        <!--url.wottrspec>https://dev.spec.ottr.xyz/wOTTR/</url.wottrspec-->
         <local.wottrspec>${project.basedir}/src/test/resources/spec/</local.wottrspec>
     </properties>
 

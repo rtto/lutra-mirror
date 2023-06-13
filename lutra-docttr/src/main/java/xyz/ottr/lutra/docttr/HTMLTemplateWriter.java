@@ -205,7 +205,8 @@ public class HTMLTemplateWriter {
             var p = parameters.get(index);
             table.with(tr(
                 td(Integer.toString(index + 1)),
-                td(text(this.prefixMapping.shortForm(p.getTerm().getIdentifier().toString()))),
+                td(text(Objects.requireNonNullElse(p.getName(),
+                        this.prefixMapping.shortForm(p.getTerm().getIdentifier().toString())))),
                 td(this.prefixMapping.shortForm(p.getTerm().getType().toString())),
                 td(p.isOptional() ? "yes" : "no"),
                 td(p.isNonBlank() ? "no" : "yes"),

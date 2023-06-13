@@ -22,6 +22,7 @@ package xyz.ottr.lutra.stottr.writer;
  * #L%
  */
 
+import java.util.HashMap;
 import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
@@ -31,6 +32,7 @@ import xyz.ottr.lutra.model.BaseTemplate;
 import xyz.ottr.lutra.model.Parameter;
 import xyz.ottr.lutra.model.Signature;
 import xyz.ottr.lutra.model.Template;
+import xyz.ottr.lutra.model.terms.Term;
 import xyz.ottr.lutra.model.types.BasicType;
 import xyz.ottr.lutra.model.types.ComplexType;
 import xyz.ottr.lutra.model.types.Type;
@@ -100,11 +102,12 @@ public class STemplateWriter implements TemplateWriter {
 
     public String writeSignature(Signature signature, boolean includePrefixes) {
 
-        var parameterVariables = signature.getParameters().stream()
-            .map(Parameter::getTerm)
-            .collect(Collectors.toSet());
+        var variableMap = new HashMap<Term, String>();
+        // cannot use stream collector as it does not support inserting null values.
+        signature.getParameters().stream()
+                .forEach(parameter -> variableMap.put(parameter.getTerm(), parameter.getName()));
 
-        STermWriter termWriter = new STermWriter(this.prefixes, parameterVariables);
+        STermWriter termWriter = new STermWriter(this.prefixes, variableMap);
 
         StringBuilder builder = new StringBuilder();
 
@@ -125,7 +128,6 @@ public class STemplateWriter implements TemplateWriter {
 
         return builder.toString();
     }
-
 
     protected StringBuilder writeSignature(Signature signature, STermWriter termWriter) {
 

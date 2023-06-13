@@ -62,6 +62,7 @@ public class WOTTR {
     // Properties
     public static final Property parameters = getProperty(ns + "parameters");
     public static final Property variable = getProperty(ns + "variable");
+    public static final Property name = getProperty(ns + "name");
     public static final Property type = getProperty(ns + "type");
     public static final Property defaultVal = getProperty(ns + "default");
     public static final Property pattern = getProperty(ns + "pattern");
