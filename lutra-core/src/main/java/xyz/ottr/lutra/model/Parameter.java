@@ -42,16 +42,21 @@ import xyz.ottr.lutra.system.Result;
 public class Parameter implements ModelElement, HasGetTerm {
 
     private final @NonNull Term term;
+    private final String name;
     private final boolean nonBlank;
     private final boolean optional;
     private final Term defaultValue;
 
     @Builder
-    public static Parameter create(@NonNull Term term, Type type, boolean nonBlank, boolean optional, Term defaultValue) {
+    public static Parameter create(@NonNull Term term, String name, Type type, boolean nonBlank, boolean optional, Term defaultValue) {
         term.setVariable(true);
         term.setType(Objects.requireNonNullElse(type, term.getVariableType()));
 
-        return new Parameter(term, nonBlank, optional, defaultValue);
+        if (name == null) {
+            name = term.getIdentifier().toString();
+        }
+
+        return new Parameter(term, name, nonBlank, optional, defaultValue);
     }
 
     public static List<Parameter> listOf(Term... terms) {
