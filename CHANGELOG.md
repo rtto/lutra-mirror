@@ -11,13 +11,11 @@ Support for named parameters, parameters may be given a persistant name. Bug fix
 
 Milestone: https://gitlab.com/groups/ottr/lutra/-/milestones/2
 
+Closed issues:
+
  - lutra · Stable and informative representation of parameters and their variables #223
  - lutra · Feching template using wrong IRI gives unhelpful error message #417
  - lutra · Generated Changelog  #123
-
-
-Closed issues:
-
 
 ## 0.6.17 - 2022.04.10
 
