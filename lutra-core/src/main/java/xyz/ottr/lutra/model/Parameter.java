@@ -52,6 +52,10 @@ public class Parameter implements ModelElement, HasGetTerm {
         term.setVariable(true);
         term.setType(Objects.requireNonNullElse(type, term.getVariableType()));
 
+        if (name == null) {
+            name = term.getIdentifier().toString();
+        }
+
         return new Parameter(term, name, nonBlank, optional, defaultValue);
     }
 

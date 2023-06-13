@@ -54,7 +54,7 @@ class SParameterParserVisitor extends SBaseParserVisitor<Parameter> {
         return ParameterBuilder.builder()
             .term(parseTerm(ctx))
             .type(parseType(ctx))
-            .name(parseName(ctx))
+            //.name(parseName(ctx))
             .optional(Result.of(modifiers.contains(STOTTR.Parameters.optional)))
             .nonBlank(Result.of(modifiers.contains(STOTTR.Parameters.nonBlank)))
             .defaultValue(parseDefaultValue(ctx))
@@ -89,12 +89,14 @@ class SParameterParserVisitor extends SBaseParserVisitor<Parameter> {
         return Result.of(new BlankNodeTerm(this.termParser.getVariableLabel(ctx.Variable())));
     }
 
+    /*
     private Result<String> parseName(stOTTRParser.ParameterContext ctx) {
         if (ctx.Variable() == null) {
             return Result.error("Unrecognized parameter variable " + SParserUtils.getTextWithLineAndColumnString(ctx));
         }
         return Result.of(this.termParser.getVariableLabel(ctx.Variable()));
     }
+    */
 
     private Result<Type> parseType(stOTTRParser.ParameterContext ctx) {
         return Result.ofNullable(ctx.type())
