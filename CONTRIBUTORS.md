@@ -26,4 +26,4 @@ Thanks to all contributors!
 
 - Martin G. Skjæveland (2017 -- )
 - Leif Harald Karlsen (2017 -- )
-- Oliver Stahl (2020 -- )
+- Oliver Stahl (2020 -- 2023)
