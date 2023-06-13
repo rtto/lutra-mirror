@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 Support for named parameters, parameters may be given a persistant name. Bug fixes to Lutra and specs.
 
-Milestone: https://gitlab.com/groups/ottr/lutra/-/milestones/2
+Milestone: https://gitlab.com/groups/ottr/-/milestones/2
 
 Closed issues:
 
