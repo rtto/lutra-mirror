@@ -23,6 +23,7 @@ package xyz.ottr.lutra.system;
  */
 
 import java.io.PrintStream;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
@@ -39,7 +40,6 @@ public class MessageHandler {
 
     private final Set<Trace> traces;
     private final PrintStream printStream;
-    private final Set<String> printedMsgs;
 
     @Setter
     private boolean quiet;
@@ -47,7 +47,6 @@ public class MessageHandler {
     public MessageHandler(PrintStream printStream) {
         this.printStream = printStream;
         this.traces = new LinkedHashSet<>();
-        this.printedMsgs = new LinkedHashSet<>();
     }
 
     public MessageHandler() {
@@ -148,16 +147,44 @@ public class MessageHandler {
      * the level of the most severe Message.
      */
     public Message.Severity printMessages() {
-        var severity = visitMessagesAndTraces(this::printMessage, this::printLocation);
-        return severity;
+        //var severity = visitMessagesAndTraces(this::printMessage, this::printLocation);
+        //return severity;
+        Message.Severity[] mostSevere = { Message.Severity.least() };
+
+        Trace.visitPaths(this.traces, path -> {
+            String indent = "";
+            for (Trace trace : path) {
+                for (Message msg : trace.getMessages()) {
+                    this.printMessage(msg, indent);
+                    if (msg.getSeverity().isGreaterEqualThan(mostSevere[0])) {
+                        mostSevere[0] = msg.getSeverity();
+                    }
+                }
+                if (!trace.getMessages().isEmpty()) {
+                    indent = indent + "  ";
+                }
+            }
+            this.printStream.println("");
+            this.printLocations(path);
+            this.printStream.println("\n");
+        });
+        return mostSevere[0];
     }
 
+    private void printLocations(Collection<Trace> traces) {
+
+        this.printStream.println("Location(s):");
+        traces.stream()
+            .filter(t -> t.hasLocation())
+            .forEach(t -> this.printStream.println("- " + t.getLocation()));
+    }
 
     public void printMessage(Message msg) {
-        if (!this.quiet && !this.printedMsgs.contains(msg.toString())) {
-            this.printStream.println("\n" + msg);
-            this.printedMsgs.add(msg.toString());
-        }
+        printMessage(msg, "\n");
+    }
+
+    public void printMessage(Message msg, String prefix) {
+        this.printStream.println(prefix + msg);
     }
 
     private static String getLocation(Trace trace) {

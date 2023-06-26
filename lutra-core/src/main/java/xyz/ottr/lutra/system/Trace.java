@@ -6,8 +6,11 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.Stack;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 import lombok.Setter;
+import org.apache.commons.collections4.SetUtils;
 
 /*-
  * #%L 
@@ -162,6 +165,41 @@ public class Trace {
             trace.trace.stream()
                 .filter(t -> !visited.contains(t))
                 .forEach(toVisit::add);
+        }
+    }
+
+    /**
+     * Visits all paths trough the Trace-graph depth-first, starting from the roots,
+     * feeding each path to the argument consumer.
+     */
+    protected static void visitPaths(Set<Trace> traces, Consumer<List<Trace>> pathConsumer) {
+        
+        Set<Trace> nonRoots = traces.stream()
+            .flatMap(t -> t.trace.stream())
+            .collect(Collectors.toSet());
+
+        Set<Trace> roots = SetUtils.difference(traces, nonRoots);
+        visitPathsFromNodes(roots, pathConsumer, new Stack<>());
+    }
+
+    private static void visitPathsFromNodes(Set<Trace> nodes,
+            Consumer<List<Trace>> pathConsumer, Stack<Trace> currentPath) {
+
+        if (nodes.isEmpty()) { // Reached end of path
+
+            // If the path contains at least one Message, send it to consumer
+            if (currentPath.stream().anyMatch(t -> !t.messages.isEmpty())) {
+                pathConsumer.accept(new LinkedList<>(currentPath));
+            }
+        } else { // Traverse further
+
+            for (Trace node : nodes) { // Make one path per node
+                currentPath.push(node);
+                visitPathsFromNodes(node.trace, pathConsumer, currentPath);
+            }
+        }
+        if (!currentPath.empty()) {
+            currentPath.pop();
         }
     }
 }
