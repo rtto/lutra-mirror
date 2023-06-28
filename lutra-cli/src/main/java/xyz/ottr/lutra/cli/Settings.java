@@ -130,12 +130,11 @@ public class Settings {
                        + "default: ${DEFAULT-VALUE})"})
     public Mode mode = Mode.expand;
 
-    @Option(names = {"--debugFullTrace"},
-        description = {"This enables tracing such that printed messages get a stack trace "
-                       + "giving more information on the location of the concerned objects. "
-                       + "NB! Enabling this flag will deteriorate performance.%n"
+    @Option(names = {"--disableFullTrace"},
+        description = {"This disable tracing such that printed messages get a stack trace "
+                       + "giving less information on the location of the concerned objects. "
                        + "default: ${DEFAULT-VALUE})"})
-    public boolean debugFullTrace = false;
+    public boolean disableFullTrace = false;
 
     @Option(names = {"--debugStackTrace"},
         description = {"This enables printing a regular java stack trace for error messages."

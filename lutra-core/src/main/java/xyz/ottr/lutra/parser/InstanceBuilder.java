@@ -53,7 +53,7 @@ public enum InstanceBuilder {
                 .flatMap(Instance::validate);
         } else {
             return Result.empty(
-                Message.error("Error building instance of template '"
+                Message.error("Error in instance of template '"
                     + iri.orElse("[IRI missing]")
                     + "'."
                 ),

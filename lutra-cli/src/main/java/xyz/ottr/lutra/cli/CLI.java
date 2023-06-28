@@ -146,7 +146,7 @@ public class CLI {
     ////////////////////////////////////////////////////////////
 
     private void initTemplateManager() {
-        this.templateManager.setFullTrace(this.settings.debugFullTrace);
+        this.templateManager.setFullTrace(!this.settings.disableFullTrace);
         this.templateManager.setStackTrace(this.settings.debugStackTrace);
         //this.templateManager.setHaltOn(this.settings.haltOn);
         this.templateManager.setFetchMissingDependencies(this.settings.fetchMissingDependencies);

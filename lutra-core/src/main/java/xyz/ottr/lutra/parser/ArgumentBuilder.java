@@ -45,7 +45,7 @@ public enum ArgumentBuilder {
             return builder.map(Argument.ArgumentBuilder::build)
                 .flatMap(Argument::validate);
         } else {
-            return Result.empty(Message.error("Error building argument."), builder);
+            return Result.empty(Message.error("Error in argument."), builder);
         }
     }
 

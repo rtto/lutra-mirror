@@ -154,20 +154,6 @@ public class Trace {
         this.messages.addAll(msgs);
     }
 
-    protected static void visitTraces(Collection<Trace> traces, Consumer<Trace> traceConsumer) {
-
-        Set<Trace> visited = new HashSet<>();
-        LinkedList<Trace> toVisit = new LinkedList<>(traces);
-        while (!toVisit.isEmpty()) {
-            Trace trace = toVisit.poll();
-            traceConsumer.accept(trace);
-            visited.add(trace);
-            trace.trace.stream()
-                .filter(t -> !visited.contains(t))
-                .forEach(toVisit::add);
-        }
-    }
-
     /**
      * Visits all paths trough the Trace-graph depth-first, starting from the roots,
      * feeding each path to the argument consumer.

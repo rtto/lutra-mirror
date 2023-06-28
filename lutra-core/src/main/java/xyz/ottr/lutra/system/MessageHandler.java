@@ -22,35 +22,43 @@ package xyz.ottr.lutra.system;
  * #L%
  */
 
+import java.io.OutputStream;
 import java.io.PrintStream;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
-import lombok.Setter;
 
 public class MessageHandler {
 
-    private static int count;
-
     private final Set<Trace> traces;
-    private final PrintStream printStream;
-
-    @Setter
+    private final PrintStream initPrintStream;
+    private PrintStream printStream;
     private boolean quiet;
 
     public MessageHandler(PrintStream printStream) {
+        this.initPrintStream = printStream;
         this.printStream = printStream;
         this.traces = new LinkedHashSet<>();
     }
 
     public MessageHandler() {
         this(System.err);
+    }
+
+    public void setQuiet(boolean quiet) {
+
+        this.quiet = quiet;
+        if (this.quiet) {
+            // Ignore printing
+            this.printStream = new PrintStream(OutputStream.nullOutputStream());
+        } else {
+            // reset to original
+            this.printStream = this.initPrintStream;
+        }
     }
 
     public void add(Message msg) {
@@ -103,42 +111,26 @@ public class MessageHandler {
      * relevant for accepted Result-s.
      */
     public List<Message> getMessages() {
+
         List<Message> msgs = new LinkedList<>();
-        Trace.visitTraces(this.traces, trace -> msgs.addAll(trace.getMessages()));
+        List<Trace> current = new LinkedList<>();
+        current.addAll(this.traces);
+
+        while (!current.isEmpty()) {
+            Trace t = current.remove(0);
+            msgs.addAll(t.getMessages());
+            current.addAll(t.getTrace());
+        }
         return msgs;
     }
 
     public Message.Severity getMostSevere() {
-        return visitMessagesAndTraces(_ignore -> { }, _ignore -> { });
+        return getMessages().stream()
+            .max(Message.severityComparator)
+            .map(m -> m.getSeverity())
+            .orElse(Message.Severity.least());
     }
 
-    /**
-     * Visits all Messages on all Traces contained in this, and feeds them to the
-     * Message consumer, and in case a Message on a Trace was fed to the Message consumer,
-     * it also feeds the Trace to the Trace consumer.
-     * @param msgConsumer
-     *      Consumer that accepts all Messages on all Traces in this MessageHandler
-     * @param traceConsumer
-     *      Consumer that accepts all Traces containing at least one Message in this MessageHandler
-     */
-    private Message.Severity visitMessagesAndTraces(Consumer<Message> msgConsumer, Consumer<Trace> traceConsumer) {
-
-        Message.Severity[] mostSevere = { Message.Severity.least() };
-
-        Trace.visitTraces(this.traces, trace -> {
-            for (Message msg : trace.getMessages()) {
-                msgConsumer.accept(msg);
-                if (msg.getSeverity().isGreaterEqualThan(mostSevere[0])) {
-                    mostSevere[0] = msg.getSeverity();
-                }
-            }
-            if (!trace.getMessages().isEmpty()) {
-                traceConsumer.accept(trace);
-            }
-        });
-        return mostSevere[0];
-    }
-    
     /**
      * Prints all Message-s from all Result-s
      * as described in #getMessages() together
@@ -147,15 +139,18 @@ public class MessageHandler {
      * the level of the most severe Message.
      */
     public Message.Severity printMessages() {
-        //var severity = visitMessagesAndTraces(this::printMessage, this::printLocation);
-        //return severity;
+        return printMessagesTo(s -> this.printStream.print(s));
+    }
+
+    public Message.Severity printMessagesTo(Consumer<String> output) {
+
         Message.Severity[] mostSevere = { Message.Severity.least() };
 
         Trace.visitPaths(this.traces, path -> {
             String indent = "";
             for (Trace trace : path) {
                 for (Message msg : trace.getMessages()) {
-                    this.printMessage(msg, indent);
+                    this.printMessage(msg, indent, output);
                     if (msg.getSeverity().isGreaterEqualThan(mostSevere[0])) {
                         mostSevere[0] = msg.getSeverity();
                     }
@@ -164,90 +159,34 @@ public class MessageHandler {
                     indent = indent + "  ";
                 }
             }
-            if (path.stream().any(t -> t.hasLocation())) {
-                this.printLocations(path);
+            if (path.stream().anyMatch(t -> t.hasLocation())) {
+                this.printLocations(path, output);
             }
-            this.printStream.println();
+            output.accept("\n");
         });
         return mostSevere[0];
     }
 
-    private void printLocations(Collection<Trace> traces) {
+    private void printLocations(Collection<Trace> traces, Consumer<String> output) {
 
-        this.printStream.println("Location(s):");
+        output.accept("Location(s):\n");
         traces.stream()
             .filter(t -> t.hasLocation())
-            .forEach(t -> this.printStream.println("- " + t.getLocation()));
+            .map(t -> "- " + t.getLocation() + "\n")
+            .forEach(output);
     }
 
     public void printMessage(Message msg) {
-        printMessage(msg, "\n");
+        printMessage(msg, "\n", s -> this.printStream.print(s));
     }
 
-    public void printMessage(Message msg, String prefix) {
-        this.printStream.println(prefix + msg);
+    public void printMessage(Message msg, String prefix, Consumer<String> output) {
+        output.accept(prefix + msg + "\n");
     }
 
-    private static String getLocation(Trace trace) {
-        StringBuilder context = new StringBuilder();
-        count = 0;
-        getLocationRecur(context, trace, "1", new HashMap<>());
-        return context.toString();
-    }
-
-    /**
-     * Writes out a stack trace and enumerates the elements of the stack
-     * trace with an enumeration (dot separated number sequence, e.g. 1.3.2)
-     * such that siblings get their parents enumeration appended with a number
-     * denoting its sibling number (e.g. a node with enumeration 1.2 and three
-     * children will make the three children get enumeration 1.2.1, 1.2.2, and 1.2.3).
-     * This enumeration is then used to reference already visited trace elements.
-     */
-    private static void getLocationRecur(StringBuilder context, Trace trace,
-           String curRef, Map<Trace, String> refs) {
-        
-        if (refs.containsKey(trace)) {
-            // Already printed subtrace, just reference to its enumeration and returns
-            context.append(toReferenceString(curRef, refs.get(trace)));
-            return;
-        } 
-        refs.put(trace, makeReference(curRef));
-        if (trace.hasLocation()) {
-            // Assign enumeration to trace element, and append to trace
-            context.append(toLocationString(trace, refs.get(trace)));
-        }
-
-        int c = 1;
-        for (Trace child : trace.getTrace()) {
-            getLocationRecur(context, child, curRef + "." + c, refs); 
-            c++;
-        }
-    }
-
-    private static String makeReference(String ref) {
-        count++;
-        return "[" + count + ": " + ref + "]";
-    }
-    
-    private static String toReferenceString(String curRef, String eqRef) {
-        return "# >>> at " + makeReference(curRef) + " = " + eqRef + "\n";
-    }
-    
-    private static String toLocationString(Trace trace, String enumStr) {
-        return "# >>> at " + enumStr + " " + trace.getLocation() + "\n";
-    }
-    
-    public void printLocation(Trace trace) {
-        if (!this.quiet) {
-            this.printStream.print(getLocation(trace));
-        }
-    }
-    
     public Optional<Message> toSingleMessage(String initialMessage) {
         StringBuilder str = new StringBuilder();
-        var severity = visitMessagesAndTraces(
-            msg -> str.append(msg).append("\n"),
-            trace -> str.append(getLocation(trace)));
+        var severity = printMessagesTo(s -> str.append(s));
 
         if (str.length() == 0) { // No messages added
             return Optional.empty();
@@ -255,5 +194,4 @@ public class MessageHandler {
         str.insert(0, initialMessage + "\n");
         return Optional.of(new Message(severity, str.toString()));
     }
-
 }
