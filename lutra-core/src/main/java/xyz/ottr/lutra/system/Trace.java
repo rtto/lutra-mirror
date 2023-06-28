@@ -9,7 +9,6 @@ import java.util.Set;
 import java.util.Stack;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
-import lombok.Setter;
 import org.apache.commons.collections4.SetUtils;
 
 /*-
@@ -38,17 +37,12 @@ public class Trace {
 
     private Optional<String> location;
     private final Set<Trace> trace;
-    private final Collection<Message> messages;
-    @Setter private static boolean deepTrace;
+    private final List<Message> messages;
    
     protected Trace(Optional<String> location) {
         this.location = location;
         this.trace = new HashSet<>();
-        if (deepTrace) {
-            this.messages = new LinkedList<>();
-        } else {
-            this.messages = new HashSet<>();
-        }
+        this.messages = new LinkedList<>();
     }
     
     protected Trace() {
@@ -61,15 +55,7 @@ public class Trace {
     
     protected static Trace fork(Collection<Trace> fs) {
         Trace fork = new Trace();
-        if (fork.deepTrace) {
-            for (Trace f : fs) {
-                if (f.hasLocation() || f.hasMessages()) {
-                    fork.trace.add(f);
-                }
-            }
-        } else {
-            fs.stream().forEach(f -> fork.addMessages(f.getMessages()));
-        }
+        fs.forEach(fork.trace::add);
         return fork;
     }
     
@@ -103,12 +89,7 @@ public class Trace {
      *      Trace element to add to this' trace
      */
     protected void addTrace(Trace elem) {
-        if (deepTrace) {
-            Set<Trace> visited = new HashSet<>();
-            addTrace(elem, visited);
-        } else {
-            this.addMessages(elem.getMessages());
-        }
+        addTrace(elem, new HashSet<>());
     }
     
     private void addTrace(Trace elem, Set<Trace> visited) {
@@ -134,14 +115,10 @@ public class Trace {
     protected void addDirectTrace(Trace elem) {
 
         if (!this.equals(elem)) {
-            if (deepTrace) {
-                if (elem.hasLocation() || elem.hasMessages()) {
-                    this.trace.add(elem);
-                } else {
-                    elem.getTrace().forEach(this::addDirectTrace);
-                }
+            if (elem.hasLocation() || elem.hasMessages()) {
+                this.trace.add(elem);
             } else {
-                this.addMessages(elem.getMessages());
+                elem.getTrace().forEach(this::addDirectTrace);
             }
         }
     }
@@ -180,8 +157,12 @@ public class Trace {
         } else { // Traverse further
 
             for (Trace node : nodes) { // Make one path per node
-                currentPath.push(node);
-                visitPathsFromNodes(node.trace, pathConsumer, currentPath);
+                if (!currentPath.contains(node)) { //Avoid cycles
+                    currentPath.push(node);
+                    visitPathsFromNodes(node.trace, pathConsumer, currentPath);
+                } else {
+                    pathConsumer.accept(new LinkedList<>(currentPath));
+                }
             }
         }
         if (!currentPath.empty()) {

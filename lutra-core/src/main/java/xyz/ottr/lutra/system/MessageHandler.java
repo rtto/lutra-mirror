@@ -25,6 +25,7 @@ package xyz.ottr.lutra.system;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -68,9 +69,7 @@ public class MessageHandler {
     }
 
     public void add(Trace trace) {
-        if (trace != null
-            && !(trace.getMessages().isEmpty() && trace.getTrace().isEmpty())) { // Avoid adding empty Trace
-
+        if (trace != null) {
             this.traces.add(trace);
         }
     }
@@ -113,13 +112,18 @@ public class MessageHandler {
     public List<Message> getMessages() {
 
         List<Message> msgs = new LinkedList<>();
-        List<Trace> current = new LinkedList<>();
-        current.addAll(this.traces);
+        List<Trace> current = new LinkedList<>(this.traces);
+        Set<Trace> visited = new HashSet<>(this.traces);
 
         while (!current.isEmpty()) {
             Trace t = current.remove(0);
             msgs.addAll(t.getMessages());
-            current.addAll(t.getTrace());
+            for (Trace nt : t.getTrace()) {
+                if (!visited.contains(nt)) {
+                    current.add(nt);
+                    visited.add(nt);
+                }
+            }
         }
         return msgs;
     }
