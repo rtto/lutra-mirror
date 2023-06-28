@@ -35,7 +35,7 @@ public class BInstanceReader implements InstanceParser<String> {
     @Override
     public ResultStream<Instance> apply(String file) {
                 
-        var res = Result.of(file).setLocation("bOTTR-file " + file);
+        var res = Result.of(file).setLocation("bOTTR file " + file);
         return ResultStream.of(res)
                 .innerFlatMap(RDFIO.fileReader())
                 .innerFlatMap(new BInstanceMapParser(file))

@@ -53,7 +53,7 @@ public enum SignatureBuilder {
                 .flatMap(Signature::validate)
                 .map(s -> (Signature)s);
         } else {
-            return Result.empty(Message.error("Error building signature."), builder);
+            return Result.empty(Message.error("Error found in parts of signature."), builder);
         }
     }
 }

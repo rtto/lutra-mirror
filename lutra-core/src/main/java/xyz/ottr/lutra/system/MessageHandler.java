@@ -164,9 +164,10 @@ public class MessageHandler {
                     indent = indent + "  ";
                 }
             }
-            this.printStream.println("");
-            this.printLocations(path);
-            this.printStream.println("\n");
+            if (path.stream().any(t -> t.hasLocation())) {
+                this.printLocations(path);
+            }
+            this.printStream.println();
         });
         return mostSevere[0];
     }
