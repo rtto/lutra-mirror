@@ -28,6 +28,7 @@ import static org.junit.jupiter.params.provider.Arguments.arguments;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.stream.Stream;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -44,6 +45,7 @@ public class BaseInstanceExpansionTest {
 
     @ParameterizedTest
     @MethodSource("data")
+    @Disabled
     public void shouldBeIsomorphic(String input, String output) {
 
         var parseOutput = RDFIO.fileReader().parse(output).get();

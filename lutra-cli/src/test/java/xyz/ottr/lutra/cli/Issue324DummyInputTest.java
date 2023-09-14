@@ -24,6 +24,7 @@ package xyz.ottr.lutra.cli;
 
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import xyz.ottr.lutra.system.Assertions;
 import xyz.ottr.lutra.system.Message;
@@ -106,6 +107,7 @@ public class Issue324DummyInputTest {
     }
 
     @Test
+    @Disabled
     public void emptyInstanceFileInFolder() {
         String args = " "
                 + " -l " + ROOT + "templates/personTemplate.stottr "

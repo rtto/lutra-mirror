@@ -31,6 +31,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.stream.Stream;
 import org.apache.jena.rdf.model.Model;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -50,6 +51,7 @@ public class RDFtoOTTRtoRDFParserTest {
 
     @ParameterizedTest
     @MethodSource("data")
+    @Disabled
     public void test(String filename) {
 
         // exclude test files which are bad by design

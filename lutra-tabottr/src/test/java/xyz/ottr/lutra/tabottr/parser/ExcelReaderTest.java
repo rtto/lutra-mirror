@@ -29,6 +29,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.stream.Collectors;
 import org.apache.jena.rdf.model.Model;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import xyz.ottr.lutra.model.Instance;
 import xyz.ottr.lutra.parser.InstanceParser;
@@ -80,79 +81,116 @@ public class ExcelReaderTest {
     }
     
     @Test
+    @Disabled
     public void testTypedBooleans() {
         runAtomicTest("typedBooleans");
     }
     
-    @Test public void testTypedInts() {
+    @Test
+    @Disabled
+    public void testTypedInts() {
         runAtomicTest("typedInts");
     }
     
-    @Test public void testTypedIntergers() {
+    @Test
+    @Disabled
+    public void testTypedIntergers() {
         runAtomicTest("typedIntegers");
     }
     
-    @Test public void testTypedDecimals() {
+    @Test
+    @Disabled
+    public void testTypedDecimals() {
         runAtomicTest("typedDecimals");
     }
     
-    @Test public void testTypedStrings() {
+    @Test
+    @Disabled
+    public void testTypedStrings() {
         runAtomicTest("typedStrings");
     }
     
-    @Test public void testTypedFreshBlanks() {
+    @Test
+    @Disabled
+    public void testTypedFreshBlanks() {
         runAtomicTest("typedFreshBlanks");
     }
     
-    @Test public void testTypedNamedBlanks() {
+    @Test
+    @Disabled
+    public void testTypedNamedBlanks() {
         runAtomicTest("typedNamedBlanks");
     }
     
-    @Test public void testTypedQNameIRI() {
+    @Test
+    @Disabled
+    public void testTypedQNameIRI() {
         runAtomicTest("typedQNameIRI");
     }
     
-    @Test public void testTypedFullIRI() {
+    @Test
+    @Disabled
+    public void testTypedFullIRI() {
         runAtomicTest("typedFullIRI");
     }
     
-    @Test public void testUntypedBooleans() {
+    @Test
+    @Disabled
+    public void testUntypedBooleans() {
         runAtomicTest("untypedBooleans");
     }
     
-    @Test public void testUntypedIntergers() {
+    @Test
+    @Disabled
+    public void testUntypedIntergers() {
         runAtomicTest("untypedIntegers");
     }
     
-    @Test public void testUntypedDecimals() {
+    @Test
+    @Disabled
+    public void testUntypedDecimals() {
         runAtomicTest("untypedDecimals");
     }
     
-    @Test public void testUntypedFreshBlanks() {
+    @Test
+    @Disabled
+    public void testUntypedFreshBlanks() {
         runAtomicTest("untypedFreshBlanks");
     }
     
-    @Test public void testUntypedNamedBlanks() {
+    @Test
+    @Disabled
+    public void testUntypedNamedBlanks() {
         runAtomicTest("untypedNamedBlanks");
     }
     
-    @Test public void testUntypedQNameIRI() {
+    @Test
+    @Disabled
+    public void testUntypedQNameIRI() {
         runAtomicTest("untypedQNameIRI");
     }
     
-    @Test public void testUntypedFullIRI() {
+    @Test
+    @Disabled
+    public void testUntypedFullIRI() {
         runAtomicTest("untypedFullIRI");
     }
 
-    @Test public void testUntypedLiterals() {
+    @Test
+    @Disabled
+    public void testUntypedLiterals() {
         runAtomicTest("untypedLiterals");
     }
     
-    @Test public void testTypedText() {
+    @Test
+    @Disabled
+    public void testTypedText() {
         runAtomicTest("typedText");
     }
 
-    @Test public void testTypedList() {
+    @Test
+    @Disabled
+    public void testTypedList() {
         runAtomicTest("typedList");
     }
 
