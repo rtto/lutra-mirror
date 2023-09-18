@@ -87,6 +87,7 @@ public class CLI {
         }
 
         this.messageHandler.setQuiet(this.settings.quiet);
+        this.messageHandler.setLinePrefix(this.settings.linePrefix);
 
         if (cli.isUsageHelpRequested()) {
             cli.usage(this.outStream);

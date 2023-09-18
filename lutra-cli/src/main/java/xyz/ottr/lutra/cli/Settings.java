@@ -115,6 +115,11 @@ public class Settings {
                        + "(default: ${DEFAULT-VALUE})"})
     public boolean quiet = false;
 
+    @Option(names = {"--messageLinePrefix"},
+        description = {"Set line prefix for output messages (use e.g. '#' to make output become comments).%n"
+                       + "(default: ${DEFAULT-VALUE})"})
+    public String linePrefix = "";
+
     @Option(names = {"--haltOn"},
         description = {"Halt execution upon receiving messages with a severity equal to or greater than this value.%n"
                         + "(legal values: ${COMPLETION-CANDIDATES}; "

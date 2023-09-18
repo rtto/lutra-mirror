@@ -32,6 +32,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 public class MessageHandler {
 
@@ -39,6 +40,7 @@ public class MessageHandler {
     private final PrintStream initPrintStream;
     private PrintStream printStream;
     private boolean quiet;
+    private String linePrefix = "";
 
     public MessageHandler(PrintStream printStream) {
         this.initPrintStream = printStream;
@@ -48,6 +50,10 @@ public class MessageHandler {
 
     public MessageHandler() {
         this(System.err);
+    }
+
+    public void setLinePrefix(String linePrefix) {
+        this.linePrefix = linePrefix;
     }
 
     public void setQuiet(boolean quiet) {
@@ -143,7 +149,7 @@ public class MessageHandler {
      * the level of the most severe Message.
      */
     public Message.Severity printMessages() {
-        return printMessagesTo(s -> this.printStream.print(s));
+        return printMessagesTo(s -> this.printStream.println(s));
     }
 
     public Message.Severity printMessagesTo(Consumer<String> output) {
@@ -166,26 +172,29 @@ public class MessageHandler {
             if (path.stream().anyMatch(t -> t.hasLocation())) {
                 this.printLocations(path, output);
             }
-            output.accept("\n");
+            output.accept("");
         });
         return mostSevere[0];
     }
 
     private void printLocations(Collection<Trace> traces, Consumer<String> output) {
 
-        output.accept("Location(s):\n");
+        output.accept(addLinePrefix("Location(s):"));
         traces.stream()
             .filter(t -> t.hasLocation())
-            .map(t -> "- " + t.getLocation() + "\n")
+            .map(t -> "- " + t.getLocation())
+            .map(this::addLinePrefix)
             .forEach(output);
     }
 
     public void printMessage(Message msg) {
-        printMessage(msg, "\n", s -> this.printStream.print(s));
+        printMessage(msg, "", s -> this.printStream.println(s));
     }
 
-    public void printMessage(Message msg, String prefix, Consumer<String> output) {
-        output.accept(prefix + msg + "\n");
+    public void printMessage(Message msg, String indent, Consumer<String> output) {
+
+        String prefixed = addLinePrefix(msg.toString(), indent);
+        output.accept(prefixed);
     }
 
     public Optional<Message> toSingleMessage(String initialMessage) {
@@ -197,5 +206,15 @@ public class MessageHandler {
         }
         str.insert(0, initialMessage + "\n");
         return Optional.of(new Message(severity, str.toString()));
+    }
+
+    private String addLinePrefix(String str) {
+        return addLinePrefix(str, "");
+    }
+
+    private String addLinePrefix(String str, String indent) {
+        return str.lines()
+                .map(l -> this.linePrefix + indent + l)
+                .collect(Collectors.joining("\n"));
     }
 }
