@@ -33,7 +33,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.apache.commons.io.FilenameUtils;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -48,7 +47,6 @@ import xyz.ottr.lutra.system.Assertions;
 import xyz.ottr.lutra.system.Message;
 import xyz.ottr.lutra.system.ResultConsumer;
 import xyz.ottr.lutra.system.ResultStream;
-import xyz.ottr.lutra.wottr.WOTTR;
 import xyz.ottr.lutra.wottr.io.RDFIO;
 
 public class ShaclEquivalenceTest {
@@ -103,11 +101,9 @@ public class ShaclEquivalenceTest {
     
     @ParameterizedTest
     @MethodSource("data")
-    @Disabled
     public void checkFile(String filename, boolean isCorrect) {
-        assumeTrue(!unsupportedTests.contains(filename));
-        
-        if (instanceTests.contains(filename)) {
+        assumeTrue(unsupportedTests.stream().noneMatch(filename::endsWith));
+        if (instanceTests.stream().anyMatch(filename::endsWith)) {
             checkInstance(filename, isCorrect);
         } else {
             checkTemplate(filename, isCorrect);
