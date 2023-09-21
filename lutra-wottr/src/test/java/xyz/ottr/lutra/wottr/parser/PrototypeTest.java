@@ -27,7 +27,6 @@ import java.util.Optional;
 import java.util.function.BiFunction;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import xyz.ottr.lutra.io.Files;
 import xyz.ottr.lutra.io.TemplateReader;
@@ -59,7 +58,6 @@ public class PrototypeTest {
     }
 
     @Test
-    @Disabled
     public void shouldParse() {
         graph.addOTTRBaseTemplates();
         //templateReader.loadTemplatesFromFolder(graph, inFolder, new String []{"ttl"}, new String []{});

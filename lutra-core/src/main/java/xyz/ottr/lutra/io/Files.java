@@ -190,6 +190,6 @@ public enum Files {
             String[] excludeExtensions) {
 
         return getFolderContents(folder, includeExtensions, excludeExtensions)
-            .mapFlatMap(file -> Result.of(file.getPath()));
+            .mapFlatMap(file -> Result.of(file.getAbsolutePath()));
     }
 }

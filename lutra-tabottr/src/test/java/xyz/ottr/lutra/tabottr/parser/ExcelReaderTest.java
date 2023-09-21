@@ -29,7 +29,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.stream.Collectors;
 import org.apache.jena.rdf.model.Model;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import xyz.ottr.lutra.model.Instance;
 import xyz.ottr.lutra.parser.InstanceParser;
@@ -56,8 +55,8 @@ public class ExcelReaderTest {
     
     private void runAtomicTest(String name) {
         Path folder = ROOT.resolve("atomic");
-        String excelFile = folder.resolve(name + ".xlsx").toString();
-        String rdfFile = folder.resolve(name + ".ttl").toString();
+        String excelFile = folder.resolve(name + ".xlsx").toAbsolutePath().toString();
+        String rdfFile = folder.resolve(name + ".ttl").toAbsolutePath().toString();
 
         Model excelModel = writeToModel(new ExcelReader().apply(excelFile));
         excelModel.setNsPrefix("ex", "http://example.org#");
@@ -81,115 +80,96 @@ public class ExcelReaderTest {
     }
     
     @Test
-    @Disabled
     public void testTypedBooleans() {
         runAtomicTest("typedBooleans");
     }
     
     @Test
-    @Disabled
     public void testTypedInts() {
         runAtomicTest("typedInts");
     }
     
     @Test
-    @Disabled
     public void testTypedIntergers() {
         runAtomicTest("typedIntegers");
     }
     
     @Test
-    @Disabled
     public void testTypedDecimals() {
         runAtomicTest("typedDecimals");
     }
     
     @Test
-    @Disabled
     public void testTypedStrings() {
         runAtomicTest("typedStrings");
     }
     
     @Test
-    @Disabled
     public void testTypedFreshBlanks() {
         runAtomicTest("typedFreshBlanks");
     }
     
     @Test
-    @Disabled
     public void testTypedNamedBlanks() {
         runAtomicTest("typedNamedBlanks");
     }
     
     @Test
-    @Disabled
     public void testTypedQNameIRI() {
         runAtomicTest("typedQNameIRI");
     }
     
     @Test
-    @Disabled
     public void testTypedFullIRI() {
         runAtomicTest("typedFullIRI");
     }
     
     @Test
-    @Disabled
     public void testUntypedBooleans() {
         runAtomicTest("untypedBooleans");
     }
     
     @Test
-    @Disabled
     public void testUntypedIntergers() {
         runAtomicTest("untypedIntegers");
     }
     
     @Test
-    @Disabled
     public void testUntypedDecimals() {
         runAtomicTest("untypedDecimals");
     }
     
     @Test
-    @Disabled
     public void testUntypedFreshBlanks() {
         runAtomicTest("untypedFreshBlanks");
     }
     
     @Test
-    @Disabled
     public void testUntypedNamedBlanks() {
         runAtomicTest("untypedNamedBlanks");
     }
     
     @Test
-    @Disabled
     public void testUntypedQNameIRI() {
         runAtomicTest("untypedQNameIRI");
     }
     
     @Test
-    @Disabled
     public void testUntypedFullIRI() {
         runAtomicTest("untypedFullIRI");
     }
 
     @Test
-    @Disabled
     public void testUntypedLiterals() {
         runAtomicTest("untypedLiterals");
     }
     
     @Test
-    @Disabled
     public void testTypedText() {
         runAtomicTest("typedText");
     }
 
     @Test
-    @Disabled
     public void testTypedList() {
         runAtomicTest("typedList");
     }
@@ -197,7 +177,7 @@ public class ExcelReaderTest {
     @Test
     public void testInvalidFile() {
         String expectedMsg = "Error parsing";
-        String file = ROOT.resolve("incorrect/stottr_instances.stottr").toString();
+        String file = ROOT.resolve("incorrect/stottr_instances.stottr").toAbsolutePath().toString();
 
         InstanceParser<String> parser = new ExcelReader();
         Result<Instance> result = parser.apply(file).collect(Collectors.toList()).get(0);

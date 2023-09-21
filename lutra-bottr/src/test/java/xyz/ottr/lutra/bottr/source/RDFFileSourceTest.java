@@ -30,7 +30,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 import org.apache.jena.rdf.model.RDFNode;
 import org.hamcrest.MatcherAssert;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import xyz.ottr.lutra.bottr.model.Source;
 import xyz.ottr.lutra.system.Assertions;
@@ -43,11 +42,10 @@ public class RDFFileSourceTest {
     private final Path root = Paths.get("src", "test", "resources", "sources", "rdf");
 
     private String getResourceFile(String file) {
-        return this.root.resolve(file).toString();
+        return this.root.resolve(file).toAbsolutePath().toString();
     }
 
     @Test
-    @Disabled
     public void prototype() {
 
         List<String> modelURIs = List.of(getResourceFile("a.ttl"), getResourceFile("b.ttl"));
@@ -61,7 +59,6 @@ public class RDFFileSourceTest {
     }
 
     @Test
-    @Disabled
     public void emptyQueryResult() {
         String expectedString = "no results";
         List<String> modelURIs = List.of(getResourceFile("a.ttl"), getResourceFile("b.ttl"));

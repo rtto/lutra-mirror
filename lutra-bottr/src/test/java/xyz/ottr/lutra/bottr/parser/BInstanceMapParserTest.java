@@ -30,7 +30,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.hamcrest.MatcherAssert;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -47,7 +46,7 @@ public class BInstanceMapParserTest {
 
     public static Stream<Arguments> data() {
         return Files.getFolderContents(ROOT, new String[]{"ttl"}, EMPTY_ARRAY)
-                .innerMap(File::toString)
+                .innerMap(File::getAbsolutePath)
                 .innerMap(Arguments::arguments)
                 .aggregate()
                 .get();
@@ -55,7 +54,6 @@ public class BInstanceMapParserTest {
 
     @ParameterizedTest
     @MethodSource("data")
-    @Disabled
     public void shouldParseWithoutError(String file) {
         Result<List<InstanceMap>> map = getInstanceMaps(file);
         MatcherAssert.assertThat(map.getAllMessages(), is(Collections.emptyList()));
