@@ -47,7 +47,6 @@ import xyz.ottr.lutra.system.Assertions;
 import xyz.ottr.lutra.system.Message;
 import xyz.ottr.lutra.system.ResultConsumer;
 import xyz.ottr.lutra.system.ResultStream;
-import xyz.ottr.lutra.wottr.WOTTR;
 import xyz.ottr.lutra.wottr.io.RDFIO;
 
 public class ShaclEquivalenceTest {
@@ -103,9 +102,8 @@ public class ShaclEquivalenceTest {
     @ParameterizedTest
     @MethodSource("data")
     public void checkFile(String filename, boolean isCorrect) {
-        assumeTrue(!unsupportedTests.contains(filename));
-        
-        if (instanceTests.contains(filename)) {
+        assumeTrue(unsupportedTests.stream().noneMatch(filename::endsWith));
+        if (instanceTests.stream().anyMatch(filename::endsWith)) {
             checkInstance(filename, isCorrect);
         } else {
             checkTemplate(filename, isCorrect);
