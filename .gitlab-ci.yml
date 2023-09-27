@@ -1,3 +1,4 @@
+# For tips, see: https://gitlab.com/gitlab-org/gitlab-foss/-/blob/master/lib/gitlab/ci/templates/Maven.gitlab-ci.yml
 
 stages:
   - build
