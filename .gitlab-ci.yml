@@ -14,7 +14,7 @@ stages:
       --errors 
       --fail-at-end 
       --show-version 
-      --no-transfer-progress"
+      --no-transfer-progress
     MAVEN_OPTS: >-
       -Dhttps.protocols=TLSv1.2
       -Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository
