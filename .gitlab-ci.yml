@@ -7,12 +7,27 @@ stages:
 
 # parent job shared by all maven jobs
 .maven-job:
-  image: maven:3.8.1-jdk-11-openj9
+  image: maven:3-jdk-11-openj9
   variables:
-    MAVEN_CLI_OPTS: "--batch-mode --errors --fail-at-end --show-version"
-    MAVEN_OPTS: "-Dmaven.repo.local=.m2/repository"
+    MAVEN_CLI_OPTS: >-
+      --batch-mode 
+      --errors 
+      --fail-at-end 
+      --show-version 
+      --no-transfer-progress"
+    MAVEN_OPTS: >-
+      -Dhttps.protocols=TLSv1.2
+      -Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository
+      -Dorg.slf4j.simpleLogger.showDateTime=true
+      -Djava.awt.headless=true
+
+  # Cache downloaded dependencies and plugins between builds.
+  # To keep cache across branches add 'key: "$CI_JOB_NAME"'
+  # Be aware that `mvn deploy` will install the built jar into this repository. If you notice your cache size
+  # increasing, consider adding `-Dmaven.install.skip=true` to `MAVEN_OPTS` or in `.mvn/maven.config`
   cache:
-    key: ${CI_COMMIT_REF_SLUG}
+    #key: ${CI_COMMIT_REF_SLUG}
+    key: ${CI_JOB_NAME}
     paths:
       - .m2/repository/
 
@@ -165,5 +180,4 @@ release-tag-docker-image:
 
 include:
   - template: Jobs/Code-Quality.gitlab-ci.yml
-  - template: Jobs/License-Scanning.gitlab-ci.yml
   - template: Jobs/Secret-Detection.gitlab-ci.yml
