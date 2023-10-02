@@ -42,6 +42,7 @@ public class SFileReader implements InputReader<String, CharStream> {
             }
         }
 
+        Result<CharStream> res;
         try {
             res = Result.of(CharStreams.fromFileName(filename));
         } catch (IOException ex) {
