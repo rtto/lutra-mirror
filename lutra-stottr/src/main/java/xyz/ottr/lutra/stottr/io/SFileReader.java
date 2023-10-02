@@ -22,11 +22,12 @@ package xyz.ottr.lutra.stottr.io;
  * #L%
  */
 
-import java.io.File;
 import java.io.IOException;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
+import xyz.ottr.lutra.io.Files;
 import xyz.ottr.lutra.io.InputReader;
+import xyz.ottr.lutra.system.Message;
 import xyz.ottr.lutra.system.Result;
 import xyz.ottr.lutra.system.ResultStream;
 
@@ -34,11 +35,11 @@ public class SFileReader implements InputReader<String, CharStream> {
 
     public ResultStream<CharStream> apply(String filename) {
 
-        Result<CharStream> res = null; 
-
-        if (new File(filename).length() == 0) {
-            res = Result.warning("Empty file: " + filename);
-            return ResultStream.of(res);
+        if (Files.isRegularFile(filename)) {
+            Message error = Files.checkFileEmpty(filename);
+            if (error != null) {
+                return ResultStream.of(Result.empty(error));
+            }
         }
 
         try {

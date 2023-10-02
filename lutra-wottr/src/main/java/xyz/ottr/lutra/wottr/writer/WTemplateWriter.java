@@ -128,6 +128,9 @@ public class WTemplateWriter implements TemplateWriter {
         model.add(paramNode, WOTTR.variable, variable);
         model.add(paramNode, WOTTR.type, type);
 
+        if (param.getName() != null) {
+            model.add(paramNode, WOTTR.name, param.getName());
+        }
         if (param.isOptional()) {
             model.add(paramNode, WOTTR.modifier, WOTTR.optional);
         }

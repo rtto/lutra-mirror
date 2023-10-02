@@ -184,7 +184,7 @@ public class FormatManager {
         allMsgs.add(unsuccessful);
         Optional<Message> errors = allMsgs.toSingleMessage(
             "Attempts of parsing library on all available formats " 
-            + this.formats + " failed with following errors:\n");
+            + this.formats.keySet() + " failed.");
 
         return errors.isPresent()
             ? Result.empty(errors.get())

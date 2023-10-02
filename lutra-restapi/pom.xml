@@ -4,7 +4,7 @@
     <parent>
         <artifactId>lutra</artifactId>
         <groupId>xyz.ottr.lutra</groupId>
-        <version>0.6.18-SNAPSHOT</version>
+        <version>0.6.19-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
@@ -48,7 +48,7 @@
         <dependency>
             <groupId>commons-fileupload</groupId>
             <artifactId>commons-fileupload</artifactId>
-            <version>1.4</version>
+            <version>1.5</version>
             <!-- transitive dependencies:
                 - commons-io
             -->

@@ -43,6 +43,7 @@ public class RDFtoOTTRtoRDFParserTest {
 
         return Files.walk(folder)
                 .filter(Files::isRegularFile)
+                .map(Path::toAbsolutePath)
                 .map(Path::toString)
                 .sorted()
                 .map(Arguments::arguments);
@@ -54,7 +55,7 @@ public class RDFtoOTTRtoRDFParserTest {
 
         // exclude test files which are bad by design
         assumeFalse(filename.contains("-bad-"));
-        assumeFalse(filename.contains("/error"));
+        assumeFalse(filename.contains("error"));
 
         // Try parse file with Jena.
         var rdfModel = RDFIO.fileReader().parse(filename);

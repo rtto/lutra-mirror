@@ -38,7 +38,8 @@ public class BaseInstanceExpansionTest {
     public static Stream<Arguments> data() {
         Path root = Paths.get("src",  "test", "resources", "baseinstances");
         return Stream.of(
-                arguments(root.resolve("test1-in.ttl").toString(), root.resolve("test1-out.ttl").toString())
+                arguments(root.resolve("test1-in.ttl").toAbsolutePath().toString(),
+                        root.resolve("test1-out.ttl").toAbsolutePath().toString())
         );
     }
 
