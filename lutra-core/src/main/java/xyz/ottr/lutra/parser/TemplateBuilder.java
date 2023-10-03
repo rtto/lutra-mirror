@@ -48,6 +48,9 @@ public enum TemplateBuilder {
             bldr.iri(sign.getIri());
             bldr.parameters(sign.getParameters());
             bldr.annotations(sign.getAnnotations());
+            if (sign.getIri() != null) {
+                builder.setLocation("Template with IRI '" + sign.getIri() + "'");
+            }
         });
         builder.addResult(instances, (bldr, insts) -> {
             bldr.instances(insts);

@@ -49,9 +49,11 @@ import xyz.ottr.lutra.model.terms.ObjectTerm;
 import xyz.ottr.lutra.store.Expander;
 import xyz.ottr.lutra.store.StandardTemplateStore;
 import xyz.ottr.lutra.store.TemplateStore;
+import xyz.ottr.lutra.store.expansion.CheckingExpander;
 import xyz.ottr.lutra.store.expansion.NonCheckingExpander;
 import xyz.ottr.lutra.system.Assertions;
 import xyz.ottr.lutra.system.Message;
+import xyz.ottr.lutra.system.MessageHandler;
 import xyz.ottr.lutra.system.Result;
 import xyz.ottr.lutra.system.ResultConsumer;
 import xyz.ottr.lutra.system.ResultStream;
@@ -204,12 +206,9 @@ public class DependencyGraphTest {
                 .build()
         );
 
-        Expander expander = new NonCheckingExpander(store);
-        Result<TemplateStore> graphRes = (Result<TemplateStore>) expander.expandAll();
-        ResultConsumer<TemplateStore> consumer = new ResultConsumer<>();
-        consumer.accept(graphRes);
+        MessageHandler msgs = store.checkTemplates();
 
-        Assertions.atLeast(consumer, Message.Severity.ERROR);
+        Assertions.atLeast(msgs, Message.Severity.ERROR);
     }
 
     @Test

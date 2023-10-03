@@ -43,6 +43,7 @@ public enum SignatureBuilder {
         annotations = Result.nullToEmpty(annotations);
 
         Result<Signature.SignatureBuilder> builder = Result.of(Signature.superbuilder());
+        builder.setLocation("Signature with IRI '" + iri.orElse("[IRI missing]") + "'");
         builder.addResult(iri, Signature.SignatureBuilder::iri);
         builder.addResult(parameters, Signature.SignatureBuilder::parameters);
         builder.addResult(annotations, Signature.SignatureBuilder::annotations);
@@ -52,7 +53,7 @@ public enum SignatureBuilder {
                 .flatMap(Signature::validate)
                 .map(s -> (Signature)s);
         } else {
-            return Result.empty(Message.error("Error building signature with IRI '" + iri.orElse("[IRI missing]'.")), builder);
+            return Result.empty(Message.error("Error found in parts of signature."), builder);
         }
     }
 }

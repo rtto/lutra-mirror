@@ -87,6 +87,7 @@ public class CLI {
         }
 
         this.messageHandler.setQuiet(this.settings.quiet);
+        this.messageHandler.setLinePrefix(this.settings.linePrefix);
 
         if (cli.isUsageHelpRequested()) {
             cli.usage(this.outStream);
@@ -146,7 +147,6 @@ public class CLI {
     ////////////////////////////////////////////////////////////
 
     private void initTemplateManager() {
-        this.templateManager.setFullTrace(this.settings.debugFullTrace);
         this.templateManager.setStackTrace(this.settings.debugStackTrace);
         //this.templateManager.setHaltOn(this.settings.haltOn);
         this.templateManager.setFetchMissingDependencies(this.settings.fetchMissingDependencies);

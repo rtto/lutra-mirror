@@ -47,7 +47,6 @@ import xyz.ottr.lutra.system.MessageHandler;
 import xyz.ottr.lutra.system.Result;
 import xyz.ottr.lutra.system.ResultConsumer;
 import xyz.ottr.lutra.system.ResultStream;
-import xyz.ottr.lutra.system.Trace;
 import xyz.ottr.lutra.writer.InstanceWriter;
 import xyz.ottr.lutra.writer.TemplateWriter;
 
@@ -63,7 +62,6 @@ public class TemplateManager {
         this.formatManager = formatManager;
         this.settings = settings;
         this.prefixes = prefixes;
-        Trace.setDeepTrace(this.settings.deepTrace);
         Message.setPrintStackTrace(this.settings.stackTrace);
     }
 
@@ -105,19 +103,6 @@ public class TemplateManager {
         this(new FormatManager());
     }
     
-    /**
-     * This toggles tracing such that printed messages get a stack trace
-     * giving more information on the location of the concerned objects.
-     * NB! Enabling this flag will deteriorate performance.
-     *
-     * @param enable
-     *      True enables deep trace, false disables deep trace.
-     */
-    public void setFullTrace(boolean enable) {
-        this.settings.deepTrace = enable;
-        Trace.setDeepTrace(enable);
-    }
-
     public void setStackTrace(boolean enable) {
         this.settings.stackTrace = enable;
         Message.setPrintStackTrace(enable);
@@ -443,7 +428,6 @@ public class TemplateManager {
 
     static class Settings {
 
-        public boolean deepTrace;
         public boolean stackTrace;
         public boolean fetchMissingDependencies;
         //public Message.Severity haltOn = Message.Severity.ERROR;

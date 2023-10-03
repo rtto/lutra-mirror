@@ -22,36 +22,50 @@ package xyz.ottr.lutra.system;
  * #L%
  */
 
+import java.io.OutputStream;
 import java.io.PrintStream;
-import java.util.HashMap;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
-import lombok.Setter;
+import java.util.stream.Collectors;
 
 public class MessageHandler {
 
-    private static int count;
-
     private final Set<Trace> traces;
-    private final PrintStream printStream;
-    private final Set<String> printedMsgs;
-
-    @Setter
+    private final PrintStream initPrintStream;
+    private PrintStream printStream;
     private boolean quiet;
+    private String linePrefix = "";
 
     public MessageHandler(PrintStream printStream) {
+        this.initPrintStream = printStream;
         this.printStream = printStream;
         this.traces = new LinkedHashSet<>();
-        this.printedMsgs = new LinkedHashSet<>();
     }
 
     public MessageHandler() {
         this(System.err);
+    }
+
+    public void setLinePrefix(String linePrefix) {
+        this.linePrefix = linePrefix;
+    }
+
+    public void setQuiet(boolean quiet) {
+
+        this.quiet = quiet;
+        if (this.quiet) {
+            // Ignore printing
+            this.printStream = new PrintStream(OutputStream.nullOutputStream());
+        } else {
+            // reset to original
+            this.printStream = this.initPrintStream;
+        }
     }
 
     public void add(Message msg) {
@@ -61,9 +75,7 @@ public class MessageHandler {
     }
 
     public void add(Trace trace) {
-        if (trace != null
-            && !(trace.getMessages().isEmpty() && trace.getTrace().isEmpty())) { // Avoid adding empty Trace
-
+        if (trace != null) {
             this.traces.add(trace);
         }
     }
@@ -104,42 +116,31 @@ public class MessageHandler {
      * relevant for accepted Result-s.
      */
     public List<Message> getMessages() {
+
         List<Message> msgs = new LinkedList<>();
-        Trace.visitTraces(this.traces, trace -> msgs.addAll(trace.getMessages()));
+        List<Trace> current = new LinkedList<>(this.traces);
+        Set<Trace> visited = new HashSet<>(this.traces);
+
+        while (!current.isEmpty()) {
+            Trace t = current.remove(0);
+            msgs.addAll(t.getMessages());
+            for (Trace nt : t.getTrace()) {
+                if (!visited.contains(nt)) {
+                    current.add(nt);
+                    visited.add(nt);
+                }
+            }
+        }
         return msgs;
     }
 
     public Message.Severity getMostSevere() {
-        return visitMessagesAndTraces(_ignore -> { }, _ignore -> { });
+        return getMessages().stream()
+            .max(Message.severityComparator)
+            .map(m -> m.getSeverity())
+            .orElse(Message.Severity.least());
     }
 
-    /**
-     * Visits all Messages on all Traces contained in this, and feeds them to the
-     * Message consumer, and in case a Message on a Trace was fed to the Message consumer,
-     * it also feeds the Trace to the Trace consumer.
-     * @param msgConsumer
-     *      Consumer that accepts all Messages on all Traces in this MessageHandler
-     * @param traceConsumer
-     *      Consumer that accepts all Traces containing at least one Message in this MessageHandler
-     */
-    private Message.Severity visitMessagesAndTraces(Consumer<Message> msgConsumer, Consumer<Trace> traceConsumer) {
-
-        Message.Severity[] mostSevere = { Message.Severity.least() };
-
-        Trace.visitTraces(this.traces, trace -> {
-            for (Message msg : trace.getMessages()) {
-                msgConsumer.accept(msg);
-                if (msg.getSeverity().isGreaterEqualThan(mostSevere[0])) {
-                    mostSevere[0] = msg.getSeverity();
-                }
-            }
-            if (!trace.getMessages().isEmpty()) {
-                traceConsumer.accept(trace);
-            }
-        });
-        return mostSevere[0];
-    }
-    
     /**
      * Prints all Message-s from all Result-s
      * as described in #getMessages() together
@@ -148,78 +149,57 @@ public class MessageHandler {
      * the level of the most severe Message.
      */
     public Message.Severity printMessages() {
-        var severity = visitMessagesAndTraces(this::printMessage, this::printLocation);
-        return severity;
+        return printMessagesTo(s -> this.printStream.println(s));
     }
 
+    public Message.Severity printMessagesTo(Consumer<String> output) {
+
+        Message.Severity[] mostSevere = { Message.Severity.least() };
+
+        Trace.visitPaths(this.traces, path -> {
+            String indent = "";
+            for (Trace trace : path) {
+                for (Message msg : trace.getMessages()) {
+                    this.printMessage(msg, indent, output);
+                    if (msg.getSeverity().isGreaterEqualThan(mostSevere[0])) {
+                        mostSevere[0] = msg.getSeverity();
+                    }
+                }
+                if (!trace.getMessages().isEmpty()) {
+                    indent = indent + "  ";
+                }
+            }
+            if (path.stream().anyMatch(t -> t.hasLocation())) {
+                this.printLocations(path, output);
+            }
+            output.accept("");
+        });
+        return mostSevere[0];
+    }
+
+    private void printLocations(Collection<Trace> traces, Consumer<String> output) {
+
+        output.accept(addLinePrefix("Location(s):"));
+        traces.stream()
+            .filter(t -> t.hasLocation())
+            .map(t -> "- " + t.getLocation())
+            .map(this::addLinePrefix)
+            .forEach(output);
+    }
 
     public void printMessage(Message msg) {
-        if (!this.quiet && !this.printedMsgs.contains(msg.toString())) {
-            this.printStream.println("\n" + msg);
-            this.printedMsgs.add(msg.toString());
-        }
+        printMessage(msg, "", s -> this.printStream.println(s));
     }
 
-    private static String getLocation(Trace trace) {
-        StringBuilder context = new StringBuilder();
-        count = 0;
-        getLocationRecur(context, trace, "1", new HashMap<>());
-        return context.toString();
+    public void printMessage(Message msg, String indent, Consumer<String> output) {
+
+        String prefixed = addLinePrefix(msg.toString(), indent);
+        output.accept(prefixed);
     }
 
-    /**
-     * Writes out a stack trace and enumerates the elements of the stack
-     * trace with an enumeration (dot separated number sequence, e.g. 1.3.2)
-     * such that siblings get their parents enumeration appended with a number
-     * denoting its sibling number (e.g. a node with enumeration 1.2 and three
-     * children will make the three children get enumeration 1.2.1, 1.2.2, and 1.2.3).
-     * This enumeration is then used to reference already visited trace elements.
-     */
-    private static void getLocationRecur(StringBuilder context, Trace trace,
-           String curRef, Map<Trace, String> refs) {
-        
-        if (refs.containsKey(trace)) {
-            // Already printed subtrace, just reference to its enumeration and returns
-            context.append(toReferenceString(curRef, refs.get(trace)));
-            return;
-        } 
-        refs.put(trace, makeReference(curRef));
-        if (trace.hasIdentifier()) {
-            // Assign enumeration to trace element, and append to trace
-            context.append(toLocationString(trace, refs.get(trace)));
-        }
-
-        int c = 1;
-        for (Trace child : trace.getTrace()) {
-            getLocationRecur(context, child, curRef + "." + c, refs); 
-            c++;
-        }
-    }
-
-    private static String makeReference(String ref) {
-        count++;
-        return "[" + count + ": " + ref + "]";
-    }
-    
-    private static String toReferenceString(String curRef, String eqRef) {
-        return "# >>> at " + makeReference(curRef) + " = " + eqRef + "\n";
-    }
-    
-    private static String toLocationString(Trace trace, String enumStr) {
-        return "# >>> at " + enumStr + " " + trace.getIdentifier() + "\n";
-    }
-    
-    public void printLocation(Trace trace) {
-        if (!this.quiet) {
-            this.printStream.print(getLocation(trace));
-        }
-    }
-    
     public Optional<Message> toSingleMessage(String initialMessage) {
         StringBuilder str = new StringBuilder();
-        var severity = visitMessagesAndTraces(
-            msg -> str.append(msg).append("\n"),
-            trace -> str.append(getLocation(trace)));
+        var severity = printMessagesTo(s -> str.append(s));
 
         if (str.length() == 0) { // No messages added
             return Optional.empty();
@@ -228,4 +208,13 @@ public class MessageHandler {
         return Optional.of(new Message(severity, str.toString()));
     }
 
+    private String addLinePrefix(String str) {
+        return addLinePrefix(str, "");
+    }
+
+    private String addLinePrefix(String str, String indent) {
+        return str.lines()
+                .map(l -> this.linePrefix + indent + l)
+                .collect(Collectors.joining("\n"));
+    }
 }

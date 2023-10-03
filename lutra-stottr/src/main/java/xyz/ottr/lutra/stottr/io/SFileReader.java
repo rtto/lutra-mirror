@@ -42,10 +42,12 @@ public class SFileReader implements InputReader<String, CharStream> {
             }
         }
 
+        Result<CharStream> res;
         try {
-            return ResultStream.innerOf(CharStreams.fromFileName(filename));
+            res = Result.of(CharStreams.fromFileName(filename));
         } catch (IOException ex) {
-            return ResultStream.of(Result.error("Reading stOTTR file: '" + filename + "'.", ex));
+            res = Result.error("Reading stOTTR file: '" + filename + "'.", ex);    
         }
+        return ResultStream.of(res.setLocation("File " + filename));
     }
 }

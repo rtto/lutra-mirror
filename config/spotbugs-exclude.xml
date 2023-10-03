@@ -37,4 +37,10 @@
     <Bug pattern="SQL_NONCONSTANT_STRING_PASSED_TO_EXECUTE" />
   </Match>
 
+  <Match>
+    <!-- MessageHandler creates a nullOutputStream to ignore printing on quiet-flag set -->
+    <Class name="xyz.ottr.lutra.system.MessageHandler" />
+    <Bug pattern="DM_DEFAULT_ENCODING" />
+  </Match>
+
 </FindBugsFilter>
