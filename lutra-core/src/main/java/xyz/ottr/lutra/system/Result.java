@@ -49,7 +49,7 @@ public class Result<E> {
 
     private Result(Optional<E> result) {
         this.result = result;
-        this.trace = new Trace(result);
+        this.trace = new Trace();
     }
 
     private Result(Optional<E> result, Collection<Message> messages) {
@@ -236,6 +236,11 @@ public class Result<E> {
         if (other != null) {
             this.trace.addTrace(other);
         }
+        return this;
+    }
+
+    public Result<E> setLocation(String location) {
+        this.trace.setLocation(location);
         return this;
     }
 

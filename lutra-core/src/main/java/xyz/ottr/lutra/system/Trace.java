@@ -6,9 +6,10 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.Stack;
 import java.util.function.Consumer;
-import java.util.function.Function;
-import lombok.Setter;
+import java.util.stream.Collectors;
+import org.apache.commons.collections4.SetUtils;
 
 /*-
  * #%L 
@@ -34,61 +35,27 @@ import lombok.Setter;
 
 public class Trace {
 
-    private static final int MAX_CONTENT_LENGTH = 60;
-    // Used to construct a printable identifier, which is stored within the Trace
-    // object to provide in the trace. This is used by a MessageHandler
-    // to give a location to the Messages printed. The default is just a slightly modified
-    // toString-representation of the original object, prefixed with the object's Class,
-    // but one can override this to get a different identifier.
-    private static Function<Object, Optional<String>> toIdentifier = obj -> { 
-        if (obj == null) {
-            return Optional.empty();
-        }
-
-        int maxLength = MAX_CONTENT_LENGTH;
-        String prefix = "(" + obj.getClass().getName() + ") ";
-        String content = obj.toString();
-        String id = prefix
-            + (content.length() <= maxLength ? content : content.substring(0, maxLength) + " ...");
-        return Optional.of(id);
-    };
-
-    /** 
-     * Sets the argument function to be the method to construct a printable identifier, which is
-     * stored within a Trace object.
-     * This identifier is then used by a MessageHandler to give a context to the Messages printed. 
-     * The default is just a slightly modifier Object#toString() prefixed with the Class-name
-     */
-    public static void setToIdentifierFunction(Function<Object, Optional<String>> fun) {
-        toIdentifier = fun;
-    }
-
-    private final Optional<String> identifier;
+    private Optional<String> location;
     private final Set<Trace> trace;
-    private final Collection<Message> messages;
-    @Setter private static boolean deepTrace;
+    private final List<Message> messages;
    
-    protected Trace(Optional<?> value) {
-        this.identifier = value.map(o -> (Object) o).flatMap(toIdentifier);
+    protected Trace(Optional<String> location) {
+        this.location = location;
         this.trace = new HashSet<>();
-        if (deepTrace) {
-            this.messages = new LinkedList<>();
-        } else {
-            this.messages = new HashSet<>();
-        }
+        this.messages = new LinkedList<>();
     }
     
     protected Trace() {
         this(Optional.empty());
     }
+
+    public void setLocation(String location) {
+        this.location = Optional.of(location);
+    }
     
     protected static Trace fork(Collection<Trace> fs) {
         Trace fork = new Trace();
-        if (fork.deepTrace) {
-            fork.trace.addAll(fs);
-        } else {
-            fs.stream().forEach(f -> fork.addMessages(f.getMessages()));
-        }
+        fs.forEach(fork.trace::add);
         return fork;
     }
     
@@ -96,12 +63,12 @@ public class Trace {
         return fork(List.of(fs));
     }
     
-    public boolean hasIdentifier() {
-        return this.identifier.isPresent();
+    public boolean hasLocation() {
+        return this.location.isPresent();
     }
     
-    public String getIdentifier() {
-        return this.identifier.get();
+    public String getLocation() {
+        return this.location.get();
     }
 
     public Set<Trace> getTrace() {
@@ -112,18 +79,17 @@ public class Trace {
         return this.messages;
     }
 
+    public boolean hasMessages() {
+        return !this.messages.isEmpty();
+    }
+
     /**
      * Adds the argument Trace at the end of the trace, so all children depend on that Trace
      * @param elem
      *      Trace element to add to this' trace
      */
     protected void addTrace(Trace elem) {
-        if (deepTrace) {
-            Set<Trace> visited = new HashSet<>();
-            addTrace(elem, visited);
-        } else {
-            this.addMessages(elem.getMessages());
-        }
+        addTrace(elem, new HashSet<>());
     }
     
     private void addTrace(Trace elem, Set<Trace> visited) {
@@ -147,11 +113,12 @@ public class Trace {
      *      Trace element to add to this' trace
      */
     protected void addDirectTrace(Trace elem) {
+
         if (!this.equals(elem)) {
-            if (deepTrace) {
+            if (elem.hasLocation() || elem.hasMessages()) {
                 this.trace.add(elem);
             } else {
-                this.addMessages(elem.getMessages());
+                elem.getTrace().forEach(this::addDirectTrace);
             }
         }
     }
@@ -164,17 +131,42 @@ public class Trace {
         this.messages.addAll(msgs);
     }
 
-    protected static void visitTraces(Collection<Trace> traces, Consumer<Trace> traceConsumer) {
+    /**
+     * Visits all paths trough the Trace-graph depth-first, starting from the roots,
+     * feeding each path to the argument consumer.
+     */
+    protected static void visitPaths(Set<Trace> traces, Consumer<List<Trace>> pathConsumer) {
+        
+        Set<Trace> nonRoots = traces.stream()
+            .flatMap(t -> t.trace.stream())
+            .collect(Collectors.toSet());
 
-        Set<Trace> visited = new HashSet<>();
-        LinkedList<Trace> toVisit = new LinkedList<>(traces);
-        while (!toVisit.isEmpty()) {
-            Trace trace = toVisit.poll();
-            traceConsumer.accept(trace);
-            visited.add(trace);
-            trace.trace.stream()
-                .filter(t -> !visited.contains(t))
-                .forEach(toVisit::add);
+        Set<Trace> roots = SetUtils.difference(traces, nonRoots);
+        visitPathsFromNodes(roots, pathConsumer, new Stack<>());
+    }
+
+    private static void visitPathsFromNodes(Set<Trace> nodes,
+            Consumer<List<Trace>> pathConsumer, Stack<Trace> currentPath) {
+
+        if (nodes.isEmpty()) { // Reached end of path
+
+            // If the path contains at least one Message, send it to consumer
+            if (currentPath.stream().anyMatch(t -> !t.messages.isEmpty())) {
+                pathConsumer.accept(new LinkedList<>(currentPath));
+            }
+        } else { // Traverse further
+
+            for (Trace node : nodes) { // Make one path per node
+                if (!currentPath.contains(node)) { //Avoid cycles
+                    currentPath.push(node);
+                    visitPathsFromNodes(node.trace, pathConsumer, currentPath);
+                } else {
+                    pathConsumer.accept(new LinkedList<>(currentPath));
+                }
+            }
+        }
+        if (!currentPath.empty()) {
+            currentPath.pop();
         }
     }
 }

@@ -46,7 +46,7 @@ public class BInstanceMapParserTest {
 
     public static Stream<Arguments> data() {
         return Files.getFolderContents(ROOT, new String[]{"ttl"}, EMPTY_ARRAY)
-                .innerMap(File::toString)
+                .innerMap(File::getAbsolutePath)
                 .innerMap(Arguments::arguments)
                 .aggregate()
                 .get();

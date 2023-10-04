@@ -132,6 +132,7 @@ public class CLIWrapper {
             // TODO disable fetching to protect tpl.ottr.xyz server:
             //  + (this.fetchMissing ? " --fetchMissing" : ""
             + " -e txt"
+            + " --messageLinePrefix #"
             + " --fetchMissing"  // must be enabled to use already loaded standard library.
             + " --stdout "
             + this.inputFiles.stream()

@@ -5,19 +5,27 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 0.6.19 - 2022.10.04
+
+Improved error messages. Build should no work on Windows.
+
+Issues worked on:
+
+ - #394, improved error messages and output
+ - #210, #390, #426, #262: problems with Windows paths and IRIs
+
+
 ## 0.6.18 - 2022.06.13
 
 Support for named parameters, parameters may be given a persistant name. Bug fixes to Lutra and specs.
 
-Milestone: https://gitlab.com/groups/ottr/lutra/-/milestones/2
+Milestone: https://gitlab.com/groups/ottr/-/milestones/2
+
+Closed issues:
 
  - lutra · Stable and informative representation of parameters and their variables #223
  - lutra · Feching template using wrong IRI gives unhelpful error message #417
  - lutra · Generated Changelog  #123
-
-
-Closed issues:
-
 
 ## 0.6.17 - 2022.04.10
 

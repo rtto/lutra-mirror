@@ -23,6 +23,7 @@ package xyz.ottr.lutra.system;
  */
 
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.stream.Collectors;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -34,6 +35,12 @@ import xyz.ottr.lutra.Space;
 public class Message {
 
     @Setter private static boolean printStackTrace = true;
+
+    public static final Comparator<Message> severityComparator = new Comparator<>() {
+        public int compare(Message m1, Message m2) {
+            return m1.getSeverity().compareTo(m2.getSeverity());
+        }
+    };
 
     public enum Severity {
         // the order of enums defines the result of compareTo method.
@@ -129,7 +136,7 @@ public class Message {
     @Override
     public String toString() {
 
-        String output = "# [" + this.severity.name() + "] " + this.message;
+        String output = "[" + this.severity.name() + "] " + this.message;
 
         if (printStackTrace) {
             output += printStackTrace();

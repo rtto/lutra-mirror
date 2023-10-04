@@ -115,6 +115,11 @@ public class Settings {
                        + "(default: ${DEFAULT-VALUE})"})
     public boolean quiet = false;
 
+    @Option(names = {"--messageLinePrefix"},
+        description = {"Set line prefix for output messages (use e.g. '#' to make output become comments).%n"
+                       + "(default: ${DEFAULT-VALUE})"})
+    public String linePrefix = "";
+
     @Option(names = {"--haltOn"},
         description = {"Halt execution upon receiving messages with a severity equal to or greater than this value.%n"
                         + "(legal values: ${COMPLETION-CANDIDATES}; "
@@ -129,13 +134,6 @@ public class Settings {
                        + "(legal values: ${COMPLETION-CANDIDATES}; "
                        + "default: ${DEFAULT-VALUE})"})
     public Mode mode = Mode.expand;
-
-    @Option(names = {"--debugFullTrace"},
-        description = {"This enables tracing such that printed messages get a stack trace "
-                       + "giving more information on the location of the concerned objects. "
-                       + "NB! Enabling this flag will deteriorate performance.%n"
-                       + "default: ${DEFAULT-VALUE})"})
-    public boolean debugFullTrace = false;
 
     @Option(names = {"--debugStackTrace"},
         description = {"This enables printing a regular java stack trace for error messages."
