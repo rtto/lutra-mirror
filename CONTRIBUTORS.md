@@ -12,13 +12,25 @@ Thanks to all contributors!
 
 ## @vmgraciolli
 
+Part of OTTR development team (2019)
+
  - Initial bOTTR implementation
 
- ## @humzaa
+## @humzaa
+
+Part of OTTR development team (2021)
 
  - Various bug fixes and improvements
 
- ## @yiyaoc
+## @yiyaoc
+
+Part of OTTR development team (2022 -- 2023)
+
+ - Various bug fixes and improvements
+
+## @noboni
+
+Part of OTTR development team (2023 --)
 
  - Various bug fixes and improvements
 
