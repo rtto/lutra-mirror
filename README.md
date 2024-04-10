@@ -1,5 +1,7 @@
 [![Gitter](https://badges.gitter.im/ottr-talk/community.svg)](https://gitter.im/ottr-talk/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
 [![Maven central](https://img.shields.io/maven-central/v/xyz.ottr.lutra/lutra)](https://search.maven.org/search?q=g:xyz.ottr.lutra)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.10954639.svg)](https://doi.org/10.5281/zenodo.10954639)
+
 
 [![codebeat badge](https://codebeat.co/badges/6bafc41c-75e1-4bb3-8e6e-9cddbc36f297)](https://codebeat.co/projects/github-com-rtto-lutra-mirror-develop)[![CodeFactor](https://www.codefactor.io/repository/github/rtto/lutra-mirror/badge)](https://www.codefactor.io/repository/github/rtto/lutra-mirror)
 [![Known Vulnerabilities](https://snyk.io/test/github/rtto/lutra-mirror/develop/badge.svg)](https://snyk.io/test/github/rtto/lutra-mirror/develop) 
