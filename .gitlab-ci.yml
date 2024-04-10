@@ -142,8 +142,7 @@ deploy2zenodo:
     DEPLOY2ZENODO_GET_METADATA: "result.json"
     DEPLOY2ZENODO_SKIP_PUBLISH: "true"
   before_script:
-    - env
-    - apk add --no-cache curl jq py3-pip
+    - apt-get update -qq && apt-get install -y -qq curl jq py3-pip git
     - pip install cffconvert --break-system-packages
     - publication_date=$(echo "$CI_COMMIT_TIMESTAMP" | grep -Eo "^[0-9]{4}-[0-9]{2}-[0-9]{2}")
     - |
