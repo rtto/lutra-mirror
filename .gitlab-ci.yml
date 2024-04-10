@@ -134,10 +134,11 @@ deploy2zenodo:
   #rules:
   #  - if: $CI_COMMIT_TAG =~ /^v([0-9]+)\.([0-9]+)\.([0-9]+)/
   variables:
+    DEPLOY2ZENODO_VERSION: "v0.6.19"
     DEPLOY2ZENODO_API_URL: https://zenodo.org/api
     DEPLOY2ZENODO_JSON: "CITATION.json"
     DEPLOY2ZENODO_DEPOSITION_ID: "create NEW record"
-    DEPLOY2ZENODO_UPLOAD: "$CI_PROJECT_NAME-$CI_COMMIT_TAG.zip"
+    DEPLOY2ZENODO_UPLOAD: "$CI_PROJECT_NAME-$DEPLOY2ZENODO_VERSION.zip"
     DEPLOY2ZENODO_ADD_IsCompiledBy_DEPLOY2ZENODO: "yes"
     DEPLOY2ZENODO_GET_METADATA: "result.json"
     DEPLOY2ZENODO_SKIP_PUBLISH: "true"
@@ -151,10 +152,10 @@ deploy2zenodo:
         jq -c ".metadata.related_identifiers += [
           {\"relation\": \"isDerivedFrom\",
           \"identifier\": \"$CI_PROJECT_URL\"}] |
-          .metadata.version = \"$CI_COMMIT_TAG\" |
+          .metadata.version = \"$DEPLOY2ZENODO_VERSION\" |
           .metadata.publication_date = \"$publication_date\"" | \
         tee $DEPLOY2ZENODO_JSON | jq -C .
-    - git archive --format zip --output "$DEPLOY2ZENODO_UPLOAD" "$CI_COMMIT_TAG"
+    - git archive --format zip --output "$DEPLOY2ZENODO_UPLOAD" "$DEPLOY2ZENODO_VERSION"
   artifacts:
     paths:
       - $DEPLOY2ZENODO_JSON
