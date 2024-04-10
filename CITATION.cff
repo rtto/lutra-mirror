@@ -1,0 +1,12 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+authors:
+  - family-names: Martin G.
+    given-names: Skjæveland
+    orcid: https://orcid.org/0000-0002-9736-8316
+  - family-names: Leif Harald
+    given-names: Karlsen
+    orcid: https://orcid.org/0000-0001-5131-5246
+title: "Lutra - the reference implementation of the OTTR framework"
+license: LGPL-2.1-only
+url: "http://ottr.xyz"
