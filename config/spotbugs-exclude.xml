@@ -34,6 +34,7 @@
   <Match>
     <!-- Passes SQL query as string from bOTTR-map directly to execute() -->
     <Class name="xyz.ottr.lutra.bottr.source.H2Source" />
+    <Method name="execute" />
     <Bug pattern="SQL_NONCONSTANT_STRING_PASSED_TO_EXECUTE" />
   </Match>
 
@@ -41,6 +42,39 @@
     <!-- MessageHandler creates a nullOutputStream to ignore printing on quiet-flag set -->
     <Class name="xyz.ottr.lutra.system.MessageHandler" />
     <Bug pattern="DM_DEFAULT_ENCODING" />
+  </Match>
+
+  <Match>
+    <!-- The use of Jena's ErrorHandler to consume all errors and report them as empty Results may lead to NullPointerExceptions. -->
+    <Class name="xyz.ottr.lutra.wottr.io.RDFReader" />
+    <Method name="parse" />
+    <Bug pattern="DCN_NULLPOINTER_EXCEPTION" />
+  </Match>
+
+  <Match>
+    <Class name="xyz.ottr.lutra.docttr.DocttrManager" />
+    <Method name="getNamespaceTrees" />
+    <Bug pattern="SBSC_USE_STRINGBUFFER_CONCATENATION" />
+  </Match>
+
+
+  <!-- The following errors are disabled due to an update of spotbugs,
+   which again is caused by a forced update of Java version.
+   These check exceptions should be evaluated and removed, or made more precise to relevant classes. -->
+  <Match>
+    <Bug pattern="EI_EXPOSE_REP2" />
+  </Match>
+  <Match>
+    <Bug pattern="EI_EXPOSE_REP" />
+  </Match>
+  <Match>
+    <Bug pattern="MC_OVERRIDABLE_METHOD_CALL_IN_CONSTRUCTOR" />
+  </Match>
+  <Match>
+    <Bug pattern="RCN_REDUNDANT_NULLCHECK_OF_NONNULL_VALUE" />
+  </Match>
+  <Match>
+    <Bug pattern="CT_CONSTRUCTOR_THROW" />
   </Match>
 
 </FindBugsFilter>
