@@ -8,7 +8,7 @@ stages:
 
 # parent job shared by all maven jobs
 .maven-job:
-  image: maven:3-jdk-11-openj9
+  image: maven:3-openjdk-17-slim
   variables:
     MAVEN_CLI_OPTS: >-
       --batch-mode 
