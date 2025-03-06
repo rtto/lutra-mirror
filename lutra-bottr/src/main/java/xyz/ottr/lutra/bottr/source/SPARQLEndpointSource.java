@@ -23,8 +23,8 @@ package xyz.ottr.lutra.bottr.source;
  */
 
 import org.apache.jena.query.QueryExecution;
-import org.apache.jena.query.QueryExecutionFactory;
 import org.apache.jena.shared.PrefixMapping;
+import org.apache.jena.sparql.exec.http.QueryExecutionHTTPBuilder;
 import xyz.ottr.lutra.system.Result;
 
 public class SPARQLEndpointSource extends AbstractSPARQLSource {
@@ -43,7 +43,7 @@ public class SPARQLEndpointSource extends AbstractSPARQLSource {
     @Override
     protected Result<QueryExecution> getQueryExecution(String query) {
         return super.getQuery(query)
-            .map(q -> QueryExecutionFactory.sparqlService(this.endpointURL, q));
+            .map(q -> QueryExecutionHTTPBuilder.service(this.endpointURL).query(q).build());
     }
 
 }

@@ -57,6 +57,11 @@
     <Bug pattern="SBSC_USE_STRINGBUFFER_CONCATENATION" />
   </Match>
 
+  <Match>
+    <Class name="xyz.ottr.lutra.docttr.HTMLMenuWriter$StringTreeViewWriter" />
+    <Method name="writeRoot" />
+    <Bug pattern="BC_UNCONFIRMED_CAST_OF_RETURN_VALUE" />
+  </Match>
 
   <!-- The following errors are disabled due to an update of spotbugs,
    which again is caused by a forced update of Java version.

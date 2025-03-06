@@ -26,7 +26,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import org.apache.jena.graph.BlankNodeId;
+import org.apache.jena.rdf.model.AnonId;
 import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.rdf.model.RDFList;
 import org.apache.jena.rdf.model.RDFNode;
@@ -60,7 +60,7 @@ public class WTermParser {
         } else if (node.canAs(RDFList.class)) {
             return toListTerm(node.as(RDFList.class)).map(tl -> (Term) tl);
         } else if (node.isAnon()) {
-            return toBlankNodeTerm(node.getId().getBlankNodeId()).map(tl -> (Term) tl);
+            return toBlankNodeTerm(node.getId()).map(tl -> (Term) tl);
         } else {
             return toError(node);
         }
@@ -90,7 +90,7 @@ public class WTermParser {
         return TermParser.toLiteralTerm(literal.getLexicalForm(), literal.getDatatypeURI(), literal.getLanguage());
     }
 
-    public static Result<BlankNodeTerm> toBlankNodeTerm(BlankNodeId blankNodeId) {
+    public static Result<BlankNodeTerm> toBlankNodeTerm(AnonId blankNodeId) {
         return TermParser.toBlankNodeTerm(blankNodeId.getLabelString());
     }
 }

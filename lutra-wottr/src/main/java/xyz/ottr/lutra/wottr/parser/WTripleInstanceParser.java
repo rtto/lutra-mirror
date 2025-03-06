@@ -69,7 +69,7 @@ public class WTripleInstanceParser implements InstanceParser<Model> {
             return TermParser.toIRITerm(node.asResource().getURI())
                 .map(t -> (Term) t);
         } else if (node.isAnon()) {
-            return WTermParser.toBlankNodeTerm(node.asResource().getId().getBlankNodeId())
+            return WTermParser.toBlankNodeTerm(node.asResource().getId())
                 .map(t -> (Term) t);
         } else if (node.isLiteral()) {
             return WTermParser.toLiteralTerm(node.asLiteral())

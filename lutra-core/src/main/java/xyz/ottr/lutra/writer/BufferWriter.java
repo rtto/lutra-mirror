@@ -56,8 +56,8 @@ public abstract class BufferWriter {
         if (consoleStream != null) {
             this.consoleStream = consoleStream;
         }
-        
-        fileOutput = (filePath != null) ? true : false;
+
+        fileOutput = filePath != null;
         
     
         if (fileOutput) {

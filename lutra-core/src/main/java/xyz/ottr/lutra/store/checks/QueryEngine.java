@@ -647,7 +647,7 @@ public abstract class QueryEngine<S extends TemplateStore> {
             unifyOrdered(tuple, ps1Vals, ps2Vals, uni).ifPresent(tuples);
         } else {
             // TODO: rather use k choose n from apache.commons.math3 (see Cluster-class) for efficiency
-            (new PermutationIterator<>(ps2Vals)).forEachRemaining(ps2Perm ->
+            new PermutationIterator<>(ps2Vals).forEachRemaining(ps2Perm ->
                     unifyOrdered(tuple, ps1Vals, ps2Perm, uni).ifPresent(tuples));
         }
 
