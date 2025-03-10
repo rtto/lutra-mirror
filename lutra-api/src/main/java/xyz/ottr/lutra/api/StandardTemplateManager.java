@@ -22,8 +22,8 @@ package xyz.ottr.lutra.api;
  * #L%
  */
 
-import java.io.IOException;
 import java.io.InputStream;
+import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
 import java.util.LinkedList;
 import java.util.List;
@@ -81,9 +81,10 @@ public final class StandardTemplateManager extends TemplateManager {
 
         try {
             paths.addAll(IOUtils.readLines(templatesList, StandardCharsets.UTF_8));
-        } catch (IOException ex) {
+        } catch (UncheckedIOException ex) {
             return ResultStream.of(Result.error(ex.getMessage()));
         }
+
         return ResultStream.innerOf(paths);
     } 
     

@@ -24,7 +24,6 @@ package xyz.ottr.lutra.util;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.jena.irix.IRIs;
-import org.apache.jena.irix.IRIx;
 import org.apache.jena.riot.web.LangTag;
 import xyz.ottr.lutra.system.Result;
 
@@ -32,26 +31,20 @@ public class DataValidator {
 
     // private static final Set<String> DEFAULT_SCHEMES = Set.of("http", "https", "sftp", "ftp", "file", "urn");
 
-    private static Result<IRIx> asIRIx(String value) {
-        try {
-            return Result.of(IRIs.reference(value));
-        } catch (org.apache.jena.irix.IRIException ex) {
-            return Result.error("Invalid IRI: " + value + ". " + ex.getMessage());
-        }
-    }
-
     public static Result<String> asURI(String value) {
-        return asIRIx(value).map(IRIx::str);
-        /* Check if scheme is ok. Use IRIs.getScheme(value), which requires a more recent version of Jena?
-            if (DEFAULT_SCHEMES.contains(IRIs.toLowerCase(Locale.getDefault()))) {
-                result.addMessage(Message.warning("Uncommon scheme for URI: " + value
-                + ". Registered common schemes are: " + DEFAULT_SCHEMES));
+        try {
+            return Result.of(IRIs.reference(value).str());
+        } catch (org.apache.jena.irix.IRIException ex) {
+            return Result.error("Unexpected IRI: " + value + ". " + ex.getMessage());
         }
-        */
     }
 
     public static Result<String> asAbsoluteURI(String value) {
-        return asIRIx(value).filter(IRIx::isAbsolute).map(IRIx::str);
+        try {
+            return Result.of(IRIs.absoluteResolver().resolve(value).str());
+        } catch (org.apache.jena.irix.IRIException ex) {
+            return Result.error("Unexpected absolute IRI: " + value + ". " + ex.getMessage());
+        }
     }
 
     public static Result<String> asLanguageTagString(String value) {

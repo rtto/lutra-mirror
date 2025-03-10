@@ -85,7 +85,7 @@ public class Tuple {
             throw new VariableNotBoundException(name);
         }
         Object mt = this.get(name);
-        if (!(clazz.isInstance(mt))) {
+        if (!clazz.isInstance(mt)) {
             throw new VariableBoundToMultipleTypesException(name, mt.getClass(), clazz);
         }
         return clazz.cast(mt);

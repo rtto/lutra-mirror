@@ -33,7 +33,6 @@ import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.stream.Collectors;
-import lombok.NonNull;
 import lombok.Setter;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.io.FileUtils;
@@ -46,19 +45,16 @@ import xyz.ottr.lutra.cli.CLI;
 public class CLIWrapper {
 
     private String prefixes;
-    private @NonNull String mode;
+    private String mode;
     private Collection<File> inputFiles;
     private Collection<File> libraryFiles;
     private Collection<File> dataFiles;
-    private @NonNull String inputFormat;
-    private @NonNull String outputFormat;
-    private boolean fetchMissing;
-    private boolean loadTplLibrary;
+    private String inputFormat;
+    private String outputFormat;
     private String libraryFormat;
 
     private Path inputDirectory;
     private Path libraryDirectory;
-    private String tplLibrary;
 
     private static final String tempPrefix = "weblutra-";
 

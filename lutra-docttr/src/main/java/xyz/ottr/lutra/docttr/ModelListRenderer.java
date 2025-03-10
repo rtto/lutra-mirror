@@ -165,6 +165,9 @@ public class ModelListRenderer {
 
         var domStatement = span(print(value.getValue()));
 
+        /* "Reification API support will be removed in Jena5"
+           https://jena.apache.org/documentation/notes/reification.html#removing-reified-statements
+
         if (this.model.isReified(value.getStatement())) {
             var reified = this.model.getAnyReifiedStatement(value.getStatement());
             domStatement.with(
@@ -177,6 +180,7 @@ public class ModelListRenderer {
                         .withStyle("border: 1px dotted #ccc; padding: 10px;")
                 ));
         }
+        */
 
         return domStatement;
     }
