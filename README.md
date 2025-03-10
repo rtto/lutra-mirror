@@ -9,7 +9,7 @@
 
 Detailed documentation on the OTTR framework can be found on our web site: https://ottr.xyz/.
 
-Lutra is our open source reference implementation of the OTTR language available under an LGPL licence. Lutra can read and write OTTR templates and instances on different serialisation formats, and expand instances into regular RDF graphs or RDF/OWL ontologies. Lutra is written in Java 11 and is currently available for use as a command line interface.
+Lutra is our open source reference implementation of the OTTR language available under an LGPL licence. Lutra can read and write OTTR templates and instances on different serialisation formats, and expand instances into regular RDF graphs or RDF/OWL ontologies. Lutra is written in Java and is currently available for use as a command line interface and via a Java API.
 
 
 ## Running and installation
