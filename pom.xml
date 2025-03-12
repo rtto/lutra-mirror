@@ -71,7 +71,8 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
     <java.version>17</java.version>
-    <maven.compiler.target>${java.version}</maven.compiler.target>
+    <maven.compiler.release>${java.version}</maven.compiler.release>
+    <maven.compiler.proc>full</maven.compiler.proc>
 
     <jena.version>5.3.0</jena.version>
     <antlr4.version>4.13.2</antlr4.version>
@@ -265,7 +266,6 @@
             <sourceDirectory>src/</sourceDirectory>
             <!-- Skip checking generated sources -->
           </sourceDirectories>
-          <encoding>UTF-8</encoding>
           <configLocation>config/checkstyle.xml</configLocation>
           <includeTestSourceDirectory>true</includeTestSourceDirectory>
           <consoleOutput>true</consoleOutput>
