@@ -72,7 +72,7 @@
 
     <java.version>17</java.version>
     <maven.compiler.release>${java.version}</maven.compiler.release>
-    <maven.compiler.proc>full</maven.compiler.proc>
+    <!--maven.compiler.proc>full</maven.compiler.proc--><!-- If compiling with Java 23, lombok needs this. -->
 
     <jena.version>5.3.0</jena.version>
     <antlr4.version>4.13.2</antlr4.version>
