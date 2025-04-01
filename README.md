@@ -1,5 +1,6 @@
 [![Gitter](https://badges.gitter.im/ottr-talk/community.svg)](https://gitter.im/ottr-talk/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
 [![Maven central](https://img.shields.io/maven-central/v/xyz.ottr.lutra/lutra)](https://search.maven.org/search?q=g:xyz.ottr.lutra)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.10954638.svg)](https://doi.org/10.5281/zenodo.10954638)
 
 [![codebeat badge](https://codebeat.co/badges/6bafc41c-75e1-4bb3-8e6e-9cddbc36f297)](https://codebeat.co/projects/github-com-rtto-lutra-mirror-develop)[![CodeFactor](https://www.codefactor.io/repository/github/rtto/lutra-mirror/badge)](https://www.codefactor.io/repository/github/rtto/lutra-mirror)
 [![Known Vulnerabilities](https://snyk.io/test/github/rtto/lutra-mirror/develop/badge.svg)](https://snyk.io/test/github/rtto/lutra-mirror/develop) 
@@ -8,14 +9,14 @@
 
 Detailed documentation on the OTTR framework can be found on our web site: https://ottr.xyz/.
 
-Lutra is our open source reference implementation of the OTTR language available under an LGPL licence. Lutra can read and write OTTR templates and instances on different serialisation formats, and expand instances into regular RDF graphs or RDF/OWL ontologies. Lutra is written in Java 11 and is currently available for use as a command line interface.
+Lutra is our open source reference implementation of the OTTR language available under an LGPL licence. Lutra can read and write OTTR templates and instances on different serialisation formats, and expand instances into regular RDF graphs or RDF/OWL ontologies. Lutra is written in Java and is currently available for use as a command line interface and via a Java API.
 
 
 ## Running and installation
 
 ### Prerequisites
 
-To run Lutra you will need to install Java 11, for instance [OpenJDK][1].
+To run Lutra you will need to install Java, for instance [OpenJDK][1].
 
 ### Downloads
 
@@ -47,7 +48,7 @@ Note that the default branch of the project is the `develop` branch.
 
 Requirements:
 
-* Java 11, for instance [OpenJDK][1]
+* Java 17, for instance [OpenJDK][1]
 * [Maven](https://maven.apache.org/) - Dependency Management
 * [Lombok](https://projectlombok.org/) - Java build and IDE plug-in.
 Free plug-ins are available for most IDEs. For guides on how to install, please check the _Install_-section on the Lombok website.
@@ -71,7 +72,6 @@ See [CONTRIBUTING](CONTRIBUTING.md) for information on how to best contribute to
 
 * Martin G. Skjæveland
 * Leif Harald Karlsen
-* Oliver Stahl
 
 See also the list of [CONTRIBUTORS](CONTRIBUTORS.md) who have participated in this project.
 
@@ -81,7 +81,7 @@ This project is licensed under the GNU Lesser General Public License v2.1 - see 
 
 ## Acknowledgments
 
-The project is supported by the [Department of Informatics][9] at University of Oslo and the [SIRIUS Centre][10] for Research-driven Innovation.
+The project is supported by the [Department of Informatics][9] at University of Oslo and was supported by the (now finished) [SIRIUS Centre][10] for Research-driven Innovation.
 
 
 [1]:https://openjdk.java.net/install/index.html

@@ -28,6 +28,7 @@ import static java.util.stream.Collectors.joining;
 
 import j2html.tags.ContainerTag;
 import j2html.tags.DomContent;
+import j2html.tags.specialized.HtmlTag;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -110,7 +111,7 @@ public class HTMLTemplateWriter {
         );
     }
 
-    private ContainerTag getHTML(Signature signature) {
+    private HtmlTag getHTML(Signature signature) {
 
         this.tocList = ul(li(a("top").withHref("#top")));
 

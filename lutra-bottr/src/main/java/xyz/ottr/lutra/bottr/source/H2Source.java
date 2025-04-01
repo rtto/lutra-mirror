@@ -26,7 +26,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
-import org.apache.jena.ext.com.google.common.io.Files;
+import java.util.UUID;
+import org.apache.commons.io.FileUtils;
 import xyz.ottr.lutra.bottr.BOTTR;
 import xyz.ottr.lutra.bottr.model.ArgumentMaps;
 import xyz.ottr.lutra.model.Argument;
@@ -42,7 +43,7 @@ public class H2Source extends JDBCSource {
     }
 
     public H2Source(String mapPath) {
-        this(mapPath, Files.createTempDir().getAbsolutePath() + "/H2Source");
+        this(mapPath, Paths.get(FileUtils.getTempDirectory().getAbsolutePath(), UUID.randomUUID().toString(), "H2Source").toString());
     }
 
     public H2Source() {
