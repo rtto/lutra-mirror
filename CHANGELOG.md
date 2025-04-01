@@ -5,9 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## 0.6.19 - 2022.10.04
+## 0.6.20 - 2025.04.01
 
-Improved error messages. Build should no work on Windows.
+Update to Java 21. Update several external dependencies.
+
+## 0.6.19 - 2023.10.04
+
+Improved error messages. Build should now work on Windows.
 
 Issues worked on:
 
@@ -15,7 +19,7 @@ Issues worked on:
  - #210, #390, #426, #262: problems with Windows paths and IRIs
 
 
-## 0.6.18 - 2022.06.13
+## 0.6.18 - 2023.06.13
 
 Support for named parameters, parameters may be given a persistant name. Bug fixes to Lutra and specs.
 
@@ -27,7 +31,7 @@ Closed issues:
  - lutra · Feching template using wrong IRI gives unhelpful error message #417
  - lutra · Generated Changelog  #123
 
-## 0.6.17 - 2022.04.10
+## 0.6.17 - 2023.04.10
 
 Milestone: https://gitlab.com/groups/ottr/lutra/-/milestones/2
 
@@ -43,7 +47,7 @@ Closed issues:
   - Give warning if using different or old `ottr:` prefix than the current #202
   - check prefixes #51
 
-## 0.6.16 - 2022.02.06
+## 0.6.16 - 2023.02.06
 
 Milestone: https://gitlab.com/ottr/lutra/lutra/-/milestones/21
 
