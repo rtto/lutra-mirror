@@ -127,6 +127,7 @@ release-gitlab:
         - name: '$CI_PROJECT_NAME executable JAR file'
           url: 'https://www.ottr.xyz/downloads/$CI_PROJECT_NAME/lutra-$CI_COMMIT_TAG.jar'
 
+# publishing maven artefacts to maven repo.
 deploy2sonatype:
   stage: release
   extends: .maven-job
