@@ -137,7 +137,7 @@ deploy2sonatype:
     - apt-get update -qq && apt-get install -y -qq gnupg
     - mkdir -p $CI_PROJECT_DIR/.m2
     - echo "$SETTINGS_XML" | base64 --decode > $CI_PROJECT_DIR/.m2/settings.xml
-    - echo "$SETTINGS_SECURITY_XML" | base64 --decode > $CI_PROJECT_DIR/.m2/settings-security.xml
+    - echo "$SETTINGS_SECURITY_XML_BASE64" | base64 --decode > $CI_PROJECT_DIR/.m2/settings-security.xml
     - echo "$MGS_PRIVATE_KEY" | base64 --decode | gpg --batch --import
   script:
     - mvn deploy $MAVEN_CLI_OPTS --settings $CI_PROJECT_DIR/.m2/settings.xml deploy
