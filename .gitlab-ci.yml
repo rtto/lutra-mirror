@@ -127,6 +127,17 @@ release-gitlab:
         - name: '$CI_PROJECT_NAME executable JAR file'
           url: 'https://www.ottr.xyz/downloads/$CI_PROJECT_NAME/lutra-$CI_COMMIT_TAG.jar'
 
+deploy2sonatype:
+  extends: .maven-job
+  rules:
+    - if: $CI_COMMIT_TAG =~ /^v([0-9]+)\.([0-9]+)\.([0-9]+)/
+  before_script:
+      - mkdir -p $CI_PROJECT_DIR/.m2
+      - echo "$SETTINGS_XML" | base64 --decode > $CI_PROJECT_DIR/.m2/settings.xml
+      - echo "$SETTINGS_SECURITY_XML" | base64 --decode > $CI_PROJECT_DIR/.m2/settings-security.xml
+      - echo "$MGS_PRIVATE_KEY" | base64 --decode | gpg --batch --import
+  script:
+      - mvn deploy $MAVEN_CLI_OPTS --settings $CI_PROJECT_DIR/.m2/settings.xml deploy
 
 ### The job deploy2zenodo publishes to zenodo, (minimally) adapted from https://zenodo.org/records/10478977
 deploy2zenodo:
