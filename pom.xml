@@ -28,11 +28,11 @@
         
         For more information about OTTR, see http://ottr.xyz.
     </description>
-  <url>http://lutra.ottr.xyz</url>
+  <url>https://ottr.xyz</url>
 
   <licenses>
     <license>
-      <name>GNU Lesser General Public License</name>
+      <name>GNU Lesser General Public License, Version 2.1</name>
       <url>https://www.gnu.org/licenses/old-licenses/lgpl-2.1.html</url>
       <distribution>repo</distribution>
     </license>
@@ -51,21 +51,10 @@
   </developers>
 
   <scm>
-    <url>https://gitlab.com/ottr/lutra/lutra.git</url>
+    <url>https://gitlab.com/ottr/lutra/lutra</url>
     <connection>scm:git:https://gitlab.com/ottr/lutra/lutra.git</connection>
     <developerConnection>scm:git:https://gitlab.com/ottr/lutra/lutra.git</developerConnection>
   </scm>
-
-  <distributionManagement>
-    <snapshotRepository>
-      <id>ossrh</id>
-      <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-    </snapshotRepository>
-    <repository>
-      <id>ossrh</id>
-      <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
-    </repository>
-  </distributionManagement>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -112,9 +101,16 @@
         <configuration>
           <source>${java.version}</source>
           <target>${java.version}</target>
+          <annotationProcessorPaths>
+            <path>
+              <groupId>org.projectlombok</groupId>
+              <artifactId>lombok</artifactId>
+            </path>
+          </annotationProcessorPaths>
         </configuration>
       </plugin>
 
+      <!-- Disable attach-sources as this is in conflict with sonatype deployment? -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-source-plugin</artifactId>
@@ -123,8 +119,11 @@
           <execution>
             <id>attach-sources</id>
             <goals>
-              <goal>jar-no-fork</goal>
+              <goal>jar</goal>
             </goals>
+            <configuration>
+              <classifier>sources</classifier>
+            </configuration>
           </execution>
         </executions>
       </plugin>
@@ -169,6 +168,25 @@
             </goals>
           </execution>
         </executions>
+        <configuration>
+          <gpgArguments>
+            <arg>--batch</arg>
+            <arg>--yes</arg>
+            <arg>--pinentry-mode</arg>
+            <arg>loopback</arg>
+          </gpgArguments>
+        </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>org.sonatype.central</groupId>
+        <artifactId>central-publishing-maven-plugin</artifactId>
+        <version>0.7.0</version>
+        <extensions>true</extensions>
+        <configuration>
+          <publishingServerId>central</publishingServerId>
+          <autoPublish>true</autoPublish>
+        </configuration>
       </plugin>
 
       <plugin>
@@ -186,18 +204,6 @@
           <commitMessages>  
             <tagReleaseMessage>Tag release @{version}</tagReleaseMessage>
           </commitMessages>
-        </configuration>
-      </plugin>
-
-      <plugin>
-        <groupId>org.sonatype.plugins</groupId>
-        <artifactId>nexus-staging-maven-plugin</artifactId>
-        <version>1.6.13</version>
-        <extensions>true</extensions>
-        <configuration>
-          <serverId>ossrh</serverId>
-          <nexusUrl>https://oss.sonatype.org/</nexusUrl>
-          <autoReleaseAfterClose>true</autoReleaseAfterClose>
         </configuration>
       </plugin>
 
@@ -504,7 +510,6 @@
 
   </build>
 
-
   <dependencies>
     <!-- https://mvnrepository.com/artifact/org.projectlombok/lombok -->
     <dependency>
@@ -554,8 +559,6 @@
     </dependency>
 
   </dependencies>
-
-
 
   <dependencyManagement>
     <dependencies>
