@@ -115,7 +115,8 @@
         </configuration>
       </plugin>
 
-      <plugin>
+      <!-- Disable attach-sources as this is in conflict with sonatype deployment. -->
+      <!--plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-source-plugin</artifactId>
         <version>3.3.1</version>
@@ -130,7 +131,7 @@
             </configuration>
           </execution>
         </executions>
-      </plugin>
+      </plugin-->
 
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
