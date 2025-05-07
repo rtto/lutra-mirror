@@ -30,7 +30,7 @@ stages:
     #key: ${CI_COMMIT_REF_SLUG} # this should keep the cache for the commit only
     key: ${CI_JOB_NAME} # this should keep the cache between builds
     paths:
-      - .m2/repository/
+      - $CI_PROJECT_DIR/.m2/repository/
 
 build-maven:
   extends: .maven-job
@@ -127,6 +127,20 @@ release-gitlab:
         - name: '$CI_PROJECT_NAME executable JAR file'
           url: 'https://www.ottr.xyz/downloads/$CI_PROJECT_NAME/lutra-$CI_COMMIT_TAG.jar'
 
+# publishing maven artefacts to maven repo.
+deploy2sonatype:
+  stage: release
+  extends: .maven-job
+  rules:
+    - if: $CI_COMMIT_TAG =~ /^v([0-9]+)\.([0-9]+)\.([0-9]+)/
+  before_script:
+    - apt-get update -qq && apt-get install -y -qq gnupg
+    - mkdir -p $CI_PROJECT_DIR/.m2
+    - echo "$SETTINGS_XML_BASE64" | base64 --decode > $CI_PROJECT_DIR/.m2/settings.xml
+    - echo "$SETTINGS_SECURITY_XML_BASE64" | base64 --decode > /root/.m2/settings-security.xml
+    - echo "$GPG_MGS_KEY" | base64 --decode | gpg --batch --import
+  script:
+    - mvn $MAVEN_CLI_OPTS --settings $CI_PROJECT_DIR/.m2/settings.xml -Dmaven.test.skip=true deploy
 
 ### The job deploy2zenodo publishes to zenodo, (minimally) adapted from https://zenodo.org/records/10478977
 deploy2zenodo:
