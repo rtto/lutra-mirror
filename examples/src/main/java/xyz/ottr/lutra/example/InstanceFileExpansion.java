@@ -47,11 +47,19 @@ import xyz.ottr.lutra.wottr.writer.WInstanceWriter;
  *   <li>Print any messages (warnings or errors) encountered during processing.</li>
  * </ul>
  */
+
+// The code is sectioned into blocks that should be possible to read from top to bottom:
+// MAIN, EXAMPLE RUNS, INIT, READ INSTANCES, EXPAND INSTANCES, and OUTPUT INSTANCES.
+
 public class InstanceFileExpansion {
 
-    private static final String folder = "examples/src/main/resources/"; // The folder where our input files are kept.
+    // The folder where our input files are kept.
+    private static final String folder = "examples/src/main/resources/";
 
-    private TemplateManager templateManager; // This is the main orchestrator class.
+    // Main orchestrator class.
+    private TemplateManager templateManager;
+
+    // Additional prefixes for pretty-printed output.
     private final Map<String, String> prefixes = Map.of(
             "o-pizza", "http://tpl.ottr.xyz/pizza/0.1/",
             "ex", "http://example.com#"
@@ -62,11 +70,11 @@ public class InstanceFileExpansion {
     }
 
     // MAIN
-
     public static void main(String[] args) {
         InstanceFileExpansion example = new InstanceFileExpansion();
-        example.run_expand_and_write_to_file();
+        example.run_expand_and_write_to_file(); // replace this with other run_* methods to run other examples.
     }
+
 
     //
     // EXAMPLE RUNS
@@ -139,6 +147,7 @@ public class InstanceFileExpansion {
         templateManager.getPrefixes().setNsPrefixes(this.prefixes);
     }
 
+
     //
     // READ INSTANCES
     //
@@ -188,6 +197,7 @@ public class InstanceFileExpansion {
                 List.of(file)); // the method expects a list of file/folder names.
     }
 
+
     //
     // EXPAND INSTANCES
     //
@@ -208,8 +218,9 @@ public class InstanceFileExpansion {
         return instances.innerFlatMap(expander);
     }
 
+
     //
-    // HANDLE INSTANCES
+    // OUTPUT INSTANCES
     //
 
     /**
@@ -268,20 +279,17 @@ public class InstanceFileExpansion {
         // Apply the consumer to the stream of instances.
         instances.forEach(consumer);
 
-        // The consumer converts instances to RDF triples, which are stored in a model object in the instanceWriter,
-        Model model = instanceWriter.writeToModel();
-
-        // For pretty-printing.
-        model.setNsPrefixes(PrefixMapping.Standard);
-        model.setNsPrefixes(this.prefixes);
-
         // Print any messages.
         consumer.getMessageHandler().printMessages();
 
+        // The consumer converts instances to RDF triples, which are stored in a model object in the instanceWriter,
+        Model model = instanceWriter.writeToModel();
+
+        // Add prefixes for pretty-printing.
+        model.setNsPrefixes(PrefixMapping.Standard);
+        model.setNsPrefixes(this.prefixes);
+
         return model;
     }
-
-
-
 
 }
