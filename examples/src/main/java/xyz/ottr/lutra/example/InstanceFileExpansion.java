@@ -37,8 +37,8 @@ import xyz.ottr.lutra.system.ResultStream;
 import xyz.ottr.lutra.wottr.writer.WInstanceWriter;
 
 /**
- * Demonstrates how to read, expand, and write OTTR instance files using the Lutra Java API.
- * Key steps in this example:
+ * This class demonstrates how to read, expand, and write OTTR instance files using the Lutra Java API.
+ * Key features shown in this example:
  * <ul>
  *   <li>Initialize a {@code StandardTemplateManager} with online template fetching enabled.</li>
  *   <li>Read input instances in different formats.</li>
@@ -108,7 +108,7 @@ public class InstanceFileExpansion {
     }
 
     /**
-     * Read instances, expand them, and write them to a Jena Model. Print model to console. Print messages to console.
+     * Read instances, expand them, and write them to a Jena Model. Print messages to console. Print model to console.
      */
     public void run_expand_and_return_rdfmodel() {
         ResultStream<Instance> instances = readExampleInstances();
@@ -129,7 +129,7 @@ public class InstanceFileExpansion {
     //
 
     /**
-     * Initialises a template manager. This class is the central orchestrator in the API. It keeps track of other central
+     * Initialises a template manager. This class is the central orchestrator of the API. It keeps track of other central
      * classes, such as FormatManager (for reading and writing templates and instances), TemplateStore (for loading and storing
      * templates), and Expanders (for expanding instances).
      *
@@ -153,15 +153,15 @@ public class InstanceFileExpansion {
     //
 
     /**
-     * Reads and parses a set of example instances on different OTTR formats to internal Instance objects.
+     * Reads and parses a set of example instances on different OTTR formats to Instance objects.
      *
-     * In the method code, Comment in/out files/formats according to your example needs. Notice that instances of all formats are read
+     * In the method code, comment in/out files/formats according to your example needs. Notice that instances of all formats are read
      * using the same method calls. The specificity of the input and output of the formats are handled by the readers
      * (and writers) of the Format objects.
      *
      * The returned object is a ResultStream of Instances.
      * A ResultStream is a java.util.Stream of Results.
-     * A Result is a java.util.Optional "result" and a "back-trace" of the input used to produce this result. The
+     * A Result is a java.util.Optional "result" and a "back trace" of the input used to produce this result. The
      * architecture supports functional programming while collecting error messages generated during the execution.
      * Streams are lazy, i.e., they are only computed when passed to a consumer - in Lutra this is typically
      * a Writer, e.g., an WInstanceWriter.
@@ -170,7 +170,7 @@ public class InstanceFileExpansion {
     private ResultStream<Instance> readExampleInstances() {
 
         // The instance examples are taken from ottr.xyz. They all contain instances of the same template. This is *not*
-        // an important feature of the example. It may result in duplicate instances in output -- or that duplicate instances
+        // an important feature of the example, and it may result in duplicate instances in output -- or that duplicate instances
         // are truncated if they are collected to a set data structure, such as a Jena Model.
         ResultStream<Instance> stOTTRinstances = readInstances(folder + "pizza-instances.stottr", StandardFormat.stottr);
         ResultStream<Instance> tabOTTRinstances = readInstances(folder + "pizza-instances.xlsx", StandardFormat.tabottr);
@@ -206,7 +206,6 @@ public class InstanceFileExpansion {
      * Expands the input instances into base template instances as specified by the templates loaded in the
      * template store in the template manager.
      *
-     * It is possible to code custom expanders.
      * @param instances the instances to be expanded
      * @return a result stream of expanded instances
      */
@@ -249,7 +248,7 @@ public class InstanceFileExpansion {
 
     /**
      * Prints input instances to file and prints any messages.
-     * @see this.printInstances
+     * @see this.printInstances for more details.
      */
     private void writeInstancesToFile(ResultStream<Instance> instances, StandardFormat format, String filename) {
         MessageHandler msgsInstances = templateManager.writeInstances(
