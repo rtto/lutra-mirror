@@ -17,6 +17,7 @@
     <module>lutra-api</module>
     <module>lutra-docttr</module>
     <module>.test-coverage</module>
+    <module>examples</module>
   </modules>
 
   <name>${project.groupId}:${project.artifactId}</name>
@@ -384,6 +385,9 @@
 
             <!-- Issue327 uses System.out: -->
             <exclude>**/xyz/ottr/lutra/cli/Issues327Test.class</exclude>
+
+            <!-- Examples are exempted. -->
+            <exclude>**/xyz/ottr/lutra/example/**</exclude>
             </excludes>
         </configuration>
         <executions>
