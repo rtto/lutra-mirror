@@ -1,5 +1,5 @@
 @prefix ottr: <http://ns.ottr.xyz/0.4/> .
-@prefix ex:   <http://example.com/ns#> .
+@prefix ex:   <http://example.com#> .
 @prefix o-pizza: <http://tpl.ottr.xyz/pizza/0.1/> .
 
 o-pizza:NamedPizza(ex:Margerita, ex:Italy, (ex:Tomato, ex:Mozzarella)) .

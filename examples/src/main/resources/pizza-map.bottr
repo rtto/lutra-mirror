@@ -1,0 +1,43 @@
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix ottr: <http://ns.ottr.xyz/0.4/> .
+
+[] a ottr:InstanceMap ;
+    ottr:template <http://tpl.ottr.xyz/pizza/0.1/NamedPizza> ;
+    ottr:query """
+PREFIX  p: <http://www.co-ode.org/ontologies/pizza/pizza.owl#>
+SELECT  ?pizza  ?country  (GROUP_CONCAT(DISTINCT ?topping; SEPARATOR=";") AS ?toppingslist)
+WHERE {
+    ?pizza  rdfs:subClassOf  p:NamedPizza ;
+            rdfs:subClassOf [
+                owl:allValuesFrom   [ owl:unionOf ?toppings ; rdf:type owl:Class ] ;
+                owl:onProperty      p:hasTopping ;
+                rdf:type            owl:Restriction ] ;
+            rdfs:subClassOf [
+                owl:onProperty      p:hasTopping ;
+                owl:someValuesFrom  ?topping ;
+                rdf:type            owl:Restriction ] .
+
+    ?toppings  (rdf:rest)*/rdf:first ?topping .
+
+    OPTIONAL {
+        ?pizza  rdfs:subClassOf [
+                  owl:hasValue    ?country ;
+                  owl:onProperty  p:hasCountryOfOrigin ;
+                  rdf:type        owl:Restriction ] .
+    }
+  }
+GROUP BY ?pizza ?country
+LIMIT 1
+""" ;
+    ottr:source [ a ottr:RDFFileSource ;
+                  ottr:sourceURL "https://protege.stanford.edu/ontologies/pizza/pizza.owl" ] ;
+    ottr:argumentMaps (
+      [] # use default map
+      [] # use default map
+      [ ottr:type (rdf:List ottr:IRI);
+        ottr:translationSettings [ ottr:listSep ";"]
+      ]
+   ) .
