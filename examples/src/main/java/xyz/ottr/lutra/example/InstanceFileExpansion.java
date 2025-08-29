@@ -31,8 +31,8 @@ import xyz.ottr.lutra.TemplateManager;
 import xyz.ottr.lutra.api.StandardFormat;
 import xyz.ottr.lutra.api.StandardTemplateManager;
 import xyz.ottr.lutra.model.Instance;
-import xyz.ottr.lutra.system.MessageHandler;
 import xyz.ottr.lutra.system.Message;
+import xyz.ottr.lutra.system.MessageHandler;
 import xyz.ottr.lutra.system.ResultConsumer;
 import xyz.ottr.lutra.system.ResultStream;
 import xyz.ottr.lutra.wottr.writer.WInstanceWriter;
@@ -114,8 +114,8 @@ public class InstanceFileExpansion {
     public void run_expand_and_write_rdfmodel() {
         ResultStream<Instance> instances = readExampleInstances();
 
-        // For instructive purposes: this will "just" write the read instances in wOTTR format, which is not what we
-        // want in this case; we need to expand the instances!
+        // For instructive purposes: the following will "just" write instances in wOTTR format, which is not what we
+        // want in this case; we need to expand the instances first.
         // Model unexpandedInstancesModel = getRDFModel(instances);
 
         ResultStream<Instance> expandedInstances = expandInstances(instances);
@@ -225,17 +225,17 @@ public class InstanceFileExpansion {
 
     /**
      * Flushes the messages in messageHandler by writing each message, e.g., warnings and errors to the messageHandler's 
-     * outputstream (default: stdout). While printing different action can be taken based on the severity of the messages.
+     * outputstream (default: stdout). After printing different (or no) actions can be taken based on the severity of the messages.
      */
     private void flushMessages(MessageHandler messageHandler) {
         // printMessages() prints messages to stdout and returns the most severe message printed.
         Message.Severity severity = messageHandler.printMessages();
         
-        // We decide to abort if there is an message more severe than WARNING, i.e., an ERROR or FATAL.
+        // We decide to throw a RunTimeException if we there is a message more severe than WARNING, i.e., an ERROR or FATAL.
         if (severity.isGreaterThan(Message.Severity.WARNING)) {
-            System.exit(1);
+            throw new RuntimeException("Error found. Aborting.");
         }   
-   }
+    }
 
     //
     // OUTPUT INSTANCES
@@ -247,8 +247,8 @@ public class InstanceFileExpansion {
      * output (unless the messages have already been processed). This method works as a consumer
      * (see java.util.function.Consumer) of the input instances, and will "deplete" the stream of instances, e.g., one
      * stream cannot be written twice.
-     * Result consumers typically do not directly return the wanted output, but channels the output it to an output location, such as a
-     * file or some output stream. Our consumers typically returns a MessageHandler that holds all the messages
+     * Result consumers typically do not directly return the wanted output, but channels the output to an output location, such as a
+     * file or some output stream. Our consumers typically return a MessageHandler that holds all the messages
      * accumulated by consuming the stream of results.
      * @param instances the instances to print to standard out
      * @param format the OTTR format for formatting the printed output
@@ -300,7 +300,7 @@ public class InstanceFileExpansion {
         // Print any messages.
         flushMessages(consumer.getMessageHandler());
 
-        // The consumer converts instances to RDF triples, which are stored in a model object in the instanceWriter,
+        // The consumer converts instances to RDF triples, which are stored in a model object in the instanceWriter.
         Model model = instanceWriter.writeToModel();
 
         // Add prefixes for pretty-printing.
