@@ -224,8 +224,8 @@ public class InstanceFileExpansion {
     // 
 
     /**
-     * Flushes the messages in messageHandler by writing each message, e.g., warnings and errors to the messageHandler's outputstream (default: stdout). While printing different action can be taken based 
-     * on the severity of the messages.
+     * Flushes the messages in messageHandler by writing each message, e.g., warnings and errors to the messageHandler's 
+     * outputstream (default: stdout). While printing different action can be taken based on the severity of the messages.
      */
     private void flushMessages(MessageHandler messageHandler) {
         // printMessages() prints messages to stdout and returns the most severe message printed.
