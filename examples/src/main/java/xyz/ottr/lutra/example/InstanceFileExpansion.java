@@ -32,6 +32,7 @@ import xyz.ottr.lutra.api.StandardFormat;
 import xyz.ottr.lutra.api.StandardTemplateManager;
 import xyz.ottr.lutra.model.Instance;
 import xyz.ottr.lutra.system.MessageHandler;
+import xyz.ottr.lutra.system.Message;
 import xyz.ottr.lutra.system.ResultConsumer;
 import xyz.ottr.lutra.system.ResultStream;
 import xyz.ottr.lutra.wottr.writer.WInstanceWriter;
@@ -110,7 +111,7 @@ public class InstanceFileExpansion {
     /**
      * Read instances, expand them, and write them to a Jena Model. Print messages to console. Print model to console.
      */
-    public void run_expand_and_return_rdfmodel() {
+    public void run_expand_and_write_rdfmodel() {
         ResultStream<Instance> instances = readExampleInstances();
 
         // For instructive purposes: this will "just" write the read instances in wOTTR format, which is not what we
@@ -218,6 +219,24 @@ public class InstanceFileExpansion {
     }
 
 
+    // 
+    // MESSAGE/ERROR HANDLING
+    // 
+
+    /**
+     * Flushes the messages in messageHandler by writing each message, e.g., warnings and errors to the messageHandler's outputstream (default: stdout). While printing different action can be taken based 
+     * on the severity of the messages.
+     */
+    private void flushMessages(MessageHandler messageHandler) {
+        // printMessages() prints messages to stdout and returns the most severe message printed.
+        Message.Severity severity = messageHandler.printMessages();
+        
+        // We decide to abort if there is an message more severe than WARNING, i.e., an ERROR or FATAL.
+        if (severity.isGreaterThan(Message.Severity.WARNING)) {
+            System.exit(1);
+        }   
+   }
+
     //
     // OUTPUT INSTANCES
     //
@@ -243,7 +262,7 @@ public class InstanceFileExpansion {
                 System.out);
 
         // Print any messages. Note that this will print any errors after any output is written.
-        msgsInstances.printMessages();
+        flushMessages(msgsInstances);
     }
 
     /**
@@ -259,7 +278,7 @@ public class InstanceFileExpansion {
         );
 
         // Print any messages. Note that this will print any errors after any output is written.
-        msgsInstances.printMessages();
+        flushMessages(msgsInstances);
     }
 
     /**
@@ -279,7 +298,7 @@ public class InstanceFileExpansion {
         instances.forEach(consumer);
 
         // Print any messages.
-        consumer.getMessageHandler().printMessages();
+        flushMessages(consumer.getMessageHandler());
 
         // The consumer converts instances to RDF triples, which are stored in a model object in the instanceWriter,
         Model model = instanceWriter.writeToModel();
