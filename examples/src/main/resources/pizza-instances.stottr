@@ -1,0 +1,8 @@
+@prefix ottr: <http://ns.ottr.xyz/0.4/> .
+@prefix ex:   <http://example.com#> .
+@prefix o-pizza: <http://tpl.ottr.xyz/pizza/0.1/> .
+
+o-pizza:NamedPizza(ex:Margerita, ex:Italy, (ex:Tomato, ex:Mozzarella)) .
+o-pizza:NamedPizza(ex:QuattroFormaggi, ex:Italy, (ex:Tomato, ex:Mozzarella, ex:Gorgonzola, ex:Parmesan, ex:Stracchino)) .
+o-pizza:NamedPizza(ex:Grandiosa, ex:Norway, (ex:Tomato, ex:Cheese, ex:BellPepper, ex:Ham)) .
+o-pizza:NamedPizza(ex:PepperoniPizza, ottr:none, (ex:Tomato, ex:Cheese, ex:Pepperoni)) .

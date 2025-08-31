@@ -16,7 +16,7 @@ Lutra is our open source reference implementation of the OTTR language available
 
 ### Prerequisites
 
-To run Lutra you will need to install Java, for instance [OpenJDK][1].
+To run Lutra you will need to install Java Runtime Environment.
 
 ### Downloads
 
@@ -48,7 +48,7 @@ Note that the default branch of the project is the `develop` branch.
 
 Requirements:
 
-* Java 17, for instance [OpenJDK][1]
+* Java 21
 * [Maven](https://maven.apache.org/) - Dependency Management
 * [Lombok](https://projectlombok.org/) - Java build and IDE plug-in.
 Free plug-ins are available for most IDEs. For guides on how to install, please check the _Install_-section on the Lombok website.
