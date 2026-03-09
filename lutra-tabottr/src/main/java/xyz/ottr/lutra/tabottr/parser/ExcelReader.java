@@ -88,7 +88,7 @@ public class ExcelReader implements InstanceParser<String> {
             return Result.error("Error parsing tabOTTR instances in file: " + filename
                 + ". Unsupported cell function; supported functions are: "
                 + String.join(", ", WorkbookEvaluator.getSupportedFunctionNames()), ex);
-        } catch (IOException | RuntimeException ex) {
+        } catch (IOException ex) {
             return Result.error("Error parsing tabOTTR instances in file: " + filename, ex);
         }
     }
