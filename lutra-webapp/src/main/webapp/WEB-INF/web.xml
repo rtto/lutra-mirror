@@ -6,6 +6,24 @@
          version="3.1">
 
   <display-name>Lutra</display-name>
+
+  <filter>
+    <filter-name>CorsFilter</filter-name>
+    <filter-class>org.apache.catalina.filters.CorsFilter</filter-class>
+    <init-param>
+      <param-name>cors.allowed.origins</param-name>
+      <param-value>http://ottr.xyz,https://ottr.xyz,http://weblutra.ottr.xyz,https://weblutra.ottr.xyz,http://www.ottr.xyz,https://www.ottr.xyz,http://spec.ottr.xyz,https://spec.ottr.xyz,http://primer.ottr.xyz,https://primer.ottr.xyz,http://dev.spec.ottr.xyz,https://dev.spec.ottr.xyz</param-value>
+    </init-param>
+    <init-param>
+      <param-name>cors.allowed.methods</param-name>
+      <param-value>GET,POST,OPTIONS</param-value>
+    </init-param>
+  </filter>
+  <filter-mapping>
+    <filter-name>CorsFilter</filter-name>
+    <url-pattern>/*</url-pattern>
+  </filter-mapping>
+
   <servlet>
     <servlet-name>lutra</servlet-name>
     <servlet-class>xyz.ottr.lutra.webapp.WebLutraServlet</servlet-class>
@@ -18,7 +36,7 @@
   </servlet-mapping>
 
   <welcome-file-list>
-    <welcome-file>weblutra/index.html</welcome-file>
+    <welcome-file>index.html</welcome-file>
   </welcome-file-list>
 
 </web-app>

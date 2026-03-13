@@ -210,7 +210,7 @@ $(function() {
 	$.ajax({
 	    data: formData,
 	    type: "post",
-	    url: "https://sws.ifi.uio.no/lutra/expand",
+	    url: "https://weblutra.ottr.xyz/expand",
 	    processData: false,
 	    contentType: false,
 	    success: function(response) {
