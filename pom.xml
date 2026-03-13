@@ -13,7 +13,7 @@
     <module>lutra-tabottr</module>
     <module>lutra-bottr</module>
     <module>lutra-cli</module>
-    <module>lutra-restapi</module>
+    <module>lutra-webapp</module>
     <module>lutra-api</module>
     <module>lutra-docttr</module>
     <module>.test-coverage</module>
@@ -25,7 +25,7 @@
         This is the parent module of Lutra. Lutra is the reference implementation of the OTTR framework.
         
         The common interfaces for Lutra are lutra-api (a Java API), lutra-cli (a command line interface
-        available as a Java executable), and lutra-restapi (a Java servlet available as a WAR file.)
+        available as a Java executable), and lutra-webapp (a Java servlet available as a WAR file.)
         
         For more information about OTTR, see http://ottr.xyz.
     </description>

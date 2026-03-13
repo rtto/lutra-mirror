@@ -96,7 +96,7 @@ release-ottrxyz:
     GIT_STRATEGY: none
   script:
     - cp lutra-cli/target/lutra.jar lutra.jar
-    - cp lutra-restapi/target/lutra.war lutra.war
+    - cp lutra-webapp/target/lutra.war lutra.war
     - apt-get update -qq && apt-get install -y -qq sshpass
     - sshpass -V
     - export SSHPASS=$FTP_PASS # this is available only in protected branches
@@ -190,12 +190,13 @@ release-build-docker-image:
   extends: .build-docker-image
   rules:
     - if: $CI_COMMIT_BRANCH == "master"
+    - if: $CI_COMMIT_BRANCH == "develop"
     - if: $CI_COMMIT_TAG =~ /^v([0-9]+)\.([0-9]+)\.([0-9]+)/
   dependencies:
     - test-maven
   script:
     - docker pull $CI_REGISTRY_IMAGE:latest || true
-    - cd lutra-restapi
+    - cd lutra-webapp
     - >
       docker build
       --pull
@@ -221,6 +222,9 @@ release-tag-docker-image:
     - if: $CI_COMMIT_BRANCH == "master"
       variables:
         IMAGETAG: "latest"
+    - if: $CI_COMMIT_BRANCH == "develop"
+      variables:
+        IMAGETAG: "develop"
   script:
     - docker pull $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
     - docker tag $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA $CI_REGISTRY_IMAGE:$IMAGETAG

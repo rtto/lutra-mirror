@@ -1,4 +1,4 @@
-package xyz.ottr.lutra.restapi;
+package xyz.ottr.lutra.webapp;
 
 /*-
  * #%L
